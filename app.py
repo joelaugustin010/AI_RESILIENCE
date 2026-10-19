@@ -1,5 +1,6 @@
-
 import streamlit as st
+
+from assessment import assess_conditions
 
 st.set_page_config(
     page_title="AI RESILIENCE",
@@ -57,14 +58,7 @@ with col2:
     )
 
 if st.button("Assess Conditions"):
-    score = 0
-
-    if rainfall >= 100:
-        score += 1
-    if river_level >= 5:
-        score += 1
-    if ground in ["Waterlogged", "Unstable"]:
-        score += 1
+    score = assess_conditions(rainfall, river_level, ground)
 
     st.header("Assessment Results")
     st.metric("Sample indicator score", f"{score}/3")
