@@ -1,0 +1,28 @@
+{
+  "events": [
+    {
+      "event_id": "kerala_floods_2018",
+      "title": "Kerala floods, June–August 2018",
+      "period_start": "2018-06-01",
+      "period_end": "2018-08-19",
+      "geographic_scope": "Kerala state; KSDMA-hosted CWC report excerpt states severe flooding in 13 of 14 districts.",
+      "evidence": "CWC report states IMD-reported rainfall of 2,346.6 mm against 1,649.5 mm normal (+42%) for 1 June–19 August 2018; severe spell 14–19 August.",
+      "source_title": "CWC Study Report: Kerala Floods of August 2018, reproduced as an annex in a KSDMA report",
+      "source_url": "https://sdma.kerala.gov.in/wp-content/uploads/2020/08/RajamonyDC-Books.pdf",
+      "publisher": "Central Water Commission; KSDMA-hosted report",
+      "relationship_to_local_observations": "No date overlap: the older local rainfall series ends in 2014 and the newer observations begin in 2021. Context only; no joined labels."
+    },
+    {
+      "event_id": "kerala_flood_landslide_2021",
+      "title": "Kerala flood/landslide affected period, October 2021",
+      "period_start": "2021-10-12",
+      "period_end": "2021-10-25",
+      "geographic_scope": "Kerala state; official order declares 305 villages in 39 taluks flood/landslide affected after excess rainfall and flooding.",
+      "evidence": "Government Order G.O.(P) No. 1/2022/DMD, dated 3 February 2022, defines the calamity period as 12–25 October 2021.",
+      "source_title": "Government Order: Flood 2021 affected villages, taluks and districts",
+      "source_url": "https://sdma.kerala.gov.in/wp-content/uploads/2022/02/G.O_P_1_2020_DMD.pdf",
+      "publisher": "Disaster Management Department, Government of Kerala; hosted by KSDMA",
+      "relationship_to_local_observations": "Some hourly observations overlap the dates. The order does not identify station-specific flood outcomes; overlap is context only and is not a model label."
+    }
+  ]
+}

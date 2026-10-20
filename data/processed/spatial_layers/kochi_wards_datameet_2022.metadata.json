@@ -1,0 +1,110 @@
+{
+  "dataset_id": "kochi_wards_datameet_2022",
+  "title": "Kochi Corporation ward boundaries (2022 community snapshot; partial geometry-valid subset)",
+  "source_url": "https://raw.githubusercontent.com/datameet/Municipal_Spatial_Data/master/Kochi/KCH_wards.geojson",
+  "publisher": "DataMeet Trust, Pune chapter; README attributes source geometry to Kerala OpenSDI KSUDP_KCH_Ward_Boundary",
+  "upstream_url": "https://opensdi.kerala.gov.in/layers/opensdi_data:geonode:KSUDP_KCH_Ward_Boundary",
+  "retrieved_on": "2026-10-20",
+  "publication_date": "Not stated; dataset README says wards as of 2022",
+  "license": "Creative Commons Attribution-ShareAlike 2.5 India (CC BY-SA 2.5 India), stated in dataset-specific DataMeet README; attribution and share-alike apply",
+  "crs": "EPSG:4326",
+  "units": "Decimal degrees (longitude, latitude)",
+  "geographic_coverage": "Source-declared Kochi Municipal Corporation wards; observed coordinate bounds 76.2373589?76.3400293 E, 9.8934161?10.0497693 N; not checked against the invalid provisional corporation polygon",
+  "limitations": [
+    "Community repackaging of a Kerala OpenSDI source; live source service and current ward register were not independently cross-checked.",
+    "Source is newline-delimited Feature objects, not one FeatureCollection; normalized copy retains feature properties and valid geometries.",
+    "Three of 77 source features self-intersect and are excluded from the processed map copy; raw source bytes remain unchanged.",
+    "Six of 77 source features have no Ward_No or Ward_Name; they remain in the processed copy, flagged as missing required attributes.",
+    "The processed subset is incomplete and not a legal/current boundary, a coverage mask, a hazard layer, or a suitable input for exposure calculations.",
+    "Source scale, positional accuracy, ward identifiers/currency, and publication date are not stated."
+  ],
+  "layer_role": "context",
+  "required_properties": [
+    "Ward_No",
+    "Ward_Name"
+  ],
+  "quality_notes": [
+    "77 source polygons; 3 self-intersecting geometries excluded after structural QA (74 remain).",
+    "6 source features lack Ward_No and Ward_Name; attributes remain missing and were not inferred.",
+    "No verified current corporation boundary was available to compare completeness or clip coverage."
+  ],
+  "crs_note": "WGS 84 longitude/latitude per GeoJSON RFC 7946 semantics; no explicit CRS member is embedded in this source file.",
+  "processed_file": "kochi_wards_datameet_2022.geojson",
+  "validation": {
+    "dataset_id": "kochi_wards_datameet_2022",
+    "source_file": "C:\\Users\\LENOVO\\OneDrive\\Desktop\\AI_RESILIENCE\\data\\processed\\spatial_layers\\kochi_wards_datameet_2022.geojson",
+    "source_sha256": "d27ee64ade27b5d4145eb11e55524f34d20f759eb8bc42b344211854aac86d40",
+    "provenance_valid": true,
+    "feature_count": 74,
+    "geometry_types": {
+      "Polygon": 74
+    },
+    "invalid_features": [],
+    "exact_duplicate_features": 0,
+    "duplicate_ids": 0,
+    "missing_property_values": 12,
+    "features_intersecting_coverage": null,
+    "features_outside_coverage": null,
+    "errors": [],
+    "warnings": [
+      "Found 12 missing/blank property value(s), including required-field checks.",
+      "Excluded 3 geometry-invalid source feature(s); original snapshot retained separately."
+    ],
+    "intersection_method": "Planar topological overlay in longitude/latitude (EPSG:4326); boundary counts as intersection; no distance/area calculation.",
+    "source_snapshot_sha256": "d8de90012f5c785b9d63c4b6f0b8bee69c72125da828051934de159d8f80dc17",
+    "source_feature_count": 77,
+    "excluded_invalid_feature_count": 3,
+    "excluded_invalid_features": [
+      {
+        "feature_index": 33,
+        "source_fid": "36",
+        "errors": [
+          "polygon ring 0 self-intersects between segments 137 and 139."
+        ]
+      },
+      {
+        "feature_index": 40,
+        "source_fid": "35",
+        "errors": [
+          "polygon ring 0 self-intersects between segments 40 and 42."
+        ]
+      },
+      {
+        "feature_index": 68,
+        "source_fid": "64",
+        "errors": [
+          "polygon ring 0 self-intersects between segments 79 and 81."
+        ]
+      }
+    ]
+  },
+  "source_format": "newline-delimited GeoJSON Feature objects",
+  "source_snapshot_file": "koch_wards_2022.geojson",
+  "source_snapshot_sha256": "d8de90012f5c785b9d63c4b6f0b8bee69c72125da828051934de159d8f80dc17",
+  "source_feature_count": 77,
+  "processed_feature_count": 74,
+  "excluded_invalid_features": [
+    {
+      "feature_index": 33,
+      "source_fid": "36",
+      "errors": [
+        "polygon ring 0 self-intersects between segments 137 and 139."
+      ]
+    },
+    {
+      "feature_index": 40,
+      "source_fid": "35",
+      "errors": [
+        "polygon ring 0 self-intersects between segments 40 and 42."
+      ]
+    },
+    {
+      "feature_index": 68,
+      "source_fid": "64",
+      "errors": [
+        "polygon ring 0 self-intersects between segments 79 and 81."
+      ]
+    }
+  ],
+  "processing_note": "Normalized source Feature lines into a FeatureCollection; geometry-invalid source features are listed and excluded. Other properties are retained as supplied."
+}

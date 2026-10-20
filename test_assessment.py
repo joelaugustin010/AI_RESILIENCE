@@ -2,7 +2,7 @@
 
 import unittest
 
-from assessment import assess_conditions
+from assessment import assess_conditions, explain_conditions
 
 
 class AssessConditionsTests(unittest.TestCase):
@@ -29,6 +29,19 @@ class AssessConditionsTests(unittest.TestCase):
 
     def test_two_rules_add_two_points(self):
         self.assertEqual(assess_conditions(100, 5, "Dry"), 2)
+
+    def test_explains_high_rainfall(self):
+        result = explain_conditions(100, 0, "Normal")
+        self.assertTrue(any("Rainfall" in item for item in result))
+
+    def test_explains_multiple_indicators(self):
+        result = explain_conditions(100, 5, "Waterlogged")
+        self.assertEqual(len(result), 3)
+
+    def test_explains_when_no_indicators_are_triggered(self):
+        result = explain_conditions(0, 0, "Normal")
+        self.assertEqual(len(result), 1)
+        self.assertIn("None", result[0])
 
 
 if __name__ == "__main__":

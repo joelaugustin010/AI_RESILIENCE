@@ -1,0 +1,6 @@
+event_id,district,taluk_village,event_date,cyclone_category,max_sustained_wind_kmh,sea_wave_height_m,daily_rainfall_mm,cumulative_2day_rain_mm,river_discharge_cumecs,dam_water_level_m,landslide_reported,people_displaced_count,infrastructure_loss_inr_crore,compound_impact_severity_class
+EVT_2018_0815,Ernakulam,Aluva / Periyar Basin,2018-08-15,Monsoon Depression / Heavy Spell,65,3.2,310.5,540.0,1800.0,169.95,1,120000,450.0,Critical Impact (L3)
+EVT_2017_1130,Thiruvananthapuram,Poonthura Coastal,2017-11-30,Very Severe Cyclonic Storm (Ockhi),155,4.8,185.0,290.0,650.0,142.0,0,35000,180.0,High Impact (L2)
+EVT_2018_0816,Idukki,Munnar / High Range,2018-08-16,Extreme Monsoon Spell,55,1.5,420.0,780.0,2400.0,700.0,1,85000,850.0,Critical Impact (L3)
+EVT_2021_1016,Kottayam,Kootickal / Meenachil Basin,2021-10-16,Severe Cloudburst / Depression,48,2.1,245.0,380.0,920.0,125.0,1,15000,120.0,High Impact (L2)
+EVT_2024_0730,Wayanad,Meppadi / Chooralmala,2024-07-30,Extreme Rainfall Spell,40,1.2,372.0,580.0,1100.0,95.0,1,45000,600.0,Critical Impact (L3)

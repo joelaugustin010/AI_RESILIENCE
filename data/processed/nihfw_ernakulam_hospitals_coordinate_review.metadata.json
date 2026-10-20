@@ -1,0 +1,47 @@
+{
+  "dataset_id": "nihfw_hospitals_ernakulam_coordinate_review",
+  "title": "NIHFW National Hospital Directory ? Ernakulam coordinate quality review (not a spatial layer)",
+  "source_url": "https://www.data.gov.in/resource/national-hospital-directory-geo-code-and-additional-parameters-updated-till-last-month",
+  "download_url": "https://data.gov.in/sites/default/files/datafile/hospital_directory.csv",
+  "publisher": "National Institute of Health and Family Welfare (NIHFW), Government of India; hosted by data.gov.in",
+  "retrieved_on": "2026-10-20",
+  "publication_date": "Published 2017-08-10; portal states updated 2025-06-02",
+  "license": "Government Open Data License - India (GODL-India), stated by the resource page; attribution required",
+  "crs": "Not stated in resource schema or CSV",
+  "coordinate_order": "Not stated; raw comma-delimited Location_Coordinates values are preserved without assigning latitude/longitude order",
+  "units": "Coordinate field contains comma-delimited numeric strings when present; datum and units are not stated",
+  "geographic_coverage": "Rows whose source attributes are State=Kerala and District=Ernakulam; district attribution is not independently verified",
+  "limitations": [
+    "Resource page documents Location_Coordinates but does not state coordinate order or CRS.",
+    "The Ernakulam subset has missing/nonnumeric coordinate strings and repeated coordinate pairs; per-row facility location accuracy and current operational status are not established.",
+    "A numeric pair within angular ranges is only a syntax/range check, not proof that the coordinate belongs to that facility or district.",
+    "No GeoJSON geometry was created and no map/exposure use is permitted until the provider confirms coordinate order, CRS, and positional quality."
+  ],
+  "validation": {
+    "dataset_id": "nihfw_hospitals_ernakulam_coordinate_review",
+    "source_sha256": "1ddcad9f9b922142a4374c7b89b70fb6cefd8a257448c70a61e1c07d98845134",
+    "processed_sha256": "6b1884390d05e9f035af573a73960c31f8a5b6f35b6e1b0834af6fb2bf1d3a05",
+    "selected_record_count": 180,
+    "coordinate_pair_parseable_count": 149,
+    "coordinate_pair_unparseable_count": 31,
+    "numeric_pair_in_lat_lon_ranges_count": 149,
+    "duplicate_coordinate_pair_group_count": 18,
+    "records_in_duplicate_coordinate_pair_groups": 63,
+    "coordinate_order": "Not documented by source; comma-delimited pair preserved without interpretation.",
+    "crs": "Not documented by source; no point geometries created.",
+    "processed_file": "C:\\Users\\LENOVO\\OneDrive\\Desktop\\AI_RESILIENCE\\data\\processed\\nihfw_ernakulam_hospitals_coordinate_review.csv"
+  },
+  "processed_file": "nihfw_ernakulam_hospitals_coordinate_review.csv",
+  "alternative_sources_reviewed": [
+    {
+      "title": "Kerala Health Department institution directory",
+      "url": "https://health.kerala.gov.in/index.php/institutionSearch",
+      "publisher": "Department of Health and Family Welfare, Government of Kerala",
+      "reviewed_on": "2026-10-20",
+      "publication_or_update_date": "Not stated on the reviewed directory page",
+      "available_evidence": "Official institution-search page lists Ernakulam public facility names, facility types, addresses, bed/service fields and View Map controls.",
+      "blocker": "The accessible page has no downloadable GIS data or exposed latitude/longitude fields; no CRS/datum, geocoding accuracy, stable spatial export schema, or spatial reuse terms were found. Not used to geocode NIHFW records or create map points.",
+      "status": "candidate_identity_reference_only_not_spatially_ingested"
+    }
+  ]
+}

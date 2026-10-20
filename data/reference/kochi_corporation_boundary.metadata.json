@@ -1,0 +1,33 @@
+{
+  "title": "Kochi Corporation boundary",
+  "dataset_id": "kochi_corporation_boundary",
+  "source_url": "https://github.com/datameet/Municipal_Spatial_Data/blob/master/Kochi/KCH_Corporation_Boundary.geojson",
+  "publisher": "DataMeet Municipal Spatial Data; upstream attribution to Kerala OpenSDI",
+  "retrieved_on": "2026-10-20",
+  "publication_date": "Not stated in the available file or Kochi README",
+  "units": "Degrees longitude and latitude",
+  "geographic_coverage": "One polygon for Kochi Corporation, Ernakulam; not Greater Kochi",
+  "file": "kochi_corporation_boundary.geojson",
+  "feature_type": "Polygon",
+  "feature_count": 1,
+  "coverage": "Kochi Municipal Corporation, Ernakulam district, Kerala",
+  "upstream_source": {
+    "publisher": "Kerala OpenSDI",
+    "layer_id": "KSUDP_KCH_Corporation_Boundary",
+    "url": "https://opensdi.kerala.gov.in/layers/opensdi_data:geonode:KSUDP_KCH_Corporation_Boundary",
+    "retrieval_copy": "DataMeet Municipal Spatial Data, Kochi",
+    "retrieval_url": "https://github.com/datameet/Municipal_Spatial_Data/blob/master/Kochi/KCH_Corporation_Boundary.geojson"
+  },
+  "retrieved_date": "2026-10-20",
+  "source_publication_or_update_date": null,
+  "crs": "EPSG:4326",
+  "crs_interpretation": "WGS 84 longitude/latitude inferred from GeoJSON coordinate order; no explicit crs member is present",
+  "positional_accuracy_or_source_scale": "Not stated in the available file or dataset-specific README",
+  "license": "CC BY-SA 2.5 India, as specified by the dataset-specific Kochi README",
+  "limitations": [
+    "The live Kerala OpenSDI service was not reachable during review, so the repackaged copy was not cross-checked against the live source.",
+    "The source publication/update date and legal boundary currency are not stated in the file or dataset-specific README.",
+    "This administrative outline is not a hazard, exposure, or vulnerability layer and is not legal boundary evidence."
+  ],
+  "sha256": "02e3217959ed1edef2c91d852305e86d1d7ff55a90971a8f61fcd3a9ce0dcdbf"
+}

@@ -1,0 +1,370 @@
+{
+  "catalog_version": 1,
+  "reviewed_on": "2026-10-20",
+  "coordinate_policy": "GeoJSON layers must carry documented WGS 84 longitude/latitude (EPSG:4326); unknown or other CRSs are not guessed or reprojected by this project.",
+  "datasets": [
+    {
+      "layer_id": "kochi_corporation_boundary",
+      "title": "Kochi Corporation administrative boundary (provisional copy)",
+      "status": "integrated_provisional",
+      "source_url": "https://github.com/datameet/Municipal_Spatial_Data/blob/master/Kochi/KCH_Corporation_Boundary.geojson",
+      "publisher": "DataMeet Municipal Spatial Data; upstream attribution to Kerala OpenSDI",
+      "upstream_url": "https://opensdi.kerala.gov.in/layers/opensdi_data:geonode:KSUDP_KCH_Corporation_Boundary",
+      "retrieved_on": "2026-10-20",
+      "publication_date": "Not stated in the available file or Kochi README",
+      "license": "CC BY-SA 2.5 India, as stated by the DataMeet Kochi README; retain attribution and share-alike",
+      "crs": "EPSG:4326 interpreted from GeoJSON longitude/latitude; no embedded CRS declaration",
+      "units": "Degrees longitude and latitude",
+      "geographic_coverage": "One polygon for Kochi Corporation, Ernakulam; not Greater Kochi",
+      "limitations": [
+        "A community-repackaged copy of a Kerala government layer; live upstream service was not cross-checked.",
+        "Boundary publication date, legal currency, positional accuracy, and source scale are not stated.",
+        "Administrative boundary only; it is not a hazard/exposure layer and is not legal boundary evidence.",
+        "No corrected official boundary snapshot was obtained during this milestone; the identified Kerala OpenSDI layer is the upstream source attributed by DataMeet, but no independently validated replacement was available. Existing provisional polygon remains unchanged and is not used as a coverage mask."
+      ],
+      "local_file": "data/reference/kochi_corporation_boundary.geojson",
+      "feature_count": 1
+    },
+    {
+      "layer_id": "hospitals_ogd_directory",
+      "title": "National Hospital Directory with Geo Code and additional parameters",
+      "status": "acquired_review_only_not_spatially_validated",
+      "source_url": "https://www.data.gov.in/resource/national-hospital-directory-geo-code-and-additional-parameters-updated-till-last-month",
+      "publisher": "National Institute of Health and Family Welfare (NIHFW), hosted by Government of India Open Government Data Platform",
+      "retrieved_on": "2026-10-20",
+      "publication_date": "Published 2017-08-10; portal states updated 2025-06-02",
+      "license": "Government Open Data License - India, stated by the portal resource metadata",
+      "crs": "Unknown from accessible resource metadata; field described as Location_Coordinates",
+      "units": "Location_Coordinates; coordinate order/units not established from accessible metadata",
+      "geographic_coverage": "India-wide; district/state fields permit filtering in principle",
+      "limitations": [
+        "The Ernakulam subset contains 180 records; 31 have missing/nonnumeric coordinate pairs and 18 exact repeated coordinate-pair groups cover 63 rows.",
+        "Although 149 remaining pairs pass generic latitude/longitude numeric ranges, this does not establish order, CRS, datum, correctness, or facility location.",
+        "The source may be incomplete or stale; current operational status and capacity are not independently confirmed.",
+        "A review-only processed CSV preserves the source coordinate string and QA flags; no point geometries were created and it is not displayed as a spatial asset layer.",
+        "The official Kerala Health institution search page provides an identity/address cross-check with View Map controls but no accessible GIS export or published coordinate semantics/accuracy/reuse terms; no coordinates were adopted from it."
+      ],
+      "blocker": "NIHFW coordinate order, CRS/datum and positional accuracy remain undocumented. The Kerala Health alternative is an official directory, but its reviewed page exposes no reusable GIS file or coordinate metadata; therefore no facility points are eligible for raster sampling.",
+      "raw_file": "data/raw/nihfw_national_hospital_directory.csv",
+      "raw_sha256": "1ddcad9f9b922142a4374c7b89b70fb6cefd8a257448c70a61e1c07d98845134",
+      "raw_bytes": 10341256,
+      "processed_review_file": "data/processed/nihfw_ernakulam_hospitals_coordinate_review.csv",
+      "processed_review_sha256": "6b1884390d05e9f035af573a73960c31f8a5b6f35b6e1b0834af6fb2bf1d3a05",
+      "selected_record_count": 180,
+      "coordinate_pair_parseable_count": 149,
+      "coordinate_pair_unparseable_count": 31,
+      "duplicate_coordinate_pair_group_count": 18,
+      "records_in_duplicate_coordinate_pair_groups": 63,
+      "layer_role": null,
+      "alternative_sources_reviewed": [
+        {
+          "title": "Kerala Health Department institution directory",
+          "url": "https://health.kerala.gov.in/index.php/institutionSearch",
+          "publisher": "Department of Health and Family Welfare, Government of Kerala",
+          "reviewed_on": "2026-10-20",
+          "publication_or_update_date": "Not stated on the reviewed directory page",
+          "available_evidence": "Official institution-search page lists Ernakulam public facility names, facility types, addresses, bed/service fields and View Map controls.",
+          "blocker": "The accessible page has no downloadable GIS data or exposed latitude/longitude fields; no CRS/datum, geocoding accuracy, stable spatial export schema, or spatial reuse terms were found. Not used to geocode NIHFW records or create map points.",
+          "status": "candidate_identity_reference_only_not_spatially_ingested"
+        }
+      ]
+    },
+    {
+      "layer_id": "kochi_wards_datameet",
+      "title": "Kochi Corporation ward boundaries (2022 community repackaging)",
+      "status": "integrated_with_exclusions",
+      "source_url": "https://raw.githubusercontent.com/datameet/Municipal_Spatial_Data/master/Kochi/KCH_wards.geojson",
+      "publisher": "DataMeet Municipal Spatial Data; README says scraped from Kerala OpenSDI KSUDP_KCH_Ward_Boundary",
+      "retrieved_on": "2026-10-20",
+      "publication_date": "Not stated; dataset-specific README says wards as of 2022",
+      "license": "CC BY-SA 2.5 India; stated by dataset-specific DataMeet README; attribution and share-alike apply",
+      "crs": "EPSG:4326 / WGS 84 per GeoJSON RFC 7946 semantics; no explicit CRS member in source",
+      "units": "Decimal degrees (longitude, latitude)",
+      "geographic_coverage": "Source-declared Kochi Municipal Corporation wards; observed bounds 76.2373589?76.3400293 E, 9.8934161?10.0497693 N",
+      "limitations": [
+        "Community repackaging of a Kerala OpenSDI source; the live source service and current ward register were not cross-checked.",
+        "Source is one Feature JSON object per line rather than a FeatureCollection; the processed copy normalizes this structure.",
+        "Three of 77 source polygons self-intersect and are excluded from the map copy; six records lack Ward_No and Ward_Name. No missing identifiers were inferred.",
+        "Processed subset is incomplete and not a legal/current boundary, coverage mask, hazard layer, or input to exposure calculations.",
+        "Source scale, positional accuracy, current validity and exact publication date are unstated."
+      ],
+      "blocker": "Integrated as a contextual map layer, with 3 invalid polygons excluded and 6 records missing ward attributes; do not use for legal boundaries or exposure analysis.",
+      "upstream_url": "https://opensdi.kerala.gov.in/layers/opensdi_data:geonode:KSUDP_KCH_Ward_Boundary",
+      "raw_file": "data/raw/koch_wards_2022.geojson",
+      "raw_sha256": "d8de90012f5c785b9d63c4b6f0b8bee69c72125da828051934de159d8f80dc17",
+      "processed_file": "data/processed/spatial_layers/kochi_wards_datameet_2022.geojson",
+      "processed_sha256": "d27ee64ade27b5d4145eb11e55524f34d20f759eb8bc42b344211854aac86d40",
+      "source_feature_count": 77,
+      "processed_feature_count": 74,
+      "geometry_types": {
+        "Polygon": 74
+      },
+      "layer_role": "context"
+    },
+    {
+      "layer_id": "roads_lris",
+      "title": "Kerala LRIS road network",
+      "status": "candidate_not_ingested",
+      "source_url": "https://lris.kslub.kerala.gov.in/",
+      "publisher": "Land Use Department, Government of Kerala (LRIS 2.0)",
+      "retrieved_on": "2026-10-20",
+      "publication_date": "Dataset-level date/version not exposed in reviewed catalogue page",
+      "license": "No dataset-level reuse licence found on the reviewed catalogue page",
+      "crs": "Not exposed for a directly downloadable Kochi extract",
+      "units": "Road geometries and attributes; dataset schema unavailable",
+      "geographic_coverage": "The catalogue describes Kerala-wide layers; a Kochi extract was not obtained",
+      "limitations": [
+        "Official catalogue identifies a Road Network layer but does not expose reviewed file-level metadata in the accessible page.",
+        "Completeness, road class, positional accuracy, and update cadence are unverified."
+      ],
+      "blocker": "No direct layer download with dataset-specific date, CRS, schema, and reuse terms was verified."
+    },
+    {
+      "layer_id": "drainage_lris",
+      "title": "Kerala LRIS drainage lines and canal network",
+      "status": "candidate_not_ingested",
+      "source_url": "https://lris.kslub.kerala.gov.in/",
+      "publisher": "Land Use Department, Government of Kerala (LRIS 2.0)",
+      "retrieved_on": "2026-10-20",
+      "publication_date": "Dataset-level date/version not exposed in reviewed catalogue page",
+      "license": "No dataset-level reuse licence found on the reviewed catalogue page",
+      "crs": "Not exposed for a directly downloadable Kochi extract",
+      "units": "Drainage-line/canal geometries; dataset schema unavailable",
+      "geographic_coverage": "The catalogue describes Kerala-wide resource layers; a Kochi extract was not obtained",
+      "limitations": [
+        "Catalogue availability does not establish that the layer contains municipal storm drains or their condition/capacity.",
+        "Hydrological connectivity, completeness, scale, and update cadence are unverified."
+      ],
+      "blocker": "No direct layer download with dataset-specific date, CRS, schema, and reuse terms was verified."
+    },
+    {
+      "layer_id": "flood_hazard_ksdma",
+      "title": "KSDMA Ernakulam historic and RCP 8.5 flood products / flood return-probability rasters",
+      "status": "acquired_not_ingested_license_and_pixel_semantics_block",
+      "source_url": "https://sdma.kerala.gov.in/hazard-maps/",
+      "download_urls": [
+        "https://sdma.kerala.gov.in/wp-content/uploads/2022/05/Ernakulam_Hist.pdf",
+        "https://sdma.kerala.gov.in/wp-content/uploads/2022/05/Ernakulam_RCP85.pdf",
+        "https://sdma.kerala.gov.in/wp-content/uploads/2026/06/1.-Flood-Return-Probability-Historical-10-25-50-years.zip",
+        "https://sdma.kerala.gov.in/wp-content/uploads/2026/06/2.Flood-Return-Probability-Historical-100-200-500-years.zip"
+      ],
+      "publisher": "Kerala State Disaster Management Authority (KSDMA); page cites UNEP, UN GRID, CIMA Italy, KSDMA (2020) and RMSI / National Insurance Academy (2024) for return-probability products",
+      "retrieved_on": "2026-10-20",
+      "publication_date": "Ernakulam PDFs linked under 2022/05 path; historic raster ZIPs linked under 2026/06 path; exact dataset publication dates not stated",
+      "license": "No dataset-level reuse licence found on the reviewed KSDMA page",
+      "crs": "EPSG:4326 / WGS 84 explicitly present in each GeoTIFF GeoKeyDirectory",
+      "units": "Single-band float32 raster; pixel-value meaning, units, and NoData semantics are not documented in the inspected metadata",
+      "geographic_coverage": "Downloaded raster grid bounds approx. 74.8646216–77.3680 E, 8.2909–12.7667 N (statewide grid extent, not hazard footprint); Kochi coverage of valid hazard pixels not established",
+      "limitations": [
+        "Archive CRC passed; it contains three 3004×5371 single-band float32 GeoTIFF files at approx. 0.000833333 degree cells, labeled 10-, 25-, and 50-year historical products.",
+        "Dataset-level reuse permission is not stated on the KSDMA catalogue; source archive is preserved raw and not unpacked into processed layers.",
+        "Pixel-value semantics/units and NoData meaning are absent; do not threshold, polygonize, or use the raster for overlay until KSDMA confirms metadata and reuse.",
+        "Return-period labels describe a scenario product, not event timing or observed flood depth.",
+        "The in-repository Ernakulam_map_dataset_draft.zip states its OCR/table alignment is unverified and includes no hazard geometries; it is not used."
+      ],
+      "blocker": "The linked archive was downloaded and its GeoTIFF CRS/schema inspected. No dataset-level reuse terms or pixel/NoData semantics were found; therefore it is retained raw but not ingested, rendered, or used for exposure.",
+      "raw_file": "data/raw/ksdma_flood_return_probability_historical_10_25_50.zip",
+      "raw_metadata_file": "data/raw/ksdma_flood_return_probability_historical_10_25_50.metadata.json",
+      "raw_sha256": "4057b36cdfc467ecaf618afb1e74b725187ef1d2a20326cdc1e4eb32df54605e",
+      "raw_bytes": 4370593,
+      "archive_integrity": "ZIP CRC passed; three TIFF members readable",
+      "layer_role": null
+    },
+    {
+      "layer_id": "landslide_gsi_ernakulam",
+      "title": "GSI (2022) Ernakulam landslide susceptibility zones",
+      "status": "candidate_not_ingested",
+      "source_url": "https://sdma.kerala.gov.in/hazard-maps/",
+      "download_urls": [
+        "https://sdma.kerala.gov.in/wp-content/uploads/2025/08/Ernakulam.zip"
+      ],
+      "publisher": "Geological Survey of India (GSI), distributed by KSDMA",
+      "retrieved_on": "2026-10-20",
+      "publication_date": "KSDMA labels product GSI 2022; linked Ernakulam ZIP appeared under 2025/08 path",
+      "license": "No dataset-level reuse licence found on the reviewed KSDMA page",
+      "crs": "Not inspected; ZIP download could not be opened",
+      "units": "Susceptibility-zone classes; classification schema not inspected",
+      "geographic_coverage": "Ernakulam district; Kochi urban extent within district is not established",
+      "limitations": [
+        "Susceptibility is not event probability, real-time warning, or site-specific engineering assessment.",
+        "The linked file's CRS, schema, class definitions, scale, and temporal validity remain unchecked."
+      ],
+      "blocker": "The KSDMA-linked ZIP was not retrievable here and no dataset-level reuse terms or metadata were verified."
+    },
+    {
+      "layer_id": "industrial_accident_hazard_ksdma",
+      "title": "KSDMA major industrial accident hazard-zone map",
+      "status": "candidate_not_ingested",
+      "source_url": "https://sdma.kerala.gov.in/hazard-maps/",
+      "download_urls": [
+        "https://sdma.kerala.gov.in/wp-content/uploads/2018/10/Map-Major-Industrial-Accident-Hazard-Zones.jpg"
+      ],
+      "publisher": "Kerala State Disaster Management Authority (KSDMA)",
+      "retrieved_on": "2026-10-20",
+      "publication_date": "Date not stated in the reviewed catalogue entry; linked file path suggests 2018/10 upload only",
+      "license": "No dataset-level reuse licence found on the reviewed KSDMA page",
+      "crs": "PDF map; no GIS CRS verified",
+      "units": "Map zones; class legend/schema not inspected",
+      "geographic_coverage": "Kerala-wide map listing; Kochi-scale georeferencing and coverage not verified",
+      "limitations": [
+        "A rendered PDF hazard map is not a verified facility inventory and does not establish a specific industry's current risk or emissions.",
+        "No georeferenced zone geometry or current facility locations were obtained."
+      ],
+      "blocker": "Static PDF only from the reviewed entry; no data-level reuse terms, vector/raster file, CRS, or accuracy metadata verified."
+    },
+    {
+      "layer_id": "coastal_hazard_ksdma",
+      "title": "KSDMA coastal hazard susceptibility map",
+      "status": "candidate_not_ingested",
+      "source_url": "https://sdma.kerala.gov.in/hazard-maps/",
+      "download_urls": [
+        "https://sdma.kerala.gov.in/wp-content/uploads/2018/10/Map-Coastal-Hazard-Susceptibility.jpg"
+      ],
+      "publisher": "Kerala State Disaster Management Authority (KSDMA)",
+      "retrieved_on": "2026-10-20",
+      "publication_date": "Date not stated in the reviewed catalogue entry; linked file path suggests 2018/10 upload only",
+      "license": "No dataset-level reuse licence found on the reviewed KSDMA page",
+      "crs": "PDF map; no GIS CRS verified",
+      "units": "Susceptibility zones; legend/schema not inspected",
+      "geographic_coverage": "Kerala coastline; Kochi-scale georeferencing and coverage not verified",
+      "limitations": [
+        "Susceptibility zones are not event forecasts or site-level engineering findings.",
+        "No georeferenced geometry or published accuracy metadata was obtained."
+      ],
+      "blocker": "Static PDF only from the reviewed entry; reuse terms and geospatial metadata are unverified."
+    },
+    {
+      "layer_id": "industrial_facilities_kspcb",
+      "title": "KSPCB industry / consent records",
+      "status": "candidate_not_ingested",
+      "source_url": "https://www.kspcbipam.kerala.gov.in/Dashboard/Industry",
+      "publisher": "Kerala State Pollution Control Board (KSPCB); portal identifies industry data as sourced from keralapcbonline.com",
+      "retrieved_on": "2026-10-20",
+      "publication_date": "Portal page has no dataset-level publication date; KSPCB site lists revised industry categorisation dated 2026-10-08",
+      "license": "No data reuse licence identified for facility records",
+      "crs": "Not exposed by the reviewed dashboard",
+      "units": "Industry attributes/categories; facility geometry schema unavailable",
+      "geographic_coverage": "Kerala dashboard with district/taluk filters; facility coordinates not confirmed",
+      "limitations": [
+        "Permit/category records do not themselves identify measured air emissions or prove a pollutant source.",
+        "Reviewed portal was not a direct, reusable, geospatial export and appeared to require interactive/session access."
+      ],
+      "blocker": "No openly licensed facility-coordinate export with stable schema and date was verified."
+    },
+    {
+      "layer_id": "air_monitoring_cpcb",
+      "title": "CPCB AQI monitoring stations and observations",
+      "status": "candidate_not_ingested",
+      "source_url": "https://airquality.cpcb.gov.in/AQI_India/",
+      "publisher": "Central Pollution Control Board (CPCB), Government of India",
+      "retrieved_on": "2026-10-20",
+      "publication_date": "Live portal; station-record date not supplied as a static dataset",
+      "license": "No dataset-level reuse licence found on the reviewed portal page",
+      "crs": "Station coordinate dataset not obtained",
+      "units": "AQI and pollutant-specific readings have their own documented units; this map layer contains no verified station data",
+      "geographic_coverage": "National portal; Kochi station coordinates/export not verified",
+      "limitations": [
+        "AQI does not identify a specific emitting facility or establish source causality.",
+        "A station list/map UI is not by itself a licensed, dated GIS dataset."
+      ],
+      "blocker": "A stable downloadable station-geometry export and reuse terms were not verified."
+    },
+    {
+      "layer_id": "openstreetmap_candidate",
+      "title": "OpenStreetMap features (possible community-mapped fallback)",
+      "status": "candidate_not_ingested",
+      "source_url": "https://www.openstreetmap.org/",
+      "publisher": "OpenStreetMap contributors",
+      "retrieved_on": "2026-10-20",
+      "publication_date": "Live, continuously edited database; a data snapshot date would need to be recorded at export",
+      "license": "Open Database License (ODbL); attribution and share-alike obligations apply",
+      "crs": "WGS 84 longitude/latitude (EPSG:4326) for OSM coordinates",
+      "units": "Geometries and tagged attributes; tags have no uniform measured units",
+      "geographic_coverage": "Global; local completeness varies by feature and mapper activity",
+      "limitations": [
+        "Community mapping is not an authoritative or complete asset register; positional/tag quality must be checked per layer.",
+        "Any retrieved snapshot needs timestamp, query/bbox, element types, provenance, and attribution recorded."
+      ],
+      "blocker": "No OSM snapshot obtained. The official OSM map endpoint rejected the Kochi bbox because it exceeds the 50,000-node cap (including a smaller trial bbox); Overpass main endpoint returned HTTP 502 capacity/queue-full, and the alternative endpoint produced no completed file."
+    },
+    {
+      "layer_id": "draft_ernakulam_flood_extract",
+      "title": "Ernakulam flood-map OCR/text extraction draft",
+      "status": "not_spatial_not_for_use",
+      "source_url": "Not embedded in the ZIP; README refers to a user-provided Ernakulam_Hist.pdf not present in the repository",
+      "publisher": "README describes KSDMA / RISK LAB / KSEOC labels visible in the absent source PDF; attribution not independently verified",
+      "retrieved_on": "Unknown; no acquisition metadata in the ZIP",
+      "publication_date": "Unknown",
+      "license": "Unknown; no reuse terms attached to the ZIP or absent PDF",
+      "crs": "None; files are OCR/text tables and locality-label candidates, not geospatial data",
+      "units": "Some extracted table fields claim km² or metres but were not verified against original map source",
+      "geographic_coverage": "Candidate Ernakulam taluk map pages, not a validated spatial layer",
+      "limitations": [
+        "The bundled README itself says facility return-period tick alignment is automatically estimated and needs checking against the PDF.",
+        "No coordinates, flood polygons, georeferencing, or hazard labels are provided."
+      ],
+      "blocker": "Original source PDF is absent; extracted draft is not authorized or sufficiently verified for spatial exposure analysis."
+    },
+    {
+      "layer_id": "flood_hazard_jrc_glofas_rp100",
+      "title": "JRC / Copernicus GloFAS global river flood depth (RP100)",
+      "status": "acquired_validated_hazard_preview_integrated_assets_unavailable",
+      "source_url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/flood_hazard/README.txt",
+      "download_urls": [
+        "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/flood_hazard/RP100/ID185_N20_E70_RP100_depth.tif",
+        "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/flood_hazard/RP100/ID186_N10_E70_RP100_depth.tif"
+      ],
+      "publisher": "Copernicus Emergency Management Service; European Commission Joint Research Centre (JRC)",
+      "retrieved_on": "2026-10-20",
+      "publication_date": "Dataset version 2.1.2; README updated 2026-01-12; RP100 tile directory lists these tiles modified 2025-12-18",
+      "license": "README states no restrictions, free and open Copernicus product; JRC copyright notice states CC BY 4.0, attribution and indication of changes required",
+      "crs": "EPSG:4326 / WGS 84 confirmed from GeoTIFF GeoKeyDirectory; longitude/latitude georeferencing",
+      "units": "Modeled flood water depth in metres; single-band float32; GeoTIFF GDAL_NODATA=-9999",
+      "geographic_coverage": "Tiles ID185 N20_E70 and ID186 N10_E70; together cover the Kochi latitude band and 70?80 E tile; preview limited to the provisional boundary bounding rectangle for display only",
+      "schema": {
+        "tile_dimensions": [
+          11999,
+          11999
+        ],
+        "bands": 1,
+        "pixel_type": "float32",
+        "compression": "DEFLATE",
+        "pixel_size_degrees": [
+          0.0008333333356347339,
+          0.0008333333333325754
+        ],
+        "resolution": "3 arc seconds (~90 m)",
+        "nodata": -9999
+      },
+      "limitations": [
+        "Modeled river-flood scenario, not an observation, forecast, warning, damage estimate, or site-specific engineering assessment.",
+        "JRC README notes only land areas are covered and warns that unrealistic high depths can arise from modeling, DEM sinks, tile boundaries, or DEM issues.",
+        "Spurious-depth and permanent-water auxiliary masks were not downloaded; model artifact flags cannot be applied.",
+        "Preview transparency combines zero, NoData, and outside coverage; transparent pixels do not establish safety.",
+        "No validated hospital/critical asset locations are available, so no asset-level exposure analysis is claimed.",
+        "The preview uses the bbox of the provisional self-intersecting boundary for rendering only, not as a mask."
+      ],
+      "raw_files": [
+        {
+          "file": "data/raw/jrc_glofas_rp100_ID185_N20_E70_depth.tif",
+          "bytes": 14020365,
+          "sha256": "93ba198ffeb0fb7436c6b97d66cf6b47b10cd59c4e6cf742a8aff59f46bdaf3b"
+        },
+        {
+          "file": "data/raw/jrc_glofas_rp100_ID186_N10_E70_depth.tif",
+          "bytes": 2207891,
+          "sha256": "cd78d43b91c235e39aa443550319ab099b816ca679f76ab83c339b5e7a9f1a30"
+        },
+        {
+          "file": "data/raw/jrc_glofas_v2_1_tile_extents.geojson",
+          "bytes": 90514,
+          "sha256": "24509D4FEE4623B3C3B78030BDF6C3B75352CD2A3FEB559492A12C45648946DE"
+        }
+      ],
+      "processed_file": "data/processed/spatial_layers/jrc_glofas_rp100_kochi_preview.png",
+      "processed_metadata_file": "data/processed/spatial_layers/jrc_glofas_rp100_kochi_preview.metadata.json",
+      "layer_role": "hazard",
+      "analysis_status": "Hazard raster preview integrated; asset-level exposure is unknown/unassessable because no independently validated facility-location layer is available."
+    }
+  ]
+}

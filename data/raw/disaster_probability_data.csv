@@ -1,0 +1,6 @@
+location_id,station_name,district,observation_date,antecedent_rainfall_3day_mm,forecast_rainfall_24h_mm,insat3d_ipwv_mm,soil_moisture_percent,slope_angle_deg,river_gauge_height_m,danger_level_m,cwc_flood_warning_level,target_flood_event_next_24h
+LOC_KL_010,Aluva River Gauge Station,Ernakulam,2026-10-19,185.0,145.0,58.2,88.5,3.2,7.8,6.5,Red Alert,1
+LOC_KL_011,Mananthavady Met Station,Wayanad,2026-10-19,210.0,180.0,52.0,94.0,24.5,4.2,4.0,Orange Alert,1
+LOC_KL_012,Thiruvananthapuram City Station,Thiruvananthapuram,2026-10-19,12.0,15.0,32.5,45.0,5.0,1.2,3.5,Green / Normal,0
+LOC_KL_013,Chengannur Pamba Station,Pathanamthitta,2026-10-19,140.0,95.0,48.5,82.0,4.1,5.8,5.5,Orange Alert,1
+LOC_KL_014,Palakkad Inland Station,Palakkad,2026-10-19,35.0,25.0,38.0,55.0,8.0,2.1,4.5,Yellow Alert,0

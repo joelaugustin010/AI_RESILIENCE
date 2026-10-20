@@ -1,0 +1,46 @@
+{
+  "reviewed_on": "2026-10-20",
+  "status": "no_verified_pollutant_observations_acquired",
+  "kspcb_namp_ernakulam_stations": [
+    {"station": "Irumpanam", "monitoring_zone": "Industrial", "program": "NAMP"},
+    {"station": "Eloor", "monitoring_zone": "Industrial", "program": "NAMP"},
+    {"station": "Kalamessery", "monitoring_zone": "Industrial", "program": "NAMP"},
+    {"station": "Udyogamandal", "monitoring_zone": "Industrial", "program": "NAMP"},
+    {"station": "M.G. Road", "monitoring_zone": "Commercial", "program": "NAMP"},
+    {"station": "Vyttila", "monitoring_zone": "Commercial", "program": "NAMP"},
+    {"station": "Ernakulam South", "monitoring_zone": "Residential", "program": "NAMP"}
+  ],
+  "sources": [
+    {
+      "publisher": "Kerala State Pollution Control Board (KSPCB)",
+      "url": "https://www.kspcb.kerala.gov.in/activities/ambient-monitoring?lang=ml",
+      "reviewed_on": "2026-10-20",
+      "publication_date": "Not stated on the reviewed page",
+      "geographic_coverage": "Statewide network; listed Ernakulam NAMP stations only are shown here",
+      "schema_crs_units": "Station name, monitoring zone and program transcribed from page; no coordinates, measurements, CRS, pollutant units, or time-series schema",
+      "evidence": "KSPCB's ambient-monitoring page lists four Ernakulam industrial stations (Irumpanam, Eloor, Kalamessery, Udyogamandal), two commercial stations (M.G. Road, Vytilla) and Ernakulam South as residential. It describes NAMP/SAMP as manual monitoring; the KSPCB IPAM page states 8–11 monitoring days per month and gives pollutant-specific sampling durations.",
+      "reuse_status": "The page is public and copyrighted by KSPCB; dataset-specific open reuse terms were not located. This record retains only a source-linked station-name inventory and does not redistribute measurements.",
+      "status": "station_network_reference_only_measurements_not_downloaded",
+      "blocker": "KSPCB e-library and report listing are public, but the e-library returned HTTP 502 in web retrieval and direct workspace HTTPS requests failed before an HTTP response. The IPAM page describes monitoring parameters/cadence but the reviewed render did not provide a dated downloadable Kochi observation table or dataset-level reuse terms."
+    },
+    {
+      "publisher": "Central Pollution Control Board (CPCB), Government of India; hosted on OGD India",
+      "url": "https://www.data.gov.in/catalog/real-time-air-quality-index",
+      "reviewed_on": "2026-10-20",
+      "publication_date": "Published 2016-08-04; catalog showed updated 2026-10-18",
+      "geographic_coverage": "National real-time monitoring stations; Kochi-specific downloadable records not obtained",
+      "schema_crs_units": "Catalog describes AQI and monitored pollutants SO2, NO2, PM10, PM2.5, CO and O3 among others; resource schema, station coordinate CRS, observation units/averaging metadata were not retrievable from the public catalog render",
+      "evidence": "The official OGD catalog attributes the resource to CPCB and MoEFCC, says it provides real-time National AQI from monitoring stations, and labels it released under NDSAP. The page links to an API-details page whose visible action is Generate API Key; the catalog page has no downloadable observation rows.",
+      "reuse_status": "Catalog states NDSAP; the portal footer states the Government Open Data License-India applies to published datasets/resources. Resource data could not be retrieved to verify its specific schema or any resource-level conditions.",
+      "status": "official_catalog_verified_api_access_blocked_no_observations_acquired",
+      "blocker": "API details require API-key generation. No credential is available in the workspace, and the public catalog exposes no raw observation file or rows; no API request was made with an unavailable key."
+    }
+  ],
+  "not_obtained": [
+    "Time-stamped pollutant-specific Ernakulam air-quality observations",
+    "Validated monitoring-station coordinates and coordinate reference system",
+    "Time-aligned wind speed/direction or other meteorological observations",
+    "Verified industrial facility geometries joined to consent/emission records"
+  ],
+  "interpretation_limit": "AQI, monitoring station proximity, or a wind direction alone cannot identify an emitting facility or prove causality. The legacy data/raw/air_pollution_data.csv is an undocumented illustrative sample and is not an observation dataset; the UI does not analyze it."
+}

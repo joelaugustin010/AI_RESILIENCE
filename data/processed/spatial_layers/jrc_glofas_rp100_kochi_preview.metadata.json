@@ -1,0 +1,101 @@
+{
+  "dataset_id": "jrc_glofas_rp100_kochi_preview",
+  "title": "JRC GloFAS modeled river flood depth, 100-year return-period scenario (map preview)",
+  "source_url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/flood_hazard/README.txt",
+  "publisher": "Copernicus Emergency Management Service; European Commission Joint Research Centre (JRC)",
+  "retrieved_on": "2026-10-20",
+  "publication_date": "Dataset version 2.1.2; README updated 2026-01-12; source directory lists these two tiles modified 2025-12-18",
+  "license": "Free and open Copernicus product; Commission copyright notice states CC BY 4.0, attribution and indication of changes required",
+  "crs": "EPSG:4326 / WGS 84",
+  "coordinate_order": "GeoTIFF georeferencing: longitude, latitude",
+  "units": "Modeled flood water depth in metres; raw band values; -9999 is NoData",
+  "geographic_coverage": "Two source grid tiles ID185 N20_E70 and ID186 N10_E70; city preview clipped to the bounding rectangle of the existing provisional Kochi boundary. This is a rendering crop only and is not used as a validated coverage mask.",
+  "source_files": [
+    {
+      "file": "jrc_glofas_rp100_ID185_N20_E70_depth.tif",
+      "bytes": 14020365,
+      "sha256": "93ba198ffeb0fb7436c6b97d66cf6b47b10cd59c4e6cf742a8aff59f46bdaf3b",
+      "dimensions": [
+        11999,
+        11999
+      ],
+      "bands": 1,
+      "dtype": "float32",
+      "compression": "DEFLATE",
+      "crs": "EPSG:4326",
+      "pixel_size_degrees": [
+        0.0008333333356347339,
+        0.0008333333333325754
+      ],
+      "bounds": [
+        69.97875146105325,
+        10.007066666675755,
+        79.97791815533442,
+        20.006233333333327
+      ],
+      "nodata": -9999.0,
+      "publisher": "Copernicus Emergency Management Service, European Commission Joint Research Centre (JRC)",
+      "source_url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/flood_hazard/RP100/ID185_N20_E70_RP100_depth.tif",
+      "retrieved_on": "2026-10-20"
+    },
+    {
+      "file": "jrc_glofas_rp100_ID186_N10_E70_depth.tif",
+      "bytes": 2207891,
+      "sha256": "cd78d43b91c235e39aa443550319ab099b816ca679f76ab83c339b5e7a9f1a30",
+      "dimensions": [
+        11999,
+        11999
+      ],
+      "bands": 1,
+      "dtype": "float32",
+      "compression": "DEFLATE",
+      "crs": "EPSG:4326",
+      "pixel_size_degrees": [
+        0.0008333333356347339,
+        0.0008333333333325754
+      ],
+      "bounds": [
+        69.97875146105325,
+        0.007900000009087194,
+        79.97791815533442,
+        10.00706666666666
+      ],
+      "nodata": -9999.0,
+      "publisher": "Copernicus Emergency Management Service, European Commission Joint Research Centre (JRC)",
+      "source_url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/flood_hazard/RP100/ID186_N10_E70_RP100_depth.tif",
+      "retrieved_on": "2026-10-20"
+    }
+  ],
+  "processing": {
+    "preview_file": "jrc_glofas_rp100_kochi_preview.png",
+    "preview_sha256": "44731c741e8edd255a30da67cff08c9aecfc1b6532d08921f76c3d73fb03eb43",
+    "bounds_epsg4326": [
+      76.23735890065669,
+      9.889718280722308,
+      76.34002933184016,
+      10.049769312385111
+    ],
+    "preview_pixels": [
+      520,
+      520
+    ],
+    "valid_sample_pixels": 30233,
+    "positive_depth_sample_pixels": 30233,
+    "nodata_or_outside_pixels": 240167,
+    "rendering": "transparent blue overlay for positive modeled depth; transparent for zero, NoData, and outside source coverage"
+  },
+  "limitations": [
+    "Global modeled riverine inundation scenario product, not an observation, forecast, official warning, site-specific engineering result, or proof of damage.",
+    "90 m nominal resolution; land areas only; model artifacts are documented, including unrealistic depths from modeling limitations, DEM sinks, tile boundaries, or DEM issues.",
+    "Only the RP100 depth field was downloaded; the separate spurious-depth and permanent-water auxiliary layers were not downloaded, so documented artifact flags are unavailable here.",
+    "Transparent zero-depth, NoData, and outside-coverage pixels look alike in the map preview; no facility exposure result is derived from this visual layer.",
+    "No verified hospital point layer is currently available. NIHFW coordinates remain review-only because source coordinate order, CRS/datum, and per-record positional accuracy are unspecified."
+  ],
+  "layer_role": "hazard",
+  "analysis_status": "hazard preview integrated; asset-level exposure unknown because no independently validated hospital layer",
+  "preview_file": "jrc_glofas_rp100_kochi_preview.png",
+  "source_snapshot_files": [
+    "data/raw/jrc_glofas_rp100_ID185_N20_E70_depth.tif",
+    "data/raw/jrc_glofas_rp100_ID186_N10_E70_depth.tif"
+  ]
+}

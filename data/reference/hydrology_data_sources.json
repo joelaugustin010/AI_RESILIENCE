@@ -1,0 +1,99 @@
+{
+  "reviewed_on": "2026-10-20",
+  "purpose": "Historical observations and sourced event context; the manual rainfall series supports only a retrospective next-record measurement benchmark. No verified labels support flood prediction, and the benchmark is excluded from the disaster assessment.",
+  "reuse_policy": "NWDP resource pages identify the CSV resources as 'Other (Open)'. The NWDP copyright policy permits accurate reproduction with prominent attribution, subject to third-party rights. Preserve this source attribution and check current portal terms before external redistribution.",
+  "timestamp_policy": "Local source strings are parsed as day-first because the stored examples use DD-MM-YYYY HH:MM. Source timezone is not documented; values are not timezone-converted.",
+  "spatial_policy": "The CSVs contain latitude/longitude columns, but these are not mapped or used in spatial joins here. The inspected portal descriptions do not establish a datum/CRS or positional accuracy for these station coordinates.",
+  "datasets": [
+    {
+      "local_file": "data/raw/rainfall_manual_hr_kerala-sw_kl_1991_2020.csv",
+      "provider": "Kerala Surface Water Department (as listed by NWDP)",
+      "source_url": "https://nwdp.nwic.gov.in/en/dataset/rainfall-manual-hourly-kerala-sw-department/resource/ceb9ffcf-927b-4b34-8ab5-6c3098dd95a9",
+      "catalog_url": "https://nwdp.nwic.gov.in/en/dataset/rainfall-manual-hourly-kerala-sw-department",
+      "portal_resource_last_updated": "2025-03-05",
+      "portal_declared_period": "1991–2020",
+      "geographic_coverage": "21 named observation stations across 10 Kerala district labels in the local rows; the file is a station subset, not a complete Kerala network.",
+      "observed_local_period": "2000-02-27 21:30 to 2014-12-31 17:30 (parsed from file)",
+      "measurement": "Manual Hourly Rainfall (mm); unit stated in local column name and portal description.",
+      "coordinate_reference_system": "Not stated; Latitude/Longitude fields are present but CRS/datum, positional accuracy, and station coordinate validation are not documented. Coordinates are not used in this analysis.",
+      "license": "NWDP resource metadata: Other (Open); NWDP copyright policy requires accurate reproduction and source acknowledgment.",
+      "retrieved_on": "Unknown for the pre-existing local copy; portal resource metadata was reviewed on 2026-10-20.",
+      "limitations": [
+        "Local filename declares 1991–2020 but rows in this local copy cover 2000–2014.",
+        "Irregular observation intervals and long gaps; no source sampling schedule was confirmed.",
+        "No station-level flood event outcome labels or timezone metadata."
+      ]
+    },
+    {
+      "local_file": "data/raw/kerala.csv",
+      "provider": "Central Water Commission (agency field in local file; NWDP CWC Kerala resource is a probable matching source, not hash-matched)",
+      "source_url": "https://nwdp.nwic.gov.in/dataset/rainfall-cwc-telemetry-hourly/resource/654dd5af-ec2c-4439-a8a5-f9bf5d61ab74",
+      "catalog_url": "https://nwdp.nwic.gov.in/dataset/rainfall-cwc-telemetry-hourly",
+      "portal_resource_last_updated": "2026-01-24",
+      "portal_declared_period": "2021–2025",
+      "geographic_coverage": "Four named stations in the local rows, with source District values PATHANAMTHITTA, WAYANAD, and ERNAKULAM; station subset only.",
+      "observed_local_period": "2021-01-03 20:30 to 2025-12-28 02:00 (parsed from file)",
+      "measurement": "Telemetry Hourly Rainfall (mm); unit stated in local column name and portal description.",
+      "coordinate_reference_system": "Not stated; Latitude/Longitude fields are present but CRS/datum and positional accuracy were not verified. Coordinates are not used in this analysis.",
+      "license": "NWDP resource metadata: Other (Open); NWDP copyright policy requires accurate reproduction and source acknowledgment.",
+      "retrieved_on": "Unknown for the pre-existing local copy; portal resource metadata was reviewed on 2026-10-20.",
+      "limitations": [
+        "Local file is named kerala.csv and was not checksum-matched with the NWDP download.",
+        "Audit found 1,471 duplicate station-time groups, 324 of them conflicting; values remain unmodified and are not accumulated.",
+        "No station-level flood event outcome labels or timezone metadata."
+      ]
+    },
+    {
+      "local_file": "data/raw/rwl_manual_hr_kerala_sw_031_2021_2025.csv",
+      "provider": "Kerala Surface Water Department (as listed by NWDP)",
+      "source_url": "https://nwdp.nwic.gov.in/dataset/river-water-level-manual-hourly-kerala-sw-godavari/resource/fe95a85e-142d-4acf-83fc-24499afc546b",
+      "catalog_url": "https://nwdp.nwic.gov.in/dataset/river-water-level-manual-hourly-kerala-sw-godavari",
+      "portal_resource_last_updated": "2026-01-24",
+      "portal_declared_period": "2021–2025",
+      "geographic_coverage": "Six station names; local District values include THRISSUR, Trichur, WAYANAD, KOZHIKODE, KANNUR, and MALAPPURAM. District/river metadata requires provider review.",
+      "observed_local_period": "2022-01-01 08:00 to 2025-03-31 16:00 (parsed from file)",
+      "measurement": "River Water Level Manual Hourly (meter); unit stated in local column name and portal description.",
+      "reference": "RL_of_zeroGauge and MeanSeaLevel columns are present but zero in these data; the physical gauge/datum convention is not resolved.",
+      "coordinate_reference_system": "Not stated; Latitude/Longitude fields are present but CRS/datum and positional accuracy were not verified. Coordinates are not used in this analysis.",
+      "license": "NWDP resource metadata: Other (Open); NWDP copyright policy requires accurate reproduction and source acknowledgment.",
+      "retrieved_on": "Unknown for the pre-existing local copy; portal resource metadata was reviewed on 2026-10-20.",
+      "limitations": ["No official warning threshold linked to the values.", "No station-level flood event outcome labels or timezone metadata.", "Mananthavadi measurement-scale/reference discontinuity remains unresolved.", "Some geographic descriptors are internally inconsistent with the recorded districts/coordinates (for example, F.C.S. Mananthavadi is labeled River=Luni and Basin=West flowing rivers from Tadri to Kanyakumari); do not use the river labels for spatial/basin attribution until the provider confirms them."]
+    },
+    {
+      "local_file": "data/raw/rwl_tel_hr_kerala_sw_031_2021_2025.csv",
+      "provider": "Kerala Surface Water Department (as listed by NWDP)",
+      "source_url": "https://nwdp.nwic.gov.in/dataset/river-water-level-telemetry-hourly-kerala-surface-water-department/resource/a6de190e-40b6-484b-ad4c-a9f811f061ba",
+      "catalog_url": "https://nwdp.nwic.gov.in/dataset/river-water-level-telemetry-hourly-kerala-surface-water-department",
+      "portal_resource_last_updated": "2026-01-24",
+      "portal_declared_period": "2021–2025",
+      "geographic_coverage": "Six station names with five source District values (WAYANAD, KOZHIKODE, THIRUVANANTHAPURAM, KANNUR, ERNAKULAM) in the local rows; district/river metadata requires provider review.",
+      "observed_local_period": "2021-06-11 20:00 to 2025-03-10 14:00 (parsed from file)",
+      "measurement": "River Water Level Telemetry Hourly (meter); unit stated in local column name and portal description.",
+      "reference": "RL_of_zeroGauge and MeanSeaLevel columns are present but zero in these data; the physical gauge/datum convention is not resolved.",
+      "coordinate_reference_system": "Not stated; Latitude/Longitude fields are present but CRS/datum and positional accuracy were not verified. Coordinates are not used in this analysis.",
+      "license": "NWDP resource metadata: Other (Open); NWDP copyright policy requires accurate reproduction and source acknowledgment.",
+      "retrieved_on": "Unknown for the pre-existing local copy; portal resource metadata was reviewed on 2026-10-20.",
+      "limitations": ["No official warning threshold linked to the values.", "No station-level flood event outcome labels or timezone metadata.", "Mananthavadi measurement-scale/reference discontinuity remains unresolved.", "Some geographic descriptors are internally inconsistent with the recorded districts/coordinates (for example, F.C.S. Mananthavadi is labeled River=Luni and Basin=West flowing rivers from Tadri to Kanyakumari); do not use the river labels for spatial/basin attribution until the provider confirms them."]
+    }
+  ],
+  "event_sources": [
+    {
+      "title": "CWC Study Report: Kerala Floods of August 2018 (reproduced as an annex in a KSDMA report)",
+      "url": "https://sdma.kerala.gov.in/wp-content/uploads/2020/08/RajamonyDC-Books.pdf",
+      "publisher": "Central Water Commission, Hydrological Studies Organisation; hosted in a Kerala Government/KSDMA report",
+      "publication_date": "September 2018 (CWC report, as cited in the host document)",
+      "license": "No dataset license for the report facts was found; quote/attribute source and avoid reproducing the report itself.",
+      "usable_facts": "The annex states IMD-reported Kerala rainfall 2,346.6 mm from 1 June to 19 August 2018 versus 1,649.5 mm normal (+42%); it records flood onset toward late July and severe flooding in 13 of 14 districts.",
+      "relation_to_local_series": "No overlap: local manual rainfall ends in 2014; the local 2021–2025 observations begin after this 2018 event. Timeline is context only, not joined labels."
+    },
+    {
+      "title": "Government Order: flood/landslide-affected villages, October 2021",
+      "url": "https://sdma.kerala.gov.in/wp-content/uploads/2022/02/G.O_P_1_2020_DMD.pdf",
+      "publisher": "Disaster Management Department, Government of Kerala / KSDMA-hosted official order",
+      "publication_date": "2022-02-03; order references severe calamities from 2021-10-12 to 2021-10-25",
+      "license": "Official government order; no separate reuse license identified. Attribute source and use factual summary only.",
+      "usable_facts": "The order declares 305 villages in 39 taluks flood/landslide affected after extreme rainfall and flooding during 2021-10-12 through 2021-10-25.",
+      "relation_to_local_series": "Some 2021–2025 local records overlap the date window. The order does not map specific station observations to outcomes, so the overlap is contextual and not a supervised label."
+    }
+  ]
+}

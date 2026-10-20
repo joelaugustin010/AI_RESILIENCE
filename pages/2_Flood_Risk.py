@@ -11,15 +11,27 @@ st.warning(
 
 area = st.selectbox(
     "Study area",
-    ["Kochi", "Ernakulam", "Fort Kochi", "Edappally", "Kalamassery"],
+    [
+        "Kochi",
+        "Ernakulam",
+        "Fort Kochi",
+        "Edappally",
+        "Kalamassery",
+    ],
 )
 
 rainfall = st.number_input(
-    "Rainfall (mm)", min_value=0.0, max_value=1000.0, value=50.0
+    "Rainfall (mm)",
+    min_value=0.0,
+    max_value=1000.0,
+    value=50.0,
 )
 
 river_level = st.number_input(
-    "River level (metres)", min_value=0.0, max_value=30.0, value=2.0
+    "River level (metres)",
+    min_value=0.0,
+    max_value=30.0,
+    value=2.0,
 )
 
 ground = st.selectbox(

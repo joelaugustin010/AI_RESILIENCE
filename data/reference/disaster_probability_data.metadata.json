@@ -1,0 +1,40 @@
+{
+  "dataset_id": "candidate_flood_labels",
+  "title": "Flood event within 24 hours example rows",
+  "data_kind": "unverified_demo",
+  "status": "readiness_review_only_not_training_data",
+  "source_url": null,
+  "publisher": null,
+  "retrieved_on": null,
+  "license": null,
+  "geographic_coverage": null,
+  "schema": {
+    "rows": 5,
+    "columns": 13,
+    "target_column": "target_flood_event_next_24h",
+    "target_definition": null,
+    "label_source": null,
+    "label_review_status": "unknown",
+    "event_group_column": null,
+    "observation_date_range": ["2026-10-19", "2026-10-19"],
+    "target_counts": {"0": 2, "1": 3},
+    "missing_cells": 0,
+    "exact_duplicate_rows": 0
+  },
+  "feature_availability_cutoff": null,
+  "prediction_horizon_hours": null,
+  "potential_leakage_features": [
+    "cwc_flood_warning_level",
+    "river_gauge_height_m",
+    "danger_level_m"
+  ],
+  "limitations": [
+    "No source, publisher, reuse terms, label definition, or verification evidence is recorded.",
+    "All rows share a single observation date, so chronological train/test evaluation is impossible.",
+    "There is no event identifier to keep related observations out of both train and test sets.",
+    "Feature timestamps relative to the prediction issue time are undocumented; warning and gauge fields may leak outcome information.",
+    "The five rows are an illustrative example, not a representative sample of Kochi or Kerala flood events.",
+    "The sidecar documents this repository's audit; it does not establish the CSV's source or turn its rows into verified observations."
+  ],
+  "raw_sha256": "687b059f610a99495fe3a522c1cb88a7f2fc185ce37f290551f886951aa8bea2"
+}

@@ -1,0 +1,34 @@
+{
+  "dataset_id": "ksdma_flood_return_probability_historical_10_25_50",
+  "title": "KSDMA Historical Flood Return Probability raster bundle (10, 25 and 50 year labels)",
+  "source_url": "https://sdma.kerala.gov.in/hazard-maps/",
+  "download_url": "https://sdma.kerala.gov.in/wp-content/uploads/2026/06/1.-Flood-Return-Probability-Historical-10-25-50-years.zip",
+  "publisher": "Kerala State Disaster Management Authority (KSDMA); the catalogue cites UNEP, UN GRID, CIMA Italy, KSDMA (2020), and RMSI / National Insurance Academy (2024)",
+  "retrieved_on": "2026-10-20",
+  "publication_date": "Not stated for this exact ZIP; KSDMA catalogue cites 2020 and 2024 assessment references; TIFF archive timestamps are 2026-04-12",
+  "license": "No dataset-specific licence or reuse terms found on the KSDMA catalogue page; ingestion and redistribution blocked pending confirmation",
+  "crs": "EPSG:4326 / WGS 84, explicitly present in each GeoTIFF GeoKeyDirectory (GeographicTypeGeoKey 4326)",
+  "units": "Raster is single-band float32; units and pixel-value meaning are not documented in TIFF metadata reviewed",
+  "geographic_coverage": "Statewide raster grid bounding extent approximately 74.8646216?77.3680 E, 8.2909?12.7667 N; this is a grid extent, not a flood extent",
+  "schema": {
+    "files": [
+      "Kerala_Flood_10_yr_Historical.tif",
+      "Kerala_Flood_25_yr_Historical.tif",
+      "Kerala_Flood_50_yr_Historical.tif"
+    ],
+    "width": 3004,
+    "height": 5371,
+    "bands": 1,
+    "pixel_type": "32-bit float",
+    "cell_size_degrees": 0.0008333333333333
+  },
+  "limitations": [
+    "KSDMA links the file as a historical flood return-probability raster product, not a live forecast.",
+    "Dataset-level reuse permission is not stated on the source catalogue; the archive is preserved raw but not unpacked into processed layers.",
+    "Pixel-value units/class meaning and NoData semantics are absent from the GeoTIFF tags/auxiliary metadata reviewed; values cannot safely be thresholded or polygonized.",
+    "No exposure analysis is performed with this raster until reuse terms and pixel semantics/NoData are confirmed."
+  ],
+  "sha256": "4057b36cdfc467ecaf618afb1e74b725187ef1d2a20326cdc1e4eb32df54605e",
+  "archive_bytes": 4370593,
+  "zip_integrity": "CRC check passed; all archive members readable"
+}
