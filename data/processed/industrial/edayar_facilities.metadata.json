@@ -1,0 +1,690 @@
+{
+  "reviewed_on": "2026-10-23",
+  "candidate_facility_rows": 8,
+  "candidate_list_source_id": "KWA-EDAYAR-DER",
+  "consent_records_file": "edayar_consent_records.csv",
+  "evidence_status_values": [
+    "verified",
+    "historical",
+    "unverified",
+    "unavailable"
+  ],
+  "evidence_status_meanings": {
+    "verified": "The source explicitly documents the field or a consent validity date still in force on the review date; this does not guarantee no later revocation.",
+    "historical": "The field is explicitly documented for a prior period, an expired consent, an old inspection or an undated/legacy directory.",
+    "unverified": "Evidence is partial or an applicable current status could not be confirmed.",
+    "unavailable": "No supporting value was found in the reviewed sources; blank values are intentionally retained."
+  },
+  "retrieval_date": "2026-10-23",
+  "source_access_method": "Public official documents/pages were reviewed through indexed source text and web search results. Direct OCMMS PDF downloads returned temporary Data Unavailable HTML; those error pages were not retained or treated as source documents.",
+  "candidate_scope": "The KWA DER names eight major industries in the Edayar estate; this is a candidate list, not a complete active-facility registry.",
+  "field_source_map": {
+    "EDAYAR-001": {
+      "identity_and_address": [
+        "KWA-EDAYAR-DER",
+        "OCMMS-CMRL-CTO-2023"
+      ],
+      "process": [
+        "CPCB-KSPCB-KOCHI-AUDIT-2004-05"
+      ],
+      "consents": [
+        "OCMMS-CMRL-CTO-2018",
+        "OCMMS-CMRL-CTO-2023"
+      ],
+      "coordinates": [],
+      "fuel": [],
+      "emissions_limits": [],
+      "measured_emissions": []
+    },
+    "EDAYAR-002": {
+      "identity_and_address": [
+        "KWA-EDAYAR-DER",
+        "OCMMS-SUD-CTO-2019"
+      ],
+      "process": [
+        "OCMMS-SUD-CTO-2019"
+      ],
+      "fuel": [
+        "OCMMS-SUD-CTO-VAR-2021"
+      ],
+      "emissions_limits": [
+        "OCMMS-SUD-CTO-2015"
+      ],
+      "measured_emissions": [],
+      "consents": [
+        "OCMMS-SUD-CTO-2015",
+        "OCMMS-SUD-CTO-2019",
+        "OCMMS-SUD-CTE-2020",
+        "OCMMS-SUD-CTO-VAR-2021",
+        "OCMMS-REJECTED-APPLICATIONS-2014-2024"
+      ],
+      "coordinates": [],
+      "effluent_measurements": [
+        "KSPCB-MPR-FEB-2024-SUD-CHEMIE-EFFLUENT"
+      ]
+    },
+    "EDAYAR-003": {
+      "identity_and_address": [
+        "KWA-EDAYAR-DER",
+        "OCMMS-ARJUNA-CTO-2019",
+        "OCMMS-ARJUNA-CTE-2021",
+        "ARJUNA-EDAYAR-FACILITY"
+      ],
+      "process": [
+        "OCMMS-ARJUNA-CTE-2021"
+      ],
+      "consents": [
+        "OCMMS-ARJUNA-CTO-2019",
+        "OCMMS-ARJUNA-CTE-2021",
+        "OCMMS-REJECTED-APPLICATIONS-2014-2024"
+      ],
+      "coordinates": [],
+      "fuel": [],
+      "emissions_limits": [],
+      "measured_emissions": [],
+      "company_environmental_report": [
+        "ARJUNA-SUSTAINABILITY-REPORT-2024"
+      ]
+    },
+    "EDAYAR-004": {
+      "identity_and_address": [
+        "KWA-EDAYAR-DER",
+        "OCMMS-TMS-CTO-2023"
+      ],
+      "process": [
+        "OCMMS-TMS-CTO-2023",
+        "CPCB-KSPCB-KOCHI-AUDIT-2004-05"
+      ],
+      "consents": [
+        "OCMMS-TMS-CTO-2018",
+        "OCMMS-TMS-CTO-2023"
+      ],
+      "coordinates": [],
+      "fuel": [],
+      "emissions_limits": [],
+      "measured_emissions": []
+    },
+    "EDAYAR-005": {
+      "identity_and_address": [
+        "KWA-EDAYAR-DER",
+        "CSEZ-ACTIVE-CHAR-UNIT-LIST",
+        "OCMMS-REJECTED-APPLICATIONS-2014-2024"
+      ],
+      "process": [
+        "CSEZ-ACTIVE-CHAR-UNIT-LIST",
+        "OCMMS-REJECTED-APPLICATIONS-2014-2024"
+      ],
+      "consents": [
+        "OCMMS-ACTIVE-CTO-2019",
+        "OCMMS-REJECTED-APPLICATIONS-2014-2024"
+      ],
+      "coordinates": [],
+      "fuel": [],
+      "emissions_limits": [],
+      "measured_emissions": []
+    },
+    "EDAYAR-006": {
+      "identity_and_address": [
+        "KWA-EDAYAR-DER",
+        "CPCB-KSPCB-KOCHI-AUDIT-2004-05",
+        "OCMMS-INDO-GERMAN-CTO-2019"
+      ],
+      "process": [
+        "CPCB-KSPCB-KOCHI-AUDIT-2004-05",
+        "OCMMS-REJECTED-APPLICATIONS-2014-2024"
+      ],
+      "fuel": [
+        "CPCB-KSPCB-KOCHI-AUDIT-2004-05",
+        "KOCHI-ENVIRONMENTAL-AUDIT-MIRROR"
+      ],
+      "consents": [
+        "OCMMS-INDO-GERMAN-CTO-2019",
+        "OCMMS-REJECTED-APPLICATIONS-2014-2024"
+      ],
+      "coordinates": [],
+      "emissions_limits": [],
+      "measured_emissions": []
+    },
+    "EDAYAR-007": {
+      "identity_and_address": [
+        "KWA-EDAYAR-DER",
+        "OCMMS-RUBBER-O-MALABAR-CTO-2020",
+        "KERALA-BOILER-REGISTER-2024",
+        "ALLIANCE-RUBBER-O-MALABAR-IDENTITY",
+        "ALLIANCE-RUBBER-O-MALABAR-ADDRESS"
+      ],
+      "process": [
+        "ALLIANCE-RUBBER-O-MALABAR-IDENTITY"
+      ],
+      "fuel": [
+        "KERALA-BOILER-REGISTER-2024",
+        "KERALA-BOILER-REGISTER-2025"
+      ],
+      "consents": [
+        "OCMMS-RUBBER-O-MALABAR-CTO-2020"
+      ],
+      "coordinates": [],
+      "emissions_limits": [],
+      "measured_emissions": []
+    },
+    "EDAYAR-008": {
+      "identity_and_address": [
+        "KWA-EDAYAR-DER",
+        "OCMMS-MALAYA-CTO-2022"
+      ],
+      "process": [
+        "OCMMS-MALAYA-CTE-2020",
+        "OCMMS-REJECTED-APPLICATIONS-2014-2024"
+      ],
+      "consents": [
+        "OCMMS-MALAYA-CTE-2020",
+        "OCMMS-MALAYA-CTO-2022",
+        "OCMMS-REJECTED-APPLICATIONS-2014-2024"
+      ],
+      "coordinates": [],
+      "fuel": [],
+      "emissions_limits": [],
+      "measured_emissions": []
+    }
+  },
+  "raw_files": [
+    {
+      "path": "data/raw/industrial/KWA_Edayar_CETP_DER_2022.pdf",
+      "publisher": "Kerala Water Authority",
+      "source_url": "https://kwa.kerala.gov.in/wp-content/uploads/2022/11/Edayar_DER-1.pdf",
+      "retrieved_on": "2026-10-23",
+      "sha256": "649955b4008cdbf1e1f14133fa4cac6d33afdb046ca0dddfc57d6a053abe0d07",
+      "bytes": 5893254,
+      "preserved_unchanged": true,
+      "reuse_terms": "No file-specific open licence identified; retain source attribution and check reuse terms."
+    },
+    {
+      "path": "data/raw/industrial/DIC_DA_EDAYAR.dwg",
+      "publisher": "Directorate of Industries and Commerce, Government of Kerala",
+      "source_url": "https://www.industry.kerala.gov.in/images/auto-cad/DA_EDAYAR.dwg",
+      "retrieved_on": "2026-10-23",
+      "sha256": "6a366806a35eb55eb25da4b9093780e4c8f9249ab18b5efabedb3acf5bc42a0a",
+      "bytes": 8148021,
+      "preserved_unchanged": true,
+      "reuse_terms": "No file-specific open licence identified; retain source attribution and check reuse terms."
+    },
+    {
+      "path": "data/raw/industrial/KSPCB_OCMMS_CTO_red_page2_2015-2019.html",
+      "publisher": "Kerala State Pollution Control Board, legacy OCMMS report",
+      "source_url": "https://krocmms.nic.in/KSPCB/allReports/popApplicationCountAllModuleCto?cat=red&fromDateStr=2015-04-01&groupId=All&number=2&toDateStr=2019-10-20&type=cto",
+      "retrieved_on": "2026-10-23",
+      "sha256": "5763c6e94dda44e3a37babce22276c02a2011a17db294c7dc23529a53bc84893",
+      "bytes": 4593949,
+      "preserved_unchanged": true,
+      "reuse_terms": "No file-specific open licence identified; retain source attribution and check reuse terms."
+    }
+  ],
+  "attempted_downloads": {
+    "source_family": "KSPCB/OCMMS individual consent certificate links",
+    "retrieved_on": "2026-10-23",
+    "result": "Each direct download attempted returned a 497-byte HTML error page titled Data Unavailable / Requested data is temporarily unavailable, not the advertised PDF.",
+    "error_pages_retained": false,
+    "note": "No hashes are reported for these failed responses. Consent details in the processed inventory are transcribed from official indexed consent/status text; local copies remain unavailable.",
+    "attempted_targets": [
+      {
+        "filename": "KSPCB_OCMMS_Active_Char_CTO_2019.pdf",
+        "application_id": "7224178",
+        "sha256": null
+      },
+      {
+        "filename": "KSPCB_OCMMS_Arjuna_Natural_CTE_2021.pdf",
+        "application_id": "14148337",
+        "sha256": null
+      },
+      {
+        "filename": "KSPCB_OCMMS_Arjuna_Natural_CTO_2019.pdf",
+        "application_id": "7185911",
+        "sha256": null
+      },
+      {
+        "filename": "KSPCB_OCMMS_CMRL_CTO_2023.pdf",
+        "application_id": "18633248",
+        "sha256": null
+      },
+      {
+        "filename": "KSPCB_OCMMS_Indo_German_Carbon_CTO_2019.pdf",
+        "application_id": "7269462",
+        "sha256": null
+      },
+      {
+        "filename": "KSPCB_OCMMS_Malaya_Rub_Tech_CTO_2022.pdf",
+        "application_id": "14999996",
+        "sha256": null
+      },
+      {
+        "filename": "KSPCB_OCMMS_Rubber_O_Malabar_CTO_2020.pdf",
+        "application_id": "13443493",
+        "sha256": null
+      },
+      {
+        "filename": "KSPCB_OCMMS_Sud_Chemie_CTE_2020.pdf",
+        "application_id": "10198074",
+        "sha256": null
+      },
+      {
+        "filename": "KSPCB_OCMMS_Sud_Chemie_CTO_Variation_2021.pdf",
+        "application_id": "13009688",
+        "sha256": null
+      },
+      {
+        "filename": "KSPCB_OCMMS_TMS_Leathers_CTO_2023.pdf",
+        "application_id": "18649703",
+        "sha256": null
+      }
+    ]
+  },
+  "environmental_clearance_search": {
+    "evidence_status": "unavailable",
+    "sources": [
+      "KSPCB-ENVIRONMENTAL-CLEARANCE-PORTAL",
+      "PARIVESH-EC-SEARCH"
+    ],
+    "result": "No facility-specific environmental-clearance record identified in reviewed official public searches. This is not proof that no clearance exists."
+  },
+  "sources": [
+    {
+      "source_id": "KWA-EDAYAR-DER",
+      "publisher": "Kerala Water Authority",
+      "source_url": "https://kwa.kerala.gov.in/wp-content/uploads/2022/11/Edayar_DER-1.pdf",
+      "retrieved_on": "2026-10-23",
+      "access_summary": "Official source file preserved locally; SHA-256 recorded in raw_files.",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "No document-specific open licence identified; retain attribution and verify reuse terms."
+    },
+    {
+      "source_id": "CPCB-KSPCB-KOCHI-AUDIT-2004-05",
+      "publisher": "CPCB/KSPCB Kochi Area environmental audit (Local Area Environmental Committee)",
+      "source_url": "https://cpcb.nic.in/displaypdf.php?id=Ri1Lb2NoaS5wZGY%3D",
+      "retrieved_on": "2026-10-23",
+      "access_summary": "CPCB-hosted official PDF indexed content confirms the audit. The direct PDF endpoint redirected and could not be fetched by the browser; Indo German fuel/process wording was cross-checked in the public Studylib reproduction of the report (document id 8455809; the tool did not expose its complete slug URL).",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "No document-specific open licence identified; cite CPCB/KSPCB report."
+    },
+    {
+      "source_id": "OCMMS-CMRL-CTO-2018",
+      "publisher": "Kerala State Pollution Control Board OCMMS",
+      "source_url": "https://ocmms.nic.in/OCMMS_NEW/download.action?applicationId=7237310&industryFor=air&industryState=Kerala&industryType=CTO",
+      "retrieved_on": "2026-10-23",
+      "access_summary": "Official consent text surfaced through indexed result; local direct download returned temporary Data Unavailable HTML, not a PDF.",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "No source-specific reuse terms identified; public regulatory record."
+    },
+    {
+      "source_id": "OCMMS-CMRL-CTO-2023",
+      "publisher": "Kerala State Pollution Control Board OCMMS",
+      "source_url": "https://ocmms.nic.in/OCMMS_NEW/download.action?applicationId=18633248&industryFor=air&industryState=Kerala&industryType=CTO",
+      "retrieved_on": "2026-10-23",
+      "access_summary": "Official consent text surfaced through indexed result; local direct download returned temporary Data Unavailable HTML, not a PDF.",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "No source-specific reuse terms identified; public regulatory record."
+    },
+    {
+      "source_id": "OCMMS-SUD-CTO-2015",
+      "publisher": "Kerala State Pollution Control Board OCMMS",
+      "source_url": "https://ocmms.nic.in/OCMMS_NEW/download.action?applicationId=1233520&industryFor=air&industryState=Kerala&industryType=CTO",
+      "retrieved_on": "2026-10-23",
+      "access_summary": "Official consent text surfaced through indexed result, including historical stack limits; local direct download returned temporary HTML.",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "No source-specific reuse terms identified; public regulatory record."
+    },
+    {
+      "source_id": "OCMMS-SUD-CTO-2019",
+      "publisher": "Kerala State Pollution Control Board OCMMS",
+      "source_url": "https://ocmms.nic.in/OCMMS_NEW/download.action?applicationId=7351498&industryFor=air&industryState=Kerala&industryType=CTO",
+      "retrieved_on": "2026-10-23",
+      "access_summary": "Official consent text surfaced through indexed result; local direct download returned temporary HTML.",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "No source-specific reuse terms identified; public regulatory record."
+    },
+    {
+      "source_id": "OCMMS-SUD-CTE-2020",
+      "publisher": "Kerala State Pollution Control Board OCMMS",
+      "source_url": "https://ocmms.nic.in/OCMMS_NEW/download.action?applicationId=10198074&industryFor=Air%2FWater%2FHWM&industryState=Kerala&industryType=CTE",
+      "retrieved_on": "2026-10-23",
+      "access_summary": "Official consent text surfaced through indexed result; local direct download returned temporary HTML.",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "No source-specific reuse terms identified; public regulatory record."
+    },
+    {
+      "source_id": "OCMMS-SUD-CTO-VAR-2021",
+      "publisher": "Kerala State Pollution Control Board OCMMS",
+      "source_url": "https://ocmms.nic.in/OCMMS_NEW/download.action?applicationId=13009688&industryFor=air&industryState=Kerala&industryType=CTO",
+      "retrieved_on": "2026-10-23",
+      "access_summary": "Official variation-order text surfaced through indexed result; natural gas and biomass are listed as raw materials, not identified as fuel.",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "No source-specific reuse terms identified; public regulatory record."
+    },
+    {
+      "source_id": "OCMMS-ARJUNA-CTO-2019",
+      "publisher": "Kerala State Pollution Control Board OCMMS",
+      "source_url": "https://ocmms.nic.in/OCMMS_NEW/download.action?applicationId=7185911&industryFor=air&industryState=Kerala&industryType=CTO",
+      "retrieved_on": "2026-10-23",
+      "access_summary": "Official consent text surfaced through indexed result; local direct download returned temporary HTML.",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "No source-specific reuse terms identified; public regulatory record."
+    },
+    {
+      "source_id": "OCMMS-ARJUNA-CTE-2021",
+      "publisher": "Kerala State Pollution Control Board OCMMS",
+      "source_url": "https://ocmms.nic.in/OCMMS_NEW/download.action?applicationId=14148337&industryFor=Air%2FWater%2FHWM&industryState=Kerala&industryType=CTE",
+      "retrieved_on": "2026-10-23",
+      "access_summary": "Official consent text surfaced through indexed result; local direct download returned temporary HTML.",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "No source-specific reuse terms identified; public regulatory record."
+    },
+    {
+      "source_id": "OCMMS-TMS-CTO-2018",
+      "publisher": "Kerala State Pollution Control Board OCMMS",
+      "source_url": "https://ocmms.nic.in/OCMMS_NEW/download.action?applicationId=7306237&industryFor=air&industryState=Kerala&industryType=CTO",
+      "retrieved_on": "2026-10-23",
+      "access_summary": "Official consent text surfaced through indexed result; local direct download returned temporary HTML.",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "No source-specific reuse terms identified; public regulatory record."
+    },
+    {
+      "source_id": "OCMMS-TMS-CTO-2023",
+      "publisher": "Kerala State Pollution Control Board OCMMS",
+      "source_url": "https://ocmms.nic.in/OCMMS_NEW/download.action?applicationId=18649703&industryFor=air&industryState=Kerala&industryType=CTO",
+      "retrieved_on": "2026-10-23",
+      "access_summary": "Official consent text surfaced through indexed result; local direct download returned temporary HTML.",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "No source-specific reuse terms identified; public regulatory record."
+    },
+    {
+      "source_id": "OCMMS-ACTIVE-CTO-2019",
+      "publisher": "Kerala State Pollution Control Board OCMMS",
+      "source_url": "https://ocmms.nic.in/OCMMS_NEW/download.action?applicationId=7224178&industryFor=air&industryState=Kerala&industryType=CTO",
+      "retrieved_on": "2026-10-23",
+      "access_summary": "Official consent text surfaced through indexed result; local direct download returned temporary HTML.",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "No source-specific reuse terms identified; public regulatory record."
+    },
+    {
+      "source_id": "OCMMS-INDO-GERMAN-CTO-2019",
+      "publisher": "Kerala State Pollution Control Board OCMMS",
+      "source_url": "https://ocmms.nic.in/OCMMS_NEW/download.action?applicationId=7269462&industryFor=air&industryState=Kerala&industryType=CTO",
+      "retrieved_on": "2026-10-23",
+      "access_summary": "Official consent text surfaced through indexed result; local direct download returned temporary HTML.",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "No source-specific reuse terms identified; public regulatory record."
+    },
+    {
+      "source_id": "OCMMS-RUBBER-O-MALABAR-CTO-2020",
+      "publisher": "Kerala State Pollution Control Board OCMMS",
+      "source_url": "https://ocmms.nic.in/OCMMS_NEW/download.action?applicationId=13443493&industryFor=air&industryState=Kerala&industryType=CTO",
+      "retrieved_on": "2026-10-23",
+      "access_summary": "Official consent text surfaced through indexed result; local direct download returned temporary HTML.",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "No source-specific reuse terms identified; public regulatory record."
+    },
+    {
+      "source_id": "OCMMS-MALAYA-CTE-2020",
+      "publisher": "Kerala State Pollution Control Board OCMMS",
+      "source_url": "https://ocmms.nic.in/OCMMS_NEW/download.action?applicationId=13920774&industryFor=Air%2FWater%2FHWM&industryState=Kerala&industryType=CTE",
+      "retrieved_on": "2026-10-23",
+      "access_summary": "Official consent text surfaced through indexed result; local direct download returned temporary HTML.",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "No source-specific reuse terms identified; public regulatory record."
+    },
+    {
+      "source_id": "OCMMS-MALAYA-CTO-2022",
+      "publisher": "Kerala State Pollution Control Board OCMMS",
+      "source_url": "https://ocmms.nic.in/OCMMS_NEW/download.action?applicationId=14999996&industryFor=air&industryState=Kerala&industryType=CTO",
+      "retrieved_on": "2026-10-23",
+      "access_summary": "Official consent text surfaced through indexed result; local direct download returned temporary HTML.",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "No source-specific reuse terms identified; public regulatory record."
+    },
+    {
+      "source_id": "OCMMS-REJECTED-APPLICATIONS-2014-2024",
+      "publisher": "Kerala State Pollution Control Board OCMMS",
+      "source_url": "https://ocmms.nic.in/OCMMS_NEW/getData.action?application=rejected&district=ESC+ELOOR&state=Kerala&status=consent&yearFrom=2014&yearTo=2024",
+      "retrieved_on": "2026-10-23",
+      "access_summary": "Official status-list result includes dated rejected applications for Sud Chemie, Active Char, Indo German and Malaya. Query is limited to 2014-2024.",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "No source-specific reuse terms identified; public regulatory status list."
+    },
+    {
+      "source_id": "CSEZ-ACTIVE-CHAR-UNIT-LIST",
+      "publisher": "Cochin Special Economic Zone, Government of India",
+      "source_url": "https://csez.com/rti/php/EOU_WEB_KL_MAST.htm",
+      "retrieved_on": "2026-10-23",
+      "access_summary": "Official EOU directory lists Active Char Products, Edayar address and activated carbon; directory status may not be current.",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "No dataset-specific open licence identified."
+    },
+    {
+      "source_id": "ARJUNA-EDAYAR-FACILITY",
+      "publisher": "Arjuna Natural Pvt Ltd",
+      "source_url": "https://arjunanatural.com/contact-us/",
+      "retrieved_on": "2026-10-23",
+      "access_summary": "Company page identifies the Edayar facility address; company-wide product/process statements are not treated as facility-specific emissions evidence.",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "Company website; no reuse licence identified."
+    },
+    {
+      "source_id": "KERALA-BOILER-REGISTER-2024",
+      "publisher": "Department of Factories and Boilers, Government of Kerala",
+      "source_url": "https://fabkerala.gov.in/images/Boiler/new_boiler_list_082024.pdf",
+      "retrieved_on": "2026-10-23",
+      "access_summary": "Official boiler registry lists Rubber O Malabar, its Edayar address, boiler registration/year and wood as registered fuel.",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "No dataset-specific open licence identified."
+    },
+    {
+      "source_id": "ALLIANCE-RUBBER-O-MALABAR-IDENTITY",
+      "publisher": "Alliance Conveyors",
+      "source_url": "https://allianceconv.com/aboutus/",
+      "retrieved_on": "2026-10-23",
+      "access_summary": "Company page states Alliance Conveyors is formerly Rubber O’ Malabar Products Pvt Ltd and describes conveyor-belt manufacturing.",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "Company website; no reuse licence identified."
+    },
+    {
+      "source_id": "ALLIANCE-RUBBER-O-MALABAR-ADDRESS",
+      "publisher": "Alliance Conveyors",
+      "source_url": "https://allianceconv.com/contact/",
+      "retrieved_on": "2026-10-23",
+      "access_summary": "Company contact page lists Rubber O’ Malabar Products Pvt Ltd and Edayar/Muppathadam address.",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "Company website; no reuse licence identified."
+    },
+    {
+      "source_id": "KSPCB-ENVIRONMENTAL-CLEARANCE-PORTAL",
+      "publisher": "Kerala State Pollution Control Board",
+      "source_url": "https://kspcb.kerala.gov.in/environmental-clearance",
+      "retrieved_on": "2026-10-23",
+      "access_summary": "Official portal checked for facility-specific EC links; no matching facility documents identified in reviewed searches.",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "Portal terms were not identified."
+    },
+    {
+      "source_id": "PARIVESH-EC-SEARCH",
+      "publisher": "Ministry of Environment, Forest and Climate Change, Government of India",
+      "source_url": "https://environmentclearance.nic.in/onlinesearch_state_main.aspx",
+      "retrieved_on": "2026-10-23",
+      "access_summary": "Official EC search page checked; no facility-specific Edayar EC documents identified in reviewed searches.",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "Portal terms were not identified."
+    },
+    {
+      "source_id": "KERALA-BOILER-REGISTER-2025",
+      "publisher": "Department of Factories and Boilers, Government of Kerala",
+      "source_url": "https://fabkerala.gov.in/images/Boiler/boiler_registered_list_2025_ason_07_11_2025.pdf",
+      "retrieved_on": "2026-10-23",
+      "access_summary": "Official searchable boiler-register extract lists Rubber O Malabar at Edayar and fuel as wood; it is a historic equipment/fuel register, not evidence of current fuel use.",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "No dataset-specific open licence identified."
+    },
+    {
+      "source_id": "KOCHI-ENVIRONMENTAL-AUDIT-MIRROR",
+      "publisher": "Third-party public reproduction of Local Area Environmental Committee report; official report hosted by CPCB",
+      "source_url": "https://cpcb.nic.in/displaypdf.php?id=Ri1Lb2NoaS5wZGY%3D",
+      "retrieved_on": "2026-10-23",
+      "access_summary": "Studylib document id 8455809 reproduced the official 2004-05 Eloor-Edayar audit. Its accessible text gives the Indo German inspection date 2005-01-05, activated-carbon production, furnace oil use and process. The web tool did not expose the complete mirror URL slug; use the CPCB source_url for the original report.",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "Third-party copy; no reuse terms identified. Verify against the official report before redistribution.",
+      "secondary_copy_host": "https://studylib.net",
+      "secondary_copy_document_id": "8455809"
+    },
+    {
+      "source_id": "ARJUNA-SUSTAINABILITY-REPORT-2024",
+      "publisher": "Arjuna Natural Pvt Ltd",
+      "source_url": "https://arjunanatural.com/wp-content/uploads/2025/01/Arjuna-Natural-Sustainability-V5-Final-1.pdf",
+      "retrieved_on": "2026-10-23",
+      "access_summary": "Company sustainability report 2024 includes facility-level energy/water-consumption reduction percentages for Edayar, but no pollutant-emission measurements or Edayar fuel breakdown were identified.",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "Company report; no reuse licence identified."
+    },
+    {
+      "source_id": "KSPCB-MPR-FEB-2024-SUD-CHEMIE-EFFLUENT",
+      "publisher": "Kerala State Pollution Control Board (official report hosted by Kerala State River Rejuvenation Commission)",
+      "source_url": "https://www.ksrrc.in/storage/category/pdf/MPR%20FEB%20FC%20signed.pdf2024-05-08-10-15-AM-663b26a763643.pdf",
+      "retrieved_on": "2026-10-25",
+      "publication_date": "Forwarding letter dated 2024-05-07; report covers February 2024.",
+      "access_summary": "Page 44 lists Sud Chemie India Private Limited, Edayar. The latest-analysis table gives effluent monitoring date 2024-01-31 and reports pH 8.16, SS 34.8 mg/L, hexavalent chromium NA, oil and grease BDL, free ammonia NA, ammoniacal nitrogen NA; KSPCB states analyzed parameters conformed to standards. This is treated-effluent evidence only, not stack-emissions data.",
+      "limitations": "The table does not identify a laboratory, analytical method, or exact sample point. It reports the discharge mode as Periyar downstream of Pathalam bund. NA and BDL are retained as printed and are not converted to zero.",
+      "sha256": null,
+      "local_source_copy": false,
+      "reuse_terms": "No dataset-specific open licence identified."
+    }
+  ],
+  "limitations": [
+    "No verified individual facility coordinates were found; the DIC estate drawing and estate reference location were not assigned to named firms.",
+    "No actual measured air-emissions values were found in the reviewed records. Permit limits are recorded separately and are not treated as measured emissions.",
+    "The Sud Chemie historical consent lists natural gas and biomass under raw materials; fuel use is therefore unavailable rather than inferred.",
+    "The Indo German furnace-oil use and Rubber O Malabar boiler fuel are historical records and do not establish present fuel use.",
+    "The public rejected-application list reviewed covers 2014-2024. It does not establish consent history after that period; later grants, revocations or renewals may be unindexed or unavailable.",
+    "A consent document's stated expiry is reported as printed; subsequent revocation or variation was not independently verified.",
+    "Environmental-clearance searches did not identify facility records; the result is not evidence that no clearance exists.",
+    "The Edayar facility list is candidate-only; current operation is not established for every named unit.",
+    "Indo German historical fuel/process details were also checked in a public Studylib reproduction of the Local Area Environmental Committee audit (document id 8455809) because the CPCB-hosted PDF endpoint redirected; the source register marks this secondary access path.",
+    "Arjuna Natural?s 2024 sustainability report reports an Edayar energy-consumption reduction but does not provide pollutant-emission measurements or a facility fuel breakdown.",
+    "The 2025-2026 OCMMS approved/rejected queries attempted on 2026-10-25 returned 497-byte Data Unavailable HTML pages, not status records; current registry status after the last accessible records remains unverified."
+  ],
+  "ranking_policy": "No facility is ranked or called a pollution source. Facility proximity, industrial category, consent history, fuel use, boiler registration or stack design alone are not causal evidence; time-aligned measured pollutant and meteorology evidence is absent.",
+  "additional_official_review": {
+    "reviewed_on": "2026-10-25",
+    "current_consent_status": {
+      "not_established": {
+        "EDAYAR-002": "Latest located granted CTO expired 2023-06-30; a 2023 CTO Air application was rejected. No later current CTO was established.",
+        "EDAYAR-003": "Latest located CTO expired 2023-06-30. The 2021 CTE is not a CTO; current operating consent was not established.",
+        "EDAYAR-005": "Latest located granted CTO expired 2023-06-30; a 2023 CTO Air application was rejected. No later current CTO was established.",
+        "EDAYAR-006": "Latest located granted CTO expired 2023-06-30; a 2023 CTO Air application was rejected. No later current CTO was established.",
+        "EDAYAR-007": "Latest located CTO expired 2025-09-30; no later renewal was established in the reviewed records."
+      },
+      "live_registry_check": "Approved and rejected OCMMS queries for district ESC ELOOR and years 2025-2026 were attempted on 2026-10-25. Each returned HTTP 200 with a 497-byte HTML page titled Data Unavailable, not a consent status list. These pages are excluded as evidence. Search-indexed status results found during this review were limited to the previously recorded 2014-2024 query. This failure does not establish that later applications or status changes do not exist.",
+      "attempted_urls": [
+        "https://ocmms.nic.in/OCMMS_NEW/getData.action?application=approved&district=ESC+ELOOR&state=Kerala&status=consent&yearFrom=2025&yearTo=2026",
+        "https://ocmms.nic.in/OCMMS_NEW/getData.action?application=rejected&district=ESC+ELOOR&state=Kerala&status=consent&yearFrom=2025&yearTo=2026"
+      ],
+      "indexed_consent_text_not_live_verification": {
+        "EDAYAR-001": "Official OCMMS indexed text states expiry 2028-06-30. The certificate file was inaccessible; live current status is unverified.",
+        "EDAYAR-004": "Official OCMMS indexed text states expiry 2028-06-30. The certificate file was inaccessible; live current status is unverified.",
+        "EDAYAR-008": "Official OCMMS indexed text states expiry 2026-12-31. The certificate file was inaccessible; live current status is unverified."
+      }
+    },
+    "stack_emissions": {
+      "result": "No accessible official source located with facility-level stack-test results identifying pollutant, measured value, units, sampling date, and reporting authority for any of the eight candidates.",
+      "searched": [
+        "KSPCB public air-quality and monitoring-report pages and facility-name searches.",
+        "CPCB public search results and reports for Edayar and named candidate facilities.",
+        "OCMMS consent records and facility-name searches; permit limits and stack design details were not treated as measurements."
+      ],
+      "excluded_material": {
+        "publisher": "Central Pollution Control Board",
+        "source_url": "https://cpcb.nic.in/openpdffile.php?id=UHVibGljYXRpb25GaWxlLzQ3OTZfMTc0NjA5ODI0OF9tZWRpYXBob3RvOTI5MC5wZGY%3D",
+        "retrieved_on": "2026-10-25",
+        "publication_date": "Not verified from accessible content.",
+        "access_status": "Indexed search excerpt only; direct PDF endpoint returned a cache-miss/redirect error in the review tool.",
+        "search_excerpt_scope": "The excerpt concerns a 2024-10-06 CPCB TMS Leathers inspection and treated-effluent/OCEMS wastewater observations; it does not show a stack-emission test.",
+        "decision": "Not accepted as a verified report or measurement and not added to facility measurement fields.",
+        "limitations": "The report contents and publication date could not be verified from an accessible document."
+      },
+      "ambient_data_boundary": "KSPCB public ambient-monitoring reports concern monitoring stations and ambient air, not facility stack tests; they cannot be attributed to a named facility."
+    },
+    "facility_coordinates": {
+      "result": "No verified facility-level coordinates found for any of the eight candidates.",
+      "searched": "Official OCMMS consent material, KSPCB and government records, and facility-name searches for latitude/longitude or mapped parcel coordinates. Addresses, survey numbers, estate locations, and ambient monitoring-station coordinates were not substituted for facility coordinates."
+    },
+    "other_official_record": {
+      "source_id": "KSPCB-MPR-FEB-2024-SUD-CHEMIE-EFFLUENT",
+      "finding": "A publicly accessible KSPCB monthly progress report provides historical treated-effluent analysis for Sud Chemie on 2024-01-31. It does not provide stack-emission data or establish current CTO status."
+    },
+    "sources_reviewed": [
+      {
+        "publisher": "Kerala State Pollution Control Board",
+        "source_url": "https://kspcb.kerala.gov.in/samp",
+        "retrieved_on": "2026-10-25",
+        "publication_date": "Dynamic public page; no page publication date stated.",
+        "finding": "Lists public SAMP and AQI monitoring reports. These are ambient monitoring reports and do not provide candidate-facility stack tests or live consent status.",
+        "limitations": "Station-level ambient records cannot be assigned to a named facility."
+      },
+      {
+        "publisher": "Kerala State Pollution Control Board",
+        "source_url": "https://kspcb.kerala.gov.in/activities/ambient-monitoring",
+        "retrieved_on": "2026-10-25",
+        "publication_date": "Not stated on the reviewed page.",
+        "finding": "Lists ambient monitoring stations and describes KSPCB programmes; no candidate-facility coordinates or stack results are published on the reviewed page.",
+        "limitations": "Ambient station locations and readings do not establish facility coordinates or source attribution."
+      },
+      {
+        "publisher": "Kerala State Pollution Control Board",
+        "source_url": "https://www.kspcb.kerala.gov.in/activities/waste-management/air-pollution",
+        "retrieved_on": "2026-10-25",
+        "publication_date": "Not stated on the reviewed page.",
+        "finding": "Describes consent and emission-monitoring requirements; does not provide facility-specific monitoring results.",
+        "limitations": "General regulatory information cannot establish current consent status or measured emissions for a named facility."
+      },
+      {
+        "publisher": "Ministry of Environment, Forest and Climate Change / KSPCB OCMMS",
+        "source_url": "https://ocmms.nic.in/OCMMS_NEW/deshboard.jsp",
+        "retrieved_on": "2026-10-25",
+        "publication_date": "Not applicable to the portal landing page.",
+        "finding": "Public portal identified for consent application and status records. The attempted 2025-2026 district status queries returned error HTML rather than results.",
+        "limitations": "The query error does not establish absence of later applications, renewals, revocations or other status changes."
+      },
+      {
+        "publisher": "Kerala State Pollution Control Board (official report hosted by Kerala State River Rejuvenation Commission)",
+        "source_url": "https://www.ksrrc.in/storage/category/pdf/MPR%20FEB%20FC%20signed.pdf2024-05-08-10-15-AM-663b26a763643.pdf",
+        "retrieved_on": "2026-10-25",
+        "publication_date": "Forwarding letter dated 2024-05-07; report covers February 2024.",
+        "finding": "Page 44 lists Sud Chemie India Private Limited, Edayar. The latest-analysis table gives effluent monitoring date 2024-01-31 and reports pH 8.16, SS 34.8 mg/L, hexavalent chromium NA, oil and grease BDL, free ammonia NA, ammoniacal nitrogen NA; KSPCB states analyzed parameters conformed to standards. This is treated-effluent evidence only, not stack-emissions data.",
+        "limitations": "The table does not identify a laboratory, analytical method, or exact sample point. It reports the discharge mode as Periyar downstream of Pathalam bund. NA and BDL are retained as printed and are not converted to zero."
+      }
+    ]
+  }
+}

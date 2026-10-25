@@ -1,0 +1,82 @@
+{
+  "generated_on": "2026-10-23",
+  "extractor": "scripts/prepare_kspcb_air_reports.py",
+  "extractor_version": "pypdf 6.21.2, local review run",
+  "sources": {
+    "monthly_caaqms": {
+      "publisher": "Kerala State Pollution Control Board",
+      "source_url": "https://kspcb.kerala.gov.in/fileViewer/UHIwKzVlZkpwTnVzaVAxY2lHZlRZTzNUQ0dBczBoYktqTmN3dFVHb2xUMm1rTktMUldZTjR4UHgyZGYwWFE1NTdYckNpc0ZweUhZc1pXaXlhK1V5UEE9PQ%2A%2A/0?raw=1",
+      "directory_url": "https://kspcb.kerala.gov.in/water-and-air-quality-directory",
+      "retrieved_on": "2026-10-23",
+      "sha256": "1cbdc3805b4406eb05af1abc67a7c5f22466944efc10333b1f116867576b4002",
+      "bytes": 923058,
+      "reuse_terms": "No dataset-specific reuse licence was found. Attribute the public source; confirm permission before redistribution beyond this project.",
+      "limitations": [
+        "Directory label and report title say August 2026; the Eloor page is daily by date.",
+        "The PDF gives pollutant units but not exact averaging intervals, row-level QA flags, completeness/capture, a station code, or coordinates for Eloor.",
+        "A numeric value means the report published a value; it is not an independent quality certification."
+      ],
+      "outputs": {
+        "kspcb_caaqms_eloor_daily_2026-08.csv": {
+          "sha256": "14886c1cb86deca55d33dd495751b2aab7a3f3aae7eaaf561100b2feba8228e9",
+          "rows": 279
+        },
+        "kspcb_caaqms_eloor_aqi_2026-08.csv": {
+          "sha256": "fbe91c0608d8e2ea494b8fdd99f4b97b880441798e396c6db80ed8a690972a83",
+          "rows": 31
+        },
+        "kspcb_caaqms_eloor_weather_2026-08.csv": {
+          "sha256": "c0aa04b9be20388d686441253d47e16304ac13c57bf8eed4d7d712b88e348b9b",
+          "rows": 31
+        }
+      }
+    },
+    "daily_aqi": {
+      "publisher": "Kerala State Pollution Control Board",
+      "source_url": "https://kspcb.kerala.gov.in/fileViewer/azN0VDUxTVp6VmpieWlJZmc1UnoyZmF0ckErZWlCNWltVzlEaFlYM3BEeC9kT1hvQkdEek1VQ2pxbUVnZk1nOE81MTYzcXJyUFlLYzZQL2NISDRDVXc9PQ%2A%2A/0?raw=1",
+      "directory_url": "https://kspcb.kerala.gov.in/water-and-air-quality-directory",
+      "retrieved_on": "2026-10-23",
+      "sha256": "5c86fea66c55643307eb8ede78e2b9b175f835c46efd2d1407239f2e766986fd",
+      "bytes": 471812,
+      "reuse_terms": "No dataset-specific reuse licence was found. Attribute the public source; confirm permission before redistribution beyond this project.",
+      "limitations": [
+        "Report date is 16 October 2026; the values are historical and are not a live feed.",
+        "The directory identifies the document as a daily-average AQI report; exact per-pollutant averaging intervals and completeness flags are not printed.",
+        "Station identifiers and coordinates are not included; three stations report insufficient data and one reports power failure."
+      ],
+      "outputs": {
+        "kspcb_daily_aqi_2026-10-16.csv": {
+          "sha256": "c30ef5a2ffac3a332c11a9f8e22a2f6c6728162811e0794d8547a773f922be82",
+          "rows": 5
+        },
+        "kspcb_daily_aqi_status_2026-10-16.csv": {
+          "sha256": "1ff44a8a57e5dfa2fc353104827b67dfa8912c1f3d77313055f21c7514a5f632",
+          "rows": 4
+        }
+      }
+    },
+    "namp": {
+      "publisher": "Kerala State Pollution Control Board",
+      "source_url": "https://kspcb.kerala.gov.in/fileViewer/NXNVM0NVdTVKeUVBdWtZTVdTWXgyUnNDVW4zQ1Y2TlVtWG14SWpFZmdzVT0%2A/0?raw=1",
+      "directory_url": "https://kspcb.kerala.gov.in/water-and-air-quality-directory",
+      "retrieved_on": "2026-10-23",
+      "sha256": "29f7e9c00da304357156c022bccbd7a9418e0b811003b75594ba88bf1ee13a1c",
+      "bytes": 3564414,
+      "reuse_terms": "No dataset-specific reuse licence was found. Attribute the public source; confirm permission before redistribution beyond this project.",
+      "limitations": [
+        "The directory filename says August 2025, but the report pages for Ernakulam state June 2025.",
+        "The report prints station codes, dates, decimal latitude/longitude, pollutant values, 4-hour/8-hour samples and 24-hour averages, and some missing-sample notes.",
+        "Pollutant concentration units and coordinate reference system are not stated in the reviewed pages; rows are preserved but excluded from concentration analysis.",
+        "Some coordinates vary within the Kuttippadam page; retain row-level values and do not promote that coordinate to a station point.",
+        "pypdf emitted four unresolved indirect-object warnings while parsing this PDF; the 62 extracted rows passed structural checks, but source-table review remains appropriate."
+      ],
+      "outputs": {
+        "kspcb_namp_ernakulam_2025-06.csv": {
+          "sha256": "433f2663ea706c70db6d187a532429dc001782c90a0d9e3a222a0d29526ee392",
+          "rows": 62
+        }
+      }
+    }
+  },
+  "analysis_boundary": "Only the August 2026 Eloor CAAQMS daily concentration series has both dated values and source-stated units. NAMP observations with unstated units are archived separately and not passed to the analysis pipeline."
+}
