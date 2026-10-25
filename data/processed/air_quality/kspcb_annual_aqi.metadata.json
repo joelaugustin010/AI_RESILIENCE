@@ -1,0 +1,47 @@
+{
+  "dataset": "KSPCB year-labeled Annual Average Air Quality Index summaries",
+  "source_page": "https://kspcbipam.kerala.gov.in/Dashboard/airQuality",
+  "retrieved_at_utc": "2026-10-23T15:49:13.502404+00:00",
+  "raw_files": [
+    {
+      "path": "kspcb_annual_aqi_2023_20261023T154709Z.json",
+      "metadata": "kspcb_annual_aqi_2023_20261023T154709Z.metadata.json",
+      "sha256": "e1ac179044cbeca12e8af2ebe90a0e9e5952a7e00008288d7f95680e5eb898aa",
+      "year": 2023
+    },
+    {
+      "path": "kspcb_annual_aqi_2024_20261023T154709Z.json",
+      "metadata": "kspcb_annual_aqi_2024_20261023T154709Z.metadata.json",
+      "sha256": "ab9546071dd7429b73f22a1c51f4d0c55de0e7e1baba039f161ecd717b3bfaab",
+      "year": 2024
+    },
+    {
+      "path": "kspcb_annual_aqi_2025_20261023T154709Z.json",
+      "metadata": "kspcb_annual_aqi_2025_20261023T154709Z.metadata.json",
+      "sha256": "f3b33a83fac58165c0813a74189d3a8557150d4d1b0c47a175b0022466fc6c20",
+      "year": 2025
+    },
+    {
+      "path": "kspcb_annual_aqi_2026_20261023T154709Z.json",
+      "metadata": "kspcb_annual_aqi_2026_20261023T154709Z.metadata.json",
+      "sha256": "a92f5fd2764625cb25fe0d7e1401cabb0973608eeb010726dfc92fc8c2892f82",
+      "year": 2026
+    }
+  ],
+  "processed_file": "kspcb_annual_aqi.csv",
+  "processed_sha256": "7d2a0dad72a852dc0fb55b63fa47cac2c3cda4e115a629859ad88838cbeb1855",
+  "rows": 130,
+  "years": [
+    2023,
+    2024,
+    2025,
+    2026
+  ],
+  "statewide_source_rows": 130,
+  "exact_reference_station_matches": 9,
+  "unmatched_station_rows": 121,
+  "transformation": "Strict schema/range validation; normalized source names; exact punctuation/case/space station mapping with matching monitoring program only; no interpolation or estimate.",
+  "period_limit": "Endpoint exposes year labels and average_aqi values, but no precise aggregation cutoff or observation timestamps.",
+  "reuse_terms": "Dataset-specific reuse terms were not located; review before republication outside this attributed project display.",
+  "not_pollutant_observations": true
+}

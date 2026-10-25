@@ -1,0 +1,85 @@
+{
+  "generated_on": "2026-10-25",
+  "extractor": "scripts/prepare_new_official_air_evidence.py plus shared parser scripts/prepare_kspcb_air_reports.py",
+  "sources": {
+    "kspcb_caaqms_eloor_2026_09": {
+      "publisher": "Kerala State Pollution Control Board",
+      "source_url": "https://kspcb.kerala.gov.in/fileViewer/UHIwKzVlZkpwTnVzaVAxY2lHZlRZS0swN04rRWJuOHBlVVNZeUNRdkZ5c0pkUlVxeDY5aDduT1AwUnR5TWt6cjRKdnp6R25UZS9ubC9oeEh3TmFUbFE9PQ%2A%2A/0?raw=1",
+      "listing_url": "https://kspcb.kerala.gov.in/water-and-air-quality-directory",
+      "retrieved_on": "2026-10-25",
+      "publication_date": "2026-09-30 (directory report date)",
+      "licence": "No dataset-specific reuse licence found; preserve publisher attribution and confirm terms before redistribution.",
+      "raw_file": "data/raw/air_quality_reports/KSPCB_CAAQMS_monthly_report_2026-09.pdf",
+      "raw_sha256": "f3412dd5cd03d32104d30449d789b407ee153407533e7a23359e12cb3bd86d45",
+      "time_coverage": {
+        "start": "2026-09-01",
+        "end": "2026-09-30",
+        "station": "Eloor CAAQMS",
+        "dated_records": 30
+      },
+      "units": {
+        "PM10": "ug/m3",
+        "PM2.5": "ug/m3",
+        "SO2": "ug/m3",
+        "CO": "mg/m3",
+        "NO": "ug/m3",
+        "NO2": "ug/m3",
+        "NOx": "ug/m3",
+        "NH3": "ug/m3",
+        "O3": "ug/m3",
+        "wind_speed": "m/s",
+        "wind_direction": "degrees",
+        "temperature": "degree C",
+        "relative_humidity": "%",
+        "rainfall": "mm"
+      },
+      "validation": "PDF signature and structure passed; Eloor September 2026 table and units were present; 30 daily rows from 2026-09-01 through 2026-09-30 parsed; nine pollutant values per date retained without changing units.",
+      "outputs": {
+        "kspcb_caaqms_eloor_daily_2026-09.csv": {
+          "sha256": "c0888fa4fc8e76bab0c49e133e4cbe261705032dad294a87744693be9ef3b217",
+          "rows": 270
+        },
+        "kspcb_caaqms_eloor_aqi_2026-09.csv": {
+          "sha256": "f2fe3c007fddc6676fb66ca4be3a308fd309946f7301f4d17da3f90e8eaa2b36",
+          "rows": 30
+        },
+        "kspcb_caaqms_eloor_weather_2026-09.csv": {
+          "sha256": "fac8b82c163bc3b91e1b8047c96b0449f5c5f1cce5fe519ed9637a3ee64d60ce",
+          "rows": 30
+        }
+      },
+      "limitations": [
+        "Report values are daily summary values; exact averaging intervals and row-level QA/completeness are not stated.",
+        "Station coordinates and station code are absent; the Eloor station location cannot be verified from this report.",
+        "Daily summary weather fields share dates with pollution rows but cannot provide subdaily time alignment or a dispersion model input series.",
+        "This is ambient monitoring, not facility stack testing; AQI is not an emissions measurement and the series alone cannot identify an industrial source."
+      ]
+    },
+    "dic_edayar_allotment_2022": {
+      "publisher": "Directorate of Industries and Commerce, Government of Kerala",
+      "source_url": "https://industry.kerala.gov.in/images/DA-DP/Ernakulam/DA_Edayar.pdf",
+      "listing_url": "https://industry.kerala.gov.in/index.php/pages/infrastructure-support/industrial-development-areas-plots1",
+      "retrieved_on": "2026-10-25",
+      "publication_date": "2022-02-15 (date in official listing label)",
+      "licence": "No dataset-specific open licence identified; preserve attribution and confirm terms before redistribution.",
+      "raw_file": "data/raw/industrial/DIC_DA_Edayar_allotment_details_2022.pdf",
+      "raw_sha256": "65ab23453d4e4f3df679d95f5671e9447edd7ae9cf19c4b64847f8ea79b99648",
+      "time_coverage": "Dated Edayar DA/DP allotment register; date basis from official listing label.",
+      "units": "Plot area in cents; plot number is a categorical identifier, not a coordinate.",
+      "validation": "PDF signature and structure passed; the source names D.A. Edayar; candidate names and serials 322 (page 26) and 338 (page 27) matched extracted source text.",
+      "outputs": {
+        "edayar_dic_allotment_crosswalk_2022.csv": {
+          "sha256": "5ce78f11741d922deeb9b3940539626a643c0b0655bc2d649e4ee7c450a3cd91",
+          "rows": 2
+        }
+      },
+      "limitations": [
+        "Only two candidate-name matches were located in the register; absence of other name matches is not evidence that those facilities are absent.",
+        "Sud Chemie row has no plot number printed; retain the plot field blank.",
+        "TMS plot 28 is not geographically georeferenced here. No candidate latitude/longitude was derived or verified.",
+        "The source's Working status is historical to the register date and does not establish current operations, consent, or emissions."
+      ]
+    }
+  },
+  "analysis_boundary": "The Eloor series is eligible for descriptive ambient-air summaries with the stated caveats. Neither source provides facility-level stack emissions or candidate coordinates; source attribution remains unsupported."
+}
