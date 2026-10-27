@@ -8,6 +8,11 @@ import streamlit as st
 
 ROOT = Path(__file__).resolve().parent
 
+DESIGN_FILE = ROOT / "app_pages" / "smart_mitigation_design.py"
+
+st.write("Design Studio file path:", str(DESIGN_FILE))
+st.write("Design Studio file exists:", DESIGN_FILE.is_file())
+
 
 @st.cache_data(ttl=3600)
 def load_quality_summary() -> tuple[str, str]:
