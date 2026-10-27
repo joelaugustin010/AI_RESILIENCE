@@ -1,4 +1,3 @@
-
 streamlit
 pydeck
 pandas
@@ -6,3 +5,4 @@ numpy
 Pillow
 scikit-learn>=1.3,<2
 pytest
+plotly
