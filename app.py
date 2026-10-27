@@ -108,7 +108,7 @@ pages = {
             icon=":material/account_balance_wallet:",
         ),
         st.Page(
-            "app_pages/smart_mitigation_design.py",
+            "app_pages/smart_mitigation_designer.py",
             title="Smart Mitigation Design Studio",
             icon=":material/engineering:",
         ),
