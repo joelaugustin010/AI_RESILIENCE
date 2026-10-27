@@ -82,7 +82,7 @@ pages = {
             title="Mitigation budget",
             icon=":material/account_balance_wallet:",
         ),
-}
+    ]
 
 page = st.navigation(pages, position="top")
 
