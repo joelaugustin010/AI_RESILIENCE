@@ -5,7 +5,7 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-
+ROOT = Path(__file__).resolve().parent
 
 @st.cache_data(ttl=3600)
 def load_quality_summary() -> tuple[str, str]:
