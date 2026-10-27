@@ -82,12 +82,6 @@ pages = {
             title="Mitigation budget",
             icon=":material/account_balance_wallet:",
         ),
-        st.Page(
-            "app_pages/smart_mitigation_design.py",
-            title="Smart Mitigation Design Studio",
-            icon=":material/engineering:",
-        ),
-    ],
 }
 
 page = st.navigation(pages, position="top")
