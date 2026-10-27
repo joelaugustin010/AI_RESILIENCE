@@ -29,128 +29,64 @@ from src.decision_workflow import budget_summary
 
 
 
+
+
 st.markdown("""
 <style>
-
-/* Professional public infrastructure dashboard */
-.stApp {
-    background: linear-gradient(135deg, #f3f7fb 0%, #edf6f5 100%);
-    color: #193247;
+.project-header {
+    background: #ffffff;
+    padding: 28px 32px;
+    border: 1px solid #d9e2ec;
+    border-top: 4px solid #17365d;
+    border-radius: 8px;
+    margin: 8px 0 26px 0;
+    box-shadow: 0 2px 8px rgba(15, 35, 60, 0.05);
 }
 
-.block-container {
-    max-width: 1500px;
-    padding-top: 1.8rem;
-    padding-bottom: 3rem;
-}
-
-/* Header */
-.gov-header {
-    background: linear-gradient(120deg, #103653 0%, #117477 100%);
-    padding: 34px 36px;
-    border-radius: 18px;
-    margin-bottom: 22px;
-    box-shadow: 0 8px 28px rgba(16, 53, 83, 0.14);
-}
-
-.gov-eyebrow {
-    color: #b9f3dd;
+.project-eyebrow {
+    color: #52677f !important;
     font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 2px;
-    margin-bottom: 12px;
+    font-weight: 700;
+    letter-spacing: 1.8px;
+    margin-bottom: 14px;
 }
 
-.gov-title {
-    color: #ffffff;
-    font-size: 32px;
+.project-title {
+    color: #17365d !important;
+    font-size: clamp(26px, 3vw, 36px);
     font-weight: 750;
-    line-height: 1.3;
+    line-height: 1.25;
     margin: 0 0 12px 0;
 }
 
-.gov-subtitle {
-    color: #e1eff6;
+.project-description {
+    color: #526174 !important;
     font-size: 15px;
-    line-height: 1.8;
+    line-height: 1.7;
+    max-width: 850px;
     margin: 0;
 }
-
-/* Section headings */
-h2, h3 {
-    color: #123b54 !important;
-    font-weight: 700 !important;
-}
-
-/* Financial KPI cards */
-div[data-testid="stMetric"] {
-    background: #ffffff;
-    border: 1px solid #dce7ed;
-    border-radius: 14px;
-    padding: 18px;
-    box-shadow: 0 4px 14px rgba(16, 53, 83, 0.06);
-}
-
-/* Project table */
-div[data-testid="stDataEditor"] {
-    border: 1px solid #dce7ed;
-    border-radius: 12px;
-    overflow: hidden;
-}
-
-/* Buttons */
-.stButton > button,
-.stDownloadButton > button {
-    border-radius: 9px;
-    font-weight: 650;
-    min-height: 42px;
-}
-
-/* Notice */
-.gov-note {
-    background: #fff8e8;
-    border-left: 4px solid #d59b27;
-    padding: 13px 17px;
-    border-radius: 8px;
-    color: #654b17;
-    font-size: 13px;
-    line-height: 1.7;
-    margin-bottom: 22px;
-}
-
-/* Sidebar */
-section[data-testid="stSidebar"] {
-    background: #f8fbfd;
-    border-right: 1px solid #dce7ed;
-}
-
-hr {
-    border-color: #dce7ed;
-}
-
 </style>
 
-<div class="gov-header">
-    <div class="gov-eyebrow">
-        AI RESILIENCE | KOCHI, KERALA, INDIA
+<div class="project-header">
+    <div class="project-eyebrow">
+        AI RESILIENCE &nbsp; | &nbsp; KOCHI, KERALA, INDIA
     </div>
-    <h1 class="gov-title">
-        Urban Flood Mitigation Budget & Project Planner
+
+    <h1 class="project-title">
+        Urban Flood Mitigation<br>
+        Budget &amp; Project Planner
     </h1>
-    <p class="gov-subtitle">
+
+    <p class="project-description">
         Public infrastructure planning concept for evaluating proposed
-        flood-mitigation investments, tracking project delivery,
-        and reviewing budget requirements.
+        flood-mitigation investments, monitoring project delivery, and
+        reviewing budget requirements.
     </p>
 </div>
-
-<div class="gov-note">
-    <strong>Planning status:</strong> Concept proposal only.
-    Costs and project details require verification. This dashboard
-    does not represent government approval, sanctioned funding,
-    or a construction-ready engineering plan.
-</div>
 """, unsafe_allow_html=True)
+
+
 
 
 st.caption(
@@ -706,6 +642,5 @@ else:
                 "among the entered projects. It does not rank safety "
                 "benefits or determine the best real-world investment."
             )
-
 
 
