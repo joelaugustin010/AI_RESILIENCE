@@ -73,16 +73,19 @@ st.markdown("""
         AI RESILIENCE &nbsp; | &nbsp; KOCHI, KERALA, INDIA
     </div>
 
-    <h1 class="project-title">
-        Urban Flood Mitigation<br>
-        Budget &amp; Project Planner
-    </h1>
+    
+<h1 class="project-title">
+    Urban Flood Mitigation Budget
+    <br>
+    &amp; Project Planning
+</h1>
 
-    <p class="project-description">
-        Public infrastructure planning concept for evaluating proposed
-        flood-mitigation investments, monitoring project delivery, and
-        reviewing budget requirements.
-    </p>
+<p class="project-description">
+    A public infrastructure planning dashboard for assessing proposed
+    flood mitigation investments, monitoring project implementation,
+    and supporting transparent budget allocation across Kochi, Kerala.
+</p>
+
 </div>
 """, unsafe_allow_html=True)
 
