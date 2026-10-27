@@ -1,0 +1,4 @@
+/data/raw/disaster_probability_data.csv text eol=lf
+/data/reference/kochi_corporation_boundary.geojson text eol=lf
+/data/raw/koch_wards_2022.geojson text eol=lf
+/data/raw/nihfw_national_hospital_directory.csv text eol=lf
