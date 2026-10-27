@@ -27,6 +27,11 @@ class NewOfficialAirEvidenceTests(unittest.TestCase):
     def test_original_official_files_match_recorded_hashes_and_pdf_signatures(self):
         for source in (self.air, self.dic):
             raw_path = ROOT / source["raw_file"]
+            self.assertTrue(
+                raw_path.is_file(),
+                f"Missing required official source: {source['raw_file']}. "
+                "Run `python scripts/acquire_air_quality_sources.py` first.",
+            )
             data = raw_path.read_bytes()
             self.assertTrue(data.startswith(b"%PDF-"))
             self.assertEqual(hashlib.sha256(data).hexdigest(), source["raw_sha256"])

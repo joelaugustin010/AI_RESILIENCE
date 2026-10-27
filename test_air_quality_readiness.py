@@ -1,5 +1,6 @@
 """Checks that the pollution page only presents source-verified context."""
 
+import hashlib
 import json
 import unittest
 from pathlib import Path
@@ -161,10 +162,25 @@ class KspcbAnnualSummaryTests(unittest.TestCase):
         self.assertEqual(rows["year"].unique().tolist(), [2023, 2024, 2025, 2026])
         self.assertEqual(int(rows["reference_station"].notna().sum()), 9)
         self.assertTrue(metadata["not_pollutant_observations"])
-        self.assertIn("period_cutoff", json.loads(
-            (ROOT / "data" / "raw" / "air_quality" / metadata["raw_files"][-1]["metadata"])
-            .read_text(encoding="utf-8")
-        ))
+        source_directory = ROOT / "data" / "raw" / "air_quality"
+        for source in metadata["raw_files"]:
+            source_path = source_directory / source["path"]
+            source_metadata_path = source_directory / source["metadata"]
+            self.assertTrue(
+                source_path.is_file(),
+                f"Missing required KSPCB source data: {source_path.relative_to(ROOT)}. "
+                "Run `python scripts/acquire_air_quality_sources.py` first.",
+            )
+            self.assertTrue(
+                source_metadata_path.is_file(),
+                f"Missing required KSPCB source metadata: {source_metadata_path.relative_to(ROOT)}. "
+                "Run `python scripts/acquire_air_quality_sources.py` first.",
+            )
+            raw_bytes = source_path.read_bytes()
+            source_metadata = json.loads(source_metadata_path.read_text(encoding="utf-8"))
+            self.assertEqual(hashlib.sha256(raw_bytes).hexdigest(), source["sha256"])
+            self.assertEqual(source_metadata["raw_sha256"], source["sha256"])
+            self.assertIn("period_cutoff", source_metadata)
 
 
 class CpcbAqiCategoryTests(unittest.TestCase):
