@@ -66,33 +66,55 @@ st.set_page_config(
 )
 
 
+
 pages = {
     "Explore": [
-        st.Page("app_pages/decision_workflow.py", title="Decision workflow", icon=":material/assignment_turned_in:"),
-        st.Page("app_pages/kochi_map.py", title="Kochi map", icon=":material/map:"),
-        st.Page("app_pages/air_pollution.py", title="Air pollution", icon=":material/factory:"),
-        st.Page("app_pages/hospital_vulnerability.py", title="Hospital vulnerability", icon=":material/local_hospital:"),
-        st.Page("app_pages/compound_scenario.py", title="Cyclone + flood", icon=":material/thunderstorm:"),
-        st.Page("app_pages/disaster_probability.py", title="Disaster probability", icon=":material/monitor_heart:"),
+        st.Page(
+            "app_pages/decision_workflow.py",
+            title="Decision Workflow",
+            icon=":material/assignment_turned_in:",
+        ),
+        st.Page(
+            "app_pages/kochi_map.py",
+            title="Kochi Map",
+            icon=":material/map:",
+        ),
+        st.Page(
+            "app_pages/air_pollution.py",
+            title="Air Pollution",
+            icon=":material/factory:",
+        ),
+        st.Page(
+            "app_pages/hospital_vulnerability.py",
+            title="Hospital Vulnerability",
+            icon=":material/local_hospital:",
+        ),
+        st.Page(
+            "app_pages/compound_scenario.py",
+            title="Cyclone + Flood",
+            icon=":material/thunderstorm:",
+        ),
+        st.Page(
+            "app_pages/disaster_probability.py",
+            title="Disaster Probability",
+            icon=":material/monitor_heart:",
+        ),
     ],
-    
-    
 
-"Plan": [
-    st.Page(
-        "app_pages/mitigation_planner.py",
-        title="Mitigation Budget",
-        icon=":material/account_balance_wallet:",
-    ),
-
-    st.Page(
-        "app_pages/smart_mitigation_design.py",
-        title="Smart Mitigation Design Studio",
-        icon=":material/engineering:",
-    ),
-]
-
+    "Plan": [
+        st.Page(
+            "app_pages/mitigation_planner.py",
+            title="Mitigation Budget",
+            icon=":material/account_balance_wallet:",
+        ),
+        st.Page(
+            "app_pages/smart_mitigation_design.py",
+            title="Smart Mitigation Design Studio",
+            icon=":material/engineering:",
+        ),
+    ],
 }
+
 page = st.navigation(pages, position="top")
 
 st.title("AI RESILIENCE")
