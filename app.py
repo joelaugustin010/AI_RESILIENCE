@@ -67,6 +67,7 @@ st.set_page_config(
     layout="wide",
 )
 
+
 pages = {
     "Explore": [
         st.Page("app_pages/decision_workflow.py", title="Decision workflow", icon=":material/assignment_turned_in:"),
@@ -76,18 +77,9 @@ pages = {
         st.Page("app_pages/compound_scenario.py", title="Cyclone + flood", icon=":material/thunderstorm:"),
         st.Page("app_pages/disaster_probability.py", title="Disaster probability", icon=":material/monitor_heart:"),
     ],
-   {
     "Plan": [
-        st.Page(
-            "app_pages/mitigation_planner.py",
-            title="Mitigation budget",
-            icon=":material/account_balance_wallet:",
-        ),
-        st.Page(
-            "app_pages/smart_mitigation_design.py",
-            title="Smart Mitigation Design Studio",
-            icon=":material/engineering:",
-        ),
+        st.Page("app_pages/mitigation_planner.py", title="Mitigation budget", icon=":material/account_balance_wallet:"),
+        st.Page("app_pages/smart_mitigation_design.py", title="Smart Mitigation Design Studio", icon=":material/engineering:"),
     ],
 }
 
