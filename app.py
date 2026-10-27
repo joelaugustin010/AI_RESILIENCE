@@ -79,7 +79,11 @@ pages = {
     ],
     "Plan": [
         st.Page("app_pages/mitigation_planner.py", title="Mitigation budget", icon=":material/account_balance_wallet:"),
-        st.Page("app_pages/smart_mitigation_design.py", title="Smart Mitigation Design Studio", icon=":material/engineering:"),
+        st.Page(
+    str(ROOT / "app_pages" / "smart_mitigation_design.py"),
+    title="Smart Mitigation Design Studio",
+    icon=":material/engineering:",
+),
     ],
 }
 
