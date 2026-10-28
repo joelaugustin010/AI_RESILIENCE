@@ -684,11 +684,38 @@ def ingest_geojson_feature_lines(
     }
 
 
+def _latest_processed_layer_paths(layer_dir: Path) -> list[Path]:
+    """Return newest metadata-described snapshot per logical layer."""
+    latest: dict[str, tuple[tuple[str, str, str], Path]] = {}
+    ungrouped: list[Path] = []
+    for geojson_path in sorted(layer_dir.glob("*.geojson")) if layer_dir.is_dir() else []:
+        metadata_path = geojson_path.with_name(f"{geojson_path.stem}.metadata.json")
+        if not metadata_path.is_file():
+            ungrouped.append(geojson_path)
+            continue
+        try:
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            ungrouped.append(geojson_path)
+            continue
+        dataset_id = str(metadata.get("dataset_id") or geojson_path.stem)
+        logical_id = str(metadata.get("logical_layer_id") or f"dataset:{dataset_id}")
+        order = (
+            str(metadata.get("retrieved_at_utc") or metadata.get("retrieved_on") or ""),
+            str(metadata.get("source_database_timestamp") or ""),
+            dataset_id,
+        )
+        current = latest.get(logical_id)
+        if current is None or order > current[0]:
+            latest[logical_id] = (order, geojson_path)
+    return sorted(ungrouped + [entry[1] for entry in latest.values()])
+
+
 def read_processed_layers(processed_root: Path, coverage_geometry: dict[str, Any] | None = None) -> list[dict[str, Any]]:
-    """Load only processed GeoJSON layers whose provenance and validation pass."""
+    """Load only the newest snapshot per logical layer when its validation passes."""
     layer_dir = Path(processed_root) / "spatial_layers"
     layers = []
-    for geojson_path in sorted(layer_dir.glob("*.geojson")) if layer_dir.is_dir() else []:
+    for geojson_path in _latest_processed_layer_paths(layer_dir):
         metadata_path = geojson_path.with_name(f"{geojson_path.stem}.metadata.json")
         if not metadata_path.is_file():
             continue
@@ -715,7 +742,7 @@ def processed_layer_issues(processed_root: Path, coverage_geometry: dict[str, An
     issues = []
     if not layer_dir.is_dir():
         return issues
-    for geojson_path in sorted(layer_dir.glob("*.geojson")):
+    for geojson_path in _latest_processed_layer_paths(layer_dir):
         metadata_path = geojson_path.with_name(f"{geojson_path.stem}.metadata.json")
         if not metadata_path.is_file():
             issues.append(f"{geojson_path.name}: missing provenance metadata sidecar; layer not loaded.")

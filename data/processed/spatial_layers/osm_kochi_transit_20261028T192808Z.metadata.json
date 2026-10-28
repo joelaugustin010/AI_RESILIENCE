@@ -1,0 +1,82 @@
+{
+  "dataset_id": "osm_kochi_transit_20261028T192808Z",
+  "logical_layer_id": "osm_kochi_transit",
+  "title": "OpenStreetMap mapped rail and transit ways (Ernakulam urban extent)",
+  "publisher": "OpenStreetMap contributors",
+  "source_url": "https://www.openstreetmap.org/",
+  "copyright_url": "https://www.openstreetmap.org/copyright",
+  "query_service_url": "https://overpass-api.de/api/interpreter",
+  "retrieved_on": "2026-10-28",
+  "retrieved_at_utc": "2026-10-28T19:28:08.864883+00:00",
+  "publication_date": "Not stated by source; OSM database state as of 2026-10-28T19:25:34Z",
+  "license": "Open Database License 1.0 (ODbL); attribution and share-alike apply to the extracted database.",
+  "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+  "attribution": "© OpenStreetMap contributors",
+  "crs": "EPSG:4326",
+  "units": "Decimal degrees (longitude, latitude); source-specific tags have no common measurement units.",
+  "geographic_coverage": "Bounding box south=9.85, west=76.15, north=10.2, east=76.45; query selection only, not a legal boundary.",
+  "coverage_bbox_south_west_north_east": [
+    9.85,
+    76.15,
+    10.2,
+    76.45
+  ],
+  "layer_role": "context",
+  "validation_status": "PROVISIONAL",
+  "analysis_status": "Context display only; not used for exposure, safety, source-attribution, or emergency-access conclusions.",
+  "required_properties": [
+    "osm_type",
+    "osm_id",
+    "feature_type",
+    "feature_name",
+    "source",
+    "osm_url"
+  ],
+  "source_query": "[out:json][timeout:120];\n(\n  way[\"highway\"~\"^(motorway|trunk|primary|secondary|tertiary|unclassified|residential|living_street)$\"](9.88971828,76.23735890,10.04976931,76.34002933);\n  way[\"railway\"~\"^(rail|light_rail|tram|subway)$\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  way[\"waterway\"~\"^(river|canal|stream|drain|ditch)$\"](9.85000000,76.15000000,10.20000000,76.45000000);\n);\nout geom;",
+  "source_query_sha256": "4f1c02d15a3a8a7a54b5c04a598cc59845f13a9287cb310271e9388e92428f86",
+  "source_database_timestamp": "2026-10-28T19:25:34Z",
+  "source_snapshot_file": "kochi_network_20261028T192808Z.json.gz",
+  "source_snapshot_sha256": "4fed76c1c78017c4c5625f418af353bee18c2e94aa5765338eaf1b72a6a1964b",
+  "source_feature_count": 442,
+  "processed_feature_count": 442,
+  "excluded_invalid_features": [],
+  "duplicate_count": 0,
+  "limitations": [
+    "Community-mapped coverage is incomplete and positional accuracy is not stated by the source.",
+    "Only selected rail and urban transit way types are queried; this is not a complete public-transport network or timetable.",
+    "The query rectangle is an urban study extent, not an administrative boundary."
+  ],
+  "quality_notes": [
+    "Coordinates and tags are taken from a community-maintained OSM database snapshot.",
+    "Feature locations were checked for GeoJSON structure and WGS 84 coordinate ranges; source completeness and ground truth were not authenticated."
+  ],
+  "field_definitions": {
+    "osm_type": "OpenStreetMap object type (node or way).",
+    "osm_id": "OpenStreetMap object ID, preserved as text.",
+    "feature_name": "OSM name/name:en value, or an explicit object ID label if unnamed.",
+    "feature_subtype": "Selected OSM tag used for map categorization.",
+    "placement_method": "Source node coordinates, way geometry, or explicitly marked Overpass bounding-box center fallback."
+  },
+  "validation": {
+    "dataset_id": "osm_kochi_transit_20261028T192808Z",
+    "source_file": "osm_kochi_transit_20261028T192808Z.geojson",
+    "source_sha256": "22a1e7301126e783179a39ad970f685de435b5e5e8f8660317d03f186cad9443",
+    "provenance_valid": true,
+    "feature_count": 442,
+    "geometry_types": {
+      "LineString": 442
+    },
+    "invalid_features": [],
+    "exact_duplicate_features": 0,
+    "duplicate_ids": 0,
+    "missing_property_values": 0,
+    "features_intersecting_coverage": null,
+    "features_outside_coverage": null,
+    "errors": [],
+    "warnings": [],
+    "intersection_method": "Planar topological overlay in longitude/latitude (EPSG:4326); boundary counts as intersection; no distance/area calculation."
+  },
+  "processed_file": "osm_kochi_transit_20261028T192808Z.geojson",
+  "processed_sha256": "22a1e7301126e783179a39ad970f685de435b5e5e8f8660317d03f186cad9443",
+  "source_snapshot_stored_sha256": "fde39febbec5e16c017ae7fd2227443d6cdbd0bad766ef40cca95c2ffc7f93ea"
+}

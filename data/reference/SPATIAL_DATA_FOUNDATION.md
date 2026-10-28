@@ -288,3 +288,16 @@ sampling. It keeps all 31 missing/nonnumeric pairs and all 63 records in the 18
 repeated-pair groups visible. None are silently removed, deduplicated, mapped,
 or sampled. The official directory is recorded as an identity-only candidate in
 the source register and NIHFW review sidecars.
+
+## Acquisition milestone: bounded OpenStreetMap context layers (2026-10-28)
+
+Later Overpass requests succeeded for selected road, transit, waterway, health,
+emergency, and industrial tags. The processed layers and exact query snapshots,
+counts, timestamps, ODbL terms, attribution, and limitations are listed in
+[`docs/kochi_geospatial_data.md`](../../docs/kochi_geospatial_data.md) and
+`data/reference/spatial_sources.json`. These are provisional community-mapped
+context layers; they do not replace official asset registers or support
+exposure, emergency-access, or source-attribution conclusions. No explicitly
+air-quality-tagged OSM monitor was returned. KSPCB/CPCB observations still have
+no verified spatial station join, and the existing official-source blockers
+above remain in effect.

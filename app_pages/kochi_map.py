@@ -84,7 +84,9 @@ st.caption("Layer status and source records are explicit. The corporation bounda
 catalog = load_source_catalog()
 catalog_rows = [{
     "Layer": item["title"],
-    "Status": item["status"],
+    "Spatial status": item.get("validation_status", ""),
+    "Source record status": item["status"],
+    "Features": item.get("feature_count", "Not ingested"),
     "Publisher": item["publisher"],
     "Coverage": item["geographic_coverage"],
     "CRS": item["crs"],
@@ -92,6 +94,16 @@ catalog_rows = [{
 } for item in catalog["datasets"]]
 st.subheader("Source and layer catalog")
 st.dataframe(pd.DataFrame(catalog_rows), hide_index=True, width="stretch", alt="Reviewed Kochi spatial source inventory with availability, coverage, CRS, and reuse status")
+air_observation_status = next(
+    (item for item in catalog["datasets"] if item.get("layer_id") == "air_observations_spatial_locations"),
+    None,
+)
+if air_observation_status:
+    st.warning(
+        f"Spatial air-observation layer: {air_observation_status['validation_status']}. "
+        f"{air_observation_status['blocker']} Dated source reports remain available on the air-pollution page.",
+        title="Air observations are not mapped to validated stations",
+    )
 for item in catalog["datasets"]:
     with st.expander(item["title"]):
         source_ref = item["source_url"]
@@ -196,6 +208,25 @@ processed_layers = load_processed_layers(coverage_geometry)
 for issue in load_processed_layer_issues(coverage_geometry):
     st.warning(issue, icon=":material/warning:")
 
+if processed_layers:
+    st.subheader("Current map-layer validation")
+    current_layer_rows = [{
+        "Layer": item["metadata"]["title"],
+        "Status": item["metadata"].get("validation_status", "PROVISIONAL"),
+        "Features": item["report"]["feature_count"],
+        "Retrieved": item["metadata"].get("retrieved_on", "Not recorded"),
+        "Source database date": item["metadata"].get("source_database_timestamp", "Not stated"),
+        "Coverage": item["metadata"].get("geographic_coverage", "Not stated"),
+    } for item in processed_layers]
+    st.dataframe(
+        pd.DataFrame(current_layer_rows), hide_index=True, width="stretch",
+        alt="Current processed Kochi map layers with validation status, feature counts, retrieval dates, source snapshot dates, and coverage",
+    )
+    st.caption(
+        "Feature counts describe structurally valid stored records, not completeness or ground truth. "
+        "OSM layers remain provisional community-mapped context and are not used for exposure or causal analysis."
+    )
+
 st.subheader("Map layers")
 show_boundary = st.checkbox("Kochi Corporation administrative boundary", value=True)
 st.caption("Blue outline = administrative boundary only. It must not be interpreted as a hazard zone or as the full Greater Kochi urban area.")
@@ -249,18 +280,32 @@ if processed_layers:
     selected_titles = st.multiselect(
         "Layers to show",
         list(processed_titles),
-        default=list(processed_titles),
+        default=[
+            title for title, layer in processed_titles.items()
+            if not str(layer["metadata"].get("logical_layer_id", "")).startswith("osm_kochi_")
+        ],
         key="kochisp_validated_layers",
     )
+    st.caption("Select each OSM context layer independently. Large community-mapped layers start hidden for map responsiveness.")
     colors = {
         "asset": ([42, 150, 115, 190], "#2A9673"),
         "hazard": ([222, 91, 58, 110], "#DE5B3A"),
         "context": ([129, 88, 171, 150], "#8158AB"),
     }
+    osm_styles = {
+        "osm_kochi_roads": ([74, 88, 102, 210], "#4A5866"),
+        "osm_kochi_transit": ([117, 76, 159, 220], "#754C9F"),
+        "osm_kochi_waterways": ([35, 127, 183, 210], "#237FB7"),
+        "osm_kochi_healthcare": ([35, 139, 103, 200], "#238B67"),
+        "osm_kochi_emergency": ([217, 119, 42, 215], "#D9772A"),
+        "osm_kochi_industry": ([155, 93, 66, 150], "#9B5D42"),
+        "osm_kochi_air_monitors": ([202, 152, 27, 220], "#CA981B"),
+    }
     for layer_index, title in enumerate(selected_titles):
         layer = processed_titles[title]
         role = layer["metadata"].get("layer_role", "context")
-        color, color_hex = colors.get(role, colors["context"])
+        logical_layer_id = layer["metadata"].get("logical_layer_id", "")
+        color, color_hex = osm_styles.get(logical_layer_id, colors.get(role, colors["context"]))
         deck_layers.append(pdk.Layer(
             "GeoJsonLayer",
             id=f"source-layer-{layer_index}",
@@ -268,20 +313,25 @@ if processed_layers:
             stroked=True,
             filled=True,
             get_fill_color=color,
-            get_line_color=[40, 50, 60, 220],
+            get_line_color=color,
             line_width_min_pixels=1,
             pickable=True,
         ))
         report = layer["report"]
-        legend_rows.append((title, color_hex, f"{report['feature_count']} features; role={role}"))
+        validation_status = layer["metadata"].get("validation_status", "PROVISIONAL")
+        legend_rows.append((title, color_hex, f"{report['feature_count']} features; {validation_status}; role={role}"))
         st.caption(
             f"{title}: {layer['metadata']['publisher']} | {layer['metadata']['license']} | "
-            f"retrieved {layer['metadata']['retrieved_on']} | {report['feature_count']} feature(s) passed structural checks. "
-            "Metadata assertions are recorded; source truth/completeness are not independently authenticated."
+            f"retrieved {layer['metadata']['retrieved_on']} | {report['feature_count']} feature(s) passed structural checks | "
+            f"status {validation_status}. {layer['metadata'].get('analysis_status', 'Source truth and completeness are not independently authenticated.')}"
         )
         source_url = layer["metadata"].get("source_url", "")
         if source_url.startswith(("https://", "http://")):
             st.markdown(f"[Dataset source]({source_url})")
+        if logical_layer_id.startswith("osm_kochi_"):
+            copyright_url = layer["metadata"].get("copyright_url", "https://www.openstreetmap.org/copyright")
+            license_url = layer["metadata"].get("license_url", "https://opendatacommons.org/licenses/odbl/1-0/")
+            st.markdown(f"[© OpenStreetMap contributors]({copyright_url}) | [ODbL 1.0 terms]({license_url})")
         if layer["metadata"].get("excluded_invalid_features"):
             excluded = layer["metadata"]["excluded_invalid_features"]
             st.warning(
@@ -357,7 +407,7 @@ if deck_layers:
     deck = pdk.Deck(
         layers=deck_layers,
         initial_view_state=pdk.ViewState(longitude=map_center[0], latitude=map_center[1], zoom=10),
-        tooltip={"text": "{Bound_Name}\n{name}\n{layer}\n{source}"},
+        tooltip={"text": "{Bound_Name}\n{Ward_Name}\n{feature_name}\n{feature_subtype}\n{source}\n{osm_timestamp}\n{osm_url}"},
     )
     st.pydeck_chart(deck, width="stretch", alt="Kochi administrative outline and selected source-documented spatial layers")
 else:
@@ -366,4 +416,9 @@ if legend_rows:
     st.markdown("**Legend**")
     st.dataframe(pd.DataFrame(legend_rows, columns=["Layer", "Symbol", "Meaning"]), hide_index=True, width="stretch")
 
-st.warning("No roads, drainage assets, hospitals, factories, air-monitor coordinates, or hazard boundaries are currently displayed as verified map layers. Proximity to the administrative outline or a facility must not be treated as proof of exposure, vulnerability, or pollution causation.")
+st.info(
+    "OpenStreetMap roads, transit, mapped waterways, and any tagged facilities shown here are provisional community-mapped context. "
+    "They do not establish complete municipal road or drainage assets, current facility operation, or emergency access. "
+    "KSPCB/CPCB observations are not spatially joined to verified station locations in this map. The JRC layer is a modeled river-flood scenario. "
+    "No validated asset-to-hazard overlay or factory source-attribution analysis is supported by the available data."
+)
