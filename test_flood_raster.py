@@ -39,7 +39,10 @@ class JrcRasterSourceTests(unittest.TestCase):
         metadata_path = output.with_name("jrc_glofas_rp100_kochi_preview.metadata.json")
         metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
         self.assertEqual(hashlib.sha256(output.read_bytes()).hexdigest(), metadata["processing"]["preview_sha256"])
-        self.assertEqual(metadata["license"].split(";")[0], "Free and open Copernicus product")
+        self.assertIn("ODbL 1.0", metadata["license"])
+        self.assertIn("CC BY 4.0", metadata["license"])
+        self.assertIn("must not be redistributed or publicly deployed", " ".join(metadata["limitations"]))
+        self.assertIn("not displayed", metadata["analysis_status"])
         self.assertEqual(len(metadata["source_files"]), 2)
         with Image.open(output) as preview:
             self.assertEqual(preview.mode, "RGBA")
@@ -47,6 +50,9 @@ class JrcRasterSourceTests(unittest.TestCase):
         catalog = json.loads((ROOT / "data" / "reference" / "spatial_sources.json").read_text(encoding="utf-8"))
         entry = next(item for item in catalog["datasets"] if item["layer_id"] == "flood_hazard_jrc_glofas_rp100")
         self.assertIn("assets_unavailable", entry["status"])
+        self.assertEqual(entry["validation_status"], "REQUIRES LICENSE CLARIFICATION; NOT DISPLAYED")
+        self.assertIn("ODbL 1.0", entry["license"])
+        self.assertIn("CC BY 4.0", entry["license"])
 
     def test_missing_or_unreadable_raster_fails_clearly(self):
         with self.assertRaises(FloodRasterError):

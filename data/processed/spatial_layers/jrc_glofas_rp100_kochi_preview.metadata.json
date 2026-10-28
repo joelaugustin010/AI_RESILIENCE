@@ -1,11 +1,11 @@
 {
   "dataset_id": "jrc_glofas_rp100_kochi_preview",
-  "title": "JRC GloFAS modeled river flood depth, 100-year return-period scenario (map preview)",
+  "title": "JRC GloFAS modeled river flood depth, 100-year return-period scenario (local preview withheld)",
   "source_url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/flood_hazard/README.txt",
   "publisher": "Copernicus Emergency Management Service; European Commission Joint Research Centre (JRC)",
   "retrieved_on": "2026-10-20",
   "publication_date": "Dataset version 2.1.2; README updated 2026-01-12; source directory lists these two tiles modified 2025-12-18",
-  "license": "Free and open Copernicus product; Commission copyright notice states CC BY 4.0, attribution and indication of changes required",
+  "license": "Unresolved: the dataset README specifies Open Data Commons ODbL 1.0; the linked JRC copyright notice specifies CC BY 4.0. No source statement clarifying precedence or dual application was found.",
   "crs": "EPSG:4326 / WGS 84",
   "coordinate_order": "GeoTIFF georeferencing: longitude, latitude",
   "units": "Modeled flood water depth in metres; raw band values; -9999 is NoData",
@@ -89,10 +89,11 @@
     "90 m nominal resolution; land areas only; model artifacts are documented, including unrealistic depths from modeling limitations, DEM sinks, tile boundaries, or DEM issues.",
     "Only the RP100 depth field was downloaded; the separate spurious-depth and permanent-water auxiliary layers were not downloaded, so documented artifact flags are unavailable here.",
     "Transparent zero-depth, NoData, and outside-coverage pixels look alike in the map preview; no facility exposure result is derived from this visual layer.",
+    "The previously generated local preview is withheld in the application and must not be redistributed or publicly deployed pending written licence clarification.",
     "No verified hospital point layer is currently available. NIHFW coordinates remain review-only because source coordinate order, CRS/datum, and per-record positional accuracy are unspecified."
   ],
   "layer_role": "hazard",
-  "analysis_status": "hazard preview integrated; asset-level exposure unknown because no independently validated hospital layer",
+  "analysis_status": "Local raster metadata reviewed; preview not displayed or used pending written licence clarification. Asset-level exposure remains unknown.",
   "preview_file": "jrc_glofas_rp100_kochi_preview.png",
   "source_snapshot_files": [
     "data/raw/jrc_glofas_rp100_ID185_N20_E70_depth.tif",

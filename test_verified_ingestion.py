@@ -132,6 +132,26 @@ class StatusAndCatalogTests(TemporaryAuditCase):
         self.assertEqual(first["flood_analysis"]["status"], "unavailable")
         self.assertFalse(first["flood_analysis"]["operational"])
 
+    def test_real_flood_analysis_stays_blocked_with_named_source_evidence(self):
+        report = build_ingestion_report(ROOT, validated_at_utc="2026-10-29T00:00:00+00:00")
+        flood = report["flood_analysis"]
+        self.assertEqual(flood["status"], "unavailable")
+        self.assertFalse(flood["operational"])
+        self.assertEqual(flood["conclusion"], "No real asset-to-flood exposure count is currently supported.")
+        self.assertIn("ODbL 1.0", flood["available_hazard_context"])
+        self.assertIn("CC BY 4.0", flood["available_hazard_context"])
+        blockers = " ".join(flood["blockers"])
+        for evidence in ("KSDMA", "NIHFW", "Sametham", "2022 flood-probability report", "OSM", "LRIS"):
+            self.assertIn(evidence.casefold(), blockers.casefold())
+        spatial = {item["dataset_id"]: item for item in report["spatial_catalog"]}
+        self.assertEqual(spatial["schools_kerala_sametham"]["status"], "unavailable")
+        self.assertEqual(spatial["flood_exposure_report_ksdma_2022"]["status"], "unavailable")
+        self.assertEqual(spatial["flood_hazard_jrc_glofas_rp100"]["status"], "provisional")
+        source_catalog = json.loads((ROOT / "data/reference/spatial_sources.json").read_text(encoding="utf-8"))
+        jrc = next(item for item in source_catalog["datasets"] if item["layer_id"] == "flood_hazard_jrc_glofas_rp100")
+        self.assertIn("preview_withheld", jrc["status"])
+        self.assertEqual(jrc["validation_status"], "REQUIRES LICENSE CLARIFICATION; NOT DISPLAYED")
+
 
 class AnnualAqiValidationTests(TemporaryAuditCase):
     def test_null_optional_aqi_object_and_year_to_date_rows_are_validated_conservatively(self):

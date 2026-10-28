@@ -105,25 +105,163 @@ and outstanding requests.
 
 ## Flood-analysis boundary
 
-The existing map may show the JRC RP100 raster as modeled hazard context. JRC
-describes the global river-flood grid as approximately 90 m, with water-depth
-values and known modeling artefacts; this is neither a forecast nor observed
-flood extent:
+### What the current flood interfaces and model calculate
+
+`pages/2_Flood_Risk.py` accepts a user-selected area, rainfall amount and
+period, river reading, and ground condition. It echoes those values after a
+button press; it performs no risk-score or probability calculation. The
+decision workflow is qualitative and keeps user-entered observations separate
+from its descriptive rainfall benchmark. Its assessment logic is unchanged;
+only its stale JRC display-status sentence was corrected.
+
+`app_pages/disaster_probability.py` audits five example rows (three positive,
+two negative) dated 2026-10-19. The rows span several Kerala districts, are
+marked `unverified_demo`, and have no event-group identifiers or independently
+verified outcome labels. The form accepts discussion inputs but generates no
+probability. The local audit blocks model fitting and inference.
+
+`src/flood_model.py` is functioning evaluation plumbing, not a validated flood
+forecast. For future eligible records it requires documented real observations,
+independently verified binary labels and a 24-hour horizon, provenance and
+feature-availability timing, at least 100 rows, 20 rows per class, 10 event
+groups per class, five observation dates, and a chronological event-separated
+holdout. Its candidate pipeline median-imputes and standardizes numeric
+features, most-frequent-imputes and one-hot encodes the CWC warning category,
+then fits balanced logistic regression. It compares a prior-only baseline and
+reports precision, recall, F1 and a confusion matrix. The row and class floors
+are engineering screening gates, not evidence of scientific validity. No
+real-data fit, metric, calibrated probability or flood forecast has been
+produced. The prediction helper only returns `predict_proba` from an already
+fitted pipeline; it has not been fit on real observations.
+
+The proposed 24-hour target is `target_flood_event_next_24h`. Candidate
+predictors are 3-day antecedent rainfall (mm), 24-hour forecast rainfall
+(mm), INSAT-3D integrated precipitable water vapour (mm), soil moisture (%),
+slope angle (degrees), river-gauge height (m), gauge danger level (m), and a
+CWC flood-warning category. The dataset would also need an observation date
+and event-group identifier. These names and units are schema claims in an
+unverified example file; they do not prove the fields are measured, aligned
+in time, correctly located, or available before the prediction issue time.
+Gauge and warning fields are specifically flagged for possible target leakage
+until feature-availability timestamps are established.
+
+The five-row sample is hash-consistent but lacks verified station locations,
+outcome provenance, event grouping and sufficient dates or volume. Existing
+hydrology rainfall and river-level files are not joined to reviewed flood-event
+labels and are not inputs to an operational flood classifier. The hospital
+vulnerability page previously ranked unsupported sample scores; it now states
+exposure and vulnerability are unknown and lists the facility, hazard, site
+data and reviewed method evidence needed before comparison. No `most
+vulnerable` facility is named.
+
+### Hazard source findings
+
+The JRC/Copernicus GloFAS version 2.1.2 tiles are modeled river-flood depth
+scenarios, not observations, coastal flooding, forecasts, warnings, or damage
+estimates. The reviewed RP100 depth tiles use WGS 84 (EPSG:4326), float32,
+approximately 3 arc seconds (~90 m), a `-9999` NoData value, and cover Kochi's
+latitude band across adjacent 10-degree tiles. JRC documents land-only coverage
+and artifacts including unrealistic depths associated with model limitations,
+DEM sinks and tile boundaries. RP100 identifies a 100-year return-period
+scenario in the dataset, not an exact probability for a facility and not a
+forecast date. The source metadata reviewed here identifies version 2.1.2 and
+tile dates in December 2025; the grid has no event-time observation period.
+
 https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/flood_hazard/README.txt.
-The JRC README states ODbL 1.0 while its linked copyright file states CC BY
-4.0, so confirm applicable reuse terms before republishing:
+The README specifies Open Data Commons ODbL 1.0, while its linked copyright
+notice specifies CC BY 4.0 with attribution and change indication. No source
+statement resolving precedence or dual application was found. This catalog
+record is provisional and marked `REQUIRES LICENSE CLARIFICATION; NOT
+DISPLAYED`. The application suppresses the previously generated preview.
+Do not redistribute or publicly deploy the raster or preview until JRC gives
+written clarification:
 https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/copyright.txt.
 
-No operational asset-to-hazard counts are supported:
+KSDMA's official hazard catalogue lists Ernakulam historic and RCP 8.5 maps,
+and historical 10-, 25-, 50-, 100-, 200-, and 500-year products. The local
+historical 10/25/50 ZIP passes CRC validation and contains three 3004 x 5371
+single-band float32 GeoTIFFs on EPSG:4326 grids with 0.000833333-degree cell
+spacing and a declared NoData sentinel of `-3.402823e38`. Valid pixel ranges
+are 0.729–1776.6, 0.6561–1974, and 0.729–1981 respectively. The source does
+not document valid pixel units or meaning, nor dataset-specific reuse terms.
+No values were thresholded, assigned a hazard class, rendered or sampled.
+The bundle remains unsuitable for this proposed analysis until KSDMA confirms
+pixel semantics and terms:
 
-- The KSDMA raster archive remains excluded because its reuse terms and
-  pixel/NoData semantics were not verified.
-- NIHFW hospital coordinate order, CRS/datum and positional accuracy remain
-  undocumented. Valid-looking numeric pairs are not treated as points.
-- OSM health, road and waterway features are provisional community context,
-  not complete facility, road-condition or municipal drainage inventories.
-- A verified school layer and an authoritative municipal drainage inventory
-  are unavailable.
+https://sdma.kerala.gov.in/hazard-maps/.
+
+The KSDMA Flood Probability Report 2022 is a candidate administrative-level
+source: indexed contents identify modeling methods, school/hospital exposure
+mapping, and Ernakulam/local-government statistics. Its 21,992,376-byte PDF
+could not be retrieved by the web tool, and no local copy was available to
+inspect. No aggregate values were transcribed or treated as verified. It is
+recorded as unavailable for asset-level analysis, not as a spatial point
+dataset:
+
+https://sdma.kerala.gov.in/wp-content/uploads/2022/06/Flood-Probability-Report-2022_Final.pdf.
+
+### Asset and supporting data findings
+
+- The NIHFW national hospital directory contributes 180 Ernakulam records to a
+  source-preserving coordinate review. 149 pairs parse as two numbers, 31 are
+  missing or malformed, and 18 repeated-pair groups cover 63 rows. Numeric
+  range checks do not establish coordinate order, CRS/datum, correctness or
+  positional accuracy. No hospital points were created.
+- KITE Sametham provides school identifiers, names, administrative fields and
+  some individual Google Maps links. The reviewed Ernakulam list has no
+  documented bulk GIS export, coordinate semantics, accuracy, or dataset-level
+  spatial reuse terms; some entries have no map link. No school points were
+  created.
+- The Kerala Health facility directory was inaccessible (HTTP 403) in the
+  reviewed session and had no verified GIS export in the local checkout.
+- KSDMA's report remains an uninspected aggregate PDF, not an asset register.
+- LRIS 2.0 lists road network, drainage lines and canal network themes, but no
+  reviewed, downloadable Kochi extract with schema, CRS, accuracy, date and
+  reuse terms was obtained. Existing OSM roads and waterways are not treated
+  as the municipal road or drainage inventory.
+- OSM processed context passed local structural, coordinate-range and geometry
+  checks: healthcare 680 features (471 points, 209 polygons), roads 13,123
+  lines, waterways 2,568 lines and emergency 105 features (44 points, 61
+  polygons). These are provisional ODbL community data, not complete or
+  ground-truthed inventories. OSM requires attribution and share-alike under
+  ODbL 1.0:
+  https://www.openstreetmap.org/copyright.
+- The provisional Kochi Corporation outline is self-intersecting and is not
+  used as a coverage mask. The KSDMA statewide raster grid extent is not a
+  flood extent. JRC tile coverage and nominal resolution alone do not establish
+  complete valid-data coverage for an asset inventory.
+
+No CRS transformation or hazard/asset intersection was performed because no
+eligible authoritative hospital or school point inventory and no suitable,
+reuse-cleared hazard input are jointly available. The app keeps exposure
+unknown; absent map features and zero/NoData/outside-coverage cells do not mean
+safe. No exact flood probability or exposed-asset count is claimed. No change
+was made to decision-workflow calculations.
+
+### Windows SciPy and test environment
+
+The active interpreter resolves to the sibling original project's read-only
+`.venv` (`C:\Users\LENOVO\OneDrive\Desktop\AI_RESILIENCE\.venv`), not a new
+environment in this checkout. It reports Python 3.15.0 x64, NumPy 2.5.4,
+SciPy 1.18.1, pytest 9.1.1 and Streamlit 1.66.0; the installed extension is
+`scipy.ndimage._ni_label.cp315-win_amd64.pyd`. A minimal import plus
+`scipy.ndimage.label` call succeeds. The earlier `_ni_label` failure therefore
+was not reproduced, and its historical exception/root cause cannot be
+established from the current run; no current exception was available to capture.
+The extension's Authenticode status is `NotSigned`. The active site-packages
+also contains SciPy's OpenBLAS DLL and NumPy's OpenBLAS and Microsoft C++
+runtime DLL; the required modules loaded successfully in this run. No
+SciPy/Python match was found in the
+reviewed application-control log entries: 1,325 Code Integrity and 15
+AppLocker EXE/DLL events were scanned with zero matches for `scipy`,
+`ni_label`, or `python.exe`. A McAfee plugin block in the Code Integrity log
+was unrelated. Authenticode reports the SciPy extension as unsigned, but the
+current interpreter imports and executes it successfully; this does not
+establish the cause of a previous failure. The Streamlit command-line
+executable separately hit Windows Application Control. The devcontainer
+specifies Python 3.11, but Python 3.11 and 3.13 are installed here without NumPy;
+Docker is unavailable and no CI workflow was found. No security control was
+changed and no binary was replaced.
 
 The app therefore reports exposure as unknown. It does not treat missing
 features or transparent raster cells as safety, and it does not claim a flood
@@ -148,7 +286,16 @@ data. Until those inputs exist, no factory ranking or causal claim is produced.
 
 Run the repository suite with:
 
-    python -m pytest -q
+    python -m pytest -q -p no:cacheprovider
+
+The repository suite includes `test_flood_model.py`, `test_flood_raster.py`,
+catalog/audit blockers, the existing decision workflow checks, and Streamlit
+AppTest coverage for Data Readiness, the Kochi map, and Hospital Vulnerability.
+On 2026-10-29 the command completed with exit code 0: 156 passed and 13
+subtests passed in 30.12 seconds, with no failures, skips, or import errors.
+This managed Windows sandbox denied test-fixture temporary-directory access
+under its default execution context, so the unchanged suite ran in the
+user-authorized execution context; no tests were removed or skipped.
 
 This checkout's tests are also unittest compatible:
 
