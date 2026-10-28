@@ -1,6 +1,5 @@
 """Kochi map showing licensed reference geometry and user-reviewed points."""
 
-import base64
 import json
 from pathlib import Path
 
@@ -10,6 +9,7 @@ import streamlit as st
 
 from src.spatial_data import classify_exposure, processed_layer_issues, read_processed_layers, validate_geojson
 from src.flood_raster import FloodRasterError
+from src.kochi_map_layers import build_jrc_preview_layer
 
 ROOT = Path(__file__).resolve().parents[1]
 BOUNDARY_PATH = ROOT / "data" / "reference" / "kochi_corporation_boundary.geojson"
@@ -207,12 +207,9 @@ if show_jrc_flood:
         jrc_metadata = load_acquisition_metadata(JRC_PREVIEW_METADATA)
         if jrc_metadata and JRC_PREVIEW_PATH.is_file():
             jrc_bounds = jrc_metadata["processing"]["bounds_epsg4326"]
-            jrc_image = base64.b64encode(JRC_PREVIEW_PATH.read_bytes()).decode("ascii")
-            deck_layers.append(pdk.Layer(
-                "BitmapLayer", id="jrc-rp100-depth-preview",
-                image=f"data:image/png;base64,{jrc_image}",
-                bounds=[jrc_bounds[0], jrc_bounds[1], jrc_bounds[2], jrc_bounds[3]],
-                opacity=0.7,
+            deck_layers.append(build_jrc_preview_layer(
+                JRC_PREVIEW_PATH,
+                [jrc_bounds[0], jrc_bounds[1], jrc_bounds[2], jrc_bounds[3]],
             ))
             legend_rows.append(("JRC modeled RP100 river-flood depth", "Blue translucent cells", "Model scenario; transparent = zero, NoData, or outside source coverage"))
             st.caption(

@@ -1,10 +1,14 @@
 """Integrity checks for the bundled, attributed Kochi boundary snapshot."""
 
+import base64
 import hashlib
 import json
 import unittest
 from pathlib import Path
 
+import pydeck as pdk
+
+from src.kochi_map_layers import build_jrc_preview_layer
 from src.spatial_data import validate_geojson
 
 
@@ -30,6 +34,20 @@ class KochiBoundaryDataTests(unittest.TestCase):
             self.assertTrue(9.0 <= latitude <= 11.0)
         self.assertEqual(metadata["source_publication_or_update_date"], None)
         self.assertIn("CC BY-SA 2.5 India", metadata["license"])
+
+    def test_jrc_bitmap_image_is_serialized_as_a_literal_data_url(self):
+        image_path = ROOT / "data" / "processed" / "spatial_layers" / "jrc_glofas_rp100_kochi_preview.png"
+        metadata_path = image_path.with_name("jrc_glofas_rp100_kochi_preview.metadata.json")
+        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+        bounds = metadata["processing"]["bounds_epsg4326"]
+
+        layer = build_jrc_preview_layer(image_path, bounds)
+        specification = json.loads(pdk.Deck(layers=[layer]).to_json())
+        image = specification["layers"][0]["image"]
+
+        self.assertTrue(image.startswith("data:image/png;base64,"))
+        self.assertFalse(image.startswith("@@="))
+        self.assertEqual(base64.b64decode(image.split(",", 1)[1]), image_path.read_bytes())
 
     def test_boundary_is_reported_as_provisional_when_topology_check_finds_issue(self):
         geojson_path = REFERENCE / "kochi_corporation_boundary.geojson"
