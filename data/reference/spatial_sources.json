@@ -1,6 +1,6 @@
 {
   "catalog_version": 2,
-  "reviewed_on": "2026-10-28",
+  "reviewed_on": "2026-10-29",
   "coordinate_policy": "GeoJSON layers must carry documented WGS 84 longitude/latitude (EPSG:4326); unknown or other CRSs are not guessed or reprojected by this project.",
   "datasets": [
     {
@@ -24,7 +24,8 @@
       ],
       "local_file": "data/reference/kochi_corporation_boundary.geojson",
       "feature_count": 1,
-      "validation_status": "PROVISIONAL"
+      "validation_status": "PROVISIONAL",
+      "evidence_status": "provisional"
     },
     {
       "layer_id": "hospitals_ogd_directory",
@@ -71,7 +72,8 @@
       ],
       "validation_status": "UNSUITABLE FOR ANALYSIS",
       "feature_count": 0,
-      "review_record_count": 180
+      "review_record_count": 180,
+      "evidence_status": "unsuitable"
     },
     {
       "layer_id": "kochi_wards_datameet",
@@ -106,7 +108,8 @@
       "layer_role": "context",
       "validation_status": "PROVISIONAL",
       "feature_count": 74,
-      "excluded_feature_count": 3
+      "excluded_feature_count": 3,
+      "evidence_status": "provisional"
     },
     {
       "layer_id": "roads_lris",
@@ -126,7 +129,8 @@
       ],
       "blocker": "No direct layer download with dataset-specific date, CRS, schema, and reuse terms was verified.",
       "validation_status": "UNAVAILABLE",
-      "feature_count": 0
+      "feature_count": 0,
+      "evidence_status": "unavailable"
     },
     {
       "layer_id": "drainage_lris",
@@ -146,7 +150,8 @@
       ],
       "blocker": "No direct layer download with dataset-specific date, CRS, schema, and reuse terms was verified.",
       "validation_status": "UNAVAILABLE",
-      "feature_count": 0
+      "feature_count": 0,
+      "evidence_status": "unavailable"
     },
     {
       "layer_id": "flood_hazard_ksdma",
@@ -182,7 +187,8 @@
       "layer_role": null,
       "validation_status": "UNSUITABLE FOR ANALYSIS",
       "feature_count": 0,
-      "source_raster_count": 3
+      "source_raster_count": 3,
+      "evidence_status": "unsuitable"
     },
     {
       "layer_id": "landslide_gsi_ernakulam",
@@ -205,7 +211,8 @@
       ],
       "blocker": "The KSDMA-linked ZIP was not retrievable here and no dataset-level reuse terms or metadata were verified.",
       "validation_status": "UNAVAILABLE",
-      "feature_count": 0
+      "feature_count": 0,
+      "evidence_status": "unavailable"
     },
     {
       "layer_id": "industrial_accident_hazard_ksdma",
@@ -228,7 +235,8 @@
       ],
       "blocker": "Static PDF only from the reviewed entry; no data-level reuse terms, vector/raster file, CRS, or accuracy metadata verified.",
       "validation_status": "UNAVAILABLE",
-      "feature_count": 0
+      "feature_count": 0,
+      "evidence_status": "unavailable"
     },
     {
       "layer_id": "coastal_hazard_ksdma",
@@ -251,7 +259,8 @@
       ],
       "blocker": "Static PDF only from the reviewed entry; reuse terms and geospatial metadata are unverified.",
       "validation_status": "UNAVAILABLE",
-      "feature_count": 0
+      "feature_count": 0,
+      "evidence_status": "unavailable"
     },
     {
       "layer_id": "industrial_facilities_kspcb",
@@ -271,7 +280,8 @@
       ],
       "blocker": "No openly licensed facility-coordinate export with stable schema and date was verified.",
       "validation_status": "UNSUITABLE FOR ANALYSIS",
-      "feature_count": 0
+      "feature_count": 0,
+      "evidence_status": "unsuitable"
     },
     {
       "layer_id": "air_monitoring_cpcb",
@@ -291,7 +301,8 @@
       ],
       "blocker": "A stable downloadable station-geometry export and reuse terms were not verified.",
       "validation_status": "UNSUITABLE FOR ANALYSIS",
-      "feature_count": 0
+      "feature_count": 0,
+      "evidence_status": "unsuitable"
     },
     {
       "layer_id": "draft_ernakulam_flood_extract",
@@ -311,7 +322,8 @@
       ],
       "blocker": "Original source PDF is absent; extracted draft is not authorized or sufficiently verified for spatial exposure analysis.",
       "validation_status": "UNAVAILABLE",
-      "feature_count": 0
+      "feature_count": 0,
+      "evidence_status": "unavailable"
     },
     {
       "layer_id": "flood_hazard_jrc_glofas_rp100",
@@ -325,7 +337,11 @@
       "publisher": "Copernicus Emergency Management Service; European Commission Joint Research Centre (JRC)",
       "retrieved_on": "2026-10-20",
       "publication_date": "Dataset version 2.1.2; README updated 2026-01-12; RP100 tile directory lists these tiles modified 2025-12-18",
-      "license": "README states no restrictions, free and open Copernicus product; JRC copyright notice states CC BY 4.0, attribution and indication of changes required",
+      "license": "Unresolved: the dataset README says the product is free and open with no restrictions, while the JRC copyright notice specifies CC BY 4.0",
+      "license_sources": [
+        "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/flood_hazard/README.txt",
+        "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/copyright.txt"
+      ],
       "crs": "EPSG:4326 / WGS 84 confirmed from GeoTIFF GeoKeyDirectory; longitude/latitude georeferencing",
       "units": "Modeled flood water depth in metres; single-band float32; GeoTIFF GDAL_NODATA=-9999",
       "geographic_coverage": "Tiles ID185 N20_E70 and ID186 N10_E70; together cover the Kochi latitude band and 70?80 E tile; preview limited to the provisional boundary bounding rectangle for display only",
@@ -345,6 +361,7 @@
         "nodata": -9999
       },
       "limitations": [
+        "Official reuse terms conflict: the dataset README says no restrictions, while the JRC copyright notice says CC BY 4.0. Resolve the applicable terms before republishing the raster or derived data.",
         "Modeled river-flood scenario, not an observation, forecast, warning, damage estimate, or site-specific engineering assessment.",
         "JRC README notes only land areas are covered and warns that unrealistic high depths can arise from modeling, DEM sinks, tile boundaries, or DEM issues.",
         "Spurious-depth and permanent-water auxiliary masks were not downloaded; model artifact flags cannot be applied.",
@@ -374,7 +391,8 @@
       "layer_role": "hazard",
       "analysis_status": "Hazard raster preview integrated; asset-level exposure is unknown/unassessable because no independently validated facility-location layer is available.",
       "validation_status": "PROVISIONAL",
-      "feature_count": 1
+      "feature_count": 1,
+      "evidence_status": "provisional"
     },
     {
       "layer_id": "osm_kochi_emergency",
@@ -415,7 +433,8 @@
       "raw_snapshot_file": "kochi_facilities_20261028T192850Z.json.gz",
       "raw_snapshot_sha256": "2dca41d299d3fc475608d9ddd811e92762b66a63db913f8d2d7b75e8382f3b64",
       "raw_snapshot_stored_sha256": "17a30871ee5694e9ab4e560262384d9330416e2b9f3d5adf784dd00d85848015",
-      "raw_snapshot_stored_bytes": 117572
+      "raw_snapshot_stored_bytes": 117572,
+      "evidence_status": "provisional"
     },
     {
       "layer_id": "osm_kochi_healthcare",
@@ -457,7 +476,8 @@
       "raw_snapshot_file": "kochi_facilities_20261028T192850Z.json.gz",
       "raw_snapshot_sha256": "2dca41d299d3fc475608d9ddd811e92762b66a63db913f8d2d7b75e8382f3b64",
       "raw_snapshot_stored_sha256": "17a30871ee5694e9ab4e560262384d9330416e2b9f3d5adf784dd00d85848015",
-      "raw_snapshot_stored_bytes": 117572
+      "raw_snapshot_stored_bytes": 117572,
+      "evidence_status": "provisional"
     },
     {
       "layer_id": "osm_kochi_industry",
@@ -499,7 +519,8 @@
       "raw_snapshot_file": "kochi_facilities_20261028T192850Z.json.gz",
       "raw_snapshot_sha256": "2dca41d299d3fc475608d9ddd811e92762b66a63db913f8d2d7b75e8382f3b64",
       "raw_snapshot_stored_sha256": "17a30871ee5694e9ab4e560262384d9330416e2b9f3d5adf784dd00d85848015",
-      "raw_snapshot_stored_bytes": 117572
+      "raw_snapshot_stored_bytes": 117572,
+      "evidence_status": "provisional"
     },
     {
       "layer_id": "osm_kochi_roads",
@@ -540,7 +561,8 @@
       "raw_snapshot_file": "kochi_network_20261028T192808Z.json.gz",
       "raw_snapshot_sha256": "4fed76c1c78017c4c5625f418af353bee18c2e94aa5765338eaf1b72a6a1964b",
       "raw_snapshot_stored_sha256": "fde39febbec5e16c017ae7fd2227443d6cdbd0bad766ef40cca95c2ffc7f93ea",
-      "raw_snapshot_stored_bytes": 2167981
+      "raw_snapshot_stored_bytes": 2167981,
+      "evidence_status": "provisional"
     },
     {
       "layer_id": "osm_kochi_transit",
@@ -580,7 +602,8 @@
       "raw_snapshot_file": "kochi_network_20261028T192808Z.json.gz",
       "raw_snapshot_sha256": "4fed76c1c78017c4c5625f418af353bee18c2e94aa5765338eaf1b72a6a1964b",
       "raw_snapshot_stored_sha256": "fde39febbec5e16c017ae7fd2227443d6cdbd0bad766ef40cca95c2ffc7f93ea",
-      "raw_snapshot_stored_bytes": 2167981
+      "raw_snapshot_stored_bytes": 2167981,
+      "evidence_status": "provisional"
     },
     {
       "layer_id": "osm_kochi_waterways",
@@ -620,7 +643,8 @@
       "raw_snapshot_file": "kochi_network_20261028T192808Z.json.gz",
       "raw_snapshot_sha256": "4fed76c1c78017c4c5625f418af353bee18c2e94aa5765338eaf1b72a6a1964b",
       "raw_snapshot_stored_sha256": "fde39febbec5e16c017ae7fd2227443d6cdbd0bad766ef40cca95c2ffc7f93ea",
-      "raw_snapshot_stored_bytes": 2167981
+      "raw_snapshot_stored_bytes": 2167981,
+      "evidence_status": "provisional"
     },
     {
       "layer_id": "osm_kochi_air_monitors",
@@ -649,7 +673,8 @@
       "raw_snapshot_file": "kochi_facilities_20261028T192850Z.json.gz",
       "raw_snapshot_sha256": "2dca41d299d3fc475608d9ddd811e92762b66a63db913f8d2d7b75e8382f3b64",
       "raw_snapshot_stored_sha256": "17a30871ee5694e9ab4e560262384d9330416e2b9f3d5adf784dd00d85848015",
-      "raw_snapshot_stored_bytes": 117572
+      "raw_snapshot_stored_bytes": 117572,
+      "evidence_status": "unavailable"
     },
     {
       "layer_id": "air_observations_spatial_locations",
@@ -672,7 +697,9 @@
         "The CPCB OGD catalog exposes API-key generation and no observation rows; the attempted catalog API route returned HTTP 503.",
         "No spatial interpolation, station comparison map, AQI recalculation, or industrial attribution is supported."
       ],
-      "blocker": "Reported values exist in the existing air-quality tables, but there is no verified spatial station/observation join. This map layer is unsuitable for spatial analysis."
+      "blocker": "Reported values exist in the existing air-quality tables, but there is no verified spatial station/observation join. This map layer is unsuitable for spatial analysis.",
+      "evidence_status": "unsuitable"
     }
-  ]
+  ],
+  "status_definitions_file": "data/reference/data_status_definitions.json"
 }

@@ -1,0 +1,26 @@
+{
+  "reviewed_on": "2026-10-29",
+  "exclusions": [
+    {
+      "dataset_id": "kspcb_ocmms_invalid_pdf_responses_2026",
+      "status": "unsuitable",
+      "original_filenames": [
+        "KSPCB_OCMMS_Active_Char_CTO_2019.pdf",
+        "KSPCB_OCMMS_Arjuna_Natural_CTE_2021.pdf",
+        "KSPCB_OCMMS_Arjuna_Natural_CTO_2019.pdf",
+        "KSPCB_OCMMS_CMRL_CTO_2023.pdf",
+        "KSPCB_OCMMS_Indo_German_Carbon_CTO_2019.pdf",
+        "KSPCB_OCMMS_Malaya_Rub_Tech_CTO_2022.pdf",
+        "KSPCB_OCMMS_Rubber_O_Malabar_CTO_2020.pdf",
+        "KSPCB_OCMMS_Sud_Chemie_CTE_2020.pdf",
+        "KSPCB_OCMMS_Sud_Chemie_CTO_Variation_2021.pdf",
+        "KSPCB_OCMMS_TMS_Leathers_CTO_2023.pdf"
+      ],
+      "source_format_claim": "PDF",
+      "observed_format": "497-byte HTML response beginning with a doctype, not a PDF signature",
+      "identical_sha256": "18678a141c79f50b21c21d645dec1490e188129896e1e34104750f13f755a76a",
+      "disposition": "Excluded from data/raw and all extractors. The original staged responses remain untouched; their identical hash and filenames are recorded here.",
+      "reason": "No source document was returned. Renaming or parsing these responses as consent PDFs would misrepresent their contents."
+    }
+  ]
+}

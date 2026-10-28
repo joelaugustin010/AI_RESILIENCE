@@ -1,0 +1,2 @@
+# Optional PDF extraction support for official air-quality report ingestion.
+pypdf>=6.0,<7

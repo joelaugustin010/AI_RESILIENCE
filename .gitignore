@@ -21,4 +21,16 @@ data/raw/air_quality_reports/KSPCB_CAAQMS_monthly_report_2026-09.pdf
 data/raw/air_quality_reports/KSPCB_CAAQMS_monthly_report_2026-09.pdf.metadata.json
 data/raw/industrial/DIC_DA_Edayar_allotment_details_2022.pdf
 data/raw/industrial/DIC_DA_Edayar_allotment_details_2022.pdf.metadata.json
+# Supplemental official reports are retained locally because dataset-specific
+# redistribution terms have not been established. Their hashes/provenance and
+# derived summaries are recorded in the tracked source catalogs.
+data/raw/air_quality_reports/KSPCB_AQI_daily_average_2026-10-16.pdf
+data/raw/air_quality_reports/KSPCB_CAAQMS_monthly_report_2026-08.pdf
+data/raw/air_quality_reports/KSPCB_NAMP_report_2025-08.pdf
+data/raw/industrial/DIC_DA_EDAYAR.dwg
+data/raw/industrial/DIC_DA_EDAYAR.dwg.metadata.json
+data/raw/industrial/KWA_Edayar_CETP_DER_2022.pdf
+data/raw/industrial/KWA_Edayar_CETP_DER_2022.pdf.metadata.json
+data/raw/industrial/KSPCB_OCMMS_CTO_red_page2_2015-2019.html
+data/raw/industrial/KSPCB_OCMMS_CTO_red_page2_2015-2019.html.metadata.json
 data/raw/openstreetmap/
