@@ -1,0 +1,30 @@
+{
+  "dataset_id": "osm_kochi_facilities_20261028T192850Z",
+  "title": "OpenStreetMap facilities query response for Kochi/Ernakulam",
+  "publisher": "OpenStreetMap contributors",
+  "source_url": "https://www.openstreetmap.org/",
+  "copyright_url": "https://www.openstreetmap.org/copyright",
+  "query_service_url": "https://overpass-api.de/api/interpreter",
+  "retrieved_at_utc": "2026-10-28T19:28:50.201207+00:00",
+  "retrieved_on": "2026-10-28",
+  "osm_timestamp": "2026-10-28T19:27:36Z",
+  "license": "Open Database License 1.0 (ODbL); attribution and share-alike apply to this extracted database.",
+  "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+  "attribution": "© OpenStreetMap contributors",
+  "query": "[out:json][timeout:120];\n(\n  node[\"amenity\"~\"^(hospital|clinic|doctors|fire_station|police)$\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  way[\"amenity\"~\"^(hospital|clinic|doctors|fire_station|police)$\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  node[\"healthcare\"~\"^(hospital|clinic|doctor)$\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  way[\"healthcare\"~\"^(hospital|clinic|doctor)$\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  node[\"emergency\"~\"^(fire_service|ambulance_station|rescue_station)$\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  way[\"emergency\"~\"^(fire_service|ambulance_station|rescue_station)$\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  node[\"man_made\"=\"works\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  way[\"man_made\"=\"works\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  node[\"industrial\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  way[\"industrial\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  way[\"landuse\"=\"industrial\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  node[\"man_made\"=\"monitoring_station\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  way[\"man_made\"=\"monitoring_station\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  node[\"monitoring:air_quality\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  way[\"monitoring:air_quality\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  node[\"monitoring\"~\"air\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  way[\"monitoring\"~\"air\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  node[\"air_quality\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  way[\"air_quality\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  node[\"measurement:air_quality\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  way[\"measurement:air_quality\"](9.85000000,76.15000000,10.20000000,76.45000000);\n);\nout center geom;",
+  "query_sha256": "a98bfab1ffec045fc0ed9d14e4abdf8aa716aff9f236122387261436699c79c1",
+  "response_sha256": "2dca41d299d3fc475608d9ddd811e92762b66a63db913f8d2d7b75e8382f3b64",
+  "response_bytes": 649488,
+  "source_element_count": 1098,
+  "geographic_coverage": "See query bounding boxes; bounding boxes are acquisition windows, not administrative boundaries.",
+  "crs": "WGS 84 longitude/latitude (EPSG:4326)",
+  "limitations": [
+    "OpenStreetMap is community-mapped and is not an authoritative completeness or positional-accuracy statement.",
+    "The Overpass response is a dated database extract, not a live feed.",
+    "The query uses bounding boxes and is not clipped to an administrative boundary."
+  ],
+  "snapshot_file": "kochi_facilities_20261028T192850Z.json.gz",
+  "snapshot_compression": "gzip (lossless)",
+  "snapshot_file_sha256": "17a30871ee5694e9ab4e560262384d9330416e2b9f3d5adf784dd00d85848015",
+  "snapshot_file_bytes": 117572
+}

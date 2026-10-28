@@ -1,0 +1,30 @@
+{
+  "dataset_id": "osm_kochi_network_20261028T192808Z",
+  "title": "OpenStreetMap network query response for Kochi/Ernakulam",
+  "publisher": "OpenStreetMap contributors",
+  "source_url": "https://www.openstreetmap.org/",
+  "copyright_url": "https://www.openstreetmap.org/copyright",
+  "query_service_url": "https://overpass-api.de/api/interpreter",
+  "retrieved_at_utc": "2026-10-28T19:28:08.864883+00:00",
+  "retrieved_on": "2026-10-28",
+  "osm_timestamp": "2026-10-28T19:25:34Z",
+  "license": "Open Database License 1.0 (ODbL); attribution and share-alike apply to this extracted database.",
+  "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+  "attribution": "© OpenStreetMap contributors",
+  "query": "[out:json][timeout:120];\n(\n  way[\"highway\"~\"^(motorway|trunk|primary|secondary|tertiary|unclassified|residential|living_street)$\"](9.88971828,76.23735890,10.04976931,76.34002933);\n  way[\"railway\"~\"^(rail|light_rail|tram|subway)$\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  way[\"waterway\"~\"^(river|canal|stream|drain|ditch)$\"](9.85000000,76.15000000,10.20000000,76.45000000);\n);\nout geom;",
+  "query_sha256": "4f1c02d15a3a8a7a54b5c04a598cc59845f13a9287cb310271e9388e92428f86",
+  "response_sha256": "4fed76c1c78017c4c5625f418af353bee18c2e94aa5765338eaf1b72a6a1964b",
+  "response_bytes": 12982097,
+  "source_element_count": 16133,
+  "geographic_coverage": "See query bounding boxes; bounding boxes are acquisition windows, not administrative boundaries.",
+  "crs": "WGS 84 longitude/latitude (EPSG:4326)",
+  "limitations": [
+    "OpenStreetMap is community-mapped and is not an authoritative completeness or positional-accuracy statement.",
+    "The Overpass response is a dated database extract, not a live feed.",
+    "The query uses bounding boxes and is not clipped to an administrative boundary."
+  ],
+  "snapshot_file": "kochi_network_20261028T192808Z.json.gz",
+  "snapshot_compression": "gzip (lossless)",
+  "snapshot_file_sha256": "fde39febbec5e16c017ae7fd2227443d6cdbd0bad766ef40cca95c2ffc7f93ea",
+  "snapshot_file_bytes": 2167981
+}

@@ -1,6 +1,6 @@
 {
-  "catalog_version": 1,
-  "reviewed_on": "2026-10-20",
+  "catalog_version": 2,
+  "reviewed_on": "2026-10-28",
   "coordinate_policy": "GeoJSON layers must carry documented WGS 84 longitude/latitude (EPSG:4326); unknown or other CRSs are not guessed or reprojected by this project.",
   "datasets": [
     {
@@ -23,7 +23,8 @@
         "No corrected official boundary snapshot was obtained during this milestone; the identified Kerala OpenSDI layer is the upstream source attributed by DataMeet, but no independently validated replacement was available. Existing provisional polygon remains unchanged and is not used as a coverage mask."
       ],
       "local_file": "data/reference/kochi_corporation_boundary.geojson",
-      "feature_count": 1
+      "feature_count": 1,
+      "validation_status": "PROVISIONAL"
     },
     {
       "layer_id": "hospitals_ogd_directory",
@@ -67,7 +68,10 @@
           "blocker": "The accessible page has no downloadable GIS data or exposed latitude/longitude fields; no CRS/datum, geocoding accuracy, stable spatial export schema, or spatial reuse terms were found. Not used to geocode NIHFW records or create map points.",
           "status": "candidate_identity_reference_only_not_spatially_ingested"
         }
-      ]
+      ],
+      "validation_status": "UNSUITABLE FOR ANALYSIS",
+      "feature_count": 0,
+      "review_record_count": 180
     },
     {
       "layer_id": "kochi_wards_datameet",
@@ -99,7 +103,10 @@
       "geometry_types": {
         "Polygon": 74
       },
-      "layer_role": "context"
+      "layer_role": "context",
+      "validation_status": "PROVISIONAL",
+      "feature_count": 74,
+      "excluded_feature_count": 3
     },
     {
       "layer_id": "roads_lris",
@@ -117,7 +124,9 @@
         "Official catalogue identifies a Road Network layer but does not expose reviewed file-level metadata in the accessible page.",
         "Completeness, road class, positional accuracy, and update cadence are unverified."
       ],
-      "blocker": "No direct layer download with dataset-specific date, CRS, schema, and reuse terms was verified."
+      "blocker": "No direct layer download with dataset-specific date, CRS, schema, and reuse terms was verified.",
+      "validation_status": "UNAVAILABLE",
+      "feature_count": 0
     },
     {
       "layer_id": "drainage_lris",
@@ -135,7 +144,9 @@
         "Catalogue availability does not establish that the layer contains municipal storm drains or their condition/capacity.",
         "Hydrological connectivity, completeness, scale, and update cadence are unverified."
       ],
-      "blocker": "No direct layer download with dataset-specific date, CRS, schema, and reuse terms was verified."
+      "blocker": "No direct layer download with dataset-specific date, CRS, schema, and reuse terms was verified.",
+      "validation_status": "UNAVAILABLE",
+      "feature_count": 0
     },
     {
       "layer_id": "flood_hazard_ksdma",
@@ -168,7 +179,10 @@
       "raw_sha256": "4057b36cdfc467ecaf618afb1e74b725187ef1d2a20326cdc1e4eb32df54605e",
       "raw_bytes": 4370593,
       "archive_integrity": "ZIP CRC passed; three TIFF members readable",
-      "layer_role": null
+      "layer_role": null,
+      "validation_status": "UNSUITABLE FOR ANALYSIS",
+      "feature_count": 0,
+      "source_raster_count": 3
     },
     {
       "layer_id": "landslide_gsi_ernakulam",
@@ -189,7 +203,9 @@
         "Susceptibility is not event probability, real-time warning, or site-specific engineering assessment.",
         "The linked file's CRS, schema, class definitions, scale, and temporal validity remain unchecked."
       ],
-      "blocker": "The KSDMA-linked ZIP was not retrievable here and no dataset-level reuse terms or metadata were verified."
+      "blocker": "The KSDMA-linked ZIP was not retrievable here and no dataset-level reuse terms or metadata were verified.",
+      "validation_status": "UNAVAILABLE",
+      "feature_count": 0
     },
     {
       "layer_id": "industrial_accident_hazard_ksdma",
@@ -210,7 +226,9 @@
         "A rendered PDF hazard map is not a verified facility inventory and does not establish a specific industry's current risk or emissions.",
         "No georeferenced zone geometry or current facility locations were obtained."
       ],
-      "blocker": "Static PDF only from the reviewed entry; no data-level reuse terms, vector/raster file, CRS, or accuracy metadata verified."
+      "blocker": "Static PDF only from the reviewed entry; no data-level reuse terms, vector/raster file, CRS, or accuracy metadata verified.",
+      "validation_status": "UNAVAILABLE",
+      "feature_count": 0
     },
     {
       "layer_id": "coastal_hazard_ksdma",
@@ -231,7 +249,9 @@
         "Susceptibility zones are not event forecasts or site-level engineering findings.",
         "No georeferenced geometry or published accuracy metadata was obtained."
       ],
-      "blocker": "Static PDF only from the reviewed entry; reuse terms and geospatial metadata are unverified."
+      "blocker": "Static PDF only from the reviewed entry; reuse terms and geospatial metadata are unverified.",
+      "validation_status": "UNAVAILABLE",
+      "feature_count": 0
     },
     {
       "layer_id": "industrial_facilities_kspcb",
@@ -249,7 +269,9 @@
         "Permit/category records do not themselves identify measured air emissions or prove a pollutant source.",
         "Reviewed portal was not a direct, reusable, geospatial export and appeared to require interactive/session access."
       ],
-      "blocker": "No openly licensed facility-coordinate export with stable schema and date was verified."
+      "blocker": "No openly licensed facility-coordinate export with stable schema and date was verified.",
+      "validation_status": "UNSUITABLE FOR ANALYSIS",
+      "feature_count": 0
     },
     {
       "layer_id": "air_monitoring_cpcb",
@@ -267,25 +289,9 @@
         "AQI does not identify a specific emitting facility or establish source causality.",
         "A station list/map UI is not by itself a licensed, dated GIS dataset."
       ],
-      "blocker": "A stable downloadable station-geometry export and reuse terms were not verified."
-    },
-    {
-      "layer_id": "openstreetmap_candidate",
-      "title": "OpenStreetMap features (possible community-mapped fallback)",
-      "status": "candidate_not_ingested",
-      "source_url": "https://www.openstreetmap.org/",
-      "publisher": "OpenStreetMap contributors",
-      "retrieved_on": "2026-10-20",
-      "publication_date": "Live, continuously edited database; a data snapshot date would need to be recorded at export",
-      "license": "Open Database License (ODbL); attribution and share-alike obligations apply",
-      "crs": "WGS 84 longitude/latitude (EPSG:4326) for OSM coordinates",
-      "units": "Geometries and tagged attributes; tags have no uniform measured units",
-      "geographic_coverage": "Global; local completeness varies by feature and mapper activity",
-      "limitations": [
-        "Community mapping is not an authoritative or complete asset register; positional/tag quality must be checked per layer.",
-        "Any retrieved snapshot needs timestamp, query/bbox, element types, provenance, and attribution recorded."
-      ],
-      "blocker": "No OSM snapshot obtained. The official OSM map endpoint rejected the Kochi bbox because it exceeds the 50,000-node cap (including a smaller trial bbox); Overpass main endpoint returned HTTP 502 capacity/queue-full, and the alternative endpoint produced no completed file."
+      "blocker": "A stable downloadable station-geometry export and reuse terms were not verified.",
+      "validation_status": "UNSUITABLE FOR ANALYSIS",
+      "feature_count": 0
     },
     {
       "layer_id": "draft_ernakulam_flood_extract",
@@ -303,7 +309,9 @@
         "The bundled README itself says facility return-period tick alignment is automatically estimated and needs checking against the PDF.",
         "No coordinates, flood polygons, georeferencing, or hazard labels are provided."
       ],
-      "blocker": "Original source PDF is absent; extracted draft is not authorized or sufficiently verified for spatial exposure analysis."
+      "blocker": "Original source PDF is absent; extracted draft is not authorized or sufficiently verified for spatial exposure analysis.",
+      "validation_status": "UNAVAILABLE",
+      "feature_count": 0
     },
     {
       "layer_id": "flood_hazard_jrc_glofas_rp100",
@@ -364,7 +372,307 @@
       "processed_file": "data/processed/spatial_layers/jrc_glofas_rp100_kochi_preview.png",
       "processed_metadata_file": "data/processed/spatial_layers/jrc_glofas_rp100_kochi_preview.metadata.json",
       "layer_role": "hazard",
-      "analysis_status": "Hazard raster preview integrated; asset-level exposure is unknown/unassessable because no independently validated facility-location layer is available."
+      "analysis_status": "Hazard raster preview integrated; asset-level exposure is unknown/unassessable because no independently validated facility-location layer is available.",
+      "validation_status": "PROVISIONAL",
+      "feature_count": 1
+    },
+    {
+      "layer_id": "osm_kochi_emergency",
+      "title": "OpenStreetMap community-mapped emergency facilities (Ernakulam urban extent)",
+      "status": "acquired_provisional_context",
+      "validation_status": "PROVISIONAL",
+      "feature_count": 105,
+      "source_feature_count": 105,
+      "geometry_types": {
+        "Point": 44,
+        "Polygon": 61
+      },
+      "source_url": "https://www.openstreetmap.org/",
+      "copyright_url": "https://www.openstreetmap.org/copyright",
+      "query_service_url": "https://overpass-api.de/api/interpreter",
+      "publisher": "OpenStreetMap contributors",
+      "retrieved_on": "2026-10-28",
+      "publication_date": "Not stated by source; OSM database state as of 2026-10-28T19:27:36Z",
+      "source_database_timestamp": "2026-10-28T19:27:36Z",
+      "license": "Open Database License 1.0 (ODbL); attribution and share-alike apply to the extracted database.",
+      "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+      "attribution": "© OpenStreetMap contributors",
+      "crs": "EPSG:4326",
+      "units": "Decimal degrees (longitude, latitude); source-specific tags have no common measurement units.",
+      "geographic_coverage": "Bounding box south=9.85, west=76.15, north=10.2, east=76.45; query selection only, not a legal boundary.",
+      "limitations": [
+        "Community-mapped locations are not an authoritative or complete facility register; operating status and response capability are not verified.",
+        "A mapped way polygon is an OSM footprint; any fallback way center is approximate and is explicitly identified in feature properties.",
+        "No response-time or service-area analysis is supported by this layer."
+      ],
+      "layer_role": "context",
+      "processed_file": "osm_kochi_emergency_20261028T192850Z.geojson",
+      "processed_metadata_file": "osm_kochi_emergency_20261028T192850Z.metadata.json",
+      "excluded_invalid_feature_count": 0,
+      "duplicate_count": 0,
+      "query_sha256": "a98bfab1ffec045fc0ed9d14e4abdf8aa716aff9f236122387261436699c79c1",
+      "analysis_status": "Context display only; not used for exposure, safety, source-attribution, or emergency-access conclusions.",
+      "raw_snapshot_file": "kochi_facilities_20261028T192850Z.json.gz",
+      "raw_snapshot_sha256": "2dca41d299d3fc475608d9ddd811e92762b66a63db913f8d2d7b75e8382f3b64",
+      "raw_snapshot_stored_sha256": "17a30871ee5694e9ab4e560262384d9330416e2b9f3d5adf784dd00d85848015",
+      "raw_snapshot_stored_bytes": 117572
+    },
+    {
+      "layer_id": "osm_kochi_healthcare",
+      "title": "OpenStreetMap community-mapped healthcare facilities (Ernakulam urban extent)",
+      "status": "acquired_provisional_context",
+      "validation_status": "PROVISIONAL",
+      "feature_count": 680,
+      "source_feature_count": 680,
+      "geometry_types": {
+        "Point": 471,
+        "Polygon": 209
+      },
+      "source_url": "https://www.openstreetmap.org/",
+      "copyright_url": "https://www.openstreetmap.org/copyright",
+      "query_service_url": "https://overpass-api.de/api/interpreter",
+      "publisher": "OpenStreetMap contributors",
+      "retrieved_on": "2026-10-28",
+      "publication_date": "Not stated by source; OSM database state as of 2026-10-28T19:27:36Z",
+      "source_database_timestamp": "2026-10-28T19:27:36Z",
+      "license": "Open Database License 1.0 (ODbL); attribution and share-alike apply to the extracted database.",
+      "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+      "attribution": "© OpenStreetMap contributors",
+      "crs": "EPSG:4326",
+      "units": "Decimal degrees (longitude, latitude); source-specific tags have no common measurement units.",
+      "geographic_coverage": "Bounding box south=9.85, west=76.15, north=10.2, east=76.45; query selection only, not a legal boundary.",
+      "limitations": [
+        "Community-mapped locations are not an authoritative or complete facility register; opening status and services are not verified.",
+        "A mapped way polygon is an OSM footprint; any fallback way center is approximate and is explicitly identified in feature properties.",
+        "NIHFW source coordinates remain review-only because the source does not define coordinate order, CRS/datum, or positional accuracy.",
+        "These locations are not used for flood-exposure or emergency-access conclusions."
+      ],
+      "layer_role": "context",
+      "processed_file": "osm_kochi_healthcare_20261028T192850Z.geojson",
+      "processed_metadata_file": "osm_kochi_healthcare_20261028T192850Z.metadata.json",
+      "excluded_invalid_feature_count": 0,
+      "duplicate_count": 0,
+      "query_sha256": "a98bfab1ffec045fc0ed9d14e4abdf8aa716aff9f236122387261436699c79c1",
+      "analysis_status": "Context display only; not used for exposure, safety, source-attribution, or emergency-access conclusions.",
+      "raw_snapshot_file": "kochi_facilities_20261028T192850Z.json.gz",
+      "raw_snapshot_sha256": "2dca41d299d3fc475608d9ddd811e92762b66a63db913f8d2d7b75e8382f3b64",
+      "raw_snapshot_stored_sha256": "17a30871ee5694e9ab4e560262384d9330416e2b9f3d5adf784dd00d85848015",
+      "raw_snapshot_stored_bytes": 117572
+    },
+    {
+      "layer_id": "osm_kochi_industry",
+      "title": "OpenStreetMap mapped industrial features (Ernakulam urban extent)",
+      "status": "acquired_provisional_context",
+      "validation_status": "PROVISIONAL",
+      "feature_count": 313,
+      "source_feature_count": 313,
+      "geometry_types": {
+        "Point": 76,
+        "Polygon": 237
+      },
+      "source_url": "https://www.openstreetmap.org/",
+      "copyright_url": "https://www.openstreetmap.org/copyright",
+      "query_service_url": "https://overpass-api.de/api/interpreter",
+      "publisher": "OpenStreetMap contributors",
+      "retrieved_on": "2026-10-28",
+      "publication_date": "Not stated by source; OSM database state as of 2026-10-28T19:27:36Z",
+      "source_database_timestamp": "2026-10-28T19:27:36Z",
+      "license": "Open Database License 1.0 (ODbL); attribution and share-alike apply to the extracted database.",
+      "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+      "attribution": "© OpenStreetMap contributors",
+      "crs": "EPSG:4326",
+      "units": "Decimal degrees (longitude, latitude); source-specific tags have no common measurement units.",
+      "geographic_coverage": "Bounding box south=9.85, west=76.15, north=10.2, east=76.45; query selection only, not a legal boundary.",
+      "limitations": [
+        "Mapped industrial land use or works tags are not a verified factory register, current consent record, or emissions inventory.",
+        "Community-mapped coverage is incomplete and positional accuracy is not stated by the source.",
+        "A mapped industrial feature is a candidate location only; proximity does not establish pollution causation or exposure.",
+        "A mapped way polygon is retained only when it passes structural geometry checks; fallback way centers are marked approximate."
+      ],
+      "layer_role": "context",
+      "processed_file": "osm_kochi_industry_20261028T192850Z.geojson",
+      "processed_metadata_file": "osm_kochi_industry_20261028T192850Z.metadata.json",
+      "excluded_invalid_feature_count": 0,
+      "duplicate_count": 0,
+      "query_sha256": "a98bfab1ffec045fc0ed9d14e4abdf8aa716aff9f236122387261436699c79c1",
+      "analysis_status": "Context display only; not used for exposure, safety, source-attribution, or emergency-access conclusions.",
+      "raw_snapshot_file": "kochi_facilities_20261028T192850Z.json.gz",
+      "raw_snapshot_sha256": "2dca41d299d3fc475608d9ddd811e92762b66a63db913f8d2d7b75e8382f3b64",
+      "raw_snapshot_stored_sha256": "17a30871ee5694e9ab4e560262384d9330416e2b9f3d5adf784dd00d85848015",
+      "raw_snapshot_stored_bytes": 117572
+    },
+    {
+      "layer_id": "osm_kochi_roads",
+      "title": "OpenStreetMap mapped roads (Kochi map extent)",
+      "status": "acquired_provisional_context",
+      "validation_status": "PROVISIONAL",
+      "feature_count": 13123,
+      "source_feature_count": 13123,
+      "geometry_types": {
+        "LineString": 13123
+      },
+      "source_url": "https://www.openstreetmap.org/",
+      "copyright_url": "https://www.openstreetmap.org/copyright",
+      "query_service_url": "https://overpass-api.de/api/interpreter",
+      "publisher": "OpenStreetMap contributors",
+      "retrieved_on": "2026-10-28",
+      "publication_date": "Not stated by source; OSM database state as of 2026-10-28T19:25:34Z",
+      "source_database_timestamp": "2026-10-28T19:25:34Z",
+      "license": "Open Database License 1.0 (ODbL); attribution and share-alike apply to the extracted database.",
+      "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+      "attribution": "© OpenStreetMap contributors",
+      "crs": "EPSG:4326",
+      "units": "Decimal degrees (longitude, latitude); source-specific tags have no common measurement units.",
+      "geographic_coverage": "Bounding box south=9.889718280722308, west=76.23735890065669, north=10.049769312385111, east=76.34002933184016; query selection only, not a legal boundary.",
+      "limitations": [
+        "Community-mapped coverage is incomplete and positional accuracy is not stated by the source.",
+        "The query includes selected routable highway classes and omits footways, paths, cycleways, and service roads.",
+        "The selected rectangle is derived from the provisional boundary extent; features are not clipped to a validated municipal boundary.",
+        "This display does not provide route travel times, road condition, accessibility, or emergency response access."
+      ],
+      "layer_role": "context",
+      "processed_file": "osm_kochi_roads_20261028T192808Z.geojson",
+      "processed_metadata_file": "osm_kochi_roads_20261028T192808Z.metadata.json",
+      "excluded_invalid_feature_count": 0,
+      "duplicate_count": 0,
+      "query_sha256": "4f1c02d15a3a8a7a54b5c04a598cc59845f13a9287cb310271e9388e92428f86",
+      "analysis_status": "Context display only; not used for exposure, safety, source-attribution, or emergency-access conclusions.",
+      "raw_snapshot_file": "kochi_network_20261028T192808Z.json.gz",
+      "raw_snapshot_sha256": "4fed76c1c78017c4c5625f418af353bee18c2e94aa5765338eaf1b72a6a1964b",
+      "raw_snapshot_stored_sha256": "fde39febbec5e16c017ae7fd2227443d6cdbd0bad766ef40cca95c2ffc7f93ea",
+      "raw_snapshot_stored_bytes": 2167981
+    },
+    {
+      "layer_id": "osm_kochi_transit",
+      "title": "OpenStreetMap mapped rail and transit ways (Ernakulam urban extent)",
+      "status": "acquired_provisional_context",
+      "validation_status": "PROVISIONAL",
+      "feature_count": 442,
+      "source_feature_count": 442,
+      "geometry_types": {
+        "LineString": 442
+      },
+      "source_url": "https://www.openstreetmap.org/",
+      "copyright_url": "https://www.openstreetmap.org/copyright",
+      "query_service_url": "https://overpass-api.de/api/interpreter",
+      "publisher": "OpenStreetMap contributors",
+      "retrieved_on": "2026-10-28",
+      "publication_date": "Not stated by source; OSM database state as of 2026-10-28T19:25:34Z",
+      "source_database_timestamp": "2026-10-28T19:25:34Z",
+      "license": "Open Database License 1.0 (ODbL); attribution and share-alike apply to the extracted database.",
+      "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+      "attribution": "© OpenStreetMap contributors",
+      "crs": "EPSG:4326",
+      "units": "Decimal degrees (longitude, latitude); source-specific tags have no common measurement units.",
+      "geographic_coverage": "Bounding box south=9.85, west=76.15, north=10.2, east=76.45; query selection only, not a legal boundary.",
+      "limitations": [
+        "Community-mapped coverage is incomplete and positional accuracy is not stated by the source.",
+        "Only selected rail and urban transit way types are queried; this is not a complete public-transport network or timetable.",
+        "The query rectangle is an urban study extent, not an administrative boundary."
+      ],
+      "layer_role": "context",
+      "processed_file": "osm_kochi_transit_20261028T192808Z.geojson",
+      "processed_metadata_file": "osm_kochi_transit_20261028T192808Z.metadata.json",
+      "excluded_invalid_feature_count": 0,
+      "duplicate_count": 0,
+      "query_sha256": "4f1c02d15a3a8a7a54b5c04a598cc59845f13a9287cb310271e9388e92428f86",
+      "analysis_status": "Context display only; not used for exposure, safety, source-attribution, or emergency-access conclusions.",
+      "raw_snapshot_file": "kochi_network_20261028T192808Z.json.gz",
+      "raw_snapshot_sha256": "4fed76c1c78017c4c5625f418af353bee18c2e94aa5765338eaf1b72a6a1964b",
+      "raw_snapshot_stored_sha256": "fde39febbec5e16c017ae7fd2227443d6cdbd0bad766ef40cca95c2ffc7f93ea",
+      "raw_snapshot_stored_bytes": 2167981
+    },
+    {
+      "layer_id": "osm_kochi_waterways",
+      "title": "OpenStreetMap mapped waterways and drainage-like ways (Ernakulam urban extent)",
+      "status": "acquired_provisional_context",
+      "validation_status": "PROVISIONAL",
+      "feature_count": 2568,
+      "source_feature_count": 2568,
+      "geometry_types": {
+        "LineString": 2568
+      },
+      "source_url": "https://www.openstreetmap.org/",
+      "copyright_url": "https://www.openstreetmap.org/copyright",
+      "query_service_url": "https://overpass-api.de/api/interpreter",
+      "publisher": "OpenStreetMap contributors",
+      "retrieved_on": "2026-10-28",
+      "publication_date": "Not stated by source; OSM database state as of 2026-10-28T19:25:34Z",
+      "source_database_timestamp": "2026-10-28T19:25:34Z",
+      "license": "Open Database License 1.0 (ODbL); attribution and share-alike apply to the extracted database.",
+      "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+      "attribution": "© OpenStreetMap contributors",
+      "crs": "EPSG:4326",
+      "units": "Decimal degrees (longitude, latitude); source-specific tags have no common measurement units.",
+      "geographic_coverage": "Bounding box south=9.85, west=76.15, north=10.2, east=76.45; query selection only, not a legal boundary.",
+      "limitations": [
+        "Community-mapped coverage is incomplete and positional accuracy is not stated by the source.",
+        "Mapped waterway=drain or ditch features are not a municipal storm-drain asset register and do not describe capacity, ownership, or flow direction.",
+        "The query rectangle is an urban study extent, not an administrative boundary."
+      ],
+      "layer_role": "context",
+      "processed_file": "osm_kochi_waterways_20261028T192808Z.geojson",
+      "processed_metadata_file": "osm_kochi_waterways_20261028T192808Z.metadata.json",
+      "excluded_invalid_feature_count": 0,
+      "duplicate_count": 0,
+      "query_sha256": "4f1c02d15a3a8a7a54b5c04a598cc59845f13a9287cb310271e9388e92428f86",
+      "analysis_status": "Context display only; not used for exposure, safety, source-attribution, or emergency-access conclusions.",
+      "raw_snapshot_file": "kochi_network_20261028T192808Z.json.gz",
+      "raw_snapshot_sha256": "4fed76c1c78017c4c5625f418af353bee18c2e94aa5765338eaf1b72a6a1964b",
+      "raw_snapshot_stored_sha256": "fde39febbec5e16c017ae7fd2227443d6cdbd0bad766ef40cca95c2ffc7f93ea",
+      "raw_snapshot_stored_bytes": 2167981
+    },
+    {
+      "layer_id": "osm_kochi_air_monitors",
+      "title": "OpenStreetMap explicitly tagged air-quality monitoring sites (Ernakulam urban query window)",
+      "status": "no_matching_features_in_bounded_snapshot",
+      "validation_status": "UNAVAILABLE",
+      "feature_count": 0,
+      "publisher": "OpenStreetMap contributors",
+      "source_url": "https://www.openstreetmap.org/",
+      "copyright_url": "https://www.openstreetmap.org/copyright",
+      "query_service_url": "https://overpass-api.de/api/interpreter",
+      "retrieved_on": "2026-10-28",
+      "publication_date": "No matching explicitly air-quality-tagged OSM objects in this database snapshot",
+      "source_database_timestamp": "2026-10-28T19:27:36Z",
+      "license": "Open Database License 1.0 (ODbL); attribution and share-alike apply.",
+      "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+      "attribution": "? OpenStreetMap contributors",
+      "crs": "EPSG:4326",
+      "units": "OSM feature coordinates; no observations or measurement units",
+      "geographic_coverage": "Bounding box south=9.85, west=76.15, north=10.20, east=76.45; query selection only.",
+      "limitations": [
+        "No matching explicitly air-quality-tagged objects were returned. This does not establish that no monitoring stations exist.",
+        "The query covers community-mapped OSM data, not KSPCB/CPCB station registries."
+      ],
+      "blocker": "No explicitly air-quality-tagged OSM feature was present in the bounded snapshot; the layer is unavailable and no station has been invented.",
+      "raw_snapshot_file": "kochi_facilities_20261028T192850Z.json.gz",
+      "raw_snapshot_sha256": "2dca41d299d3fc475608d9ddd811e92762b66a63db913f8d2d7b75e8382f3b64",
+      "raw_snapshot_stored_sha256": "17a30871ee5694e9ab4e560262384d9330416e2b9f3d5adf784dd00d85848015",
+      "raw_snapshot_stored_bytes": 117572
+    },
+    {
+      "layer_id": "air_observations_spatial_locations",
+      "title": "KSPCB/CPCB air-quality observations joined to verified station locations",
+      "status": "reported_observations_exist_station_join_unavailable",
+      "validation_status": "UNSUITABLE FOR ANALYSIS",
+      "feature_count": 0,
+      "publisher": "Kerala State Pollution Control Board; Central Pollution Control Board / Open Government Data Platform",
+      "source_url": "https://www.kspcbipam.kerala.gov.in/Dashboard/airQuality",
+      "alternative_source_url": "https://www.data.gov.in/catalog/real-time-air-quality-index",
+      "retrieved_on": "2026-10-28",
+      "publication_date": "Dated KSPCB report tables are recorded in data/reference/air_quality_acquisition.json; no validated spatial time-series export was obtained.",
+      "license": "KSPCB report-specific redistribution terms were not located. CPCB OGD catalog states NDSAP/GODL-India terms, but the API resource/schema was not obtained.",
+      "crs": "No verified station CRS and coordinate join",
+      "units": "Source-reported AQI and pollutant values; exact averaging/completeness details vary by report.",
+      "geographic_coverage": "Ernakulam station names and historical report records; no validated station geometries for map joining.",
+      "limitations": [
+        "KSPCB reports provide dated values but do not consistently provide station coordinates, station IDs, exact pollutant averaging periods, or completeness flags.",
+        "The KSPCB public station-points request returned HTTP 403 during a read-only review; no restriction was bypassed.",
+        "The CPCB OGD catalog exposes API-key generation and no observation rows; the attempted catalog API route returned HTTP 503.",
+        "No spatial interpolation, station comparison map, AQI recalculation, or industrial attribution is supported."
+      ],
+      "blocker": "Reported values exist in the existing air-quality tables, but there is no verified spatial station/observation join. This map layer is unsuitable for spatial analysis."
     }
   ]
 }

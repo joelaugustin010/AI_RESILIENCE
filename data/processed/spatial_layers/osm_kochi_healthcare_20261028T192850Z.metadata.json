@@ -1,0 +1,84 @@
+{
+  "dataset_id": "osm_kochi_healthcare_20261028T192850Z",
+  "logical_layer_id": "osm_kochi_healthcare",
+  "title": "OpenStreetMap community-mapped healthcare facilities (Ernakulam urban extent)",
+  "publisher": "OpenStreetMap contributors",
+  "source_url": "https://www.openstreetmap.org/",
+  "copyright_url": "https://www.openstreetmap.org/copyright",
+  "query_service_url": "https://overpass-api.de/api/interpreter",
+  "retrieved_on": "2026-10-28",
+  "retrieved_at_utc": "2026-10-28T19:28:50.201207+00:00",
+  "publication_date": "Not stated by source; OSM database state as of 2026-10-28T19:27:36Z",
+  "license": "Open Database License 1.0 (ODbL); attribution and share-alike apply to the extracted database.",
+  "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+  "attribution": "© OpenStreetMap contributors",
+  "crs": "EPSG:4326",
+  "units": "Decimal degrees (longitude, latitude); source-specific tags have no common measurement units.",
+  "geographic_coverage": "Bounding box south=9.85, west=76.15, north=10.2, east=76.45; query selection only, not a legal boundary.",
+  "coverage_bbox_south_west_north_east": [
+    9.85,
+    76.15,
+    10.2,
+    76.45
+  ],
+  "layer_role": "context",
+  "validation_status": "PROVISIONAL",
+  "analysis_status": "Context display only; not used for exposure, safety, source-attribution, or emergency-access conclusions.",
+  "required_properties": [
+    "osm_type",
+    "osm_id",
+    "feature_type",
+    "feature_name",
+    "source",
+    "osm_url"
+  ],
+  "source_query": "[out:json][timeout:120];\n(\n  node[\"amenity\"~\"^(hospital|clinic|doctors|fire_station|police)$\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  way[\"amenity\"~\"^(hospital|clinic|doctors|fire_station|police)$\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  node[\"healthcare\"~\"^(hospital|clinic|doctor)$\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  way[\"healthcare\"~\"^(hospital|clinic|doctor)$\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  node[\"emergency\"~\"^(fire_service|ambulance_station|rescue_station)$\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  way[\"emergency\"~\"^(fire_service|ambulance_station|rescue_station)$\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  node[\"man_made\"=\"works\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  way[\"man_made\"=\"works\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  node[\"industrial\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  way[\"industrial\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  way[\"landuse\"=\"industrial\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  node[\"man_made\"=\"monitoring_station\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  way[\"man_made\"=\"monitoring_station\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  node[\"monitoring:air_quality\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  way[\"monitoring:air_quality\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  node[\"monitoring\"~\"air\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  way[\"monitoring\"~\"air\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  node[\"air_quality\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  way[\"air_quality\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  node[\"measurement:air_quality\"](9.85000000,76.15000000,10.20000000,76.45000000);\n  way[\"measurement:air_quality\"](9.85000000,76.15000000,10.20000000,76.45000000);\n);\nout center geom;",
+  "source_query_sha256": "a98bfab1ffec045fc0ed9d14e4abdf8aa716aff9f236122387261436699c79c1",
+  "source_database_timestamp": "2026-10-28T19:27:36Z",
+  "source_snapshot_file": "kochi_facilities_20261028T192850Z.json.gz",
+  "source_snapshot_sha256": "2dca41d299d3fc475608d9ddd811e92762b66a63db913f8d2d7b75e8382f3b64",
+  "source_feature_count": 680,
+  "processed_feature_count": 680,
+  "excluded_invalid_features": [],
+  "duplicate_count": 0,
+  "limitations": [
+    "Community-mapped locations are not an authoritative or complete facility register; opening status and services are not verified.",
+    "A mapped way polygon is an OSM footprint; any fallback way center is approximate and is explicitly identified in feature properties.",
+    "NIHFW source coordinates remain review-only because the source does not define coordinate order, CRS/datum, or positional accuracy.",
+    "These locations are not used for flood-exposure or emergency-access conclusions."
+  ],
+  "quality_notes": [
+    "Coordinates and tags are taken from a community-maintained OSM database snapshot.",
+    "Feature locations were checked for GeoJSON structure and WGS 84 coordinate ranges; source completeness and ground truth were not authenticated."
+  ],
+  "field_definitions": {
+    "osm_type": "OpenStreetMap object type (node or way).",
+    "osm_id": "OpenStreetMap object ID, preserved as text.",
+    "feature_name": "OSM name/name:en value, or an explicit object ID label if unnamed.",
+    "feature_subtype": "Selected OSM tag used for map categorization.",
+    "placement_method": "Source node coordinates, way geometry, or explicitly marked Overpass bounding-box center fallback."
+  },
+  "validation": {
+    "dataset_id": "osm_kochi_healthcare_20261028T192850Z",
+    "source_file": "osm_kochi_healthcare_20261028T192850Z.geojson",
+    "source_sha256": "ccd6ea80e1eb7c4210be3971fd9e138ba3af3c07c7a318da510f304fb97c94f9",
+    "provenance_valid": true,
+    "feature_count": 680,
+    "geometry_types": {
+      "Point": 471,
+      "Polygon": 209
+    },
+    "invalid_features": [],
+    "exact_duplicate_features": 0,
+    "duplicate_ids": 0,
+    "missing_property_values": 0,
+    "features_intersecting_coverage": null,
+    "features_outside_coverage": null,
+    "errors": [],
+    "warnings": [],
+    "intersection_method": "Planar topological overlay in longitude/latitude (EPSG:4326); boundary counts as intersection; no distance/area calculation."
+  },
+  "processed_file": "osm_kochi_healthcare_20261028T192850Z.geojson",
+  "processed_sha256": "ccd6ea80e1eb7c4210be3971fd9e138ba3af3c07c7a318da510f304fb97c94f9",
+  "source_snapshot_stored_sha256": "17a30871ee5694e9ab4e560262384d9330416e2b9f3d5adf784dd00d85848015"
+}
