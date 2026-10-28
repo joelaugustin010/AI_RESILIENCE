@@ -68,6 +68,17 @@
           "available_evidence": "Official institution-search page lists Ernakulam public facility names, facility types, addresses, bed/service fields and View Map controls.",
           "blocker": "The accessible page has no downloadable GIS data or exposed latitude/longitude fields; no CRS/datum, geocoding accuracy, stable spatial export schema, or spatial reuse terms were found. Not used to geocode NIHFW records or create map points.",
           "status": "candidate_identity_reference_only_not_spatially_ingested"
+        },
+        {
+          "title": "Ernakulam district administration hospital directory",
+          "url": "https://ernakulam.nic.in/en/public-utility-category/hospitals/",
+          "publisher": "District Administration Ernakulam, Government of Kerala; hosted by National Informatics Centre",
+          "reviewed_on": "2026-10-29",
+          "publication_or_update_date": "Page states last updated 2026-10-15",
+          "license": "No dataset-specific reuse terms for a spatial export were stated on the reviewed page.",
+          "available_evidence": "Public utility listings contain hospital names, addresses, phone numbers, and category/type.",
+          "blocker": "The page provides no coordinates or downloadable GIS export, CRS/datum, positional accuracy, or spatial reuse terms. Addresses were not geocoded and no point features were created.",
+          "status": "identity_address_reference_only_not_spatially_ingested"
         }
       ],
       "validation_status": "UNSUITABLE FOR ANALYSIS",
@@ -100,6 +111,30 @@
         "Directory attributes can support school identity research, but the source has not been validated as a complete current spatial asset inventory for the Kochi study area."
       ],
       "blocker": "No documented school-point export with stable spatial fields, CRS, positional accuracy, and reuse terms was available for validation; no school is counted as spatially exposed.",
+      "alternative_sources_reviewed": [
+        {
+          "title": "Ernakulam district administration school directory",
+          "url": "https://ernakulam.nic.in/en/public-utility-category/schools/",
+          "publisher": "District Administration Ernakulam, Government of Kerala; hosted by National Informatics Centre",
+          "reviewed_on": "2026-10-29",
+          "publication_or_update_date": "Page states last updated 2026-10-15",
+          "license": "No dataset-specific reuse terms for a spatial export were stated on the reviewed page.",
+          "available_evidence": "Public utility listings contain school names, addresses, phone numbers, and category/type.",
+          "blocker": "The page provides no coordinates or downloadable GIS export, CRS/datum, positional accuracy, or spatial reuse terms. Addresses were not geocoded and no point features were created.",
+          "status": "identity_address_reference_only_not_spatially_ingested"
+        },
+        {
+          "title": "Ernakulam district education information",
+          "url": "https://ernakulam.nic.in/en/education/",
+          "publisher": "District Administration Ernakulam, Government of Kerala; hosted by National Informatics Centre",
+          "reviewed_on": "2026-10-29",
+          "publication_or_update_date": "Not stated on the reviewed page",
+          "license": "No dataset-specific reuse terms for a spatial export were stated on the reviewed page.",
+          "available_evidence": "Education-office contact information and school counts by level and management type.",
+          "blocker": "Administrative counts and office addresses are not a school facility GIS inventory and contain no validated school coordinates or point export.",
+          "status": "administrative_reference_only_not_spatially_ingested"
+        }
+      ],
       "validation_status": "UNAVAILABLE AS SPATIAL INPUT",
       "feature_count": 0,
       "layer_role": null,

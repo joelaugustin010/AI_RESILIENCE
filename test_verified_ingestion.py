@@ -90,6 +90,7 @@ class StatusAndCatalogTests(TemporaryAuditCase):
         for path, key, id_field in (
             ("data/reference/air_quality_acquisition.json", "sources", "dataset_id"),
             ("data/reference/spatial_sources.json", "datasets", "layer_id"),
+            ("data/reference/hydrology_data_sources.json", "station_metadata_sources", "source_id"),
         ):
             catalog = json.loads((ROOT / path).read_text(encoding="utf-8"))
             entries = catalog[key]
@@ -141,7 +142,7 @@ class StatusAndCatalogTests(TemporaryAuditCase):
         self.assertIn("ODbL 1.0", flood["available_hazard_context"])
         self.assertIn("CC BY 4.0", flood["available_hazard_context"])
         blockers = " ".join(flood["blockers"])
-        for evidence in ("KSDMA", "NIHFW", "Sametham", "2022 flood-probability report", "OSM", "LRIS"):
+        for evidence in ("KSDMA", "NIHFW", "Sametham", "2022 flood-probability report", "OSM", "LRIS", "CWC", "NWIC", "Ernakulam district administration"):
             self.assertIn(evidence.casefold(), blockers.casefold())
         spatial = {item["dataset_id"]: item for item in report["spatial_catalog"]}
         self.assertEqual(spatial["schools_kerala_sametham"]["status"], "unavailable")
@@ -151,6 +152,25 @@ class StatusAndCatalogTests(TemporaryAuditCase):
         jrc = next(item for item in source_catalog["datasets"] if item["layer_id"] == "flood_hazard_jrc_glofas_rp100")
         self.assertIn("preview_withheld", jrc["status"])
         self.assertEqual(jrc["validation_status"], "REQUIRES LICENSE CLARIFICATION; NOT DISPLAYED")
+
+    def test_new_cwc_and_nwic_hydrology_leads_do_not_create_spatial_data(self):
+        catalog = json.loads((ROOT / "data/reference/hydrology_data_sources.json").read_text(encoding="utf-8"))
+        sources = {item["source_id"]: item for item in catalog["station_metadata_sources"]}
+
+        cwc = sources["cwc_kerala_station_register_2012"]
+        self.assertEqual(cwc["evidence_status"], "provisional")
+        self.assertEqual(cwc["feature_count"], 0)
+        self.assertIsNone(cwc["local_file"])
+        self.assertIn("Kalampur", cwc["source_content_reviewed"])
+        self.assertIn("Not stated", cwc["coordinate_reference_system"])
+        self.assertTrue(any("2012" in item for item in cwc["limitations"]))
+
+        nwic = sources["nwic_kerala_sw_telemetry_hourly_2026_2030"]
+        self.assertEqual(nwic["evidence_status"], "unavailable")
+        self.assertEqual(nwic["feature_count"], 0)
+        self.assertIsNone(nwic["local_file"])
+        self.assertIn("cache-miss", nwic["retrieval_result"])
+        self.assertIn("not_retrieved", nwic["status"])
 
 
 class AnnualAqiValidationTests(TemporaryAuditCase):

@@ -215,6 +215,37 @@ https://sdma.kerala.gov.in/wp-content/uploads/2022/06/Flood-Probability-Report-2
 - The Kerala Health facility directory was inaccessible (HTTP 403) in the
   reviewed session and had no verified GIS export in the local checkout.
 - KSDMA's report remains an uninspected aggregate PDF, not an asset register.
+- The CWC's official meteorological-station register, dated 1 June 2012, lists
+  Kalampur, Ramamangalam and Neeleeswaram in Ernakulam and prints DMS
+  coordinates. The register does not state a CRS/datum or positional
+  accuracy, and it does not establish current operations. It is a station
+  metadata lead only; no coordinates were converted into geometry. The PDF
+  was reviewed online on 2026-10-29, not downloaded, so no local file hash is
+  available:
+  https://www.cwc.gov.in/sites/default/files/meteorological-network-details-of-cwc.pdf.
+- NWIC's Kerala Surface Water Department page lists an hourly river-level
+  telemetry resource for 2026–2030, including a West flowing rivers from
+  Tadri to Kanyakumari CSV. The dataset description says records contain a
+  date, station identifier/geographic hierarchy, river and water level in
+  metres; the page reported an update on 26 October 2026. The CSV resource
+  page returned a cache-miss error and no bytes were acquired. The NWIC
+  copyright policy permits accurate reproduction with prominent attribution,
+  except for third-party material, but this does not verify the resource
+  payload, its station semantics or resource-specific rights. No hash, rows,
+  coordinates or model inputs were created:
+  https://nwdp.nwic.gov.in/dataset/river-water-level-telemetry-hourly-kerala-surface-water-department
+  and
+  https://nwdp.nwic.gov.in/footer/copyrightPolicy.
+- Ernakulam district administration's hospital and school directory pages,
+  both marked last updated 15 October 2026, provide names and addresses; the
+  hospital page also lists phone numbers and facility type. Its education
+  page provides office contacts and school counts by level and management
+  type. None of these pages exposes a reusable school/hospital GIS download
+  with coordinate semantics, CRS, positional accuracy and spatial reuse
+  terms; addresses were not geocoded:
+  https://ernakulam.nic.in/en/public-utility-category/hospitals/,
+  https://ernakulam.nic.in/en/public-utility-category/schools/ and
+  https://ernakulam.nic.in/en/education/.
 - LRIS 2.0 lists road network, drainage lines and canal network themes, but no
   reviewed, downloadable Kochi extract with schema, CRS, accuracy, date and
   reuse terms was obtained. Existing OSM roads and waterways are not treated
@@ -263,6 +294,46 @@ specifies Python 3.11, but Python 3.11 and 3.13 are installed here without NumPy
 Docker is unavailable and no CI workflow was found. No security control was
 changed and no binary was replaced.
 
+### Supported environment and reproducibility
+
+The repository's declared baseline is Python 3.11 in
+`.devcontainer/devcontainer.json`. Python 3.11 remains in security-fix support
+through October 2027, and Streamlit's installation documentation currently
+lists Python 3.11–3.15. Use an isolated Python 3.11 environment to match the
+configured project baseline; do not use the sibling project's Python 3.15
+environment as a deployment or lockfile baseline. Python 3.11 is in security
+maintenance, so plan a tested move to a newer supported minor before its
+security-fix period ends:
+https://devguide.python.org/versions/ and
+https://docs.streamlit.io/get-started/installation/command-line.
+
+On Windows PowerShell, create and install the project's core dependencies in
+an isolated environment with:
+
+    py -3.11 -m venv .venv
+    .\.venv\Scripts\python.exe -m pip install --upgrade pip
+    .\.venv\Scripts\python.exe -m pip install -r requirements.txt
+    .\.venv\Scripts\python.exe -m pip check
+
+For optional PDF extraction, also install `requirements-data.txt`. Run the
+source audit, fail-closed flood-model readiness CLI, and test suite from that
+same interpreter:
+
+    .\.venv\Scripts\python.exe scripts/audit_data_sources.py --format json
+    .\.venv\Scripts\python.exe src/evaluate_flood_model.py
+    .\.venv\Scripts\python.exe -m pytest -q -p no:cacheprovider
+
+The current `requirements.txt` pins Streamlit and bounds scikit-learn, but
+leaves several direct and transitive dependencies unpinned; it is not a lock
+file. Exact Python 3.11 resolved versions were not captured because the local
+Python 3.11 installation has no pip, no dependency wheel cache is available,
+and Docker is unavailable. Do not treat the successful Python 3.15 test run
+as verification of the Python 3.11 environment. After a clean Python 3.11
+install succeeds, capture and review `python -m pip freeze --all` as a
+platform-specific lock artifact before claiming exact environment
+reproduction. The SciPy toolchain compatibility table can guide that review:
+https://docs.scipy.org/doc/scipy/dev/toolchain.html.
+
 The app therefore reports exposure as unknown. It does not treat missing
 features or transparent raster cells as safety, and it does not claim a flood
 probability, predicted loss or most-vulnerable facility. The existing
@@ -291,11 +362,11 @@ Run the repository suite with:
 The repository suite includes `test_flood_model.py`, `test_flood_raster.py`,
 catalog/audit blockers, the existing decision workflow checks, and Streamlit
 AppTest coverage for Data Readiness, the Kochi map, and Hospital Vulnerability.
-On 2026-10-29 the command completed with exit code 0: 156 passed and 13
-subtests passed in 30.12 seconds, with no failures, skips, or import errors.
-This managed Windows sandbox denied test-fixture temporary-directory access
-under its default execution context, so the unchanged suite ran in the
-user-authorized execution context; no tests were removed or skipped.
+On 2026-10-29 the command completed with exit code 0: 157 passed and 13
+subtests passed in 29.92 seconds, with no failures, skips, or import errors.
+The default Windows sandbox denied test-fixture access under `.test_tmp`; the
+suite was rerun in the permitted execution context. No tests were removed or
+skipped.
 
 This checkout's tests are also unittest compatible:
 
