@@ -161,6 +161,25 @@ DATASET_CATALOG: list[dict[str, Any]] = [
         "limitations": "A map catalogue is not one harmonised dataset; layers may have different dates, scales, classifications and intended uses.",
     },
     {
+        "id": "imd_cyclone_best_track",
+        "hazards": ["Cyclone", "Compound: cyclone + flood"],
+        "theme": "Historical cyclone tracks and intensity",
+        "dataset": "IMD/RSMC New Delhi North Indian Ocean best-track record (1982-2026), parsed by imdtrack",
+        "publisher": "India Meteorological Department / RSMC New Delhi (underlying data); imdtrack community parser",
+        "url": "https://rsmcnewdelhi.imd.gov.in/report.php?internal_menu=MzM%3D",
+        "resource_urls": [
+            "https://raw.githubusercontent.com/syedhamidali/imdtrack/main/data/manifest.json",
+            "https://raw.githubusercontent.com/syedhamidali/imdtrack/main/data/observations.parquet",
+            "https://raw.githubusercontent.com/syedhamidali/imdtrack/main/data/storms.parquet",
+            "https://raw.githubusercontent.com/syedhamidali/imdtrack/main/data/remarks.parquet"
+        ],
+        "access": "Parsed Parquet mirror is used for a private research artifact only. Mirror parser code is BSD-3-Clause; underlying data are © IMD and reuse/redistribution terms must be verified with IMD.",
+        "priority": "P0",
+        "status": "Acquired and audited in workflow run 40932094184: 425 storms, 7,585 fixes and 656 remarks (1982-2026). Two storms have a non-suspect track fix within 100 km of the approximate Kochi reference point; 13 within 300 km. QA flags remain unresolved.",
+        "required_checks": "Verify the original IMD workbook against the mirror, confirm IMD reuse terms, review 32 rows involved in duplicate storm/time pairs and 203 date-suspect flags, then link tracks to independent local wind/rainfall/surge and impact evidence.",
+        "limitations": "Best-track position/intensity is hazard-path evidence, not a local wind field, rainfall, storm surge, damage or consequence label. The nearest non-suspect track fix is 23.7 km from the approximate Kochi reference point (storm ID 2018-013, GAJA), but this is not a validated impact claim. Source flags are retained and uncorrected; the latest season may be tentative."
+    },
+    {
         "id": "ncs_earthquake_catalog",
         "hazards": ["Earthquake", "Compound: earthquake + infrastructure disruption"],
         "theme": "Seismic events",
