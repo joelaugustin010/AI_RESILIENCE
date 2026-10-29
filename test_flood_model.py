@@ -1,6 +1,11 @@
 """Readiness and pipeline tests; synthetic rows here test plumbing only."""
 
 import unittest
+import hashlib
+import json
+import tempfile
+from pathlib import Path
+from unittest.mock import patch
 
 import numpy as np
 import pandas as pd
@@ -44,16 +49,25 @@ def synthetic_fixture() -> tuple[pd.DataFrame, dict]:
     return pd.DataFrame(rows), metadata
 
 
+def unverified_demo_fixture() -> tuple[pd.DataFrame, dict]:
+    """Build a tiny, explicitly unverified sample without reading repository data."""
+    frame, _ = synthetic_fixture()
+    frame = frame.iloc[:5].copy()
+    frame[TARGET] = [1, 1, 1, 0, 0]
+    frame["observation_date"] = "2026-10-19T12:00:00"
+    frame = frame.drop(columns=["event_group_id"])
+    return frame, {"data_kind": "unverified_demo"}
+
+
 class FloodModelReadinessTests(unittest.TestCase):
-    def test_bundled_five_rows_are_blocked_with_auditable_reasons(self):
-        frame, metadata = load_flood_data()
+    def test_five_unverified_rows_are_blocked_with_auditable_reasons(self):
+        frame, metadata = unverified_demo_fixture()
         report = audit_flood_dataset(frame, metadata)
         self.assertFalse(report["ready"])
         self.assertEqual(report["rows"], 5)
         self.assertEqual(report["target_counts"], {"1": 3, "0": 2})
         self.assertEqual(report["distinct_dates"], 1)
         self.assertEqual(report["exact_duplicates"], 0)
-        self.assertTrue(metadata["raw_hash_matches"])
         self.assertTrue(any("verified real observations" in item for item in report["blockers"]))
         self.assertTrue(any("chronological" in item for item in report["blockers"]))
         self.assertTrue(any("event-group column" in item for item in report["blockers"]))
@@ -110,8 +124,24 @@ class FloodModelReadinessTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "between 0 and 100"):
             predict_flood_probability(model, sample)
 
-    def test_evaluation_refuses_the_unverified_bundled_dataset(self):
-        frame, metadata = load_flood_data()
+    def test_loader_checks_a_synthetic_csv_and_provenance_hash(self):
+        frame, metadata = unverified_demo_fixture()
+        with tempfile.TemporaryDirectory() as folder:
+            data_path = Path(folder) / "fixture.csv"
+            metadata_path = Path(folder) / "fixture.metadata.json"
+            csv_bytes = frame.to_csv(index=False).encode("utf-8")
+            data_path.write_bytes(csv_bytes)
+            metadata["raw_sha256"] = hashlib.sha256(csv_bytes).hexdigest()
+            metadata_path.write_text(json.dumps(metadata), encoding="utf-8")
+            with patch("src.flood_model.DATA_PATH", data_path), patch(
+                "src.flood_model.METADATA_PATH", metadata_path
+            ):
+                loaded, loaded_metadata = load_flood_data()
+        self.assertEqual(len(loaded), 5)
+        self.assertTrue(loaded_metadata["raw_hash_matches"])
+
+    def test_evaluation_refuses_the_unverified_demo_fixture(self):
+        frame, metadata = unverified_demo_fixture()
         with self.assertRaisesRegex(ValueError, "evaluation blocked"):
             evaluate_flood_model(frame, metadata)
 

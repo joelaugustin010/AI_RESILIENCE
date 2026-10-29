@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "statuses": {
+    "verified": "Source identity, integrity, schema, dates/coverage, units and spatial meaning support the stated limited use.",
+    "provisional": "Source identity or integrity is supported, but a material metadata, coverage, quality, reuse or interpretation gap remains.",
+    "unavailable": "The source or a required input was not obtained or is missing from this checkout.",
+    "unsuitable": "The file or evidence is invalid, or it cannot support the proposed analysis without unsupported assumptions."
+  },
+  "status_scope": "A status applies only to the explicitly stated intended use; it does not imply that a dataset supports unrelated predictions or causal claims."
+}

@@ -33,3 +33,9 @@ and [DIC policy](https://industry.kerala.gov.in/index.php/copyright-policy).
 The exact downloaded paths are listed in `.gitignore` so local test setup does
 not add source documents to a commit or make `git status` appear dirty. The
 test assertions still verify the recorded hashes and PDF signatures.
+
+For the reviewed source inventory, explicit verified/provisional/unavailable/
+unsuitable meanings, hash and schema checks, and current flood/air readiness,
+see [Verified data ingestion and operational analysis](verified_data_ingestion.md).
+Run `python scripts/audit_data_sources.py --format markdown` for a local
+read-only report. The audit does not acquire files or rebuild products.

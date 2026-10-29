@@ -85,6 +85,11 @@ pages = {
             icon=":material/factory:",
         ),
         st.Page(
+            "app_pages/data_readiness.py",
+            title="Data Readiness",
+            icon=":material/fact_check:",
+        ),
+        st.Page(
             "app_pages/hospital_vulnerability.py",
             title="Hospital Vulnerability",
             icon=":material/local_hospital:",

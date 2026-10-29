@@ -1,5 +1,5 @@
 {
-  "reviewed_on": "2026-10-23",
+  "reviewed_on": "2026-10-29",
   "status": "dated_verified_station_reports_acquired_live_feed_and_factory_ranking_unavailable",
   "kspcb_namp_ernakulam_stations": [
     {
@@ -49,7 +49,9 @@
       "evidence": "KSPCB's ambient-monitoring page lists four Ernakulam industrial stations (Irumpanam, Eloor, Kalamessery, Udyogamandal), two commercial stations (M.G. Road, Vytilla) and Ernakulam South as residential. It describes NAMP/SAMP as manual monitoring; the KSPCB IPAM page states 8–11 monitoring days per month and gives pollutant-specific sampling durations.",
       "reuse_status": "The page is public and copyrighted by KSPCB; dataset-specific open reuse terms were not located. This record retains only a source-linked station-name inventory and does not redistribute measurements.",
       "status": "station_network_reference_only_measurements_not_downloaded",
-      "blocker": "KSPCB e-library and report listing are public, but the e-library returned HTTP 502 in web retrieval and direct workspace HTTPS requests failed before an HTTP response. The IPAM page describes monitoring parameters/cadence but the reviewed render did not provide a dated downloadable Kochi observation table or dataset-level reuse terms."
+      "blocker": "KSPCB e-library and report listing are public, but the e-library returned HTTP 502 in web retrieval and direct workspace HTTPS requests failed before an HTTP response. The IPAM page describes monitoring parameters/cadence but the reviewed render did not provide a dated downloadable Kochi observation table or dataset-level reuse terms.",
+      "dataset_id": "kspcb_station_network_reference",
+      "evidence_status": "unavailable"
     },
     {
       "publisher": "Central Pollution Control Board (CPCB), Government of India; hosted on OGD India",
@@ -61,7 +63,9 @@
       "evidence": "The official OGD catalog attributes the resource to CPCB and MoEFCC, says it provides real-time National AQI from monitoring stations, and labels it released under NDSAP. The page links to an API-details page whose visible action is Generate API Key; the catalog page has no downloadable observation rows.",
       "reuse_status": "Catalog states NDSAP; the portal footer states the Government Open Data License-India applies to published datasets/resources. Resource data could not be retrieved to verify its specific schema or any resource-level conditions.",
       "status": "official_catalog_verified_api_access_blocked_no_observations_acquired",
-      "blocker": "API details require API-key generation. No credential is available in the workspace, and the public catalog exposes no raw observation file or rows; no API request was made with an unavailable key."
+      "blocker": "API details require API-key generation. No credential is available in the workspace, and the public catalog exposes no raw observation file or rows; no API request was made with an unavailable key.",
+      "dataset_id": "cpcb_realtime_aqi",
+      "evidence_status": "unavailable"
     },
     {
       "publisher": "Kerala State Pollution Control Board (KSPCB), IPAM air-quality dashboard",
@@ -74,7 +78,9 @@
       "evidence": "Public GET endpoint returned 130 statewide year-labeled AQI summary rows for 2023-2026. Requests for 2015-2022 returned empty station lists. Nine rows match the documented NAMP reference stations after case/punctuation/spacing normalization and matching the monitoring program. The processed copy is data/processed/air_quality/kspcb_annual_aqi.csv; raw responses and SHA-256 metadata are stored under data/raw/air_quality/.",
       "reuse_status": "Dataset-specific reuse terms were not located; the KSPCB portal states copyright. This project retains source attribution and original downloaded payloads.",
       "status": "source_reported_annual_summaries_acquired_not_live_measurements",
-      "blocker": "This annual endpoint provides only year-labeled average_aqi and no pollutant-specific values or exact period cutoff. Separate KSPCB daily/monthly reports have now supplied historical dated readings; the latest/live dashboard request still returned HTTP 403."
+      "blocker": "This annual endpoint provides only year-labeled average_aqi and no pollutant-specific values or exact period cutoff. Separate KSPCB daily/monthly reports have now supplied historical dated readings; the latest/live dashboard request still returned HTTP 403.",
+      "dataset_id": "kspcb_annual_aqi",
+      "evidence_status": "provisional"
     },
     {
       "publisher": "Central Pollution Control Board (CPCB), National AQI method",
@@ -86,7 +92,9 @@
       "evidence": "CPCB states that the highest pollutant sub-index is the AQI and that individual sub-indices can be disseminated when the overall AQI data requirement is not met.",
       "reuse_status": "Official public methodology document; linked for attribution and method reference.",
       "status": "methodology_reference",
-      "blocker": "CPCB methodology is documented. KSPCB reports now supply dated station values, but exact per-pollutant averaging and completeness fields are absent in the available reports, so this project does not recalculate AQI or identify a driving pollutant."
+      "blocker": "CPCB methodology is documented. KSPCB reports now supply dated station values, but exact per-pollutant averaging and completeness fields are absent in the available reports, so this project does not recalculate AQI or identify a driving pollutant.",
+      "dataset_id": "cpcb_aqi_methodology",
+      "evidence_status": "verified"
     },
     {
       "publisher": "Kerala State Pollution Control Board (KSPCB), daily average AQI report",
@@ -99,7 +107,9 @@
       "evidence": "The one-page report gives source-reported daily AQI and concentrations for Eloor, Plamood, Karyavattom, Kannur, and Thrissur. Palayam, M.G. Road, and Vytilla are marked insufficient data; Kollam is marked power failure. Parsed rows and station status are in data/processed/air_quality/kspcb_daily_aqi_2026-10-16.csv and kspcb_daily_aqi_status_2026-10-16.csv. Original PDF and SHA-256 are preserved under data/raw/air_quality_reports/.",
       "reuse_status": "No report-specific open licence identified; source is attributed to KSPCB and retained for project research. Confirm redistribution terms before republication.",
       "status": "historical_source_reported_daily_aqi_and_pollutants_acquired",
-      "blocker": "This is one historical report date and not a live feed. Pollutant averaging periods/completeness are not stated, so no CPCB sub-index or driver is calculated."
+      "blocker": "This is one historical report date and not a live feed. Pollutant averaging periods/completeness are not stated, so no CPCB sub-index or driver is calculated.",
+      "dataset_id": "kspcb_daily_aqi_2026_10_16",
+      "evidence_status": "provisional"
     },
     {
       "publisher": "Kerala State Pollution Control Board (KSPCB), CAAQMS monthly report",
@@ -112,7 +122,9 @@
       "evidence": "The Eloor monthly page provides 31 daily pollutant-value rows, 31 source-reported AQI values, wind speed and direction. The normalized pollutant table contains 279 rows; AQI and weather tables contain 31 rows each. Extracts are in data/processed/air_quality/ and source hashes are in kspcb_air_reports.metadata.json.",
       "reuse_status": "No dataset-specific licence identified; source is attributed to KSPCB and retained for project research. Confirm redistribution terms before republication.",
       "status": "dated_eloor_caaqms_pollutant_values_and_aqi_acquired",
-      "blocker": "Exact pollutant averaging duration and completeness/capture flags are not printed for Eloor. Only one Ernakulam CAAQMS station is included in this report, so a Kochi station comparison is unavailable."
+      "blocker": "Exact pollutant averaging duration and completeness/capture flags are not printed for Eloor. Only one Ernakulam CAAQMS station is included in this report, so a Kochi station comparison is unavailable.",
+      "dataset_id": "kspcb_eloor_caaqms_2026_08",
+      "evidence_status": "provisional"
     },
     {
       "publisher": "Kerala State Pollution Control Board (KSPCB), NAMP report",
@@ -125,7 +137,9 @@
       "evidence": "Ernakulam pages contain 62 dated station rows for June 2025 across eight station codes. Raw-field extract is data/processed/air_quality/kspcb_namp_ernakulam_2025-06.csv. * markers are retained. Kuttippadam coordinates vary across rows.",
       "reuse_status": "No dataset-specific licence identified; source is attributed to KSPCB and retained for project research. Confirm redistribution terms before republication.",
       "status": "dated_pollutant_values_and_station_coordinates_acquired_units_unresolved_excluded_from_analysis",
-      "blocker": "Pollutant concentration units and coordinate reference system are absent from the reviewed PDF. Do not use the values for trends or AQI until units are verified. Report entry month conflicts with page content."
+      "blocker": "Pollutant concentration units and coordinate reference system are absent from the reviewed PDF. Do not use the values for trends or AQI until units are verified. Report entry month conflicts with page content.",
+      "dataset_id": "kspcb_namp_ernakulam_2025_06",
+      "evidence_status": "unsuitable"
     },
     {
       "publisher": "Kerala Water Authority (KWA), Edayar CETP report and source page",
@@ -137,7 +151,9 @@
       "evidence": "The KWA DER names CMRL, Sud-cheme India, Arjuna Natural Extracts, TMS Leathers, Active Char Product, Indo German Carbon, Rubber O Malabar Products, and Malaya Rub Tech as major industries. It says CMRL, TMS Leathers and Sud-Cheme had treated-effluent discharge authorization to Periyar as of the report. The current KWA page gives estate-level industry-type counts.",
       "reuse_status": "No document-specific open licence identified; retain KWA attribution and confirm redistribution terms.",
       "status": "candidate_facility_inventory_and_effluent_context_acquired_air_emissions_unavailable",
-      "blocker": "Effluent planning data are not air emissions. The source provides no individual coordinates, pollutant emissions, stack profiles or current air consent validity."
+      "blocker": "Effluent planning data are not air emissions. The source provides no individual coordinates, pollutant emissions, stack profiles or current air consent validity.",
+      "dataset_id": "kwa_edayar_cetp_2022",
+      "evidence_status": "provisional"
     },
     {
       "publisher": "Directorate of Industries and Commerce, Government of Kerala",
@@ -150,7 +166,9 @@
       "evidence": "Official listing links DA Edayar to a DWG file, preserved under data/raw/industrial/. Directorate Ernakulam infrastructure page (dated 2022-01-10) reports 264 working units in the Development Area.",
       "reuse_status": "Directorate page carries a copyright policy; no dataset-specific open licence identified.",
       "status": "official_estate_map_and_administrative_context_acquired",
-      "blocker": "No compatible CAD reader was available to verify plot labels or join named firms to plots. No facility coordinates are derived from this map."
+      "blocker": "No compatible CAD reader was available to verify plot labels or join named firms to plots. No facility coordinates are derived from this map.",
+      "dataset_id": "dic_edayar_site_plan",
+      "evidence_status": "provisional"
     },
     {
       "publisher": "Kerala State Pollution Control Board, legacy OCMMS public application report",
@@ -162,7 +180,9 @@
       "evidence": "The preserved page lists TMS Leathers CTO application 7306237 approved 2018-07-04 and Cochin Minerals and Rutile Ltd CTO application 7237310 approved 2018-06-12.",
       "reuse_status": "No dataset-specific open licence identified; public KSPCB record, use with attribution.",
       "status": "historical_consent_application_rows_acquired_validity_unknown",
-      "blocker": "An approved legacy application record is not a current consent certificate. Current validity and air-emission limits were not verified."
+      "blocker": "An approved legacy application record is not a current consent certificate. Current validity and air-emission limits were not verified.",
+      "dataset_id": "kspcb_ocmms_historical_cto_listing",
+      "evidence_status": "provisional"
     },
     {
       "publisher": "Kerala State Pollution Control Board, Phoenix public certificate verification",
@@ -174,7 +194,38 @@
       "evidence": "The public search form is reachable. A name search POST returned an unexpected-error page during this review.",
       "reuse_status": "Public portal; no dataset-specific reuse terms identified.",
       "status": "current_consent_verification_attempted_not_obtained",
-      "blocker": "Public search POST failed with an unexpected-error response; current facility consent status remains unverified."
+      "blocker": "Public search POST failed with an unexpected-error response; current facility consent status remains unverified.",
+      "dataset_id": "kspcb_current_consent_search",
+      "evidence_status": "unavailable"
+    },
+    {
+      "dataset_id": "kspcb_eloor_caaqms_2026_09",
+      "evidence_status": "provisional",
+      "publisher": "Kerala State Pollution Control Board (KSPCB), CAAQMS monthly report",
+      "url": "https://kspcb.kerala.gov.in/fileViewer/UHIwKzVlZkpwTnVzaVAxY2lHZlRZS0swN04rRWJuOHBlVVNZeUNRdkZ5c0pkUlVxeDY5aDduT1AwUnR5TWt6cjRKdnp6R25UZS9ubC9oeEh3TmFUbFE9PQ%2A%2A/0?raw=1",
+      "directory_url": "https://kspcb.kerala.gov.in/water-and-air-quality-directory",
+      "reviewed_on": "2026-10-29",
+      "publication_date": "2026-09-30 (KSPCB directory label)",
+      "geographic_coverage": "Eloor CAAQMS report page, Ernakulam; September 2026",
+      "schema_crs_units": "Daily source-reported AQI and pollutant values; units printed in report. No station code, coordinate or exact pollutant averaging window.",
+      "evidence": "PDF signature, size and SHA-256 match acquisition metadata; metadata records five pages and 20,066 extracted text characters with Eloor/PM10/SO2 markers. A local PDF parser is optional and was unavailable during this review.",
+      "reuse_status": "No dataset-specific open licence identified; preserve KSPCB attribution and confirm redistribution terms.",
+      "status": "dated_eloor_caaqms_pollutant_values_and_aqi_acquired",
+      "blocker": "Historical daily summaries only; exact averaging windows, row-level QA/completeness and verified station coordinates are absent. Does not support factory attribution."
+    },
+    {
+      "dataset_id": "dic_edayar_allotment_2022",
+      "evidence_status": "provisional",
+      "publisher": "Directorate of Industries and Commerce, Government of Kerala",
+      "url": "https://industry.kerala.gov.in/images/DA-DP/Ernakulam/DA_Edayar.pdf",
+      "reviewed_on": "2026-10-29",
+      "publication_date": "2022-02-15 (official listing label)",
+      "geographic_coverage": "Edayar industrial development area; historical plot allotment register",
+      "schema_crs_units": "Published business names, plot identifiers and plot areas as printed. Plot identifiers are not coordinates.",
+      "evidence": "PDF signature, byte count and SHA-256 match sidecar; sidecar records 30 pages, 52,159 extracted text characters and Edayar/allotment markers.",
+      "reuse_status": "No document-specific open licence identified; retain attribution and confirm terms before redistribution.",
+      "status": "historical_estate_allotment_register_acquired",
+      "blocker": "Historical name/allotment evidence does not establish current occupancy, verified coordinates, air consent or emissions."
     }
   ],
   "not_obtained": [
@@ -185,5 +236,6 @@
     "Hour-aligned meteorology, background pollution and a competing-source inventory for potential-source analysis",
     "Dataset-specific reuse/licence terms for the KSPCB and KWA report documents"
   ],
-  "interpretation_limit": "AQI indicates an air-quality concern but does not identify its source. The Edayar facility list is a candidate inventory only. Do not infer causation from industrial-estate presence, proximity, AQI, or wind direction alone. The legacy data/raw/air_pollution_data.csv remains an undocumented illustrative sample and is not analyzed."
+  "interpretation_limit": "AQI indicates an air-quality concern but does not identify its source. The Edayar facility list is a candidate inventory only. Do not infer causation from industrial-estate presence, proximity, AQI, or wind direction alone. The legacy data/raw/air_pollution_data.csv remains an undocumented illustrative sample and is not analyzed.",
+  "status_definitions_file": "data/reference/data_status_definitions.json"
 }

@@ -8,8 +8,8 @@
   "publication_date": "Not stated for this exact ZIP; KSDMA catalogue cites 2020 and 2024 assessment references; TIFF archive timestamps are 2026-04-12",
   "license": "No dataset-specific licence or reuse terms found on the KSDMA catalogue page; ingestion and redistribution blocked pending confirmation",
   "crs": "EPSG:4326 / WGS 84, explicitly present in each GeoTIFF GeoKeyDirectory (GeographicTypeGeoKey 4326)",
-  "units": "Raster is single-band float32; units and pixel-value meaning are not documented in TIFF metadata reviewed",
-  "geographic_coverage": "Statewide raster grid bounding extent approximately 74.8646216?77.3680 E, 8.2909?12.7667 N; this is a grid extent, not a flood extent",
+  "units": "Raster is single-band float32; valid pixel-value units and meaning are not documented in TIFF metadata",
+  "geographic_coverage": "Statewide raster grid bounding extent approximately 74.8646216-77.3680 E, 8.2909-12.7667 N; this is a grid extent, not a flood extent",
   "schema": {
     "files": [
       "Kerala_Flood_10_yr_Historical.tif",
@@ -20,14 +20,29 @@
     "height": 5371,
     "bands": 1,
     "pixel_type": "32-bit float",
-    "cell_size_degrees": 0.0008333333333333
+    "cell_size_degrees": 0.0008333333333333,
+    "nodata_value": -3.402823e+38
   },
   "limitations": [
     "KSDMA links the file as a historical flood return-probability raster product, not a live forecast.",
     "Dataset-level reuse permission is not stated on the source catalogue; the archive is preserved raw but not unpacked into processed layers.",
-    "Pixel-value units/class meaning and NoData semantics are absent from the GeoTIFF tags/auxiliary metadata reviewed; values cannot safely be thresholded or polygonized.",
-    "No exposure analysis is performed with this raster until reuse terms and pixel semantics/NoData are confirmed."
+    "Each main TIFF declares GDAL_NODATA=-3.402823e38. Valid pixel values have no documented units or class meaning and range from 0.729 to 1776.6 (10-year), 0.6561 to 1974 (25-year), and 0.729 to 1981 (50-year); values cannot safely be thresholded or polygonized.",
+    "No exposure analysis is performed with this raster until reuse terms, valid pixel semantics, and the interpretation/application of the NoData sentinel are confirmed."
   ],
+  "observed_pixel_review": {
+    "archive_member_count": 13,
+    "valid_pixel_counts_by_return_period": {
+      "10-year": 326956,
+      "25-year": 350934,
+      "50-year": 370006
+    },
+    "valid_pixel_value_ranges_by_return_period": {
+      "10-year": [0.729, 1776.6],
+      "25-year": [0.6561, 1974.0],
+      "50-year": [0.729, 1981.0]
+    },
+    "validation_method": "Read-only ZIP CRC check and Pillow GeoTIFF inspection. Pixel values were not assigned a meaning or modified."
+  },
   "sha256": "4057b36cdfc467ecaf618afb1e74b725187ef1d2a20326cdc1e4eb32df54605e",
   "archive_bytes": 4370593,
   "zip_integrity": "CRC check passed; all archive members readable"

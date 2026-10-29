@@ -8,16 +8,12 @@ import pydeck as pdk
 import streamlit as st
 
 from src.spatial_data import classify_exposure, processed_layer_issues, read_processed_layers, validate_geojson
-from src.flood_raster import FloodRasterError
-from src.kochi_map_layers import build_jrc_preview_layer
 
 ROOT = Path(__file__).resolve().parents[1]
 BOUNDARY_PATH = ROOT / "data" / "reference" / "kochi_corporation_boundary.geojson"
 SOURCE_CATALOG_PATH = ROOT / "data" / "reference" / "spatial_sources.json"
 FLOOD_ACQUISITION_METADATA = ROOT / "data" / "raw" / "ksdma_flood_return_probability_historical_10_25_50.metadata.json"
 HOSPITAL_REVIEW_METADATA = ROOT / "data" / "processed" / "nihfw_ernakulam_hospitals_coordinate_review.metadata.json"
-JRC_PREVIEW_PATH = ROOT / "data" / "processed" / "spatial_layers" / "jrc_glofas_rp100_kochi_preview.png"
-JRC_PREVIEW_METADATA = JRC_PREVIEW_PATH.with_name("jrc_glofas_rp100_kochi_preview.metadata.json")
 HOSPITAL_REVIEW_CSV = ROOT / "data" / "processed" / "nihfw_ernakulam_hospitals_coordinate_review.csv"
 
 
@@ -121,9 +117,9 @@ if flood_metadata or hospital_metadata:
     st.subheader("Recent real-data acquisition status")
     if flood_metadata:
         st.warning(
-            "KSDMA historical flood raster archive obtained and checksum-verified. Its GeoTIFFs identify EPSG:4326, "
-            "but KSDMA reuse terms and raster value/NoData meaning remain undocumented. The archive is kept in "
-            "data/raw and is not displayed or used for exposure; unknown exposure is not a safe result.",
+            "KSDMA historical flood archive obtained and checksum-verified. Its GeoTIFFs identify EPSG:4326 and "
+            "declare a NoData sentinel (-3.402823e38), but the valid pixel meaning/units and dataset reuse terms "
+            "remain undocumented. The raw archive is not rendered or used for exposure; unknown exposure is not a safe result.",
             title="Flood hazard layer unavailable for analysis",
         )
         st.caption(
@@ -232,31 +228,12 @@ show_boundary = st.checkbox("Kochi Corporation administrative boundary", value=T
 st.caption("Blue outline = administrative boundary only. It must not be interpreted as a hazard zone or as the full Greater Kochi urban area.")
 deck_layers = []
 legend_rows = []
-show_jrc_flood = st.checkbox("JRC modeled river flood depth (RP100 scenario)", value=True)
-if show_jrc_flood:
-    try:
-        jrc_metadata = load_acquisition_metadata(JRC_PREVIEW_METADATA)
-        if jrc_metadata and JRC_PREVIEW_PATH.is_file():
-            jrc_bounds = jrc_metadata["processing"]["bounds_epsg4326"]
-            deck_layers.append(build_jrc_preview_layer(
-                JRC_PREVIEW_PATH,
-                [jrc_bounds[0], jrc_bounds[1], jrc_bounds[2], jrc_bounds[3]],
-            ))
-            legend_rows.append(("JRC modeled RP100 river-flood depth", "Blue translucent cells", "Model scenario; transparent = zero, NoData, or outside source coverage"))
-            st.caption(
-                "Blue pixels visualize positive modeled depth in the JRC 100-year return-period scenario. "
-                "This is a global river-flood model at about 90 m resolution, not an observed or forecast flood. "
-                "Transparent pixels combine zero depth, NoData, and outside-coverage cells, so they do not establish safety. "
-                "The image is cropped to the provisional boundary's bounding rectangle for display only; that invalid boundary is not used as an analysis mask."
-            )
-            st.markdown(
-                "[JRC dataset documentation](https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/flood_hazard/README.txt) | "
-                "[Reuse terms](https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/copyright.txt)"
-            )
-        else:
-            st.warning("The downloaded JRC raster preview or its provenance metadata is missing; the flood raster is unavailable on this map.")
-    except (OSError, KeyError, TypeError, FloodRasterError) as error:
-        st.warning(f"The JRC raster preview could not be loaded: {error}")
+st.warning(
+    "The JRC RP100 raster preview is withheld. Its dataset README lists ODbL 1.0, while the linked JRC copyright "
+    "notice lists CC BY 4.0; no clarification has been obtained. Do not redistribute or publicly deploy the local "
+    "raster or preview until the applicable terms are confirmed.",
+    title="JRC flood preview withheld pending licence clarification",
+)
 
 template = pd.DataFrame(columns=["name", "layer", "latitude", "longitude", "source", "source_date"])
 st.download_button("Download point CSV template", template.to_csv(index=False).encode("utf-8"), file_name="kochi_reviewed_points_template.csv", mime="text/csv")
@@ -345,7 +322,7 @@ if processed_layers:
     hazard_layers = [layer for layer in processed_layers if layer["metadata"].get("layer_role") == "hazard"]
     st.subheader("Spatial exposure overlay")
     if not asset_layers:
-        st.info("Unknown / unassessable exposure: no validated asset-location layer is available. The JRC flood raster is hazard context only; NIHFW hospital coordinates remain review-only because the source omits coordinate order, CRS/datum, and positional accuracy. No facility is assumed safe or exposed.")
+        st.info("Unknown / unassessable exposure: no validated asset-location layer is available. The JRC preview is withheld pending licence clarification; KSDMA pixel values remain uninterpreted. NIHFW hospital coordinates are review-only because coordinate order, CRS/datum, and positional accuracy are undocumented. No facility is assumed safe or exposed.")
     elif not hazard_layers:
         st.info("Unknown exposure: no compatible processed hazard layer is available. No asset is assumed safe.")
     else:
@@ -419,6 +396,6 @@ if legend_rows:
 st.info(
     "OpenStreetMap roads, transit, mapped waterways, and any tagged facilities shown here are provisional community-mapped context. "
     "They do not establish complete municipal road or drainage assets, current facility operation, or emergency access. "
-    "KSPCB/CPCB observations are not spatially joined to verified station locations in this map. The JRC layer is a modeled river-flood scenario. "
+    "KSPCB/CPCB observations are not spatially joined to verified station locations in this map. The JRC preview is withheld pending licence clarification. "
     "No validated asset-to-hazard overlay or factory source-attribution analysis is supported by the available data."
 )

@@ -1,0 +1,37 @@
+name: Python tests
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-data.txt
+      - name: Install declared dependencies
+        run: python -m pip install -r requirements.txt -r requirements-data.txt
+      - name: Check dependency consistency
+        run: python -m pip check
+      - name: Record resolved dependency versions
+        run: python -m pip freeze
+      - name: Check NumPy, SciPy, and scikit-learn imports
+        run: >-
+          python -c "import numpy, scipy, sklearn; from scipy.ndimage import label;
+          label(numpy.array([[1]], dtype=numpy.uint8));
+          print(f'numpy={numpy.__version__} scipy={scipy.__version__} scikit-learn={sklearn.__version__}')"
+      - name: Run clean-checkout test suite
+        run: python -m pytest -q -ra --strict-markers

@@ -270,7 +270,7 @@ st.warning("This prototype does not issue official warnings or validated predict
 st.caption("A historical rainfall measurement benchmark is available in the evidence explorer. It is separate from the assessment and is not a current rainfall or flood forecast.")
 st.page_link("app_pages/kochi_map.py", label="Open the Kochi map", icon=":material/map:")
 st.info(
-    "Kochi evidence update: an official JRC 100-year river-flood depth scenario is available as map context. "
+    "Kochi evidence update: JRC 100-year river-flood depth tiles are locally reviewed as modeled hazard data, but the map preview is withheld pending clarification of conflicting licence statements. "
     "Asset-level flood exposure remains unknown because there is no independently validated hospital or critical-facility location layer. "
     "See the map for source details and the broader data gaps."
 )

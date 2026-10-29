@@ -43,11 +43,13 @@ three single-band 3004×5371 float32 GeoTIFFs, each with an explicit EPSG:4326
 GeoKey, labeled historical 10-, 25-, and 50-year products. The raster grid spans
 approximately 74.8646–77.3680 E and 8.2909–12.7667 N; these are grid bounds, not
 the mapped flood footprint. The catalogue identifies historic/return-probability
-products, but the GeoTIFF metadata does not state pixel units/meaning or NoData
-semantics, and the catalogue does not state a dataset-level reuse licence. The
-archive is therefore preserved but not unpacked into processed data, rendered,
-thresholded, or used for exposure analysis. Return-period labels are not an
-event forecast or observed flood depth.
+products. Each main TIFF declares GDAL_NODATA=-3.402823e38, but valid pixel
+units/meaning, NoData interpretation, and dataset-level reuse terms remain
+undocumented. The archive is therefore preserved but not unpacked into
+processed data, rendered, thresholded, or used for exposure analysis.
+Return-period labels are not an event forecast or observed flood depth. The
+2026-10-29 review confirmed the ZIP CRC and recorded valid-value ranges in the
+source metadata sidecar without interpreting or modifying those values.
 
 The official [Kerala LRIS 2.0 catalogue](https://lris.kslub.kerala.gov.in/),
 maintained by the Land Use Department, lists a road network, drainage lines, and
@@ -170,8 +172,8 @@ hazard–asset exposure analysis has been completed**. The map reports these
 acquisition/validation states and continues to label exposure unknown when no
 compatible hazard layer is available. It does not treat no detected intersection
 as proof of safety. Request from KSDMA the reuse permission, raster band units or
-class interpretation, NoData definition, and method/report explaining the
-10/25/50-year products. Request from NIHFW the coordinate order, CRS/datum,
+class interpretation, meaning/application of its declared NoData sentinel, and
+method/report explaining the 10/25/50-year products. Request from NIHFW the coordinate order, CRS/datum,
 geocoding method/accuracy, and corrected duplicate/missing or clearly invalid
 hospital coordinates. Until then, do not convert the review CSV to points.
 
@@ -232,25 +234,30 @@ Two JRC/Copernicus GloFAS v2.1.2 RP100 depth tiles were downloaded for the
 Kochi latitude band: `data/raw/jrc_glofas_rp100_ID185_N20_E70_depth.tif` and
 `data/raw/jrc_glofas_rp100_ID186_N10_E70_depth.tif`. The source README documents
 global land coverage, 3 arc-second (~90 m) resolution, water depth in metres,
-WGS84, and free/open Copernicus use; the JRC copyright notice states CC BY 4.0
-with attribution and indication of changes. The GeoTIFFs independently report
-EPSG:4326, 11999x11999 float32, DEFLATE, and `-9999` NoData. The RP100 tile
-index records both files as modified 2025-12-18. Hashes and full technical
-metadata are in `data/reference/spatial_sources.json` and the processed
-preview sidecar.
+and WGS84. It specifies ODbL 1.0; the linked JRC copyright notice specifies
+CC BY 4.0 with attribution and indication of changes. No source statement
+clarifying precedence or dual application was found. The dataset is provisional
+and requires written licence clarification before redistribution or public
+display. The GeoTIFFs report EPSG:4326, 11999x11999 float32, DEFLATE, and
+`-9999` NoData. The RP100 tile index records both files as modified 2025-12-18.
+Hashes and technical metadata are in `data/reference/spatial_sources.json` and
+the preview sidecar.
 
-`src/flood_raster.py` reads the source tiles without modifying them and writes a
-separate transparent PNG preview under `data/processed/spatial_layers/`. The
-preview rectangle is taken from the provisional boundary's numeric bounds for
-rendering only; the self-intersecting polygon is not used as a mask. Blue pixels
-show sampled positive modeled depth. Transparent pixels can mean zero,
-NoData, or outside source coverage and therefore cannot establish safety. The
-JRC README warns about possible artifacts from model limitations, DEM sinks,
-tile boundaries, and DEM issues. The separate spurious-depth and permanent
-water masks have not been downloaded or applied.
+`src/flood_raster.py` was used to create a separate transparent PNG preview
+under `data/processed/spatial_layers/`; the source tiles were not modified. The
+preview rectangle used the provisional boundary's numeric bounds for rendering
+only; the self-intersecting polygon was not used as a mask. Blue pixels show
+sampled positive modeled depth. Transparent pixels can mean zero, NoData, or
+outside source coverage and cannot establish safety. The JRC README warns about
+possible artifacts from model limitations, DEM sinks, tile boundaries, and DEM
+issues. The separate spurious-depth and permanent-water masks have not been
+downloaded or applied. Since the licensing conflict was reviewed on 2026-10-29,
+the application withholds this local preview pending written clarification.
 
-This is a real hazard layer, but **a hazard–infrastructure exposure analysis
-has not yet been completed**. NIHFW's licensed hospital CSV remains review-only:
+This is a modeled river-flood hazard scenario, but **a hazard–infrastructure
+exposure analysis has not been completed**. The JRC preview is withheld because
+of the unresolved licence conflict. NIHFW's licensed hospital CSV remains
+review-only:
 the official resource defines `Location_Coordinates` but does not specify
 coordinate order, CRS/datum, geocoding method, positional accuracy, or row-level
 location correctness. The Ernakulam subset has 31 missing/nonnumeric pairs and
@@ -261,14 +268,15 @@ available Geofabrik regional fallback was a 532 MB PBF (roughly 1.1 GB in the
 reviewed GIS bundle formats) and is community-mapped rather than authoritative.
 No alternate facility file was accepted.
 
-The map overlays the real JRC RP100 raster preview and reports hospital
-exposure as unknown/unassessable. A future provider request must confirm the
-NIHFW coordinate order, CRS/datum, geocoding method/accuracy, and corrections
-for missing/repeated/implausible locations; alternatively obtain a licensed,
-dated, independently checked facility GIS layer. Separately, polygon/vector
-intersection and raster cell sampling are different methods: the provided
-`classify_depth_sample` helper deliberately labels cell samples and never
-claims damage, failure, or safety.
+The map does not display the JRC RP100 preview and reports exposure as
+unknown/unassessable. A future provider request must confirm the JRC licence
+terms and NIHFW coordinate order, CRS/datum, geocoding method/accuracy, and
+corrections for missing/repeated/implausible locations; alternatively obtain a
+licensed, dated, independently checked facility GIS layer. Separately,
+polygon/vector intersection and raster cell sampling are different methods:
+the provided `classify_depth_sample` helper deliberately labels cell samples
+and never claims damage, failure, or safety. A functioning helper and passing
+synthetic tests do not constitute a real-data exposure analysis.
 
 ## Hospital source follow-up (2026-10-20)
 

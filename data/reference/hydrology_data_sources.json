@@ -1,5 +1,5 @@
 {
-  "reviewed_on": "2026-10-20",
+  "reviewed_on": "2026-10-29",
   "purpose": "Historical observations and sourced event context; the manual rainfall series supports only a retrospective next-record measurement benchmark. No verified labels support flood prediction, and the benchmark is excluded from the disaster assessment.",
   "reuse_policy": "NWDP resource pages identify the CSV resources as 'Other (Open)'. The NWDP copyright policy permits accurate reproduction with prominent attribution, subject to third-party rights. Preserve this source attribution and check current portal terms before external redistribution.",
   "timestamp_policy": "Local source strings are parsed as day-first because the stored examples use DD-MM-YYYY HH:MM. Source timezone is not documented; values are not timezone-converted.",
@@ -74,6 +74,54 @@
       "license": "NWDP resource metadata: Other (Open); NWDP copyright policy requires accurate reproduction and source acknowledgment.",
       "retrieved_on": "Unknown for the pre-existing local copy; portal resource metadata was reviewed on 2026-10-20.",
       "limitations": ["No official warning threshold linked to the values.", "No station-level flood event outcome labels or timezone metadata.", "Mananthavadi measurement-scale/reference discontinuity remains unresolved.", "Some geographic descriptors are internally inconsistent with the recorded districts/coordinates (for example, F.C.S. Mananthavadi is labeled River=Luni and Basin=West flowing rivers from Tadri to Kanyakumari); do not use the river labels for spatial/basin attribution until the provider confirms them."]
+    }
+  ],
+  "station_metadata_sources": [
+    {
+      "source_id": "cwc_kerala_station_register_2012",
+      "title": "CWC Details of Meteorological Observation Stations",
+      "source_url": "https://www.cwc.gov.in/sites/default/files/meteorological-network-details-of-cwc.pdf",
+      "publisher": "Central Water Commission, Government of India",
+      "document_date": "Stations listed as on 2012-06-01",
+      "reviewed_on": "2026-10-29",
+      "source_content_reviewed": "Official PDF page 38 lists Kalampur (Ernakulam; Muvattupuzha/Kaliyar; 09°59′26″N, 76°37′56″E), Ramamangalam (Ernakulam; Muvattupuzha; 09°50′42″N, 76°28′00″E), and Neeleeswaram (Ernakulam; Periyar; 10°11′00″N, 76°30′00″E), with parameter start dates.",
+      "coordinate_reference_system": "Not stated in the reviewed register; source coordinates remain DMS text and were not converted to geometry.",
+      "positional_accuracy": "Not stated",
+      "license": "No dataset-specific reuse terms identified in the reviewed PDF/page; no local copy retained.",
+      "local_file": null,
+      "file_sha256": null,
+      "feature_count": 0,
+      "evidence_status": "provisional",
+      "status": "station_metadata_lead_only_not_spatially_validated",
+      "limitations": [
+        "The register is dated 2012 and does not establish current operation or monitoring continuity.",
+        "The source does not document coordinate datum/CRS or positional accuracy; coordinates are not used in spatial analysis.",
+        "The station list is not a water-level time series, official warning threshold, or verified flood-event label source."
+      ]
+    },
+    {
+      "source_id": "nwic_kerala_sw_telemetry_hourly_2026_2030",
+      "title": "Kerala Surface Water Department River Water Level Telemetry Hourly (2026–2030 resource listing)",
+      "source_url": "https://nwdp.nwic.gov.in/dataset/river-water-level-telemetry-hourly-kerala-surface-water-department/resource/d021ec1f-187d-431f-a3bf-1de36058fe7c",
+      "catalog_url": "https://nwdp.nwic.gov.in/dataset/river-water-level-telemetry-hourly-kerala-surface-water-department",
+      "publisher": "Kerala Surface Water Department; hosted by National Water Informatics Centre, Ministry of Jal Shakti",
+      "portal_resource_last_updated": "2026-10-26",
+      "reviewed_on": "2026-10-29",
+      "portal_description": "The dataset page describes hourly river water level records with date, station identifier/geographic hierarchy, river and level in metres; it lists a 2026–2030 West flowing rivers from Tadri to Kanyakumari CSV resource.",
+      "license": "NWIC copyright policy permits accurate reproduction with prominent source acknowledgment, except third-party material; resource-specific rights were not confirmed because the CSV resource page could not be retrieved.",
+      "retrieval_result": "The portal dataset listing was reviewed; the resource page request returned a cache-miss error and no CSV bytes were obtained.",
+      "local_file": null,
+      "file_sha256": null,
+      "feature_count": 0,
+      "evidence_status": "unavailable",
+      "status": "resource_listed_csv_not_retrieved_or_validated",
+      "coordinate_reference_system": "Not verified",
+      "positional_accuracy": "Not verified",
+      "limitations": [
+        "No resource bytes were available to validate file integrity, schema, station tags, coordinate order, CRS/datum, duplicates, missingness, or observation range.",
+        "The resource listing does not by itself establish verified flood-event outcomes, station warning thresholds, or feature availability before a forecast issue time.",
+        "No station geometries or model inputs were created from this listing."
+      ]
     }
   ],
   "event_sources": [

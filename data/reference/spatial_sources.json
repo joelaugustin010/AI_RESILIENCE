@@ -1,6 +1,6 @@
 {
   "catalog_version": 2,
-  "reviewed_on": "2026-10-28",
+  "reviewed_on": "2026-10-29",
   "coordinate_policy": "GeoJSON layers must carry documented WGS 84 longitude/latitude (EPSG:4326); unknown or other CRSs are not guessed or reprojected by this project.",
   "datasets": [
     {
@@ -24,7 +24,8 @@
       ],
       "local_file": "data/reference/kochi_corporation_boundary.geojson",
       "feature_count": 1,
-      "validation_status": "PROVISIONAL"
+      "validation_status": "PROVISIONAL",
+      "evidence_status": "provisional"
     },
     {
       "layer_id": "hospitals_ogd_directory",
@@ -67,11 +68,102 @@
           "available_evidence": "Official institution-search page lists Ernakulam public facility names, facility types, addresses, bed/service fields and View Map controls.",
           "blocker": "The accessible page has no downloadable GIS data or exposed latitude/longitude fields; no CRS/datum, geocoding accuracy, stable spatial export schema, or spatial reuse terms were found. Not used to geocode NIHFW records or create map points.",
           "status": "candidate_identity_reference_only_not_spatially_ingested"
+        },
+        {
+          "title": "Ernakulam district administration hospital directory",
+          "url": "https://ernakulam.nic.in/en/public-utility-category/hospitals/",
+          "publisher": "District Administration Ernakulam, Government of Kerala; hosted by National Informatics Centre",
+          "reviewed_on": "2026-10-29",
+          "publication_or_update_date": "Page states last updated 2026-10-15",
+          "license": "No dataset-specific reuse terms for a spatial export were stated on the reviewed page.",
+          "available_evidence": "Public utility listings contain hospital names, addresses, phone numbers, and category/type.",
+          "blocker": "The page provides no coordinates or downloadable GIS export, CRS/datum, positional accuracy, or spatial reuse terms. Addresses were not geocoded and no point features were created.",
+          "status": "identity_address_reference_only_not_spatially_ingested"
         }
       ],
       "validation_status": "UNSUITABLE FOR ANALYSIS",
       "feature_count": 0,
-      "review_record_count": 180
+      "review_record_count": 180,
+      "evidence_status": "unsuitable"
+    },
+    {
+      "layer_id": "schools_kerala_sametham",
+      "title": "KITE Sametham Kerala school directory (Ernakulam list reviewed; no spatial export verified)",
+      "status": "directory_reviewed_no_eligible_spatial_layer",
+      "source_url": "https://sametham.kite.kerala.gov.in/publicView/schoolsLists/LP/edu/26/1",
+      "publisher": "Kerala Infrastructure and Technology for Education (KITE), Government of Kerala",
+      "retrieved_on": "2026-10-29",
+      "publication_date": "The Sametham homepage states school data updated 2026-06-27",
+      "license": "No dataset-specific reuse terms for a bulk spatial export were identified on the reviewed pages.",
+      "crs": "Not stated for the school list or its individual Google Maps links",
+      "units": "School IDs and administrative/academic attributes; no coordinate units documented",
+      "geographic_coverage": "Sametham describes a Kerala-wide school directory. The reviewed Ernakulam school-list page includes school IDs, names, block/local-body fields, school levels, and individual Location map links.",
+      "available_attributes": [
+        "School code and name",
+        "Block and local-body fields",
+        "Assembly name, school type, and class levels",
+        "Some individual Google Maps links; some rows state Not Available"
+      ],
+      "limitations": [
+        "The reviewed directory is a live web list, not a documented downloadable GIS file or stable spatial API.",
+        "The individual Location map links lead to Google Maps; no coordinate order, CRS/datum, geocoding method, positional accuracy, or bulk reuse terms are documented on the reviewed list.",
+        "Some rows have no Location map link. No coordinates were copied, geocoded, or assigned to facility records.",
+        "Directory attributes can support school identity research, but the source has not been validated as a complete current spatial asset inventory for the Kochi study area."
+      ],
+      "blocker": "No documented school-point export with stable spatial fields, CRS, positional accuracy, and reuse terms was available for validation; no school is counted as spatially exposed.",
+      "alternative_sources_reviewed": [
+        {
+          "title": "Ernakulam district administration school directory",
+          "url": "https://ernakulam.nic.in/en/public-utility-category/schools/",
+          "publisher": "District Administration Ernakulam, Government of Kerala; hosted by National Informatics Centre",
+          "reviewed_on": "2026-10-29",
+          "publication_or_update_date": "Page states last updated 2026-10-15",
+          "license": "No dataset-specific reuse terms for a spatial export were stated on the reviewed page.",
+          "available_evidence": "Public utility listings contain school names, addresses, phone numbers, and category/type.",
+          "blocker": "The page provides no coordinates or downloadable GIS export, CRS/datum, positional accuracy, or spatial reuse terms. Addresses were not geocoded and no point features were created.",
+          "status": "identity_address_reference_only_not_spatially_ingested"
+        },
+        {
+          "title": "Ernakulam district education information",
+          "url": "https://ernakulam.nic.in/en/education/",
+          "publisher": "District Administration Ernakulam, Government of Kerala; hosted by National Informatics Centre",
+          "reviewed_on": "2026-10-29",
+          "publication_or_update_date": "Not stated on the reviewed page",
+          "license": "No dataset-specific reuse terms for a spatial export were stated on the reviewed page.",
+          "available_evidence": "Education-office contact information and school counts by level and management type.",
+          "blocker": "Administrative counts and office addresses are not a school facility GIS inventory and contain no validated school coordinates or point export.",
+          "status": "administrative_reference_only_not_spatially_ingested"
+        }
+      ],
+      "validation_status": "UNAVAILABLE AS SPATIAL INPUT",
+      "feature_count": 0,
+      "layer_role": null,
+      "evidence_status": "unavailable"
+    },
+    {
+      "layer_id": "flood_exposure_report_ksdma_2022",
+      "title": "KSDMA Flood Probability Report 2022 (aggregate school/hospital exposure tables; PDF not locally inspected)",
+      "status": "official_report_linked_not_retrieved_or_validated",
+      "source_url": "https://sdma.kerala.gov.in/wp-content/uploads/2022/06/Flood-Probability-Report-2022_Final.pdf",
+      "publisher": "Kerala State Disaster Management Authority (KSDMA); report describes work with UNEP, CIMA Italy, GRID and other cited partners",
+      "retrieved_on": "2026-10-29 (catalogue/page review; report file not retrieved)",
+      "publication_date": "Report title is Flood Probability Report 2022; exact file publication date not stated in the reviewed page",
+      "license": "No report-specific reuse terms were identified on the linked KSDMA catalogue page; attribution and redistribution terms remain to be confirmed.",
+      "crs": "Not applicable to the indexed tables; the report's aggregate tables are not a spatial geometry file",
+      "units": "Indexed contents describe inundated area and school/hospital counts by state, district, taluk, and local government",
+      "geographic_coverage": "Kerala, with an Ernakulam section and taluk/local-government statistics listed in the report contents",
+      "available_evidence": "KSDMA's official page links the report. Search-indexed contents identify modelling-method sections, school/hospital exposure mapping, and local-government statistics; the full tables and definitions were not independently inspected.",
+      "retrieval_attempt": "The web retrieval tool rejected the 21,992,376-byte PDF as too large; no local report copy was available in this checkout.",
+      "limitations": [
+        "The indexed contents and catalogue establish a report candidate, not validated table values, current facility coverage, or a downloadable geospatial asset layer.",
+        "The report appears to summarize modeled exposure at administrative-unit level; it does not supply verified current school/hospital coordinates in the reviewed page.",
+        "Underlying asset register, hazard source dates, counting rules, coordinate methods, and reuse terms need review before using any aggregate figures."
+      ],
+      "blocker": "The report could not be retrieved for content validation and is an aggregate PDF rather than a point dataset; it cannot support reproducible asset-level exposure counts in this checkout.",
+      "validation_status": "UNAVAILABLE FOR ASSET-LEVEL ANALYSIS",
+      "feature_count": 0,
+      "layer_role": null,
+      "evidence_status": "unavailable"
     },
     {
       "layer_id": "kochi_wards_datameet",
@@ -84,7 +176,7 @@
       "license": "CC BY-SA 2.5 India; stated by dataset-specific DataMeet README; attribution and share-alike apply",
       "crs": "EPSG:4326 / WGS 84 per GeoJSON RFC 7946 semantics; no explicit CRS member in source",
       "units": "Decimal degrees (longitude, latitude)",
-      "geographic_coverage": "Source-declared Kochi Municipal Corporation wards; observed bounds 76.2373589?76.3400293 E, 9.8934161?10.0497693 N",
+      "geographic_coverage": "Source-declared Kochi Municipal Corporation wards; observed bounds 76.2373589-76.3400293 E, 9.8934161-10.0497693 N",
       "limitations": [
         "Community repackaging of a Kerala OpenSDI source; the live source service and current ward register were not cross-checked.",
         "Source is one Feature JSON object per line rather than a FeatureCollection; the processed copy normalizes this structure.",
@@ -106,7 +198,8 @@
       "layer_role": "context",
       "validation_status": "PROVISIONAL",
       "feature_count": 74,
-      "excluded_feature_count": 3
+      "excluded_feature_count": 3,
+      "evidence_status": "provisional"
     },
     {
       "layer_id": "roads_lris",
@@ -126,7 +219,8 @@
       ],
       "blocker": "No direct layer download with dataset-specific date, CRS, schema, and reuse terms was verified.",
       "validation_status": "UNAVAILABLE",
-      "feature_count": 0
+      "feature_count": 0,
+      "evidence_status": "unavailable"
     },
     {
       "layer_id": "drainage_lris",
@@ -146,7 +240,8 @@
       ],
       "blocker": "No direct layer download with dataset-specific date, CRS, schema, and reuse terms was verified.",
       "validation_status": "UNAVAILABLE",
-      "feature_count": 0
+      "feature_count": 0,
+      "evidence_status": "unavailable"
     },
     {
       "layer_id": "flood_hazard_ksdma",
@@ -156,24 +251,50 @@
       "download_urls": [
         "https://sdma.kerala.gov.in/wp-content/uploads/2022/05/Ernakulam_Hist.pdf",
         "https://sdma.kerala.gov.in/wp-content/uploads/2022/05/Ernakulam_RCP85.pdf",
+        "https://sdma.kerala.gov.in/wp-content/uploads/2022/06/Flood-Probability-Report-2022_Final.pdf",
         "https://sdma.kerala.gov.in/wp-content/uploads/2026/06/1.-Flood-Return-Probability-Historical-10-25-50-years.zip",
         "https://sdma.kerala.gov.in/wp-content/uploads/2026/06/2.Flood-Return-Probability-Historical-100-200-500-years.zip"
       ],
       "publisher": "Kerala State Disaster Management Authority (KSDMA); page cites UNEP, UN GRID, CIMA Italy, KSDMA (2020) and RMSI / National Insurance Academy (2024) for return-probability products",
       "retrieved_on": "2026-10-20",
+      "catalog_reviewed_on": "2026-10-29",
       "publication_date": "Ernakulam PDFs linked under 2022/05 path; historic raster ZIPs linked under 2026/06 path; exact dataset publication dates not stated",
       "license": "No dataset-level reuse licence found on the reviewed KSDMA page",
       "crs": "EPSG:4326 / WGS 84 explicitly present in each GeoTIFF GeoKeyDirectory",
-      "units": "Single-band float32 raster; pixel-value meaning, units, and NoData semantics are not documented in the inspected metadata",
+      "units": "Single-band float32; valid pixel-value meaning and units are not documented",
       "geographic_coverage": "Downloaded raster grid bounds approx. 74.8646216–77.3680 E, 8.2909–12.7667 N (statewide grid extent, not hazard footprint); Kochi coverage of valid hazard pixels not established",
       "limitations": [
-        "Archive CRC passed; it contains three 3004×5371 single-band float32 GeoTIFF files at approx. 0.000833333 degree cells, labeled 10-, 25-, and 50-year historical products.",
+        "The 4,370,593-byte ZIP passes CRC validation and contains 13 entries: three 3004×5371 single-band float32 TIFFs plus world files, auxiliary XML, and overviews. All three main TIFFs declare EPSG:4326 and approx. 0.000833333 degree cells.",
+        "The three main TIFFs declare GDAL_NODATA=-3.402823e38. Valid pixel ranges observed in the stored rasters are 0.729–1776.6 (10-year), 0.6561–1974 (25-year), and 0.729–1981 (50-year); these values have no documented units or class meaning.",
         "Dataset-level reuse permission is not stated on the KSDMA catalogue; source archive is preserved raw and not unpacked into processed layers.",
-        "Pixel-value semantics/units and NoData meaning are absent; do not threshold, polygonize, or use the raster for overlay until KSDMA confirms metadata and reuse.",
-        "Return-period labels describe a scenario product, not event timing or observed flood depth.",
+        "Although a numeric NoData sentinel is present, the source does not explain its application to coverage or valid-cell interpretation. Do not threshold, polygonize, sample, or overlay until KSDMA confirms pixel semantics and reuse.",
+        "Return-period labels describe a modeled scenario product, not event timing or observed flood depth.",
+        "The official Flood Probability Report 2022 links aggregate school/hospital statistics by administrative unit, but the PDF exceeded the web tool's 21,992,376-byte retrieval limit and is not locally available for validation.",
         "The in-repository Ernakulam_map_dataset_draft.zip states its OCR/table alignment is unverified and includes no hazard geometries; it is not used."
       ],
-      "blocker": "The linked archive was downloaded and its GeoTIFF CRS/schema inspected. No dataset-level reuse terms or pixel/NoData semantics were found; therefore it is retained raw but not ingested, rendered, or used for exposure.",
+      "observed_pixel_review": {
+        "archive_member_count": 13,
+        "main_geotiff_count": 3,
+        "nodata_value": -3.402823e+38,
+        "valid_value_ranges_by_rp": {
+          "10-year": [0.729, 1776.6],
+          "25-year": [0.6561, 1974.0],
+          "50-year": [0.729, 1981.0]
+        },
+        "valid_pixel_counts_by_rp": {
+          "10-year": 326956,
+          "25-year": 350934,
+          "50-year": 370006
+        },
+        "validation_method": "Read-only ZIP CRC check and Pillow GeoTIFF inspection; no raster values were modified or interpreted as depth/probability."
+      },
+      "associated_report": {
+        "url": "https://sdma.kerala.gov.in/wp-content/uploads/2022/06/Flood-Probability-Report-2022_Final.pdf",
+        "reviewed_on": "2026-10-29",
+        "indexed_content": "Report contents identify modelling methods, school/hospital exposure mapping, and statistics by state, district, taluk, and local government, including Ernakulam.",
+        "retrieval_result": "Web retrieval tool rejected the 21,992,376-byte PDF as too large; full tables and definitions were not validated."
+      },
+      "blocker": "The archive's grid, CRS, dimensions, float type, and numeric NoData sentinel are validated, but valid pixel meanings/units and dataset-specific reuse terms are not. It remains raw and is not rendered, sampled, or used for exposure.",
       "raw_file": "data/raw/ksdma_flood_return_probability_historical_10_25_50.zip",
       "raw_metadata_file": "data/raw/ksdma_flood_return_probability_historical_10_25_50.metadata.json",
       "raw_sha256": "4057b36cdfc467ecaf618afb1e74b725187ef1d2a20326cdc1e4eb32df54605e",
@@ -182,7 +303,8 @@
       "layer_role": null,
       "validation_status": "UNSUITABLE FOR ANALYSIS",
       "feature_count": 0,
-      "source_raster_count": 3
+      "source_raster_count": 3,
+      "evidence_status": "unsuitable"
     },
     {
       "layer_id": "landslide_gsi_ernakulam",
@@ -205,7 +327,8 @@
       ],
       "blocker": "The KSDMA-linked ZIP was not retrievable here and no dataset-level reuse terms or metadata were verified.",
       "validation_status": "UNAVAILABLE",
-      "feature_count": 0
+      "feature_count": 0,
+      "evidence_status": "unavailable"
     },
     {
       "layer_id": "industrial_accident_hazard_ksdma",
@@ -228,7 +351,8 @@
       ],
       "blocker": "Static PDF only from the reviewed entry; no data-level reuse terms, vector/raster file, CRS, or accuracy metadata verified.",
       "validation_status": "UNAVAILABLE",
-      "feature_count": 0
+      "feature_count": 0,
+      "evidence_status": "unavailable"
     },
     {
       "layer_id": "coastal_hazard_ksdma",
@@ -251,7 +375,8 @@
       ],
       "blocker": "Static PDF only from the reviewed entry; reuse terms and geospatial metadata are unverified.",
       "validation_status": "UNAVAILABLE",
-      "feature_count": 0
+      "feature_count": 0,
+      "evidence_status": "unavailable"
     },
     {
       "layer_id": "industrial_facilities_kspcb",
@@ -271,7 +396,8 @@
       ],
       "blocker": "No openly licensed facility-coordinate export with stable schema and date was verified.",
       "validation_status": "UNSUITABLE FOR ANALYSIS",
-      "feature_count": 0
+      "feature_count": 0,
+      "evidence_status": "unsuitable"
     },
     {
       "layer_id": "air_monitoring_cpcb",
@@ -291,7 +417,8 @@
       ],
       "blocker": "A stable downloadable station-geometry export and reuse terms were not verified.",
       "validation_status": "UNSUITABLE FOR ANALYSIS",
-      "feature_count": 0
+      "feature_count": 0,
+      "evidence_status": "unsuitable"
     },
     {
       "layer_id": "draft_ernakulam_flood_extract",
@@ -311,12 +438,13 @@
       ],
       "blocker": "Original source PDF is absent; extracted draft is not authorized or sufficiently verified for spatial exposure analysis.",
       "validation_status": "UNAVAILABLE",
-      "feature_count": 0
+      "feature_count": 0,
+      "evidence_status": "unavailable"
     },
     {
       "layer_id": "flood_hazard_jrc_glofas_rp100",
       "title": "JRC / Copernicus GloFAS global river flood depth (RP100)",
-      "status": "acquired_validated_hazard_preview_integrated_assets_unavailable",
+      "status": "acquired_tiles_reviewed_preview_withheld_assets_unavailable",
       "source_url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/flood_hazard/README.txt",
       "download_urls": [
         "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/flood_hazard/RP100/ID185_N20_E70_RP100_depth.tif",
@@ -325,10 +453,15 @@
       "publisher": "Copernicus Emergency Management Service; European Commission Joint Research Centre (JRC)",
       "retrieved_on": "2026-10-20",
       "publication_date": "Dataset version 2.1.2; README updated 2026-01-12; RP100 tile directory lists these tiles modified 2025-12-18",
-      "license": "README states no restrictions, free and open Copernicus product; JRC copyright notice states CC BY 4.0, attribution and indication of changes required",
+      "catalog_reviewed_on": "2026-10-29",
+      "license": "Unresolved: the dataset README specifies Open Data Commons ODbL 1.0; the linked JRC copyright notice specifies CC BY 4.0. No source statement clarifying precedence or dual application was found.",
+      "license_sources": [
+        "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/flood_hazard/README.txt",
+        "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/copyright.txt"
+      ],
       "crs": "EPSG:4326 / WGS 84 confirmed from GeoTIFF GeoKeyDirectory; longitude/latitude georeferencing",
       "units": "Modeled flood water depth in metres; single-band float32; GeoTIFF GDAL_NODATA=-9999",
-      "geographic_coverage": "Tiles ID185 N20_E70 and ID186 N10_E70; together cover the Kochi latitude band and 70?80 E tile; preview limited to the provisional boundary bounding rectangle for display only",
+      "geographic_coverage": "Tiles ID185 N20_E70 and ID186 N10_E70; together cover the Kochi latitude band and 70-80 E tile; preview limited to the provisional boundary bounding rectangle for display only",
       "schema": {
         "tile_dimensions": [
           11999,
@@ -345,12 +478,13 @@
         "nodata": -9999
       },
       "limitations": [
+        "The README identifies ODbL 1.0; the linked copyright notice says CC BY 4.0. Obtain written clarification before redistributing, publicly displaying, or deploying the raster or preview.",
         "Modeled river-flood scenario, not an observation, forecast, warning, damage estimate, or site-specific engineering assessment.",
         "JRC README notes only land areas are covered and warns that unrealistic high depths can arise from modeling, DEM sinks, tile boundaries, or DEM issues.",
         "Spurious-depth and permanent-water auxiliary masks were not downloaded; model artifact flags cannot be applied.",
         "Preview transparency combines zero, NoData, and outside coverage; transparent pixels do not establish safety.",
         "No validated hospital/critical asset locations are available, so no asset-level exposure analysis is claimed.",
-        "The preview uses the bbox of the provisional self-intersecting boundary for rendering only, not as a mask."
+        "The previously generated local preview is suppressed in the application pending licence clarification; its bbox used the provisional self-intersecting boundary for display only, not as a mask."
       ],
       "raw_files": [
         {
@@ -372,9 +506,10 @@
       "processed_file": "data/processed/spatial_layers/jrc_glofas_rp100_kochi_preview.png",
       "processed_metadata_file": "data/processed/spatial_layers/jrc_glofas_rp100_kochi_preview.metadata.json",
       "layer_role": "hazard",
-      "analysis_status": "Hazard raster preview integrated; asset-level exposure is unknown/unassessable because no independently validated facility-location layer is available.",
-      "validation_status": "PROVISIONAL",
-      "feature_count": 1
+      "analysis_status": "Local raster metadata reviewed; preview not displayed or used pending written licence clarification. Asset-level exposure remains unknown.",
+      "validation_status": "REQUIRES LICENSE CLARIFICATION; NOT DISPLAYED",
+      "feature_count": 0,
+      "evidence_status": "provisional"
     },
     {
       "layer_id": "osm_kochi_emergency",
@@ -415,7 +550,8 @@
       "raw_snapshot_file": "kochi_facilities_20261028T192850Z.json.gz",
       "raw_snapshot_sha256": "2dca41d299d3fc475608d9ddd811e92762b66a63db913f8d2d7b75e8382f3b64",
       "raw_snapshot_stored_sha256": "17a30871ee5694e9ab4e560262384d9330416e2b9f3d5adf784dd00d85848015",
-      "raw_snapshot_stored_bytes": 117572
+      "raw_snapshot_stored_bytes": 117572,
+      "evidence_status": "provisional"
     },
     {
       "layer_id": "osm_kochi_healthcare",
@@ -457,7 +593,8 @@
       "raw_snapshot_file": "kochi_facilities_20261028T192850Z.json.gz",
       "raw_snapshot_sha256": "2dca41d299d3fc475608d9ddd811e92762b66a63db913f8d2d7b75e8382f3b64",
       "raw_snapshot_stored_sha256": "17a30871ee5694e9ab4e560262384d9330416e2b9f3d5adf784dd00d85848015",
-      "raw_snapshot_stored_bytes": 117572
+      "raw_snapshot_stored_bytes": 117572,
+      "evidence_status": "provisional"
     },
     {
       "layer_id": "osm_kochi_industry",
@@ -499,7 +636,8 @@
       "raw_snapshot_file": "kochi_facilities_20261028T192850Z.json.gz",
       "raw_snapshot_sha256": "2dca41d299d3fc475608d9ddd811e92762b66a63db913f8d2d7b75e8382f3b64",
       "raw_snapshot_stored_sha256": "17a30871ee5694e9ab4e560262384d9330416e2b9f3d5adf784dd00d85848015",
-      "raw_snapshot_stored_bytes": 117572
+      "raw_snapshot_stored_bytes": 117572,
+      "evidence_status": "provisional"
     },
     {
       "layer_id": "osm_kochi_roads",
@@ -540,7 +678,8 @@
       "raw_snapshot_file": "kochi_network_20261028T192808Z.json.gz",
       "raw_snapshot_sha256": "4fed76c1c78017c4c5625f418af353bee18c2e94aa5765338eaf1b72a6a1964b",
       "raw_snapshot_stored_sha256": "fde39febbec5e16c017ae7fd2227443d6cdbd0bad766ef40cca95c2ffc7f93ea",
-      "raw_snapshot_stored_bytes": 2167981
+      "raw_snapshot_stored_bytes": 2167981,
+      "evidence_status": "provisional"
     },
     {
       "layer_id": "osm_kochi_transit",
@@ -580,7 +719,8 @@
       "raw_snapshot_file": "kochi_network_20261028T192808Z.json.gz",
       "raw_snapshot_sha256": "4fed76c1c78017c4c5625f418af353bee18c2e94aa5765338eaf1b72a6a1964b",
       "raw_snapshot_stored_sha256": "fde39febbec5e16c017ae7fd2227443d6cdbd0bad766ef40cca95c2ffc7f93ea",
-      "raw_snapshot_stored_bytes": 2167981
+      "raw_snapshot_stored_bytes": 2167981,
+      "evidence_status": "provisional"
     },
     {
       "layer_id": "osm_kochi_waterways",
@@ -620,7 +760,8 @@
       "raw_snapshot_file": "kochi_network_20261028T192808Z.json.gz",
       "raw_snapshot_sha256": "4fed76c1c78017c4c5625f418af353bee18c2e94aa5765338eaf1b72a6a1964b",
       "raw_snapshot_stored_sha256": "fde39febbec5e16c017ae7fd2227443d6cdbd0bad766ef40cca95c2ffc7f93ea",
-      "raw_snapshot_stored_bytes": 2167981
+      "raw_snapshot_stored_bytes": 2167981,
+      "evidence_status": "provisional"
     },
     {
       "layer_id": "osm_kochi_air_monitors",
@@ -637,7 +778,7 @@
       "source_database_timestamp": "2026-10-28T19:27:36Z",
       "license": "Open Database License 1.0 (ODbL); attribution and share-alike apply.",
       "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
-      "attribution": "? OpenStreetMap contributors",
+      "attribution": "© OpenStreetMap contributors",
       "crs": "EPSG:4326",
       "units": "OSM feature coordinates; no observations or measurement units",
       "geographic_coverage": "Bounding box south=9.85, west=76.15, north=10.20, east=76.45; query selection only.",
@@ -649,7 +790,8 @@
       "raw_snapshot_file": "kochi_facilities_20261028T192850Z.json.gz",
       "raw_snapshot_sha256": "2dca41d299d3fc475608d9ddd811e92762b66a63db913f8d2d7b75e8382f3b64",
       "raw_snapshot_stored_sha256": "17a30871ee5694e9ab4e560262384d9330416e2b9f3d5adf784dd00d85848015",
-      "raw_snapshot_stored_bytes": 117572
+      "raw_snapshot_stored_bytes": 117572,
+      "evidence_status": "unavailable"
     },
     {
       "layer_id": "air_observations_spatial_locations",
@@ -672,7 +814,9 @@
         "The CPCB OGD catalog exposes API-key generation and no observation rows; the attempted catalog API route returned HTTP 503.",
         "No spatial interpolation, station comparison map, AQI recalculation, or industrial attribution is supported."
       ],
-      "blocker": "Reported values exist in the existing air-quality tables, but there is no verified spatial station/observation join. This map layer is unsuitable for spatial analysis."
+      "blocker": "Reported values exist in the existing air-quality tables, but there is no verified spatial station/observation join. This map layer is unsuitable for spatial analysis.",
+      "evidence_status": "unsuitable"
     }
-  ]
+  ],
+  "status_definitions_file": "data/reference/data_status_definitions.json"
 }

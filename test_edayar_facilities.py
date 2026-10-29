@@ -1,12 +1,13 @@
 """Evidence and integrity checks for the Edayar facility candidate inventory."""
 
-import csv
 import json
 import unittest
 from datetime import date
 from pathlib import Path
 
+
 from src.edayar_facilities import (
+    FACILITY_STATUS_FIELDS,
     FacilityInventoryError,
     consent_temporal_status,
     validate_consent_records,
@@ -19,22 +20,62 @@ INDUSTRIAL = ROOT / "data" / "processed" / "industrial"
 AS_OF = date(2026, 10, 23)
 
 
-def read_csv(path):
-    with path.open(encoding="utf-8-sig", newline="") as source:
-        return list(csv.DictReader(source))
+def facility(facility_id: str, official_name: str, aliases: str = "") -> dict:
+    row = {
+        "facility_id": facility_id,
+        "official_name": official_name,
+        "name_aliases": aliases,
+        "source_url": f"https://example.test/facilities/{facility_id}",
+        "retrieved_on": "2026-10-20",
+        "facility_latitude": "",
+        "facility_longitude": "",
+        "coordinates_status": "unavailable",
+        "coordinate_uncertainty": "Not quantifiable without verified facility coordinates.",
+        "coordinates_evidence": "No individual plant coordinate is present in this synthetic fixture.",
+        "measured_emissions_value": "",
+        "measured_emissions_status": "unavailable",
+        "emissions_limits_value": "",
+        "emissions_limits_status": "unavailable",
+        "ranking_status": "Candidate only; not ranked",
+    }
+    row.update({field: "unavailable" for field in FACILITY_STATUS_FIELDS})
+    return row
+
+
+def consent(
+    record_id: str,
+    facility_id: str,
+    valid_until: str,
+    status: str,
+    decision: str = "Approved",
+) -> dict:
+    return {
+        "record_id": record_id,
+        "facility_id": facility_id,
+        "decision": decision,
+        "decision_or_issue_date": "2025-01-01",
+        "valid_until": valid_until,
+        "evidence_status": status,
+        "source_url": f"https://example.test/consents/{record_id}",
+        "retrieved_on": "2026-10-20",
+    }
 
 
 class EdayarInventoryTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.facilities = read_csv(INDUSTRIAL / "edayar_candidate_facilities.csv")
-        cls.consents = read_csv(INDUSTRIAL / "edayar_consent_records.csv")
-        cls.metadata = json.loads(
-            (INDUSTRIAL / "edayar_facilities.metadata.json").read_text(encoding="utf-8")
-        )
+        cls.facilities = [
+            facility("FIXTURE-001", "Synthetic Factory Alpha", "Alpha Works"),
+            facility("FIXTURE-002", "Synthetic Factory Beta", "Beta Works"),
+        ]
+        cls.consents = [
+            consent("FIXTURE-EXPIRED", "FIXTURE-001", "2024-12-31", "historical"),
+            consent("FIXTURE-VALID", "FIXTURE-002", "2027-12-31", "verified"),
+            consent("FIXTURE-REJECTED", "FIXTURE-002", "", "historical", decision="Rejected"),
+        ]
 
-    def test_all_eight_candidates_have_unique_identities_and_valid_consent_links(self):
-        self.assertEqual(len(self.facilities), 8)
+    def test_synthetic_candidates_have_unique_identities_and_valid_consent_links(self):
+        self.assertEqual(len(self.facilities), 2)
         validate_facility_inventory(self.facilities)
         validate_consent_records(
             self.consents,
@@ -71,10 +112,10 @@ class EdayarInventoryTests(unittest.TestCase):
 
     def test_consent_dates_distinguish_historical_expired_and_documented_validity(self):
         by_id = {row["record_id"]: row for row in self.consents}
-        self.assertEqual(consent_temporal_status(by_id["RUBBER-O-MALABAR-CTO-2020"], AS_OF), "historical")
-        self.assertEqual(by_id["RUBBER-O-MALABAR-CTO-2020"]["evidence_status"], "historical")
-        self.assertEqual(consent_temporal_status(by_id["CMRL-CTO-2023"], AS_OF), "verified")
-        self.assertEqual(by_id["SUD-CTO-AIR-REJECTED-2023"]["evidence_status"], "historical")
+        self.assertEqual(consent_temporal_status(by_id["FIXTURE-EXPIRED"], AS_OF), "historical")
+        self.assertEqual(by_id["FIXTURE-EXPIRED"]["evidence_status"], "historical")
+        self.assertEqual(consent_temporal_status(by_id["FIXTURE-VALID"], AS_OF), "verified")
+        self.assertEqual(by_id["FIXTURE-REJECTED"]["evidence_status"], "historical")
 
         invalid = [dict(row) for row in self.consents]
         invalid[0]["valid_until"] = "2018-01-01"
@@ -97,7 +138,10 @@ class EdayarInventoryTests(unittest.TestCase):
             validate_facility_inventory(inconsistent)
 
     def test_source_metadata_preserves_prior_raw_hashes_and_states_download_blocker(self):
-        preserved = {item["path"]: item for item in self.metadata["raw_files"]}
+        metadata = json.loads(
+            (INDUSTRIAL / "edayar_facilities.metadata.json").read_text(encoding="utf-8")
+        )
+        preserved = {item["path"]: item for item in metadata["raw_files"]}
         self.assertEqual(
             preserved["data/raw/industrial/KWA_Edayar_CETP_DER_2022.pdf"]["sha256"],
             "649955b4008cdbf1e1f14133fa4cac6d33afdb046ca0dddfc57d6a053abe0d07",
@@ -110,12 +154,12 @@ class EdayarInventoryTests(unittest.TestCase):
             preserved["data/raw/industrial/KSPCB_OCMMS_CTO_red_page2_2015-2019.html"]["sha256"],
             "5763c6e94dda44e3a37babce22276c02a2011a17db294c7dc23529a53bc84893",
         )
-        self.assertFalse(self.metadata["attempted_downloads"]["error_pages_retained"])
-        self.assertIn("497-byte HTML", self.metadata["attempted_downloads"]["result"])
-        self.assertEqual(len(self.metadata["attempted_downloads"]["attempted_targets"]), 10)
-        source_ids = {source["source_id"] for source in self.metadata["sources"]}
-        self.assertEqual(len(source_ids), len(self.metadata["sources"]))
-        for source_map in self.metadata["field_source_map"].values():
+        self.assertFalse(metadata["attempted_downloads"]["error_pages_retained"])
+        self.assertIn("497-byte HTML", metadata["attempted_downloads"]["result"])
+        self.assertEqual(len(metadata["attempted_downloads"]["attempted_targets"]), 10)
+        source_ids = {source["source_id"] for source in metadata["sources"]}
+        self.assertEqual(len(source_ids), len(metadata["sources"]))
+        for source_map in metadata["field_source_map"].values():
             for source_ids_for_field in source_map.values():
                 self.assertTrue(set(source_ids_for_field).issubset(source_ids))
 
