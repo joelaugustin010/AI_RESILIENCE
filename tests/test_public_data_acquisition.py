@@ -14,13 +14,12 @@ class FakeResponse:
     def __init__(self, body: bytes, content_type: str = "text/csv"):
         self.body = body
         self.headers = {"Content-Type": content_type}
-        self.closed = False
 
     def __enter__(self):
         return self
 
     def __exit__(self, *_args):
-        self.closed = True
+        return None
 
     def read(self):
         return self.body
@@ -65,9 +64,7 @@ class PublicDataAcquisitionTests(unittest.TestCase):
     def test_download_writes_raw_bytes_and_hash_manifest(self, mocked_urlopen):
         body = b"station,time,rainfall_mm\nA,2021-01-01 00:00,2.5\n"
         mocked_urlopen.return_value = FakeResponse(body)
-        record = acquisition.download_one(
-            self.source, self.output, self.manifest
-        )
+        record = acquisition.download_one(self.source, self.output, self.manifest)
         target = self.output / "test.csv"
         self.assertEqual(target.read_bytes(), body)
         self.assertEqual(record["status"], "downloaded_raw_unvalidated")
@@ -81,9 +78,7 @@ class PublicDataAcquisitionTests(unittest.TestCase):
         self.output.mkdir(parents=True)
         target = self.output / "test.csv"
         target.write_bytes(b"original,bytes\n")
-        record = acquisition.download_one(
-            self.source, self.output, self.manifest
-        )
+        record = acquisition.download_one(self.source, self.output, self.manifest)
         mocked_urlopen.assert_not_called()
         self.assertEqual(target.read_bytes(), b"original,bytes\n")
         self.assertEqual(record["status"], "already_present_not_overwritten")
@@ -99,17 +94,16 @@ class PublicDataAcquisitionTests(unittest.TestCase):
         self.assertFalse((self.output / "test.csv").exists())
 
     def test_registry_rejects_non_https_url(self):
-        original = acquisition.load_registry
-        try:
-            with patch.object(acquisition, "load_registry", return_value={
-                "downloadable_sources": [{**self.source, "download_url": "http://example.org/data.csv"}]
-            }):
-                # load_registry's validation is tested through the checked-in registry;
-                # download_one itself also receives only the validated registry in normal use.
-                registry = acquisition.load_registry()
-                self.assertTrue(registry["downloadable_sources"][0]["download_url"].startswith("http://"))
-        finally:
-            acquisition.load_registry = original
+        invalid_registry = self.root / "registry.json"
+        invalid_registry.write_text(json.dumps({
+            "downloadable_sources": [{
+                **self.source,
+                "download_url": "http://example.org/data.csv"
+            }]
+        }), encoding="utf-8")
+        with patch.object(acquisition, "REGISTRY", invalid_registry):
+            with self.assertRaisesRegex(ValueError, "Refusing non-HTTPS"):
+                acquisition.load_registry()
 
 
 if __name__ == "__main__":
