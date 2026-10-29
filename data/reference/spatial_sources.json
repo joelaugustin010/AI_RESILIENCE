@@ -871,6 +871,28 @@
         "symmetric_difference_fraction_of_union": 0.21062676,
         "status": "COMPLETED_SHAPE_COMPARISON_NOT_LEGAL_APPROVAL"
       }
+    },
+    {
+      "layer_id": "kochi_official_ward_roster",
+      "title": "Kochi Corporation official ward-code/name roster (not spatial geometry)",
+      "status": "official_name_reference_only",
+      "source_url": "https://sec.kerala.gov.in/public/cnstncy/wd/d0f41644-754b-4b6e-a8dc-97ecbf5fee16",
+      "publisher": "State Election Commission, Kerala",
+      "retrieved_on": "2026-10-29",
+      "publication_date": "Current ward list page; page's publication date not stated",
+      "license": "No dataset-specific reuse terms stated on the reviewed page; retained for factual reference with source attribution",
+      "crs": "Not applicable; no coordinates or geometries",
+      "units": "Official ward codes and names",
+      "geographic_coverage": "Kochi Municipal Corporation, Ernakulam district; 76 listed wards",
+      "limitations": [
+        "A name/code roster only; it does not contain polygons, coordinates, boundary topology, or geometry IDs.",
+        "It must not be joined to old polygons solely by name or ordinal position.",
+        "Current geometry remains unverified until final notified spatial boundaries are obtained and checked."
+      ],
+      "local_file": "data/reference/kochi_official_ward_roster_2025.json",
+      "feature_count": 76,
+      "validation_status": "REFERENCE ONLY — NOT GEOMETRY",
+      "evidence_status": "authoritative_names_only"
     }
   ],
   "status_definitions_file": "data/reference/data_status_definitions.json"
