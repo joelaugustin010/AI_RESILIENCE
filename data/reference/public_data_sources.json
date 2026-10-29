@@ -1,7 +1,7 @@
 {
   "registry_version": 1,
   "reviewed_on": "2026-10-29",
-  "purpose": "Reproducible catalogue of public hydrological observations and independent historical flood evidence candidates. Downloading or auditing data does not establish that it is suitable as a predictive label.",
+  "purpose": "Reproducible catalogue of public hydrological observations and independent historical flood evidence candidates. Downloading or auditing data does not establish that it is suitable as a predictive label. INDOFLOODS event records are a promising candidate for gauge-event outcome review, but must not be treated as a Kochi training dataset until geographic coverage, station identity, temporal alignment, licence and non-event sampling are validated.",
   "download_policy": {
     "preserve_raw": true,
     "never_silently_deduplicate": true,
@@ -138,6 +138,80 @@
         "A severity index is not the probability of a future flood.",
         "District-scale values cannot be interpreted as ward-scale values.",
         "Verify formula, reference period, coverage, missingness and validation in the paper before comparing districts."
+      ]
+    },
+    {
+      "id": "indofloods_flood_events",
+      "title": "INDOFLOODS station-level historical flood events",
+      "publisher": "Sai Kiran Kuntla and Manabendra Saharia, IIT Delhi; hosted by Zenodo",
+      "catalog_url": "https://zenodo.org/records/14584655",
+      "download_url": "https://zenodo.org/records/14584655/files/floodevents_indofloods.csv?download=1",
+      "filename": "floodevents_indofloods.csv",
+      "measurement": "Observed flood-event periods and event attributes at included gauge stations",
+      "units": "Mixed; see associated variable-description PDF",
+      "declared_period": "As recorded in source file; inspect before use",
+      "license": "Zenodo describes access for academic and research purposes, but no explicit licence was visible in inspected metadata; internal research only pending licence/reuse clarification",
+      "role": "Candidate event-outcome evidence for catchments/stations only after checking geographic coverage and matching gauge IDs to rainfall inputs",
+      "limitations": [
+        "The dataset excludes Ganga and Brahmaputra basins; Kerala coverage must be confirmed from station metadata rather than assumed.",
+        "Flood-event rows alone do not provide non-event observations, so they cannot independently train a binary probability model.",
+        "Event times and peak levels must be checked against documented gauge thresholds, station IDs, units, and the paper's methods.",
+        "Do not merge to Kerala telemetry using similar station names without a verified station crosswalk.",
+        "Do not redistribute until applicable licence terms are verified; preserve citation to the dataset and paper."
+      ]
+    },
+    {
+      "id": "indofloods_metadata",
+      "title": "INDOFLOODS gauge metadata",
+      "publisher": "Sai Kiran Kuntla and Manabendra Saharia, IIT Delhi; hosted by Zenodo",
+      "catalog_url": "https://zenodo.org/records/14584655",
+      "download_url": "https://zenodo.org/records/14584655/files/metadata_indofloods.csv?download=1",
+      "filename": "metadata_indofloods.csv",
+      "measurement": "Gauge station metadata and identifiers",
+      "units": "As defined in source",
+      "declared_period": "Station metadata for INDOFLOODS",
+      "license": "Zenodo describes access for academic and research purposes, but no explicit licence was visible in inspected metadata; internal research only pending licence/reuse clarification",
+      "role": "Station coverage and crosswalk review; do not assume identifiers match NWDP stations",
+      "limitations": [
+        "Verify CRS, coordinate precision, station identity, basin coverage and definitions against the associated paper.",
+        "Do not geocode missing coordinates or match stations by name alone.",
+        "Do not redistribute until applicable licence terms are verified."
+      ]
+    },
+    {
+      "id": "indofloods_catchment_characteristics",
+      "title": "INDOFLOODS catchment characteristics",
+      "publisher": "Sai Kiran Kuntla and Manabendra Saharia, IIT Delhi; hosted by Zenodo",
+      "catalog_url": "https://zenodo.org/records/14584655",
+      "download_url": "https://zenodo.org/records/14584655/files/catchment_characteristics_indofloods.csv?download=1",
+      "filename": "catchment_characteristics_indofloods.csv",
+      "measurement": "Catchment geomorphological, climatological, land-cover, soil and related attributes",
+      "units": "Mixed; consult variable-description PDF",
+      "declared_period": "Catchment-level static or summary attributes; verify individual columns",
+      "license": "Zenodo describes access for academic and research purposes, but no explicit licence was visible in inspected metadata; internal research only pending licence/reuse clarification",
+      "role": "Candidate explanatory features only after catchment geography and data timing are reviewed",
+      "limitations": [
+        "Catchment-scale features cannot be transferred to Kochi wards without a defensible spatial method.",
+        "Review source dates, units, missingness and feature definitions before modeling.",
+        "Do not redistribute until applicable licence terms are verified."
+      ]
+    },
+    {
+      "id": "indofloods_precipitation_variables",
+      "title": "INDOFLOODS event-scale precipitation variables",
+      "publisher": "Sai Kiran Kuntla and Manabendra Saharia, IIT Delhi; hosted by Zenodo",
+      "catalog_url": "https://zenodo.org/records/14584655",
+      "download_url": "https://zenodo.org/records/14584655/files/precipitation_variables_indofloods.csv?download=1",
+      "filename": "precipitation_variables_indofloods.csv",
+      "measurement": "Event-scale precipitation attributes",
+      "units": "Mixed; consult variable-description PDF",
+      "declared_period": "Event-level period defined in source",
+      "license": "Zenodo describes access for academic and research purposes, but no explicit licence was visible in inspected metadata; internal research only pending licence/reuse clarification",
+      "role": "Candidate event-scale hydrometeorological features after verifying time windows and availability before prediction issue time",
+      "limitations": [
+        "Event-scale aggregates may include rainfall occurring during or after the flood event and can cause target leakage for early-warning use.",
+        "Verify station/catchment matching, units, time windows, source coverage and missingness.",
+        "Do not redistribute until applicable licence terms are verified."
       ]
     }
   ],
