@@ -117,11 +117,18 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
     def test_counts_invalid_points_and_filter_mismatches(self, mocked_fetch):
         hospitals = {
             "type": "FeatureCollection",
-            "features": [{
-                "type": "Feature",
-                "properties": {"state_name": "Tamil Nadu", "district_name": "Other"},
-                "geometry": {"type": "Point", "coordinates": [999, 9.9]},
-            }],
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": {"state_name": "Tamil Nadu", "district_name": "Other"},
+                    "geometry": {"type": "Point", "coordinates": [999, 9.9]},
+                },
+                {
+                    "type": "Feature",
+                    "properties": {"state_name": "Tamil Nadu", "district_name": "Other", "health_facility_name": "Out-of-area test"},
+                    "geometry": {"type": "Point", "coordinates": [99, 9.9]},
+                },
+            ],
         }
         memory = io.BytesIO()
         with zipfile.ZipFile(memory, "w") as archive:
