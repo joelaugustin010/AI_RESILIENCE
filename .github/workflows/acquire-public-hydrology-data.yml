@@ -138,3 +138,15 @@ jobs:
             echo "One or more registered data downloads failed. Review the acquisition log and artifact."
             exit 1
           fi
+
+      - name: Fail workflow if spatial acquisition or raster audit failed
+        if: always()
+        run: |
+          if [ "${{ steps.map_acquisition.outcome }}" != "success" ]; then
+            echo "Hospital/KSDMA spatial acquisition failed or did not complete. Review map_acquisition.log and manifest."
+            exit 1
+          fi
+          if [ "${{ steps.raster_audit.outcome }}" != "success" ]; then
+            echo "Raster metadata audit failed or did not complete. Review the audit log and artifact."
+            exit 1
+          fi
