@@ -1,14 +1,14 @@
 {
   "registry_version": 1,
   "reviewed_on": "2026-10-29",
-  "purpose": "A reproducible catalogue of official hydrological observations and independent flood-event evidence candidates for AI_RESILIENCE. Downloading a dataset does not establish its suitability as a model label.",
+  "purpose": "Reproducible catalogue of public hydrological observations and independent historical flood evidence candidates. Downloading or auditing data does not establish that it is suitable as a predictive label.",
   "download_policy": {
     "preserve_raw": true,
     "never_silently_deduplicate": true,
     "record_sha256": true,
     "record_retrieval_timestamp_utc": true,
     "do_not_commit_large_raw_downloads_by_default": true,
-    "reuse_note": "Check each provider's current licence and terms before redistribution. NWDP resources have been described as Other (Open), but preserve attribution and re-check terms."
+    "reuse_note": "Preserve attribution and raw source bytes. Verify current source licence before redistribution; where the applicable licence is unclear, use only for cautious internal analysis until clarified."
   },
   "downloadable_sources": [
     {
@@ -65,6 +65,79 @@
         "Known local-copy concerns include inconsistent river/basin descriptors and unresolved gauge-reference metadata.",
         "Does not provide independently verified flood/no-flood outcome labels.",
         "The NWDP page structure groups this resource under a page titled Godavari Basin while the specific resource name says West flowing rivers from Tadri to Kanyakumari. Treat this catalogue/resource mismatch as unresolved provenance until verified with NWIC/provider."
+      ]
+    },
+    {
+      "id": "ifi_impacts_inventory_v3",
+      "title": "India Flood Inventory v3, 1967–2023 (event-level CSV)",
+      "publisher": "HydroSense Lab, IIT Delhi; hosted by Zenodo; inventory data sourced from IMD and manually digitized/cleaned as described by authors",
+      "catalog_url": "https://zenodo.org/records/16994648",
+      "download_url": "https://zenodo.org/records/16994648/files/India_Flood_Inventory_v3.csv?download=1",
+      "filename": "India_Flood_Inventory_v3.csv",
+      "measurement": "Historical flood-event records with dates, reported districts, causes, impacts and optional coordinates",
+      "units": "Mixed fields; inspect individual column definitions",
+      "declared_period": "1967–2023",
+      "license": "Landing page does not clearly expose the applicable licence in the visible metadata; retain attribution and do not redistribute until licence is verified",
+      "role": "Independent historical event context; candidate cross-check for Ernakulam event dates only, not station-hour labels",
+      "limitations": [
+        "National event inventory with multi-district event records; a row mentioning Ernakulam does not prove every place in the district flooded.",
+        "Date ranges and event descriptions are not equivalent to hourly station-level flood/no-flood outcomes.",
+        "Coordinates may be absent; do not invent or geocode missing locations as if observed.",
+        "Check the dataset paper, version and licence before publication or redistribution."
+      ]
+    },
+    {
+      "id": "ifi_impacts_district_flood_impact",
+      "title": "IFI-Impacts District Flood Impact table",
+      "publisher": "HydroSense Lab, IIT Delhi; hosted by Zenodo",
+      "catalog_url": "https://zenodo.org/records/16994648",
+      "download_url": "https://zenodo.org/records/16994648/files/District_FloodImpact.csv?download=1",
+      "filename": "District_FloodImpact.csv",
+      "measurement": "District-level historical flood impact summary",
+      "units": "As defined in source columns; audit before use",
+      "declared_period": "1967–2023",
+      "license": "Landing page does not clearly expose the applicable licence in the visible metadata; retain attribution and do not redistribute until licence is verified",
+      "role": "District-scale historical impact context, not ward-level or hourly labels",
+      "limitations": [
+        "District summaries cannot be assigned to individual Kochi wards or stations without a defensible spatial/time model.",
+        "Do not use as a station-hour training label.",
+        "Column meanings and missingness must be inspected before quantitative interpretation."
+      ]
+    },
+    {
+      "id": "ifi_impacts_district_flooded_area",
+      "title": "IFI-Impacts District Flooded Area table",
+      "publisher": "HydroSense Lab, IIT Delhi; hosted by Zenodo",
+      "catalog_url": "https://zenodo.org/records/16994648",
+      "download_url": "https://zenodo.org/records/16994648/files/District_FloodedArea.csv?download=1",
+      "filename": "District_FloodedArea.csv",
+      "measurement": "District-level reported flooded-area summary",
+      "units": "As defined in source columns; audit before use",
+      "declared_period": "1967–2023",
+      "license": "Landing page does not clearly expose the applicable licence in the visible metadata; retain attribution and do not redistribute until licence is verified",
+      "role": "District-scale impact context; potential broad event cross-check only",
+      "limitations": [
+        "District totals do not establish which ward or hour was inundated.",
+        "Definitions, area units and event aggregation must be checked from source documentation.",
+        "Not a substitute for georeferenced inundation polygons or point observations."
+      ]
+    },
+    {
+      "id": "ifi_impacts_dfsi",
+      "title": "IFI-Impacts District Flood Severity Index (DFSI)",
+      "publisher": "HydroSense Lab, IIT Delhi; hosted by Zenodo",
+      "catalog_url": "https://zenodo.org/records/16994648",
+      "download_url": "https://zenodo.org/records/16994648/files/DFSI.csv?download=1",
+      "filename": "DFSI.csv",
+      "measurement": "District-level flood severity index",
+      "units": "Index units/scale as defined by authors; inspect before use",
+      "declared_period": "Historical period described in the source record; verify exact coverage in file",
+      "license": "Landing page does not clearly expose the applicable licence in the visible metadata; retain attribution and do not redistribute until licence is verified",
+      "role": "Research context for district-level severity; not a calibrated prediction for Kochi",
+      "limitations": [
+        "A severity index is not the probability of a future flood.",
+        "District-scale values cannot be interpreted as ward-scale values.",
+        "Verify formula, reference period, coverage, missingness and validation in the paper before comparing districts."
       ]
     }
   ],
