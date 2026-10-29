@@ -25,7 +25,7 @@ from sklearn.metrics import (
     accuracy_score, balanced_accuracy_score, confusion_matrix, f1_score,
     precision_score, recall_score, roc_auc_score,
 )
-from sklearn.model_selection import GroupShuffleSplit
+from sklearn.model_selection import GroupKFold, GroupShuffleSplit
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 
@@ -172,6 +172,48 @@ def train(raw_dir: Path, model_path: Path, report_path: Path) -> dict:
         ],
     }
 
+    # Additional gauge-grouped 5-fold CV checks whether the single holdout is stable.
+    fold_results = []
+    for fold, (fold_train, fold_test) in enumerate(
+        GroupKFold(n_splits=5).split(X, y, groups=groups), start=1
+    ):
+        cv_pipeline = Pipeline([
+            ("preprocess", preprocessing),
+            ("classifier", RandomForestClassifier(
+                n_estimators=300, min_samples_leaf=5,
+                class_weight="balanced_subsample", random_state=42,
+                n_jobs=-1, max_features="sqrt",
+            )),
+        ])
+        cv_pipeline.fit(X.iloc[fold_train], y.iloc[fold_train])
+        fold_prediction = cv_pipeline.predict(X.iloc[fold_test])
+        fold_probability = cv_pipeline.predict_proba(X.iloc[fold_test])[:, 1]
+        fold_results.append({
+            "fold": fold,
+            "train_rows": int(len(fold_train)),
+            "test_rows": int(len(fold_test)),
+            "test_gauges": int(groups.iloc[fold_test].nunique()),
+            "accuracy": float(accuracy_score(y.iloc[fold_test], fold_prediction)),
+            "balanced_accuracy": float(balanced_accuracy_score(y.iloc[fold_test], fold_prediction)),
+            "precision": float(precision_score(y.iloc[fold_test], fold_prediction, zero_division=0)),
+            "recall": float(recall_score(y.iloc[fold_test], fold_prediction, zero_division=0)),
+            "f1": float(f1_score(y.iloc[fold_test], fold_prediction, zero_division=0)),
+            "roc_auc": float(roc_auc_score(y.iloc[fold_test], fold_probability)),
+        })
+    report["grouped_cross_validation"] = {
+        "method": "5-fold GroupKFold by gauge; 300-tree Random Forest per fold",
+        "folds": fold_results,
+        "mean_std": {
+            metric: {
+                "mean": float(pd.Series([fold[metric] for fold in fold_results]).mean()),
+                "std": float(pd.Series([fold[metric] for fold in fold_results]).std(ddof=1)),
+            }
+            for metric in ["accuracy", "balanced_accuracy", "precision", "recall", "f1", "roc_auc"]
+        },
+    }
+
+    # Save a final research model fit on all labeled records after evaluation.
+    pipeline.fit(X, y)
     model_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump({"pipeline": pipeline, "features": features, "target": report["target"]}, model_path, compress=3)
