@@ -118,6 +118,42 @@ class BudgetTests(unittest.TestCase):
 
 
 class EvidenceAndReportTests(unittest.TestCase):
+    def test_flood_checklist_identifies_missing_verification(self):
+        checklist = hazard_evidence_checklist(valid_inputs(), Path(__file__).resolve().parent)
+        self.assertGreaterEqual(len(checklist), 4)
+        self.assertTrue(checklist["Evidence needed"].str.contains("exposed assets", case=False).any())
+        self.assertTrue(checklist["Known limitation"].str.contains("licence", case=False).any())
+
+    def test_compound_checklist_covers_both_hazards(self):
+        checklist = hazard_evidence_checklist(
+            valid_inputs(hazard="Compound: cyclone + flood"),
+            Path(__file__).resolve().parent,
+        )
+        self.assertEqual(set(checklist["Hazard component"]), {"Flood", "Cyclone"})
+
+    def test_industrial_checklist_cautions_against_unverified_source_claims(self):
+        checklist = hazard_evidence_checklist(
+            valid_inputs(hazard="Industrial incident"),
+            Path(__file__).resolve().parent,
+        )
+        limitations = " ".join(checklist["Known limitation"].tolist()).lower()
+        self.assertIn("aqi alone", limitations)
+        self.assertTrue(checklist["Next verification step"].str.contains("pollutant", case=False).any())
+
+    def test_report_includes_evidence_readiness_checklist(self):
+        inputs = valid_inputs()
+        evidence = evidence_inventory(Path(__file__).resolve().parent)
+        scenarios = build_scenario_comparison(inputs)
+        actions = mitigation_actions_for("Flood").head(1).copy()
+        combinations = compare_action_combinations(actions, None, {"A": actions["Action"].tolist()})
+        checklist = hazard_evidence_checklist(inputs, Path(__file__).resolve().parent)
+        report = report_rows(
+            inputs, evidence, scenarios, actions, None, combinations,
+            Path(__file__).resolve().parent, evidence_checklist=checklist
+        )
+        rows = report.loc[report["Section"].eq("Evidence readiness checklist")]
+        self.assertGreater(len(rows), 0)
+
     def test_missing_data_is_reported_without_blocking_inventory(self):
         inventory = evidence_inventory(Path(__file__).resolve().parent / "missing_project")
         self.assertTrue((inventory["Available"] == "No").all())
