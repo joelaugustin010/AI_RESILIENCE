@@ -17,7 +17,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from shapely.geometry import shape
+from shapely import make_valid
+from shapely.geometry import mapping, shape
+from shapely.ops import unary_union
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_URL = "https://wardmap.ksmart.live/files/Ernakulam_Cochin_01JBBD7151DY27T8X2GJ2ZD40P.json"
@@ -86,9 +88,22 @@ def extract_source_ward_name(feature: dict[str, Any]) -> str:
     return ""
 
 
+def _polygonal_parts(geometry):
+    if geometry.geom_type == "Polygon":
+        return [geometry]
+    if geometry.geom_type == "MultiPolygon":
+        return list(geometry.geoms)
+    if hasattr(geometry, "geoms"):
+        parts = []
+        for child in geometry.geoms:
+            parts.extend(_polygonal_parts(child))
+        return parts
+    return []
+
+
 def validate_and_annotate(
     features: list[dict[str, Any]], roster: list[list[str]]
-) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
     if len(features) != 76:
         raise ValueError(f"Expected 76 source features; received {len(features)}. Candidate was not promoted.")
     roster_by_number = {}
@@ -107,6 +122,7 @@ def validate_and_annotate(
     seen_numbers: set[int] = set()
     geometry_errors = []
     name_mismatches = []
+    geometry_repairs = []
     for index, feature in enumerate(features, start=1):
         number = extract_ward_number(feature)
         if number is None:
@@ -122,12 +138,33 @@ def validate_and_annotate(
             geometry_errors.append(f"ward {number}: missing geometry")
             continue
         try:
-            polygon = shape(geometry)
-            if polygon.is_empty or polygon.geom_type not in {"Polygon", "MultiPolygon"} or not polygon.is_valid:
-                geometry_errors.append(f"ward {number}: empty, non-polygon, or invalid geometry ({polygon.geom_type})")
+            source_geometry = shape(geometry)
+            if source_geometry.is_empty or source_geometry.geom_type not in {"Polygon", "MultiPolygon"}:
+                geometry_errors.append(f"ward {number}: empty or non-polygon geometry ({source_geometry.geom_type})")
                 continue
+            output_geometry = source_geometry
+            repair_record = None
+            if not source_geometry.is_valid:
+                repaired = make_valid(source_geometry)
+                polygon_parts = _polygonal_parts(repaired)
+                if not polygon_parts:
+                    geometry_errors.append(f"ward {number}: make_valid produced no polygonal component")
+                    continue
+                output_geometry = unary_union(polygon_parts)
+                if output_geometry.is_empty or output_geometry.geom_type not in {"Polygon", "MultiPolygon"} or not output_geometry.is_valid:
+                    geometry_errors.append(f"ward {number}: geometry remains invalid after make_valid")
+                    continue
+                repair_record = {
+                    "ward_number": number,
+                    "source_ward_name": extract_source_ward_name(feature) or None,
+                    "method": "Shapely make_valid; retained polygonal components only",
+                    "source_geometry_type": source_geometry.geom_type,
+                    "repaired_geometry_type": output_geometry.geom_type,
+                    "note": "Raw source geometry is preserved in the raw file; repaired geometry is only in the clearly marked draft candidate copy.",
+                }
+                geometry_repairs.append(repair_record)
         except Exception as exc:
-            geometry_errors.append(f"ward {number}: geometry parse error: {exc}")
+            geometry_errors.append(f"ward {number}: geometry parse/repair error: {exc}")
             continue
 
         code, official_name = roster_by_number[number]
@@ -141,18 +178,20 @@ def validate_and_annotate(
             })
         copied = json.loads(json.dumps(feature))
         copied.setdefault("properties", {})
+        copied["geometry"] = mapping(output_geometry)
         copied["properties"]["source_ward_name"] = source_name or None
         copied["properties"]["sec_ward_code"] = code
         copied["properties"]["sec_ward_name"] = official_name
         copied["properties"]["boundary_status"] = "draft_candidate_not_approved"
+        copied["properties"]["geometry_repaired_for_candidate"] = repair_record is not None
         annotated.append(copied)
 
     if geometry_errors:
-        raise ValueError("Invalid source geometries; no automatic repair performed: " + "; ".join(geometry_errors[:12]))
+        raise ValueError("Invalid source geometries; no usable candidate copy created: " + "; ".join(geometry_errors[:12]))
     if seen_numbers != set(range(1, 77)) or len(annotated) != 76:
         missing = sorted(set(range(1, 77)) - seen_numbers)
         raise ValueError(f"Source Ward_No coverage is not exactly 1..76; missing={missing}")
-    return annotated, name_mismatches
+    return annotated, name_mismatches, geometry_repairs
 
 def write_json(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -169,7 +208,7 @@ def main() -> int:
         roster = roster_payload.get("wards", [])
         if len(roster) != 76:
             raise ValueError(f"Expected 76 official roster entries, found {len(roster)}.")
-        annotated, name_mismatches = validate_and_annotate(features, roster)
+        annotated, name_mismatches, geometry_repairs = validate_and_annotate(features, roster)
     except Exception as exc:
         print(f"KOCHI_WARD_CANDIDATE_BLOCKED: {type(exc).__name__}: {exc}", file=sys.stderr)
         return 2
@@ -215,7 +254,9 @@ def main() -> int:
         "matched_official_ward_count": 76,
         "source_name_mismatch_count": len(name_mismatches),
         "match_method": "explicit source Ward_No (unique values 1..76) matched to numeric suffix of SEC ward codes; source labels are retained and audited, not used to assign IDs",
-        "geometry_validation": "all 76 features parsed as valid Polygon/MultiPolygon by Shapely; no automatic repair",
+        "geometry_validation": "all 76 output features are valid Polygon/MultiPolygon geometries; any repairs use make_valid and are itemized below",
+        "geometry_repair_count": len(geometry_repairs),
+        "geometry_repairs": geometry_repairs,
         "crs": "EPSG:4326 assumed from source coordinates; confirm source CRS metadata before metric calculations",
         "units": "longitude/latitude degrees",
         "layer_role": "context",
@@ -225,6 +266,7 @@ def main() -> int:
         "limitations": raw_metadata["limitations"] + [
             "CRS assumption is not independently confirmed from a formal metadata record.",
             "Candidate is not used for production exposure calculations.",
+            "Any geometry repairs are listed in geometry_repairs; repaired geometry is for candidate visualization only.",
         ],
     }
     write_json(CANDIDATE_META_PATH, candidate_metadata)
@@ -268,6 +310,8 @@ def main() -> int:
         "catalog_status": "provisional / candidate_not_integrated",
         "source_name_mismatch_count": len(name_mismatches),
         "source_name_mismatches": name_mismatches,
+        "geometry_repair_count": len(geometry_repairs),
+        "geometry_repairs": geometry_repairs,
         "warning": "DRAFT NOTIFICATION candidate only; not approved for legal boundaries or exposure analysis",
     }, indent=2))
     return 0
