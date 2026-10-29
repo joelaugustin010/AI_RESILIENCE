@@ -22,6 +22,9 @@ from shapely.geometry import mapping, shape
 from shapely.ops import unary_union
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from src.spatial_data import validate_geojson
 SOURCE_URL = "https://wardmap.ksmart.live/files/Ernakulam_Cochin_01JBBD7151DY27T8X2GJ2ZD40P.json"
 SOURCE_PAGE = "https://kochicorporation.lsgkerala.gov.in/en/delimitation-commission-kerala-notification/590"
 ROSTER_PATH = ROOT / "data/reference/kochi_official_ward_roster_2025.json"
@@ -293,26 +296,24 @@ def main() -> int:
             "Candidate is not approved for legal boundaries or production exposure calculations.",
             "Reuse rights require confirmation before further redistribution or non-educational reuse.",
         ],
-        "validation": {
-            "dataset_id": "kochi_wards_ksmart_2024_draft_candidate",
-            "source_sha256": candidate_sha,
-            "source_snapshot_sha256": raw_sha256,
-            "provenance_valid": True,
-            "feature_count": len(annotated),
-            "geometry_types": geometry_types,
-            "invalid_features": [],
-            "exact_duplicate_features": 0,
-            "duplicate_ids": 0,
-            "missing_property_values": 0,
-            "features_intersecting_coverage": None,
-            "features_outside_coverage": None,
-            "errors": [],
-            "warnings": validation_warnings,
-            "source_feature_count": len(features),
-            "excluded_invalid_feature_count": 0,
-            "excluded_invalid_features": [],
-        },
+        "validation": {},
     }
+    validation_report = validate_geojson(CANDIDATE_PATH, candidate_metadata)
+    if validation_report.get("errors") or not validation_report.get("provenance_valid"):
+        raise ValueError(
+            "Processed candidate failed repository validation: "
+            + "; ".join(validation_report.get("errors", []))
+            + "; provenance_valid="
+            + str(validation_report.get("provenance_valid"))
+        )
+    validation_report["source_snapshot_sha256"] = raw_sha256
+    validation_report["source_feature_count"] = len(features)
+    validation_report["excluded_invalid_feature_count"] = 0
+    validation_report["excluded_invalid_features"] = []
+    validation_report["warnings"] = list(dict.fromkeys(
+        validation_report.get("warnings", []) + validation_warnings
+    ))
+    candidate_metadata["validation"] = validation_report
     write_json(CANDIDATE_META_PATH, candidate_metadata)
 
     catalog = json.loads(CATALOG_PATH.read_text(encoding="utf-8"))
