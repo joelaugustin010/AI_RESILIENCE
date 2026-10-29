@@ -1,0 +1,311 @@
+{
+  "report_version": 1,
+  "reviewed_on": "2026-10-29",
+  "purpose": "Aggregate, non-sensitive summary of the controlled multi-hazard source acquisition and QA run. Raw source files are not committed to Git; this record is not a scientific validation certificate.",
+  "acquisition": {
+    "workflow": "Acquire public hydrology data",
+    "run_id": 40928550082,
+    "run_url": "https://github.com/joelaugustin010/AI_RESILIENCE/actions/runs/40928550082",
+    "run_status": "success",
+    "commit_sha": "f459c990935a880d2d43e1f8c0a1da395de1e3f8",
+    "artifact_name": "public-hydrology-source-bundle",
+    "artifact_id": 12921571939,
+    "artifact_sha256": "bdb515c43040dd7020e96217b7fe7b0a42a36a8419850c13c44340a433805dc4",
+    "artifact_compressed_bytes": 13312310,
+    "artifact_uncompressed_bytes": 105327429,
+    "artifact_files": 25,
+    "artifact_expires_at_utc": "2026-11-05T18:13:41Z",
+    "retention_note": "Private short-lived workflow artifact. Re-run the existing acquisition workflow to reproduce after expiry; do not treat the artifact as a permanent data store."
+  },
+  "datasets": [
+    {
+      "id": "kerala_sw_rainfall_telemetry_2021_2025",
+      "source_url": "https://nwdp.nwic.gov.in/dataset/09518a17-a04b-43e3-a4e0-3d0fe81dbf68/resource/0410ec7a-b253-4d85-8f0f-e6b69c44e40c/download/rainfall_tel_hr_kerala_sw_kl_2021_2025.csv",
+      "acquisition_status": "downloaded_raw_unvalidated; descriptive audit completed",
+      "rows": 188045,
+      "stations": 108,
+      "ernakulam_rows": 14347,
+      "ernakulam_station_names": 9,
+      "first_timestamp": "2021-04-07 22:15:00",
+      "last_timestamp": "2025-03-09 21:00:00",
+      "invalid_timestamps": 0,
+      "invalid_numeric_measurements": 0,
+      "duplicate_station_time_groups": 0,
+      "sha256": "7834f0c32621dbe907acabb0edd6ba317bd0529252cbe0cfda64e6c92baba988",
+      "limitations": [
+        "Source timezone is not established; timestamps remain timezone-naive.",
+        "Stations have irregular intervals and substantial long gaps.",
+        "Ernakulam district coverage is not equivalent to Kochi Corporation coverage.",
+        "Rainfall observations are not verified flood/no-flood outcome labels."
+      ]
+    },
+    {
+      "id": "kerala_sw_river_level_telemetry_2021_2025",
+      "source_url": "https://nwdp.nwic.gov.in/dataset/1a00209e-c864-4c1c-bc82-b5e2d8ecb66e/resource/0af0acba-517c-4278-bf77-ff137eb3c2cf/download/rwl_tel_hr_kerala_sw_999_2021_2025.csv",
+      "acquisition_status": "downloaded_raw_unvalidated; descriptive audit completed",
+      "rows": 465076,
+      "stations": 26,
+      "ernakulam_rows": 35337,
+      "ernakulam_source_station_count": 2,
+      "first_timestamp": "2021-05-29 12:00:00",
+      "last_timestamp": "2025-03-10 14:00:00",
+      "duplicate_station_time_groups": 0,
+      "sha256": "ba8bf391803b19e617702b797776c1bd6c0322b8635659a75aa98f6c9fd5b0c6",
+      "limitations": [
+        "Vertical gauge datum/reference and source timezone remain unresolved.",
+        "Provider-reported river/basin labels and station identities require review.",
+        "River stage is not flood depth; no threshold comparison or flood prediction is enabled."
+      ]
+    },
+    {
+      "id": "kerala_sw_river_level_manual_2021_2025",
+      "source_url": "https://nwdp.nwic.gov.in/dataset/b7ed6f63-d702-429b-a342-c3e2acd31ad6/resource/fe95a85e-142d-4acf-83fc-24499afc546b/download/rwl_manual_hr_kerala_sw_031_2021_2025.csv",
+      "acquisition_status": "downloaded_raw_unvalidated; descriptive audit completed",
+      "rows": 16005,
+      "stations": 6,
+      "ernakulam_rows": 0,
+      "first_timestamp": "2022-01-01 08:00:00",
+      "last_timestamp": "2025-03-31 16:00:00",
+      "duplicate_station_time_groups": 0,
+      "sha256": "8b71aae37c539b6124f45b4120e730e03a19ad8d51c0ceb1164abcff6dc9d783",
+      "limitations": [
+        "No records are source-labelled Ernakulam in this download.",
+        "Gauge reference, timezone, sampling gaps and some river/basin labels remain unresolved."
+      ]
+    },
+    {
+      "id": "ifi_impacts_historical_flood_inventory",
+      "source_url": "https://zenodo.org/records/16994648",
+      "acquisition_status": "downloaded_raw_unvalidated; descriptive audit completed",
+      "event_rows": 6876,
+      "rows_mentioning_kerala": 608,
+      "rows_mentioning_ernakulam": 86,
+      "exact_duplicate_rows": 0,
+      "sha256": "ef9ab2cd0db7bf917dcc22c7cb094ec599f5013ef1b96ba525d816f26ff1b108",
+      "limitations": [
+        "District/event mentions are not station-hour labels or ward-level inundation evidence.",
+        "The dataset landing page did not clearly establish the applicable licence for redistribution.",
+        "Missing dates and impact fields require source-specific treatment."
+      ]
+    },
+    {
+      "id": "ifi_impacts_district_tables",
+      "source_url": "https://zenodo.org/records/16994648",
+      "acquisition_status": "downloaded_raw_unvalidated; descriptive audit completed",
+      "district_flood_impact_rows": 732,
+      "district_flooded_area_rows": 732,
+      "district_flood_severity_index_rows": 744,
+      "limitations": [
+        "District-scale summaries cannot be assigned to individual Kochi wards or hours.",
+        "Definitions, units, reference periods and missingness require review."
+      ]
+    },
+    {
+      "id": "indofloods",
+      "source_url": "https://zenodo.org/records/14584655",
+      "acquisition_status": "downloaded_raw_unvalidated; descriptive audit completed",
+      "event_rows": 4548,
+      "gauge_metadata_rows": 214,
+      "kerala_gauges": 26,
+      "privacy_open_gauges": 155,
+      "privacy_restricted_gauges": 59,
+      "catchment_rows": 155,
+      "event_precipitation_rows": 4548,
+      "sha256_by_file": {
+        "floodevents_indofloods.csv": "72cea519d07b5c8cc679a57b16e887f58aaffba2cc162d89a955153a474cacbc",
+        "metadata_indofloods.csv": "cbc03f588b164bafcf5482649ffc7379fac875050d8a113a0da010e8827b1a73",
+        "catchment_characteristics_indofloods.csv": "1748b37645c87a9931630fdb14cc8780acbd809dd77529520221c26b173add8f",
+        "precipitation_variables_indofloods.csv": "a2615f03e0e71591e336a242c329429f92415ff96e7aea5a75b2ee6fe1ab60b8"
+      },
+      "limitations": [
+        "All 26 Kerala gauge metadata records are marked Privacy=Open in the acquired source; do not generalize this to the other 188 gauges, 59 of which are Restricted.",
+        "Candidate Periyar/Muvattupuzha gauges have historical event records, but their identities and coordinates have not been crosswalked to Kerala Surface Water/NWDP stations.",
+        "The INDOFLOODS event records end in 2020, while the newly acquired Kerala Surface Water telemetry begins in 2021; these datasets do not directly overlap in time.",
+        "A defensible flood probability model still needs event/no-event windows, verified gauge-specific thresholds, matched rainfall windows, missingness controls and leakage-free validation.",
+        "District/event mentions do not establish ward-level or station-hour flood outcomes."
+      ],
+      "kerala_event_rows": 531,
+      "kerala_gauges_with_events": 26,
+      "kerala_privacy_screen": "All 26 Kerala gauge records in this metadata join have Privacy=Open; other states contain restricted gauge records that must not be used in shareable derivatives.",
+      "candidate_periyar_and_muvattupuzha_gauges": [
+        {
+          "gauge_id": "INDOFLOODS-gauge-420",
+          "station": "Neeleeswaram",
+          "river": "Periyar",
+          "latitude": 10.1833,
+          "longitude": 76.5,
+          "events": 13,
+          "privacy": "Open"
+        },
+        {
+          "gauge_id": "INDOFLOODS-gauge-430",
+          "station": "Arangali",
+          "river": "Periyar/Chalakudy",
+          "latitude": 10.2814,
+          "longitude": 76.3153,
+          "events": 4,
+          "privacy": "Open"
+        },
+        {
+          "gauge_id": "INDOFLOODS-gauge-411",
+          "station": "Ramamangalam",
+          "river": "Muvattupuzha",
+          "latitude": 9.845,
+          "longitude": 76.4667,
+          "events": 4,
+          "privacy": "Open"
+        },
+        {
+          "gauge_id": "INDOFLOODS-gauge-412",
+          "station": "Kalampur",
+          "river": "Muvattupuzha (source field truncated)",
+          "latitude": 9.9906,
+          "longitude": 76.6322,
+          "events": 25,
+          "privacy": "Open"
+        },
+        {
+          "gauge_id": "INDOFLOODS-gauge-445",
+          "station": "Pallippady",
+          "river": "Kothamangalam",
+          "latitude": 10.04,
+          "longitude": 76.62,
+          "events": 1,
+          "privacy": "Open"
+        }
+      ]
+    },
+    {
+      "id": "ksdma_historical_flood_return_probability_rasters",
+      "source_url": "https://sdma.kerala.gov.in/hazard-maps/",
+      "direct_download_url": "https://sdma.kerala.gov.in/wp-content/uploads/2026/06/1.-Flood-Return-Probability-Historical-10-25-50-years.zip",
+      "acquisition_status": "downloaded_raw_candidate; ZIP integrity and raster metadata inspected; not approved for map/model use",
+      "raster_count": 3,
+      "archive_sha256": "4057b36cdfc467ecaf618afb1e74b725187ef1d2a20326cdc1e4eb32df54605e",
+      "crs": "EPSG:4326",
+      "raster_dimensions": "3004 x 5371 pixels per raster",
+      "resolution_degrees": 0.0008333333333333,
+      "nodata": -3.4028230607370965e+38,
+      "overlaps_kochi_screening_box": true,
+      "band_units": null,
+      "limitations": [
+        "Valid pixel values have no documented unit or meaning in the inspected raster metadata.",
+        "Dataset-specific reuse terms remain unresolved.",
+        "Spatial overlap does not establish valid flood depth, probability interpretation, ward exposure or hospital exposure."
+      ]
+    },
+    {
+      "id": "esri_india_health_facility_candidate_layer",
+      "source_url": "https://livingatlas.esri.in/server/rest/services/LivingAtlas/IND_Health/MapServer/0",
+      "acquisition_status": "downloaded_raw_candidate; structure and preliminary spatial QA completed; not approved for exposure analysis",
+      "feature_count": 642,
+      "invalid_points": 0,
+      "district_filter_mismatches": 0,
+      "duplicate_coordinate_groups": 64,
+      "rows_in_duplicate_coordinate_groups": 213,
+      "points_inside_provisional_boundary": 84,
+      "points_outside_provisional_boundary": 558,
+      "sha256": "9e303b37e506fb371440a36212fbf509b73b6301ed5e4b2cec2ef6b43de87a72",
+      "limitations": [
+        "The Esri layer is a candidate source; data provenance, currency, positional accuracy and licence require review.",
+        "Ernakulam district is larger than Kochi Corporation; the inside/outside counts use an unverified boundary candidate.",
+        "No facility vulnerability or flood exposure claim is approved."
+      ]
+    },
+    {
+      "id": "kochi_wards_2024_candidate",
+      "source_url": "https://data.opencity.in/dataset/kochi-wards-map",
+      "acquisition_status": "downloaded_raw_candidate; KML structure checked; current legal alignment unverified",
+      "placemarks": 74,
+      "unique_placemark_names": 74,
+      "polygon_geometries": 83,
+      "invalid_coordinate_tuples": 0,
+      "unclosed_rings": 0,
+      "sha256": "e6376e6a2ac3a0ab28615cd77f4d649bfba5c48034d26c2e31ae295697d06238",
+      "limitations": [
+        "A source catalogue's reported ward count and structurally valid KML do not prove current legal ward delimitation.",
+        "Official ward-map file attempt returned HTTP 404 in this run; source recovery and ward-by-ward comparison remain required.",
+        "No ward-level hazard/exposure joins should use this candidate until official names, IDs, count, CRS and topology are reconciled."
+      ]
+    },
+    {
+      "id": "existing_kspcb_air_quality_and_edayar_industrial_evidence",
+      "acquisition_status": "Existing project records retained; not newly acquired by this workflow",
+      "status": "Dated KSPCB reports, annual AQI summaries, Edayar estate documents and historical consent records exist in project records.",
+      "limitations": [
+        "Live AQI feed was previously blocked; dated reports do not prove current conditions.",
+        "Verified facility coordinates, current consent validity and measured factory-specific air emissions remain unavailable.",
+        "AQI alone cannot attribute a pollution episode to an individual factory."
+      ]
+    },
+    {
+      "id": "gsi_landslide_susceptibility_ernakulam",
+      "source_url": "https://sdma.kerala.gov.in/hazard-maps/",
+      "direct_download_url": "https://sdma.kerala.gov.in/wp-content/uploads/2025/08/Ernakulam.zip",
+      "acquisition_status": "downloaded_raw_candidate; ZIP integrity and shapefile sidecars checked; geometry audit completed; not approved for model use",
+      "archive_bytes": 3541467,
+      "archive_sha256": "7bac333a4a2c26410582555dbf722157fa97df63fafa24b5a0bb8ef269935b20",
+      "shapefile": "Ernakulam/Ernakulam_GSI_LS.shp",
+      "shapefile_feature_count": 3,
+      "geometry_type": "MultiPolygon",
+      "attribute_fields": [
+        "Susceptibi"
+      ],
+      "susceptibility_class_values": [
+        "High",
+        "Low",
+        "Moderate"
+      ],
+      "crs": "EPSG:32643",
+      "bounds_epsg4326": [
+        76.41102118681698,
+        9.836105351582866,
+        76.92068619153798,
+        10.301953329415356
+      ],
+      "overlaps_rough_kochi_screening_bbox": true,
+      "invalid_geometry_count": 3,
+      "invalid_geometry_reasons": [
+        "High: Ring Self-intersection near (707860.6815, 1133516.7395) in source CRS",
+        "Low: Ring Self-intersection near (708232.2643, 1132325.8133) in source CRS",
+        "Moderate: Ring Self-intersection near (708418.8155, 1133028.0434) in source CRS"
+      ],
+      "limitations": [
+        "The class field is truncated to Susceptibi in the shapefile DBF; source legend and semantics must be checked.",
+        "All three geometries are invalid; no automatic repair was applied.",
+        "The rough screening-box overlap is not proof of valid coverage within the current Kochi Corporation boundary.",
+        "Source scale, currency and redistribution terms remain unverified; susceptibility is not a timed forecast."
+      ]
+    }
+  ],
+  "overall_conclusion": {
+    "acquisition_workflow_passed": true,
+    "raw_files_committed_to_git": false,
+    "scientific_predictions_enabled": false,
+    "validated_kochi_flood_prediction": false,
+    "next_gates": [
+      "Persist reproducible provenance and audit summaries while keeping raw files outside Git.",
+      "Resolve station crosswalks, time zones and river gauge references.",
+      "Confirm flood raster pixel semantics and reuse terms.",
+      "Resolve the current official Kochi boundary/ward layer and compare every ward name and geometry.",
+      "Validate hospital identity and location before exposure analysis.",
+      "Filter INDOFLOODS by privacy field and test whether valid Kochi/Ernakulam event and non-event labels can be built without leakage.",
+      "Acquire and validate cyclone, coastal, earthquake, heat, drought, air-pollution and industrial-hazard evidence with hazard-specific methods.",
+      "Resolve the three invalid GSI landslide susceptibility geometries with the publisher before spatial joins or consequence estimates."
+    ]
+  },
+  "follow_up_acquisition": {
+    "workflow_run_id": 40930196302,
+    "workflow_run_url": "https://github.com/joelaugustin010/AI_RESILIENCE/actions/runs/40930196302",
+    "status": "success",
+    "commit_sha": "76105a978671396eb7ceedb07216442003fedebe",
+    "artifact_id": 12922133047,
+    "artifact_name": "public-hydrology-source-bundle",
+    "artifact_sha256": "de8f0e86063222e7f92351adcb12a711e98696097efd873249ae6407400054c2",
+    "artifact_compressed_bytes": 16840599,
+    "artifact_uncompressed_bytes": 108870792,
+    "artifact_files": 26,
+    "artifact_expires_at_utc": "2026-11-05T18:23:57Z",
+    "note": "Follow-up run added the GSI Ernakulam landslide susceptibility archive. Raw files remain in a private temporary artifact, not committed to Git."
+  }
+}

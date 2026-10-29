@@ -22,6 +22,7 @@ USER_AGENT = "AI_RESILIENCE educational research; preserve source attribution"
 HOSPITAL_QUERY = "https://livingatlas.esri.in/server/rest/services/LivingAtlas/IND_Health/MapServer/0/query"
 PREVIOUS_HOSPITAL_QUERY = "https://livingatlas.esri.in/server/rest/services/LivingAtlas/IND_Hospital_Directory/MapServer/0/query"
 FLOOD_ZIP = "https://sdma.kerala.gov.in/wp-content/uploads/2026/06/1.-Flood-Return-Probability-Historical-10-25-50-years.zip"
+LANDSLIDE_ZIP = "https://sdma.kerala.gov.in/wp-content/uploads/2025/08/Ernakulam.zip"
 SOURCES = {
     "health_facilities_ernakulam.geojson": {
         "url": HOSPITAL_QUERY,
@@ -68,6 +69,18 @@ SOURCES = {
             "CRS, units, NoData values, band meanings, resolution, and spatial alignment must be audited.",
             "Return-period hazard is not a forecast for a specific date and is not an observed flood label.",
             "Do not display as validated exposure until raster metadata, licence, and Kochi coverage are confirmed."
+        ],
+    },
+    "gsi_landslide_susceptibility_ernakulam.zip": {
+        "url": LANDSLIDE_ZIP,
+        "publisher": "Geological Survey of India (GSI), landslide susceptibility zones (2022), listed by KSDMA",
+        "source_page": "https://sdma.kerala.gov.in/hazard-maps/",
+        "reuse": "Dataset-specific licence and redistribution terms were not verified; retain as raw candidate pending review.",
+        "purpose": "Candidate Ernakulam landslide-susceptibility vector layer for archive and schema review.",
+        "limitations": [
+            "Susceptibility is not a timed landslide forecast or a quantified consequence estimate.",
+            "The layer classification legend, scale, publication/version metadata and CRS require inspection.",
+            "Do not join to wards, facilities or rainfall until CRS, geometry, coverage, source terms and current official boundary are reviewed."
         ],
     },
     "kerala_health_department_institutions_2024_25.pdf": {
@@ -430,14 +443,35 @@ def acquire(output: Path) -> dict:
                 with zipfile.ZipFile(io.BytesIO(data)) as archive:
                     bad_member = archive.testzip()
                     if bad_member is not None:
-                        raise RuntimeError(f"KSDMA ZIP failed CRC check at member: {bad_member}")
+                        raise RuntimeError(f"Source ZIP failed CRC check at member: {bad_member}")
                     members = [item for item in archive.infolist() if not item.is_dir()]
                     record["archive_member_count"] = len(members)
-                    record["raster_candidates"] = [item.filename for item in members if item.filename.lower().endswith((".tif", ".tiff", ".vrt"))]
-                    if not record["raster_candidates"]:
-                        raise RuntimeError("KSDMA ZIP contains no TIFF/VRT raster candidates.")
+                    if filename == "ksdma_flood_return_probability_historical_10_25_50.zip":
+                        record["raster_candidates"] = [item.filename for item in members if item.filename.lower().endswith((".tif", ".tiff", ".vrt"))]
+                        if not record["raster_candidates"]:
+                            raise RuntimeError("KSDMA ZIP contains no TIFF/VRT raster candidates.")
+                    elif filename == "gsi_landslide_susceptibility_ernakulam.zip":
+                        names = {item.filename.lower() for item in members}
+                        shapefiles = [item.filename for item in members if item.filename.lower().endswith(".shp")]
+                        if not shapefiles:
+                            raise RuntimeError("GSI ZIP contains no shapefile (.shp) vector candidates.")
+                        record["vector_candidates"] = shapefiles
+                        record["shapefile_sidecar_check"] = {}
+                        for shp_name in shapefiles:
+                            stem = shp_name[:-4].lower()
+                            available = {
+                                suffix: any(name == stem + suffix or name.endswith("/" + stem + suffix) for name in names)
+                                for suffix in (".shx", ".dbf", ".prj")
+                            }
+                            record["shapefile_sidecar_check"][shp_name] = available
+                            if not available[".shx"] or not available[".dbf"]:
+                                raise RuntimeError(f"Incomplete shapefile bundle for {shp_name}: .shx and .dbf are required.")
                 atomic_write(output / filename, data)
-                record["validation_status"] = "ZIP_INTEGRITY_CHECKED_RASTER_SEMANTICS_UNVERIFIED"
+                record["validation_status"] = (
+                    "ZIP_INTEGRITY_CHECKED_VECTOR_SCHEMA_PENDING"
+                    if filename == "gsi_landslide_susceptibility_ernakulam.zip"
+                    else "ZIP_INTEGRITY_CHECKED_RASTER_SEMANTICS_UNVERIFIED"
+                )
             record["status"] = "DOWNLOADED_RAW_CANDIDATE"
         except Exception as error:
             record["status"] = "ACQUISITION_FAILED"
@@ -475,6 +509,8 @@ def main() -> int:
             print(f"  Features: {item['feature_count']}; invalid points: {item['invalid_point_count']}; filter mismatches: {item['district_filter_mismatch_count']}")
         if "raster_candidates" in item:
             print(f"  Raster candidates: {len(item['raster_candidates'])}; archive members: {item['archive_member_count']}")
+        if "vector_candidates" in item:
+            print(f"  Vector candidates: {len(item['vector_candidates'])}; archive members: {item['archive_member_count']}")
     print("These files are raw candidates only; no layer was automatically approved for display or analysis.")
     return 0
 

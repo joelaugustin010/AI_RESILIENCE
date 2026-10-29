@@ -34,6 +34,16 @@ BOUNDARY = {
 }
 
 
+def make_landslide_zip() -> bytes:
+    memory = io.BytesIO()
+    with zipfile.ZipFile(memory, "w") as archive:
+        archive.writestr("Ernakulam_Susceptibility.shp", b"placeholder-shp")
+        archive.writestr("Ernakulam_Susceptibility.shx", b"placeholder-shx")
+        archive.writestr("Ernakulam_Susceptibility.dbf", b"placeholder-dbf")
+        archive.writestr("Ernakulam_Susceptibility.prj", b"placeholder-prj")
+    return memory.getvalue()
+
+
 class FakeResponse:
     def __init__(self, body: bytes, content_type: str):
         self.body = body
@@ -77,25 +87,29 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
             (json.dumps({"objectIds": [1]}).encode(), "https://example.org/ids", "application/json"),
             (json.dumps(hospitals).encode(), "https://example.org/hospitals", "application/geo+json"),
             (memory.getvalue(), "https://example.org/flood.zip", "application/zip"),
+            (make_landslide_zip(), "https://example.org/landslide.zip", "application/zip"),
             (b"%PDF-1.4\\nmock official institution list", "https://example.org/institutions.pdf", "application/pdf"),
             (json.dumps(BOUNDARY).encode(), "https://example.org/boundary.geojson", "application/geo+json"),
         ]
 
         manifest = acquisition.acquire(self.output)
         self.assertEqual(manifest["overall_status"], "RAW_CANDIDATES_NOT_APPROVED_FOR_MAP")
-        self.assertEqual(len(manifest["files"]), 4)
+        self.assertEqual(len(manifest["files"]), 5)
         self.assertTrue((self.output / "health_facilities_ernakulam.geojson").exists())
         self.assertTrue((self.output / "ksdma_flood_return_probability_historical_10_25_50.zip").exists())
+        self.assertTrue((self.output / "gsi_landslide_susceptibility_ernakulam.zip").exists())
         self.assertTrue((self.output / "kerala_health_department_institutions_2024_25.pdf").exists())
         self.assertTrue((self.output / "kochi_corporation_boundary_candidate.geojson").exists())
         stored = json.loads((self.output / "map_reference_manifest.json").read_text(encoding="utf-8"))
         self.assertEqual(stored["files"][0]["feature_count"], 1)
         self.assertEqual(stored["files"][0]["validation_status"], "STRUCTURE_CHECKED_SPATIAL_ACCURACY_AND_LICENCE_UNVERIFIED")
         self.assertEqual(stored["files"][1]["validation_status"], "ZIP_INTEGRITY_CHECKED_RASTER_SEMANTICS_UNVERIFIED")
-        self.assertEqual(stored["files"][2]["validation_status"], "PDF_SIGNATURE_CHECKED_FACILITY_MATCHING_REQUIRED")
-        self.assertEqual(stored["files"][3]["validation_status"], "BOUNDARY_GEOJSON_STRUCTURE_CHECKED_LEGAL_STATUS_UNVERIFIED")
-        self.assertEqual(stored["files"][3]["geometry_type"], "MultiPolygon")
-        self.assertEqual(stored["files"][3]["boundary_feature_count"], 2)
+        self.assertEqual(stored["files"][2]["validation_status"], "ZIP_INTEGRITY_CHECKED_VECTOR_SCHEMA_PENDING")
+        self.assertEqual(stored["files"][2]["vector_candidates"], ["Ernakulam_Susceptibility.shp"])
+        self.assertEqual(stored["files"][3]["validation_status"], "PDF_SIGNATURE_CHECKED_FACILITY_MATCHING_REQUIRED")
+        self.assertEqual(stored["files"][4]["validation_status"], "BOUNDARY_GEOJSON_STRUCTURE_CHECKED_LEGAL_STATUS_UNVERIFIED")
+        self.assertEqual(stored["files"][4]["geometry_type"], "MultiPolygon")
+        self.assertEqual(stored["files"][4]["boundary_feature_count"], 2)
         self.assertEqual(stored["files"][0]["city_boundary_screening"]["points_inside_candidate_boundary"], 1)
         self.assertEqual(stored["files"][0]["city_boundary_screening"]["points_outside_candidate_boundary"], 0)
         self.assertTrue(all(item["sha256"] for item in stored["files"]))
@@ -122,6 +136,7 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
             (json.dumps({"objectIds": [7]}).encode(), "https://example.org/spatial-ids", "application/json"),
             (json.dumps(hospitals).encode(), "https://example.org/hospitals", "application/geo+json"),
             (memory.getvalue(), "https://example.org/flood.zip", "application/zip"),
+            (make_landslide_zip(), "https://example.org/landslide.zip", "application/zip"),
             (b"%PDF-1.4\\nmock official institution list", "https://example.org/institutions.pdf", "application/pdf"),
             (json.dumps(BOUNDARY).encode(), "https://example.org/boundary.geojson", "application/geo+json"),
         ]
@@ -129,8 +144,9 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
         manifest = acquisition.acquire(self.output)
         self.assertEqual(manifest["overall_status"], "RAW_CANDIDATES_NOT_APPROVED_FOR_MAP")
         self.assertEqual(manifest["files"][0]["feature_count"], 1)
-        self.assertEqual(manifest["files"][2]["validation_status"], "PDF_SIGNATURE_CHECKED_FACILITY_MATCHING_REQUIRED")
-        self.assertEqual(manifest["files"][3]["validation_status"], "BOUNDARY_GEOJSON_STRUCTURE_CHECKED_LEGAL_STATUS_UNVERIFIED")
+        self.assertEqual(manifest["files"][2]["validation_status"], "ZIP_INTEGRITY_CHECKED_VECTOR_SCHEMA_PENDING")
+        self.assertEqual(manifest["files"][3]["validation_status"], "PDF_SIGNATURE_CHECKED_FACILITY_MATCHING_REQUIRED")
+        self.assertEqual(manifest["files"][4]["validation_status"], "BOUNDARY_GEOJSON_STRUCTURE_CHECKED_LEGAL_STATUS_UNVERIFIED")
         self.assertTrue((self.output / "kerala_health_department_institutions_2024_25.pdf").exists())
         first_url = mocked_fetch.call_args_list[0].args[0]
         fallback_url = mocked_fetch.call_args_list[1].args[0]
@@ -153,6 +169,7 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
             (json.dumps({"objectIds": [1]}).encode(), "https://example.org/ids", "application/json"),
             (json.dumps(hospitals).encode(), "https://example.org/hospitals", "application/geo+json"),
             (b"<html>error</html>", "https://example.org/error", "text/html"),
+            (make_landslide_zip(), "https://example.org/landslide.zip", "application/zip"),
             (b"%PDF-1.4\\nmock official institution list", "https://example.org/institutions.pdf", "application/pdf"),
             (json.dumps(BOUNDARY).encode(), "https://example.org/boundary.geojson", "application/geo+json"),
         ]
@@ -177,6 +194,7 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
             (json.dumps({"objectIds": [1]}).encode(), "https://example.org/ids", "application/json"),
             (json.dumps(hospitals).encode(), "https://example.org/hospitals", "application/geo+json"),
             (b"<html>download failed</html>", "https://example.org/error", "text/html"),
+            (make_landslide_zip(), "https://example.org/landslide.zip", "application/zip"),
             (b"%PDF-1.4\\nmock official institution list", "https://example.org/institutions.pdf", "application/pdf"),
             (json.dumps(BOUNDARY).encode(), "https://example.org/boundary.geojson", "application/geo+json"),
         ]
@@ -186,12 +204,14 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
         self.assertTrue(manifest_path.exists())
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         self.assertEqual(manifest["overall_status"], "PARTIAL_ACQUISITION_FAILED")
-        self.assertEqual(len(manifest["files"]), 4)
+        self.assertEqual(len(manifest["files"]), 5)
         self.assertEqual(manifest["files"][0]["status"], "DOWNLOADED_RAW_CANDIDATE")
         self.assertEqual(manifest["files"][1]["status"], "ACQUISITION_FAILED")
         self.assertEqual(manifest["files"][2]["status"], "DOWNLOADED_RAW_CANDIDATE")
-        self.assertEqual(manifest["files"][2]["validation_status"], "PDF_SIGNATURE_CHECKED_FACILITY_MATCHING_REQUIRED")
+        self.assertEqual(manifest["files"][2]["validation_status"], "ZIP_INTEGRITY_CHECKED_VECTOR_SCHEMA_PENDING")
         self.assertEqual(manifest["files"][3]["status"], "DOWNLOADED_RAW_CANDIDATE")
+        self.assertEqual(manifest["files"][3]["validation_status"], "PDF_SIGNATURE_CHECKED_FACILITY_MATCHING_REQUIRED")
+        self.assertEqual(manifest["files"][4]["status"], "DOWNLOADED_RAW_CANDIDATE")
         self.assertTrue(manifest["files"][0]["sha256"])
         self.assertIn("not a ZIP archive", manifest["files"][1]["error"])
 
@@ -219,6 +239,7 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
             (json.dumps({"objectIds": [1]}).encode(), "https://example.org/ids", "application/json"),
             (json.dumps(hospitals).encode(), "https://example.org/hospitals", "application/geo+json"),
             (memory.getvalue(), "https://example.org/flood.zip", "application/zip"),
+            (make_landslide_zip(), "https://example.org/landslide.zip", "application/zip"),
             (b"%PDF-1.4\\nmock official institution list", "https://example.org/institutions.pdf", "application/pdf"),
             (json.dumps(BOUNDARY).encode(), "https://example.org/boundary.geojson", "application/geo+json"),
         ]

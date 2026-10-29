@@ -7,6 +7,10 @@ import json
 import pandas as pd
 import streamlit as st
 
+from src.scientific_scenario_engine import build_scientific_scenario_frame
+from src.source_registry import build_source_registry, source_fitness_summary
+from src.disaster_data_catalog import get_catalog, validate_catalog_record
+
 from src.decision_workflow import (
     HAZARD_OPTIONS,
     assessment_summary,
@@ -14,6 +18,7 @@ from src.decision_workflow import (
     budget_summary,
     compare_action_combinations,
     evidence_inventory,
+    expand_hazards,
     hazard_evidence_checklist,
     mitigation_actions_for,
     report_html,
@@ -372,6 +377,93 @@ evidence = evidence_inventory(ROOT, st.session_state.get("rainfall_backtest_resu
 st.caption("The separate historical benchmark uses only the manual rainfall observations. Its results do not enter this qualitative assessment; conflicted CWC rainfall, unverified sample rows, and unresolved river levels remain excluded from model calculations.")
 st.dataframe(evidence, hide_index=True, width="stretch")
 
+with st.expander("Dataset provenance and scientific fitness register", expanded=True):
+    st.caption(
+        "A listed source is not automatically suitable for every claim. Unknown licence, time-zone, "
+        "datum, checksum, or spatial metadata stays unresolved; this register does not certify data."
+    )
+    registry = build_source_registry()
+    registry_view = []
+    for record in registry:
+        fitness = source_fitness_summary(record)
+        registry_view.append({
+            "Dataset": record["name"],
+            "Publisher / source attribution": record["publisher"],
+            "Observation type": record["data_type"],
+            "Unit": record["unit"],
+            "Retrieval date": record["retrieval_date"],
+            "Licence status": record["license_status"],
+            "Checksum match": record["checksum_match"],
+            "Time zone": record["time_zone"],
+            "Spatial reference / datum": record["spatial_reference"],
+            "Validation status": record["validation_status"],
+            "Scientific fitness": fitness["scientific_fitness"],
+            "Permitted use": record["permitted_use"],
+            "Known limitation": record["known_limitation"],
+            "Source URL": record["source_url"],
+        })
+    st.dataframe(pd.DataFrame(registry_view), hide_index=True, width="stretch")
+    st.warning(
+        "No dataset in this registry is approved by this app for numerical disaster prediction or official warnings. "
+        "Source metadata completeness and scientific validation are different checks."
+    )
+
+with st.expander("Kochi multi-hazard data acquisition board", expanded=True):
+    st.caption(
+        "This is the parallel acquisition queue. 'Discovered' means a credible source page was identified, "
+        "not that its files have been downloaded or validated. Restricted or unclear sources are not scraped."
+    )
+    catalog_records = get_catalog()
+    catalog_issues = {
+        row["id"]: validate_catalog_record(row)
+        for row in catalog_records
+        if validate_catalog_record(row)
+    }
+    if catalog_issues:
+        st.error(f"Data catalog metadata structure needs review for {len(catalog_issues)} record(s).")
+        st.json(catalog_issues)
+    selected_hazards = set(expand_hazards(inputs["hazard"])) | {inputs["hazard"]}
+    # Show highest-priority data relevant to the selected hazard while keeping
+    # all other disaster sources available for project planning.
+    relevant_records = [
+        row for row in catalog_records
+        if selected_hazards.intersection(row["hazards"])
+    ]
+    all_records = relevant_records + [
+        row for row in catalog_records if row not in relevant_records
+    ]
+    st.markdown("**Priority order:** P0 = core baseline evidence; P1 = important supporting evidence; P2 = later extension.")
+    st.dataframe(pd.DataFrame([{
+        "Priority": row["priority"],
+        "Hazard(s)": ", ".join(row["hazards"]),
+        "Theme": row["theme"],
+        "Dataset": row["dataset"],
+        "Publisher": row["publisher"],
+        "Acquisition status": row["status"],
+        "Access conditions": row["access"],
+        "Required QA before use": row["required_checks"],
+        "Known limitations": row["limitations"],
+        "Official source": row["url"],
+        "Direct resource URLs": "; ".join(row.get("resource_urls", [])) or "No direct file link confirmed",
+    } for row in all_records]), hide_index=True, width="stretch")
+    for row in relevant_records:
+        with st.expander(f"{row['priority']} · {row['dataset']}"):
+            st.markdown(f"**Publisher:** {row['publisher']}")
+            st.markdown(f"**Source:** [{row['url']}]({row['url']})")
+            if row.get("resource_urls"):
+                st.markdown("**Direct source files:**")
+                for resource_url in row["resource_urls"]:
+                    st.markdown(f"- [{resource_url.rsplit('/', 1)[-1]}]({resource_url})")
+            st.markdown(f"**Current status:** {row['status']}")
+            st.markdown(f"**Access:** {row['access']}")
+            st.markdown(f"**Required checks:** {row['required_checks']}")
+            st.markdown(f"**Limitations:** {row['limitations']}")
+    st.info(
+        "The catalog is a verified-source discovery queue, not a downloaded-data inventory. "
+        "A dataset moves to 'acquired' only after its file, publisher metadata, retrieval date, "
+        "licence/access terms, checksum, schema, spatial coverage and QA results are recorded."
+    )
+
 st.subheader("Evidence readiness checklist for this hazard")
 st.caption(
     "This checklist identifies evidence needed before stronger conclusions are justified. "
@@ -392,6 +484,24 @@ st.write("**Selected hazard(s):**", assessment["hazards"])
 st.write("**Interpretation:**", assessment["interpretation"])
 st.warning(assessment["additional_caution"])
 st.caption("No user-entered value is treated as verified. River-level values are recorded in the report but never compared with a threshold in this workflow.")
+
+st.subheader("Scientific scenario frame and evidence gates")
+scientific_frame = build_scientific_scenario_frame(inputs)
+st.error(scientific_frame["evidence_gate"])
+st.caption(
+    "This frame structures the reasoning into hazard, exposure, vulnerability, and consequences to investigate. "
+    "It does not calculate a probability, impact estimate, or warning."
+)
+if scientific_frame["pathways"]:
+    st.dataframe(pd.DataFrame(scientific_frame["pathways"]), hide_index=True, width="stretch")
+else:
+    st.warning("No pathway template exists for this selection. The app will not guess one.")
+st.markdown("**Evidence required before stronger conclusions:**")
+for item in scientific_frame["required_evidence"]:
+    st.markdown(f"- {item}")
+st.markdown("**Interpretation safeguards:**")
+for item in scientific_frame["limitations"]:
+    st.markdown(f"- {item}")
 
 st.header("4. Compare hypothetical scenarios")
 st.caption("The following cases differ only by their stated assumptions. Possible pathways are planning prompts, not calculated impacts.")
@@ -446,6 +556,22 @@ st.caption("A combination is shown because you selected its actions. Affordabili
 
 st.header("7. Generate a report")
 report = report_rows(inputs, evidence, scenarios, actions, budget, combinations, ROOT, evidence_checklist=evidence_checklist)
+# Include the same evidence-gated scientific frame in exports so caveats survive outside the app.
+frame_rows = [
+    {"Section": "Scientific scenario frame", "Item": row["Reasoning stage"],
+     "Detail": f'{row["Hazard component"]}: {row["Question to investigate"]} — {row["Status"]}'}
+    for row in scientific_frame["pathways"]
+]
+frame_rows.extend(
+    {"Section": "Scientific evidence gate", "Item": "Required evidence", "Detail": item}
+    for item in scientific_frame["required_evidence"]
+)
+frame_rows.extend(
+    {"Section": "Scientific limitation", "Item": "Safeguard", "Detail": item}
+    for item in scientific_frame["limitations"]
+)
+frame_rows.append({"Section": "Scientific evidence gate", "Item": "Status", "Detail": scientific_frame["evidence_gate"]})
+report = pd.concat([report, pd.DataFrame(frame_rows)], ignore_index=True, sort=False)
 report_slug = slug or "scenario"
 csv_bytes = report.to_csv(index=False).encode("utf-8-sig")
 html_bytes = report_html(report).encode("utf-8")
