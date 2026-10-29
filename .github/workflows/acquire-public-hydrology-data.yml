@@ -72,7 +72,7 @@ jobs:
         if: always() && steps.acquisition.outcome == 'success'
         run: python scripts/audit_indofloods.py --input-dir data/external/raw --output data/external/indofloods_audit_report.json
 
-      - name: Acquire candidate hospital GIS and KSDMA flood-hazard archive
+      - name: Acquire candidate health-facility GIS, Kochi boundary and KSDMA flood-hazard archive
         id: map_acquisition
         continue-on-error: true
         run: |
@@ -120,7 +120,7 @@ jobs:
             echo "IFI audit is descriptive only: district/event records are not converted into ward-level or hourly flood labels."
             echo ""
             if [ "${{ steps.map_acquisition.outcome }}" = "success" ]; then
-              echo "**Map reference acquisition:** Candidate Ernakulam hospital points and KSDMA flood-return raster archive downloaded with SHA-256 provenance. These remain unvalidated candidates; they are not automatically shown on the map."
+              echo "**Map reference acquisition:** Candidate Ernakulam public health-facility points, Kochi boundary candidate and KSDMA flood-return raster archive downloaded with SHA-256 provenance. These remain unvalidated candidates; they are not automatically shown on the map."
               if [ "${{ steps.raster_audit.outcome }}" = "success" ]; then
                 echo "**Raster metadata audit:** Completed. Review raster_metadata_audit.json for CRS, bounds, resolution, units, NoData, sampled values, and Kochi screening-box overlap. Metadata inspection does not approve the layer for display."
               else
