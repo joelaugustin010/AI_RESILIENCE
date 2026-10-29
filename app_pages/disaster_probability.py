@@ -1,4 +1,7 @@
 import streamlit as st
+import pandas as pd
+
+from src.evidence_fusion import SOURCE_REGISTRY, audit_multisource_evidence
 
 from src.flood_model import (
     FEATURE_COLUMNS,
@@ -24,6 +27,46 @@ st.write(
 )
 st.error("CURRENT OUTPUT: No flood probability or operational warning is available from this model.")
 st.caption("For real-time safety decisions, use official KSDMA/IMD/CWC guidance. This school project is not an emergency-warning service.")
+
+fusion_readiness = audit_multisource_evidence([])
+st.subheader("Multi-source evidence fusion")
+st.write(
+    "The system now inventories independent evidence families instead of relying on one dataset: "
+    "rain-gauge observations, river-gauge observations, official hazard mapping, gridded rainfall/flood-frequency "
+    "estimates, meteorological forecasts, and terrain/drainage evidence. Each source has its own quality, time, "
+    "location, unit, and reuse checks."
+)
+st.error(
+    "Fusion status: INSUFFICIENT_EVIDENCE. No numerical flood prediction is permitted because the current "
+    "source records are not yet approved for automated fusion. This is an intentional fail-closed result, not a zero-risk result."
+)
+st.caption(
+    f"Approved independent source families currently available for automated fusion: "
+    f"{len(fusion_readiness['independent_source_families'])}. "
+    "Required minimum: 3, with time-aligned rainfall/forecast evidence and an independent river/hazard context."
+)
+source_rows = [
+    {
+        "Evidence family": source.get("family", "unknown"),
+        "Source": source.get("title", source_id),
+        "Status": source.get("status", "not documented"),
+        "Units": source.get("unit") or "Not applicable / not established",
+        "Permitted use and limitation": source.get("use", ""),
+        "Source URL": source.get("url", ""),
+    }
+    for source_id, source in SOURCE_REGISTRY.items()
+]
+with st.expander("Reviewed multi-source inventory", expanded=True):
+    st.dataframe(
+        pd.DataFrame(source_rows),
+        hide_index=True,
+        width="stretch",
+        column_config={"Source URL": st.column_config.LinkColumn("Source URL")},
+    )
+    st.markdown("**Fusion gate blockers**")
+    for blocker in fusion_readiness["blockers"]:
+        st.markdown(f"- {blocker}")
+    st.caption(fusion_readiness["interpretation"])
 
 positive = int(data["target_flood_event_next_24h"].eq(1).sum())
 negative = int(data["target_flood_event_next_24h"].eq(0).sum())
