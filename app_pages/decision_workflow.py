@@ -313,23 +313,60 @@ with st.form("decision_workflow_intake"):
         help="Example: source name, timestamp, timezone, station, and averaging period. This app does not verify them.",
     )
 
-    st.caption("All numeric fields are optional. Empty means not supplied; the app does not fill in values.")
+    # Show only fields relevant to the selected hazard. Keep hidden fields explicitly
+    # unset so stale values from a previous selection cannot influence this assessment.
+    show_rainfall = hazard in {
+        "Flood", "Cyclone", "Landslide", "Drought",
+        "Compound: cyclone + flood",
+        "Compound: heavy rainfall + drainage failure",
+    }
+    show_river = hazard in {"Flood", "Compound: cyclone + flood"}
+    show_wind = hazard in {"Cyclone", "Compound: cyclone + flood"}
+    show_temperature = hazard == "Heatwave"
+    show_drainage = hazard in {
+        "Flood", "Compound: cyclone + flood",
+        "Compound: heavy rainfall + drainage failure",
+    }
+
+    rainfall_mm = None
+    rainfall_period = "Not supplied"
+    river_level_m = None
+    river_station = ""
+    river_reference = ""
+    wind_speed_kmh = None
+    temperature_c = None
+    normal_max_temperature_c = None
+    heatwave_consecutive_days = None
+    heatwave_station_count = None
+    affected_population = None
+    drainage_status = "Not supplied"
+    infrastructure_status = "Not supplied"
+
+    st.caption("Only fields relevant to the selected hazard are shown. Empty means not supplied; the app does not fill in values.")
     col1, col2 = st.columns(2)
     with col1:
-        rainfall_mm = st.number_input("Rainfall (mm)", min_value=0.0, value=None, step=1.0, key="wf_rainfall")
-        rainfall_period = st.selectbox("Rainfall period", ["Not supplied", "Last 1 hour", "Last 24 hours", "Last 3 days", "Other / state in notes"], key="wf_rainfall_period")
-        river_level_m = st.number_input("River-level reading (m)", value=None, step=0.1, key="wf_river", help="Gauge readings can be below zero depending on the reference datum. The app does not compare this with a threshold.")
-        river_station = st.text_input("River station (if applicable)", key="wf_river_station")
-        river_reference = st.text_input("Gauge zero / datum reference (if known)", key="wf_river_reference")
-    with col2:
-        wind_speed_kmh = st.number_input("Wind speed (km/h)", min_value=0.0, value=None, step=1.0, key="wf_wind")
-        temperature_c = st.number_input("Maximum temperature (°C)", value=None, step=0.5, key="wf_temperature")
-        normal_max_temperature_c = st.number_input("Normal daily maximum for this station (°C; heatwave screening)", value=None, step=0.5, key="wf_normal_temperature", help="Use an official station normal for the relevant date/period; leave blank if unknown.")
-        heatwave_consecutive_days = st.number_input("Consecutive days meeting the heatwave criteria (if verified)", min_value=0, value=None, step=1, key="wf_heatwave_days")
-        heatwave_station_count = st.number_input("Stations in the meteorological subdivision meeting criteria (if verified)", min_value=0, value=None, step=1, key="wf_heatwave_stations")
-        affected_population = st.number_input("Affected population context (people; optional)", min_value=0, value=None, step=1, key="wf_population")
-        drainage_status = st.selectbox("Drainage condition", ["Not supplied", "Reported functioning", "Reported partially impaired", "Reported failed", "Hypothetical partial failure", "Not applicable"], key="wf_drainage")
+        if show_rainfall:
+            st.markdown("**Rainfall evidence**")
+            rainfall_mm = st.number_input("Rainfall (mm)", min_value=0.0, value=None, step=1.0, key="wf_rainfall")
+            rainfall_period = st.selectbox("Rainfall period", ["Not supplied", "Last 1 hour", "Last 24 hours", "Last 3 days", "Other / state in notes"], key="wf_rainfall_period")
+        if show_river:
+            st.markdown("**River evidence**")
+            river_level_m = st.number_input("River-level reading (m)", value=None, step=0.1, key="wf_river", help="Gauge readings can be below zero depending on the reference datum. The app does not compare this with a threshold.")
+            river_station = st.text_input("River station (if applicable)", key="wf_river_station")
+            river_reference = st.text_input("Gauge zero / datum reference (if known)", key="wf_river_reference")
+        if show_wind:
+            wind_speed_kmh = st.number_input("Wind speed (km/h)", min_value=0.0, value=None, step=1.0, key="wf_wind")
+        if show_drainage:
+            drainage_status = st.selectbox("Drainage condition", ["Not supplied", "Reported functioning", "Reported partially impaired", "Reported failed", "Hypothetical partial failure", "Not applicable"], key="wf_drainage")
         infrastructure_status = st.selectbox("Other infrastructure condition", ["Not supplied", "No disruption reported", "Possible / hypothetical disruption", "Disruption reported by user", "Not applicable"], key="wf_infrastructure")
+    with col2:
+        if show_temperature:
+            st.markdown("**Heatwave evidence**")
+            temperature_c = st.number_input("Maximum temperature (°C)", value=None, step=0.5, key="wf_temperature")
+            normal_max_temperature_c = st.number_input("Normal daily maximum for this station (°C; heatwave screening)", value=None, step=0.5, key="wf_normal_temperature", help="Use an official station normal for the relevant date/period; leave blank if unknown.")
+            heatwave_consecutive_days = st.number_input("Consecutive days meeting the heatwave criteria (if verified)", min_value=0, value=None, step=1, key="wf_heatwave_days")
+            heatwave_station_count = st.number_input("Stations in the meteorological subdivision meeting criteria (if verified)", min_value=0, value=None, step=1, key="wf_heatwave_stations")
+        affected_population = st.number_input("Affected population context (people; optional)", min_value=0, value=None, step=1, key="wf_population")
 
     assets = st.multiselect(
         "Services or assets to review (user-nominated; location/exposure not verified)",
