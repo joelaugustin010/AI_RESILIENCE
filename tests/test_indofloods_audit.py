@@ -58,6 +58,25 @@ class IndofloodsAuditTests(unittest.TestCase):
             self.assertEqual(event_report["event_end_before_start_count"], 1)
             self.assertEqual(event_report["start_date_invalid_count"], 1)
 
+    def test_incomplete_schema_blocks_audit_readiness(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_table(root, "metadata_indofloods.csv", pd.DataFrame([
+                {"GaugeID": "INDOFLOODS-gauge-429", "State": "Kerala"},
+            ]))
+            self.write_table(root, "floodevents_indofloods.csv", pd.DataFrame([
+                {"EventID": "INDOFLOODS-gauge-429-1"},
+            ]))
+            self.write_table(root, "catchment_characteristics_indofloods.csv", pd.DataFrame([
+                {"GaugeID": "INDOFLOODS-gauge-429"},
+            ]))
+            self.write_table(root, "precipitation_variables_indofloods.csv", pd.DataFrame([
+                {"EventID": "INDOFLOODS-gauge-429-1"},
+            ]))
+            report = build_report(root)
+            self.assertEqual(report["crosswalk_checks"]["status"], "SCHEMA_INCOMPLETE")
+            self.assertGreater(len(report["missing_required_columns"]), 0)
+
     def test_missing_files_are_reported_not_fabricated(self):
         with tempfile.TemporaryDirectory() as directory:
             report = build_report(Path(directory))
