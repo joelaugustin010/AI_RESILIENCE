@@ -1,0 +1,30 @@
+name: Audit multi-hazard dataset readiness
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "data/external/hazard_dataset_registry.json"
+      - "scripts/audit_hazard_datasets.py"
+      - "scripts/train_hazard_baseline.py"
+      - "data/external/hazards/**"
+      - ".github/workflows/audit-hazard-readiness.yml"
+permissions:
+  contents: read
+jobs:
+  readiness-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --upgrade pip pandas scikit-learn joblib
+      - name: Audit available hazard datasets
+        run: python scripts/audit_hazard_datasets.py
+      - name: Upload readiness report
+        uses: actions/upload-artifact@v4
+        with:
+          name: multi-hazard-readiness-report
+          path: reports/hazard_dataset_readiness.json
+          if-no-files-found: error
+          retention-days: 30
