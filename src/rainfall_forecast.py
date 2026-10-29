@@ -65,7 +65,7 @@ def _validated_frame(observations: pd.DataFrame) -> pd.DataFrame:
 def _make_features(pairs: pd.DataFrame) -> pd.DataFrame:
     month = pairs["timestamp"].dt.month.to_numpy(dtype=float)
     hour = pairs["timestamp"].dt.hour.to_numpy(dtype=float)
-    day = pairs["timestamp"].dt.dayofyear.to_numpy(dtype=float)
+    day = pairs["timestamp"].dt.day_of_year.to_numpy(dtype=float)
     return pd.DataFrame(
         {
             "station": pairs["station"].astype(str).to_numpy(),
