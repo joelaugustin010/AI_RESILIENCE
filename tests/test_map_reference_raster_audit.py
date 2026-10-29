@@ -31,7 +31,7 @@ class RasterMetadataAuditTests(unittest.TestCase):
                 count=1,
                 dtype="uint8",
                 crs="EPSG:32643",
-                transform=from_origin(190000, 1120000, 1000, 1000),
+                transform=from_origin(620000, 1120000, 1000, 1000),
                 nodata=0,
             ) as dataset:
                 import numpy as np
