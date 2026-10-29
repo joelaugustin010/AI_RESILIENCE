@@ -43,6 +43,9 @@ jobs:
       - name: Test INDOFLOODS audit safeguards
         run: python -m unittest discover -s tests -p 'test_indofloods_audit.py' -v
 
+      - name: Test map-reference acquisition safeguards
+        run: python -m unittest discover -s tests -p 'test_map_reference_acquisition.py' -v
+
       - name: Download catalogued source CSVs and write provenance
         id: acquisition
         continue-on-error: true
