@@ -19,7 +19,7 @@ python scripts/acquire_public_hydrology_data.py --source kerala_sw_rainfall_tele
 python scripts/acquire_public_hydrology_data.py --all
 ```
 
-If the portal changes a resource URL, the script should fail visibly rather than save a web error page as a CSV. Update the source registry only after checking the official catalogue page. **Acquisition completed:** GitHub Actions successfully downloaded all three registered NWDP CSVs on 2026-10-29 and uploaded them as the short-lived artifact [public-hydrology-source-bundle](https://github.com/joelaugustin010/AI_RESILIENCE/actions/runs/40887522787). The ZIP is approximately 5.2 MB compressed (about 94 MB uncompressed) and expires on 2026-11-05. The raw data were not committed to Git. A follow-up workflow run adds the automated audit report to the artifact.
+If the portal changes a resource URL, the script should fail visibly rather than save a web error page as a CSV. Update the source registry only after checking the official catalogue page. **Acquisition completed:** GitHub Actions successfully downloaded all three registered NWDP CSVs on 2026-10-29. The latest [public-hydrology-source-bundle with automated audit report](https://github.com/joelaugustin010/AI_RESILIENCE/actions/runs/40888067324) is about 5.4 MB compressed (about 94 MB uncompressed) and expires on 2026-11-05. It contains the untouched raw CSVs, SHA-256/retrieval manifest, acquisition log and `audit_report.json`. The raw data were not committed to Git.
 
 ## Source selection and roles
 
