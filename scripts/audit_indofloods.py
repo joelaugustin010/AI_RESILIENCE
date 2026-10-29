@@ -56,7 +56,7 @@ def summarize_table(path: Path, table_id: str) -> dict[str, Any]:
     }
     if "GaugeID" in frame.columns:
         ids = frame["GaugeID"].astype("string").str.strip()
-        report["gauge_id_missing"] = int(ids.isna().sum() | ids.eq("").sum())
+        report["gauge_id_missing"] = int(ids.isna().sum() + ids.eq("").sum())
         report["unique_gauge_ids"] = int(ids.nunique(dropna=True))
     if "EventID" in frame.columns:
         ids = frame["EventID"].astype("string").str.strip()
