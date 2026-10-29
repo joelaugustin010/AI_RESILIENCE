@@ -8,6 +8,8 @@ on:
     paths:
       - "scripts/acquire_public_hydrology_data.py"
       - "scripts/acquire_map_reference_data.py"
+      - "scripts/audit_map_reference_raster.py"
+      - "tests/test_map_reference_acquisition.py"
       - "scripts/audit_public_hydrology_data.py"
       - "scripts/audit_ifi_flood_inventory.py"
       - "scripts/audit_indofloods.py"
@@ -113,6 +115,11 @@ jobs:
             echo ""
             if [ "${{ steps.map_acquisition.outcome }}" = "success" ]; then
               echo "**Map reference acquisition:** Candidate Ernakulam hospital points and KSDMA flood-return raster archive downloaded with SHA-256 provenance. These remain unvalidated candidates; they are not automatically shown on the map."
+              if [ "${{ steps.raster_audit.outcome }}" = "success" ]; then
+                echo "**Raster metadata audit:** Completed. Review raster_metadata_audit.json for CRS, bounds, resolution, units, NoData, sampled values, and Kochi screening-box overlap. Metadata inspection does not approve the layer for display."
+              else
+                echo "**Raster metadata audit:** Not completed successfully. Treat the raster as blocked until the audit log and artifact are reviewed."
+              fi
             else
               echo "**Map reference acquisition:** One or more spatial source downloads or structural checks failed. Review map_acquisition.log and the artifact."
             fi
