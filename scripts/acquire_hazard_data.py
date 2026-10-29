@@ -10,6 +10,7 @@ import hashlib
 import io
 import json
 import sys
+import time
 from datetime import date
 from pathlib import Path
 from urllib.error import HTTPError, URLError
@@ -23,10 +24,29 @@ USER_AGENT = "AI_RESILIENCE-student-research/1.0 (public dataset acquisition; so
 TIMEOUT = 120
 
 
-def download_bytes(url: str) -> tuple[bytes, str, str]:
-    req = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "*/*"})
-    with urlopen(req, timeout=TIMEOUT) as response:
-        return response.read(), response.headers.get("Content-Type", ""), response.geturl()
+def download_bytes(url: str, attempts: int = 5) -> tuple[bytes, str, str]:
+    """Retry transient source throttling and server errors with backoff."""
+    last_error = None
+    for attempt in range(attempts):
+        try:
+            req = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "*/*"})
+            with urlopen(req, timeout=TIMEOUT) as response:
+                return response.read(), response.headers.get("Content-Type", ""), response.geturl()
+        except HTTPError as exc:
+            last_error = exc
+            if exc.code not in (429, 500, 502, 503, 504) or attempt == attempts - 1:
+                raise
+            delay = min(5 * (2 ** attempt), 60)
+            print(f"[RETRY] HTTP {exc.code}; waiting {delay}s before retry", file=sys.stderr)
+            time.sleep(delay)
+        except URLError as exc:
+            last_error = exc
+            if attempt == attempts - 1:
+                raise
+            delay = min(3 * (2 ** attempt), 30)
+            print(f"[RETRY] {exc}; waiting {delay}s before retry", file=sys.stderr)
+            time.sleep(delay)
+    raise RuntimeError(f"Download failed after retries: {last_error}")
 
 
 def save_data(name: str, url: str, data: bytes, content_type: str, final_url: str,
@@ -142,6 +162,9 @@ def main() -> int:
             "timezone": "Asia/Kolkata",
         })
         entries.append(fetch(f"weather/{location}_daily_weather_2000_2025.json", weather_url))
+        # Respect public API rate limits between location requests.
+        import time as _time
+        _time.sleep(3)
 
     access_notes = [
         {"hazard_id": "wildfire", "status": "ACCESS_KEY_REQUIRED_FOR_ARCHIVE",
