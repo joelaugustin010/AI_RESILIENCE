@@ -7,6 +7,7 @@ on:
       - map-details-upgrade
     paths:
       - "scripts/acquire_public_hydrology_data.py"
+      - "scripts/audit_public_hydrology_data.py"
       - "data/reference/public_data_sources.json"
       - ".github/workflows/acquire-public-hydrology-data.yml"
 
@@ -34,7 +35,11 @@ jobs:
           python scripts/acquire_public_hydrology_data.py --list
           python scripts/acquire_public_hydrology_data.py --all 2>&1 | tee acquisition.log
 
-      - name: Upload raw data and provenance as a short-lived artifact
+      - name: Audit acquired source files without changing raw data
+        if: always() && steps.acquisition.outcome == 'success'
+        run: python scripts/audit_public_hydrology_data.py --input-dir data/external/raw --output data/external/audit_report.json
+
+      - name: Upload raw data, audit and provenance as a short-lived artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -42,6 +47,7 @@ jobs:
           path: |
             data/external/raw/**
             data/external/download_manifest.json
+            data/external/audit_report.json
             acquisition.log
           if-no-files-found: warn
           retention-days: 7
