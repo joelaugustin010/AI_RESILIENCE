@@ -31,6 +31,9 @@ The existing `src/flood_model.py` readiness gate is intentionally fail-closed. I
 6. **CWC appraisal report** — https://cwc.gov.in/sites/default/files/appraisal-report-2024-publicationcompressed.pdf  
    CWC describes operational forecasting inputs including rainfall products, IMD forecasts and river observations. This supports the need to align multiple time-stamped hydrometeorological sources; it does not validate this repository's model.
 
+7. **INDOFLOODS gauge-event dataset** — https://zenodo.org/records/14584655  
+   The dataset contains gauge-level flood event periods, warning/danger thresholds, gauge metadata, catchment characteristics and event-scale precipitation. Its metadata includes Kerala gauges, making it a candidate for event/outcome review. The full audit must determine coverage and event counts, and no gauge may be joined to NWDP data by name alone. Event-scale precipitation may include rainfall during/after an event and cause leakage. The flood-event table does not provide representative non-event periods by itself. See `docs/INDOFLOODS_DATASET_REVIEW.md`.
+
 ## Required data before a real model can be evaluated
 
 Build a provenance-preserving, station-time table with (where available):
@@ -58,4 +61,4 @@ A target definition must be agreed before joining data. For example, a station/c
 
 Until these data requirements are met, present the flood module as a **data-readiness and historical-risk evidence dashboard**, not as a predictor. It can show sourced rainfall summaries, data-quality warnings, official historical event context and transparent limitations. Any manually entered scenario must be labelled as a hypothetical scenario, not a probability forecast.
 
-**Current status:** Data-readiness gate = blocked; verified labelled training/evaluation dataset = not available in the repository; operational flood prediction = not validated.
+**Current status:** Data-readiness gate = blocked. INDOFLOODS is now registered for provenance-preserving acquisition and descriptive gauge/event auditing, but it has not yet been established as a suitable Kochi training/evaluation dataset. Verified representative non-event periods, exact gauge crosswalks and a leakage-safe prediction horizon remain unresolved. Operational flood prediction = not validated.
