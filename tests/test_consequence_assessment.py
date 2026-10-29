@@ -1,6 +1,9 @@
 import unittest
 
-from src.consequence_assessment import build_consequence_assessment
+from src.consequence_assessment import (
+    assess_coastal_heatwave_screening,
+    build_consequence_assessment,
+)
 
 
 class ConsequenceAssessmentTests(unittest.TestCase):
@@ -30,6 +33,23 @@ class ConsequenceAssessmentTests(unittest.TestCase):
     def test_missing_source_and_time_are_reported(self):
         result = build_consequence_assessment("Flood", "Kochi", "Hypothetical scenario assumption")
         self.assertIn("source_and_time", result["missing_context"])
+
+    def test_heatwave_coastal_screen_requires_temperature_and_normal_departure(self):
+        result = assess_coastal_heatwave_screening(38.0, None)
+        self.assertIn("cannot be checked", result["station_status"].lower())
+        self.assertFalse(result["is_official_warning"])
+
+    def test_heatwave_coastal_numeric_screen_and_declaration_duration_are_separate(self):
+        result = assess_coastal_heatwave_screening(38.5, 33.0, 2, 2)
+        self.assertAlmostEqual(result["departure_from_normal_c"], 5.5)
+        self.assertIn("meet the numeric IMD coastal-station screen", result["station_status"])
+        self.assertIn("meet the numeric multi-station", result["declaration_status"])
+        self.assertFalse(result["is_official_warning"])
+
+    def test_heatwave_screen_does_not_claim_criteria_when_departure_is_too_small(self):
+        result = assess_coastal_heatwave_screening(38.0, 34.0, 1, 1)
+        self.assertIn("do not meet both numeric", result["station_status"])
+        self.assertIn("not established", result["declaration_status"].lower())
 
     def test_unknown_hazard_does_not_generate_fake_predictions(self):
         result = build_consequence_assessment("Volcano", "Kochi", "Hypothetical scenario assumption")
