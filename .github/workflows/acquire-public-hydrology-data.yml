@@ -78,7 +78,7 @@ jobs:
         if: always() && steps.acquisition.outcome == 'success'
         run: python scripts/audit_indofloods.py --input-dir data/external/raw --output data/external/indofloods_audit_report.json
 
-      - name: Acquire candidate health-facility GIS, Kochi boundary and KSDMA flood-hazard archive
+      - name: Acquire candidate health-facility GIS, Kochi boundary, KSDMA flood and GSI landslide archives
         id: map_acquisition
         continue-on-error: true
         run: |
