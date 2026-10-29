@@ -10,6 +10,7 @@ import streamlit as st
 from src.scientific_scenario_engine import build_scientific_scenario_frame
 from src.source_registry import build_source_registry, source_fitness_summary
 from src.disaster_data_catalog import get_catalog, validate_catalog_record
+from src.consequence_data_requirements import HAZARD_REQUIREMENTS, requirements_for_hazard, requirements_table
 
 from src.decision_workflow import (
     HAZARD_OPTIONS,
@@ -463,6 +464,29 @@ with st.expander("Kochi multi-hazard data acquisition board", expanded=True):
         "A dataset moves to 'acquired' only after its file, publisher metadata, retrieval date, "
         "licence/access terms, checksum, schema, spatial coverage and QA results are recorded."
     )
+
+with st.expander("Consequence-model data requirements by disaster", expanded=True):
+    st.caption(
+        "This matrix defines the evidence needed to estimate local consequences—not just whether a hazard exists. "
+        "It separates hazard intensity, physical processes, exposure, vulnerability and observed outcomes. "
+        "It is a requirements plan, not a working consequence predictor."
+    )
+    requirement_hazard = st.selectbox(
+        "Inspect data requirements for",
+        list(HAZARD_REQUIREMENTS),
+        index=list(HAZARD_REQUIREMENTS).index(inputs["hazard"]) if inputs["hazard"] in HAZARD_REQUIREMENTS else 0,
+        key="consequence_requirements_hazard",
+    )
+    req = requirements_for_hazard(requirement_hazard)
+    st.markdown(f"**Candidate model family:** {req['model_family']}")
+    st.dataframe(pd.DataFrame(requirements_table(requirement_hazard)), hide_index=True, width="stretch")
+    st.markdown("**Specific blockers before consequence estimates:**")
+    st.warning(req["current_blockers"])
+    st.markdown("**Potential authoritative starting sources:**")
+    st.write(req["starter_sources"])
+    st.markdown("**Validation rule:** every hazard needs independent event/outcome evidence, a baseline comparison, event- or time-separated evaluation, uncertainty reporting, and a documented intended-use boundary.")
+    with st.expander("Shared minimum requirements across every hazard"):
+        st.dataframe(pd.DataFrame(req["common_requirements"]), hide_index=True, width="stretch")
 
 st.subheader("Evidence readiness checklist for this hazard")
 st.caption(
