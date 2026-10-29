@@ -24,6 +24,12 @@ FILES = {
     "catchment": "catchment_characteristics_indofloods.csv",
     "precipitation": "precipitation_variables_indofloods.csv",
 }
+REQUIRED_COLUMNS = {
+    "events": {"EventID", "Start Date", "End Date"},
+    "metadata": {"GaugeID", "State", "Station", "Latitude", "Longitude", "Basin"},
+    "catchment": {"GaugeID"},
+    "precipitation": {"EventID"},
+}
 
 
 def sha256_file(path: Path) -> str:
@@ -108,14 +114,22 @@ def build_report(input_dir: Path) -> dict[str, Any]:
     ]
     tables: dict[str, pd.DataFrame] = {}
     reports = []
+    missing_columns: list[dict[str, Any]] = []
     for table_id, filename in FILES.items():
         path = input_dir / filename
         if path.is_file():
             tables[table_id] = read_table(path)
             reports.append(summarize_table(path, table_id))
+            absent = sorted(REQUIRED_COLUMNS[table_id] - set(tables[table_id].columns))
+            if absent:
+                missing_columns.append({"table_id": table_id, "missing_columns": absent})
 
     crosswalk: dict[str, Any] = {
-        "status": "NOT_EVALUATED_MISSING_TABLES" if missing else "DESCRIPTIVE_ONLY",
+        "status": (
+            "NOT_EVALUATED_MISSING_TABLES" if missing
+            else "SCHEMA_INCOMPLETE" if missing_columns
+            else "DESCRIPTIVE_ONLY"
+        ),
         "kerala_gauge_count": None,
         "kerala_gauge_ids": [],
         "event_rows_for_kerala_gauges": None,
@@ -183,6 +197,7 @@ def build_report(input_dir: Path) -> dict[str, Any]:
         "dataset_doi": "10.5281/zenodo.14584654",
         "input_directory": str(input_dir),
         "missing_expected_files": missing,
+        "missing_required_columns": missing_columns,
         "tables": reports,
         "crosswalk_checks": crosswalk,
         "scientific_conclusion": (
@@ -207,11 +222,12 @@ def main() -> int:
     for table in report["tables"]:
         print(f"- {table['filename']}: {table['rows']:,} rows; {len(table['columns'])} columns")
     print(f"Missing expected files: {len(report['missing_expected_files'])}")
+    print(f"Tables with missing required columns: {len(report['missing_required_columns'])}")
     crosswalk = report["crosswalk_checks"]
     if crosswalk["kerala_gauge_count"] is not None:
         print(f"Kerala gauges in metadata: {crosswalk['kerala_gauge_count']}")
         print(f"Flood-event rows associated with Kerala gauges: {crosswalk['event_rows_for_kerala_gauges']}")
-    return 1 if report["missing_expected_files"] else 0
+    return 1 if report["missing_expected_files"] or report["missing_required_columns"] else 0
 
 
 if __name__ == "__main__":
