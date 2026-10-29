@@ -1,0 +1,144 @@
+{
+  "registry_version": 1,
+  "reviewed_on": "2026-10-29",
+  "purpose": "A reproducible catalogue of official hydrological observations and independent flood-event evidence candidates for AI_RESILIENCE. Downloading a dataset does not establish its suitability as a model label.",
+  "download_policy": {
+    "preserve_raw": true,
+    "never_silently_deduplicate": true,
+    "record_sha256": true,
+    "record_retrieval_timestamp_utc": true,
+    "do_not_commit_large_raw_downloads_by_default": true,
+    "reuse_note": "Check each provider's current licence and terms before redistribution. NWDP resources have been described as Other (Open), but preserve attribution and re-check terms."
+  },
+  "downloadable_sources": [
+    {
+      "id": "kerala_sw_rainfall_telemetry_2021_2025",
+      "title": "Rainfall (Telemetry - Hourly), Kerala Surface Water Department, 2021-2025",
+      "publisher": "Kerala Surface Water Department, catalogued by National Water Data Portal / National Water Informatics Centre",
+      "catalog_url": "https://nwdp.nwic.gov.in/dataset/rainfall-telemetry-hourly-kerala-surface-water-department",
+      "download_url": "https://nwdp.nwic.gov.in/dataset/09518a17-a04b-43e3-a4e0-3d0fe81dbf68/resource/0410ec7a-b253-4d85-8f0f-e6b69c44e40c/download/rainfall_tel_hr_kerala_sw_kl_2021_2025.csv",
+      "filename": "rainfall_tel_hr_kerala_sw_kl_2021_2025.csv",
+      "measurement": "Hourly rainfall",
+      "units": "mm (as described by the portal)",
+      "declared_period": "2021-2025",
+      "license": "NWDP metadata lists resource licence as Other (Open); verify current terms",
+      "role": "Candidate observation input for historical rainfall summaries and later time-aligned analysis",
+      "limitations": [
+        "Station metadata, timestamp convention/time zone, coordinate reference and positional accuracy must be checked.",
+        "Does not provide independently verified flood/no-flood outcome labels.",
+        "Do not combine stations or aggregate duplicate timestamps until conflicts are investigated."
+      ]
+    },
+    {
+      "id": "kerala_sw_river_level_telemetry_2021_2025",
+      "title": "River Water Level (Telemetry - Hourly), Kerala Surface Water Department, 2021-2025",
+      "publisher": "Kerala Surface Water Department, catalogued by National Water Data Portal / National Water Informatics Centre",
+      "catalog_url": "https://nwdp.nwic.gov.in/dataset/river-water-level-telemetry-hourly-kerala-surface-water-department",
+      "download_url": "https://nwdp.nwic.gov.in/dataset/1a00209e-c864-4c1c-bc82-b5e2d8ecb66e/resource/a6de190e-40b6-484b-ad4c-a9f811f061ba/download/rwl_tel_hr_kerala_sw_031_2021_2025.csv",
+      "filename": "rwl_tel_hr_kerala_sw_031_2021_2025.csv",
+      "measurement": "Hourly river water level",
+      "units": "m (as described by the portal)",
+      "declared_period": "2021-2025",
+      "license": "NWDP metadata lists resource licence as Other (Open); verify current terms",
+      "role": "Candidate hydrological observation; only use station-specific levels after reference/datum checks",
+      "limitations": [
+        "Water level is not the same as flood depth and can only be interpreted against a verified station datum and official thresholds.",
+        "Known local-copy concerns include inconsistent river/basin descriptors and unresolved gauge-reference metadata.",
+        "Does not provide independently verified flood/no-flood outcome labels."
+      ]
+    },
+    {
+      "id": "kerala_sw_river_level_manual_2021_2025",
+      "title": "River Water Level (Manual - Hourly), Kerala Surface Water Department, 2021-2025",
+      "publisher": "Kerala Surface Water Department, catalogued by National Water Data Portal / National Water Informatics Centre",
+      "catalog_url": "https://nwdp.nwic.gov.in/dataset/river-water-level-manual-hourly-kerala-sw-godavari",
+      "download_url": "https://nwdp.nwic.gov.in/dataset/b7ed6f63-d702-429b-a342-c3e2acd31ad6/resource/fe95a85e-142d-4acf-83fc-24499afc546b/download/rwl_manual_hr_kerala_sw_031_2021_2025.csv",
+      "filename": "rwl_manual_hr_kerala_sw_031_2021_2025.csv",
+      "measurement": "Manual hourly river water level",
+      "units": "m (as described by the portal)",
+      "declared_period": "2021-2025",
+      "license": "NWDP metadata lists resource licence as Other (Open); verify current terms",
+      "role": "Candidate hydrological observation; station/datum review required",
+      "limitations": [
+        "Manual observations may be irregular; preserve original timestamps and missingness.",
+        "Known local-copy concerns include inconsistent river/basin descriptors and unresolved gauge-reference metadata.",
+        "Does not provide independently verified flood/no-flood outcome labels."
+      ]
+    }
+  ],
+  "event_evidence_candidates": [
+    {
+      "id": "ksdma_flood_2018_inundation_depth",
+      "title": "Crowd-sourced Flood 2018 inundation-depth evidence",
+      "publisher": "Kerala State Disaster Management Authority / Kerala State Emergency Operations Centre and research partners",
+      "url": "https://sdma.kerala.gov.in/crowd-sourcing-flood-2018/",
+      "reported_coverage": "KSDMA states approximately 13,000 points were collected across Kerala after the 2018 flood.",
+      "role": "Potential spatial validation evidence if raw point records, coordinates, timestamps, measurement definitions and reuse terms can be obtained.",
+      "status": "Public page and map are discoverable; a machine-readable downloadable point file has not yet been verified.",
+      "limitations": [
+        "A map image alone is not a machine-readable label table.",
+        "Points need coordinate/reference, depth, collection method, location precision and quality checks before use."
+      ]
+    },
+    {
+      "id": "ksdma_ernakulam_historical_hazard_pdf",
+      "title": "Ernakulam flood hazard probability and exposure maps based on historical data",
+      "publisher": "Kerala State Disaster Management Authority",
+      "url": "https://sdma.kerala.gov.in/wp-content/uploads/2022/05/Ernakulam_Hist.pdf",
+      "role": "Independent context layer for exposure and historic hazard, not event-by-hour labels.",
+      "status": "Official PDF linked from KSDMA hazard maps page.",
+      "limitations": [
+        "PDF/map values must be extracted and georeferenced carefully before spatial analysis.",
+        "Return-period/hazard probability is not the observed outcome of a specific hour or station."
+      ]
+    },
+    {
+      "id": "ksdma_historical_flood_return_period_rasters",
+      "title": "Flood return probability rasters (10, 25, 50, 100, 200 and 500 years)",
+      "publisher": "Kerala State Disaster Management Authority; page cites UNEP, UN GRID, CIMA Italy and additional flood return-probability assessment work",
+      "url": "https://sdma.kerala.gov.in/hazard-maps/",
+      "role": "Potential GIS hazard layer after CRS, legend, resolution, scenario and licence checks.",
+      "status": "Official page links historical-data raster ZIP resources.",
+      "limitations": [
+        "Not a substitute for time-stamped observed flood outcomes.",
+        "Must not be converted into a station-hour classifier target."
+      ]
+    },
+    {
+      "id": "india_flood_inventory_impacts",
+      "title": "India Flood Inventory-Impacts (IFI-Impacts), 1967-2023",
+      "publisher": "HydroSense Lab, IIT Delhi; hosted on Zenodo",
+      "url": "https://zenodo.org/records/16994648",
+      "role": "Candidate independent district/event inventory for cross-checking event dates and reported impacts.",
+      "status": "Open dataset record found; exact files, schema, district scope, licence and target granularity must be inspected before use.",
+      "limitations": [
+        "National/district-level event records do not automatically label station-level hourly flood outcomes.",
+        "Check the dataset version, DOI, licence, missingness and event definition before joining."
+      ]
+    },
+    {
+      "id": "ksdma_2018_flood_report",
+      "title": "Kerala Floods and Landslides: Post-Disaster Needs Assessment",
+      "publisher": "Government of Kerala / Kerala State Disaster Management Authority",
+      "url": "https://sdma.kerala.gov.in/wp-content/uploads/2019/03/PDNA-report-FINAL-FEB-2019_compressed.pdf",
+      "role": "Official historical event context and impact documentation.",
+      "status": "Report available online.",
+      "limitations": [
+        "Narrative and district summaries need explicit spatial/time interpretation; do not turn broad statements into station-time labels."
+      ]
+    }
+  ],
+  "evaluation_gate": {
+    "status": "BLOCKED_PENDING_LABEL_AUDIT",
+    "reason": "Hydrological measurements and hazard maps are not equivalent to independently verified, time-aligned flood outcomes.",
+    "minimum_requirements": [
+      "Verify source-file hashes and provenance.",
+      "Validate timestamps, units, station identifiers, coordinates, missingness and duplicate/conflicting keys.",
+      "Resolve gauge datum/reference and official station-specific thresholds before interpreting river levels.",
+      "Obtain independently verified outcomes with spatial unit, time interval, target definition and evidence source.",
+      "Set prediction issue time and horizon before selecting features; exclude information unavailable at issue time.",
+      "Use chronological/event-grouped holdout and compare against a simple baseline.",
+      "Report event and sample counts, class balance, confusion matrix, precision, recall and F1; do not claim model skill if data are insufficient."
+    ]
+  }
+}
