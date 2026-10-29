@@ -11,10 +11,10 @@ from scripts import acquire_kochi_ward_boundary_candidate as acquisition
 
 KML = b"""<?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2"><Document>
-<Placemark><name>Ward 1</name><Polygon><outerBoundaryIs><LinearRing><coordinates>
+<Placemark><ExtendedData><SchemaData><SimpleData name="ward_lgd_name">Ward 1</SimpleData></SchemaData></ExtendedData><Polygon><outerBoundaryIs><LinearRing><coordinates>
 76.20,9.80,0 76.30,9.80,0 76.30,9.90,0 76.20,9.90,0 76.20,9.80,0
 </coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
-<Placemark><name>Ward 2</name><Polygon><outerBoundaryIs><LinearRing><coordinates>
+<Placemark><ExtendedData><SchemaData><SimpleData name="ward_lgd_name">Ward 2</SimpleData></SchemaData></ExtendedData><Polygon><outerBoundaryIs><LinearRing><coordinates>
 76.31,9.80,0 76.40,9.80,0 76.40,9.90,0 76.31,9.90,0 76.31,9.80,0
 </coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
 </Document></kml>"""
