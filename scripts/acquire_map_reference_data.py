@@ -89,7 +89,7 @@ def acquire(output: Path) -> dict:
         url = source["url"]
         if filename.endswith(".geojson"):
             params = {
-                "where": "upper(state_name)='KERALA' AND upper(district_name)='ERNAKULAM'",
+                "where": "state_name = 'Kerala' AND district_name = 'Ernakulam'",
                 "outFields": "*",
                 "returnGeometry": "true",
                 "outSR": "4326",
@@ -120,6 +120,8 @@ def acquire(output: Path) -> dict:
                     raise RuntimeError("Hospital service did not return a GeoJSON FeatureCollection.")
                 features = payload["features"]
                 record["feature_count"] = len(features)
+                if not features:
+                    raise RuntimeError("Hospital query returned zero features; refusing to treat an empty GeoJSON response as a successful data download. Check the source query and field values.")
                 record["geometry_type_counts"] = {}
                 invalid_coordinates = 0
                 district_mismatches = 0
