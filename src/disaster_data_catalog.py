@@ -180,6 +180,20 @@ DATASET_CATALOG: list[dict[str, Any]] = [
         "limitations": "Best-track position/intensity is hazard-path evidence, not a local wind field, rainfall, storm surge, damage or consequence label. The nearest non-suspect track fix is 23.7 km from the approximate Kochi reference point (storm ID 2018-013, GAJA), but this is not a validated impact claim. Source flags are retained and uncorrected; the latest season may be tentative."
     },
     {
+        "id": "usgs_earthquake_catalog_kochiregion",
+        "hazards": ["Earthquake", "Compound: earthquake + infrastructure disruption"],
+        "theme": "Regional earthquake event catalogue",
+        "dataset": "USGS ComCat earthquake events within 1,000 km of approximate Kochi reference point, magnitude 2.5+, 1970-current",
+        "publisher": "United States Geological Survey (USGS), Earthquake Hazards Program",
+        "url": "https://earthquake.usgs.gov/fdsnws/event/1/",
+        "resource_urls": ["https://earthquake.usgs.gov/fdsnws/event/1/query", "https://riseq.seismo.gov.in/riseq/earthquake/archive"],
+        "access": "USGS FDSN Event Web Service provides parameterized GeoJSON queries. The NCS archive is retained as an India-specific comparison source; bulk export was not confirmed, so it is not scraped by this workflow.",
+        "priority": "P0",
+        "status": "Source identified; acquisition pending. Planned query uses five-year windows, 1970-current, magnitude >=2.5 and a 1,000 km radius around an approximate Kochi point.",
+        "required_checks": "Verify query-window counts, event IDs, UTC times, magnitude/depth fields, coordinates, duplicate IDs and missingness. Compare regional events against NCS and GSI seismotectonic evidence before any hazard conclusions.",
+        "limitations": "USGS ComCat is a multi-network catalogue with variable completeness and location uncertainty. Regional event density is not local ground shaking, site response, building damage or an earthquake probability model."
+    },
+    {
         "id": "ncs_earthquake_catalog",
         "hazards": ["Earthquake", "Compound: earthquake + infrastructure disruption"],
         "theme": "Seismic events",
