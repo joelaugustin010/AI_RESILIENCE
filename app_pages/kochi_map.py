@@ -32,29 +32,42 @@ def _first_property(properties: dict, candidates: tuple[str, ...], fallback: str
     return fallback
 
 
-def normalize_geojson_for_tooltip(geojson: dict) -> dict:
-    """Add display-only aliases while preserving every original property and geometry."""
+def normalize_geojson_for_tooltip(geojson: dict, fallback_name: str | None = None) -> dict:
+    """Add display-only aliases while preserving every original property and geometry.
+
+    Ward names are also used as the boundary label when a source has Ward_Name
+    but no Bound_Name. Truly unnamed source features are identified by their
+    feature position rather than being assigned an invented place name.
+    """
     display = json.loads(json.dumps(geojson))
 
-    def normalize_feature(feature: dict) -> None:
+    def normalize_feature(feature: dict, feature_index: int) -> None:
         properties = feature.get("properties")
         if not isinstance(properties, dict):
             properties = {}
             feature["properties"] = properties
+        source_id = _first_property(
+            properties, ("fid", "id", "OBJECTID", "objectid", "source_fid"),
+            f"source feature {feature_index}",
+        )
+        missing_name = f"Name missing in source ({source_id})"
+        properties["display_feature_id"] = source_id
         properties["display_bound"] = _first_property(
             properties,
-            ("Bound_Name", "Bound Name", "bound_name", "boundname", "boundary_name", "name"),
-            "Not available in source data",
+            ("Bound_Name", "Bound Name", "bound_name", "boundname", "boundary_name",
+             "Ward_Name", "Ward Name", "ward_name", "wardname", "name"),
+            fallback_name or missing_name,
         )
         properties["display_ward"] = _first_property(
             properties,
-            ("Ward_Name", "Ward Name", "ward_name", "wardname", "Ward_No", "ward_no", "ward", "ward_number"),
-            "Not available in source data",
+            ("Ward_Name", "Ward Name", "ward_name", "wardname", "Ward_No", "ward_no",
+             "ward", "ward_number", "Bound_Name", "Bound Name"),
+            missing_name,
         )
         properties["display_name"] = _first_property(
             properties,
             ("feature_name", "name", "name_en", "Bound_Name", "Ward_Name", "amenity", "highway", "landuse"),
-            "Unnamed feature",
+            missing_name,
         )
         properties["display_type"] = _first_property(
             properties,
@@ -72,11 +85,11 @@ def normalize_geojson_for_tooltip(geojson: dict) -> dict:
         )
 
     if display.get("type") == "FeatureCollection":
-        for feature in display.get("features", []):
+        for index, feature in enumerate(display.get("features", []), start=1):
             if isinstance(feature, dict):
-                normalize_feature(feature)
+                normalize_feature(feature, index)
     elif display.get("type") == "Feature":
-        normalize_feature(display)
+        normalize_feature(display, 1)
     return display
 
 
@@ -324,7 +337,7 @@ uploaded = st.file_uploader("Upload source-reviewed point layers", type=["csv"],
 
 if show_boundary:
     deck_layers.append(pdk.Layer(
-        "GeoJsonLayer", id="kochi-corporation-boundary", data=normalize_geojson_for_tooltip(boundary),
+        "GeoJsonLayer", id="kochi-corporation-boundary", data=normalize_geojson_for_tooltip(boundary, "Kochi Corporation boundary (provisional)"),
         stroked=True, filled=False, get_line_color=[38, 106, 166, 220],
         line_width_min_pixels=2, pickable=True,
     ))
@@ -506,7 +519,7 @@ if deck_layers:
     deck = pdk.Deck(
         layers=deck_layers,
         initial_view_state=pdk.ViewState(longitude=map_center[0], latitude=map_center[1], zoom=10),
-        tooltip={"text": "Bound Name: {display_bound}\nWard Name: {display_ward}\nFeature: {display_name}\nType: {display_type}\nSource: {display_source}\nOSM updated: {display_timestamp}\nSource URL: {display_url}"},
+        tooltip={"text": "Bound Name: {display_bound}\nWard Name: {display_ward}\nFeature ID: {display_feature_id}\nFeature: {display_name}\nType: {display_type}\nSource: {display_source}\nOSM updated: {display_timestamp}\nSource URL: {display_url}"},
     )
     st.pydeck_chart(deck, width="stretch", alt="Kochi administrative outline and selected source-documented spatial layers")
 else:
