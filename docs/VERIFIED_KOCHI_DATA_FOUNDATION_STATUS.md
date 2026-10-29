@@ -6,7 +6,7 @@
 This report separates verified acquisition/structure checks from scientific and legal validation. A green acquisition workflow means files were retrieved and structural checks passed; it does not certify suitability for exposure analysis or model training.
 
 
-## 9. Multi-source flood evidence fusion (29 October 2026)
+## Multi-source flood evidence fusion (29 October 2026)
 
 A reviewed source inventory is now stored in `data/reference/flood_evidence_sources.json` and consumed by `src/evidence_fusion.py`. It records distinct evidence families rather than treating one raster or one station feed as sufficient:
 
@@ -178,3 +178,10 @@ This is not a negligible edge mismatch. Approximately 21.1% of the combined unio
 - Added `shapely` and `pyproj` to `requirements-data.txt` so the full test workflow has the same geometry-comparison dependencies as the acquisition workflow.
 - Acquisition workflow #40906415813 passed. The full Python test workflow is being rerun after fixing its missing geometry-test dependencies; do not treat earlier failed test runs as passing.
 - These results complete a significant boundary-audit step, **not the overall map or scientific data foundation**. Remaining map blockers include official boundary/legal reconciliation, health-facility identity and coordinate verification, KSDMA raster pixel semantics/licence, and the hydrology station/datum/time-alignment issues documented above.
+
+
+## Latest software verification (29 October 2026)
+
+- Full CI: [workflow #40909191281](https://github.com/joelaugustin010/AI_RESILIENCE/actions/runs/40909191281) — **185 passed, 5 skipped, 13 subtests passed**.
+- New tests cover independent source-family counting, unit/time/location/quality gates, and the requirement for feature-to-source provenance before real-observation model evaluation.
+- CI success confirms software checks only. The scientific release gates above remain open, and the model continues to withhold numerical predictions.
