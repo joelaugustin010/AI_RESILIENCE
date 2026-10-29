@@ -78,7 +78,7 @@ def normalize_geojson_for_tooltip(geojson: dict, fallback_name: str | None = Non
         # Keep ward numbers separate from ward names: a numeric ID must never
         # be presented as though it were the missing human-readable ward name.
         ward_number = _first_property(
-            properties, ("Ward_No", "Ward No", "ward_no", "ward_number", "wardnumber", "ward"),
+            properties, ("Ward_No", "Ward No", "ward_no", "ward_number", "wardnumber", "ward_id", "wardid"),
             "",
         )
         ward_name = _first_property(
