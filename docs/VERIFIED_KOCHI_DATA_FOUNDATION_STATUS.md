@@ -46,7 +46,7 @@ A related rainfall depth-duration-frequency dataset hosted by the Environmental 
 ## 5. Gate checklist
 
 - [x] Acquisition workflow completes and records provenance.
-- [x] Python tests passed on commit 37b8bd2e4676d32532b348e51f22f8ba38e5182d (run #84).
+- [x] Python tests passed on commit 37b8bd2e4676d32532b348e51f22f8ba38e5182d (run #84); later full Python test workflow #86 also passed on the current documentation commit. Passing tests are software evidence only.
 - [x] Raster ZIP integrity and basic technical metadata checked.
 - [ ] Verify and checksum the 2024 Cochin boundary geometry against official notification.
 - [ ] Reconcile all 642 facility candidates and duplicate-coordinate groups.
@@ -92,3 +92,27 @@ A secondary open-data repository, Kerala Open Maps, documents that its ward laye
 - [ ] Complete spatial QA with the verified boundary, test time alignment/leakage and independent target labels, and obtain human review.
 
 **Decision remains NOT APPROVED FOR MODEL TRAINING OR VERIFIED EXPOSURE CLAIMS.** Software CI passing is a useful code-quality signal only. This report deliberately does not call the milestone complete while source-level legal, geographic and scientific questions remain unresolved.
+
+
+## 7. Additional Kochi boundary candidate located (29 October 2026)
+
+A separate catalogue entry was found for **"Kochi Wards Map 2024"**, described as a 74-ward Kochi Municipal Corporation KML. The catalogue reports a public-domain licence, credits the source as Esri Living Atlas, and shows the resource was updated in November 2025. This is a potentially useful independent candidate for comparison and may be more targeted than downloading the full statewide ward layer.
+
+- Dataset page: https://data.opencity.in/dataset/kochi-wards-map
+- Resource metadata: https://data.opencity.in/dataset/kochi-wards-map/resource/24a3de7a-4b14-436e-ae0c-e9ec7b1749e0
+- Official Kochi Corporation 2024 delimitation notification: https://kochicorporation.lsgkerala.gov.in/en/delimitation-commission-kerala-notification/590
+- Official delimitation portal: https://wardmap.ksmart.live/
+
+**Important distinction:** a catalogue's public-domain label is not proof that the file matches the final legal 2024 notification, has valid geometries, or is suitable for the project. The resource has not yet been downloaded and inspected in this workflow. Do not replace the current boundary or mark the boundary gate complete based on the catalogue description alone.
+
+### Next boundary verification action
+1. Acquire the KML with its metadata and SHA-256, retaining the raw file unchanged.
+2. Parse and validate all feature geometries, coordinate ranges, ward identifiers/names, and feature count.
+3. Compare ward names/counts and the unioned corporation outline against the official map/notification.
+4. Record discrepancies and licence/attribution details. If comparison cannot establish a reliable match, keep the boundary gate blocked and use no ward-level exposure claims.
+
+### Current test evidence
+- Python tests workflow #86: https://github.com/joelaugustin010/AI_RESILIENCE/actions/runs/40902168189 — passed.
+- Hydrology acquisition workflow #58: https://github.com/joelaugustin010/AI_RESILIENCE/actions/runs/40900447377 — passed as an acquisition run; this does not make the acquired sources scientifically approved.
+
+**Updated decision: NOT APPROVED FOR MODEL TRAINING OR VERIFIED EXPOSURE CLAIMS.** The new catalogue entry improves the next acquisition route, but boundary verification, hospital reconciliation, raster semantics/licensing, and hydrology datum/time/label validation remain open.
