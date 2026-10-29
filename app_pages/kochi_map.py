@@ -1,5 +1,6 @@
 """Kochi map showing licensed reference geometry and user-reviewed points."""
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -13,6 +14,8 @@ ROOT = Path(__file__).resolve().parents[1]
 BOUNDARY_PATH = ROOT / "data" / "reference" / "kochi_corporation_boundary.geojson"
 SOURCE_CATALOG_PATH = ROOT / "data" / "reference" / "spatial_sources.json"
 WARD_ROSTER_PATH = ROOT / "data" / "reference" / "kochi_official_ward_roster_2025.json"
+DRAFT_WARD_CANDIDATE_PATH = ROOT / "data" / "candidates" / "kochi_wards_ksmart_2024_draft_candidate.geojson"
+DRAFT_WARD_CANDIDATE_META_PATH = DRAFT_WARD_CANDIDATE_PATH.with_name("kochi_wards_ksmart_2024_draft_candidate.metadata.json")
 FLOOD_ACQUISITION_METADATA = ROOT / "data" / "raw" / "ksdma_flood_return_probability_historical_10_25_50.metadata.json"
 HOSPITAL_REVIEW_METADATA = ROOT / "data" / "processed" / "nihfw_ernakulam_hospitals_coordinate_review.metadata.json"
 HOSPITAL_REVIEW_CSV = ROOT / "data" / "processed" / "nihfw_ernakulam_hospitals_coordinate_review.csv"
@@ -150,6 +153,43 @@ def load_boundary() -> dict:
     if len(ring) < 4 or ring[0] != ring[-1]:
         raise ValueError("Boundary polygon ring is missing or not closed.")
     return feature
+
+
+@st.cache_data
+def load_draft_ward_candidate() -> dict:
+    """Load the draft map for visualization only; never route it into exposure calculations."""
+    raw_bytes = DRAFT_WARD_CANDIDATE_PATH.read_bytes()
+    metadata = json.loads(DRAFT_WARD_CANDIDATE_META_PATH.read_text(encoding="utf-8"))
+    candidate = json.loads(raw_bytes.decode("utf-8"))
+    actual_hash = hashlib.sha256(raw_bytes).hexdigest()
+    if actual_hash != metadata.get("processed_sha256"):
+        raise ValueError("Draft ward candidate hash does not match its metadata.")
+    validation = metadata.get("validation") or {}
+    if actual_hash != validation.get("source_sha256"):
+        raise ValueError("Draft ward candidate validation hash does not match the file.")
+    if validation.get("shapely_valid_geometry_count") != 76:
+        raise ValueError("Draft ward candidate does not have 76 Shapely-validated geometries.")
+    features = candidate.get("features") if candidate.get("type") == "FeatureCollection" else None
+    if not isinstance(features, list) or len(features) != 76:
+        raise ValueError("Draft ward candidate must contain exactly 76 features.")
+    codes = []
+    names = []
+    for index, feature in enumerate(features, start=1):
+        properties = feature.get("properties") if isinstance(feature, dict) else None
+        geometry = feature.get("geometry") if isinstance(feature, dict) else None
+        if not isinstance(properties, dict) or not isinstance(geometry, dict):
+            raise ValueError(f"Draft ward candidate feature {index} has missing properties or geometry.")
+        if geometry.get("type") not in {"Polygon", "MultiPolygon"}:
+            raise ValueError(f"Draft ward candidate feature {index} is not a polygon.")
+        code = properties.get("sec_ward_code")
+        name = properties.get("sec_ward_name")
+        if not code or not name:
+            raise ValueError(f"Draft ward candidate feature {index} lacks its SEC ward code/name.")
+        codes.append(str(code))
+        names.append(str(name))
+    if len(set(codes)) != 76 or len(set(names)) != 76:
+        raise ValueError("Draft ward candidate SEC codes/names are duplicated.")
+    return {"geojson": candidate, "metadata": metadata}
 
 
 @st.cache_data
@@ -411,24 +451,31 @@ processed_layers = load_processed_layers(coverage_geometry)
 for issue in load_processed_layer_issues(coverage_geometry):
     st.warning(issue, icon=":material/warning:")
 
-draft_ward_candidate = next(
-    (
-        item for item in processed_layers
-        if item["metadata"].get("dataset_id") == "kochi_wards_ksmart_2024_draft_candidate"
-    ),
-    None,
-)
+try:
+    draft_ward_candidate = load_draft_ward_candidate()
+except (OSError, json.JSONDecodeError, ValueError) as exc:
+    draft_ward_candidate = None
+    st.warning(f"The draft Kochi ward candidate is unavailable or failed its integrity check: {exc}")
+
 if draft_ward_candidate:
     draft_metadata = draft_ward_candidate["metadata"]
     st.warning(
         "The 76-ward layer is sourced from a map page labelled DRAFT NOTIFICATION. "
         f"Validation found {draft_metadata.get('source_name_mismatch_count', 0)} source-name differences "
         f"and {draft_metadata.get('geometry_repair_count', 0)} geometry repairs in the candidate copy. "
-        "Official SEC names are displayed using explicit Ward_No identifiers; source names and raw geometries are retained for audit. "
-        "This is a context-only candidate—not a legally approved boundary or a flood-exposure mask. "
-        "Reuse rights also require confirmation.",
+        "Official SEC names are displayed using explicit Ward_No identifiers; original source names and raw geometries are retained for audit. "
+        "The repository's separate topology checker disagreed with Shapely on this source, so the candidate is visual-only. "
+        "It is not a legally approved boundary or a flood-exposure mask. Reuse rights also require confirmation.",
         title="Kochi ward map: draft candidate, not final",
     )
+    with st.expander("Ward-name differences and geometry repairs", expanded=False):
+        mismatches = draft_metadata.get("source_name_mismatches", [])
+        repairs = draft_metadata.get("geometry_repairs", [])
+        st.caption(f"{len(mismatches)} source ward-name differences matched by explicit Ward_No; {len(repairs)} geometry repairs in candidate copy.")
+        if mismatches:
+            st.dataframe(pd.DataFrame(mismatches), hide_index=True, width="stretch")
+        if repairs:
+            st.dataframe(pd.DataFrame(repairs), hide_index=True, width="stretch")
 
 if processed_layers:
     st.subheader("Current map-layer validation")
@@ -452,6 +499,7 @@ if processed_layers:
 st.subheader("Map layers")
 show_boundary = st.checkbox("Kochi Corporation administrative boundary", value=True)
 st.caption("Blue outline = administrative boundary only. It must not be interpreted as a hazard zone or as the full Greater Kochi urban area.")
+show_draft_wards = st.checkbox("Show 2024 draft ward boundaries (visual only)", value=draft_ward_candidate is not None, disabled=draft_ward_candidate is None)
 deck_layers = []
 legend_rows = []
 st.warning(
@@ -473,6 +521,24 @@ if show_boundary:
         line_width_min_pixels=2, pickable=True,
     ))
     legend_rows.append(("Kochi Corporation boundary", "#266AA6 outline", "Administrative boundary"))
+
+if show_draft_wards and draft_ward_candidate:
+    deck_layers.append(pdk.Layer(
+        "GeoJsonLayer",
+        id="kochi-ward-draft-candidate",
+        data=normalize_geojson_for_tooltip(draft_ward_candidate["geojson"]),
+        stroked=True,
+        filled=True,
+        get_fill_color=[129, 88, 171, 42],
+        get_line_color=[129, 88, 171, 210],
+        line_width_min_pixels=1,
+        pickable=True,
+    ))
+    legend_rows.append((
+        "2024 draft ward boundaries (visual only)",
+        "#8158AB",
+        "76 wards; provisional; not an exposure-analysis layer",
+    ))
 
 if processed_layers:
     st.subheader("Processed spatial layers (validation and exclusions shown per source)")
