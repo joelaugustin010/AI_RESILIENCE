@@ -31,11 +31,11 @@
     },
     {
       "id": "kerala_sw_river_level_telemetry_2021_2025",
-      "title": "River Water Level (Telemetry - Hourly), Kerala Surface Water Department, 2021-2025",
+      "title": "River Water Level (Telemetry - Hourly), Kerala Surface Water Department, all-network resource, 2021-2025",
       "publisher": "Kerala Surface Water Department, catalogued by National Water Data Portal / National Water Informatics Centre",
       "catalog_url": "https://nwdp.nwic.gov.in/dataset/river-water-level-telemetry-hourly-kerala-surface-water-department",
-      "download_url": "https://nwdp.nwic.gov.in/dataset/1a00209e-c864-4c1c-bc82-b5e2d8ecb66e/resource/a6de190e-40b6-484b-ad4c-a9f811f061ba/download/rwl_tel_hr_kerala_sw_031_2021_2025.csv",
-      "filename": "rwl_tel_hr_kerala_sw_031_2021_2025.csv",
+      "download_url": "https://nwdp.nwic.gov.in/dataset/1a00209e-c864-4c1c-bc82-b5e2d8ecb66e/resource/0af0acba-517c-4278-bf77-ff137eb3c2cf/download/rwl_tel_hr_kerala_sw_999_2021_2025.csv",
+      "filename": "rwl_tel_hr_kerala_sw_999_2021_2025.csv",
       "measurement": "Hourly river water level",
       "units": "m (as described by the portal)",
       "declared_period": "2021-2025",
@@ -44,12 +44,13 @@
       "limitations": [
         "Water level is not the same as flood depth and can only be interpreted against a verified station datum and official thresholds.",
         "Known local-copy concerns include inconsistent river/basin descriptors and unresolved gauge-reference metadata.",
-        "Does not provide independently verified flood/no-flood outcome labels."
+        "Does not provide independently verified flood/no-flood outcome labels.",
+        "The all-network resource may contain station metadata inconsistencies; inspect station, river, basin, coordinate and gauge-reference fields before any spatial or predictive use."
       ]
     },
     {
       "id": "kerala_sw_river_level_manual_2021_2025",
-      "title": "River Water Level (Manual - Hourly), Kerala Surface Water Department, 2021-2025",
+      "title": "River Water Level (Manual - Hourly), Kerala Surface Water Department, West flowing rivers from Tadri to Kanyakumari, 2021-2025",
       "publisher": "Kerala Surface Water Department, catalogued by National Water Data Portal / National Water Informatics Centre",
       "catalog_url": "https://nwdp.nwic.gov.in/dataset/river-water-level-manual-hourly-kerala-sw-godavari",
       "download_url": "https://nwdp.nwic.gov.in/dataset/b7ed6f63-d702-429b-a342-c3e2acd31ad6/resource/fe95a85e-142d-4acf-83fc-24499afc546b/download/rwl_manual_hr_kerala_sw_031_2021_2025.csv",
@@ -62,7 +63,8 @@
       "limitations": [
         "Manual observations may be irregular; preserve original timestamps and missingness.",
         "Known local-copy concerns include inconsistent river/basin descriptors and unresolved gauge-reference metadata.",
-        "Does not provide independently verified flood/no-flood outcome labels."
+        "Does not provide independently verified flood/no-flood outcome labels.",
+        "The NWDP page structure groups this resource under a page titled Godavari Basin while the specific resource name says West flowing rivers from Tadri to Kanyakumari. Treat this catalogue/resource mismatch as unresolved provenance until verified with NWIC/provider."
       ]
     }
   ],
