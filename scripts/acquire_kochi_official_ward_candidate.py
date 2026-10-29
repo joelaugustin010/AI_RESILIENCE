@@ -56,55 +56,92 @@ def extract_features(payload: Any) -> list[dict[str, Any]]:
     raise ValueError(f"Unsupported ward-map JSON structure: root type={type(payload).__name__}, keys={list(payload)[:30] if isinstance(payload, dict) else 'n/a'}")
 
 
-def feature_name_matches(feature: dict[str, Any], roster_by_normalized_name: dict[str, tuple[str, str]]) -> tuple[str, str] | None:
+def extract_ward_number(feature: dict[str, Any]) -> int | None:
     properties = feature.get("properties")
     if not isinstance(properties, dict):
         return None
-    matches = set()
-    for value in properties.values():
-        if not isinstance(value, (str, int, float)):
+    preferred_keys = {"wardno", "wardnumber", "divisionno", "wardid"}
+    for key, value in properties.items():
+        if normalize(key) not in preferred_keys or value is None:
             continue
-        normalized = normalize(value)
-        if normalized in roster_by_normalized_name:
-            matches.add(normalized)
-    if len(matches) == 1:
-        return roster_by_normalized_name[next(iter(matches))]
+        if isinstance(value, (int, float)) and float(value).is_integer():
+            number = int(value)
+            return number if 1 <= number <= 76 else None
+        match = re.fullmatch(r"\\s*(?:ward\\s*(?:no\\.?|number)?\\s*)?0*(\\d+)\\s*", str(value), flags=re.IGNORECASE)
+        if match:
+            number = int(match.group(1))
+            return number if 1 <= number <= 76 else None
     return None
 
 
-def validate_and_annotate(features: list[dict[str, Any]], roster: list[list[str]]) -> list[dict[str, Any]]:
+def extract_source_ward_name(feature: dict[str, Any]) -> str:
+    properties = feature.get("properties")
+    if not isinstance(properties, dict):
+        return ""
+    for key, value in properties.items():
+        if normalize(key) in {"wardname", "divisionname", "nameen", "name"} and value is not None:
+            label = str(value).strip()
+            if label and label.casefold() not in {"null", "none", "nan", "#name?"}:
+                return label
+    return ""
+
+
+def validate_and_annotate(
+    features: list[dict[str, Any]], roster: list[list[str]]
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     if len(features) != 76:
         raise ValueError(f"Expected 76 source features; received {len(features)}. Candidate was not promoted.")
-    roster_by_name = {normalize(name): (code, name) for code, name in roster}
-    if len(roster_by_name) != 76:
-        raise ValueError("Official roster does not contain 76 unique normalized names.")
+    roster_by_number = {}
+    for code, name in roster:
+        match = re.search(r"(\\d{3})$", code)
+        if not match:
+            raise ValueError(f"Official ward code has no three-digit ward number: {code}")
+        number = int(match.group(1))
+        if number in roster_by_number:
+            raise ValueError(f"Duplicate official ward number in roster: {number}")
+        roster_by_number[number] = (code, name)
+    if set(roster_by_number) != set(range(1, 77)):
+        raise ValueError("Official roster must contain explicit ward numbers 1 through 76.")
 
     annotated = []
-    matched_codes: list[str] = []
+    seen_numbers: set[int] = set()
     geometry_errors = []
+    name_mismatches = []
     for index, feature in enumerate(features, start=1):
+        number = extract_ward_number(feature)
+        if number is None:
+            props = feature.get("properties")
+            keys = sorted(props.keys()) if isinstance(props, dict) else []
+            raise ValueError(f"Feature {index} has no explicit Ward_No/ward identifier in 1..76; property keys={keys}")
+        if number in seen_numbers:
+            raise ValueError(f"Duplicate explicit source Ward_No {number}; no ordinal or spatial fallback will be used.")
+        seen_numbers.add(number)
+
         geometry = feature.get("geometry")
         if not isinstance(geometry, dict):
-            geometry_errors.append(f"feature {index}: missing geometry")
+            geometry_errors.append(f"ward {number}: missing geometry")
             continue
         try:
             polygon = shape(geometry)
             if polygon.is_empty or polygon.geom_type not in {"Polygon", "MultiPolygon"} or not polygon.is_valid:
-                geometry_errors.append(f"feature {index}: empty, non-polygon, or invalid geometry ({polygon.geom_type})")
+                geometry_errors.append(f"ward {number}: empty, non-polygon, or invalid geometry ({polygon.geom_type})")
                 continue
         except Exception as exc:
-            geometry_errors.append(f"feature {index}: geometry parse error: {exc}")
+            geometry_errors.append(f"ward {number}: geometry parse error: {exc}")
             continue
 
-        matched = feature_name_matches(feature, roster_by_name)
-        if matched is None:
-            props = feature.get("properties")
-            keys = sorted(props.keys()) if isinstance(props, dict) else []
-            raise ValueError(f"Feature {index} has no unique exact match to the SEC roster; property keys={keys}")
-        code, official_name = matched
-        matched_codes.append(code)
+        code, official_name = roster_by_number[number]
+        source_name = extract_source_ward_name(feature)
+        if normalize(source_name) != normalize(official_name):
+            name_mismatches.append({
+                "ward_number": number,
+                "ward_code": code,
+                "source_name": source_name or None,
+                "official_sec_name": official_name,
+            })
         copied = json.loads(json.dumps(feature))
         copied.setdefault("properties", {})
+        copied["properties"]["source_ward_name"] = source_name or None
         copied["properties"]["sec_ward_code"] = code
         copied["properties"]["sec_ward_name"] = official_name
         copied["properties"]["boundary_status"] = "draft_candidate_not_approved"
@@ -112,13 +149,10 @@ def validate_and_annotate(features: list[dict[str, Any]], roster: list[list[str]
 
     if geometry_errors:
         raise ValueError("Invalid source geometries; no automatic repair performed: " + "; ".join(geometry_errors[:12]))
-    if len(annotated) != 76 or len(set(matched_codes)) != 76:
-        raise ValueError(f"SEC-name match is not one-to-one: features={len(annotated)}, unique_codes={len(set(matched_codes))}")
-    missing = sorted(set(code for code, _ in roster) - set(matched_codes))
-    if missing:
-        raise ValueError(f"Source is missing official ward codes: {missing}")
-    return annotated
-
+    if seen_numbers != set(range(1, 77)) or len(annotated) != 76:
+        missing = sorted(set(range(1, 77)) - seen_numbers)
+        raise ValueError(f"Source Ward_No coverage is not exactly 1..76; missing={missing}")
+    return annotated, name_mismatches
 
 def write_json(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -135,7 +169,7 @@ def main() -> int:
         roster = roster_payload.get("wards", [])
         if len(roster) != 76:
             raise ValueError(f"Expected 76 official roster entries, found {len(roster)}.")
-        annotated = validate_and_annotate(features, roster)
+        annotated, name_mismatches = validate_and_annotate(features, roster)
     except Exception as exc:
         print(f"KOCHI_WARD_CANDIDATE_BLOCKED: {type(exc).__name__}: {exc}", file=sys.stderr)
         return 2
@@ -178,7 +212,7 @@ def main() -> int:
         "processed_sha256": candidate_sha,
         "source_feature_count": len(features),
         "processed_feature_count": len(annotated),
-        "matched_official_ward_count": 76,
+        "matched_official_ward_count": 76,\n        "source_name_mismatch_count": len(name_mismatches),
         "match_method": "exact normalized official name match across source property values; no spatial/ordinal guessing",
         "geometry_validation": "all 76 features parsed as valid Polygon/MultiPolygon by Shapely; no automatic repair",
         "crs": "EPSG:4326 assumed from source coordinates; confirm source CRS metadata before metric calculations",
@@ -231,7 +265,7 @@ def main() -> int:
         "raw_file": str(RAW_PATH.relative_to(ROOT)),
         "candidate_file": str(CANDIDATE_PATH.relative_to(ROOT)),
         "catalog_status": "provisional / candidate_not_integrated",
-        "warning": "DRAFT NOTIFICATION candidate only; not approved for legal boundaries or exposure analysis",
+        "source_name_mismatch_count": len(name_mismatches),\n        "source_name_mismatches": name_mismatches,\n        "warning": "DRAFT NOTIFICATION candidate only; not approved for legal boundaries or exposure analysis",
     }, indent=2))
     return 0
 
