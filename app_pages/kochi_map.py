@@ -84,13 +84,15 @@ def normalize_geojson_for_tooltip(geojson: dict, fallback_name: str | None = Non
         )
         ward_name = _first_property(
             properties,
-            ("Ward_Name", "Ward Name", "ward_name", "wardname", "ward_name_en", "wardnameen",
+            ("sec_ward_name", "SEC_Ward_Name", "official_ward_name",
+             "Ward_Name", "Ward Name", "ward_name", "wardname", "ward_name_en", "wardnameen",
              "ward_label", "wardname_1", "name_en", "name"),
             "",
         )
         bound_name = _first_property(
             properties,
-            ("Bound_Name", "Bound Name", "bound_name", "boundname", "bound_name_1", "boundary_name",
+            ("sec_ward_name", "SEC_Ward_Name", "official_ward_name",
+             "Bound_Name", "Bound Name", "bound_name", "boundname", "bound_name_1", "boundary_name",
              "boundaryname", "ward_boundary_name", "boundname_1"),
             "",
         )
@@ -110,7 +112,7 @@ def normalize_geojson_for_tooltip(geojson: dict, fallback_name: str | None = Non
         properties["display_ward"] = ward_name
         properties["display_name"] = _first_property(
             properties,
-            ("feature_name", "name", "name_en", "Bound_Name", "Ward_Name", "amenity", "highway", "landuse"),
+            ("sec_ward_name", "official_ward_name", "feature_name", "name", "name_en", "Bound_Name", "Ward_Name", "amenity", "highway", "landuse"),
             bound_name,
         )
         properties["display_type"] = _first_property(
@@ -409,6 +411,25 @@ processed_layers = load_processed_layers(coverage_geometry)
 for issue in load_processed_layer_issues(coverage_geometry):
     st.warning(issue, icon=":material/warning:")
 
+draft_ward_candidate = next(
+    (
+        item for item in processed_layers
+        if item["metadata"].get("dataset_id") == "kochi_wards_ksmart_2024_draft_candidate"
+    ),
+    None,
+)
+if draft_ward_candidate:
+    draft_metadata = draft_ward_candidate["metadata"]
+    st.warning(
+        "The 76-ward layer is sourced from a map page labelled DRAFT NOTIFICATION. "
+        f"Validation found {draft_metadata.get('source_name_mismatch_count', 0)} source-name differences "
+        f"and {draft_metadata.get('geometry_repair_count', 0)} geometry repairs in the candidate copy. "
+        "Official SEC names are displayed using explicit Ward_No identifiers; source names and raw geometries are retained for audit. "
+        "This is a context-only candidate—not a legally approved boundary or a flood-exposure mask. "
+        "Reuse rights also require confirmation.",
+        title="Kochi ward map: draft candidate, not final",
+    )
+
 if processed_layers:
     st.subheader("Current map-layer validation")
     current_layer_rows = [{
@@ -465,6 +486,10 @@ if processed_layers:
         default=[
             title for title, layer in processed_titles.items()
             if not str(layer["metadata"].get("logical_layer_id", "")).startswith("osm_kochi_")
+            and not (
+                draft_ward_candidate is not None
+                and layer["metadata"].get("dataset_id") == "kochi_wards_datameet_2022"
+            )
         ],
         key="kochisp_validated_layers",
     )
