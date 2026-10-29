@@ -11,7 +11,9 @@ on:
       - "scripts/acquire_map_reference_data.py"
       - "scripts/acquire_kochi_ward_boundary_candidate.py"
       - "scripts/audit_map_reference_raster.py"
+      - "scripts/audit_landslide_vector_archive.py"
       - "tests/test_map_reference_acquisition.py"
+      - "tests/test_landslide_vector_archive_audit.py"
       - "tests/test_acquire_kochi_ward_boundary_candidate.py"
       - "tests/test_map_reference_raster_audit.py"
       - "scripts/audit_public_hydrology_data.py"
@@ -38,7 +40,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install audit dependency
-        run: python -m pip install --disable-pip-version-check pandas rasterio shapely pyproj
+        run: python -m pip install --disable-pip-version-check pandas rasterio shapely pyproj pyshp
 
       - name: Test public-data acquisition safeguards
         run: python -m unittest discover -s tests -p 'test_public_data_acquisition.py' -v
@@ -57,6 +59,9 @@ jobs:
 
       - name: Test raster metadata and coverage audit
         run: python -m unittest discover -s tests -p 'test_map_reference_raster_audit.py' -v
+
+      - name: Test GSI landslide vector archive audit
+        run: python -m unittest discover -s tests -p 'test_landslide_vector_archive_audit.py' -v
 
       - name: Download catalogued source CSVs and write provenance
         id: acquisition
@@ -84,6 +89,12 @@ jobs:
         run: |
           set -o pipefail
           python scripts/acquire_map_reference_data.py 2>&1 | tee map_acquisition.log
+
+      - name: Audit GSI Ernakulam landslide susceptibility vector archive
+        id: landslide_audit
+        if: always() && steps.map_acquisition.outcome == 'success'
+        continue-on-error: true
+        run: python scripts/audit_landslide_vector_archive.py --input data/external/map_reference/gsi_landslide_susceptibility_ernakulam.zip --output data/external/map_reference/landslide_vector_audit.json
 
       - name: Acquire and audit OpenCity Kochi 2024 ward-boundary candidate
         id: kochi_wards
@@ -132,11 +143,16 @@ jobs:
             echo "IFI audit is descriptive only: district/event records are not converted into ward-level or hourly flood labels."
             echo ""
             if [ "${{ steps.map_acquisition.outcome }}" = "success" ]; then
-              echo "**Map reference acquisition:** Candidate Ernakulam public health-facility points, Kochi boundary candidate and KSDMA flood-return raster archive downloaded with SHA-256 provenance. These remain unvalidated candidates; they are not automatically shown on the map."
+              echo "**Map reference acquisition:** Candidate Ernakulam health-facility points, Kochi boundary, KSDMA flood-return raster and GSI landslide-susceptibility archive downloaded with SHA-256 provenance. These remain unvalidated candidates; they are not automatically shown on the map."
               if [ "${{ steps.raster_audit.outcome }}" = "success" ]; then
                 echo "**Raster metadata audit:** Completed. Review raster_metadata_audit.json for CRS, bounds, resolution, units, NoData, sampled values, and Kochi screening-box overlap. Metadata inspection does not approve the layer for display."
               else
                 echo "**Raster metadata audit:** Not completed successfully. Treat the raster as blocked until the audit log and artifact are reviewed."
+              fi
+              if [ "${{ steps.landslide_audit.outcome }}" = "success" ]; then
+                echo "**Landslide vector audit:** Completed; review landslide_vector_audit.json for CRS, fields, geometry validity and rough coverage. Invalid geometry or unknown class semantics block spatial joins and prediction."
+              else
+                echo "**Landslide vector audit:** Not completed successfully. Treat the layer as blocked until the audit log and artifact are reviewed."
               fi
             else
               echo "**Map reference acquisition:** One or more spatial source downloads or structural checks failed. Review map_acquisition.log and the artifact."
@@ -151,14 +167,18 @@ jobs:
             exit 1
           fi
 
-      - name: Fail workflow if spatial acquisition or raster audit failed
+      - name: Fail workflow if spatial, raster or landslide audit failed
         if: always()
         run: |
           if [ "${{ steps.map_acquisition.outcome }}" != "success" ]; then
-            echo "Hospital/KSDMA spatial acquisition failed or did not complete. Review map_acquisition.log and manifest."
+            echo "Hospital/KSDMA/GSI spatial acquisition failed or did not complete. Review map_acquisition.log and manifest."
             exit 1
           fi
           if [ "${{ steps.raster_audit.outcome }}" != "success" ]; then
             echo "Raster metadata audit failed or did not complete. Review the audit log and artifact."
+            exit 1
+          fi
+          if [ "${{ steps.landslide_audit.outcome }}" != "success" ]; then
+            echo "GSI landslide vector audit failed or did not complete. Review the audit log and artifact."
             exit 1
           fi

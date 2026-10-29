@@ -237,6 +237,45 @@
         "Verified facility coordinates, current consent validity and measured factory-specific air emissions remain unavailable.",
         "AQI alone cannot attribute a pollution episode to an individual factory."
       ]
+    },
+    {
+      "id": "gsi_landslide_susceptibility_ernakulam",
+      "source_url": "https://sdma.kerala.gov.in/hazard-maps/",
+      "direct_download_url": "https://sdma.kerala.gov.in/wp-content/uploads/2025/08/Ernakulam.zip",
+      "acquisition_status": "downloaded_raw_candidate; ZIP integrity and shapefile sidecars checked; geometry audit completed; not approved for model use",
+      "archive_bytes": 3541467,
+      "archive_sha256": "7bac333a4a2c26410582555dbf722157fa97df63fafa24b5a0bb8ef269935b20",
+      "shapefile": "Ernakulam/Ernakulam_GSI_LS.shp",
+      "shapefile_feature_count": 3,
+      "geometry_type": "MultiPolygon",
+      "attribute_fields": [
+        "Susceptibi"
+      ],
+      "susceptibility_class_values": [
+        "High",
+        "Low",
+        "Moderate"
+      ],
+      "crs": "EPSG:32643",
+      "bounds_epsg4326": [
+        76.41102118681698,
+        9.836105351582866,
+        76.92068619153798,
+        10.301953329415356
+      ],
+      "overlaps_rough_kochi_screening_bbox": true,
+      "invalid_geometry_count": 3,
+      "invalid_geometry_reasons": [
+        "High: Ring Self-intersection near (707860.6815, 1133516.7395) in source CRS",
+        "Low: Ring Self-intersection near (708232.2643, 1132325.8133) in source CRS",
+        "Moderate: Ring Self-intersection near (708418.8155, 1133028.0434) in source CRS"
+      ],
+      "limitations": [
+        "The class field is truncated to Susceptibi in the shapefile DBF; source legend and semantics must be checked.",
+        "All three geometries are invalid; no automatic repair was applied.",
+        "The rough screening-box overlap is not proof of valid coverage within the current Kochi Corporation boundary.",
+        "Source scale, currency and redistribution terms remain unverified; susceptibility is not a timed forecast."
+      ]
     }
   ],
   "overall_conclusion": {
@@ -251,7 +290,22 @@
       "Resolve the current official Kochi boundary/ward layer and compare every ward name and geometry.",
       "Validate hospital identity and location before exposure analysis.",
       "Filter INDOFLOODS by privacy field and test whether valid Kochi/Ernakulam event and non-event labels can be built without leakage.",
-      "Acquire and validate cyclone, coastal, earthquake, heat, drought, air-pollution and industrial-hazard evidence with hazard-specific methods."
+      "Acquire and validate cyclone, coastal, earthquake, heat, drought, air-pollution and industrial-hazard evidence with hazard-specific methods.",
+      "Resolve the three invalid GSI landslide susceptibility geometries with the publisher before spatial joins or consequence estimates."
     ]
+  },
+  "follow_up_acquisition": {
+    "workflow_run_id": 40930196302,
+    "workflow_run_url": "https://github.com/joelaugustin010/AI_RESILIENCE/actions/runs/40930196302",
+    "status": "success",
+    "commit_sha": "76105a978671396eb7ceedb07216442003fedebe",
+    "artifact_id": 12922133047,
+    "artifact_name": "public-hydrology-source-bundle",
+    "artifact_sha256": "de8f0e86063222e7f92351adcb12a711e98696097efd873249ae6407400054c2",
+    "artifact_compressed_bytes": 16840599,
+    "artifact_uncompressed_bytes": 108870792,
+    "artifact_files": 26,
+    "artifact_expires_at_utc": "2026-11-05T18:23:57Z",
+    "note": "Follow-up run added the GSI Ernakulam landslide susceptibility archive. Raw files remain in a private temporary artifact, not committed to Git."
   }
 }

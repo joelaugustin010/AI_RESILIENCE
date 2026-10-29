@@ -35,9 +35,9 @@ DATASET_CATALOG: list[dict[str, Any]] = [
         "resource_urls": ["https://sdma.kerala.gov.in/wp-content/uploads/2025/08/Ernakulam.zip"],
         "access": "District shapefile ZIP is listed by the portal; terms and layer metadata must be checked",
         "priority": "P1",
-        "status": "Discovered; not yet acquired/verified for this repository",
-        "required_checks": "Confirm exact Ernakulam layer availability, classification legend, scale, CRS, topology, publication version, and study-area overlap.",
-        "limitations": "Susceptibility zoning is not a landslide time forecast; local slope/soil/trigger evidence remains necessary.",
+        "status": "Acquired in workflow run 40930196302; ZIP CRC and shapefile sidecars pass. A schema/geometry audit found 3 MultiPolygon records (High/Low/Moderate), all 3 invalid due to ring self-intersections; CRS is EPSG:32643. Not approved for spatial joins or prediction.",
+        "required_checks": "Ask the source provider to clarify/fix expected polygon topology; verify classification legend, scale, publication/version, licence, district coverage and official Kochi boundary overlap before any repair or use.",
+        "limitations": "All three source geometries are invalid. Do not auto-repair, dissolve, or use the layer for ward/facility exposure until provider semantics and geometry are resolved. Susceptibility zoning is not a time-specific landslide forecast.",
     },
     {
         "id": "kerala_sw_rainfall_telemetry_2021_2025",
