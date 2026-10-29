@@ -8,6 +8,7 @@ import pandas as pd
 import streamlit as st
 
 from src.scientific_scenario_engine import build_scientific_scenario_frame
+from src.source_registry import build_source_registry, source_fitness_summary
 
 from src.decision_workflow import (
     HAZARD_OPTIONS,
@@ -373,6 +374,37 @@ st.header("2. Review evidence")
 evidence = evidence_inventory(ROOT, st.session_state.get("rainfall_backtest_result"))
 st.caption("The separate historical benchmark uses only the manual rainfall observations. Its results do not enter this qualitative assessment; conflicted CWC rainfall, unverified sample rows, and unresolved river levels remain excluded from model calculations.")
 st.dataframe(evidence, hide_index=True, width="stretch")
+
+with st.expander("Dataset provenance and scientific fitness register", expanded=True):
+    st.caption(
+        "A listed source is not automatically suitable for every claim. Unknown licence, time-zone, "
+        "datum, checksum, or spatial metadata stays unresolved; this register does not certify data."
+    )
+    registry = build_source_registry()
+    registry_view = []
+    for record in registry:
+        fitness = source_fitness_summary(record)
+        registry_view.append({
+            "Dataset": record["name"],
+            "Publisher / source attribution": record["publisher"],
+            "Observation type": record["data_type"],
+            "Unit": record["unit"],
+            "Retrieval date": record["retrieval_date"],
+            "Licence status": record["license_status"],
+            "Checksum match": record["checksum_match"],
+            "Time zone": record["time_zone"],
+            "Spatial reference / datum": record["spatial_reference"],
+            "Validation status": record["validation_status"],
+            "Scientific fitness": fitness["scientific_fitness"],
+            "Permitted use": record["permitted_use"],
+            "Known limitation": record["known_limitation"],
+            "Source URL": record["source_url"],
+        })
+    st.dataframe(pd.DataFrame(registry_view), hide_index=True, width="stretch")
+    st.warning(
+        "No dataset in this registry is approved by this app for numerical disaster prediction or official warnings. "
+        "Source metadata completeness and scientific validation are different checks."
+    )
 
 st.subheader("Evidence readiness checklist for this hazard")
 st.caption(
