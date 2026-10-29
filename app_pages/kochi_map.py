@@ -228,6 +228,21 @@ if ward_candidate:
             "The OpenCity 2024 ward map is recorded as a candidate only. It is not used as the production boundary or exposure mask.",
             title="2024 ward boundary candidate",
         )
+current_ward_layer = next(
+    (item for item in catalog["datasets"] if item.get("layer_id") == "kochi_wards_datameet"),
+    None,
+)
+if current_ward_layer and current_ward_layer.get("feature_count") != 76:
+    st.error(
+        "The integrated ward layer is not a complete current ward map: it contains "
+        f"{current_ward_layer.get('feature_count', 'an unknown number of')} retained polygons, "
+        "while the Kerala State Election Commission currently lists 76 Kochi wards. "
+        "The source snapshot also contains missing ward attributes and excluded invalid geometries. "
+        "Do not treat fallback labels as official ward names or use this layer for ward-level exposure/risk conclusions. "
+        "Replace it only after integrating and validating the final notified ward geometries and identifiers. "
+        "Official ward list: https://sec.kerala.gov.in/public/cnstncy/wd/d0f41644-754b-4b6e-a8dc-97ecbf5fee16",
+        title="Current Kochi ward coverage is not verified",
+    )
 air_observation_status = next(
     (item for item in catalog["datasets"] if item.get("layer_id") == "air_observations_spatial_locations"),
     None,
