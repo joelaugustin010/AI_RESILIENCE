@@ -33,7 +33,7 @@ SOURCES = {
             "reason": "The Hospital Directory layer returned an empty FeatureCollection when the retrieved object IDs were queried; retained as a failed source attempt rather than silently accepted."
         },
         "reuse": "Service page did not state a dataset-specific licence; review terms before redistribution.",
-        "purpose": "Candidate hospital locations for independent identity and coordinate review.",
+        "purpose": "Candidate public health-facility locations (PHCs, CHCs, sub-centres and hospitals) for independent identity and coordinate review.",
         "independent_verification_sources": [
             {
                 "publisher": "Kerala Health Department",
@@ -75,12 +75,25 @@ SOURCES = {
         "publisher": "Kerala Health Department, Government of Kerala",
         "source_page": "https://health.kerala.gov.in/index.php/institutionSearch",
         "reuse": "No explicit licence for redistribution verified; retain attribution and verify terms before republishing.",
-        "purpose": "Independent name/address reference for cross-checking candidate hospital features; not a coordinate source.",
+        "purpose": "Independent name/address reference for cross-checking candidate health-facility features; not a coordinate source.",
         "limitations": [
             "This is a 2024-25 snapshot and may not reflect current facility status.",
             "Facility names and addresses must be matched carefully; spelling variants are not proof of identity.",
             "This PDF does not independently verify the coordinates of the Esri features.",
-            "Do not treat a successful PDF download as completion of hospital verification."
+            "Do not treat a successful PDF download as completion of facility verification."
+        ],
+    },
+    "kochi_corporation_boundary_candidate.geojson": {
+        "url": "https://raw.githubusercontent.com/yashveeeeeeer/india-geodata/main/data/urban/municipal-boundaries/kochi/KCH_Corporation_Boundary.geojson",
+        "publisher": "DataMeet Trust; curated mirror in India Geodata, sourced from Kerala OpenSDI",
+        "source_page": "https://opensdi.kerala.gov.in/layers/opensdi_data:geonode:KSUDP_KCH_Corporation_Boundary",
+        "reuse": "CC BY-SA 2.5 India, as stated in the source repository README; preserve attribution and share-alike terms.",
+        "purpose": "Candidate Kochi Corporation polygon for preliminary point-in-polygon screening of Ernakulam health-facility coordinates.",
+        "limitations": [
+            "The source README does not establish that this polygon reflects the current 2024 delimitation; date/currentness remain unverified.",
+            "Kochi Corporation published a 2024 delimitation notification; compare this candidate with the current official ward map before treating it as the authoritative city boundary.",
+            "Spatial inclusion is preliminary screening only and does not verify facility identity, positional accuracy, or current operating status.",
+            "Do not use this boundary or filtered points for final exposure analysis until the boundary version is confirmed."
         ],
     },
 }
@@ -104,6 +117,90 @@ def atomic_write(path: Path, data: bytes) -> None:
     finally:
         if os.path.exists(temp_name):
             os.unlink(temp_name)
+
+
+def point_in_ring(point: tuple[float, float], ring: list) -> bool:
+    """Ray-casting point-in-ring test for longitude/latitude coordinates."""
+    x, y = point
+    inside = False
+    if len(ring) < 4:
+        return False
+    j = len(ring) - 1
+    for i in range(len(ring)):
+        xi, yi = ring[i][:2]
+        xj, yj = ring[j][:2]
+        # Treat points on a segment as inside within a small numerical tolerance.
+        cross = (x - xi) * (yj - yi) - (y - yi) * (xj - xi)
+        if abs(cross) < 1e-10 and min(xi, xj) - 1e-10 <= x <= max(xi, xj) + 1e-10 and min(yi, yj) - 1e-10 <= y <= max(yi, yj) + 1e-10:
+            return True
+        if (yi > y) != (yj > y):
+            intersection_x = (xj - xi) * (y - yi) / (yj - yi) + xi
+            if x < intersection_x:
+                inside = not inside
+        j = i
+    return inside
+
+
+def point_in_polygon(point: tuple[float, float], polygon: list) -> bool:
+    if not polygon or not point_in_ring(point, polygon[0]):
+        return False
+    return not any(point_in_ring(point, hole) for hole in polygon[1:])
+
+
+def point_in_geometry(point: tuple[float, float], geometry: dict) -> bool:
+    kind = geometry.get("type")
+    coordinates = geometry.get("coordinates") or []
+    if kind == "Polygon":
+        return point_in_polygon(point, coordinates)
+    if kind == "MultiPolygon":
+        return any(point_in_polygon(point, polygon) for polygon in coordinates)
+    return False
+
+
+def add_boundary_screening(output: Path, manifest: dict) -> None:
+    """Record preliminary health-facility overlap with the candidate 2022-era city boundary."""
+    facility_file = output / "health_facilities_ernakulam.geojson"
+    boundary_file = output / "kochi_corporation_boundary_candidate.geojson"
+    if not facility_file.exists() or not boundary_file.exists():
+        return
+    facilities = json.loads(facility_file.read_text(encoding="utf-8"))
+    boundary_payload = json.loads(boundary_file.read_text(encoding="utf-8-sig"))
+    boundary_feature = boundary_payload if boundary_payload.get("type") == "Feature" else None
+    if boundary_feature is None:
+        return
+    geometry = boundary_feature.get("geometry") or {}
+    inside = outside = invalid = 0
+    for feature in facilities.get("features", []):
+        point_geometry = feature.get("geometry") or {}
+        coords = point_geometry.get("coordinates") or []
+        if point_geometry.get("type") != "Point" or len(coords) < 2:
+            invalid += 1
+            continue
+        try:
+            point = (float(coords[0]), float(coords[1]))
+        except (TypeError, ValueError):
+            invalid += 1
+            continue
+        if not (-180 <= point[0] <= 180 and -90 <= point[1] <= 90):
+            invalid += 1
+        elif point_in_geometry(point, geometry):
+            inside += 1
+        else:
+            outside += 1
+    for item in manifest["files"]:
+        if item.get("filename") == "health_facilities_ernakulam.geojson":
+            item["city_boundary_screening"] = {
+                "boundary_file": boundary_file.name,
+                "boundary_source": "DataMeet Trust / Kerala OpenSDI via India Geodata mirror",
+                "boundary_date": "not established by source metadata; ward reference is 2022 and current 2024 delimitation must be checked",
+                "candidate_facility_points": len(facilities.get("features", [])),
+                "points_inside_candidate_boundary": inside,
+                "points_outside_candidate_boundary": outside,
+                "invalid_points_for_boundary_test": invalid,
+                "status": "PRELIMINARY_SCREENING_ONLY_NOT_APPROVED",
+                "limitation": "A point outside the 2022-era candidate boundary may be a valid Ernakulam district facility; the boundary is not yet confirmed as the current Kochi Corporation polygon."
+            }
+            break
 
 
 def acquire(output: Path) -> dict:
@@ -133,7 +230,7 @@ def acquire(output: Path) -> dict:
         try:
             source_feature_count = None
             payload = None
-            if filename.endswith(".geojson"):
+            if filename == "health_facilities_ernakulam.geojson":
                 # Query a bounded Ernakulam-area envelope first so the service does not
                 # need to scan/download the national directory. If the spatial query returns
                 # no IDs, try the Kerala state attribute as a secondary route.
@@ -210,8 +307,8 @@ def acquire(output: Path) -> dict:
                 "sha256": hashlib.sha256(data).hexdigest(),
                 "size_bytes": len(data),
             })
-            if filename.endswith(".geojson"):
-                # Hospital features were assembled from all object-ID batches above.
+            if filename == "health_facilities_ernakulam.geojson":
+                # Health-facility features were assembled from all object-ID batches above.
                 if payload.get("type") != "FeatureCollection" or not isinstance(payload.get("features"), list):
                     raise RuntimeError("Hospital service did not return a GeoJSON FeatureCollection.")
                 features = payload["features"]
@@ -269,6 +366,19 @@ def acquire(output: Path) -> dict:
                     raise RuntimeError("Kerala Health Department response is not a PDF; refusing to save an error page as reference data.")
                 atomic_write(output / filename, data)
                 record["validation_status"] = "PDF_SIGNATURE_CHECKED_FACILITY_MATCHING_REQUIRED"
+            elif filename.endswith(".geojson"):
+                try:
+                    boundary_payload = json.loads(data.decode("utf-8-sig"))
+                except (UnicodeDecodeError, json.JSONDecodeError) as error:
+                    raise RuntimeError(f"Boundary response is not valid GeoJSON: {error}") from error
+                boundary_feature = boundary_payload if boundary_payload.get("type") == "Feature" else None
+                boundary_geometry = (boundary_feature or {}).get("geometry") or {}
+                if boundary_geometry.get("type") not in {"Polygon", "MultiPolygon"}:
+                    raise RuntimeError("Kochi boundary GeoJSON does not contain a Polygon or MultiPolygon feature.")
+                record["geometry_type"] = boundary_geometry.get("type")
+                record["boundary_properties"] = boundary_feature.get("properties") or {}
+                record["validation_status"] = "BOUNDARY_GEOJSON_STRUCTURE_CHECKED_CURRENTNESS_UNVERIFIED"
+                atomic_write(output / filename, data)
             else:
                 import io
                 if not zipfile.is_zipfile(io.BytesIO(data)):
@@ -299,6 +409,10 @@ def acquire(output: Path) -> dict:
         manifest["updated_at_utc"] = datetime.now(timezone.utc).isoformat()
         atomic_write(manifest_path, json.dumps(manifest, indent=2).encode("utf-8"))
 
+    if not failures:
+        add_boundary_screening(output, manifest)
+        manifest["updated_at_utc"] = datetime.now(timezone.utc).isoformat()
+        atomic_write(manifest_path, json.dumps(manifest, indent=2).encode("utf-8"))
     if failures:
         raise RuntimeError(
             "One or more map reference downloads failed: " + ", ".join(failures)
