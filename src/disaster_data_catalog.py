@@ -180,6 +180,20 @@ DATASET_CATALOG: list[dict[str, Any]] = [
         "limitations": "Best-track position/intensity is hazard-path evidence, not a local wind field, rainfall, storm surge, damage or consequence label. The nearest non-suspect track fix is 23.7 km from the approximate Kochi reference point (storm ID 2018-013, GAJA), but this is not a validated impact claim. Source flags are retained and uncorrected; the latest season may be tentative."
     },
     {
+        "id": "usgs_earthquake_catalog_kochiregion",
+        "hazards": ["Earthquake", "Compound: earthquake + infrastructure disruption"],
+        "theme": "Regional earthquake event catalogue",
+        "dataset": "USGS ComCat earthquake events within 1,000 km of approximate Kochi reference point, magnitude 2.5+, 1970-current",
+        "publisher": "United States Geological Survey (USGS), Earthquake Hazards Program",
+        "url": "https://earthquake.usgs.gov/fdsnws/event/1/",
+        "resource_urls": ["https://earthquake.usgs.gov/fdsnws/event/1/query", "https://riseq.seismo.gov.in/riseq/earthquake/archive"],
+        "access": "USGS FDSN Event Web Service provides parameterized GeoJSON queries. The NCS archive is retained as an India-specific comparison source; bulk export was not confirmed, so it is not scraped by this workflow.",
+        "priority": "P0",
+        "status": "Acquired and audited in workflow run 40933408852: 92 USGS ComCat events of magnitude 2.5+ within 1,000 km of the approximate Kochi point (1970-2026). Five are within 500 km; none are within 300 km in this catalogue/query. Two rows have invalid timestamps; coordinates/magnitudes are present and no duplicate event IDs were found. Not validated for local hazard or consequence prediction.",
+        "required_checks": "Cross-check this global catalogue against the India-specific NCS archive and GSI seismotectonic atlas; review the two invalid timestamps; obtain site geology, local ground-motion evidence, building inventory and vulnerability data before consequence analysis.",
+        "limitations": "No USGS events within 300 km in this query is not evidence of no earthquake hazard. USGS ComCat is a multi-network catalogue with variable completeness and location uncertainty; events below magnitude 2.5 are excluded. Regional event density is not local ground shaking, site response, building damage or an earthquake probability model."
+    },
+    {
         "id": "ncs_earthquake_catalog",
         "hazards": ["Earthquake", "Compound: earthquake + infrastructure disruption"],
         "theme": "Seismic events",

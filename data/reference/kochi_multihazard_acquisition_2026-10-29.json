@@ -374,6 +374,113 @@
         "The mirror parser repository is BSD-3-Clause, but underlying IMD data are © IMD and terms for redistribution/operational use remain to be confirmed.",
         "Track-to-point distance does not estimate wind damage, rainfall, storm surge, flood impact, or exposure."
       ]
+    },
+    {
+      "id": "usgs_comcat_regional_earthquake_catalog",
+      "official_api": "https://earthquake.usgs.gov/fdsnws/event/1/query",
+      "api_documentation": "https://earthquake.usgs.gov/fdsnws/event/1/",
+      "acquisition_status": "downloaded_raw; 12 non-overlapping time windows queried; audit completed; not validated for local ground shaking",
+      "query": {
+        "start_year": 1970,
+        "end_date_utc": "2026-10-29",
+        "minimum_magnitude": 2.5,
+        "radius_km": 1000,
+        "reference_point": {
+          "latitude": 9.9312,
+          "longitude": 76.2673,
+          "label": "approximate Kochi city-centre screening point"
+        },
+        "windows": 12
+      },
+      "counts": {
+        "events": 92,
+        "unique_event_ids": 92,
+        "invalid_time_rows": 2,
+        "missing_coordinate_rows": 0,
+        "out_of_range_coordinate_rows": 0,
+        "missing_magnitude_rows": 0,
+        "duplicate_event_id_rows": 0,
+        "valid_time_range_utc": [
+          "1973-08-30T19:50:02.900000+00:00",
+          "2026-09-08T16:58:58.167000+00:00"
+        ],
+        "magnitude_range": [
+          3.6,
+          6.2
+        ],
+        "events_by_decade": {
+          "1970s": 1,
+          "1980s": 8,
+          "1990s": 26,
+          "2000s": 35,
+          "2010s": 10,
+          "2020s": 10
+        },
+        "magnitude_bins": {
+          "<3.0": 0,
+          "3.0-3.9": 5,
+          "4.0-4.9": 70,
+          "5.0-5.9": 16,
+          ">=6.0": 1,
+          "missing": 0
+        }
+      },
+      "kochi_proximity_screening": {
+        "events_within_100_km": 0,
+        "events_within_300_km": 0,
+        "events_within_500_km": 5,
+        "events_within_1000_km": 92,
+        "nearest_events": [
+          {
+            "event_id": "us7000mcym",
+            "time_utc": "2024-04-10T18:45:49.997000+00:00",
+            "magnitude": 4.6,
+            "depth_km": 10,
+            "distance_km": 364.55184,
+            "place": "66 km SSE of Kavaratti, India"
+          },
+          {
+            "event_id": "usp000hgsb",
+            "time_utc": "2010-07-25T09:35:02.540000+00:00",
+            "magnitude": 4,
+            "depth_km": 10,
+            "distance_km": 374.49123,
+            "place": "180 km SSW of Manavalakurichi, India"
+          },
+          {
+            "event_id": "us70007jey",
+            "time_utc": "2020-02-05T20:47:08.396000+00:00",
+            "magnitude": 4.5,
+            "depth_km": 10,
+            "distance_km": 407.82572,
+            "place": "76 km NE of Dhidhdhoo, Maldives"
+          },
+          {
+            "event_id": "usp00064sj",
+            "time_utc": "1993-12-06T20:54:45.430000+00:00",
+            "magnitude": 5.2,
+            "depth_km": 10,
+            "distance_km": 412.15964,
+            "place": "163 km SSE of Kanyakumari, India"
+          },
+          {
+            "event_id": "usp000apsa",
+            "time_utc": "2001-09-25T14:56:44.250000+00:00",
+            "magnitude": 5.2,
+            "depth_km": 10,
+            "distance_km": 486.12634,
+            "place": "39 km SE of Marakkanam, India"
+          }
+        ],
+        "interpretation": "Regional event proximity only. Absence of events within 300 km in this catalogue/query does not mean zero local seismic hazard."
+      },
+      "limitations": [
+        "USGS ComCat is a multi-network catalogue; completeness and location uncertainty vary by time, magnitude and contributing network.",
+        "The query excludes events below magnitude 2.5 and is not a complete India-specific catalogue.",
+        "No events within 300 km is a query result, not evidence of no hazard.",
+        "Magnitude, depth and epicentre distance do not alone predict shaking or damage in Kochi.",
+        "Compare with NCS and GSI seismotectonic evidence; obtain site geology, local ground-motion models, building inventory and vulnerability data before consequence analysis."
+      ]
     }
   ],
   "overall_conclusion": {
@@ -390,7 +497,8 @@
       "Filter INDOFLOODS by privacy field and test whether valid Kochi/Ernakulam event and non-event labels can be built without leakage.",
       "Acquire and validate cyclone, coastal, earthquake, heat, drought, air-pollution and industrial-hazard evidence with hazard-specific methods.",
       "Resolve the three invalid GSI landslide susceptibility geometries with the publisher before spatial joins or consequence estimates.",
-      "Cross-check the cyclone mirror against the official IMD workbook and confirm data terms; investigate 32 duplicate storm/time rows and 203 date-suspect fixes before using any track for a consequence model."
+      "Cross-check the cyclone mirror against the official IMD workbook and confirm data terms; investigate 32 duplicate storm/time rows and 203 date-suspect fixes before using any track for a consequence model.",
+      "Cross-check USGS regional events against NCS and GSI seismotectonic evidence; acquire site geology, local ground-motion, building inventory and vulnerability data before local earthquake consequence analysis."
     ]
   },
   "follow_up_acquisition": {
@@ -420,5 +528,19 @@
     "artifact_files": 33,
     "artifact_expires_at_utc": "2026-11-05T18:36:34Z",
     "note": "Cyclone Parquet tables and audit reports are in a private temporary artifact. Raw tables are not committed to Git."
+  },
+  "earthquake_acquisition": {
+    "workflow_run_id": 40933408852,
+    "workflow_run_url": "https://github.com/joelaugustin010/AI_RESILIENCE/actions/runs/40933408852",
+    "status": "success",
+    "branch_commit": "849298b624b4cc420e5b2d3550deec27b1dc3ca1",
+    "artifact_id": 12923223392,
+    "artifact_name": "public-hydrology-source-bundle",
+    "artifact_sha256": "f32d7e683d7d37a78680a625398ec8d5060143245025b4fd04aaee5e08dae050",
+    "artifact_compressed_bytes": 17075261,
+    "artifact_uncompressed_bytes": 109266694,
+    "artifact_files": 48,
+    "artifact_expires_at_utc": "2026-11-05T18:44:33Z",
+    "note": "Raw GeoJSON windows and normalized CSV are in a private temporary artifact; no raw earthquake catalogue rows are committed to Git."
   }
 }

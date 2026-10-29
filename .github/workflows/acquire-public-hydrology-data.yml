@@ -7,6 +7,7 @@ on:
       - map-details-upgrade
       - phase2/scientific-scenario-engine
       - phase2/imd-cyclone-data-foundation
+      - phase2/usgs-earthquake-data-foundation
     paths:
       - "scripts/acquire_public_hydrology_data.py"
       - "scripts/acquire_map_reference_data.py"
@@ -23,6 +24,8 @@ on:
       - "tests/test_indofloods_audit.py"
       - "scripts/acquire_cyclone_best_track.py"
       - "tests/test_cyclone_best_track_acquisition.py"
+      - "scripts/acquire_earthquake_catalog.py"
+      - "tests/test_earthquake_catalog_acquisition.py"
       - "data/reference/public_data_sources.json"
       - ".github/workflows/acquire-public-hydrology-data.yml"
 
@@ -69,6 +72,9 @@ jobs:
       - name: Test cyclone best-track acquisition and audit
         run: python -m unittest discover -s tests -p 'test_cyclone_best_track_acquisition.py' -v
 
+      - name: Test USGS earthquake catalogue acquisition and audit
+        run: python -m unittest discover -s tests -p 'test_earthquake_catalog_acquisition.py' -v
+
       - name: Download catalogued source CSVs and write provenance
         id: acquisition
         continue-on-error: true
@@ -93,6 +99,11 @@ jobs:
         id: cyclone_acquisition
         continue-on-error: true
         run: python scripts/acquire_cyclone_best_track.py --output-dir data/external/cyclone_best_track
+
+      - name: Acquire and audit USGS regional earthquake catalogue
+        id: earthquake_acquisition
+        continue-on-error: true
+        run: python scripts/acquire_earthquake_catalog.py --output-dir data/external/earthquake_catalog
 
       - name: Acquire candidate health-facility GIS, Kochi boundary, KSDMA flood and GSI landslide archives
         id: map_acquisition
@@ -128,6 +139,7 @@ jobs:
             data/external/raw/**
             data/external/map_reference/**
             data/external/cyclone_best_track/**
+            data/external/earthquake_catalog/**
             data/external/download_manifest.json
             data/external/audit_report.json
             data/external/ifi_audit_report.json
@@ -159,6 +171,11 @@ jobs:
             else
               echo "**Cyclone best-track acquisition:** Failed or incomplete; do not use cyclone tracks until the source manifest, files and audit report are available."
             fi
+            if [ "${{ steps.earthquake_acquisition.outcome }}" = "success" ]; then
+              echo "**Earthquake catalogue acquisition:** USGS ComCat regional events acquired and audited; event density and distance are descriptive context, not local shaking or damage predictions."
+            else
+              echo "**Earthquake catalogue acquisition:** Failed or incomplete; do not use event counts until the source windows, counts and audit report are available."
+            fi
             echo ""
             if [ "${{ steps.map_acquisition.outcome }}" = "success" ]; then
               echo "**Map reference acquisition:** Candidate Ernakulam health-facility points, Kochi boundary, KSDMA flood-return raster and GSI landslide-susceptibility archive downloaded with SHA-256 provenance. These remain unvalidated candidates; they are not automatically shown on the map."
@@ -186,6 +203,10 @@ jobs:
           fi
           if [ "${{ steps.cyclone_acquisition.outcome }}" != "success" ]; then
             echo "IMD cyclone best-track acquisition/audit failed or did not complete. Review cyclone_best_track_audit.json and the artifact."
+            exit 1
+          fi
+          if [ "${{ steps.earthquake_acquisition.outcome }}" != "success" ]; then
+            echo "USGS earthquake catalogue acquisition/audit failed or did not complete. Review earthquake_audit.json and the artifact."
             exit 1
           fi
 
