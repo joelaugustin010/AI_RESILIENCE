@@ -28,6 +28,22 @@ SOURCES = {
         "source_page": "https://livingatlas.esri.in/server/rest/services/LivingAtlas/IND_Hospital_Directory/MapServer/0",
         "reuse": "Service page did not state a dataset-specific licence; review terms before redistribution.",
         "purpose": "Candidate hospital locations for independent identity and coordinate review.",
+        "independent_verification_sources": [
+            {
+                "publisher": "Kerala Health Department",
+                "title": "Institutions List (live search)",
+                "url": "https://health.kerala.gov.in/index.php/institutionSearch",
+                "role": "Independent reference for facility names, district, address, category and reported bed counts; does not itself provide a verified GIS export.",
+                "status": "REFERENCE_IDENTIFIED_MATCHING_NOT_YET_PERFORMED"
+            },
+            {
+                "publisher": "Kerala Health Department",
+                "title": "List of Modern Medicine Institutions 2024-25",
+                "url": "https://health.kerala.gov.in/assets/backend/uploads/Galleryitem/17506790021511401637.pdf",
+                "role": "Downloadable official name/address cross-check; older snapshot, not a source of coordinates or current operating status.",
+                "status": "REFERENCE_TO_BE_DOWNLOADED_AND_MATCHED"
+            }
+        ],
         "limitations": [
             "Not an official Kerala Health Department GIS export; source provenance, currency and licence require review.",
             "Ernakulam district is broader than Kochi Corporation.",
@@ -46,6 +62,19 @@ SOURCES = {
             "CRS, units, NoData values, band meanings, resolution, and spatial alignment must be audited.",
             "Return-period hazard is not a forecast for a specific date and is not an observed flood label.",
             "Do not display as validated exposure until raster metadata, licence, and Kochi coverage are confirmed."
+        ],
+    },
+    "kerala_health_department_institutions_2024_25.pdf": {
+        "url": "https://health.kerala.gov.in/assets/backend/uploads/Galleryitem/17506790021511401637.pdf",
+        "publisher": "Kerala Health Department, Government of Kerala",
+        "source_page": "https://health.kerala.gov.in/index.php/institutionSearch",
+        "reuse": "No explicit licence for redistribution verified; retain attribution and verify terms before republishing.",
+        "purpose": "Independent name/address reference for cross-checking candidate hospital features; not a coordinate source.",
+        "limitations": [
+            "This is a 2024-25 snapshot and may not reflect current facility status.",
+            "Facility names and addresses must be matched carefully; spelling variants are not proof of identity.",
+            "This PDF does not independently verify the coordinates of the Esri features.",
+            "Do not treat a successful PDF download as completion of hospital verification."
         ],
     },
 }
@@ -219,6 +248,11 @@ def acquire(output: Path) -> dict:
                     else "STRUCTURE_CHECKED_SPATIAL_ACCURACY_AND_LICENCE_UNVERIFIED"
                 )
                 atomic_write(output / filename, json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8"))
+            elif filename.endswith(".pdf"):
+                if not data.startswith(b"%PDF-"):
+                    raise RuntimeError("Kerala Health Department response is not a PDF; refusing to save an error page as reference data.")
+                atomic_write(output / filename, data)
+                record["validation_status"] = "PDF_SIGNATURE_CHECKED_FACILITY_MATCHING_REQUIRED"
             else:
                 import io
                 if not zipfile.is_zipfile(io.BytesIO(data)):
