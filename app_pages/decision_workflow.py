@@ -294,8 +294,10 @@ with st.expander("Longer-term AI RESILIENCE roadmap"):
 _render_hydrology_explorer()
 
 st.header("1. Select a hazard and describe conditions")
+# Keep the hazard selector outside the form so Streamlit reruns immediately when
+# the user changes hazards; the visible inputs then update before submission.
+hazard = st.selectbox("Hazard or compound scenario", HAZARD_OPTIONS, key="wf_hazard")
 with st.form("decision_workflow_intake"):
-    hazard = st.selectbox("Hazard or compound scenario", HAZARD_OPTIONS, key="wf_hazard")
     location = st.text_input(
         "Location or area name",
         value="Kochi Municipal Corporation — area not specified",
