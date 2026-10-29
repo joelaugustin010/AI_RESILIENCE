@@ -547,6 +547,14 @@ st.caption(
 )
 st.write("**Scenario type:**", consequence_assessment["scenario_type"])
 st.write("**Current model status:**", consequence_assessment["model_status"])
+if consequence_assessment["heatwave_screening"] is not None:
+    heat = consequence_assessment["heatwave_screening"]
+    st.markdown("**Heatwave criteria screen (not a forecast or official warning)**")
+    st.write("**Station-level screening:**", heat["station_status"])
+    if heat["departure_from_normal_c"] is not None:
+        st.metric("Supplied maximum-temperature departure from normal", f"{heat['departure_from_normal_c']:.1f} °C")
+    st.write("**Duration and multi-station check:**", heat["declaration_status"])
+    st.caption(heat["source"])
 col_prob, col_area = st.columns(2)
 with col_prob:
     st.markdown("**Probability of occurrence**")
