@@ -277,9 +277,18 @@
         "main_geotiff_count": 3,
         "nodata_value": -3.402823e+38,
         "valid_value_ranges_by_rp": {
-          "10-year": [0.729, 1776.6],
-          "25-year": [0.6561, 1974.0],
-          "50-year": [0.729, 1981.0]
+          "10-year": [
+            0.729,
+            1776.6
+          ],
+          "25-year": [
+            0.6561,
+            1974
+          ],
+          "50-year": [
+            0.729,
+            1981
+          ]
         },
         "valid_pixel_counts_by_rp": {
           "10-year": 326956,
@@ -816,6 +825,38 @@
       ],
       "blocker": "Reported values exist in the existing air-quality tables, but there is no verified spatial station/observation join. This map layer is unsuitable for spatial analysis.",
       "evidence_status": "unsuitable"
+    },
+    {
+      "layer_id": "kochi_wards_opencity_2024_candidate",
+      "title": "Kochi Corporation 2024 ward boundaries (OpenCity KML candidate)",
+      "status": "acquired_candidate_not_integrated",
+      "source_url": "https://data.opencity.in/dataset/kochi-wards-map",
+      "upstream_url": "https://data.opencity.in/dataset/kochi-wards-map/resource/24a3de7a-4b14-436e-ae0c-e9ec7b1749e0",
+      "publisher": "OpenCity.in; catalogue credits Esri India Living Atlas",
+      "retrieved_on": "2026-10-29",
+      "publication_date": "Catalogue describes the ward map as 2024; resource metadata last updated 2025-11-25",
+      "license": "Catalogue reports Public Domain; independent rights/legal verification not completed",
+      "crs": "KML longitude/latitude coordinates interpreted as WGS84; no independent CRS/positional-accuracy statement verified",
+      "units": "Degrees longitude and latitude",
+      "geographic_coverage": "Kochi Municipal Corporation; catalogue describes 74 wards",
+      "limitations": [
+        "CI acquisition retrieved a 533,483-byte KML with SHA-256 e6376e6a2ac3a0ab28615cd77f4d649bfba5c48034d26c2e31ae295697d06238; raw candidate is in the short-lived workflow artifact, not yet converted or committed as an app-ready layer.",
+        "Structural review found 74 placemarks, 74 unique ward names in ExtendedData, 83 polygon components, 83 coordinate rings, zero unclosed rings, zero malformed coordinate tuples, and zero coordinates outside legal longitude/latitude ranges. This is structural QA, not complete topology validation.",
+        "Candidate bounds are [76.2370672, 9.8930813, 76.3399039, 10.0502655]. Compared with the configured provisional boundary's bounds, the edge differences are approximately 32 m west, 374 m south, 14 m east, and 55 m north. This is a bounding-box comparison only and does not prove polygon equality or explain the discrepancy.",
+        "The official Cochin map page is labelled Draft Notification; final notification alignment has not been established.",
+        "Do not promote this candidate to the production boundary or use it for exposure analysis until the final official source, topology, legal status, and full geometry comparison are reviewed."
+      ],
+      "feature_count": 74,
+      "validation_status": "CANDIDATE STRUCTURE CHECKED; OFFICIAL ALIGNMENT AND FULL GEOMETRY COMPARISON REQUIRED",
+      "evidence_status": "candidate_not_approved",
+      "candidate_sha256": "e6376e6a2ac3a0ab28615cd77f4d649bfba5c48034d26c2e31ae295697d06238",
+      "candidate_bounds_lonlat": [
+        76.2370671795491,
+        9.89308129910554,
+        76.3399038923155,
+        10.0502655156484
+      ],
+      "boundary_comparison": "Bounding-box only; not approved for boundary replacement."
     }
   ],
   "status_definitions_file": "data/reference/data_status_definitions.json"
