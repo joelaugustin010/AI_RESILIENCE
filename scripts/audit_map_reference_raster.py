@@ -18,6 +18,11 @@ try:
 except ImportError:  # pragma: no cover - exercised by a clear CLI error
     rasterio = None
 
+try:
+    from rasterio.warp import transform_bounds
+except ImportError:  # pragma: no cover
+    transform_bounds = None
+
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_ARCHIVE = ROOT / "data" / "external" / "map_reference" / "ksdma_flood_return_probability_historical_10_25_50.zip"
 DEFAULT_OUTPUT = ROOT / "data" / "external" / "map_reference" / "raster_metadata_audit.json"
@@ -54,11 +59,17 @@ def inspect_archive(archive_path: Path) -> dict[str, Any]:
                     with rasterio.open(target) as ds:
                         bounds = [float(ds.bounds.left), float(ds.bounds.bottom), float(ds.bounds.right), float(ds.bounds.top)]
                         crs_text = ds.crs.to_string() if ds.crs else None
+                        bounds_epsg4326 = None
                         kochi_overlap = None
-                        if ds.crs and ds.crs.to_epsg() == 4326:
-                            left, bottom, right, top = bounds
-                            kleft, kbottom, kright, ktop = KOCHI_SCREENING_BOUNDS
-                            kochi_overlap = not (right < kleft or left > kright or top < kbottom or bottom > ktop)
+                        if ds.crs:
+                            try:
+                                bounds_epsg4326 = list(transform_bounds(ds.crs, "EPSG:4326", *bounds, densify_pts=21))
+                                left, bottom, right, top = bounds_epsg4326
+                                kleft, kbottom, kright, ktop = KOCHI_SCREENING_BOUNDS
+                                kochi_overlap = not (right < kleft or left > kright or top < kbottom or bottom > ktop)
+                            except Exception:
+                                # A failed transform is a blocking coverage uncertainty, not a no-overlap result.
+                                bounds_epsg4326 = None
                         sample_summary = []
                         for band in range(1, ds.count + 1):
                             height = min(512, ds.height)
@@ -93,6 +104,7 @@ def inspect_archive(archive_path: Path) -> dict[str, Any]:
                             "band_count": ds.count,
                             "data_types": list(ds.dtypes),
                             "bounds_in_source_crs": bounds,
+                            "bounds_epsg4326": bounds_epsg4326,
                             "resolution_in_source_crs_units": [float(ds.res[0]), float(ds.res[1])],
                             "transform": list(ds.transform)[:6],
                             "nodata": ds.nodata,
@@ -101,7 +113,7 @@ def inspect_archive(archive_path: Path) -> dict[str, Any]:
                             "kochi_screening_box": list(KOCHI_SCREENING_BOUNDS),
                             "limitations": [
                                 "Sampled min/max are from a downsampled sample, not guaranteed full-raster extrema.",
-                                "A bounding-box overlap is only a screening check, not a polygon-coverage or alignment validation.",
+                                "Bounds are transformed to EPSG:4326 where possible. A bounding-box overlap is only a screening check, not a polygon-coverage or alignment validation.",
                                 "Band values, return-period semantics, vertical/horizontal units, source accuracy and licence require source documentation.",
                                 "No raster is approved for map display or exposure analysis by this audit.",
                             ],
