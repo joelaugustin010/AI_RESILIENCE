@@ -1,0 +1,124 @@
+{
+  "status": "READINESS_AUDIT_ONLY",
+  "trained_models": 0,
+  "warning": "This report does not claim any model is trained or scientifically validated.",
+  "hazards": [
+    {
+      "hazard_id": "earthquake",
+      "label": "Earthquake shaking impact",
+      "source": "USGS ComCat",
+      "source_url": "https://earthquake.usgs.gov/fdsnws/event/1/",
+      "exists": false,
+      "audit": {
+        "status": "MISSING_DATA",
+        "issues": [
+          "No local dataset file found; no model trained."
+        ]
+      }
+    },
+    {
+      "hazard_id": "cyclone",
+      "label": "Tropical cyclone",
+      "source": "NOAA IBTrACS",
+      "source_url": "https://www.ncei.noaa.gov/products/international-best-track-archive",
+      "exists": false,
+      "audit": {
+        "status": "MISSING_DATA",
+        "issues": [
+          "No local dataset file found; no model trained."
+        ]
+      }
+    },
+    {
+      "hazard_id": "landslide",
+      "label": "Landslide susceptibility",
+      "source": "NASA Global Landslide Catalog / USGS inventories",
+      "source_url": "https://data.nasa.gov/",
+      "exists": false,
+      "audit": {
+        "status": "MISSING_DATA",
+        "issues": [
+          "No local dataset file found; no model trained."
+        ]
+      }
+    },
+    {
+      "hazard_id": "drought",
+      "label": "Drought conditions",
+      "source": "NASA Earth observation and climate data",
+      "source_url": "https://earthdata.nasa.gov/",
+      "exists": false,
+      "audit": {
+        "status": "MISSING_DATA",
+        "issues": [
+          "No local dataset file found; no model trained."
+        ]
+      }
+    },
+    {
+      "hazard_id": "heatwave",
+      "label": "Extreme heat",
+      "source": "NOAA climate data / ERA5",
+      "source_url": "https://www.ncei.noaa.gov/; https://cds.climate.copernicus.eu/",
+      "exists": false,
+      "audit": {
+        "status": "MISSING_DATA",
+        "issues": [
+          "No local dataset file found; no model trained."
+        ]
+      }
+    },
+    {
+      "hazard_id": "wildfire",
+      "label": "Wildfire occurrence / burned area",
+      "source": "NASA FIRMS and MODIS/VIIRS burned-area products",
+      "source_url": "https://firms.modaps.eosdis.nasa.gov/; https://lpdaac.usgs.gov/",
+      "exists": false,
+      "audit": {
+        "status": "MISSING_DATA",
+        "issues": [
+          "No local dataset file found; no model trained."
+        ]
+      }
+    },
+    {
+      "hazard_id": "tsunami",
+      "label": "Tsunami coastal exposure",
+      "source": "NOAA/NCEI tsunami event database",
+      "source_url": "https://www.ngdc.noaa.gov/hazel/view/hazards/tsunami/event-search",
+      "exists": false,
+      "audit": {
+        "status": "MISSING_DATA",
+        "issues": [
+          "No local dataset file found; no model trained."
+        ]
+      }
+    },
+    {
+      "hazard_id": "severe_storm",
+      "label": "Severe storm / extreme rainfall",
+      "source": "IMD and Copernicus Climate Data Store",
+      "source_url": "https://mausam.imd.gov.in/; https://cds.climate.copernicus.eu/",
+      "exists": false,
+      "audit": {
+        "status": "MISSING_DATA",
+        "issues": [
+          "No local dataset file found; no model trained."
+        ]
+      }
+    },
+    {
+      "hazard_id": "air_pollution",
+      "label": "Air-quality episode",
+      "source": "CPCB / OpenAQ",
+      "source_url": "https://cpcb.nic.in/; https://openaq.org/",
+      "exists": false,
+      "audit": {
+        "status": "MISSING_DATA",
+        "issues": [
+          "No local dataset file found; no model trained."
+        ]
+      }
+    }
+  ]
+}
