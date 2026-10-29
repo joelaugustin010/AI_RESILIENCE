@@ -322,7 +322,10 @@ with st.form("decision_workflow_intake"):
         river_reference = st.text_input("Gauge zero / datum reference (if known)", key="wf_river_reference")
     with col2:
         wind_speed_kmh = st.number_input("Wind speed (km/h)", min_value=0.0, value=None, step=1.0, key="wf_wind")
-        temperature_c = st.number_input("Temperature (°C)", value=None, step=0.5, key="wf_temperature")
+        temperature_c = st.number_input("Maximum temperature (°C)", value=None, step=0.5, key="wf_temperature")
+        normal_max_temperature_c = st.number_input("Normal daily maximum for this station (°C; heatwave screening)", value=None, step=0.5, key="wf_normal_temperature", help="Use an official station normal for the relevant date/period; leave blank if unknown.")
+        heatwave_consecutive_days = st.number_input("Consecutive days meeting the heatwave criteria (if verified)", min_value=0, value=None, step=1, key="wf_heatwave_days")
+        heatwave_station_count = st.number_input("Stations in the meteorological subdivision meeting criteria (if verified)", min_value=0, value=None, step=1, key="wf_heatwave_stations")
         affected_population = st.number_input("Affected population context (people; optional)", min_value=0, value=None, step=1, key="wf_population")
         drainage_status = st.selectbox("Drainage condition", ["Not supplied", "Reported functioning", "Reported partially impaired", "Reported failed", "Hypothetical partial failure", "Not applicable"], key="wf_drainage")
         infrastructure_status = st.selectbox("Other infrastructure condition", ["Not supplied", "No disruption reported", "Possible / hypothetical disruption", "Disruption reported by user", "Not applicable"], key="wf_infrastructure")
@@ -349,6 +352,9 @@ if submitted:
         "river_reference": river_reference,
         "wind_speed_kmh": wind_speed_kmh,
         "temperature_c": temperature_c,
+        "normal_max_temperature_c": normal_max_temperature_c,
+        "heatwave_consecutive_days": heatwave_consecutive_days,
+        "heatwave_station_count": heatwave_station_count,
         "affected_population": affected_population,
         "drainage_status": drainage_status,
         "infrastructure_status": infrastructure_status,
