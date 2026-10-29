@@ -19,13 +19,19 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT = ROOT / "data" / "external" / "map_reference"
 USER_AGENT = "AI_RESILIENCE educational research; preserve source attribution"
-HOSPITAL_QUERY = "https://livingatlas.esri.in/server/rest/services/LivingAtlas/IND_Hospital_Directory/MapServer/0/query"
+HOSPITAL_QUERY = "https://livingatlas.esri.in/server/rest/services/LivingAtlas/IND_Health/MapServer/0/query"
+PREVIOUS_HOSPITAL_QUERY = "https://livingatlas.esri.in/server/rest/services/LivingAtlas/IND_Hospital_Directory/MapServer/0/query"
 FLOOD_ZIP = "https://sdma.kerala.gov.in/wp-content/uploads/2026/06/1.-Flood-Return-Probability-Historical-10-25-50-years.zip"
 SOURCES = {
-    "hospital_directory_ernakulam.geojson": {
+    "health_facilities_ernakulam.geojson": {
         "url": HOSPITAL_QUERY,
-        "publisher": "Esri India Living Atlas, Hospital Directory of India (underlying data provenance requires review)",
-        "source_page": "https://livingatlas.esri.in/server/rest/services/LivingAtlas/IND_Hospital_Directory/MapServer/0",
+        "publisher": "Esri India Living Atlas, Health Centers in India (underlying data provenance requires review)",
+        "source_page": "https://livingatlas.esri.in/server/rest/services/LivingAtlas/IND_Health/MapServer/0",
+        "previous_source_attempt": {
+            "url": PREVIOUS_HOSPITAL_QUERY,
+            "status": "FAILED_ZERO_FEATURES_AFTER_TWO_OBJECT_IDS",
+            "reason": "The Hospital Directory layer returned an empty FeatureCollection when the retrieved object IDs were queried; retained as a failed source attempt rather than silently accepted."
+        },
         "reuse": "Service page did not state a dataset-specific licence; review terms before redistribution.",
         "purpose": "Candidate hospital locations for independent identity and coordinate review.",
         "independent_verification_sources": [
@@ -133,7 +139,7 @@ def acquire(output: Path) -> dict:
                 # If the state attribute query returns no IDs, fall back to a broad
                 # Ernakulam-area envelope rather than downloading the entire country.
                 ids_url = url + "?" + urllib.parse.urlencode({
-                    "where": "state_name='Kerala'",
+                    "where": "statename='Kerala'",
                     "returnIdsOnly": "true",
                     "f": "json",
                 })
@@ -180,9 +186,18 @@ def acquire(output: Path) -> dict:
                 filtered = []
                 for feature in all_features:
                     props = feature.get("properties") or {}
-                    state = str(props.get("state_name", "")).strip().casefold()
-                    district = " ".join(str(props.get("district_name", "")).strip().casefold().replace("-", " ").split())
+                    state_value = props.get("state_name", props.get("statename", ""))
+                    district_value = props.get("district_name", props.get("districtname", ""))
+                    state = str(state_value).strip().casefold()
+                    district = " ".join(str(district_value).strip().casefold().replace("-", " ").split())
                     if state == "kerala" and district in {"ernakulam", "ernakulam district", "ernakulam (kochi)"}:
+                        # Normalize alternate layer fields while preserving all original properties.
+                        props["state_name"] = str(state_value).strip()
+                        props["district_name"] = str(district_value).strip()
+                        props["health_facility_name"] = props.get("health_facility_name") or props.get("facilityname", "")
+                        props["address"] = props.get("address") or props.get("facilityaddress", "")
+                        props["facility_type"] = props.get("facility_type") or props.get("facilitytype", "")
+                        feature["properties"] = props
                         filtered.append(feature)
                 payload = {"type": "FeatureCollection", "features": filtered}
                 data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
@@ -228,9 +243,11 @@ def acquire(output: Path) -> dict:
                             if not (74.0 <= float(lon) <= 78.0 and 8.0 <= float(lat) <= 13.0):
                                 outside_kerala_screening_box += 1
                     props = feature.get("properties") or {}
-                    if not str(props.get("health_facility_name", props.get("name", ""))).strip():
+                    if not str(props.get("health_facility_name", props.get("facilityname", props.get("name", "")))).strip():
                         missing_facility_names += 1
-                    if str(props.get("state_name", "")).strip().casefold() != "kerala" or str(props.get("district_name", "")).strip().casefold() != "ernakulam":
+                    normalized_state = str(props.get("state_name", props.get("statename", ""))).strip().casefold()
+                    normalized_district = " ".join(str(props.get("district_name", props.get("districtname", ""))).strip().casefold().replace("-", " ").split())
+                    if normalized_state != "kerala" or normalized_district not in {"ernakulam", "ernakulam district", "ernakulam (kochi)"}:
                         district_mismatches += 1
                 from collections import Counter
                 coordinate_counts = Counter(coordinate_pairs)
