@@ -46,7 +46,7 @@ A related rainfall depth-duration-frequency dataset hosted by the Environmental 
 ## 5. Gate checklist
 
 - [x] Acquisition workflow completes and records provenance.
-- [x] Python tests passed on commit 37b8bd2e4676d32532b348e51f22f8ba38e5182d (run #84); later full Python test workflow #86 passed on code commit 21ab7461e952eed0cb83fcb9284c5c06f4f8d1f0 (before the subsequent documentation-only update). Passing tests are software evidence only.
+- [x] Previous full Python test workflow #40903978424 passed on commit 20a29285b2bd16de08bb6e6bfbba1f5903390089. Later map-audit code added new geometry dependencies and tests; see Section 8 for the latest run status. Passing tests are software evidence only.
 - [x] Raster ZIP integrity and basic technical metadata checked.
 - [ ] Verify and checksum the 2024 Cochin boundary geometry against official notification.
 - [ ] Reconcile all 642 facility candidates and duplicate-coordinate groups.
@@ -116,3 +116,41 @@ A separate catalogue entry was found for **"Kochi Wards Map 2024"**, described a
 - Hydrology acquisition workflow #58: https://github.com/joelaugustin010/AI_RESILIENCE/actions/runs/40900447377 — passed as an acquisition run; this does not make the acquired sources scientifically approved.
 
 **Updated decision: NOT APPROVED FOR MODEL TRAINING OR VERIFIED EXPOSURE CLAIMS.** The new catalogue entry improves the next acquisition route, but boundary verification, hospital reconciliation, raster semantics/licensing, and hydrology datum/time/label validation remain open.
+
+
+## 8. OpenCity 2024 ward candidate: structural audit and geometry comparison (29 October 2026)
+
+The OpenCity resource API returned the KML resource for **Kochi Wards Map 2024**. The latest successful acquisition run is [workflow #40906415813](https://github.com/joelaugustin010/AI_RESILIENCE/actions/runs/40906415813). The raw KML and audit metadata are in its short-lived `public-hydrology-source-bundle` artifact; the raw KML has SHA-256 `e6376e6a2ac3a0ab28615cd77f4d649bfba5c48034d26c2e31ae295697d06238`.
+
+### Structural results
+
+- 74 placemarks and 74 unique ward names read from the KML `ExtendedData` fields.
+- 83 polygon components across the ward features; 83 coordinate rings checked.
+- Zero unclosed rings, malformed coordinate tuples, or coordinates outside longitude/latitude ranges.
+- Candidate extent (longitude/latitude): `[76.2370672, 9.8930813, 76.3399039, 10.0502655]`.
+- The catalogue labels the licence Public Domain and credits Esri India Living Atlas. These are recorded as catalogue claims; the source's legal status and positional accuracy have not been independently certified.
+
+### Full geometry comparison with the configured provisional boundary
+
+The candidate ward polygons were unioned without repairing invalid inputs and compared to the existing DataMeet/Kerala OpenSDI provisional corporation polygon in EPSG:32643. Both the configured polygon and candidate union passed the geometry validity checks, but their shapes disagree materially:
+
+| Measure | Result |
+|---|---:|
+| Candidate ward union area | 79.0992 km² |
+| Existing provisional boundary area | 96.1376 km² |
+| Intersection area | 77.3049 km² |
+| Symmetric difference area | 20.6271 km² |
+| Intersection over union | 0.78937324 |
+| Symmetric difference / union area | 0.21062676 |
+
+This is not a negligible edge mismatch. Approximately 21.1% of the combined union area is in the symmetric difference. The bounding boxes also differ, including an approximate 374 m difference at the southern edge, but the full geometry comparison is the stronger evidence.
+
+**Decision:** neither geometry is promoted as the authoritative Kochi boundary. The candidate is catalogued in `data/reference/spatial_sources.json` as not integrated and not approved. The map UI now displays a warning with the comparison metrics. Do not use either geometry for definitive ward-level exposure counts until the discrepancy is resolved against the final official notification and source metadata. The official Cochin map page currently surfaced by the portal is labelled Draft Notification; that is not proof of the final legal boundary.
+
+### Implementation and test status
+
+- Added `scripts/acquire_kochi_ward_boundary_candidate.py` to retrieve the catalogue's actual resource URL via the resource API, preserve the raw KML, hash it, and audit ward names, rings, coordinates, extents, and geometry overlap.
+- Added unit tests for malformed KML, metadata/download failure, ring/coordinate checks, bounding-box comparison, and projected geometry comparison.
+- Added `shapely` and `pyproj` to `requirements-data.txt` so the full test workflow has the same geometry-comparison dependencies as the acquisition workflow.
+- Acquisition workflow #40906415813 passed. The full Python test workflow is being rerun after fixing its missing geometry-test dependencies; do not treat earlier failed test runs as passing.
+- These results complete a significant boundary-audit step, **not the overall map or scientific data foundation**. Remaining map blockers include official boundary/legal reconciliation, health-facility identity and coordinate verification, KSDMA raster pixel semantics/licence, and the hydrology station/datum/time-alignment issues documented above.
