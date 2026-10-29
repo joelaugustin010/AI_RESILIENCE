@@ -9,6 +9,8 @@ on:
       - "scripts/acquire_public_hydrology_data.py"
       - "scripts/audit_public_hydrology_data.py"
       - "scripts/audit_ifi_flood_inventory.py"
+      - "scripts/audit_indofloods.py"
+      - "tests/test_indofloods_audit.py"
       - "data/reference/public_data_sources.json"
       - ".github/workflows/acquire-public-hydrology-data.yml"
 
@@ -37,6 +39,9 @@ jobs:
       - name: Test IFI inventory audit safeguards
         run: python -m unittest discover -s tests -p 'test_ifi_flood_inventory_audit.py' -v
 
+      - name: Test INDOFLOODS audit safeguards
+        run: python -m unittest discover -s tests -p 'test_indofloods_audit.py' -v
+
       - name: Download catalogued source CSVs and write provenance
         id: acquisition
         continue-on-error: true
@@ -53,6 +58,10 @@ jobs:
         if: always() && steps.acquisition.outcome == 'success'
         run: python scripts/audit_ifi_flood_inventory.py --input-dir data/external/raw --output data/external/ifi_audit_report.json
 
+      - name: Audit INDOFLOODS gauge-event dataset
+        if: always() && steps.acquisition.outcome == 'success'
+        run: python scripts/audit_indofloods.py --input-dir data/external/raw --output data/external/indofloods_audit_report.json
+
       - name: Upload raw data, audit and provenance as a short-lived artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -63,6 +72,7 @@ jobs:
             data/external/download_manifest.json
             data/external/audit_report.json
             data/external/ifi_audit_report.json
+            data/external/indofloods_audit_report.json
             acquisition.log
           if-no-files-found: warn
           retention-days: 7
