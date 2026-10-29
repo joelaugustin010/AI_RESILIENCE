@@ -11,6 +11,7 @@ from src.scientific_scenario_engine import build_scientific_scenario_frame
 from src.source_registry import build_source_registry, source_fitness_summary
 from src.disaster_data_catalog import get_catalog, validate_catalog_record
 from src.consequence_data_requirements import HAZARD_REQUIREMENTS, requirements_for_hazard, requirements_table
+from src.consequence_assessment import build_consequence_assessment
 
 from src.decision_workflow import (
     HAZARD_OPTIONS,
@@ -526,6 +527,35 @@ for item in scientific_frame["required_evidence"]:
 st.markdown("**Interpretation safeguards:**")
 for item in scientific_frame["limitations"]:
     st.markdown(f"- {item}")
+
+st.subheader("Consequence assessment: probability, affected areas and impacts")
+consequence_assessment = build_consequence_assessment(
+    inputs["hazard"],
+    inputs["location"],
+    inputs["input_classification"],
+    inputs,
+)
+st.caption(
+    "This is the required output structure for every selected disaster. Numerical probability and affected-area results "
+    "will appear only after the corresponding validated model and spatial evidence are connected."
+)
+st.write("**Scenario type:**", consequence_assessment["scenario_type"])
+st.write("**Current model status:**", consequence_assessment["model_status"])
+col_prob, col_area = st.columns(2)
+with col_prob:
+    st.markdown("**Probability of occurrence**")
+    st.info(consequence_assessment["occurrence_probability"])
+with col_area:
+    st.markdown("**Affected-area estimate**")
+    st.info(consequence_assessment["affected_area"])
+st.markdown("**Consequences this assessment must examine**")
+for item in consequence_assessment["consequence_categories"]:
+    st.markdown(f"- {item}")
+st.markdown("**Required evidence for this scenario**")
+for item in consequence_assessment["required_evidence"]:
+    st.markdown(f"- {item}")
+st.warning(consequence_assessment["scientific_guardrail"])
+st.caption(consequence_assessment["probability_semantics"])
 
 st.header("4. Compare hypothetical scenarios")
 st.caption("The following cases differ only by their stated assumptions. Possible pathways are planning prompts, not calculated impacts.")
