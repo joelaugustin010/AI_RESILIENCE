@@ -1,22 +1,23 @@
-name: Acquire and audit multi-hazard source data
+name: Acquire and store multi-hazard source data
 on:
   workflow_dispatch:
   push:
     paths:
-      - "data/external/hazard_dataset_registry.json"
       - "scripts/acquire_hazard_data.py"
       - "scripts/audit_hazard_datasets.py"
       - "scripts/train_hazard_baseline.py"
-      - "data/external/hazards/**"
+      - "data/external/hazard_dataset_registry.json"
       - ".github/workflows/audit-hazard-readiness.yml"
 permissions:
-  contents: read
+  contents: write
 jobs:
-  acquire-audit:
+  acquire-audit-store:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -26,7 +27,38 @@ jobs:
         run: |
           python -m pip install --upgrade pip pandas scikit-learn joblib
           python scripts/audit_hazard_datasets.py
-      - name: Upload source data and provenance reports
+      - name: Check GitHub repository file-size limits
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          limit = 45 * 1024 * 1024
+          too_large = []
+          for path in Path("data/external/hazards/raw").rglob("*"):
+              if path.is_file() and path.stat().st_size > limit:
+                  too_large.append((path, path.stat().st_size))
+          if too_large:
+              for path, size in too_large:
+                  print(f"NOT COMMITTING (>45 MiB): {path} ({size / 1024 / 1024:.1f} MiB)")
+                  path.unlink()
+              print("Oversized files are excluded from the Git commit; acquisition logs identify what was downloaded.")
+          PY
+      - name: Store downloaded data and provenance in GitHub
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/external/hazards/raw reports/hazard_data_acquisition_manifest.json reports/hazard_dataset_readiness.json
+          if git diff --cached --quiet; then
+            echo "No new or changed data files to commit."
+          else
+            git commit -m "Add acquired multi-hazard source data and provenance"
+            git push
+          fi
+      - name: Upload source-data archive and provenance reports
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: nine-hazard-source-data-and-audit
@@ -34,5 +66,5 @@ jobs:
             data/external/hazards/raw/
             reports/hazard_data_acquisition_manifest.json
             reports/hazard_dataset_readiness.json
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 30
