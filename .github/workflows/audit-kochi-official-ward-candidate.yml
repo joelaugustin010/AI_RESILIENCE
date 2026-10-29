@@ -43,3 +43,36 @@ jobs:
             git commit -m "Acquire and validate Kochi draft ward-map candidate"
             git push origin "HEAD:$BRANCH_NAME"
           fi
+      - name: Verify candidate passes repository ingestion checks
+        run: |
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          from src.spatial_data import read_processed_layers
+
+          processed_root = Path("data/processed")
+          candidate_path = processed_root / "spatial_layers" / "kochi_wards_ksmart_2024_draft_candidate.geojson"
+          candidate_sha = hashlib.sha256(candidate_path.read_bytes()).hexdigest()
+          layers = read_processed_layers(processed_root)
+          candidates = [
+              layer for layer in layers
+              if layer["metadata"].get("dataset_id") == "kochi_wards_ksmart_2024_draft_candidate"
+          ]
+          if len(candidates) != 1:
+              raise SystemExit(
+                  "Candidate did not pass read_processed_layers provenance/geometry gate; "
+                  f"loaded candidates={len(candidates)}"
+              )
+          candidate = candidates[0]
+          if candidate["report"]["feature_count"] != 76:
+              raise SystemExit(f"Expected 76 loaded features; got {candidate['report']['feature_count']}")
+          if candidate["report"]["source_sha256"] != candidate_sha:
+              raise SystemExit("Loaded candidate hash does not match the stored GeoJSON.")
+          print({
+              "loaded_candidate_features": candidate["report"]["feature_count"],
+              "provenance_valid": candidate["report"]["provenance_valid"],
+              "source_name_mismatches": candidate["metadata"].get("source_name_mismatch_count"),
+              "geometry_repairs": candidate["metadata"].get("geometry_repair_count"),
+              "candidate_only": candidate["metadata"].get("status"),
+          })
+          PY
