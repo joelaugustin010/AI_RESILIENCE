@@ -8,8 +8,10 @@ on:
     paths:
       - "scripts/acquire_public_hydrology_data.py"
       - "scripts/acquire_map_reference_data.py"
+      - "scripts/acquire_kochi_ward_boundary_candidate.py"
       - "scripts/audit_map_reference_raster.py"
       - "tests/test_map_reference_acquisition.py"
+      - "tests/test_acquire_kochi_ward_boundary_candidate.py"
       - "tests/test_map_reference_raster_audit.py"
       - "scripts/audit_public_hydrology_data.py"
       - "scripts/audit_ifi_flood_inventory.py"
