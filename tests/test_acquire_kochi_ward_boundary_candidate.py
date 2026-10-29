@@ -31,6 +31,23 @@ class KochiWardBoundaryCandidateTests(unittest.TestCase):
         self.assertFalse(audit["expected_74_ward_count_matches"])
         self.assertEqual(audit["structural_status"], "STRUCTURE_CHECKED_CANDIDATE_ONLY")
 
+    def test_projected_geometry_overlay_reports_shape_similarity_without_legal_approval(self):
+        boundary = {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [[[76.2, 9.8], [76.4, 9.8], [76.4, 9.9], [76.2, 9.9], [76.2, 9.8]]],
+            },
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            boundary_path = Path(directory) / "boundary.geojson"
+            boundary_path.write_text(json.dumps(boundary), encoding="utf-8")
+            result = acquisition.compare_candidate_geometry_with_boundary(KML, boundary_path)
+        self.assertEqual(result["status"], "GEOMETRY_OVERLAY_COMPLETED_NOT_LEGAL_APPROVAL")
+        self.assertEqual(result["invalid_candidate_polygon_count"], 0)
+        self.assertAlmostEqual(result["intersection_over_union"], 1.0, places=6)
+        self.assertIn("does not establish which boundary is legally authoritative", result["warning"])
+
     def test_boundary_extent_comparison_is_explicitly_not_geometry_approval(self):
         boundary = {
             "type": "Feature",
