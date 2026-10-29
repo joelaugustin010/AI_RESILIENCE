@@ -40,6 +40,48 @@ DATASET_CATALOG: list[dict[str, Any]] = [
         "limitations": "Susceptibility zoning is not a landslide time forecast; local slope/soil/trigger evidence remains necessary.",
     },
     {
+        "id": "kerala_sw_rainfall_telemetry_2021_2025",
+        "hazards": ["Flood", "Cyclone", "Compound: cyclone + flood", "Compound: heavy rainfall + drainage failure"],
+        "theme": "Rainfall observations",
+        "dataset": "Kerala Surface Water Department telemetry rainfall (hourly), 2021-2025",
+        "publisher": "Kerala Surface Water Department via National Water Data Portal / National Water Informatics Centre",
+        "url": "https://nwdp.nwic.gov.in/dataset/09518a17-a04b-43e3-a4e0-3d0fe81dbf68/resource/0410ec7a-b253-4d85-8f0f-e6b69c44e40c/download/rainfall_tel_hr_kerala_sw_kl_2021_2025.csv",
+        "resource_urls": ["https://nwdp.nwic.gov.in/dataset/09518a17-a04b-43e3-a4e0-3d0fe81dbf68/resource/0410ec7a-b253-4d85-8f0f-e6b69c44e40c/download/rainfall_tel_hr_kerala_sw_kl_2021_2025.csv"],
+        "access": "Acquired in workflow run 40928550082; raw CSV and SHA-256 manifest are in the private short-lived artifact, not committed to Git.",
+        "priority": "P0",
+        "status": "Downloaded and descriptively audited: 188,045 rows, 108 stations, 14,347 Ernakulam rows across 9 named stations; zero invalid timestamps/numeric values and zero duplicate station-time groups in this file.",
+        "required_checks": "Confirm station coordinates/CRS and accuracy, source timezone, irregular observation gaps, instrument/quality flags, temporal sampling, current licence terms and alignment to verified flood-event periods.",
+        "limitations": "Rows span 2021-04-07 to 2025-03-09; some stations have very long gaps. Ernakulam district coverage is not equivalent to Kochi Corporation coverage. This is rainfall input, not a flood/no-flood label or current forecast."
+    },
+    {
+        "id": "kerala_sw_river_level_telemetry_2021_2025",
+        "hazards": ["Flood", "Compound: cyclone + flood"],
+        "theme": "River-level observations",
+        "dataset": "Kerala Surface Water Department telemetry river level, 2021-2025",
+        "publisher": "Kerala Surface Water Department via National Water Data Portal / National Water Informatics Centre",
+        "url": "https://nwdp.nwic.gov.in/dataset/1a00209e-c864-4c1c-bc82-b5e2d8ecb66e/resource/0af0acba-517c-4278-bf77-ff137eb3c2cf/download/rwl_tel_hr_kerala_sw_999_2021_2025.csv",
+        "resource_urls": ["https://nwdp.nwic.gov.in/dataset/1a00209e-c864-4c1c-bc82-b5e2d8ecb66e/resource/0af0acba-517c-4278-bf77-ff137eb3c2cf/download/rwl_tel_hr_kerala_sw_999_2021_2025.csv"],
+        "access": "Acquired and structurally audited in workflow run 40928550082; raw CSV and SHA-256 manifest are in the private short-lived artifact.",
+        "priority": "P0",
+        "status": "Downloaded and descriptively audited: 465,076 rows, 26 stations, 35,337 Ernakulam rows at two source-reported stations; no duplicate station-time groups in this download.",
+        "required_checks": "Resolve vertical gauge datum/reference and timezone, validate station identity and river/basin metadata with provider, inspect gaps and official station-specific warning thresholds, then align with independent event evidence.",
+        "limitations": "River stage is not flood depth. No threshold comparison or spatial exposure claim is permitted until datum, station identity and local warning threshold are verified."
+    },
+    {
+        "id": "kerala_sw_river_level_manual_2021_2025",
+        "hazards": ["Flood", "Compound: cyclone + flood"],
+        "theme": "River-level observations",
+        "dataset": "Kerala Surface Water Department manual river level, 2021-2025",
+        "publisher": "Kerala Surface Water Department via National Water Data Portal / National Water Informatics Centre",
+        "url": "https://nwdp.nwic.gov.in/dataset/b7ed6f63-d702-429b-a342-c3e2acd31ad6/resource/fe95a85e-142d-4acf-83fc-24499afc546b/download/rwl_manual_hr_kerala_sw_031_2021_2025.csv",
+        "resource_urls": ["https://nwdp.nwic.gov.in/dataset/b7ed6f63-d702-429b-a342-c3e2acd31ad6/resource/fe95a85e-142d-4acf-83fc-24499afc546b/download/rwl_manual_hr_kerala_sw_031_2021_2025.csv"],
+        "access": "Acquired and audited in workflow run 40928550082; raw CSV and SHA-256 manifest are in the private short-lived artifact.",
+        "priority": "P1",
+        "status": "Downloaded and descriptively audited: 16,005 rows from 6 stations; zero source rows were labelled Ernakulam in this download.",
+        "required_checks": "Confirm geographic coverage, gauge reference, source timezone, irregular sampling and inconsistent river/basin labels with provider before use.",
+        "limitations": "This manual dataset is not Kochi-specific in the audited records and cannot supply Kochi labels without verified spatial and station identity evidence."
+    },
+    {
         "id": "nwdp_cwc_rainfall",
         "hazards": ["Flood", "Cyclone", "Heatwave", "Drought", "Compound: cyclone + flood", "Compound: heavy rainfall + drainage failure"],
         "theme": "Rainfall observations",
@@ -173,9 +215,9 @@ DATASET_CATALOG: list[dict[str, Any]] = [
         ],
         "access": "Sources are catalogued in data/reference/public_data_sources.json and the existing public hydrology acquisition utility supports controlled downloads; check each licence and privacy/reuse field.",
         "priority": "P0",
-        "status": "Catalogued as candidate historical evidence; acquisition state must be confirmed from the local acquisition manifest; not approved as Kochi training labels.",
-        "required_checks": "Inspect event geography, station/gauge identifiers, event dates, units, coordinate quality, privacy/licence fields, non-event sampling and leakage. Match stations only with a verified crosswalk.",
-        "limitations": "National/district event records do not establish ward-level or station-hour flood outcomes. INDOFLOODS coverage excludes some basins; Kerala/Kochi coverage must be checked, not assumed."
+        "status": "Acquired in workflow run 40928550082 and descriptively audited in a private 7-day artifact; raw data remain unvalidated and are not approved as Kochi training labels.",
+        "required_checks": "Audit found 6,876 IFI event rows, 86 mentioning Ernakulam; INDOFLOODS has 4,548 events and 214 gauge records, including 26 Kerala gauges. Verify station/gauge identifiers, event dates, units, coordinate quality, privacy/licence fields, non-event sampling and leakage. Match stations only with a verified crosswalk.",
+        "limitations": "District/event mentions do not establish ward-level or station-hour flood outcomes. INDOFLOODS has 155 Open and 59 Restricted gauge records; restricted records must be excluded from any shareable derived product. Candidate Kerala gauges include Periyar-area stations, but no station crosswalk or predictive labels have been approved."
     },
     {
         "id": "edayar_industrial_evidence",
@@ -193,6 +235,33 @@ DATASET_CATALOG: list[dict[str, Any]] = [
         "status": "Candidate industry names, historical estate documents, some consent records and dated Eloor air-quality reports are acquired; verified facility points, current consent and measured air emissions remain unavailable.",
         "required_checks": "Verify current facility identity/occupancy, coordinates from authoritative geospatial evidence, current consent validity, permit limits, pollutant-specific measured emissions, monitoring station geometry, wind/time alignment and document reuse terms.",
         "limitations": "Eight facilities are a candidate list, not a complete active-facility inventory. Effluent records are not air emissions. Historical consent applications do not prove current authorization or factory-level pollution causation."
+    },
+    {
+        "id": "ernakulam_health_facility_candidate_layer",
+        "hazards": ["Flood", "Cyclone", "Earthquake", "Heatwave", "Industrial incident", "Compound: cyclone + flood"],
+        "theme": "Critical-facility exposure",
+        "dataset": "Ernakulam health-facility candidate GeoJSON",
+        "publisher": "National hospital directory source; downloaded and filtered by existing project acquisition utility",
+        "url": "https://ndhm.gov.in/",
+        "priority": "P0",
+        "status": "Downloaded in workflow run 40928550082: 642 point features, zero invalid points and zero district-filter mismatches; 64 duplicate-coordinate groups involve 213 records; only 84 points fell inside the provisional Kochi boundary candidate.",
+        "access": "Short-lived private artifact only; existing spatial source metadata records the coordinate and reuse limitations.",
+        "required_checks": "Resolve source coordinate order/CRS/datum/accuracy, duplicates, facility identity and current operation; verify the current official Kochi Corporation boundary before spatial joins.",
+        "limitations": "Ernakulam district facilities are not all within Kochi Corporation. The 84/558 boundary split is preliminary screening against an unverified candidate boundary, not a facility error rate. No points are approved for raster exposure sampling."
+    },
+    {
+        "id": "kochi_wards_2024_candidate",
+        "hazards": ["Flood", "Cyclone", "Earthquake", "Heatwave", "Air pollution", "Industrial incident"],
+        "theme": "Administrative boundaries",
+        "dataset": "OpenCity Kochi Wards Map 2024 KML candidate",
+        "publisher": "OpenCity.in catalogue; source attribution to Esri India Living Atlas",
+        "url": "https://data.opencity.in/dataset/kochi-wards-map",
+        "resource_urls": ["https://data.opencity.in/dataset/kochi-wards-map/resource/24a3de7a-4b14-436e-ae0c-e9ec7b1749e0"],
+        "priority": "P1",
+        "status": "Downloaded and structure-checked in workflow run 40928550082: 74 named placemarks, 74 unique names and 83 polygon geometries; legal/current delimitation alignment is unverified.",
+        "access": "Short-lived private artifact only; candidate is not merged into the app's official boundary layer.",
+        "required_checks": "Compare every ward name, ID, polygon and count against the current official KSMART/Delimitation Commission source; validate multipart features, topology, area and boundary date.",
+        "limitations": "Structural validity does not prove legal currency. Do not use for ward-level risk/exposure claims or auto-correct spelling/name differences from geometry alone."
     },
     {
         "id": "kerala_official_statistics",
