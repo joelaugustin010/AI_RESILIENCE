@@ -75,7 +75,9 @@ jobs:
       - name: Acquire candidate hospital GIS and KSDMA flood-hazard archive
         id: map_acquisition
         continue-on-error: true
-        run: python scripts/acquire_map_reference_data.py 2>&1 | tee map_acquisition.log
+        run: |
+          set -o pipefail
+          python scripts/acquire_map_reference_data.py 2>&1 | tee map_acquisition.log
 
       - name: Inspect raster CRS, bounds, units, NoData and sample values
         id: raster_audit
