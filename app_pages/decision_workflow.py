@@ -9,6 +9,7 @@ import streamlit as st
 
 from src.scientific_scenario_engine import build_scientific_scenario_frame
 from src.source_registry import build_source_registry, source_fitness_summary
+from src.disaster_data_catalog import get_catalog, validate_catalog_record
 
 from src.decision_workflow import (
     HAZARD_OPTIONS,
@@ -404,6 +405,49 @@ with st.expander("Dataset provenance and scientific fitness register", expanded=
     st.warning(
         "No dataset in this registry is approved by this app for numerical disaster prediction or official warnings. "
         "Source metadata completeness and scientific validation are different checks."
+    )
+
+with st.expander("Kochi multi-hazard data acquisition board", expanded=True):
+    st.caption(
+        "This is the parallel acquisition queue. 'Discovered' means a credible source page was identified, "
+        "not that its files have been downloaded or validated. Restricted or unclear sources are not scraped."
+    )
+    catalog_records = get_catalog()
+    selected_hazards = set(scientific_frame["hazard_components"])
+    # Show highest-priority data relevant to the selected hazard while keeping
+    # all other disaster sources available for project planning.
+    relevant_records = [
+        row for row in catalog_records
+        if selected_hazards.intersection(row["hazards"])
+    ]
+    all_records = relevant_records + [
+        row for row in catalog_records if row not in relevant_records
+    ]
+    st.markdown("**Priority order:** P0 = core baseline evidence; P1 = important supporting evidence; P2 = later extension.")
+    st.dataframe(pd.DataFrame([{
+        "Priority": row["priority"],
+        "Hazard(s)": ", ".join(row["hazards"]),
+        "Theme": row["theme"],
+        "Dataset": row["dataset"],
+        "Publisher": row["publisher"],
+        "Acquisition status": row["status"],
+        "Access conditions": row["access"],
+        "Required QA before use": row["required_checks"],
+        "Known limitations": row["limitations"],
+        "Official source": row["url"],
+    } for row in all_records]), hide_index=True, width="stretch")
+    for row in relevant_records:
+        with st.expander(f"{row['priority']} · {row['dataset']}"):
+            st.markdown(f"**Publisher:** {row['publisher']}")
+            st.markdown(f"**Source:** [{row['url']}]({row['url']})")
+            st.markdown(f"**Current status:** {row['status']}")
+            st.markdown(f"**Access:** {row['access']}")
+            st.markdown(f"**Required checks:** {row['required_checks']}")
+            st.markdown(f"**Limitations:** {row['limitations']}")
+    st.info(
+        "The catalog is a verified-source discovery queue, not a downloaded-data inventory. "
+        "A dataset moves to 'acquired' only after its file, publisher metadata, retrieval date, "
+        "licence/access terms, checksum, schema, spatial coverage and QA results are recorded."
     )
 
 st.subheader("Evidence readiness checklist for this hazard")
