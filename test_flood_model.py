@@ -140,6 +140,28 @@ class FloodModelReadinessTests(unittest.TestCase):
         self.assertEqual(len(loaded), 5)
         self.assertTrue(loaded_metadata["raw_hash_matches"])
 
+    def test_real_observation_metadata_requires_independent_sources_and_feature_crosswalk(self):
+        frame, metadata = synthetic_fixture()
+        metadata.update({
+            "data_kind": "verified_observations",
+            "publisher": "Test publisher",
+            "source_url": "https://example.org/dataset",
+            "retrieved_on": "2026-10-29",
+            "license": "Test-only terms",
+            "geographic_coverage": "Test-only fixture",
+            "label_definition": "Test-only binary label",
+            "label_source": "Test fixture labels",
+            "label_review_status": "independently_verified",
+            "feature_availability_cutoff": "Test fixture predictors precede labels",
+            "time_zone": "UTC",
+            "prediction_horizon_hours": 24,
+        })
+        report = audit_flood_dataset(frame, metadata)
+        self.assertFalse(report["ready"])
+        self.assertTrue(any("Feature provenance must map every model feature" in item for item in report["blockers"]))
+        self.assertTrue(any("Independent source families must be documented" in item for item in report["blockers"]))
+        self.assertTrue(any("crosswalk" in item.lower() for item in report["blockers"]))
+
     def test_evaluation_refuses_the_unverified_demo_fixture(self):
         frame, metadata = unverified_demo_fixture()
         with self.assertRaisesRegex(ValueError, "evaluation blocked"):
