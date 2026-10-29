@@ -7,6 +7,8 @@ import json
 import pandas as pd
 import streamlit as st
 
+from src.scientific_scenario_engine import build_scientific_scenario_frame
+
 from src.decision_workflow import (
     HAZARD_OPTIONS,
     assessment_summary,
@@ -393,6 +395,24 @@ st.write("**Interpretation:**", assessment["interpretation"])
 st.warning(assessment["additional_caution"])
 st.caption("No user-entered value is treated as verified. River-level values are recorded in the report but never compared with a threshold in this workflow.")
 
+st.subheader("Scientific scenario frame and evidence gates")
+scientific_frame = build_scientific_scenario_frame(inputs)
+st.error(scientific_frame["evidence_gate"])
+st.caption(
+    "This frame structures the reasoning into hazard, exposure, vulnerability, and consequences to investigate. "
+    "It does not calculate a probability, impact estimate, or warning."
+)
+if scientific_frame["pathways"]:
+    st.dataframe(pd.DataFrame(scientific_frame["pathways"]), hide_index=True, width="stretch")
+else:
+    st.warning("No pathway template exists for this selection. The app will not guess one.")
+st.markdown("**Evidence required before stronger conclusions:**")
+for item in scientific_frame["required_evidence"]:
+    st.markdown(f"- {item}")
+st.markdown("**Interpretation safeguards:**")
+for item in scientific_frame["limitations"]:
+    st.markdown(f"- {item}")
+
 st.header("4. Compare hypothetical scenarios")
 st.caption("The following cases differ only by their stated assumptions. Possible pathways are planning prompts, not calculated impacts.")
 scenarios = build_scenario_comparison(inputs)
@@ -446,6 +466,22 @@ st.caption("A combination is shown because you selected its actions. Affordabili
 
 st.header("7. Generate a report")
 report = report_rows(inputs, evidence, scenarios, actions, budget, combinations, ROOT, evidence_checklist=evidence_checklist)
+# Include the same evidence-gated scientific frame in exports so caveats survive outside the app.
+frame_rows = [
+    {"Section": "Scientific scenario frame", "Item": row["Reasoning stage"],
+     "Detail": f'{row["Hazard component"]}: {row["Question to investigate"]} — {row["Status"]}'}
+    for row in scientific_frame["pathways"]
+]
+frame_rows.extend(
+    {"Section": "Scientific evidence gate", "Item": "Required evidence", "Detail": item}
+    for item in scientific_frame["required_evidence"]
+)
+frame_rows.extend(
+    {"Section": "Scientific limitation", "Item": "Safeguard", "Detail": item}
+    for item in scientific_frame["limitations"]
+)
+frame_rows.append({"Section": "Scientific evidence gate", "Item": "Status", "Detail": scientific_frame["evidence_gate"]})
+report = pd.concat([report, pd.DataFrame(frame_rows)], ignore_index=True, sort=False)
 report_slug = slug or "scenario"
 csv_bytes = report.to_csv(index=False).encode("utf-8-sig")
 html_bytes = report_html(report).encode("utf-8")
