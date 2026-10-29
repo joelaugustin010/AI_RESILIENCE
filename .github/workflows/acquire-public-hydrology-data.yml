@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - map-details-upgrade
+      - phase2/scientific-scenario-engine
     paths:
       - "scripts/acquire_public_hydrology_data.py"
       - "scripts/acquire_map_reference_data.py"
