@@ -12,6 +12,7 @@ from src.decision_workflow import (
     budget_summary,
     compare_action_combinations,
     evidence_inventory,
+    hazard_evidence_checklist,
     mitigation_actions_for,
     report_html,
     report_rows,
