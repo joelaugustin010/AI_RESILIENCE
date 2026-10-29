@@ -1,0 +1,38 @@
+name: Acquire and audit multi-hazard source data
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "data/external/hazard_dataset_registry.json"
+      - "scripts/acquire_hazard_data.py"
+      - "scripts/audit_hazard_datasets.py"
+      - "scripts/train_hazard_baseline.py"
+      - "data/external/hazards/**"
+      - ".github/workflows/audit-hazard-readiness.yml"
+permissions:
+  contents: read
+jobs:
+  acquire-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Acquire public source datasets
+        run: python scripts/acquire_hazard_data.py
+      - name: Audit curated training-table readiness
+        run: |
+          python -m pip install --upgrade pip pandas scikit-learn joblib
+          python scripts/audit_hazard_datasets.py
+      - name: Upload source data and provenance reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: nine-hazard-source-data-and-audit
+          path: |
+            data/external/hazards/raw/
+            reports/hazard_data_acquisition_manifest.json
+            reports/hazard_dataset_readiness.json
+          if-no-files-found: error
+          retention-days: 30

@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "note": "Source registry, not proof of downloaded data or trained models. Each hazard needs local labels, non-event/background examples, predictors aligned to prediction time, and held-out evaluation before a model can be considered trained.",
+  "hazards": [
+    {
+      "id": "earthquake",
+      "label": "Earthquake shaking impact",
+      "source": "USGS ComCat",
+      "url": "https://earthquake.usgs.gov/fdsnws/event/1/",
+      "format": "GeoJSON API",
+      "candidate_target": "observed event magnitude or observed impact class",
+      "limitation": "An event catalogue alone cannot predict earthquake occurrence; use for event catalogue analysis or impact modelling only with appropriate labels and exposure/shaking features."
+    },
+    {
+      "id": "cyclone",
+      "label": "Tropical cyclone",
+      "source": "NOAA IBTrACS",
+      "url": "https://www.ncei.noaa.gov/products/international-best-track-archive",
+      "format": "CSV/NetCDF",
+      "candidate_target": "track/intensity at a defined forecast lead time",
+      "limitation": "Track data alone is not a validated local landfall forecast; split by storm/season and use forecast-time predictors only."
+    },
+    {
+      "id": "landslide",
+      "label": "Landslide susceptibility",
+      "source": "NASA Global Landslide Catalog / USGS inventories",
+      "url": "https://data.nasa.gov/",
+      "format": "CSV/geospatial",
+      "candidate_target": "inventory presence with defensible background samples",
+      "limitation": "Event-only inventories are biased by reporting and do not by themselves provide negatives."
+    },
+    {
+      "id": "drought",
+      "label": "Drought conditions",
+      "source": "NASA Earth observation and climate data",
+      "url": "https://earthdata.nasa.gov/",
+      "format": "Raster/time series",
+      "candidate_target": "future drought index class at a defined lead time",
+      "limitation": "Requires a defined drought index, temporal coverage, and leakage-safe time split."
+    },
+    {
+      "id": "heatwave",
+      "label": "Extreme heat",
+      "source": "NOAA climate data / ERA5",
+      "url": "https://www.ncei.noaa.gov/; https://cds.climate.copernicus.eu/",
+      "format": "Station or gridded time series",
+      "candidate_target": "heatwave threshold exceedance at a defined lead time",
+      "limitation": "Threshold and local calibration must be specified; historical temperatures alone do not prove health impact."
+    },
+    {
+      "id": "wildfire",
+      "label": "Wildfire occurrence / burned area",
+      "source": "NASA FIRMS and MODIS/VIIRS burned-area products",
+      "url": "https://firms.modaps.eosdis.nasa.gov/; https://lpdaac.usgs.gov/",
+      "format": "CSV/API/raster",
+      "candidate_target": "fire occurrence or burned-area class with non-fire samples",
+      "limitation": "Satellite detections have coverage/cloud/overpass biases and need exposure and weather predictors."
+    },
+    {
+      "id": "tsunami",
+      "label": "Tsunami coastal exposure",
+      "source": "NOAA/NCEI tsunami event database",
+      "url": "https://www.ngdc.noaa.gov/hazel/view/hazards/tsunami/event-search",
+      "format": "Event catalogue",
+      "candidate_target": "event impact or scenario exposure, not short-term occurrence",
+      "limitation": "Rare-event catalogues are not sufficient for reliable local probability prediction."
+    },
+    {
+      "id": "severe_storm",
+      "label": "Severe storm / extreme rainfall",
+      "source": "IMD and Copernicus Climate Data Store",
+      "url": "https://mausam.imd.gov.in/; https://cds.climate.copernicus.eu/",
+      "format": "Station/gridded time series",
+      "candidate_target": "defined threshold exceedance at a future lead time",
+      "limitation": "Needs time-aligned predictors and event/non-event periods; no mixing observed future values into features."
+    },
+    {
+      "id": "air_pollution",
+      "label": "Air-quality episode",
+      "source": "CPCB / OpenAQ",
+      "url": "https://cpcb.nic.in/; https://openaq.org/",
+      "format": "Station time series",
+      "candidate_target": "AQI category or pollutant threshold at a future lead time",
+      "limitation": "Station observations do not identify a responsible factory; source attribution needs emissions/dispersion evidence."
+    }
+  ]
+}
