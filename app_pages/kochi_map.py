@@ -19,9 +19,14 @@ HOSPITAL_REVIEW_CSV = ROOT / "data" / "processed" / "nihfw_ernakulam_hospitals_c
 
 def _first_property(properties: dict, candidates: tuple[str, ...], fallback: str) -> str:
     """Return the first populated source property without assuming every dataset uses the same schema."""
-    normalized = {str(key).casefold(): value for key, value in properties.items()}
+    def normalize_key(value: object) -> str:
+        # GeoJSON publishers commonly vary between Bound_Name, Bound Name,
+        # bound-name, and camel-case spellings.
+        return "".join(character for character in str(value).casefold() if character.isalnum())
+
+    normalized = {normalize_key(key): value for key, value in properties.items()}
     for candidate in candidates:
-        value = normalized.get(candidate.casefold())
+        value = normalized.get(normalize_key(candidate))
         if value is not None and str(value).strip() and str(value).strip().casefold() not in {"nan", "none", "null"}:
             return str(value).strip()
     return fallback
@@ -36,13 +41,20 @@ def normalize_geojson_for_tooltip(geojson: dict) -> dict:
         if not isinstance(properties, dict):
             properties = {}
             feature["properties"] = properties
+        properties["display_bound"] = _first_property(
+            properties,
+            ("Bound_Name", "Bound Name", "bound_name", "boundname", "boundary_name", "name"),
+            "Not available in source data",
+        )
+        properties["display_ward"] = _first_property(
+            properties,
+            ("Ward_Name", "Ward Name", "ward_name", "wardname", "Ward_No", "ward_no", "ward", "ward_number"),
+            "Not available in source data",
+        )
         properties["display_name"] = _first_property(
             properties,
             ("feature_name", "name", "name_en", "Bound_Name", "Ward_Name", "amenity", "highway", "landuse"),
             "Unnamed feature",
-        )
-        properties["display_ward"] = _first_property(
-            properties, ("Ward_Name", "Ward_No", "ward_no", "ward", "ward_number"), "Not recorded"
         )
         properties["display_type"] = _first_property(
             properties,
@@ -386,7 +398,26 @@ if processed_layers:
                 )
                 inspected = feature_records[int(feature_number) - 1]
                 properties = inspected.get("properties") or {}
+                st.markdown("**Key location details**")
+                detail_cols = st.columns(2)
+                detail_cols[0].metric(
+                    "Bound Name",
+                    _first_property(
+                        properties,
+                        ("Bound_Name", "Bound Name", "bound_name", "boundname", "boundary_name", "name"),
+                        "Not available in source data",
+                    ),
+                )
+                detail_cols[1].metric(
+                    "Ward Name",
+                    _first_property(
+                        properties,
+                        ("Ward_Name", "Ward Name", "ward_name", "wardname"),
+                        "Not available in source data",
+                    ),
+                )
                 if properties:
+                    st.markdown("**All original source attributes**")
                     st.json(properties)
                 else:
                     st.info("This feature has no recorded properties.")
@@ -456,7 +487,7 @@ if deck_layers:
     deck = pdk.Deck(
         layers=deck_layers,
         initial_view_state=pdk.ViewState(longitude=map_center[0], latitude=map_center[1], zoom=10),
-        tooltip={"text": "Name: {display_name}\nWard: {display_ward}\nType: {display_type}\nSource: {display_source}\nOSM updated: {display_timestamp}\nSource URL: {display_url}"},
+        tooltip={"text": "Bound Name: {display_bound}\nWard Name: {display_ward}\nFeature: {display_name}\nType: {display_type}\nSource: {display_source}\nOSM updated: {display_timestamp}\nSource URL: {display_url}"},
     )
     st.pydeck_chart(deck, width="stretch", alt="Kochi administrative outline and selected source-documented spatial layers")
 else:
