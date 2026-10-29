@@ -300,11 +300,14 @@ def main() -> int:
     }
     validation_report = validate_geojson(CANDIDATE_PATH, candidate_metadata)
     if validation_report.get("errors") or not validation_report.get("provenance_valid"):
+        invalid_details = validation_report.get("invalid_features", [])[:10]
         raise ValueError(
             "Processed candidate failed repository validation: "
             + "; ".join(validation_report.get("errors", []))
             + "; provenance_valid="
             + str(validation_report.get("provenance_valid"))
+            + "; first_invalid_features="
+            + json.dumps(invalid_details, ensure_ascii=False)
         )
     validation_report["source_snapshot_sha256"] = raw_sha256
     validation_report["source_feature_count"] = len(features)
