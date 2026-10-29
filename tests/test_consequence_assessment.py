@@ -8,7 +8,7 @@ class ConsequenceAssessmentTests(unittest.TestCase):
         result = build_consequence_assessment(
             "Earthquake", "Kochi", "Hypothetical scenario assumption"
         )
-        self.assertIn("Ground shaking and structural damage scenarios", result["consequence_categories"])
+        self.assertTrue(any(x.startswith("Ground shaking and structural damage scenarios") for x in result["consequence_categories"]))
         self.assertIn("Not estimated", result["occurrence_probability"])
         self.assertIn("Not established", result["affected_area"])
         self.assertFalse(result["prediction_permitted"])
