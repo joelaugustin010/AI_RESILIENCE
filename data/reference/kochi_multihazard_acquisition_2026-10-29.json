@@ -276,6 +276,104 @@
         "The rough screening-box overlap is not proof of valid coverage within the current Kochi Corporation boundary.",
         "Source scale, currency and redistribution terms remain unverified; susceptibility is not a timed forecast."
       ]
+    },
+    {
+      "id": "imd_rsmc_cyclone_best_track_1982_2026",
+      "official_source_url": "https://rsmcnewdelhi.imd.gov.in/report.php?internal_menu=MzM%3D",
+      "original_workbook_url": "https://rsmcnewdelhi.imd.gov.in/download.php?path=uploads/best-track/78b4b0_Best_Tracks__Data__1982-2026_.xlsx",
+      "parsed_mirror": "https://github.com/syedhamidali/imdtrack",
+      "acquisition_status": "downloaded_raw_unvalidated; manifest counts matched; descriptive audit completed; not validated for impact prediction",
+      "original_workbook_downloaded_by_project": false,
+      "source_manifest": {
+        "generated_at": "2026-08-09T13:49:29+00:00",
+        "original_workbook_sha256_as_reported_by_mirror": "f29c4ad4ede53cbb7468680a41beeb0b0030e96b5af35f9749f74eeef29adcb6",
+        "storms": 425,
+        "observation_fixes": 7585,
+        "remarks": 656,
+        "year_range": [
+          1982,
+          2026
+        ]
+      },
+      "acquired_file_sha256": {
+        "manifest.json": "08d3a8d48bcc0223a7d1b7863acf7e76e2dbd6ac367510b932fe446ddc39efe7",
+        "observations.parquet": "98823ecb851876c4a75b1ae212312a66e04b606344acb4e4daead1102f3e6117",
+        "storms.parquet": "84658af6e3a912c76db91f4bceac09f1424b89774902ca23d77554442ec7e8de",
+        "remarks.parquet": "1f37ee51d2a136ca928e113309fe5bb778b220cd58c16c8f3f0c16c238f4d665"
+      },
+      "quality_checks": {
+        "valid_timestamp_rows": 7585,
+        "invalid_timestamp_rows": 0,
+        "missing_coordinate_rows": 14,
+        "out_of_range_coordinate_rows": 0,
+        "duplicate_storm_time_rows": 32,
+        "position_suspect_rows": 2,
+        "date_suspect_rows": 203,
+        "rows_with_valid_non_suspect_coordinates": 7569,
+        "time_range_utc": [
+          "1982-05-01T03:00:00+00:00",
+          "2026-01-10T12:00:00+00:00"
+        ],
+        "basin_counts": {
+          "BOB": 5024,
+          "ARB": 2177,
+          "LAND": 384
+        }
+      },
+      "kochi_proximity_screening": {
+        "reference_point": {
+          "latitude": 9.9312,
+          "longitude": 76.2673,
+          "label": "approximate Kochi city-centre screening point"
+        },
+        "storms_with_non_suspect_fix_within_100_km": 2,
+        "storms_with_non_suspect_fix_within_300_km": 13,
+        "nearest_track_candidates": [
+          {
+            "storm_id": "2018-013",
+            "name": "GAJA",
+            "nearest_fix_km": 23.73698,
+            "year": 2018,
+            "peak_recorded_wind_knots": 70
+          },
+          {
+            "storm_id": "1992-009",
+            "name": null,
+            "nearest_fix_km": 68.18163,
+            "year": 1992,
+            "peak_recorded_wind_knots": 55
+          },
+          {
+            "storm_id": "2000-006",
+            "name": null,
+            "nearest_fix_km": 106.64396,
+            "year": 2000,
+            "peak_recorded_wind_knots": 90
+          },
+          {
+            "storm_id": "1993-002",
+            "name": null,
+            "nearest_fix_km": 131.07116,
+            "year": 1993,
+            "peak_recorded_wind_knots": 25
+          },
+          {
+            "storm_id": "2000-005",
+            "name": null,
+            "nearest_fix_km": 191.93272,
+            "year": 2000,
+            "peak_recorded_wind_knots": 102
+          }
+        ],
+        "interpretation": "Distance screening only; not municipal-boundary intersection, landfall, wind footprint, rainfall, surge, damage or probability of consequences."
+      },
+      "limitations": [
+        "The original IMD workbook was not downloaded by this workflow; its SHA-256 is reported by the parser mirror and was not independently recomputed against the workbook.",
+        "32 rows participate in duplicate storm/time pairs; 203 fixes carry a date-suspect flag and 2 carry a position-suspect flag. These are not corrected or dropped.",
+        "Fourteen rows lack coordinates; no coordinates are out of range.",
+        "The mirror parser repository is BSD-3-Clause, but underlying IMD data are © IMD and terms for redistribution/operational use remain to be confirmed.",
+        "Track-to-point distance does not estimate wind damage, rainfall, storm surge, flood impact, or exposure."
+      ]
     }
   ],
   "overall_conclusion": {
@@ -291,7 +389,8 @@
       "Validate hospital identity and location before exposure analysis.",
       "Filter INDOFLOODS by privacy field and test whether valid Kochi/Ernakulam event and non-event labels can be built without leakage.",
       "Acquire and validate cyclone, coastal, earthquake, heat, drought, air-pollution and industrial-hazard evidence with hazard-specific methods.",
-      "Resolve the three invalid GSI landslide susceptibility geometries with the publisher before spatial joins or consequence estimates."
+      "Resolve the three invalid GSI landslide susceptibility geometries with the publisher before spatial joins or consequence estimates.",
+      "Cross-check the cyclone mirror against the official IMD workbook and confirm data terms; investigate 32 duplicate storm/time rows and 203 date-suspect fixes before using any track for a consequence model."
     ]
   },
   "follow_up_acquisition": {
@@ -307,5 +406,19 @@
     "artifact_files": 26,
     "artifact_expires_at_utc": "2026-11-05T18:23:57Z",
     "note": "Follow-up run added the GSI Ernakulam landslide susceptibility archive. Raw files remain in a private temporary artifact, not committed to Git."
+  },
+  "cyclone_acquisition": {
+    "workflow_run_id": 40932094184,
+    "workflow_run_url": "https://github.com/joelaugustin010/AI_RESILIENCE/actions/runs/40932094184",
+    "status": "success",
+    "branch_commit": "3b72fbd80bfcf4bc9620b85db582bf86c7f411cb",
+    "artifact_id": 12923177293,
+    "artifact_name": "public-hydrology-source-bundle",
+    "artifact_sha256": "0cad531463588fd4ed9e4669727befa08e85e7de638247622a0b044733cbbd83",
+    "artifact_compressed_bytes": 17047374,
+    "artifact_uncompressed_bytes": 109144240,
+    "artifact_files": 33,
+    "artifact_expires_at_utc": "2026-11-05T18:36:34Z",
+    "note": "Cyclone Parquet tables and audit reports are in a private temporary artifact. Raw tables are not committed to Git."
   }
 }

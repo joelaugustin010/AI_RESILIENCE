@@ -175,9 +175,9 @@ DATASET_CATALOG: list[dict[str, Any]] = [
         ],
         "access": "Parsed Parquet mirror is used for a private research artifact only. Mirror parser code is BSD-3-Clause; underlying data are © IMD and reuse/redistribution terms must be verified with IMD.",
         "priority": "P0",
-        "status": "Source identified; acquisition and Kochi-proximity audit pending. Mirror manifest reports 425 storms, 7,585 fixes and 656 remarks for 1982-2026.",
-        "required_checks": "Verify source manifest/checksums, UTC timestamps, coordinates, storm IDs, duplicate fixes, pos_suspect/date_suspect flags and current-season status. Screen track distance to Kochi using non-suspect fixes only.",
-        "limitations": "Best-track position/intensity is hazard-path evidence, not a local wind field, rainfall, storm surge, damage or consequence label. The 2026 season is tentative in the mirror; source flags must remain visible and uncorrected."
+        "status": "Acquired and audited in workflow run 40932094184: 425 storms, 7,585 fixes and 656 remarks (1982-2026). Two storms have a non-suspect track fix within 100 km of the approximate Kochi reference point; 13 within 300 km. QA flags remain unresolved.",
+        "required_checks": "Verify the original IMD workbook against the mirror, confirm IMD reuse terms, review 32 rows involved in duplicate storm/time pairs and 203 date-suspect flags, then link tracks to independent local wind/rainfall/surge and impact evidence.",
+        "limitations": "Best-track position/intensity is hazard-path evidence, not a local wind field, rainfall, storm surge, damage or consequence label. The nearest non-suspect track fix is 23.7 km from the approximate Kochi reference point (storm ID 2018-013, GAJA), but this is not a validated impact claim. Source flags are retained and uncorrected; the latest season may be tentative."
     },
     {
         "id": "ncs_earthquake_catalog",
