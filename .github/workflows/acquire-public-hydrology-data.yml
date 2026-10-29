@@ -49,6 +49,9 @@ jobs:
       - name: Test map-reference acquisition safeguards
         run: python -m unittest discover -s tests -p 'test_map_reference_acquisition.py' -v
 
+      - name: Test Kochi 2024 ward-boundary candidate audit
+        run: python -m unittest discover -s tests -p 'test_acquire_kochi_ward_boundary_candidate.py' -v
+
       - name: Test raster metadata and coverage audit
         run: python -m unittest discover -s tests -p 'test_map_reference_raster_audit.py' -v
 
@@ -78,6 +81,12 @@ jobs:
         run: |
           set -o pipefail
           python scripts/acquire_map_reference_data.py 2>&1 | tee map_acquisition.log
+
+      - name: Acquire and audit OpenCity Kochi 2024 ward-boundary candidate
+        id: kochi_wards
+        if: always()
+        continue-on-error: true
+        run: python scripts/acquire_kochi_ward_boundary_candidate.py --output-dir data/external/map_reference
 
       - name: Inspect raster CRS, bounds, units, NoData and sample values
         id: raster_audit
