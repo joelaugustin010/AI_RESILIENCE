@@ -120,8 +120,8 @@ def main() -> int:
     print(f"Wrote IFI audit report: {args.output}")
     for dataset in report["datasets"]:
         print(f"- {dataset['filename']}: {dataset['rows']:,} rows; {len(dataset['columns'])} columns")
-        if dataset.get("rows_mentioning_district_field_mentioning_ernakulam") is not None:
-            print(f"  District-field Ernakulam mentions: {dataset['rows_mentioning_district_field_mentioning_ernakulam']}")
+        if dataset.get("rows_with_district_field_mentioning_ernakulam") is not None:
+            print(f"  District-field Ernakulam mentions: {dataset['rows_with_district_field_mentioning_ernakulam']}")
     print(f"Expected files missing: {len(report['missing_expected_files'])}")
     return 1 if report["missing_expected_files"] else 0
 
