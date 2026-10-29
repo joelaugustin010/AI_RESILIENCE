@@ -34,3 +34,6 @@ data/raw/industrial/KWA_Edayar_CETP_DER_2022.pdf.metadata.json
 data/raw/industrial/KSPCB_OCMMS_CTO_red_page2_2015-2019.html
 data/raw/industrial/KSPCB_OCMMS_CTO_red_page2_2015-2019.html.metadata.json
 data/raw/openstreetmap/
+
+# Downloaded raw source snapshots and acquisition manifests stay local by default.
+data/external/
