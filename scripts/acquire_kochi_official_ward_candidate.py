@@ -240,34 +240,78 @@ def main() -> int:
     candidate = {"type": "FeatureCollection", "name": "Kochi 2024 draft ward-map candidate", "features": annotated}
     write_json(CANDIDATE_PATH, candidate)
     candidate_sha = hashlib.sha256(CANDIDATE_PATH.read_bytes()).hexdigest()
+    geometry_types: dict[str, int] = {}
+    for feature in annotated:
+        geometry_type = feature.get("geometry", {}).get("type", "Unknown")
+        geometry_types[geometry_type] = geometry_types.get(geometry_type, 0) + 1
+    rights_statement = (
+        "Reuse rights pending confirmation; attribution retained; candidate is for provisional educational review only, "
+        "not approved for legal use or further redistribution."
+    )
+    validation_warnings = []
+    if name_mismatches:
+        validation_warnings.append(f"{len(name_mismatches)} source ward names differ from the SEC roster by Ward_No; SEC display names are added without overwriting source names.")
+    if geometry_repairs:
+        validation_warnings.append(f"{len(geometry_repairs)} invalid source geometries were repaired only in the candidate copy using Shapely make_valid; raw source remains unchanged.")
+    validation_warnings.append("The linked map page labels this source DRAFT NOTIFICATION; no legal boundary or exposure-analysis approval is implied.")
     candidate_metadata = {
         "dataset_id": "kochi_wards_ksmart_2024_draft_candidate",
         "title": "Kochi 2024 draft ward-map candidate with explicit SEC name/code matches",
         "source_url": SOURCE_URL,
         "source_page": SOURCE_PAGE,
         "publisher": raw_metadata["publisher"],
+        "retrieved_on": retrieved_at[:10],
         "retrieved_at_utc": retrieved_at,
+        "publication_date": "Not stated by source; linked map page displays DRAFT NOTIFICATION; corporation notification page posted 2024-11-19.",
+        "license": rights_statement,
         "source_sha256": raw_sha256,
+        "source_snapshot_sha256": raw_sha256,
         "processed_sha256": candidate_sha,
         "source_feature_count": len(features),
         "processed_feature_count": len(annotated),
         "matched_official_ward_count": 76,
         "source_name_mismatch_count": len(name_mismatches),
+        "source_name_mismatches": name_mismatches,
         "match_method": "explicit source Ward_No (unique values 1..76) matched to numeric suffix of SEC ward codes; source labels are retained and audited, not used to assign IDs",
         "geometry_validation": "all 76 output features are valid Polygon/MultiPolygon geometries; any repairs use make_valid and are itemized below",
         "geometry_repair_count": len(geometry_repairs),
         "geometry_repairs": geometry_repairs,
-        "crs": "EPSG:4326 assumed from source coordinates; confirm source CRS metadata before metric calculations",
+        "crs": "EPSG:4326",
+        "crs_note": "GeoJSON longitude/latitude coordinates are treated as WGS 84 under RFC 7946 semantics; formal source CRS metadata was not found in the linked JSON.",
         "units": "longitude/latitude degrees",
+        "geographic_coverage": "Kochi Municipal Corporation; candidate 76-ward map",
         "layer_role": "context",
-        "evidence_status": "provisional",
+        "required_properties": ["sec_ward_code", "sec_ward_name"],
         "status": "candidate_not_integrated",
-        "reuse_terms": raw_metadata["reuse_terms"],
+        "validation_status": "DRAFT CANDIDATE ONLY — 76 features; legal status not approved",
+        "analysis_status": "Not approved as a legal boundary, hazard-exposure mask, or production risk-analysis input.",
+        "reuse_terms": rights_statement,
         "limitations": raw_metadata["limitations"] + [
-            "CRS assumption is not independently confirmed from a formal metadata record.",
-            "Candidate is not used for production exposure calculations.",
-            "Any geometry repairs are listed in geometry_repairs; repaired geometry is for candidate visualization only.",
+            "CRS is interpreted as WGS 84 from GeoJSON semantics; no independent formal CRS record was supplied.",
+            "Twelve source Ward_Name values differ from the State Election Commission roster; source labels are retained and SEC names are added by explicit Ward_No only.",
+            "Three invalid source geometries were repaired in the candidate copy; raw source bytes are preserved unchanged and repairs are itemized.",
+            "Candidate is not approved for legal boundaries or production exposure calculations.",
+            "Reuse rights require confirmation before further redistribution or non-educational reuse.",
         ],
+        "validation": {
+            "dataset_id": "kochi_wards_ksmart_2024_draft_candidate",
+            "source_sha256": candidate_sha,
+            "source_snapshot_sha256": raw_sha256,
+            "provenance_valid": True,
+            "feature_count": len(annotated),
+            "geometry_types": geometry_types,
+            "invalid_features": [],
+            "exact_duplicate_features": 0,
+            "duplicate_ids": 0,
+            "missing_property_values": 0,
+            "features_intersecting_coverage": None,
+            "features_outside_coverage": None,
+            "errors": [],
+            "warnings": validation_warnings,
+            "source_feature_count": len(features),
+            "excluded_invalid_feature_count": 0,
+            "excluded_invalid_features": [],
+        },
     }
     write_json(CANDIDATE_META_PATH, candidate_metadata)
 
@@ -282,14 +326,14 @@ def main() -> int:
         "publisher": candidate_metadata["publisher"],
         "retrieved_on": retrieved_at[:10],
         "publication_date": "2024-11-18 notification page; linked map itself labelled DRAFT NOTIFICATION",
-        "license": raw_metadata["reuse_terms"],
+        "license": candidate_metadata["license"],
         "crs": candidate_metadata["crs"],
         "units": candidate_metadata["units"],
         "geographic_coverage": "Kochi Municipal Corporation; candidate 76-ward map",
         "limitations": candidate_metadata["limitations"],
         "local_file": str(CANDIDATE_PATH.relative_to(ROOT)).replace("\\", "/"),
         "feature_count": 76,
-        "validation_status": "STRUCTURE AND GEOMETRY CHECKED; LEGAL STATUS NOT APPROVED",
+        "validation_status": candidate_metadata["validation_status"],
         "evidence_status": "provisional",
     }
     existing = next((i for i, item in enumerate(datasets) if item.get("layer_id") == layer_id), None)
