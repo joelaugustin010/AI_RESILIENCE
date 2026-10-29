@@ -80,8 +80,11 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
             (json.dumps(hospitals).encode(), "https://example.org/hospitals", "application/geo+json"),
             (b"<html>error</html>", "https://example.org/error", "text/html"),
         ]
-        with self.assertRaisesRegex(RuntimeError, "not a ZIP archive"):
+        with self.assertRaisesRegex(RuntimeError, "One or more map reference downloads failed"):
             acquisition.acquire(self.output)
+        manifest = json.loads((self.output / "map_reference_manifest.json").read_text(encoding="utf-8"))
+        self.assertIn("not a ZIP archive", manifest["files"][1]["error"])
+        self.assertEqual(manifest["overall_status"], "PARTIAL_ACQUISITION_FAILED")
         self.assertFalse((self.output / "ksdma_flood_return_probability_historical_10_25_50.zip").exists())
 
     @patch.object(acquisition, "fetch")
