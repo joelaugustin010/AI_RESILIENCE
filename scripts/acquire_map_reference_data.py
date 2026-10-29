@@ -123,6 +123,9 @@ def acquire(output: Path) -> dict:
                 record["geometry_type_counts"] = {}
                 invalid_coordinates = 0
                 district_mismatches = 0
+                outside_kerala_screening_box = 0
+                coordinate_pairs = []
+                missing_facility_names = 0
                 for feature in features:
                     geometry = feature.get("geometry") or {}
                     kind = geometry.get("type", "missing")
@@ -134,14 +137,29 @@ def acquire(output: Path) -> dict:
                         lon, lat = coordinates[:2]
                         if not isinstance(lon, (int, float)) or not isinstance(lat, (int, float)) or not (-180 <= lon <= 180 and -90 <= lat <= 90):
                             invalid_coordinates += 1
+                        else:
+                            coordinate_pairs.append((round(float(lon), 6), round(float(lat), 6)))
+                            # Broad state screening box only; never a substitute for a district polygon.
+                            if not (74.0 <= float(lon) <= 78.0 and 8.0 <= float(lat) <= 13.0):
+                                outside_kerala_screening_box += 1
                     props = feature.get("properties") or {}
+                    if not str(props.get("health_facility_name", props.get("name", ""))).strip():
+                        missing_facility_names += 1
                     if str(props.get("state_name", "")).strip().casefold() != "kerala" or str(props.get("district_name", "")).strip().casefold() != "ernakulam":
                         district_mismatches += 1
+                from collections import Counter
+                coordinate_counts = Counter(coordinate_pairs)
+                duplicate_groups = sum(1 for count in coordinate_counts.values() if count > 1)
+                rows_in_duplicate_groups = sum(count for count in coordinate_counts.values() if count > 1)
                 record["invalid_point_count"] = invalid_coordinates
                 record["district_filter_mismatch_count"] = district_mismatches
+                record["outside_kerala_screening_box_count"] = outside_kerala_screening_box
+                record["missing_facility_name_count"] = missing_facility_names
+                record["duplicate_coordinate_pair_group_count"] = duplicate_groups
+                record["rows_in_duplicate_coordinate_pair_groups"] = rows_in_duplicate_groups
                 record["validation_status"] = (
                     "STRUCTURE_CHECKED_WITH_SPATIAL_QA_FLAGS"
-                    if invalid_coordinates or district_mismatches
+                    if invalid_coordinates or district_mismatches or outside_kerala_screening_box or missing_facility_names or duplicate_groups
                     else "STRUCTURE_CHECKED_SPATIAL_ACCURACY_AND_LICENCE_UNVERIFIED"
                 )
                 atomic_write(output / filename, json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8"))
