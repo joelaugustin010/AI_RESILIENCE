@@ -132,7 +132,7 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
         self.assertFalse((self.output / "ksdma_flood_return_probability_historical_10_25_50.zip").exists())
 
     @patch.object(acquisition, "fetch")
-    def test_partial_failure_preserves_manifest_for_both_sources(self, mocked_fetch):
+    def test_partial_failure_preserves_manifest_for_all_sources(self, mocked_fetch):
         hospitals = {
             "type": "FeatureCollection",
             "features": [{
@@ -185,6 +185,7 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
             (json.dumps({"objectIds": [1]}).encode(), "https://example.org/ids", "application/json"),
             (json.dumps(hospitals).encode(), "https://example.org/hospitals", "application/geo+json"),
             (memory.getvalue(), "https://example.org/flood.zip", "application/zip"),
+            (b"%PDF-1.4\\nmock official institution list", "https://example.org/institutions.pdf", "application/pdf"),
         ]
         manifest = acquisition.acquire(self.output)
         record = manifest["files"][0]
