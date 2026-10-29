@@ -892,7 +892,7 @@
       "local_file": "data/reference/kochi_official_ward_roster_2025.json",
       "feature_count": 76,
       "validation_status": "REFERENCE ONLY — NOT GEOMETRY",
-      "evidence_status": "authoritative_names_only"
+      "evidence_status": "provisional"
     }
   ],
   "status_definitions_file": "data/reference/data_status_definitions.json"
