@@ -304,6 +304,18 @@ with st.form("decision_workflow_intake"):
         key="wf_source_time",
         help="Example: source name, timestamp, timezone, station, and averaging period. This app does not verify them.",
     )
+    source_checked_by_user = st.checkbox(
+        "I reviewed the source, time, location and units where available",
+        value=False,
+        key="wf_source_checked",
+        help=(
+            "This records your own review only. It does not authenticate the source or make the data "
+            "independently verified; the workflow will still treat the values as unverified."
+        ),
+    )
+    st.caption(
+        "Source-review status is a user attestation for the report, not an app verification or scientific approval."
+    )
 
     st.caption("All numeric fields are optional. Empty means not supplied; the app does not fill in values.")
     col1, col2 = st.columns(2)
@@ -335,6 +347,7 @@ if submitted:
         "location": location,
         "input_classification": input_classification,
         "source_and_time": source_and_time,
+        "source_checked_by_user": source_checked_by_user,
         "rainfall_mm": rainfall_mm,
         "rainfall_period": rainfall_period if rainfall_mm is not None else "Not supplied",
         "river_level_m": river_level_m,
