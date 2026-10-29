@@ -86,3 +86,11 @@ These sources are downloaded to the temporary workflow artifact rather than comm
 
 The workflow also runs `tests/test_ifi_flood_inventory_audit.py` before acquisition to check that the audit preserves missing-data and spatial/time-granularity safeguards.
 
+### Additional gauge-event candidate: INDOFLOODS
+
+The registry now also includes four CSVs from [INDOFLOODS on Zenodo](https://zenodo.org/records/14584655): gauge-event periods/peak levels, gauge metadata, catchment characteristics and event-scale precipitation. The published metadata preview contains Kerala gauges, including Ramamangalam on the Muvattupuzha river, but does not show a station explicitly labelled Ernakulam. These facts make the dataset worth auditing, not automatically valid for Kochi.
+
+The new `scripts/audit_indofloods.py` produces a descriptive report covering schema, missingness, date range, coordinates, Kerala gauge identifiers and explicit gauge/event/catchment table crosswalk gaps. The tests exercise those joins without manufacturing missing records. The audit must determine the actual event counts and coverage from the downloaded complete files.
+
+INDOFLOODS is not a ready-made flood probability training table. Event rows alone do not provide representative non-flood windows; event-scale precipitation may include future information relative to an early-warning issue time; and matching an INDOFLOODS gauge to NWDP data requires a verified crosswalk. The source page describes access for academic/research purposes but an explicit licence was not visible in the metadata inspected; do not redistribute until terms are clarified. See `docs/INDOFLOODS_DATASET_REVIEW.md` and `docs/SCIENTIFIC_MODEL_DESIGN.md`.
+
