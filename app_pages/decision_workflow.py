@@ -12,6 +12,7 @@ from src.source_registry import build_source_registry, source_fitness_summary
 from src.disaster_data_catalog import get_catalog, validate_catalog_record
 from src.consequence_data_requirements import HAZARD_REQUIREMENTS, requirements_for_hazard, requirements_table
 from src.consequence_assessment import build_consequence_assessment
+from src.scenario_input_quality import evaluate_scenario_readiness
 
 from src.decision_workflow import (
     HAZARD_OPTIONS,
@@ -533,6 +534,23 @@ for item in scientific_frame["required_evidence"]:
 st.markdown("**Interpretation safeguards:**")
 for item in scientific_frame["limitations"]:
     st.markdown(f"- {item}")
+
+st.subheader("Input quality and hazard-specific evidence gate")
+input_quality = evaluate_scenario_readiness(inputs["hazard"], inputs)
+if input_quality["input_status"] == "Review required":
+    st.warning("Input review required before interpreting this scenario.")
+else:
+    st.success(input_quality["input_status"])
+for item in input_quality["errors"]:
+    st.error(item)
+for item in input_quality["warnings"]:
+    st.warning(item)
+st.markdown("**Hazard-specific evidence checklist**")
+for item in input_quality["evidence_factors_present"]:
+    st.markdown(f"- ✓ Supplied in the form: {item}")
+for item in input_quality["evidence_factors_missing_or_unverified"]:
+    st.markdown(f"- ☐ Missing or not independently verified: {item}")
+st.info(input_quality["reason"])
 
 st.subheader("Consequence assessment: probability, affected areas and impacts")
 consequence_assessment = build_consequence_assessment(
