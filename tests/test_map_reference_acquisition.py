@@ -44,7 +44,7 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
             "type": "FeatureCollection",
             "features": [{
                 "type": "Feature",
-                "properties": {"state_name": "Kerala", "district_name": "Ernakulam", "health_facility_name": "Test Hospital"},
+                "properties": {"statename": "Kerala", "districtname": "Ernakulam", "facilityname": "Test Hospital", "facilityaddress": "Kochi", "facilitytype": "District Hospital"},
                 "geometry": {"type": "Point", "coordinates": [76.3, 9.9]},
             }],
         }
@@ -61,7 +61,7 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
         manifest = acquisition.acquire(self.output)
         self.assertEqual(manifest["overall_status"], "RAW_CANDIDATES_NOT_APPROVED_FOR_MAP")
         self.assertEqual(len(manifest["files"]), 3)
-        self.assertTrue((self.output / "hospital_directory_ernakulam.geojson").exists())
+        self.assertTrue((self.output / "health_facilities_ernakulam.geojson").exists())
         self.assertTrue((self.output / "ksdma_flood_return_probability_historical_10_25_50.zip").exists())
         self.assertTrue((self.output / "kerala_health_department_institutions_2024_25.pdf").exists())
         stored = json.loads((self.output / "map_reference_manifest.json").read_text(encoding="utf-8"))
