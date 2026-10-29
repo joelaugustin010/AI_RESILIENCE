@@ -75,6 +75,11 @@ pages = {
             icon=":material/assignment_turned_in:",
         ),
         st.Page(
+            "app_pages/disaster_assistant.py",
+            title="Disaster Intelligence Assistant",
+            icon=":material/psychology_alt:",
+        ),
+        st.Page(
             "app_pages/kochi_map.py",
             title="Kochi Map",
             icon=":material/map:",

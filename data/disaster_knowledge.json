@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "title": "AI RESILIENCE evidence-grounded disaster knowledge",
+  "purpose": "General disaster preparedness information and source navigation. Not a live warning feed, local forecast, or substitute for official instructions.",
+  "topics": [
+    {
+      "id": "flood",
+      "title": "Flood preparedness",
+      "keywords": [
+        "flood",
+        "flooding",
+        "waterlogging",
+        "inundation",
+        "heavy rain",
+        "drainage"
+      ],
+      "summary": "Flood impacts depend on rainfall, catchment response, drainage, river or coastal conditions, terrain, and local infrastructure. Do not infer a street- or ward-level flood probability from a statewide hazard map alone.",
+      "actions": [
+        "Follow current instructions and warnings from the competent local and state authorities.",
+        "Avoid walking or driving through floodwater; depth, current, and road condition may be unknown.",
+        "Keep essential medicines, drinking water, charged communication devices, and important documents ready where appropriate.",
+        "Report blocked drains or damaged infrastructure to the responsible local authority; do not enter drains or floodwater to inspect them."
+      ],
+      "limitations": [
+        "This assistant has no verified live flood observations or operational forecast.",
+        "The current project flood raster has unresolved pixel semantics and reuse terms, so it is not used to calculate local depth or probability."
+      ],
+      "sources": [
+        {
+          "publisher": "Kerala State Disaster Management Authority",
+          "title": "Hazard maps and disaster information",
+          "url": "https://sdma.kerala.gov.in/hazard-maps/"
+        },
+        {
+          "publisher": "India Meteorological Department",
+          "title": "Official weather information and warnings",
+          "url": "https://mausam.imd.gov.in/"
+        }
+      ]
+    },
+    {
+      "id": "cyclone",
+      "title": "Cyclone preparedness",
+      "keywords": [
+        "cyclone",
+        "storm",
+        "wind",
+        "coastal",
+        "storm surge"
+      ],
+      "summary": "Cyclone impacts may include destructive winds, intense rainfall, coastal flooding, power or communication disruption, and blocked access. Actual local impacts depend on the official forecast and local conditions.",
+      "actions": [
+        "Use official IMD bulletins and local-authority instructions for timing and evacuation decisions.",
+        "Secure loose outdoor objects only when it is safe to do so; do not go outside during dangerous conditions.",
+        "Plan for power, communications, drinking water, medicines, and essential-service disruption.",
+        "Treat cyclone-plus-flood impacts as a compound scenario; this prototype does not calculate joint probabilities."
+      ],
+      "limitations": [
+        "No live cyclone warning feed is connected to this assistant.",
+        "Do not use this assistant to decide whether to evacuate; follow official instructions."
+      ],
+      "sources": [
+        {
+          "publisher": "India Meteorological Department",
+          "title": "Official weather information and warnings",
+          "url": "https://mausam.imd.gov.in/"
+        },
+        {
+          "publisher": "National Disaster Management Authority",
+          "title": "Disaster management guidance",
+          "url": "https://ndma.gov.in/"
+        }
+      ]
+    },
+    {
+      "id": "earthquake",
+      "title": "Earthquake preparedness",
+      "keywords": [
+        "earthquake",
+        "seismic",
+        "tremor",
+        "building safety"
+      ],
+      "summary": "Earthquake consequences depend on shaking, soil conditions, building design and condition, and exposed people and services. This app cannot certify the safety of any building.",
+      "actions": [
+        "Identify safe places and exits in advance and practise an age-appropriate household or school plan.",
+        "During shaking, follow recognised protective guidance such as Drop, Cover, and Hold On where appropriate; stay away from windows.",
+        "After shaking, avoid damaged structures and follow emergency-service instructions.",
+        "Have structural safety concerns assessed by qualified engineers, not by this app."
+      ],
+      "limitations": [
+        "No building inventory, site-specific seismic assessment, or structural inspection is connected.",
+        "The assistant does not estimate earthquake probability or building damage."
+      ],
+      "sources": [
+        {
+          "publisher": "National Disaster Management Authority",
+          "title": "Disaster management guidance",
+          "url": "https://ndma.gov.in/"
+        }
+      ]
+    },
+    {
+      "id": "air_quality",
+      "title": "Air pollution and industrial source attribution",
+      "keywords": [
+        "air pollution",
+        "aqi",
+        "pollution",
+        "factory",
+        "industrial",
+        "pm2.5",
+        "pm10",
+        "emissions",
+        "pollutant"
+      ],
+      "summary": "AQI describes air-quality conditions using measured pollutant information; it does not by itself identify a particular factory as the source. Attribution needs pollutant-specific measurements, reliable station locations and times, meteorology, and facility emissions or other source evidence.",
+      "actions": [
+        "Check the date, station, pollutant, units, averaging period, and data-completeness notes for each measurement.",
+        "Compare multiple time-aligned observations and meteorological conditions before drawing source hypotheses.",
+        "Treat a possible facility source as a hypothesis for investigation, not a proven cause.",
+        "Use the responsible pollution-control authority's monitoring and complaint channels for official investigation."
+      ],
+      "limitations": [
+        "The current project does not establish a scientifically validated factory-attribution result.",
+        "Historical station summaries must not be described as live AQI."
+      ],
+      "sources": [
+        {
+          "publisher": "Kerala State Pollution Control Board",
+          "title": "Water and air quality directory",
+          "url": "https://kspcb.kerala.gov.in/water-and-air-quality-directory"
+        },
+        {
+          "publisher": "Central Pollution Control Board",
+          "title": "Official CPCB portal",
+          "url": "https://cpcb.nic.in/"
+        }
+      ]
+    },
+    {
+      "id": "compound",
+      "title": "Compound disasters and critical services",
+      "keywords": [
+        "compound",
+        "multiple hazards",
+        "hospital",
+        "roads",
+        "critical infrastructure",
+        "cascading",
+        "cyclone and flood",
+        "flood and cyclone"
+      ],
+      "summary": "When hazards overlap, one event may reduce access, power, communications, drainage, or healthcare capacity needed to respond to another. The sequence and shared dependencies matter; separate hazard probabilities must not simply be multiplied without a justified joint model.",
+      "actions": [
+        "List each hazard, its timing, what is observed versus assumed, and the source for each input.",
+        "Review dependencies across hospitals, roads, power, water, communications, shelters, and drainage.",
+        "Record alternate access, backup duration, responsible operators, and decision triggers from official plans.",
+        "Keep uncertain consequences qualitative until local impact records and a validated method are available."
+      ],
+      "limitations": [
+        "The compound-scenario worksheet is qualitative and does not estimate casualties, damage, outage duration, or joint probability.",
+        "Hospital locations, flood exposure, and access routes are not yet approved for definitive ward-level claims."
+      ],
+      "sources": [
+        {
+          "publisher": "Kerala State Disaster Management Authority",
+          "title": "Hazard maps and disaster information",
+          "url": "https://sdma.kerala.gov.in/hazard-maps/"
+        },
+        {
+          "publisher": "National Disaster Management Authority",
+          "title": "Disaster management guidance",
+          "url": "https://ndma.gov.in/"
+        }
+      ]
+    }
+  ]
+}
