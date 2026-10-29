@@ -46,7 +46,7 @@ A related rainfall depth-duration-frequency dataset hosted by the Environmental 
 ## 5. Gate checklist
 
 - [x] Acquisition workflow completes and records provenance.
-- [x] Python tests passed on commit 37b8bd2e4676d32532b348e51f22f8ba38e5182d (run #84); later full Python test workflow #86 also passed on the current documentation commit. Passing tests are software evidence only.
+- [x] Python tests passed on commit 37b8bd2e4676d32532b348e51f22f8ba38e5182d (run #84); later full Python test workflow #86 passed on code commit 21ab7461e952eed0cb83fcb9284c5c06f4f8d1f0 (before the subsequent documentation-only update). Passing tests are software evidence only.
 - [x] Raster ZIP integrity and basic technical metadata checked.
 - [ ] Verify and checksum the 2024 Cochin boundary geometry against official notification.
 - [ ] Reconcile all 642 facility candidates and duplicate-coordinate groups.
