@@ -73,12 +73,18 @@ def atomic_write(path: Path, data: bytes) -> None:
 
 def acquire(output: Path) -> dict:
     output.mkdir(parents=True, exist_ok=True)
+    manifest_path = output / "map_reference_manifest.json"
     manifest = {
         "manifest_version": 1,
         "retrieved_at_utc": datetime.now(timezone.utc).isoformat(),
-        "overall_status": "RAW_CANDIDATES_NOT_APPROVED_FOR_MAP",
+        "overall_status": "ACQUISITION_IN_PROGRESS",
         "files": [],
     }
+    failures = []
+    # Persist the manifest after every source, including failures, so partial runs
+    # never leave successfully downloaded bytes without a provenance record.
+    atomic_write(manifest_path, json.dumps(manifest, indent=2).encode("utf-8"))
+
     for filename, source in SOURCES.items():
         url = source["url"]
         if filename.endswith(".geojson"):
@@ -90,63 +96,91 @@ def acquire(output: Path) -> dict:
                 "f": "geojson",
             }
             url = url + "?" + urllib.parse.urlencode(params)
-        data, final_url, content_type = fetch(url)
-        if not data:
-            raise RuntimeError(f"Empty response from {source['publisher']}")
         record = dict(source)
         record.update({
             "filename": filename,
             "request_url": url,
-            "final_url": final_url,
-            "content_type": content_type,
-            "sha256": hashlib.sha256(data).hexdigest(),
-            "size_bytes": len(data),
             "retrieved_at_utc": datetime.now(timezone.utc).isoformat(),
+            "status": "ACQUISITION_FAILED",
             "validation_status": "NOT_VALIDATED",
         })
-        if filename.endswith(".geojson"):
-            payload = json.loads(data.decode("utf-8-sig"))
-            if payload.get("type") != "FeatureCollection" or not isinstance(payload.get("features"), list):
-                raise RuntimeError("Hospital service did not return a GeoJSON FeatureCollection.")
-            features = payload["features"]
-            record["feature_count"] = len(features)
-            record["geometry_type_counts"] = {}
-            invalid_coordinates = 0
-            district_mismatches = 0
-            for feature in features:
-                geometry = feature.get("geometry") or {}
-                kind = geometry.get("type", "missing")
-                record["geometry_type_counts"][kind] = record["geometry_type_counts"].get(kind, 0) + 1
-                coordinates = geometry.get("coordinates")
-                if kind != "Point" or not isinstance(coordinates, list) or len(coordinates) < 2:
-                    invalid_coordinates += 1
-                else:
-                    lon, lat = coordinates[:2]
-                    if not isinstance(lon, (int, float)) or not isinstance(lat, (int, float)) or not (-180 <= lon <= 180 and -90 <= lat <= 90):
+        try:
+            data, final_url, content_type = fetch(url)
+            if not data:
+                raise RuntimeError(f"Empty response from {source['publisher']}")
+            record.update({
+                "final_url": final_url,
+                "content_type": content_type,
+                "sha256": hashlib.sha256(data).hexdigest(),
+                "size_bytes": len(data),
+            })
+            if filename.endswith(".geojson"):
+                payload = json.loads(data.decode("utf-8-sig"))
+                if payload.get("type") != "FeatureCollection" or not isinstance(payload.get("features"), list):
+                    raise RuntimeError("Hospital service did not return a GeoJSON FeatureCollection.")
+                features = payload["features"]
+                record["feature_count"] = len(features)
+                record["geometry_type_counts"] = {}
+                invalid_coordinates = 0
+                district_mismatches = 0
+                for feature in features:
+                    geometry = feature.get("geometry") or {}
+                    kind = geometry.get("type", "missing")
+                    record["geometry_type_counts"][kind] = record["geometry_type_counts"].get(kind, 0) + 1
+                    coordinates = geometry.get("coordinates")
+                    if kind != "Point" or not isinstance(coordinates, list) or len(coordinates) < 2:
                         invalid_coordinates += 1
-                props = feature.get("properties") or {}
-                if str(props.get("state_name", "")).strip().casefold() != "kerala" or str(props.get("district_name", "")).strip().casefold() != "ernakulam":
-                    district_mismatches += 1
-            record["invalid_point_count"] = invalid_coordinates
-            record["district_filter_mismatch_count"] = district_mismatches
-            record["validation_status"] = ("STRUCTURE_CHECKED_WITH_SPATIAL_QA_FLAGS" if invalid_coordinates or district_mismatches else "STRUCTURE_CHECKED_SPATIAL_ACCURACY_AND_LICENCE_UNVERIFIED")
-            atomic_write(output / filename, json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8"))
-        else:
-            if not zipfile.is_zipfile(__import__("io").BytesIO(data)):
-                raise RuntimeError("KSDMA response is not a ZIP archive; refusing to save an error page as data.")
-            import io
-            with zipfile.ZipFile(io.BytesIO(data)) as archive:
-                members = [item for item in archive.infolist() if not item.is_dir()]
-                record["archive_member_count"] = len(members)
-                record["raster_candidates"] = [item.filename for item in members if item.filename.lower().endswith((".tif", ".tiff", ".vrt"))]
-                if not record["raster_candidates"]:
-                    raise RuntimeError("KSDMA ZIP contains no TIFF/VRT raster candidates.")
-            atomic_write(output / filename, data)
-            record["validation_status"] = "ZIP_INTEGRITY_CHECKED_RASTER_SEMANTICS_UNVERIFIED"
+                    else:
+                        lon, lat = coordinates[:2]
+                        if not isinstance(lon, (int, float)) or not isinstance(lat, (int, float)) or not (-180 <= lon <= 180 and -90 <= lat <= 90):
+                            invalid_coordinates += 1
+                    props = feature.get("properties") or {}
+                    if str(props.get("state_name", "")).strip().casefold() != "kerala" or str(props.get("district_name", "")).strip().casefold() != "ernakulam":
+                        district_mismatches += 1
+                record["invalid_point_count"] = invalid_coordinates
+                record["district_filter_mismatch_count"] = district_mismatches
+                record["validation_status"] = (
+                    "STRUCTURE_CHECKED_WITH_SPATIAL_QA_FLAGS"
+                    if invalid_coordinates or district_mismatches
+                    else "STRUCTURE_CHECKED_SPATIAL_ACCURACY_AND_LICENCE_UNVERIFIED"
+                )
+                atomic_write(output / filename, json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8"))
+            else:
+                import io
+                if not zipfile.is_zipfile(io.BytesIO(data)):
+                    raise RuntimeError("KSDMA response is not a ZIP archive; refusing to save an error page as data.")
+                with zipfile.ZipFile(io.BytesIO(data)) as archive:
+                    bad_member = archive.testzip()
+                    if bad_member is not None:
+                        raise RuntimeError(f"KSDMA ZIP failed CRC check at member: {bad_member}")
+                    members = [item for item in archive.infolist() if not item.is_dir()]
+                    record["archive_member_count"] = len(members)
+                    record["raster_candidates"] = [item.filename for item in members if item.filename.lower().endswith((".tif", ".tiff", ".vrt"))]
+                    if not record["raster_candidates"]:
+                        raise RuntimeError("KSDMA ZIP contains no TIFF/VRT raster candidates.")
+                atomic_write(output / filename, data)
+                record["validation_status"] = "ZIP_INTEGRITY_CHECKED_RASTER_SEMANTICS_UNVERIFIED"
+            record["status"] = "DOWNLOADED_RAW_CANDIDATE"
+        except Exception as error:
+            record["status"] = "ACQUISITION_FAILED"
+            record["error"] = f"{type(error).__name__}: {error}"
+            failures.append(filename)
         manifest["files"].append(record)
-    atomic_write(output / "map_reference_manifest.json", json.dumps(manifest, indent=2).encode("utf-8"))
-    return manifest
+        manifest["overall_status"] = (
+            "RAW_CANDIDATES_NOT_APPROVED_FOR_MAP"
+            if not failures and len(manifest["files"]) == len(SOURCES)
+            else "PARTIAL_ACQUISITION_FAILED" if failures
+            else "ACQUISITION_IN_PROGRESS"
+        )
+        manifest["updated_at_utc"] = datetime.now(timezone.utc).isoformat()
+        atomic_write(manifest_path, json.dumps(manifest, indent=2).encode("utf-8"))
 
+    if failures:
+        raise RuntimeError(
+            "One or more map reference downloads failed: " + ", ".join(failures)
+            + f". Partial provenance manifest saved to {manifest_path}."
+        )
+    return manifest
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
