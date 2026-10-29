@@ -36,43 +36,49 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/raw/kochi_wards_ksmart_2024_draft.json data/raw/kochi_wards_ksmart_2024_draft.metadata.json data/processed/spatial_layers/kochi_wards_ksmart_2024_draft_candidate.geojson data/processed/spatial_layers/kochi_wards_ksmart_2024_draft_candidate.metadata.json data/reference/spatial_sources.json
+          git add data/raw/kochi_wards_ksmart_2024_draft.json data/raw/kochi_wards_ksmart_2024_draft.metadata.json data/candidates/kochi_wards_ksmart_2024_draft_candidate.geojson data/candidates/kochi_wards_ksmart_2024_draft_candidate.metadata.json data/reference/spatial_sources.json
           if git diff --cached --quiet; then
             echo "Candidate data already up to date; no commit needed."
           else
             git commit -m "Acquire and validate Kochi draft ward-map candidate"
             git push origin "HEAD:$BRANCH_NAME"
           fi
-      - name: Verify candidate passes repository ingestion checks
+      - name: Verify visual-only candidate integrity
         run: |
           python - <<'PY'
           import hashlib
+          import json
           from pathlib import Path
-          from src.spatial_data import read_processed_layers
+          from shapely.geometry import shape
 
-          processed_root = Path("data/processed")
-          candidate_path = processed_root / "spatial_layers" / "kochi_wards_ksmart_2024_draft_candidate.geojson"
-          candidate_sha = hashlib.sha256(candidate_path.read_bytes()).hexdigest()
-          layers = read_processed_layers(processed_root)
-          candidates = [
-              layer for layer in layers
-              if layer["metadata"].get("dataset_id") == "kochi_wards_ksmart_2024_draft_candidate"
+          candidate_path = Path("data/candidates/kochi_wards_ksmart_2024_draft_candidate.geojson")
+          metadata_path = candidate_path.with_name("kochi_wards_ksmart_2024_draft_candidate.metadata.json")
+          metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+          candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
+          features = candidate.get("features", [])
+          if len(features) != 76:
+              raise SystemExit(f"Expected 76 candidate features; got {len(features)}")
+          codes = [feature.get("properties", {}).get("sec_ward_code") for feature in features]
+          names = [feature.get("properties", {}).get("sec_ward_name") for feature in features]
+          if len(set(codes)) != 76 or len(set(names)) != 76 or any(not value for value in codes + names):
+              raise SystemExit("Candidate SEC ward codes/names are missing or duplicated.")
+          invalid = [
+              index + 1 for index, feature in enumerate(features)
+              if not feature.get("geometry") or not shape(feature["geometry"]).is_valid
           ]
-          if len(candidates) != 1:
-              raise SystemExit(
-                  "Candidate did not pass read_processed_layers provenance/geometry gate; "
-                  f"loaded candidates={len(candidates)}"
-              )
-          candidate = candidates[0]
-          if candidate["report"]["feature_count"] != 76:
-              raise SystemExit(f"Expected 76 loaded features; got {candidate['report']['feature_count']}")
-          if candidate["report"]["source_sha256"] != candidate_sha:
-              raise SystemExit("Loaded candidate hash does not match the stored GeoJSON.")
+          if invalid:
+              raise SystemExit(f"Shapely reports invalid candidate geometries: {invalid[:12]}")
+          actual_hash = hashlib.sha256(candidate_path.read_bytes()).hexdigest()
+          if metadata.get("processed_sha256") != actual_hash:
+              raise SystemExit("Candidate sidecar hash does not match the GeoJSON.")
           print({
-              "loaded_candidate_features": candidate["report"]["feature_count"],
-              "provenance_valid": candidate["report"]["provenance_valid"],
-              "source_name_mismatches": candidate["metadata"].get("source_name_mismatch_count"),
-              "geometry_repairs": candidate["metadata"].get("geometry_repair_count"),
-              "candidate_only": candidate["metadata"].get("status"),
+              "candidate_features": len(features),
+              "unique_SEC_codes": len(set(codes)),
+              "unique_SEC_names": len(set(names)),
+              "Shapely_valid_geometries": len(features) - len(invalid),
+              "source_name_mismatches": metadata.get("source_name_mismatch_count"),
+              "geometry_repairs": metadata.get("geometry_repair_count"),
+              "status": "DRAFT VISUAL CANDIDATE ONLY",
+              "warning": "Not in strict processed-layer ingestion; not for legal or exposure analysis.",
           })
           PY
