@@ -6,6 +6,8 @@ import json
 import unittest
 from pathlib import Path
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parent
 
@@ -24,6 +26,10 @@ class NewOfficialAirEvidenceTests(unittest.TestCase):
         cls.air = cls.air_metadata["sources"]["kspcb_caaqms_eloor_2026_09"]
         cls.dic = cls.air_metadata["sources"]["dic_edayar_allotment_2022"]
 
+    @pytest.mark.local_research(
+        "data/raw/air_quality_reports/KSPCB_CAAQMS_monthly_report_2026-09.pdf",
+        "data/raw/industrial/DIC_DA_Edayar_allotment_details_2022.pdf",
+    )
     def test_original_official_files_match_recorded_hashes_and_pdf_signatures(self):
         for source in (self.air, self.dic):
             raw_path = ROOT / source["raw_file"]

@@ -6,6 +6,7 @@ import unittest
 from pathlib import Path
 
 import pandas as pd
+import pytest
 
 from src.air_quality import (
     AirQualityDataError,
@@ -153,6 +154,18 @@ class KspcbAnnualSummaryTests(unittest.TestCase):
         with self.assertRaisesRegex(AirQualitySourceError, "Duplicate station summary"):
             prepare_kspcb_annual_aqi(duplicate, 2026, inventory)
 
+    @pytest.mark.local_research(
+        "data/processed/air_quality/kspcb_annual_aqi.csv",
+        "data/processed/air_quality/kspcb_annual_aqi.metadata.json",
+        "data/raw/air_quality/kspcb_annual_aqi_2023_20261023T154709Z.json",
+        "data/raw/air_quality/kspcb_annual_aqi_2023_20261023T154709Z.metadata.json",
+        "data/raw/air_quality/kspcb_annual_aqi_2024_20261023T154709Z.json",
+        "data/raw/air_quality/kspcb_annual_aqi_2024_20261023T154709Z.metadata.json",
+        "data/raw/air_quality/kspcb_annual_aqi_2025_20261023T154709Z.json",
+        "data/raw/air_quality/kspcb_annual_aqi_2025_20261023T154709Z.metadata.json",
+        "data/raw/air_quality/kspcb_annual_aqi_2026_20261023T154709Z.json",
+        "data/raw/air_quality/kspcb_annual_aqi_2026_20261023T154709Z.metadata.json",
+    )
     def test_downloaded_summaries_are_labeled_and_not_pollutant_observations(self):
         summary_path = ROOT / "data" / "processed" / "air_quality" / "kspcb_annual_aqi.csv"
         metadata_path = ROOT / "data" / "processed" / "air_quality" / "kspcb_annual_aqi.metadata.json"
@@ -269,8 +282,8 @@ class VerifiedAirQualityPipelineTests(unittest.TestCase):
         with self.assertRaisesRegex(AirQualityDataError, "Negative pollutant"):
             validate_observations(rows, STATIONS, verified=True)
 
-    def test_legacy_illustrative_csv_does_not_match_observation_schema(self):
-        sample = pd.read_csv(ROOT / "data" / "raw" / "air_pollution_data.csv")
+    def test_legacy_illustrative_fixture_does_not_match_observation_schema(self):
+        sample = pd.DataFrame({"Year": [2020], "PM2.5": [42]})
         with self.assertRaisesRegex(AirQualityDataError, "Missing required column"):
             validate_observations(sample, STATIONS, verified=True)
 

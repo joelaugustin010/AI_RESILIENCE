@@ -290,9 +290,9 @@ was unrelated. Authenticode reports the SciPy extension as unsigned, but the
 current interpreter imports and executes it successfully; this does not
 establish the cause of a previous failure. The Streamlit command-line
 executable separately hit Windows Application Control. The devcontainer
-specifies Python 3.11, but Python 3.11 and 3.13 are installed here without NumPy;
-Docker is unavailable and no CI workflow was found. No security control was
-changed and no binary was replaced.
+specifies Python 3.11. Docker is unavailable. No security control was changed
+and no binary was replaced. A Python 3.11 pull-request workflow is now defined
+in `.github/workflows/tests.yml`.
 
 ### Supported environment and reproducibility
 
@@ -325,13 +325,15 @@ same interpreter:
 
 The current `requirements.txt` pins Streamlit and bounds scikit-learn, but
 leaves several direct and transitive dependencies unpinned; it is not a lock
-file. Exact Python 3.11 resolved versions were not captured because the local
-Python 3.11 installation has no pip, no dependency wheel cache is available,
-and Docker is unavailable. Do not treat the successful Python 3.15 test run
-as verification of the Python 3.11 environment. After a clean Python 3.11
-install succeeds, capture and review `python -m pip freeze --all` as a
-platform-specific lock artifact before claiming exact environment
-reproduction. The SciPy toolchain compatibility table can guide that review:
+file. A clean Python 3.11 environment was created and pip was bootstrapped, but
+dependency installation failed when DNS resolution for
+`files.pythonhosted.org` failed while retrieving PyArrow. Resolver selections
+are recorded in `docs/testing.md`; no Python 3.11 dependencies were installed
+or tested. Do not treat the successful Python 3.15 test run as verification of
+the Python 3.11 environment. After a clean Python 3.11 install succeeds,
+capture and review `python -m pip freeze --all` as a platform-specific lock
+artifact before claiming exact environment reproduction. The SciPy toolchain
+compatibility table can guide that review:
 https://docs.scipy.org/doc/scipy/dev/toolchain.html.
 
 The app therefore reports exposure as unknown. It does not treat missing
@@ -355,18 +357,20 @@ data. Until those inputs exist, no factory ranking or causal claim is produced.
 
 ## Tests
 
-Run the repository suite with:
+Run the clean-checkout-compatible suite with:
 
-    python -m pytest -q -p no:cacheprovider
+    python -m pytest -q -ra --strict-markers
 
 The repository suite includes `test_flood_model.py`, `test_flood_raster.py`,
 catalog/audit blockers, the existing decision workflow checks, and Streamlit
 AppTest coverage for Data Readiness, the Kochi map, and Hospital Vulnerability.
-On 2026-10-29 the command completed with exit code 0: 157 passed and 13
-subtests passed in 29.92 seconds, with no failures, skips, or import errors.
-The default Windows sandbox denied test-fixture access under `.test_tmp`; the
-suite was rerun in the permitted execution context. No tests were removed or
-skipped.
+On 2026-10-29, the available Python 3.15 interpreter completed the default
+suite with 155 passed, 3 skipped, and 13 passing subtests. The skips are the
+optional ignored-source snapshot checks described in `docs/testing.md`. The
+local research checks were also run separately: 3 passed, 155 deselected. The
+first sandboxed attempt denied fixture writes; both final runs used a writable
+temporary directory within the isolated workspace. This verifies the suite in
+the available Python 3.15 environment only; Python 3.11 remains unverified.
 
 This checkout's tests are also unittest compatible:
 

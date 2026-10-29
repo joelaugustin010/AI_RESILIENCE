@@ -11,6 +11,8 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
+import pytest
+
 from src.ingestion_audit import (
     DATA_STATUS_DEFINITIONS,
     build_ingestion_report,
@@ -100,6 +102,39 @@ class StatusAndCatalogTests(TemporaryAuditCase):
             self.assertTrue(all(ids))
             self.assertTrue(set(statuses).issubset(DATA_STATUS_DEFINITIONS))
 
+    @pytest.mark.local_research(
+        "data/processed/air_quality/kspcb_annual_aqi.metadata.json",
+        "data/processed/air_quality/kspcb_annual_aqi.csv",
+        "data/raw/air_quality/kspcb_annual_aqi_2023_20261023T154709Z.json",
+        "data/raw/air_quality/kspcb_annual_aqi_2023_20261023T154709Z.metadata.json",
+        "data/raw/air_quality/kspcb_annual_aqi_2024_20261023T154709Z.json",
+        "data/raw/air_quality/kspcb_annual_aqi_2024_20261023T154709Z.metadata.json",
+        "data/raw/air_quality/kspcb_annual_aqi_2025_20261023T154709Z.json",
+        "data/raw/air_quality/kspcb_annual_aqi_2025_20261023T154709Z.metadata.json",
+        "data/raw/air_quality/kspcb_annual_aqi_2026_20261023T154709Z.json",
+        "data/raw/air_quality/kspcb_annual_aqi_2026_20261023T154709Z.metadata.json",
+        "data/processed/air_quality/kspcb_air_reports.metadata.json",
+        "data/raw/air_quality_reports/KSPCB_AQI_daily_average_2026-10-16.pdf",
+        "data/raw/air_quality_reports/KSPCB_CAAQMS_monthly_report_2026-08.pdf",
+        "data/raw/air_quality_reports/KSPCB_NAMP_report_2025-08.pdf",
+        "data/processed/air_quality/kspcb_daily_aqi_2026-10-16.csv",
+        "data/processed/air_quality/kspcb_daily_aqi_status_2026-10-16.csv",
+        "data/processed/air_quality/kspcb_caaqms_eloor_daily_2026-08.csv",
+        "data/processed/air_quality/kspcb_caaqms_eloor_aqi_2026-08.csv",
+        "data/processed/air_quality/kspcb_caaqms_eloor_weather_2026-08.csv",
+        "data/processed/air_quality/kspcb_namp_ernakulam_2025-06.csv",
+        "data/processed/air_quality/kspcb_caaqms_eloor_2026-09.metadata.json",
+        "data/raw/air_quality_reports/KSPCB_CAAQMS_monthly_report_2026-09.pdf",
+        "data/raw/air_quality_reports/KSPCB_CAAQMS_monthly_report_2026-09.pdf.metadata.json",
+        "data/raw/industrial/DIC_DA_Edayar_allotment_details_2022.pdf",
+        "data/raw/industrial/DIC_DA_Edayar_allotment_details_2022.pdf.metadata.json",
+        "data/raw/industrial/KWA_Edayar_CETP_DER_2022.pdf",
+        "data/raw/industrial/KWA_Edayar_CETP_DER_2022.pdf.metadata.json",
+        "data/raw/industrial/DIC_DA_EDAYAR.dwg",
+        "data/raw/industrial/DIC_DA_EDAYAR.dwg.metadata.json",
+        "data/raw/industrial/KSPCB_OCMMS_CTO_red_page2_2015-2019.html",
+        "data/raw/industrial/KSPCB_OCMMS_CTO_red_page2_2015-2019.html.metadata.json",
+    )
     def test_local_research_hashes_and_derived_output_hashes_match(self):
         report = build_ingestion_report(ROOT, validated_at_utc="2026-10-29T00:00:00+00:00")
         self.assertEqual(report["catalog_errors"], [])
@@ -134,7 +169,12 @@ class StatusAndCatalogTests(TemporaryAuditCase):
         self.assertFalse(first["flood_analysis"]["operational"])
 
     def test_real_flood_analysis_stays_blocked_with_named_source_evidence(self):
-        report = build_ingestion_report(ROOT, validated_at_utc="2026-10-29T00:00:00+00:00")
+        (self.root / "data/reference").mkdir(parents=True)
+        for catalog in ("spatial_sources.json", "air_quality_acquisition.json"):
+            (self.root / "data/reference" / catalog).write_bytes(
+                (ROOT / "data/reference" / catalog).read_bytes()
+            )
+        report = build_ingestion_report(self.root, validated_at_utc="2026-10-29T00:00:00+00:00")
         flood = report["flood_analysis"]
         self.assertEqual(flood["status"], "unavailable")
         self.assertFalse(flood["operational"])
@@ -148,7 +188,7 @@ class StatusAndCatalogTests(TemporaryAuditCase):
         self.assertEqual(spatial["schools_kerala_sametham"]["status"], "unavailable")
         self.assertEqual(spatial["flood_exposure_report_ksdma_2022"]["status"], "unavailable")
         self.assertEqual(spatial["flood_hazard_jrc_glofas_rp100"]["status"], "provisional")
-        source_catalog = json.loads((ROOT / "data/reference/spatial_sources.json").read_text(encoding="utf-8"))
+        source_catalog = json.loads((self.root / "data/reference/spatial_sources.json").read_text(encoding="utf-8"))
         jrc = next(item for item in source_catalog["datasets"] if item["layer_id"] == "flood_hazard_jrc_glofas_rp100")
         self.assertIn("preview_withheld", jrc["status"])
         self.assertEqual(jrc["validation_status"], "REQUIRES LICENSE CLARIFICATION; NOT DISPLAYED")
