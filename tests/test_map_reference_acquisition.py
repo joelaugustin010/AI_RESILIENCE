@@ -103,7 +103,7 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
         self.assertTrue((self.output / "kerala_health_department_institutions_2024_25.pdf").exists())
         first_url = mocked_fetch.call_args_list[0].args[0]
         fallback_url = mocked_fetch.call_args_list[1].args[0]
-        self.assertIn("state_name%3D%27Kerala%27", first_url)
+        self.assertIn("statename%3D%27Kerala%27", first_url)
         self.assertIn("geometryType=esriGeometryEnvelope", fallback_url)
         self.assertIn("inSR=4326", fallback_url)
         self.assertIn("75.9", fallback_url)
