@@ -88,14 +88,43 @@ def acquire(output: Path) -> dict:
     for filename, source in SOURCES.items():
         url = source["url"]
         if filename.endswith(".geojson"):
-            params = {
-                "where": "state_name = 'Kerala' AND district_name = 'Ernakulam'",
-                "outFields": "*",
-                "returnGeometry": "true",
-                "outSR": "4326",
-                "f": "geojson",
-            }
-            url = url + "?" + urllib.parse.urlencode(params)
+            # First ask the service for object IDs, then retrieve all records in
+            # bounded batches. Filter state/district locally because service-side
+            # SQL expressions and district spelling/case have returned empty data.
+            ids_url = url + "?" + urllib.parse.urlencode({
+                "where": "1=1",
+                "returnIdsOnly": "true",
+                "f": "json",
+            })
+            ids_data, final_url, content_type = fetch(ids_url)
+            ids_payload = json.loads(ids_data.decode("utf-8-sig"))
+            object_ids = ids_payload.get("objectIds")
+            if not isinstance(object_ids, list) or not object_ids:
+                raise RuntimeError("Hospital service returned no object IDs; refusing to treat an empty response as valid GIS data.")
+            all_features = []
+            for start in range(0, len(object_ids), 500):
+                batch_url = url + "?" + urllib.parse.urlencode({
+                    "objectIds": ",".join(str(value) for value in object_ids[start:start + 500]),
+                    "outFields": "*",
+                    "returnGeometry": "true",
+                    "outSR": "4326",
+                    "f": "geojson",
+                })
+                batch_data, final_url, content_type = fetch(batch_url)
+                batch_payload = json.loads(batch_data.decode("utf-8-sig"))
+                if batch_payload.get("type") != "FeatureCollection" or not isinstance(batch_payload.get("features"), list):
+                    raise RuntimeError("Hospital service batch did not return a GeoJSON FeatureCollection.")
+                all_features.extend(batch_payload["features"])
+            # The original source filter is applied locally and case-insensitively.
+            filtered = []
+            for feature in all_features:
+                props = feature.get("properties") or {}
+                state = str(props.get("state_name", "")).strip().casefold()
+                district = " ".join(str(props.get("district_name", "")).strip().casefold().replace("-", " ").split())
+                if state == "kerala" and district in {"ernakulam", "ernakulam district", "ernakulam (kochi)"}:
+                    filtered.append(feature)
+            payload = {"type": "FeatureCollection", "features": filtered}
+            data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
         record = dict(source)
         record.update({
             "filename": filename,
@@ -115,7 +144,7 @@ def acquire(output: Path) -> dict:
                 "size_bytes": len(data),
             })
             if filename.endswith(".geojson"):
-                payload = json.loads(data.decode("utf-8-sig"))
+                # Hospital features were assembled from all object-ID batches above.
                 if payload.get("type") != "FeatureCollection" or not isinstance(payload.get("features"), list):
                     raise RuntimeError("Hospital service did not return a GeoJSON FeatureCollection.")
                 features = payload["features"]
