@@ -17,18 +17,38 @@ HOSPITAL_REVIEW_METADATA = ROOT / "data" / "processed" / "nihfw_ernakulam_hospit
 HOSPITAL_REVIEW_CSV = ROOT / "data" / "processed" / "nihfw_ernakulam_hospitals_coordinate_review.csv"
 
 
-def _first_property(properties: dict, candidates: tuple[str, ...], fallback: str) -> str:
-    """Return the first populated source property without assuming every dataset uses the same schema."""
-    def normalize_key(value: object) -> str:
-        # GeoJSON publishers commonly vary between Bound_Name, Bound Name,
-        # bound-name, and camel-case spellings.
-        return "".join(character for character in str(value).casefold() if character.isalnum())
+def _normalize_property_key(value: object) -> str:
+    """Normalize GIS field aliases such as Ward_Name, ward name, and WardName_1."""
+    return "".join(character for character in str(value).casefold() if character.isalnum())
 
-    normalized = {normalize_key(key): value for key, value in properties.items()}
-    for candidate in candidates:
-        value = normalized.get(normalize_key(candidate))
-        if value is not None and str(value).strip() and str(value).strip().casefold() not in {"nan", "none", "null"}:
+
+def _has_display_value(value: object) -> bool:
+    """Reject empty and common GIS null sentinels without rejecting numeric ward IDs."""
+    return value is not None and str(value).strip().casefold() not in {
+        "", "nan", "none", "null", "<null>", "n/a", "na", "unknown"
+    }
+
+
+def _first_property(properties: dict, candidates: tuple[str, ...], fallback: str) -> str:
+    """Find the first populated known GIS property, including common suffixed field aliases."""
+    normalized = {_normalize_property_key(key): value for key, value in properties.items()}
+    candidate_keys = [_normalize_property_key(candidate) for candidate in candidates]
+
+    # Prefer exact aliases to avoid accidentally matching unrelated metadata.
+    for candidate in candidate_keys:
+        value = normalized.get(candidate)
+        if _has_display_value(value):
             return str(value).strip()
+
+    # Shapefile exports often append _1, _2, or a source-specific suffix to
+    # duplicate fields. Accept a suffixed alias only when it uniquely matches.
+    for candidate in candidate_keys:
+        matches = [
+            value for key, value in normalized.items()
+            if key.startswith(candidate) and key != candidate and _has_display_value(value)
+        ]
+        if len(matches) == 1:
+            return str(matches[0]).strip()
     return fallback
 
 
@@ -54,14 +74,16 @@ def normalize_geojson_for_tooltip(geojson: dict, fallback_name: str | None = Non
         properties["display_feature_id"] = source_id
         properties["display_bound"] = _first_property(
             properties,
-            ("Bound_Name", "Bound Name", "bound_name", "boundname", "boundary_name",
-             "Ward_Name", "Ward Name", "ward_name", "wardname", "name"),
+            ("Bound_Name", "Bound Name", "bound_name", "boundname", "bound_name_1", "boundary_name",
+             "boundaryname", "ward_boundary_name", "Ward_Name", "Ward Name", "ward_name",
+             "wardname", "ward_name_en", "wardnameen", "ward_label", "name_en", "name"),
             fallback_name or missing_name,
         )
         properties["display_ward"] = _first_property(
             properties,
-            ("Ward_Name", "Ward Name", "ward_name", "wardname", "Ward_No", "ward_no",
-             "ward", "ward_number", "Bound_Name", "Bound Name"),
+            ("Ward_Name", "Ward Name", "ward_name", "wardname", "ward_name_en", "wardnameen",
+             "ward_label", "wardname_1", "Ward_No", "ward_no", "ward_number", "wardnumber",
+             "ward", "Bound_Name", "Bound Name", "boundary_name", "name_en", "name"),
             missing_name,
         )
         properties["display_name"] = _first_property(
