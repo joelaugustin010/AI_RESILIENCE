@@ -52,6 +52,7 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
         with zipfile.ZipFile(memory, "w") as archive:
             archive.writestr("candidate.tif", b"not a real raster; archive integrity only")
         mocked_fetch.side_effect = [
+            (json.dumps({"objectIds": [1]}).encode(), "https://example.org/ids", "application/json"),
             (json.dumps(hospitals).encode(), "https://example.org/hospitals", "application/geo+json"),
             (memory.getvalue(), "https://example.org/flood.zip", "application/zip"),
         ]
@@ -77,6 +78,7 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
             }],
         }
         mocked_fetch.side_effect = [
+            (json.dumps({"objectIds": [1]}).encode(), "https://example.org/ids", "application/json"),
             (json.dumps(hospitals).encode(), "https://example.org/hospitals", "application/geo+json"),
             (b"<html>error</html>", "https://example.org/error", "text/html"),
         ]
@@ -98,6 +100,7 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
             }],
         }
         mocked_fetch.side_effect = [
+            (json.dumps({"objectIds": [1]}).encode(), "https://example.org/ids", "application/json"),
             (json.dumps(hospitals).encode(), "https://example.org/hospitals", "application/geo+json"),
             (b"<html>download failed</html>", "https://example.org/error", "text/html"),
         ]
@@ -134,15 +137,18 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
         with zipfile.ZipFile(memory, "w") as archive:
             archive.writestr("candidate.tif", b"placeholder")
         mocked_fetch.side_effect = [
+            (json.dumps({"objectIds": [1]}).encode(), "https://example.org/ids", "application/json"),
             (json.dumps(hospitals).encode(), "https://example.org/hospitals", "application/geo+json"),
             (memory.getvalue(), "https://example.org/flood.zip", "application/zip"),
         ]
         manifest = acquisition.acquire(self.output)
         record = manifest["files"][0]
-        self.assertEqual(record["invalid_point_count"], 1)
-        self.assertEqual(record["district_filter_mismatch_count"], 1)
+        self.assertEqual(record["source_feature_count"], 2)
+        self.assertEqual(record["feature_count"], 1)
+        self.assertEqual(record["invalid_point_count"], 0)
+        self.assertEqual(record["district_filter_mismatch_count"], 0)
         self.assertEqual(record["outside_kerala_screening_box_count"], 1)
-        self.assertEqual(record["missing_facility_name_count"], 1)
+        self.assertEqual(record["missing_facility_name_count"], 0)
         self.assertEqual(record["validation_status"], "STRUCTURE_CHECKED_WITH_SPATIAL_QA_FLAGS")
         self.assertEqual(manifest["overall_status"], "RAW_CANDIDATES_NOT_APPROVED_FOR_MAP")
 
