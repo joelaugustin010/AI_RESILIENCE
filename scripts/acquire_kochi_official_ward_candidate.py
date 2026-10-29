@@ -67,7 +67,7 @@ def extract_ward_number(feature: dict[str, Any]) -> int | None:
         if isinstance(value, (int, float)) and float(value).is_integer():
             number = int(value)
             return number if 1 <= number <= 76 else None
-        match = re.fullmatch(r"\\s*(?:ward\\s*(?:no\\.?|number)?\\s*)?0*(\\d+)\\s*", str(value), flags=re.IGNORECASE)
+        match = re.fullmatch(r"\s*(?:ward\s*(?:no\.?|number)?\s*)?0*(\d+)\s*", str(value), flags=re.IGNORECASE)
         if match:
             number = int(match.group(1))
             return number if 1 <= number <= 76 else None
@@ -93,7 +93,7 @@ def validate_and_annotate(
         raise ValueError(f"Expected 76 source features; received {len(features)}. Candidate was not promoted.")
     roster_by_number = {}
     for code, name in roster:
-        match = re.search(r"(\\d{3})$", code)
+        match = re.search(r"(\d{3})$", code)
         if not match:
             raise ValueError(f"Official ward code has no three-digit ward number: {code}")
         number = int(match.group(1))
