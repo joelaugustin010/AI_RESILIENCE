@@ -8,74 +8,13 @@ corroborated. It never turns missing data into zero or emits a risk score.
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import json
+from pathlib import Path
 from typing import Any
 
-SOURCE_REGISTRY = {
-    "ksdma_historical_raster": {
-        "family": "official_hazard_mapping",
-        "title": "KSDMA historical flood-return raster",
-        "status": "not_eligible_pixel_semantics_and_reuse_unresolved",
-        "unit": None,
-        "url": "https://sdma.kerala.gov.in/hazard-maps/",
-        "use": "Context only; do not sample or threshold pixels until exact value semantics and reuse terms are confirmed.",
-    },
-    "ksdma_ernakulam_pdf": {
-        "family": "official_hazard_mapping",
-        "title": "KSDMA Ernakulam district flood-hazard maps",
-        "status": "district_context_only",
-        "unit": None,
-        "url": "https://sdma.kerala.gov.in/hazard-maps/",
-        "use": "District-level contextual review only; not ward-level or facility-level exposure.",
-    },
-    "cwc_rainfall_observations": {
-        "family": "rain_gauge_observations",
-        "title": "CWC hourly rainfall observations in the project repository",
-        "status": "raw_observations_conflicts_and_coverage_gaps",
-        "unit": "mm",
-        "url": "https://cwc.gov.in/",
-        "use": "Only after station-time conflicts, time zone, observation interval, and missingness are handled.",
-    },
-    "cwc_river_observations": {
-        "family": "river_gauge_observations",
-        "title": "CWC river-level observations in the project repository",
-        "status": "raw_observations_gauge_reference_unresolved",
-        "unit": "m",
-        "url": "https://cwc.gov.in/",
-        "use": "Source-reported reading only until gauge datum, station identity, and warning thresholds are confirmed.",
-    },
-    "eidc_rainfall_ddf": {
-        "family": "gridded_rainfall_frequency",
-        "title": "Kerala gridded rainfall depth-duration-frequency estimates (1979–2020)",
-        "status": "candidate_not_ingested_license_not_provided",
-        "unit": "mm",
-        "url": "https://catalogue.ceh.ac.uk/documents/4a08e6f1-e508-4bb6-b571-b3145dd1588e",
-        "use": "Historical modelled rainfall-frequency context; not live forecast rainfall.",
-    },
-    "eidc_flood_frequency": {
-        "family": "gridded_flood_frequency",
-        "title": "Kerala gridded flood-frequency estimates",
-        "status": "candidate_not_ingested_license_not_provided",
-        "unit": "m³/s",
-        "url": "https://catalogue.ceh.ac.uk/documents/cba9f9db-4706-4f1e-aaf4-fd7769e00db0",
-        "use": "River-network peak-flow frequency context; not local inundation depth or flood probability.",
-    },
-    "imd_forecast": {
-        "family": "meteorological_forecast",
-        "title": "India Meteorological Department official forecasts and warnings",
-        "status": "not_integrated",
-        "unit": None,
-        "url": "https://mausam.imd.gov.in/",
-        "use": "Operational context only after source, issue time, valid time, spatial coverage, and product are captured.",
-    },
-    "terrain_drainage": {
-        "family": "terrain_and_drainage",
-        "title": "Terrain, drainage, and local infrastructure evidence",
-        "status": "no_validated_kochi_layer_in_model",
-        "unit": None,
-        "url": "https://bhuvan.nrsc.gov.in/",
-        "use": "Required for local waterlogging mechanisms; source, resolution, and reuse must be checked before ingestion.",
-    },
-}
+REGISTRY_PATH = Path(__file__).resolve().parents[1] / "data" / "reference" / "flood_evidence_sources.json"
+_REGISTRY_DOCUMENT = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
+SOURCE_REGISTRY = _REGISTRY_DOCUMENT["sources"]
 
 
 def audit_multisource_evidence(
