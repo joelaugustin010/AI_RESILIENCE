@@ -55,17 +55,20 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
             (json.dumps({"objectIds": [1]}).encode(), "https://example.org/ids", "application/json"),
             (json.dumps(hospitals).encode(), "https://example.org/hospitals", "application/geo+json"),
             (memory.getvalue(), "https://example.org/flood.zip", "application/zip"),
+            (b"%PDF-1.4\\nmock official institution list", "https://example.org/institutions.pdf", "application/pdf"),
         ]
 
         manifest = acquisition.acquire(self.output)
         self.assertEqual(manifest["overall_status"], "RAW_CANDIDATES_NOT_APPROVED_FOR_MAP")
-        self.assertEqual(len(manifest["files"]), 2)
+        self.assertEqual(len(manifest["files"]), 3)
         self.assertTrue((self.output / "hospital_directory_ernakulam.geojson").exists())
         self.assertTrue((self.output / "ksdma_flood_return_probability_historical_10_25_50.zip").exists())
+        self.assertTrue((self.output / "kerala_health_department_institutions_2024_25.pdf").exists())
         stored = json.loads((self.output / "map_reference_manifest.json").read_text(encoding="utf-8"))
         self.assertEqual(stored["files"][0]["feature_count"], 1)
         self.assertEqual(stored["files"][0]["validation_status"], "STRUCTURE_CHECKED_SPATIAL_ACCURACY_AND_LICENCE_UNVERIFIED")
         self.assertEqual(stored["files"][1]["validation_status"], "ZIP_INTEGRITY_CHECKED_RASTER_SEMANTICS_UNVERIFIED")
+        self.assertEqual(stored["files"][2]["validation_status"], "PDF_SIGNATURE_CHECKED_FACILITY_MATCHING_REQUIRED")
         self.assertTrue(all(item["sha256"] for item in stored["files"]))
 
     @patch.object(acquisition, "fetch")
@@ -90,11 +93,14 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
             (json.dumps({"objectIds": [7]}).encode(), "https://example.org/spatial-ids", "application/json"),
             (json.dumps(hospitals).encode(), "https://example.org/hospitals", "application/geo+json"),
             (memory.getvalue(), "https://example.org/flood.zip", "application/zip"),
+            (b"%PDF-1.4\\nmock official institution list", "https://example.org/institutions.pdf", "application/pdf"),
         ]
 
         manifest = acquisition.acquire(self.output)
         self.assertEqual(manifest["overall_status"], "RAW_CANDIDATES_NOT_APPROVED_FOR_MAP")
         self.assertEqual(manifest["files"][0]["feature_count"], 1)
+        self.assertEqual(manifest["files"][2]["validation_status"], "PDF_SIGNATURE_CHECKED_FACILITY_MATCHING_REQUIRED")
+        self.assertTrue((self.output / "kerala_health_department_institutions_2024_25.pdf").exists())
         first_url = mocked_fetch.call_args_list[0].args[0]
         fallback_url = mocked_fetch.call_args_list[1].args[0]
         self.assertIn("state_name%3D%27Kerala%27", first_url)
@@ -116,6 +122,7 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
             (json.dumps({"objectIds": [1]}).encode(), "https://example.org/ids", "application/json"),
             (json.dumps(hospitals).encode(), "https://example.org/hospitals", "application/geo+json"),
             (b"<html>error</html>", "https://example.org/error", "text/html"),
+            (b"%PDF-1.4\\nmock official institution list", "https://example.org/institutions.pdf", "application/pdf"),
         ]
         with self.assertRaisesRegex(RuntimeError, "One or more map reference downloads failed"):
             acquisition.acquire(self.output)
@@ -138,6 +145,7 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
             (json.dumps({"objectIds": [1]}).encode(), "https://example.org/ids", "application/json"),
             (json.dumps(hospitals).encode(), "https://example.org/hospitals", "application/geo+json"),
             (b"<html>download failed</html>", "https://example.org/error", "text/html"),
+            (b"%PDF-1.4\\nmock official institution list", "https://example.org/institutions.pdf", "application/pdf"),
         ]
         with self.assertRaisesRegex(RuntimeError, "Partial provenance manifest saved"):
             acquisition.acquire(self.output)
@@ -145,9 +153,11 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
         self.assertTrue(manifest_path.exists())
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         self.assertEqual(manifest["overall_status"], "PARTIAL_ACQUISITION_FAILED")
-        self.assertEqual(len(manifest["files"]), 2)
+        self.assertEqual(len(manifest["files"]), 3)
         self.assertEqual(manifest["files"][0]["status"], "DOWNLOADED_RAW_CANDIDATE")
         self.assertEqual(manifest["files"][1]["status"], "ACQUISITION_FAILED")
+        self.assertEqual(manifest["files"][2]["status"], "DOWNLOADED_RAW_CANDIDATE")
+        self.assertEqual(manifest["files"][2]["validation_status"], "PDF_SIGNATURE_CHECKED_FACILITY_MATCHING_REQUIRED")
         self.assertTrue(manifest["files"][0]["sha256"])
         self.assertIn("not a ZIP archive", manifest["files"][1]["error"])
 
