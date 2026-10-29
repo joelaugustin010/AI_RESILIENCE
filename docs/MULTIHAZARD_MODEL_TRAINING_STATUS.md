@@ -13,10 +13,10 @@ Updated: 2026-10-30
 
 - Usable labeled events: 4,451 from 153 gauges; 97 of 4,548 events lacked gauge danger-level metadata and were excluded.
 - Train/test: 3,098 / 1,353 events; 114 train gauges and 39 held-out gauges.
-- Test ROC-AUC: 0.646.
-- Test balanced accuracy: 0.578.
-- Test F1: 0.456.
-- Majority baseline accuracy: 0.611; model accuracy: 0.615.
+- Single gauge-holdout ROC-AUC: 0.646; balanced accuracy: 0.578; F1: 0.456.
+- Additional 5-fold gauge-grouped cross-validation: mean ROC-AUC 0.633 (SD 0.120), mean balanced accuracy 0.602 (SD 0.088), mean F1 0.480 (SD 0.152).
+- One cross-validation fold had ROC-AUC 0.433, showing substantial variability across held-out gauges.
+- Single-holdout majority baseline accuracy: 0.611; model accuracy: 0.615.
 
 These results show only modest discrimination. This is **not** a validated flood forecasting model. INDOFLOODS contains recorded flood events, not matched non-flood periods, so it cannot train the probability of a flood occurring. The records are from Indian gauges generally and do not establish performance in Kochi.
 
@@ -37,7 +37,7 @@ These results show only modest discrimination. This is **not** a validated flood
 
 ## Reproducibility
 
-The training script is `scripts/train_flood_event_severity_baseline.py`. It reads the four INDOFLOODS tables from `data/external/raw/`, saves a model to `models/flood_event_severity_baseline.joblib`, and writes metrics to `reports/flood_event_severity_baseline.json`.
+The training script is `scripts/train_flood_event_severity_baseline.py`. It reads the four INDOFLOODS tables from `data/external/raw/`, performs a gauge-held-out test plus five-fold grouped validation, fits a final research model on all 4,451 labeled events, saves it to `models/flood_event_severity_baseline.joblib`, and writes metrics to `reports/flood_event_severity_baseline.json`.
 
 Source: Kuntla & Saharia, INDOFLOODS, Zenodo DOI 10.5281/zenodo.14584654. Dataset is described as openly accessible for academic/research purposes; cite the dataset and associated paper and observe original-source data policies.
 
