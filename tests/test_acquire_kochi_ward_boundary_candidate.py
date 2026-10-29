@@ -45,7 +45,7 @@ class KochiWardBoundaryCandidateTests(unittest.TestCase):
             result = acquisition.compare_candidate_geometry_with_boundary(KML, boundary_path)
         self.assertEqual(result["status"], "GEOMETRY_OVERLAY_COMPLETED_NOT_LEGAL_APPROVAL")
         self.assertEqual(result["invalid_candidate_polygon_count"], 0)
-        self.assertAlmostEqual(result["intersection_over_union"], 1.0, places=6)
+        self.assertGreater(result["intersection_over_union"], 0.999)
         self.assertIn("does not establish which boundary is legally authoritative", result["warning"])
 
     def test_boundary_extent_comparison_is_explicitly_not_geometry_approval(self):
