@@ -70,26 +70,47 @@ def normalize_geojson_for_tooltip(geojson: dict, fallback_name: str | None = Non
             properties, ("fid", "id", "OBJECTID", "objectid", "source_fid"),
             f"source feature {feature_index}",
         )
-        missing_name = f"Name missing in source ({source_id})"
+        feature_reference = f"source feature {feature_index}"
+        if not str(source_id).casefold().startswith("source feature "):
+            feature_reference += f" (ID {source_id})"
         properties["display_feature_id"] = source_id
-        properties["display_bound"] = _first_property(
-            properties,
-            ("Bound_Name", "Bound Name", "bound_name", "boundname", "bound_name_1", "boundary_name",
-             "boundaryname", "ward_boundary_name", "Ward_Name", "Ward Name", "ward_name",
-             "wardname", "ward_name_en", "wardnameen", "ward_label", "name_en", "name"),
-            fallback_name or missing_name,
+
+        # Keep ward numbers separate from ward names: a numeric ID must never
+        # be presented as though it were the missing human-readable ward name.
+        ward_number = _first_property(
+            properties, ("Ward_No", "Ward No", "ward_no", "ward_number", "wardnumber", "ward_id", "wardid"),
+            "",
         )
-        properties["display_ward"] = _first_property(
+        ward_name = _first_property(
             properties,
             ("Ward_Name", "Ward Name", "ward_name", "wardname", "ward_name_en", "wardnameen",
-             "ward_label", "wardname_1", "Ward_No", "ward_no", "ward_number", "wardnumber",
-             "ward", "Bound_Name", "Bound Name", "boundary_name", "name_en", "name"),
-            missing_name,
+             "ward_label", "wardname_1", "name_en", "name"),
+            "",
         )
+        bound_name = _first_property(
+            properties,
+            ("Bound_Name", "Bound Name", "bound_name", "boundname", "bound_name_1", "boundary_name",
+             "boundaryname", "ward_boundary_name", "boundname_1"),
+            "",
+        )
+        # Some ward datasets store the ward label only in a boundary-name field.
+        if not ward_name and bound_name:
+            ward_name = bound_name
+        if not bound_name and ward_name:
+            bound_name = ward_name
+        if not bound_name:
+            bound_name = f"Boundary feature {feature_index} (source label unavailable)"
+        if not ward_name:
+            ward_name = (
+                f"Ward name unavailable (ward no. {ward_number}; {feature_reference})"
+                if ward_number else f"Ward name unavailable ({feature_reference})"
+            )
+        properties["display_bound"] = bound_name
+        properties["display_ward"] = ward_name
         properties["display_name"] = _first_property(
             properties,
             ("feature_name", "name", "name_en", "Bound_Name", "Ward_Name", "amenity", "highway", "landuse"),
-            missing_name,
+            bound_name,
         )
         properties["display_type"] = _first_property(
             properties,
