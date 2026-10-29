@@ -1,0 +1,316 @@
+{
+  "schema_version": 1,
+  "title": "Kochi Municipal Corporation official ward roster",
+  "publisher": "State Election Commission, Kerala",
+  "source_url": "https://sec.kerala.gov.in/public/cnstncy/wd/d0f41644-754b-4b6e-a8dc-97ecbf5fee16",
+  "retrieved_on": "2026-10-29",
+  "source_note": "Names and ward codes transcribed from the State Election Commission's Ward List of Kochi. This is an authoritative name/code reference, not a spatial boundary dataset.",
+  "expected_ward_count": 76,
+  "spatial_use": "reference_only_not_geometry",
+  "wards": [
+    [
+      "C07003001",
+      "FORT KOCHI"
+    ],
+    [
+      "C07003002",
+      "KALVATHY"
+    ],
+    [
+      "C07003003",
+      "EARAVELY"
+    ],
+    [
+      "C07003004",
+      "KARIPPALAM"
+    ],
+    [
+      "C07003005",
+      "CHERALAYI"
+    ],
+    [
+      "C07003006",
+      "MATTANCHERY"
+    ],
+    [
+      "C07003007",
+      "CHAKKAMADAM"
+    ],
+    [
+      "C07003008",
+      "KARUVELIPPADY"
+    ],
+    [
+      "C07003009",
+      "ISLAND NORTH"
+    ],
+    [
+      "C07003010",
+      "RAVIPURAM"
+    ],
+    [
+      "C07003011",
+      "ERNAKULAM SOUTH"
+    ],
+    [
+      "C07003012",
+      "GANDHI NAGAR"
+    ],
+    [
+      "C07003013",
+      "KATHRIKADAVU"
+    ],
+    [
+      "C07003014",
+      "ERNAKULAM CENTRAL"
+    ],
+    [
+      "C07003015",
+      "ERNAKULAM NORTH"
+    ],
+    [
+      "C07003016",
+      "KALOOR SOUTH"
+    ],
+    [
+      "C07003017",
+      "KALOOR-NORTH"
+    ],
+    [
+      "C07003018",
+      "THRIKKANARVATTOM"
+    ],
+    [
+      "C07003019",
+      "AYYAPPANKAVU"
+    ],
+    [
+      "C07003020",
+      "POTTAKUZHY"
+    ],
+    [
+      "C07003021",
+      "ELAMAKKARA SOUTH"
+    ],
+    [
+      "C07003022",
+      "PACHALAM"
+    ],
+    [
+      "C07003023",
+      "THATTAZHAM"
+    ],
+    [
+      "C07003024",
+      "VADUTHALA WEST"
+    ],
+    [
+      "C07003025",
+      "VADUTHALA EAST"
+    ],
+    [
+      "C07003026",
+      "ELAMAKKARA NORTH"
+    ],
+    [
+      "C07003027",
+      "PUTHUKKALAVATTAM"
+    ],
+    [
+      "C07003028",
+      "KUNNUMPURAM"
+    ],
+    [
+      "C07003029",
+      "PONEKKARA"
+    ],
+    [
+      "C07003030",
+      "EDAPPALLY"
+    ],
+    [
+      "C07003031",
+      "CHANGAMPUZHA"
+    ],
+    [
+      "C07003032",
+      "DHEVANKULANGARA"
+    ],
+    [
+      "C07003033",
+      "PALARIVATTAM"
+    ],
+    [
+      "C07003034",
+      "STADIUM"
+    ],
+    [
+      "C07003035",
+      "KARANAKKODAM"
+    ],
+    [
+      "C07003036",
+      "PUTHIYAROAD"
+    ],
+    [
+      "C07003037",
+      "PADIVATTAM"
+    ],
+    [
+      "C07003038",
+      "VENNALA"
+    ],
+    [
+      "C07003039",
+      "CHAKKARAPARAMBU"
+    ],
+    [
+      "C07003040",
+      "CHALIKKAVATTAM"
+    ],
+    [
+      "C07003041",
+      "THAMMANAM"
+    ],
+    [
+      "C07003042",
+      "ELAMKULAM"
+    ],
+    [
+      "C07003043",
+      "GIRINAGAR"
+    ],
+    [
+      "C07003044",
+      "PONNURUNNI"
+    ],
+    [
+      "C07003045",
+      "PONNURUNNI EAST"
+    ],
+    [
+      "C07003046",
+      "VYTTILA"
+    ],
+    [
+      "C07003047",
+      "POONITHURA"
+    ],
+    [
+      "C07003048",
+      "VYTTILA JANATHA"
+    ],
+    [
+      "C07003049",
+      "KADAVANTHRA"
+    ],
+    [
+      "C07003050",
+      "PANAMPILLI NAGAR"
+    ],
+    [
+      "C07003051",
+      "PERUMANOOR"
+    ],
+    [
+      "C07003052",
+      "KONTHURUTHY"
+    ],
+    [
+      "C07003053",
+      "THEVARA"
+    ],
+    [
+      "C07003054",
+      "ISLAND SOUTH"
+    ],
+    [
+      "C07003055",
+      "KADEBHAGAM"
+    ],
+    [
+      "C07003056",
+      "PALLURUTHY EAST"
+    ],
+    [
+      "C07003057",
+      "THAZHUPPU"
+    ],
+    [
+      "C07003058",
+      "EADAKOCHI NORTH"
+    ],
+    [
+      "C07003059",
+      "EDAKOCHI SOUTH"
+    ],
+    [
+      "C07003060",
+      "PERUMBADAPPU"
+    ],
+    [
+      "C07003061",
+      "KONAM"
+    ],
+    [
+      "C07003062",
+      "PALLURUTHY-KACHERIPADY"
+    ],
+    [
+      "C07003063",
+      "NAMBYAPURAM"
+    ],
+    [
+      "C07003064",
+      "PALLURUTHY"
+    ],
+    [
+      "C07003065",
+      "PULLARDESAM"
+    ],
+    [
+      "C07003066",
+      "THAREBHAGAM"
+    ],
+    [
+      "C07003067",
+      "THOPPUMPADY"
+    ],
+    [
+      "C07003068",
+      "MUNDAMVELY EAST"
+    ],
+    [
+      "C07003069",
+      "MUNDAMVELY"
+    ],
+    [
+      "C07003070",
+      "MANASSERY"
+    ],
+    [
+      "C07003071",
+      "MOOLAMKUZHY"
+    ],
+    [
+      "C07003072",
+      "CHULLICKAL"
+    ],
+    [
+      "C07003073",
+      "NASRATHU"
+    ],
+    [
+      "C07003074",
+      "PANAYAPPILLY"
+    ],
+    [
+      "C07003075",
+      "AMARAVATHY"
+    ],
+    [
+      "C07003076",
+      "FORTKOCHI VELI"
+    ]
+  ]
+}
