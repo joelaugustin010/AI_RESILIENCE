@@ -68,3 +68,21 @@ The acquisition script preserves source bytes and hashes. The audit script `scri
 ## Current scientific claim
 
 This work improves data provenance and reproducibility. It does **not** yet create verified flood labels, establish the performance of a flood model, or authorize operational warnings. AI_RESILIENCE should continue to label any hypothetical scenario as hypothetical and direct real-world emergency decisions to official authorities.
+
+## Additional acquisition milestone: independent IFI-Impacts tables (2026-10-29)
+
+The acquisition registry now includes four files from the authors' [IFI-Impacts v4 Zenodo record](https://zenodo.org/records/16994648):
+
+- `India_Flood_Inventory_v3.csv` — event-level inventory, with reported start/end dates, causes, affected districts, optional coordinates, impacts and event identifiers.
+- `District_FloodImpact.csv` — district-level impact table.
+- `District_FloodedArea.csv` — district-level flooded-area table.
+- `DFSI.csv` — district-level Flood Severity Index table.
+
+These sources are downloaded to the temporary workflow artifact rather than committed as raw data. The workflow records SHA-256 hashes and retrieval metadata and runs `scripts/audit_ifi_flood_inventory.py`. The audit reports table shape, missingness, duplicate rows, date parsing, coordinate completeness, and records whose reported state/district fields mention Kerala and Ernakulam.
+
+**Licence caveat:** the record page does not clearly expose the applicable licence in the visible metadata inspected for this milestone. Keep source attribution, and do not redistribute these files until the applicable licence is verified. Download availability alone is not a reuse licence.
+
+**Scientific interpretation:** an event record that mentions Ernakulam is only a district/event-level historical reference. It is not evidence that every ward flooded, and it is not a flood/no-flood label for each hour in the rainfall table. The district impact, flooded-area and severity tables must not be downscaled to ward-level claims without a defensible method and independent validation. The new audit deliberately does not create model labels, fill missing coordinates, or train a model.
+
+The workflow also runs `tests/test_ifi_flood_inventory_audit.py` before acquisition to check that the audit preserves missing-data and spatial/time-granularity safeguards.
+
