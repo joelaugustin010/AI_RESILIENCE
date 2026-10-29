@@ -175,7 +175,7 @@ def train(raw_dir: Path, model_path: Path, report_path: Path) -> dict:
     model_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump({"pipeline": pipeline, "features": features, "target": report["target"]}, model_path, compress=3)
-    report_path.write_text(json.dumps(report, indent=2) + "\\n", encoding="utf-8")
+    report_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     return report
 
 
