@@ -65,6 +65,112 @@ def _coordinate_pairs(value: Any):
                 yield from _coordinate_pairs(child)
 
 
+def _kml_coordinates(node: ET.Element) -> list[tuple[float, float]]:
+    coordinate_node = next((child for child in node.iter() if local_name(child.tag) == "coordinates"), None)
+    if coordinate_node is None:
+        return []
+    points = []
+    for token in (coordinate_node.text or "").split():
+        parts = token.split(",")
+        try:
+            lon, lat = float(parts[0]), float(parts[1])
+        except (ValueError, IndexError):
+            return []
+        if not (-180 <= lon <= 180 and -90 <= lat <= 90):
+            return []
+        points.append((lon, lat))
+    return points
+
+
+def compare_candidate_geometry_with_boundary(kml_data: bytes, boundary_path: Path) -> dict[str, Any]:
+    """Compare the KML ward union to the configured polygon using a local metric CRS.
+
+    Invalid input geometries are reported, never silently repaired. A geometric
+    match is evidence about shape only and does not establish legal currency.
+    """
+    try:
+        from pyproj import Transformer
+        from shapely.geometry import Polygon, shape
+        from shapely.ops import transform, unary_union
+    except ImportError as error:
+        return {"status": "NOT_RUN_REQUIRED_GEOMETRY_DEPENDENCY_MISSING", "error": str(error)}
+    if not Path(boundary_path).exists():
+        return {"status": "NOT_RUN_CONFIGURED_BOUNDARY_FILE_MISSING"}
+    try:
+        root = ET.fromstring(kml_data)
+        polygons = []
+        invalid_polygon_count = 0
+        for node in (item for item in root.iter() if local_name(item.tag) == "Polygon"):
+            outer = next((item for item in node.iter() if local_name(item.tag) == "outerBoundaryIs"), None)
+            shell = _kml_coordinates(outer) if outer is not None else []
+            holes = []
+            for inner in (item for item in node.iter() if local_name(item.tag) == "innerBoundaryIs"):
+                ring = _kml_coordinates(inner)
+                if ring:
+                    holes.append(ring)
+            if len(shell) < 4 or shell[0] != shell[-1]:
+                invalid_polygon_count += 1
+                continue
+            polygon = Polygon(shell, holes)
+            if polygon.is_empty or not polygon.is_valid:
+                invalid_polygon_count += 1
+                continue
+            polygons.append(polygon)
+        if invalid_polygon_count:
+            return {
+                "status": "BLOCKED_INVALID_CANDIDATE_POLYGONS",
+                "candidate_polygon_count": len(polygons) + invalid_polygon_count,
+                "invalid_candidate_polygon_count": invalid_polygon_count,
+                "valid_candidate_polygon_count": len(polygons),
+                "action": "No geometry repair or comparison was performed.",
+            }
+        if not polygons:
+            return {"status": "BLOCKED_NO_CANDIDATE_POLYGONS"}
+        boundary_payload = json.loads(Path(boundary_path).read_text(encoding="utf-8-sig"))
+        if boundary_payload.get("type") != "Feature" or not boundary_payload.get("geometry"):
+            return {"status": "BLOCKED_UNSUPPORTED_CONFIGURED_BOUNDARY_FORMAT"}
+        boundary_geometry = shape(boundary_payload["geometry"])
+        if boundary_geometry.is_empty or not boundary_geometry.is_valid:
+            return {
+                "status": "BLOCKED_INVALID_CONFIGURED_BOUNDARY",
+                "configured_boundary_valid": bool(boundary_geometry.is_valid),
+                "action": "No geometry repair or comparison was performed.",
+            }
+        candidate_union = unary_union(polygons)
+        if candidate_union.is_empty or not candidate_union.is_valid:
+            return {
+                "status": "BLOCKED_INVALID_CANDIDATE_UNION",
+                "candidate_union_valid": bool(candidate_union.is_valid),
+                "action": "No geometry repair was performed.",
+            }
+        # Kochi lies in UTM zone 43N. Project both geometries before calculating area.
+        transformer = Transformer.from_crs("EPSG:4326", "EPSG:32643", always_xy=True)
+        candidate_projected = transform(transformer.transform, candidate_union)
+        boundary_projected = transform(transformer.transform, boundary_geometry)
+        intersection_area = candidate_projected.intersection(boundary_projected).area
+        union_area = candidate_projected.union(boundary_projected).area
+        symmetric_difference_area = candidate_projected.symmetric_difference(boundary_projected).area
+        return {
+            "status": "GEOMETRY_OVERLAY_COMPLETED_NOT_LEGAL_APPROVAL",
+            "comparison_crs": "EPSG:32643",
+            "configured_boundary_file": Path(boundary_path).name,
+            "configured_boundary_sha256": hashlib.sha256(Path(boundary_path).read_bytes()).hexdigest(),
+            "configured_boundary_valid": bool(boundary_geometry.is_valid),
+            "candidate_polygon_count": len(polygons),
+            "invalid_candidate_polygon_count": 0,
+            "candidate_union_valid": bool(candidate_union.is_valid),
+            "candidate_area_km2": round(candidate_projected.area / 1_000_000, 4),
+            "configured_boundary_area_km2": round(boundary_projected.area / 1_000_000, 4),
+            "intersection_area_km2": round(intersection_area / 1_000_000, 4),
+            "symmetric_difference_area_km2": round(symmetric_difference_area / 1_000_000, 4),
+            "intersection_over_union": round(intersection_area / union_area, 8) if union_area else None,
+            "symmetric_difference_fraction_of_union": round(symmetric_difference_area / union_area, 8) if union_area else None,
+            "warning": "This compares shapes only. It does not establish which boundary is legally authoritative, whether either source is current, or whether a layer is suitable for exposure claims.",
+        }
+    except Exception as error:
+        return {"status": "GEOMETRY_COMPARISON_FAILED", "error": f"{type(error).__name__}: {error}"}
+
+
 def compare_to_configured_boundary(candidate_bounds: list[float], boundary_path: Path) -> dict[str, Any]:
     """Compare extents only; never treat a bounding-box match as geometry validation."""
     boundary_path = Path(boundary_path)
@@ -231,6 +337,10 @@ def acquire(output: Path = DEFAULT_OUTPUT) -> dict[str, Any]:
         audit = audit_kml(data)
         audit["comparison_to_configured_boundary"] = compare_to_configured_boundary(
             audit["coordinate_bounds_lonlat"],
+            ROOT / "data" / "reference" / "kochi_corporation_boundary.geojson",
+        )
+        audit["geometry_comparison_to_configured_boundary"] = compare_candidate_geometry_with_boundary(
+            data,
             ROOT / "data" / "reference" / "kochi_corporation_boundary.geojson",
         )
         raw_path = output / "kochi_wards_2024_candidate.kml"
