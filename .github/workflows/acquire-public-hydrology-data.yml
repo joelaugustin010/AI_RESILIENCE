@@ -7,6 +7,7 @@ on:
       - map-details-upgrade
     paths:
       - "scripts/acquire_public_hydrology_data.py"
+      - "scripts/acquire_map_reference_data.py"
       - "scripts/audit_public_hydrology_data.py"
       - "scripts/audit_ifi_flood_inventory.py"
       - "scripts/audit_indofloods.py"
@@ -62,6 +63,11 @@ jobs:
         if: always() && steps.acquisition.outcome == 'success'
         run: python scripts/audit_indofloods.py --input-dir data/external/raw --output data/external/indofloods_audit_report.json
 
+      - name: Acquire candidate hospital GIS and KSDMA flood-hazard archive
+        id: map_acquisition
+        continue-on-error: true
+        run: python scripts/acquire_map_reference_data.py 2>&1 | tee map_acquisition.log
+
       - name: Upload raw data, audit and provenance as a short-lived artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -69,11 +75,13 @@ jobs:
           name: public-hydrology-source-bundle
           path: |
             data/external/raw/**
+            data/external/map_reference/**
             data/external/download_manifest.json
             data/external/audit_report.json
             data/external/ifi_audit_report.json
             data/external/indofloods_audit_report.json
             acquisition.log
+            map_acquisition.log
           if-no-files-found: warn
           retention-days: 7
 
@@ -93,6 +101,12 @@ jobs:
             echo ""
             echo "Downloaded bytes are marked downloaded_raw_unvalidated. SHA-256 and retrieval metadata are recorded where a download succeeds."
             echo "IFI audit is descriptive only: district/event records are not converted into ward-level or hourly flood labels."
+            echo ""
+            if [ "${{ steps.map_acquisition.outcome }}" = "success" ]; then
+              echo "**Map reference acquisition:** Candidate Ernakulam hospital points and KSDMA flood-return raster archive downloaded with SHA-256 provenance. These remain unvalidated candidates; they are not automatically shown on the map."
+            else
+              echo "**Map reference acquisition:** One or more spatial source downloads or structural checks failed. Review map_acquisition.log and the artifact."
+            fi
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Fail workflow if any registered download failed
