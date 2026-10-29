@@ -31,6 +31,23 @@ class KochiWardBoundaryCandidateTests(unittest.TestCase):
         self.assertFalse(audit["expected_74_ward_count_matches"])
         self.assertEqual(audit["structural_status"], "STRUCTURE_CHECKED_CANDIDATE_ONLY")
 
+    def test_boundary_extent_comparison_is_explicitly_not_geometry_approval(self):
+        boundary = {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [[[76.1, 9.7], [76.3, 9.7], [76.3, 10.0], [76.1, 10.0], [76.1, 9.7]]],
+            },
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            boundary_path = Path(directory) / "boundary.geojson"
+            boundary_path.write_text(json.dumps(boundary), encoding="utf-8")
+            result = acquisition.compare_to_configured_boundary([76.2, 9.8, 76.4, 10.1], boundary_path)
+        self.assertEqual(result["status"], "BOUNDING_BOX_ONLY_REQUIRES_FULL_GEOMETRY_COMPARISON")
+        self.assertEqual(result["configured_boundary_bounds_lonlat"], [76.1, 9.7, 76.3, 10.0])
+        self.assertGreater(result["absolute_edge_deltas_degrees"]["west"], 0)
+        self.assertIn("do not establish polygon equality", result["warning"].lower())
+
     def test_rejects_non_kml_xml(self):
         with self.assertRaisesRegex(ValueError, "root element is not KML"):
             acquisition.audit_kml(b"<html><body>not KML</body></html>")
