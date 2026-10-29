@@ -156,7 +156,8 @@ def validate_and_annotate(
 
 def write_json(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "
+", encoding="utf-8")
 
 
 def main() -> int:
@@ -212,7 +213,8 @@ def main() -> int:
         "processed_sha256": candidate_sha,
         "source_feature_count": len(features),
         "processed_feature_count": len(annotated),
-        "matched_official_ward_count": 76,\n        "source_name_mismatch_count": len(name_mismatches),
+        "matched_official_ward_count": 76,
+        "source_name_mismatch_count": len(name_mismatches),
         "match_method": "explicit source Ward_No (unique values 1..76) matched to numeric suffix of SEC ward codes; source labels are retained and audited, not used to assign IDs",
         "geometry_validation": "all 76 features parsed as valid Polygon/MultiPolygon by Shapely; no automatic repair",
         "crs": "EPSG:4326 assumed from source coordinates; confirm source CRS metadata before metric calculations",
@@ -265,7 +267,9 @@ def main() -> int:
         "raw_file": str(RAW_PATH.relative_to(ROOT)),
         "candidate_file": str(CANDIDATE_PATH.relative_to(ROOT)),
         "catalog_status": "provisional / candidate_not_integrated",
-        "source_name_mismatch_count": len(name_mismatches),\n        "source_name_mismatches": name_mismatches,\n        "warning": "DRAFT NOTIFICATION candidate only; not approved for legal boundaries or exposure analysis",
+        "source_name_mismatch_count": len(name_mismatches),
+        "source_name_mismatches": name_mismatches,
+        "warning": "DRAFT NOTIFICATION candidate only; not approved for legal boundaries or exposure analysis",
     }, indent=2))
     return 0
 
