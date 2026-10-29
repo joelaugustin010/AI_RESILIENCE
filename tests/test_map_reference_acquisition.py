@@ -69,6 +69,41 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
         self.assertTrue(all(item["sha256"] for item in stored["files"]))
 
     @patch.object(acquisition, "fetch")
+    def test_falls_back_to_bounded_ernakulam_envelope_if_state_filter_is_empty(self, mocked_fetch):
+        hospitals = {
+            "type": "FeatureCollection",
+            "features": [{
+                "type": "Feature",
+                "properties": {
+                    "state_name": "Kerala",
+                    "district_name": "Ernakulam",
+                    "health_facility_name": "Fallback Hospital",
+                },
+                "geometry": {"type": "Point", "coordinates": [76.3, 9.9]},
+            }],
+        }
+        memory = io.BytesIO()
+        with zipfile.ZipFile(memory, "w") as archive:
+            archive.writestr("candidate.tif", b"placeholder")
+        mocked_fetch.side_effect = [
+            (json.dumps({"objectIds": []}).encode(), "https://example.org/empty-state", "application/json"),
+            (json.dumps({"objectIds": [7]}).encode(), "https://example.org/spatial-ids", "application/json"),
+            (json.dumps(hospitals).encode(), "https://example.org/hospitals", "application/geo+json"),
+            (memory.getvalue(), "https://example.org/flood.zip", "application/zip"),
+        ]
+
+        manifest = acquisition.acquire(self.output)
+        self.assertEqual(manifest["overall_status"], "RAW_CANDIDATES_NOT_APPROVED_FOR_MAP")
+        self.assertEqual(manifest["files"][0]["feature_count"], 1)
+        first_url = mocked_fetch.call_args_list[0].args[0]
+        fallback_url = mocked_fetch.call_args_list[1].args[0]
+        self.assertIn("state_name%3D%27Kerala%27", first_url)
+        self.assertIn("geometryType=esriGeometryEnvelope", fallback_url)
+        self.assertIn("inSR=4326", fallback_url)
+        self.assertIn("75.9", fallback_url)
+        self.assertIn("77.0", fallback_url)
+
+    @patch.object(acquisition, "fetch")
     def test_rejects_html_instead_of_flood_zip(self, mocked_fetch):
         hospitals = {
             "type": "FeatureCollection",
