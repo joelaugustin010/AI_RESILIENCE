@@ -161,6 +161,25 @@ DATASET_CATALOG: list[dict[str, Any]] = [
         "limitations": "A map catalogue is not one harmonised dataset; layers may have different dates, scales, classifications and intended uses.",
     },
     {
+        "id": "imd_cyclone_best_track",
+        "hazards": ["Cyclone", "Compound: cyclone + flood"],
+        "theme": "Historical cyclone tracks and intensity",
+        "dataset": "IMD/RSMC New Delhi North Indian Ocean best-track record (1982-2026), parsed by imdtrack",
+        "publisher": "India Meteorological Department / RSMC New Delhi (underlying data); imdtrack community parser",
+        "url": "https://rsmcnewdelhi.imd.gov.in/report.php?internal_menu=MzM%3D",
+        "resource_urls": [
+            "https://raw.githubusercontent.com/syedhamidali/imdtrack/main/data/manifest.json",
+            "https://raw.githubusercontent.com/syedhamidali/imdtrack/main/data/observations.parquet",
+            "https://raw.githubusercontent.com/syedhamidali/imdtrack/main/data/storms.parquet",
+            "https://raw.githubusercontent.com/syedhamidali/imdtrack/main/data/remarks.parquet"
+        ],
+        "access": "Parsed Parquet mirror is used for a private research artifact only. Mirror parser code is BSD-3-Clause; underlying data are © IMD and reuse/redistribution terms must be verified with IMD.",
+        "priority": "P0",
+        "status": "Source identified; acquisition and Kochi-proximity audit pending. Mirror manifest reports 425 storms, 7,585 fixes and 656 remarks for 1982-2026.",
+        "required_checks": "Verify source manifest/checksums, UTC timestamps, coordinates, storm IDs, duplicate fixes, pos_suspect/date_suspect flags and current-season status. Screen track distance to Kochi using non-suspect fixes only.",
+        "limitations": "Best-track position/intensity is hazard-path evidence, not a local wind field, rainfall, storm surge, damage or consequence label. The 2026 season is tentative in the mirror; source flags must remain visible and uncorrected."
+    },
+    {
         "id": "ncs_earthquake_catalog",
         "hazards": ["Earthquake", "Compound: earthquake + infrastructure disruption"],
         "theme": "Seismic events",
