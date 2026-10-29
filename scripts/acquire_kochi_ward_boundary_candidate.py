@@ -74,8 +74,18 @@ def audit_kml(data: bytes) -> dict[str, Any]:
     all_lats: list[float] = []
 
     for placemark in placemarks:
-        name = next((child.text.strip() for child in placemark.iter()
-                     if local_name(child.tag) == "name" and child.text and child.text.strip()), "")
+        # ArcGIS-exported KML commonly stores ward names in ExtendedData /
+        # SimpleData rather than a Placemark <name> element.
+        name = ""
+        for child in placemark.iter():
+            if local_name(child.tag) == "SimpleData" and child.attrib.get("name", "").casefold() in {
+                "ward_lgd_name", "ward_name", "wardname", "sourcewardname", "name"
+            } and child.text and child.text.strip():
+                name = child.text.strip()
+                break
+        if not name:
+            name = next((child.text.strip() for child in placemark.iter()
+                         if local_name(child.tag) == "name" and child.text and child.text.strip()), "")
         if name:
             names.append(name)
         for polygon in (child for child in placemark.iter() if local_name(child.tag) == "Polygon"):
