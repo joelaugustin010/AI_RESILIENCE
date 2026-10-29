@@ -1,0 +1,64 @@
+name: Acquire public hydrology data
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - map-details-upgrade
+    paths:
+      - "scripts/acquire_public_hydrology_data.py"
+      - "data/reference/public_data_sources.json"
+      - ".github/workflows/acquire-public-hydrology-data.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Download catalogued source CSVs and write provenance
+        id: acquisition
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          python scripts/acquire_public_hydrology_data.py --list
+          python scripts/acquire_public_hydrology_data.py --all 2>&1 | tee acquisition.log
+
+      - name: Upload raw data and provenance as a short-lived artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-hydrology-source-bundle
+          path: |
+            data/external/raw/**
+            data/external/download_manifest.json
+            acquisition.log
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Summarize acquisition status
+        if: always()
+        run: |
+          {
+            echo "## Public hydrology data acquisition"
+            echo ""
+            echo "This workflow downloads source files to a temporary artifact; it does not commit raw datasets."
+            echo ""
+            if [ "${{ steps.acquisition.outcome }}" = "success" ]; then
+              echo "**Result:** All registered downloads completed."
+            else
+              echo "**Result:** One or more registered downloads failed. Check the acquisition log and artifact; no failed source is treated as validated."
+            fi
+            echo ""
+            echo "Downloaded bytes are marked `downloaded_raw_unvalidated`. SHA-256 and retrieval metadata are recorded where a download succeeds."
+          } >> "$GITHUB_STEP_SUMMARY"
