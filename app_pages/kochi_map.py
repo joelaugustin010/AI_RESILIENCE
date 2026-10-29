@@ -17,6 +17,69 @@ HOSPITAL_REVIEW_METADATA = ROOT / "data" / "processed" / "nihfw_ernakulam_hospit
 HOSPITAL_REVIEW_CSV = ROOT / "data" / "processed" / "nihfw_ernakulam_hospitals_coordinate_review.csv"
 
 
+def _first_property(properties: dict, candidates: tuple[str, ...], fallback: str) -> str:
+    """Return the first populated source property without assuming every dataset uses the same schema."""
+    def normalize_key(value: object) -> str:
+        # GeoJSON publishers commonly vary between Bound_Name, Bound Name,
+        # bound-name, and camel-case spellings.
+        return "".join(character for character in str(value).casefold() if character.isalnum())
+
+    normalized = {normalize_key(key): value for key, value in properties.items()}
+    for candidate in candidates:
+        value = normalized.get(normalize_key(candidate))
+        if value is not None and str(value).strip() and str(value).strip().casefold() not in {"nan", "none", "null"}:
+            return str(value).strip()
+    return fallback
+
+
+def normalize_geojson_for_tooltip(geojson: dict) -> dict:
+    """Add display-only aliases while preserving every original property and geometry."""
+    display = json.loads(json.dumps(geojson))
+
+    def normalize_feature(feature: dict) -> None:
+        properties = feature.get("properties")
+        if not isinstance(properties, dict):
+            properties = {}
+            feature["properties"] = properties
+        properties["display_bound"] = _first_property(
+            properties,
+            ("Bound_Name", "Bound Name", "bound_name", "boundname", "boundary_name", "name"),
+            "Not available in source data",
+        )
+        properties["display_ward"] = _first_property(
+            properties,
+            ("Ward_Name", "Ward Name", "ward_name", "wardname", "Ward_No", "ward_no", "ward", "ward_number"),
+            "Not available in source data",
+        )
+        properties["display_name"] = _first_property(
+            properties,
+            ("feature_name", "name", "name_en", "Bound_Name", "Ward_Name", "amenity", "highway", "landuse"),
+            "Unnamed feature",
+        )
+        properties["display_type"] = _first_property(
+            properties,
+            ("feature_subtype", "feature_type", "type", "amenity", "highway", "landuse", "building"),
+            "Not recorded",
+        )
+        properties["display_source"] = _first_property(
+            properties, ("source", "source_name", "publisher", "provider"), "Not recorded"
+        )
+        properties["display_timestamp"] = _first_property(
+            properties, ("osm_timestamp", "timestamp", "last_edited", "updated_at"), "Not recorded"
+        )
+        properties["display_url"] = _first_property(
+            properties, ("osm_url", "url", "source_url"), "Not recorded"
+        )
+
+    if display.get("type") == "FeatureCollection":
+        for feature in display.get("features", []):
+            if isinstance(feature, dict):
+                normalize_feature(feature)
+    elif display.get("type") == "Feature":
+        normalize_feature(display)
+    return display
+
+
 @st.cache_data
 def load_boundary() -> dict:
     """Load the downloaded GeoJSON; fail clearly if it is missing or malformed."""
@@ -90,6 +153,25 @@ catalog_rows = [{
 } for item in catalog["datasets"]]
 st.subheader("Source and layer catalog")
 st.dataframe(pd.DataFrame(catalog_rows), hide_index=True, width="stretch", alt="Reviewed Kochi spatial source inventory with availability, coverage, CRS, and reuse status")
+ward_candidate = next(
+    (item for item in catalog["datasets"] if item.get("layer_id") == "kochi_wards_opencity_2024_candidate"),
+    None,
+)
+if ward_candidate:
+    geometry_comparison = ward_candidate.get("geometry_comparison", {})
+    if geometry_comparison.get("status") == "COMPLETED_SHAPE_COMPARISON_NOT_LEGAL_APPROVAL":
+        st.warning(
+            "The OpenCity 2024 ward candidate and the configured provisional Kochi Corporation boundary disagree substantially: "
+            f"intersection-over-union {geometry_comparison.get('intersection_over_union', 'unknown')}, "
+            f"symmetric difference {geometry_comparison.get('symmetric_difference_area_km2', 'unknown')} km². "
+            "Neither geometry is promoted by this comparison. The candidate remains excluded from exposure masking until its source and final official notification alignment are resolved.",
+            title="2024 ward boundary candidate is not approved",
+        )
+    else:
+        st.info(
+            "The OpenCity 2024 ward map is recorded as a candidate only. It is not used as the production boundary or exposure mask.",
+            title="2024 ward boundary candidate",
+        )
 air_observation_status = next(
     (item for item in catalog["datasets"] if item.get("layer_id") == "air_observations_spatial_locations"),
     None,
@@ -242,7 +324,7 @@ uploaded = st.file_uploader("Upload source-reviewed point layers", type=["csv"],
 
 if show_boundary:
     deck_layers.append(pdk.Layer(
-        "GeoJsonLayer", id="kochi-corporation-boundary", data=boundary,
+        "GeoJsonLayer", id="kochi-corporation-boundary", data=normalize_geojson_for_tooltip(boundary),
         stroked=True, filled=False, get_line_color=[38, 106, 166, 220],
         line_width_min_pixels=2, pickable=True,
     ))
@@ -286,7 +368,7 @@ if processed_layers:
         deck_layers.append(pdk.Layer(
             "GeoJsonLayer",
             id=f"source-layer-{layer_index}",
-            data=layer["geojson"],
+            data=normalize_geojson_for_tooltip(layer["geojson"]),
             stroked=True,
             filled=True,
             get_fill_color=color,
@@ -318,6 +400,46 @@ if processed_layers:
             )
         if layer["metadata"].get("quality_notes"):
             st.warning("Data-quality notes: " + " ".join(layer["metadata"]["quality_notes"]))
+        feature_records = layer.get("features", [])
+        if feature_records:
+            with st.expander(f"Inspect feature attributes — {layer['metadata']['title']}"):
+                st.caption(
+                    "Choose a record to inspect every source property. Display aliases used by the map are added only in memory; "
+                    "the source GeoJSON files are not changed."
+                )
+                feature_number = st.number_input(
+                    "Feature number",
+                    min_value=1,
+                    max_value=len(feature_records),
+                    value=1,
+                    step=1,
+                    key=f"feature-inspector-{layer['metadata']['dataset_id']}",
+                )
+                inspected = feature_records[int(feature_number) - 1]
+                properties = inspected.get("properties") or {}
+                st.markdown("**Key location details**")
+                detail_cols = st.columns(2)
+                detail_cols[0].metric(
+                    "Bound Name",
+                    _first_property(
+                        properties,
+                        ("Bound_Name", "Bound Name", "bound_name", "boundname", "boundary_name", "name"),
+                        "Not available in source data",
+                    ),
+                )
+                detail_cols[1].metric(
+                    "Ward Name",
+                    _first_property(
+                        properties,
+                        ("Ward_Name", "Ward Name", "ward_name", "wardname"),
+                        "Not available in source data",
+                    ),
+                )
+                if properties:
+                    st.markdown("**All original source attributes**")
+                    st.json(properties)
+                else:
+                    st.info("This feature has no recorded properties.")
     asset_layers = [layer for layer in processed_layers if layer["metadata"].get("layer_role") == "asset"]
     hazard_layers = [layer for layer in processed_layers if layer["metadata"].get("layer_role") == "hazard"]
     st.subheader("Spatial exposure overlay")
@@ -384,7 +506,7 @@ if deck_layers:
     deck = pdk.Deck(
         layers=deck_layers,
         initial_view_state=pdk.ViewState(longitude=map_center[0], latitude=map_center[1], zoom=10),
-        tooltip={"text": "{Bound_Name}\n{Ward_Name}\n{feature_name}\n{feature_subtype}\n{source}\n{osm_timestamp}\n{osm_url}"},
+        tooltip={"text": "Bound Name: {display_bound}\nWard Name: {display_ward}\nFeature: {display_name}\nType: {display_type}\nSource: {display_source}\nOSM updated: {display_timestamp}\nSource URL: {display_url}"},
     )
     st.pydeck_chart(deck, width="stretch", alt="Kochi administrative outline and selected source-documented spatial layers")
 else:

@@ -1,2 +1,4 @@
 # Optional PDF extraction support for official air-quality report ingestion.
 pypdf>=6.0,<7
+shapely>=2.0,<3
+pyproj>=3.6,<4

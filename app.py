@@ -101,8 +101,8 @@ pages = {
         ),
         st.Page(
             "app_pages/disaster_probability.py",
-            title="Disaster Probability",
-            icon=":material/monitor_heart:",
+            title="Flood Model Readiness",
+            icon=":material/fact_check:",
         ),
     ],
 

@@ -277,9 +277,18 @@
         "main_geotiff_count": 3,
         "nodata_value": -3.402823e+38,
         "valid_value_ranges_by_rp": {
-          "10-year": [0.729, 1776.6],
-          "25-year": [0.6561, 1974.0],
-          "50-year": [0.729, 1981.0]
+          "10-year": [
+            0.729,
+            1776.6
+          ],
+          "25-year": [
+            0.6561,
+            1974
+          ],
+          "50-year": [
+            0.729,
+            1981
+          ]
         },
         "valid_pixel_counts_by_rp": {
           "10-year": 326956,
@@ -816,6 +825,52 @@
       ],
       "blocker": "Reported values exist in the existing air-quality tables, but there is no verified spatial station/observation join. This map layer is unsuitable for spatial analysis.",
       "evidence_status": "unsuitable"
+    },
+    {
+      "layer_id": "kochi_wards_opencity_2024_candidate",
+      "title": "Kochi Corporation 2024 ward boundaries (OpenCity KML candidate)",
+      "status": "candidate_not_integrated",
+      "source_url": "https://data.opencity.in/dataset/kochi-wards-map",
+      "upstream_url": "https://data.opencity.in/dataset/kochi-wards-map/resource/24a3de7a-4b14-436e-ae0c-e9ec7b1749e0",
+      "publisher": "OpenCity.in; catalogue credits Esri India Living Atlas",
+      "retrieved_on": "2026-10-29",
+      "publication_date": "Catalogue describes the ward map as 2024; resource metadata last updated 2025-11-25",
+      "license": "Catalogue reports Public Domain; independent rights/legal verification not completed",
+      "crs": "KML longitude/latitude coordinates interpreted as WGS84; no independent CRS/positional-accuracy statement verified",
+      "units": "Degrees longitude and latitude",
+      "geographic_coverage": "Kochi Municipal Corporation; catalogue describes 74 wards",
+      "limitations": [
+        "Structural review found 74 placemarks, 74 unique ward names in ExtendedData, 83 polygon components, 83 coordinate rings, zero unclosed rings, zero malformed coordinate tuples, and zero coordinates outside legal longitude/latitude ranges. This is structural QA, not complete topology validation.",
+        "The official Cochin map page is labelled Draft Notification; final notification alignment has not been established.",
+        "Do not promote this candidate to the production boundary or use it for exposure analysis until the final official source, topology, legal status, and full geometry comparison are reviewed.",
+        "CI acquisition retrieved a 533,483-byte KML with SHA-256 e6376e6a2ac3a0ab28615cd77f4d649bfba5c48034d26c2e31ae295697d06238. Structural checks: 74 placemarks, 74 unique ward names in ExtendedData, 83 polygon components, 83 rings, zero unclosed rings, zero malformed coordinate tuples, and zero out-of-range coordinates.",
+        "A full projected geometry comparison (EPSG:32643) found both geometries valid and the ward union valid, but substantial disagreement: candidate ward union 79.0992 km², configured provisional boundary 96.1376 km², intersection 77.3049 km², symmetric difference 20.6271 km², intersection-over-union 0.78937324, and symmetric-difference fraction 0.21062676. This is not a minor boundary discrepancy; do not replace either geometry or use the candidate for exposure masking until source identity and final official notification alignment are resolved.",
+        "Candidate bounds [76.2370672, 9.8930813, 76.3399039, 10.0502655] differ from the configured boundary bounds [76.2373589, 9.8897183, 76.3400293, 10.0497693]; the approximate edge differences are 32 m west, 374 m south, 14 m east, and 55 m north. Extent differences are supplementary to the full geometry mismatch.",
+        "The official Cochin map page is labelled Draft Notification; final legal boundary alignment and source-specific positional accuracy are not established.",
+        "Do not promote this candidate to the production boundary or use it for exposure analysis until the geometry discrepancy, source identity, final official notification, and applicable reuse terms are resolved."
+      ],
+      "feature_count": 74,
+      "validation_status": "STRUCTURE VALID; SUBSTANTIAL GEOMETRY DISAGREEMENT; NOT APPROVED",
+      "evidence_status": "provisional",
+      "candidate_sha256": "e6376e6a2ac3a0ab28615cd77f4d649bfba5c48034d26c2e31ae295697d06238",
+      "candidate_bounds_lonlat": [
+        76.2370671795491,
+        9.89308129910554,
+        76.3399038923155,
+        10.0502655156484
+      ],
+      "boundary_comparison": "Bounding-box only; not approved for boundary replacement.",
+      "geometry_comparison": {
+        "comparison_crs": "EPSG:32643",
+        "configured_boundary_sha256": "02e3217959ed1edef2c91d852305e86d1d7ff55a90971a8f61fcd3a9ce0dcdbf",
+        "candidate_area_km2": 79.0992,
+        "configured_boundary_area_km2": 96.1376,
+        "intersection_area_km2": 77.3049,
+        "symmetric_difference_area_km2": 20.6271,
+        "intersection_over_union": 0.78937324,
+        "symmetric_difference_fraction_of_union": 0.21062676,
+        "status": "COMPLETED_SHAPE_COMPARISON_NOT_LEGAL_APPROVAL"
+      }
     }
   ],
   "status_definitions_file": "data/reference/data_status_definitions.json"
