@@ -189,9 +189,9 @@ DATASET_CATALOG: list[dict[str, Any]] = [
         "resource_urls": ["https://earthquake.usgs.gov/fdsnws/event/1/query", "https://riseq.seismo.gov.in/riseq/earthquake/archive"],
         "access": "USGS FDSN Event Web Service provides parameterized GeoJSON queries. The NCS archive is retained as an India-specific comparison source; bulk export was not confirmed, so it is not scraped by this workflow.",
         "priority": "P0",
-        "status": "Source identified; acquisition pending. Planned query uses five-year windows, 1970-current, magnitude >=2.5 and a 1,000 km radius around an approximate Kochi point.",
-        "required_checks": "Verify query-window counts, event IDs, UTC times, magnitude/depth fields, coordinates, duplicate IDs and missingness. Compare regional events against NCS and GSI seismotectonic evidence before any hazard conclusions.",
-        "limitations": "USGS ComCat is a multi-network catalogue with variable completeness and location uncertainty. Regional event density is not local ground shaking, site response, building damage or an earthquake probability model."
+        "status": "Acquired and audited in workflow run 40933408852: 92 USGS ComCat events of magnitude 2.5+ within 1,000 km of the approximate Kochi point (1970-2026). Five are within 500 km; none are within 300 km in this catalogue/query. Two rows have invalid timestamps; coordinates/magnitudes are present and no duplicate event IDs were found. Not validated for local hazard or consequence prediction.",
+        "required_checks": "Cross-check this global catalogue against the India-specific NCS archive and GSI seismotectonic atlas; review the two invalid timestamps; obtain site geology, local ground-motion evidence, building inventory and vulnerability data before consequence analysis.",
+        "limitations": "No USGS events within 300 km in this query is not evidence of no earthquake hazard. USGS ComCat is a multi-network catalogue with variable completeness and location uncertainty; events below magnitude 2.5 are excluded. Regional event density is not local ground shaking, site response, building damage or an earthquake probability model."
     },
     {
         "id": "ncs_earthquake_catalog",
