@@ -829,7 +829,7 @@
     {
       "layer_id": "kochi_wards_opencity_2024_candidate",
       "title": "Kochi Corporation 2024 ward boundaries (OpenCity KML candidate)",
-      "status": "acquired_candidate_not_integrated",
+      "status": "candidate_not_integrated",
       "source_url": "https://data.opencity.in/dataset/kochi-wards-map",
       "upstream_url": "https://data.opencity.in/dataset/kochi-wards-map/resource/24a3de7a-4b14-436e-ae0c-e9ec7b1749e0",
       "publisher": "OpenCity.in; catalogue credits Esri India Living Atlas",
@@ -851,7 +851,7 @@
       ],
       "feature_count": 74,
       "validation_status": "STRUCTURE VALID; SUBSTANTIAL GEOMETRY DISAGREEMENT; NOT APPROVED",
-      "evidence_status": "candidate_not_approved_geometry_mismatch",
+      "evidence_status": "provisional",
       "candidate_sha256": "e6376e6a2ac3a0ab28615cd77f4d649bfba5c48034d26c2e31ae295697d06238",
       "candidate_bounds_lonlat": [
         76.2370671795491,
