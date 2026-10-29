@@ -12,6 +12,7 @@ from src.spatial_data import classify_exposure, processed_layer_issues, read_pro
 ROOT = Path(__file__).resolve().parents[1]
 BOUNDARY_PATH = ROOT / "data" / "reference" / "kochi_corporation_boundary.geojson"
 SOURCE_CATALOG_PATH = ROOT / "data" / "reference" / "spatial_sources.json"
+WARD_ROSTER_PATH = ROOT / "data" / "reference" / "kochi_official_ward_roster_2025.json"
 FLOOD_ACQUISITION_METADATA = ROOT / "data" / "raw" / "ksdma_flood_return_probability_historical_10_25_50.metadata.json"
 HOSPITAL_REVIEW_METADATA = ROOT / "data" / "processed" / "nihfw_ernakulam_hospitals_coordinate_review.metadata.json"
 HOSPITAL_REVIEW_CSV = ROOT / "data" / "processed" / "nihfw_ernakulam_hospitals_coordinate_review.csv"
@@ -243,6 +244,57 @@ if current_ward_layer and current_ward_layer.get("feature_count") != 76:
         "Official ward list: https://sec.kerala.gov.in/public/cnstncy/wd/d0f41644-754b-4b6e-a8dc-97ecbf5fee16",
         title="Current Kochi ward coverage is not verified",
     )
+with st.expander("Official ward-name cross-check (text only; not a boundary join)", expanded=False):
+    try:
+        with WARD_ROSTER_PATH.open(encoding="utf-8") as source:
+            official_ward_roster = json.load(source)
+        ward_geojson_path = ROOT / "data" / "processed" / "spatial_layers" / "kochi_wards_datameet_2022.geojson"
+        with ward_geojson_path.open(encoding="utf-8") as source:
+            ward_geojson = json.load(source)
+
+        def _normalized_ward_label(value: object) -> str:
+            return "".join(character for character in str(value).casefold() if character.isalnum())
+
+        source_ward_labels = set()
+        for feature in ward_geojson.get("features", []):
+            properties = feature.get("properties") if isinstance(feature, dict) else None
+            if not isinstance(properties, dict):
+                continue
+            label = _first_property(
+                properties,
+                ("Ward_Name", "Ward Name", "ward_name", "wardname", "name_en", "name",
+                 "Bound_Name", "bound_name", "boundary_name", "ward_label"),
+                "",
+            )
+            if _has_display_value(label):
+                source_ward_labels.add(_normalized_ward_label(label))
+
+        official_wards = official_ward_roster.get("wards", [])
+        text_matched = [
+            {"Ward code": code, "Official ward name": name}
+            for code, name in official_wards
+            if _normalized_ward_label(name) in source_ward_labels
+        ]
+        text_unmatched = [
+            {"Ward code": code, "Official ward name": name}
+            for code, name in official_wards
+            if _normalized_ward_label(name) not in source_ward_labels
+        ]
+        st.caption(
+            f"Official roster: {len(official_wards)} ward names. "
+            f"Current 2022 source labels text-match {len(text_matched)} names after case/punctuation normalization. "
+            "A text match does not prove that a polygon has the correct current ward geometry or ID."
+        )
+        st.metric("Official names not found in source labels", len(text_unmatched))
+        if text_unmatched:
+            st.dataframe(pd.DataFrame(text_unmatched), hide_index=True, width="stretch")
+        st.caption(
+            "No ward name is automatically assigned to a polygon by this check. "
+            "Do not use the list as evidence of boundary correspondence."
+        )
+    except (OSError, json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
+        st.warning(f"Official ward-name cross-check could not run: {exc}")
+
 air_observation_status = next(
     (item for item in catalog["datasets"] if item.get("layer_id") == "air_observations_spatial_locations"),
     None,
