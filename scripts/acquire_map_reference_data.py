@@ -47,7 +47,7 @@ SOURCES = {
                 "title": "List of Modern Medicine Institutions 2024-25",
                 "url": "https://health.kerala.gov.in/assets/backend/uploads/Galleryitem/17506790021511401637.pdf",
                 "role": "Downloadable official name/address cross-check; older snapshot, not a source of coordinates or current operating status.",
-                "status": "REFERENCE_TO_BE_DOWNLOADED_AND_MATCHED"
+                "status": "REFERENCE_DOWNLOADED_MATCHING_NOT_YET_PERFORMED"
             }
         ],
         "limitations": [
@@ -261,7 +261,7 @@ def acquire(output: Path) -> dict:
                     object_ids = ids_payload.get("objectIds")
                 if not isinstance(object_ids, list) or not object_ids:
                     raise RuntimeError(
-                        "Hospital service returned no object IDs for the Kerala filter or "
+                        "Health-facility service returned no object IDs for the Kerala filter or "
                         "Ernakulam-area spatial fallback; refusing to treat an empty response as valid GIS data."
                     )
                 all_features = []
@@ -276,7 +276,7 @@ def acquire(output: Path) -> dict:
                     batch_data, final_url, content_type = fetch(batch_url)
                     batch_payload = json.loads(batch_data.decode("utf-8-sig"))
                     if batch_payload.get("type") != "FeatureCollection" or not isinstance(batch_payload.get("features"), list):
-                        raise RuntimeError("Hospital service batch did not return a GeoJSON FeatureCollection.")
+                        raise RuntimeError("Health-facility service batch did not return a GeoJSON FeatureCollection.")
                     all_features.extend(batch_payload["features"])
                 source_feature_count = len(all_features)
                 filtered = []
@@ -310,12 +310,12 @@ def acquire(output: Path) -> dict:
             if filename == "health_facilities_ernakulam.geojson":
                 # Health-facility features were assembled from all object-ID batches above.
                 if payload.get("type") != "FeatureCollection" or not isinstance(payload.get("features"), list):
-                    raise RuntimeError("Hospital service did not return a GeoJSON FeatureCollection.")
+                    raise RuntimeError("Health-facility service did not return a GeoJSON FeatureCollection.")
                 features = payload["features"]
                 record["source_feature_count"] = source_feature_count
                 record["feature_count"] = len(features)
                 if not features:
-                    raise RuntimeError("Hospital query returned zero features; refusing to treat an empty GeoJSON response as a successful data download. Check the source query and field values.")
+                    raise RuntimeError("Health-facility query returned zero features; refusing to treat an empty GeoJSON response as a successful data download. Check the source query and field values.")
                 record["geometry_type_counts"] = {}
                 invalid_coordinates = 0
                 district_mismatches = 0
