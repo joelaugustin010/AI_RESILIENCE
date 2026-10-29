@@ -215,9 +215,9 @@ DATASET_CATALOG: list[dict[str, Any]] = [
         ],
         "access": "Sources are catalogued in data/reference/public_data_sources.json and the existing public hydrology acquisition utility supports controlled downloads; check each licence and privacy/reuse field.",
         "priority": "P0",
-        "status": "Acquired in workflow run 40928550082 and descriptively audited in a private 7-day artifact; raw data remain unvalidated and are not approved as Kochi training labels.",
-        "required_checks": "Audit found 6,876 IFI event rows, 86 mentioning Ernakulam; INDOFLOODS has 4,548 events and 214 gauge records, including 26 Kerala gauges. Verify station/gauge identifiers, event dates, units, coordinate quality, privacy/licence fields, non-event sampling and leakage. Match stations only with a verified crosswalk.",
-        "limitations": "District/event mentions do not establish ward-level or station-hour flood outcomes. INDOFLOODS has 155 Open and 59 Restricted gauge records; restricted records must be excluded from any shareable derived product. Candidate Kerala gauges include Periyar-area stations, but no station crosswalk or predictive labels have been approved."
+        "status": "Acquired and descriptively audited in workflow run 40928550082; raw files remain in a private 7-day artifact and are not approved as Kochi training labels. IFI has 6,876 event rows, 86 mentioning Ernakulam; INDOFLOODS has 4,548 events, including 531 events across 26 Kerala gauges.",
+        "required_checks": "Candidate Periyar/Muvattupuzha gauges include Neeleeswaram (13 event rows), Arangali (4), Ramamangalam (4) and Kalampur (25); all 26 Kerala gauge records were marked Privacy=Open. Verify station/gauge identifiers, event dates, units, coordinate quality, privacy/licence fields, non-event sampling and leakage. Match stations only with a verified crosswalk.",
+        "limitations": "District/event mentions do not establish ward-level or station-hour flood outcomes. INDOFLOODS has 155 Open and 59 Restricted gauge records overall; restricted records must be excluded from shareable derivatives. INDOFLOODS event records end in 2020, while the newly acquired Kerala Surface Water telemetry begins in 2021, so no direct time overlap exists; no station crosswalk or predictive labels have been approved."
     },
     {
         "id": "edayar_industrial_evidence",
