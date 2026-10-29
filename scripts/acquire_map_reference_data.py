@@ -99,10 +99,12 @@ def acquire(output: Path) -> dict:
             source_feature_count = None
             payload = None
             if filename.endswith(".geojson"):
-                # Get IDs first, then fetch all records in bounded batches.
-                # Filtering is local because service-side district SQL returned empty data.
+                # First restrict the service query to Kerala. The previous where=1=1
+                # approach fetched the national directory and made CI unnecessarily slow.
+                # If the state attribute query returns no IDs, fall back to a broad
+                # Ernakulam-area envelope rather than downloading the entire country.
                 ids_url = url + "?" + urllib.parse.urlencode({
-                    "where": "1=1",
+                    "where": "state_name='Kerala'",
                     "returnIdsOnly": "true",
                     "f": "json",
                 })
@@ -110,7 +112,27 @@ def acquire(output: Path) -> dict:
                 ids_payload = json.loads(ids_data.decode("utf-8-sig"))
                 object_ids = ids_payload.get("objectIds")
                 if not isinstance(object_ids, list) or not object_ids:
-                    raise RuntimeError("Hospital service returned no object IDs; refusing to treat an empty response as valid GIS data.")
+                    ernakulam_envelope = json.dumps({
+                        "xmin": 75.9, "ymin": 9.5, "xmax": 77.0, "ymax": 10.6,
+                        "spatialReference": {"wkid": 4326},
+                    }, separators=(",", ":"))
+                    spatial_ids_url = url + "?" + urllib.parse.urlencode({
+                        "where": "1=1",
+                        "geometry": ernakulam_envelope,
+                        "geometryType": "esriGeometryEnvelope",
+                        "inSR": "4326",
+                        "spatialRel": "esriSpatialRelIntersects",
+                        "returnIdsOnly": "true",
+                        "f": "json",
+                    })
+                    ids_data, final_url, content_type = fetch(spatial_ids_url)
+                    ids_payload = json.loads(ids_data.decode("utf-8-sig"))
+                    object_ids = ids_payload.get("objectIds")
+                if not isinstance(object_ids, list) or not object_ids:
+                    raise RuntimeError(
+                        "Hospital service returned no object IDs for the Kerala filter or "
+                        "Ernakulam-area spatial fallback; refusing to treat an empty response as valid GIS data."
+                    )
                 all_features = []
                 for batch_start in range(0, len(object_ids), 500):
                     batch_url = url + "?" + urllib.parse.urlencode({
