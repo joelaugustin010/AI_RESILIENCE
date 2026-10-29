@@ -8,6 +8,7 @@ on:
       - phase2/scientific-scenario-engine
       - phase2/imd-cyclone-data-foundation
       - phase2/usgs-earthquake-data-foundation
+      - phase2/consequence-data-requirements-matrix
     paths:
       - "scripts/acquire_public_hydrology_data.py"
       - "scripts/acquire_map_reference_data.py"
@@ -26,6 +27,11 @@ on:
       - "tests/test_cyclone_best_track_acquisition.py"
       - "scripts/acquire_earthquake_catalog.py"
       - "tests/test_earthquake_catalog_acquisition.py"
+      - "scripts/acquire_air_quality_sources.py"
+      - "src/air_quality_sources.py"
+      - "data/reference/air_quality_acquisition.json"
+      - "data/processed/air_quality/kspcb_annual_aqi.metadata.json"
+      - "data/processed/air_quality/kspcb_caaqms_eloor_2026-09.metadata.json"
       - "data/reference/public_data_sources.json"
       - ".github/workflows/acquire-public-hydrology-data.yml"
 
@@ -105,6 +111,11 @@ jobs:
         continue-on-error: true
         run: python scripts/acquire_earthquake_catalog.py --output-dir data/external/earthquake_catalog
 
+      - name: Acquire pinned official KSPCB air-quality and Edayar source snapshots
+        id: air_quality_acquisition
+        continue-on-error: true
+        run: python scripts/acquire_air_quality_sources.py
+
       - name: Acquire candidate health-facility GIS, Kochi boundary, KSDMA flood and GSI landslide archives
         id: map_acquisition
         continue-on-error: true
@@ -140,6 +151,7 @@ jobs:
             data/external/map_reference/**
             data/external/cyclone_best_track/**
             data/external/earthquake_catalog/**
+            data/raw/air_quality/**
             data/external/download_manifest.json
             data/external/audit_report.json
             data/external/ifi_audit_report.json
