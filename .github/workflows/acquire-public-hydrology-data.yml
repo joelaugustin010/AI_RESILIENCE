@@ -27,6 +27,9 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install audit dependency
+        run: python -m pip install --disable-pip-version-check pandas
+
       - name: Download catalogued source CSVs and write provenance
         id: acquisition
         continue-on-error: true
@@ -66,5 +69,5 @@ jobs:
               echo "**Result:** One or more registered downloads failed. Check the acquisition log and artifact; no failed source is treated as validated."
             fi
             echo ""
-            echo "Downloaded bytes are marked `downloaded_raw_unvalidated`. SHA-256 and retrieval metadata are recorded where a download succeeds."
+            echo "Downloaded bytes are marked downloaded_raw_unvalidated. SHA-256 and retrieval metadata are recorded where a download succeeds."
           } >> "$GITHUB_STEP_SUMMARY"
