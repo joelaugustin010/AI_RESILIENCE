@@ -1,0 +1,164 @@
+{
+  "dataset_id": "kochi_wards_ksmart_2024_draft_candidate",
+  "title": "Kochi 2024 draft ward-map candidate with explicit SEC name/code matches",
+  "source_url": "https://wardmap.ksmart.live/files/Ernakulam_Cochin_01JBBD7151DY27T8X2GJ2ZD40P.json",
+  "source_page": "https://kochicorporation.lsgkerala.gov.in/en/delimitation-commission-kerala-notification/590",
+  "publisher": "Information Kerala Mission / Delimitation Commission portal (as attributed by the official portal)",
+  "retrieved_on": "2026-10-29",
+  "retrieved_at_utc": "2026-10-29T17:21:44.403570+00:00",
+  "publication_date": "Not stated by source; linked map page displays DRAFT NOTIFICATION; corporation notification page posted 2024-11-19.",
+  "license": "Reuse rights pending confirmation; attribution retained; candidate is for provisional educational review only, not approved for legal use or further redistribution.",
+  "source_sha256": "c624dd6142dfe0febae3b0850d316b7f0844a2f685adc8a4cf23f2b940873f52",
+  "source_snapshot_sha256": "c624dd6142dfe0febae3b0850d316b7f0844a2f685adc8a4cf23f2b940873f52",
+  "processed_sha256": "29866a110884f92352c68af74aaccb77d84932187799c639182a37cce4957846",
+  "source_feature_count": 76,
+  "processed_feature_count": 76,
+  "matched_official_ward_count": 76,
+  "source_name_mismatch_count": 12,
+  "source_name_mismatches": [
+    {
+      "ward_number": 68,
+      "ward_code": "C07003068",
+      "source_name": "MUNDAMVELLY EAST",
+      "official_sec_name": "MUNDAMVELY EAST"
+    },
+    {
+      "ward_number": 6,
+      "ward_code": "C07003006",
+      "source_name": "KOCHANGADI",
+      "official_sec_name": "MATTANCHERY"
+    },
+    {
+      "ward_number": 69,
+      "ward_code": "C07003069",
+      "source_name": "MUNDAMVELLY",
+      "official_sec_name": "MUNDAMVELY"
+    },
+    {
+      "ward_number": 34,
+      "ward_code": "C07003034",
+      "source_name": "KARUKAPPILLI",
+      "official_sec_name": "STADIUM"
+    },
+    {
+      "ward_number": 3,
+      "ward_code": "C07003003",
+      "source_name": "MATTANCHERY",
+      "official_sec_name": "EARAVELY"
+    },
+    {
+      "ward_number": 51,
+      "ward_code": "C07003051",
+      "source_name": "PERUMANUR",
+      "official_sec_name": "PERUMANOOR"
+    },
+    {
+      "ward_number": 31,
+      "ward_code": "C07003031",
+      "source_name": "EDAPPALLY CHANGAMPPUZHA",
+      "official_sec_name": "CHANGAMPUZHA"
+    },
+    {
+      "ward_number": 64,
+      "ward_code": "C07003064",
+      "source_name": "PALLLURUTHY",
+      "official_sec_name": "PALLURUTHY"
+    },
+    {
+      "ward_number": 33,
+      "ward_code": "C07003033",
+      "source_name": "MAMANGALAM",
+      "official_sec_name": "PALARIVATTAM"
+    },
+    {
+      "ward_number": 7,
+      "ward_code": "C07003007",
+      "source_name": "CHAKKAMADOM",
+      "official_sec_name": "CHAKKAMADAM"
+    },
+    {
+      "ward_number": 58,
+      "ward_code": "C07003058",
+      "source_name": "EDAKOCHI NORTH",
+      "official_sec_name": "EADAKOCHI NORTH"
+    },
+    {
+      "ward_number": 36,
+      "ward_code": "C07003036",
+      "source_name": "PALARIVATTAM",
+      "official_sec_name": "PUTHIYAROAD"
+    }
+  ],
+  "match_method": "explicit source Ward_No (unique values 1..76) matched to numeric suffix of SEC ward codes; source labels are retained and audited, not used to assign IDs",
+  "geometry_validation": "Shapely reports valid Polygon/MultiPolygon output geometries after itemized make_valid repairs; the repository custom topology checker reports a conflicting invalid-feature result, so this candidate remains visual-only pending reconciliation",
+  "geometry_repair_count": 3,
+  "geometry_repairs": [
+    {
+      "ward_number": 24,
+      "source_ward_name": "VADUTHALA WEST",
+      "method": "Shapely make_valid; retained polygonal components only",
+      "source_geometry_type": "Polygon",
+      "repaired_geometry_type": "Polygon",
+      "note": "Raw source geometry is preserved in the raw file; repaired geometry is only in the clearly marked draft candidate copy."
+    },
+    {
+      "ward_number": 22,
+      "source_ward_name": "PACHALAM",
+      "method": "Shapely make_valid; retained polygonal components only",
+      "source_geometry_type": "Polygon",
+      "repaired_geometry_type": "Polygon",
+      "note": "Raw source geometry is preserved in the raw file; repaired geometry is only in the clearly marked draft candidate copy."
+    },
+    {
+      "ward_number": 2,
+      "source_ward_name": "KALVATHY",
+      "method": "Shapely make_valid; retained polygonal components only",
+      "source_geometry_type": "Polygon",
+      "repaired_geometry_type": "MultiPolygon",
+      "note": "Raw source geometry is preserved in the raw file; repaired geometry is only in the clearly marked draft candidate copy."
+    }
+  ],
+  "crs": "EPSG:4326",
+  "crs_note": "GeoJSON longitude/latitude coordinates are treated as WGS 84 under RFC 7946 semantics; formal source CRS metadata was not found in the linked JSON.",
+  "units": "longitude/latitude degrees",
+  "geographic_coverage": "Kochi Municipal Corporation; candidate 76-ward map",
+  "layer_role": "context",
+  "required_properties": [
+    "sec_ward_code",
+    "sec_ward_name"
+  ],
+  "status": "candidate_not_integrated",
+  "validation_status": "DRAFT CANDIDATE ONLY — 76 features; legal status not approved",
+  "analysis_status": "Not approved as a legal boundary, hazard-exposure mask, or production risk-analysis input.",
+  "reuse_terms": "Reuse rights pending confirmation; attribution retained; candidate is for provisional educational review only, not approved for legal use or further redistribution.",
+  "limitations": [
+    "Candidate boundary only; the linked map page labels the map DRAFT NOTIFICATION.",
+    "A successful name/geometry audit does not establish legal finality or positional accuracy.",
+    "Not approved as a hazard-exposure mask or legal boundary.",
+    "CRS is interpreted as WGS 84 from GeoJSON semantics; no independent formal CRS record was supplied.",
+    "Twelve source Ward_Name values differ from the State Election Commission roster; source labels are retained and SEC names are added by explicit Ward_No only.",
+    "Three invalid source geometries were repaired in the candidate copy; raw source bytes are preserved unchanged and repairs are itemized.",
+    "Candidate is not approved for legal boundaries or production exposure calculations.",
+    "Reuse rights require confirmation before further redistribution or non-educational reuse."
+  ],
+  "validation": {
+    "source_sha256": "29866a110884f92352c68af74aaccb77d84932187799c639182a37cce4957846",
+    "source_snapshot_sha256": "c624dd6142dfe0febae3b0850d316b7f0844a2f685adc8a4cf23f2b940873f52",
+    "feature_count": 76,
+    "geometry_types": {
+      "Polygon": 75,
+      "MultiPolygon": 1
+    },
+    "shapely_valid_geometry_count": 76,
+    "geometry_repair_count": 3,
+    "provenance_valid": true,
+    "errors": [],
+    "warnings": [
+      "12 source ward names differ from the SEC roster by Ward_No; SEC display names are added without overwriting source names.",
+      "3 invalid source geometries were repaired only in the candidate copy using Shapely make_valid; raw source remains unchanged.",
+      "The linked map page labels this source DRAFT NOTIFICATION; no legal boundary or exposure-analysis approval is implied.",
+      "Not admitted to the strict processed-layer ingestion pipeline: repository topology validation disagreed with Shapely on 52 feature records.",
+      "Visual candidate only; no legal or hazard-exposure use is approved."
+    ]
+  }
+}
