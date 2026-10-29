@@ -414,6 +414,14 @@ with st.expander("Kochi multi-hazard data acquisition board", expanded=True):
         "not that its files have been downloaded or validated. Restricted or unclear sources are not scraped."
     )
     catalog_records = get_catalog()
+    catalog_issues = {
+        row["id"]: validate_catalog_record(row)
+        for row in catalog_records
+        if validate_catalog_record(row)
+    }
+    if catalog_issues:
+        st.error(f"Data catalog metadata structure needs review for {len(catalog_issues)} record(s).")
+        st.json(catalog_issues)
     selected_hazards = set(expand_hazards(inputs["hazard"])) | {inputs["hazard"]}
     # Show highest-priority data relevant to the selected hazard while keeping
     # all other disaster sources available for project planning.
@@ -436,11 +444,16 @@ with st.expander("Kochi multi-hazard data acquisition board", expanded=True):
         "Required QA before use": row["required_checks"],
         "Known limitations": row["limitations"],
         "Official source": row["url"],
+        "Direct resource URLs": "; ".join(row.get("resource_urls", [])) or "No direct file link confirmed",
     } for row in all_records]), hide_index=True, width="stretch")
     for row in relevant_records:
         with st.expander(f"{row['priority']} · {row['dataset']}"):
             st.markdown(f"**Publisher:** {row['publisher']}")
             st.markdown(f"**Source:** [{row['url']}]({row['url']})")
+            if row.get("resource_urls"):
+                st.markdown("**Direct source files:**")
+                for resource_url in row["resource_urls"]:
+                    st.markdown(f"- [{resource_url.rsplit('/', 1)[-1]}]({resource_url})")
             st.markdown(f"**Current status:** {row['status']}")
             st.markdown(f"**Access:** {row['access']}")
             st.markdown(f"**Required checks:** {row['required_checks']}")
