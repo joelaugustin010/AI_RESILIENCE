@@ -29,7 +29,7 @@
   },
   "test_metrics": {
     "accuracy": 0.614929785661493,
-    "balanced_accuracy": 0.5784456169938,
+    "balanced_accuracy": 0.5784456163419938,
     "precision": 0.505800464037123,
     "recall": 0.4144486692015209,
     "f1": 0.4555903866248694,
