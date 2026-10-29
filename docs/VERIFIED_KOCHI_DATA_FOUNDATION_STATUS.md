@@ -56,3 +56,39 @@ A related rainfall depth-duration-frequency dataset hosted by the Environmental 
 - [ ] Human review of evidence; only then consider closing the data-foundation milestone.
 
 **Current decision: remain draft/unmerged.** Automated tests passing is necessary but not sufficient for scientific validation.
+
+
+## 6. Follow-up review of the latest acquisition artifact (29 October 2026)
+
+The successful acquisition workflow artifact was downloaded and its JSON audit outputs and source manifests were inspected. This adds evidence about the data limitations; it does **not** promote the datasets to approved model inputs.
+
+### Hydrology audit findings
+
+- **Rainfall telemetry:** 188,045 rows across 108 stations and 15 district labels. Parsed timestamps are valid and no duplicate station/timestamp groups were detected by the current audit. However, source timezone is not established, there are no zero-rainfall observations, and many stations have very long gaps. Missing hours must not be interpreted as zero rainfall.
+- **River-level telemetry:** 465,076 rows across 26 stations. The audit flags 21,230 rows outside its broad Kerala coordinate screen, all associated with RAMAMANGALAM BRIDGE at longitude 91.4725; this is a serious location-quality failure, not something to silently correct. Exclude that station from spatial/predictive use until the source provider confirms the correct coordinate. Gauge-reference fields are constant across the file and their datum/meaning remains unresolved.
+- **Manual river levels:** 16,005 rows across six stations. The F.C.S. Mananthavadi readings are approximately 710.695–719.126 m. These may reflect a station/reference datum rather than flood depth; do not treat them as flood depth or compare across stations until the provider documents the datum and threshold semantics.
+- **IFI-Impacts inventory:** 6,876 event-inventory rows, plus district-level tables. The audit is descriptive only. District-level values cannot become ward- or station-hour labels. Applicable reuse/licence terms were not clearly established in the visible source metadata, so do not redistribute these files until terms are verified.
+- **INDOFLOODS:** 4,548 event records; the crosswalk finds 531 event rows associated with Kerala gauge prefixes. There are 214 gauge metadata rows, of which 59 are marked restricted, and 59 metadata gauges have no catchment-table entry. Do not use restricted gauge records. Event-scale precipitation windows may leak future information unless their timing is proven to precede the forecast issue time; event records alone do not provide representative non-event samples.
+- These are source-quality findings, not evidence that a Kochi-specific flood predictor is trained or validated. The current sources do not yet establish target labels, time alignment, local representativeness, or a defensible evaluation design.
+
+### Additional 2024 ward-boundary source identified
+
+A secondary open-data repository, Kerala Open Maps, documents that its ward layer is sourced from the 2024 Delimitation Commission material and is distributed under ODbL. Its README also warns that its local-government boundaries come from a different source/vintage and may not perfectly align with the 2024 ward boundaries. This is a promising candidate for extracting Cochin ward features, but it is not the official notification itself and does not alone prove that the current corporation outline is legally or geometrically verified.
+
+- Official delimitation portal: https://wardmap.ksmart.live/
+- Official Cochin Corporation notification page: https://kochicorporation.lsgkerala.gov.in/en/delimitation-commission-kerala-notification/590
+- Secondary open-data repository and licence statement: https://github.com/DonLillykuttyThomas/Kerala_Open_Maps
+- Repository caveat: ward and local-government boundaries can differ in source vintage and may not align perfectly.
+
+### Updated acceptance decision
+
+- [x] Inspect the latest successful acquisition artifact and its generated audit reports.
+- [x] Identify a potential 2024 ward-boundary distribution with stated ODbL terms and record its known alignment caveat.
+- [x] Identify and document high-risk hydrology quality flags, including the out-of-region telemetry coordinate and unresolved station datum.
+- [ ] Extract the Cochin 2024 ward features, validate geometry/CRS, compute a corporation outline and compare it against the official notification/map.
+- [ ] Obtain provider confirmation or authoritative metadata for the telemetry coordinate and river gauge datums.
+- [ ] Verify source-specific licence/reuse terms for Esri health features, the KSDMA raster archive and historical flood inventories.
+- [ ] Reconcile candidate health facilities against a current official source with identity and coordinate evidence; duplicate-coordinate groups need review, not automatic deletion.
+- [ ] Complete spatial QA with the verified boundary, test time alignment/leakage and independent target labels, and obtain human review.
+
+**Decision remains NOT APPROVED FOR MODEL TRAINING OR VERIFIED EXPOSURE CLAIMS.** Software CI passing is a useful code-quality signal only. This report deliberately does not call the milestone complete while source-level legal, geographic and scientific questions remain unresolved.
