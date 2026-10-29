@@ -10,6 +10,7 @@ on:
       - "scripts/acquire_map_reference_data.py"
       - "scripts/audit_map_reference_raster.py"
       - "tests/test_map_reference_acquisition.py"
+      - "tests/test_map_reference_raster_audit.py"
       - "scripts/audit_public_hydrology_data.py"
       - "scripts/audit_ifi_flood_inventory.py"
       - "scripts/audit_indofloods.py"
@@ -47,6 +48,9 @@ jobs:
 
       - name: Test map-reference acquisition safeguards
         run: python -m unittest discover -s tests -p 'test_map_reference_acquisition.py' -v
+
+      - name: Test raster metadata and coverage audit
+        run: python -m unittest discover -s tests -p 'test_map_reference_raster_audit.py' -v
 
       - name: Download catalogued source CSVs and write provenance
         id: acquisition
