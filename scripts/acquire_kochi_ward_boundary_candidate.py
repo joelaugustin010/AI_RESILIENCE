@@ -24,7 +24,8 @@ RESOURCE_PAGE = f"https://data.opencity.in/dataset/kochi-wards-map/resource/{RES
 OFFICIAL_PORTAL = "https://wardmap.ksmart.live/"
 OFFICIAL_CORPORATION_PAGE = "https://kochicorporation.lsgkerala.gov.in/en/delimitation-commission-kerala-notification/590"
 USER_AGENT = "AI_RESILIENCE educational research; preserve source attribution"
-DEFAULT_OUTPUT = Path(__file__).resolve().parents[1] / "data" / "external" / "map_reference"
+ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_OUTPUT = ROOT / "data" / "external" / "map_reference"
 
 
 def fetch(url: str, timeout: int = 90) -> tuple[bytes, str, str]:
@@ -52,6 +53,57 @@ def atomic_write(path: Path, data: bytes) -> None:
 
 def local_name(tag: str) -> str:
     return tag.rsplit("}", 1)[-1]
+
+
+def _coordinate_pairs(value: Any):
+    """Yield finite-looking longitude/latitude pairs from nested GeoJSON coordinates."""
+    if isinstance(value, list):
+        if len(value) >= 2 and isinstance(value[0], (int, float)) and isinstance(value[1], (int, float)):
+            yield float(value[0]), float(value[1])
+        else:
+            for child in value:
+                yield from _coordinate_pairs(child)
+
+
+def compare_to_configured_boundary(candidate_bounds: list[float], boundary_path: Path) -> dict[str, Any]:
+    """Compare extents only; never treat a bounding-box match as geometry validation."""
+    boundary_path = Path(boundary_path)
+    if not boundary_path.exists():
+        return {"status": "NOT_RUN_CONFIGURED_BOUNDARY_FILE_MISSING"}
+    try:
+        boundary = json.loads(boundary_path.read_text(encoding="utf-8-sig"))
+        geometry = boundary.get("geometry") if boundary.get("type") == "Feature" else None
+        if geometry is None:
+            return {"status": "NOT_RUN_UNSUPPORTED_BOUNDARY_GEOJSON_SHAPE"}
+        pairs = list(_coordinate_pairs(geometry.get("coordinates", [])))
+        if not pairs:
+            return {"status": "NOT_RUN_NO_BOUNDARY_COORDINATES"}
+        xs = [point[0] for point in pairs]
+        ys = [point[1] for point in pairs]
+        current = [min(xs), min(ys), max(xs), max(ys)]
+        candidate = candidate_bounds
+        keys = ("west", "south", "east", "north")
+        deltas = [abs(candidate[i] - current[i]) for i in range(4)]
+        mean_lat = (candidate[1] + candidate[3] + current[1] + current[3]) / 4
+        import math
+        metres = [
+            deltas[0] * 111320 * math.cos(math.radians(mean_lat)),
+            deltas[1] * 111320,
+            deltas[2] * 111320 * math.cos(math.radians(mean_lat)),
+            deltas[3] * 111320,
+        ]
+        return {
+            "status": "BOUNDING_BOX_ONLY_REQUIRES_FULL_GEOMETRY_COMPARISON",
+            "configured_boundary_file": boundary_path.name,
+            "configured_boundary_sha256": hashlib.sha256(boundary_path.read_bytes()).hexdigest(),
+            "configured_boundary_bounds_lonlat": current,
+            "candidate_bounds_lonlat": candidate,
+            "absolute_edge_deltas_degrees": dict(zip(keys, deltas)),
+            "approximate_edge_deltas_metres": {key: round(value, 1) for key, value in zip(keys, metres)},
+            "warning": "Bounding boxes do not establish polygon equality, legal currency, topology, or spatial coverage. Do not promote the candidate on this comparison alone.",
+        }
+    except (OSError, json.JSONDecodeError, TypeError, ValueError) as error:
+        return {"status": "BOUNDARY_COMPARISON_FAILED", "error": f"{type(error).__name__}: {error}"}
 
 
 def audit_kml(data: bytes) -> dict[str, Any]:
@@ -177,6 +229,10 @@ def acquire(output: Path = DEFAULT_OUTPUT) -> dict[str, Any]:
         if not data:
             raise ValueError("OpenCity KML resource download was empty.")
         audit = audit_kml(data)
+        audit["comparison_to_configured_boundary"] = compare_to_configured_boundary(
+            audit["coordinate_bounds_lonlat"],
+            ROOT / "data" / "reference" / "kochi_corporation_boundary.geojson",
+        )
         raw_path = output / "kochi_wards_2024_candidate.kml"
         atomic_write(raw_path, data)
         record.update({
