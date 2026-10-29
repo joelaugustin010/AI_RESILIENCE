@@ -35,6 +35,28 @@ class IndofloodsAuditTests(unittest.TestCase):
             self.assertEqual(report["crosswalk_checks"]["kerala_gauges_with_at_least_one_event"], ["INDOFLOODS-gauge-429"])
             self.assertEqual(report["missing_expected_files"], [])
 
+    def test_malformed_event_ids_and_reversed_dates_are_flagged(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_table(root, "metadata_indofloods.csv", pd.DataFrame([
+                {"GaugeID": "INDOFLOODS-gauge-429", "State": "Kerala", "Station": "Example"},
+            ]))
+            self.write_table(root, "floodevents_indofloods.csv", pd.DataFrame([
+                {"EventID": "INDOFLOODS-gauge-429-1", "Start Date": "2018-08-03", "End Date": "2018-08-01"},
+                {"EventID": "unknown-station-event", "Start Date": "bad-date", "End Date": "2018-08-02"},
+            ]))
+            self.write_table(root, "catchment_characteristics_indofloods.csv", pd.DataFrame([
+                {"GaugeID": "INDOFLOODS-gauge-429"},
+            ]))
+            self.write_table(root, "precipitation_variables_indofloods.csv", pd.DataFrame([
+                {"EventID": "INDOFLOODS-gauge-429-1"},
+            ]))
+            report = build_report(root)
+            event_report = next(item for item in report["tables"] if item["table_id"] == "events")
+            self.assertEqual(event_report["event_ids_without_recognized_gauge_prefix"], 1)
+            self.assertEqual(event_report["event_end_before_start_count"], 1)
+            self.assertEqual(event_report["start_date_invalid_count"], 1)
+
     def test_missing_files_are_reported_not_fabricated(self):
         with tempfile.TemporaryDirectory() as directory:
             report = build_report(Path(directory))
