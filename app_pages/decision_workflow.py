@@ -10,6 +10,8 @@ import streamlit as st
 from src.scientific_scenario_engine import build_scientific_scenario_frame
 from src.source_registry import build_source_registry, source_fitness_summary
 from src.disaster_data_catalog import get_catalog, validate_catalog_record
+from src.consequence_data_requirements import HAZARD_REQUIREMENTS, requirements_for_hazard, requirements_table
+from src.consequence_assessment import build_consequence_assessment
 
 from src.decision_workflow import (
     HAZARD_OPTIONS,
@@ -320,7 +322,10 @@ with st.form("decision_workflow_intake"):
         river_reference = st.text_input("Gauge zero / datum reference (if known)", key="wf_river_reference")
     with col2:
         wind_speed_kmh = st.number_input("Wind speed (km/h)", min_value=0.0, value=None, step=1.0, key="wf_wind")
-        temperature_c = st.number_input("Temperature (°C)", value=None, step=0.5, key="wf_temperature")
+        temperature_c = st.number_input("Maximum temperature (°C)", value=None, step=0.5, key="wf_temperature")
+        normal_max_temperature_c = st.number_input("Normal daily maximum for this station (°C; heatwave screening)", value=None, step=0.5, key="wf_normal_temperature", help="Use an official station normal for the relevant date/period; leave blank if unknown.")
+        heatwave_consecutive_days = st.number_input("Consecutive days meeting the heatwave criteria (if verified)", min_value=0, value=None, step=1, key="wf_heatwave_days")
+        heatwave_station_count = st.number_input("Stations in the meteorological subdivision meeting criteria (if verified)", min_value=0, value=None, step=1, key="wf_heatwave_stations")
         affected_population = st.number_input("Affected population context (people; optional)", min_value=0, value=None, step=1, key="wf_population")
         drainage_status = st.selectbox("Drainage condition", ["Not supplied", "Reported functioning", "Reported partially impaired", "Reported failed", "Hypothetical partial failure", "Not applicable"], key="wf_drainage")
         infrastructure_status = st.selectbox("Other infrastructure condition", ["Not supplied", "No disruption reported", "Possible / hypothetical disruption", "Disruption reported by user", "Not applicable"], key="wf_infrastructure")
@@ -347,6 +352,9 @@ if submitted:
         "river_reference": river_reference,
         "wind_speed_kmh": wind_speed_kmh,
         "temperature_c": temperature_c,
+        "normal_max_temperature_c": normal_max_temperature_c,
+        "heatwave_consecutive_days": heatwave_consecutive_days,
+        "heatwave_station_count": heatwave_station_count,
         "affected_population": affected_population,
         "drainage_status": drainage_status,
         "infrastructure_status": infrastructure_status,
@@ -464,6 +472,29 @@ with st.expander("Kochi multi-hazard data acquisition board", expanded=True):
         "licence/access terms, checksum, schema, spatial coverage and QA results are recorded."
     )
 
+with st.expander("Consequence-model data requirements by disaster", expanded=True):
+    st.caption(
+        "This matrix defines the evidence needed to estimate local consequences—not just whether a hazard exists. "
+        "It separates hazard intensity, physical processes, exposure, vulnerability and observed outcomes. "
+        "It is a requirements plan, not a working consequence predictor."
+    )
+    requirement_hazard = st.selectbox(
+        "Inspect data requirements for",
+        list(HAZARD_REQUIREMENTS),
+        index=list(HAZARD_REQUIREMENTS).index(inputs["hazard"]) if inputs["hazard"] in HAZARD_REQUIREMENTS else 0,
+        key="consequence_requirements_hazard",
+    )
+    req = requirements_for_hazard(requirement_hazard)
+    st.markdown(f"**Candidate model family:** {req['model_family']}")
+    st.dataframe(pd.DataFrame(requirements_table(requirement_hazard)), hide_index=True, width="stretch")
+    st.markdown("**Specific blockers before consequence estimates:**")
+    st.warning(req["current_blockers"])
+    st.markdown("**Potential authoritative starting sources:**")
+    st.write(req["starter_sources"])
+    st.markdown("**Validation rule:** every hazard needs independent event/outcome evidence, a baseline comparison, event- or time-separated evaluation, uncertainty reporting, and a documented intended-use boundary.")
+    with st.expander("Shared minimum requirements across every hazard"):
+        st.dataframe(pd.DataFrame(req["common_requirements"]), hide_index=True, width="stretch")
+
 st.subheader("Evidence readiness checklist for this hazard")
 st.caption(
     "This checklist identifies evidence needed before stronger conclusions are justified. "
@@ -502,6 +533,43 @@ for item in scientific_frame["required_evidence"]:
 st.markdown("**Interpretation safeguards:**")
 for item in scientific_frame["limitations"]:
     st.markdown(f"- {item}")
+
+st.subheader("Consequence assessment: probability, affected areas and impacts")
+consequence_assessment = build_consequence_assessment(
+    inputs["hazard"],
+    inputs["location"],
+    inputs["input_classification"],
+    inputs,
+)
+st.caption(
+    "This is the required output structure for every selected disaster. Numerical probability and affected-area results "
+    "will appear only after the corresponding validated model and spatial evidence are connected."
+)
+st.write("**Scenario type:**", consequence_assessment["scenario_type"])
+st.write("**Current model status:**", consequence_assessment["model_status"])
+if consequence_assessment["heatwave_screening"] is not None:
+    heat = consequence_assessment["heatwave_screening"]
+    st.markdown("**Heatwave criteria screen (not a forecast or official warning)**")
+    st.write("**Station-level screening:**", heat["station_status"])
+    if heat["departure_from_normal_c"] is not None:
+        st.metric("Supplied maximum-temperature departure from normal", f"{heat['departure_from_normal_c']:.1f} °C")
+    st.write("**Duration and multi-station check:**", heat["declaration_status"])
+    st.caption(heat["source"])
+col_prob, col_area = st.columns(2)
+with col_prob:
+    st.markdown("**Probability of occurrence**")
+    st.info(consequence_assessment["occurrence_probability"])
+with col_area:
+    st.markdown("**Affected-area estimate**")
+    st.info(consequence_assessment["affected_area"])
+st.markdown("**Consequences this assessment must examine**")
+for item in consequence_assessment["consequence_categories"]:
+    st.markdown(f"- {item}")
+st.markdown("**Required evidence for this scenario**")
+for item in consequence_assessment["required_evidence"]:
+    st.markdown(f"- {item}")
+st.warning(consequence_assessment["scientific_guardrail"])
+st.caption(consequence_assessment["probability_semantics"])
 
 st.header("4. Compare hypothetical scenarios")
 st.caption("The following cases differ only by their stated assumptions. Possible pathways are planning prompts, not calculated impacts.")
