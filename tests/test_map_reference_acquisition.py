@@ -85,6 +85,32 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
         self.assertFalse((self.output / "ksdma_flood_return_probability_historical_10_25_50.zip").exists())
 
     @patch.object(acquisition, "fetch")
+    def test_partial_failure_preserves_manifest_for_both_sources(self, mocked_fetch):
+        hospitals = {
+            "type": "FeatureCollection",
+            "features": [{
+                "type": "Feature",
+                "properties": {"state_name": "Kerala", "district_name": "Ernakulam"},
+                "geometry": {"type": "Point", "coordinates": [76.3, 9.9]},
+            }],
+        }
+        mocked_fetch.side_effect = [
+            (json.dumps(hospitals).encode(), "https://example.org/hospitals", "application/geo+json"),
+            (b"<html>download failed</html>", "https://example.org/error", "text/html"),
+        ]
+        with self.assertRaisesRegex(RuntimeError, "Partial provenance manifest saved"):
+            acquisition.acquire(self.output)
+        manifest_path = self.output / "map_reference_manifest.json"
+        self.assertTrue(manifest_path.exists())
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        self.assertEqual(manifest["overall_status"], "PARTIAL_ACQUISITION_FAILED")
+        self.assertEqual(len(manifest["files"]), 2)
+        self.assertEqual(manifest["files"][0]["status"], "DOWNLOADED_RAW_CANDIDATE")
+        self.assertEqual(manifest["files"][1]["status"], "ACQUISITION_FAILED")
+        self.assertTrue(manifest["files"][0]["sha256"])
+        self.assertIn("not a ZIP archive", manifest["files"][1]["error"])
+
+    @patch.object(acquisition, "fetch")
     def test_counts_invalid_points_and_filter_mismatches(self, mocked_fetch):
         hospitals = {
             "type": "FeatureCollection",
