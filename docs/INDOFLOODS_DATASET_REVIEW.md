@@ -23,7 +23,7 @@ The acquisition workflow preserves raw bytes, computes SHA-256 and retrieval tim
 ## Hard limitations before any model training
 
 1. Verify the paper's variable definitions and event extraction method.
-2. Confirm the applicable licence. Zenodo describes access for academic and research purposes, but the inspected record did not clearly show an explicit licence. Keep attribution and do not redistribute until terms are clarified.
+2. The Zenodo record says the dataset is openly accessible for academic and research purposes; the HydroSense Lab dataset page describes its released datasets as public domain except where restricted by the source. The gauge metadata has a `Privacy` field identifying source records as `Open` or `Restricted`. Audit and respect that field before any reuse; do not assume every gauge's underlying observations are unrestricted. Cite the dataset and the BAMS paper, and check source-specific terms for derived catchment variables.
 3. Verify each gauge's identity, location, basin and threshold definitions. Do not match an INDOFLOODS gauge to an NWDP station by similar name alone.
 4. Confirm timestamps/time zone and the issue-time horizon. Event-scale precipitation windows may include rainfall during or after a flood and can leak the outcome if used for early-warning prediction.
 5. A flood-event table contains positive events; absence of a row is not evidence of no flood. Obtain verified non-event periods with comparable monitoring coverage.
