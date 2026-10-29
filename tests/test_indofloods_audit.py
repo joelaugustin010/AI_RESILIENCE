@@ -16,8 +16,8 @@ class IndofloodsAuditTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             self.write_table(root, "metadata_indofloods.csv", pd.DataFrame([
-                {"GaugeID": "INDOFLOODS-gauge-429", "State": "Kerala", "Station": "Example", "Latitude": 9.22, "Longitude": 76.71, "Basin": "West flowing"},
-                {"GaugeID": "INDOFLOODS-gauge-999", "State": "Other", "Station": "Other", "Latitude": 20, "Longitude": 80, "Basin": "Other"},
+                {"GaugeID": "INDOFLOODS-gauge-429", "State": "Kerala", "Station": "Example", "Latitude": 9.22, "Longitude": 76.71, "Basin": "West flowing", "Privacy": "Open"},
+                {"GaugeID": "INDOFLOODS-gauge-999", "State": "Other", "Station": "Other", "Latitude": 20, "Longitude": 80, "Basin": "Other", "Privacy": "Restricted"},
             ]))
             self.write_table(root, "floodevents_indofloods.csv", pd.DataFrame([
                 {"EventID": "INDOFLOODS-gauge-429-1", "Start Date": "2018-08-01", "End Date": "2018-08-02"},
@@ -33,6 +33,7 @@ class IndofloodsAuditTests(unittest.TestCase):
             self.assertEqual(report["crosswalk_checks"]["kerala_gauge_count"], 1)
             self.assertEqual(report["crosswalk_checks"]["event_rows_for_kerala_gauges"], 1)
             self.assertEqual(report["crosswalk_checks"]["kerala_gauges_with_at_least_one_event"], ["INDOFLOODS-gauge-429"])
+            self.assertEqual(report["crosswalk_checks"]["kerala_gauge_privacy_counts"], {"open": 1})
             self.assertEqual(report["missing_expected_files"], [])
 
     def test_malformed_event_ids_and_reversed_dates_are_flagged(self):
