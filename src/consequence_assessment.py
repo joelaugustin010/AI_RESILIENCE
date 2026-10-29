@@ -11,6 +11,73 @@ from typing import Any
 from src.consequence_data_requirements import requirements_for_hazard
 
 
+def assess_coastal_heatwave_screening(
+    maximum_temperature_c: float | None,
+    normal_maximum_temperature_c: float | None,
+    consecutive_days: int | None = None,
+    qualifying_stations: int | None = None,
+) -> dict[str, Any]:
+    """Apply an explicit station-level coastal heatwave criteria screen.
+
+    This is not a forecast, probability model, or official warning. It screens
+    supplied observations against the published IMD coastal-station criterion.
+    """
+    if maximum_temperature_c is None:
+        station_status = "Cannot screen: maximum temperature was not supplied."
+        departure = None
+    elif normal_maximum_temperature_c is None:
+        departure = None
+        if maximum_temperature_c >= 37.0:
+            station_status = (
+                "Temperature is at/above the 37°C coastal threshold, but the "
+                "official station-level criterion cannot be checked without the "
+                "normal maximum temperature (departure must be >4.5°C)."
+            )
+        else:
+            station_status = (
+                "This supplied maximum is below the 37°C coastal threshold; this "
+                "single reading does not establish or rule out a heatwave forecast."
+            )
+    else:
+        departure = maximum_temperature_c - normal_maximum_temperature_c
+        if maximum_temperature_c >= 37.0 and departure > 4.5:
+            station_status = (
+                "Supplied values meet the numeric IMD coastal-station screen "
+                "(maximum ≥37°C and departure >4.5°C); source and observation "
+                "quality still need verification."
+            )
+        else:
+            station_status = (
+                "Supplied values do not meet both numeric IMD coastal-station "
+                "conditions for this reading."
+            )
+
+    declaration_conditions = (
+        consecutive_days is not None
+        and qualifying_stations is not None
+        and consecutive_days >= 2
+        and qualifying_stations >= 2
+    )
+    if declaration_conditions:
+        declaration_status = (
+            "The supplied duration/station counts meet the numeric multi-station "
+            "and two-consecutive-day duration screen; this is not an official declaration."
+        )
+    else:
+        declaration_status = (
+            "Official subdivision-level declaration conditions are not established: "
+            "verification is needed that criteria are met at ≥2 stations for ≥2 "
+            "consecutive days. The app cannot issue official warnings."
+        )
+    return {
+        "station_status": station_status,
+        "departure_from_normal_c": departure,
+        "declaration_status": declaration_status,
+        "source": "IMD coastal-station criterion: maximum temperature ≥37°C and departure from normal >4.5°C; declaration duration/station rules require separate verification.",
+        "is_official_warning": False,
+    }
+
+
 def build_consequence_assessment(
     hazard: str,
     location: str,
@@ -50,8 +117,19 @@ def build_consequence_assessment(
             "Pollutant concentration pattern (requires timestamped pollutant-specific measurements and meteorology)",
             "Potential source attribution (requires source-specific emissions and validated spatial-temporal analysis)",
         ])
+    heatwave_screening = None
     if hazard == "Heatwave":
-        consequences.append("Heat exposure (requires local temperature/humidity fields and population vulnerability)")
+        consequences.extend([
+            "Heat exposure and heat-related health burden (requires local temperature/humidity, duration, population and vulnerability data)",
+            "Hot-night exposure and limited overnight recovery (requires minimum-temperature observations and local normals)",
+            "Outdoor-worker, older-adult, child and health-service exposure (requires validated population/asset layers and vulnerability data)",
+        ])
+        heatwave_screening = assess_coastal_heatwave_screening(
+            data.get("temperature_c"),
+            data.get("normal_max_temperature_c"),
+            data.get("heatwave_consecutive_days"),
+            data.get("heatwave_station_count"),
+        )
     if hazard == "Drought":
         consequences.append("Water-supply stress (requires source, storage, demand and supply-disruption records)")
     if hazard == "Landslide":
@@ -90,6 +168,7 @@ def build_consequence_assessment(
         "occurrence_probability": probability_status,
         "affected_area": area_status,
         "consequence_categories": list(dict.fromkeys(consequences)),
+        "heatwave_screening": heatwave_screening,
         "required_evidence": [
             requirements["hazard_inputs"],
             requirements["process_data"],
