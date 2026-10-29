@@ -63,6 +63,10 @@ def summarize_table(path: Path, table_id: str) -> dict[str, Any]:
         report["event_id_missing"] = int(ids.isna().sum() + ids.eq("").sum())
         report["unique_event_ids"] = int(ids.nunique(dropna=True))
         report["duplicate_event_id_rows"] = int(ids.duplicated(keep=False).sum())
+        parsed_gauge_ids = ids.str.extract(r"^(INDOFLOODS-gauge-[0-9]+)-")[0]
+        report["event_ids_without_recognized_gauge_prefix"] = int(
+            (ids.notna() & ids.ne("") & parsed_gauge_ids.isna()).sum()
+        )
     if "Start Date" in frame.columns:
         dates = pd.to_datetime(frame["Start Date"], errors="coerce")
         report["start_date_invalid_count"] = int(dates.isna().sum())
@@ -73,6 +77,11 @@ def summarize_table(path: Path, table_id: str) -> dict[str, Any]:
         report["end_date_invalid_count"] = int(dates.isna().sum())
         report["end_date_first"] = dates.min().isoformat() if dates.notna().any() else None
         report["end_date_last"] = dates.max().isoformat() if dates.notna().any() else None
+    if {"Start Date", "End Date"}.issubset(frame.columns):
+        starts = pd.to_datetime(frame["Start Date"], errors="coerce")
+        ends = pd.to_datetime(frame["End Date"], errors="coerce")
+        valid_dates = starts.notna() & ends.notna()
+        report["event_end_before_start_count"] = int((valid_dates & ends.lt(starts)).sum())
     if {"Latitude", "Longitude"}.issubset(frame.columns):
         lat = pd.to_numeric(frame["Latitude"], errors="coerce")
         lon = pd.to_numeric(frame["Longitude"], errors="coerce")
