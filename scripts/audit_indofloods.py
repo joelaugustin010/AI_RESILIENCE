@@ -131,8 +131,12 @@ def build_report(input_dir: Path) -> dict[str, Any]:
                 crosswalk["kerala_coordinates_missing_or_outside_screen"] = int(
                     (lat.isna() | lon.isna() | ~lat.between(6, 15) | ~lon.between(74, 78)).sum()
                 )
-            if "events" in tables and "GaugeID" in tables["events"]:
-                event_ids = tables["events"]["EventID"].astype("string").str.extract(r"^(INDOFLOODS-gauge-[^-]+)-")[0] if "EventID" in tables["events"].columns else pd.Series(dtype="string")
+            if "events" in tables and "EventID" in tables["events"].columns:
+                # Event IDs embed the dataset's explicit GaugeID prefix, e.g.
+                # INDOFLOODS-gauge-411-1. Parse that identifier; never join by station name.
+                event_ids = tables["events"]["EventID"].astype("string").str.extract(
+                    r"^(INDOFLOODS-gauge-[0-9]+)-"
+                )[0]
                 event_gauges = set(event_ids.dropna().astype(str))
                 crosswalk["event_rows_for_kerala_gauges"] = int(event_ids.isin(gauge_ids).sum())
                 crosswalk["kerala_gauges_with_at_least_one_event"] = sorted(event_gauges.intersection(gauge_ids))
