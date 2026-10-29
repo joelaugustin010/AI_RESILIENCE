@@ -153,6 +153,25 @@ catalog_rows = [{
 } for item in catalog["datasets"]]
 st.subheader("Source and layer catalog")
 st.dataframe(pd.DataFrame(catalog_rows), hide_index=True, width="stretch", alt="Reviewed Kochi spatial source inventory with availability, coverage, CRS, and reuse status")
+ward_candidate = next(
+    (item for item in catalog["datasets"] if item.get("layer_id") == "kochi_wards_opencity_2024_candidate"),
+    None,
+)
+if ward_candidate:
+    geometry_comparison = ward_candidate.get("geometry_comparison", {})
+    if geometry_comparison.get("status") == "COMPLETED_SHAPE_COMPARISON_NOT_LEGAL_APPROVAL":
+        st.warning(
+            "The OpenCity 2024 ward candidate and the configured provisional Kochi Corporation boundary disagree substantially: "
+            f"intersection-over-union {geometry_comparison.get('intersection_over_union', 'unknown')}, "
+            f"symmetric difference {geometry_comparison.get('symmetric_difference_area_km2', 'unknown')} km². "
+            "Neither geometry is promoted by this comparison. The candidate remains excluded from exposure masking until its source and final official notification alignment are resolved.",
+            title="2024 ward boundary candidate is not approved",
+        )
+    else:
+        st.info(
+            "The OpenCity 2024 ward map is recorded as a candidate only. It is not used as the production boundary or exposure mask.",
+            title="2024 ward boundary candidate",
+        )
 air_observation_status = next(
     (item for item in catalog["datasets"] if item.get("layer_id") == "air_observations_spatial_locations"),
     None,
