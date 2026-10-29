@@ -19,7 +19,7 @@ python scripts/acquire_public_hydrology_data.py --source kerala_sw_rainfall_tele
 python scripts/acquire_public_hydrology_data.py --all
 ```
 
-If the portal changes a resource URL, the script should fail visibly rather than save a web error page as a CSV. Update the source registry only after checking the official catalogue page. The current environment used for this review could inspect the catalogue pages but could not download the CSV response directly; therefore no claim is made that new raw datasets have already been acquired by this commit.
+If the portal changes a resource URL, the script should fail visibly rather than save a web error page as a CSV. Update the source registry only after checking the official catalogue page. **Acquisition completed:** GitHub Actions successfully downloaded all three registered NWDP CSVs on 2026-10-29 and uploaded them as the short-lived artifact [public-hydrology-source-bundle](https://github.com/joelaugustin010/AI_RESILIENCE/actions/runs/40887522787). The ZIP is approximately 5.2 MB compressed (about 94 MB uncompressed) and expires on 2026-11-05. The raw data were not committed to Git. A follow-up workflow run adds the automated audit report to the artifact.
 
 ## Source selection and roles
 
@@ -33,7 +33,21 @@ The National Water Data Portal (NWDP / NWIC) catalogs hourly rainfall and river-
 
 Do not treat a measured river level as flood depth without a verified gauge datum and location-specific threshold. Do not silently merge records from different stations, infer timezone, or average conflicting duplicate timestamps.
 
-### Independent flood-event and inundation evidence
+### First acquisition: findings that block immediate model training
+
+The acquired files were inspected without modifying their raw bytes. SHA-256 hashes and retrieval timestamps are in the downloaded `data/external/download_manifest.json`.
+
+| Source | Raw rows | Stations | Observed timestamp span | Important finding |
+|---|---:|---:|---|---|
+| Kerala SW hourly rainfall telemetry | 188,045 | 108 | 2021-04-07 to 2025-03-09 | 14,347 rows across 9 Ernakulam stations. Every recorded rainfall value is positive (0.5–113 mm); no zero-rainfall rows exist, and station time intervals are irregular. Missing rows must not be treated as dry hours. |
+| Kerala SW river-level telemetry, all-network resource | 465,076 | 26 | 2021-05-29 to 2025-03-10 | 35,337 rows in Ernakulam, but only two listed stations. River/Basin fields are all `-`, gauge-reference fields are all zero, and the Ramamangalam Bridge longitude is 91.4725°E, outside the broad Kerala coordinate screening range. Do not use those coordinates or levels for spatial risk until the provider resolves them. |
+| Kerala SW manual river-level subset | 16,005 | 6 | 2022-01-01 to 2025-03-31 | No Ernakulam stations. F.C.S. Mananthavadi has values around 711–719 m and is tagged River=Luni despite being listed in Wayanad; this is a serious station-scale/metadata warning. Exclude that station from analysis until verified. |
+
+No duplicate station/timestamp groups were found in these three freshly downloaded files in the initial audit. That is a useful integrity check, not proof of completeness or scientific validity. The rainfall file's lack of zero values, irregular time coverage, the river telemetry's missing river/basin and gauge reference fields, and the manual file's extreme values are material limitations.
+
+The acquisition script preserves source bytes and hashes. The audit script `scripts/audit_public_hydrology_data.py` reproduces structural, timestamp, duplicate, coordinate and value-range checks; its report is emitted by the acquisition workflow. All files remain marked raw/unvalidated until a separate review approves specific fields and stations.
+
+## Independent flood-event and inundation evidence
 
 - [KSDMA Crowd Sourcing Flood 2018](https://sdma.kerala.gov.in/crowd-sourcing-flood-2018/) reports around 13,000 inundation-depth points collected across Kerala. The public page/map is useful evidence that observations exist, but the raw machine-readable point data, coordinate precision, measurement metadata and reuse terms still need to be verified.
 - [KSDMA Hazard Maps](https://sdma.kerala.gov.in/hazard-maps/) links district flood-hazard/exposure PDFs and historical flood-return-probability raster ZIPs. These are hazard/exposure context layers, not hourly outcome labels.
