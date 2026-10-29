@@ -85,7 +85,7 @@ def train(csv_path: Path, hazard: str, output_dir: Path) -> dict:
     output_dir.mkdir(parents=True, exist_ok=True)
     import joblib
     joblib.dump(model, output_dir / f"{hazard}_research_baseline.joblib")
-    (output_dir / f"{hazard}_evaluation.json").write_text(json.dumps(report, indent=2) + "\\n", encoding="utf-8")
+    (output_dir / f"{hazard}_evaluation.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     return report
 
 def main():
