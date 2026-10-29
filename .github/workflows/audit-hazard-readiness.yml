@@ -50,7 +50,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/external/hazards/raw reports/hazard_data_acquisition_manifest.json reports/hazard_dataset_readiness.json
+          git add -f data/external/hazards/raw
+          git add reports/hazard_data_acquisition_manifest.json reports/hazard_dataset_readiness.json
           if git diff --cached --quiet; then
             echo "No new or changed data files to commit."
           else
