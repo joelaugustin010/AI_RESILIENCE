@@ -12,12 +12,25 @@ from unittest.mock import patch
 from scripts import acquire_map_reference_data as acquisition
 
 BOUNDARY = {
-    "type": "Feature",
-    "properties": {"source": "mock candidate boundary"},
-    "geometry": {
-        "type": "Polygon",
-        "coordinates": [[[76.2, 9.8], [76.4, 9.8], [76.4, 10.0], [76.2, 10.0], [76.2, 9.8]]],
-    },
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {"ward": "Test Ward A"},
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [[[76.2, 9.8], [76.4, 9.8], [76.4, 10.0], [76.2, 10.0], [76.2, 9.8]]],
+            },
+        },
+        {
+            "type": "Feature",
+            "properties": {"ward": "Test Ward B"},
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [[[76.5, 9.8], [76.6, 9.8], [76.6, 10.0], [76.5, 10.0], [76.5, 9.8]]],
+            },
+        },
+    ],
 }
 
 
@@ -80,7 +93,9 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
         self.assertEqual(stored["files"][0]["validation_status"], "STRUCTURE_CHECKED_SPATIAL_ACCURACY_AND_LICENCE_UNVERIFIED")
         self.assertEqual(stored["files"][1]["validation_status"], "ZIP_INTEGRITY_CHECKED_RASTER_SEMANTICS_UNVERIFIED")
         self.assertEqual(stored["files"][2]["validation_status"], "PDF_SIGNATURE_CHECKED_FACILITY_MATCHING_REQUIRED")
-        self.assertEqual(stored["files"][3]["validation_status"], "BOUNDARY_GEOJSON_STRUCTURE_CHECKED_CURRENTNESS_UNVERIFIED")
+        self.assertEqual(stored["files"][3]["validation_status"], "BOUNDARY_GEOJSON_STRUCTURE_CHECKED_LEGAL_STATUS_UNVERIFIED")
+        self.assertEqual(stored["files"][3]["geometry_type"], "MultiPolygon")
+        self.assertEqual(stored["files"][3]["boundary_feature_count"], 2)
         self.assertEqual(stored["files"][0]["city_boundary_screening"]["points_inside_candidate_boundary"], 1)
         self.assertEqual(stored["files"][0]["city_boundary_screening"]["points_outside_candidate_boundary"], 0)
         self.assertTrue(all(item["sha256"] for item in stored["files"]))
@@ -115,7 +130,7 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
         self.assertEqual(manifest["overall_status"], "RAW_CANDIDATES_NOT_APPROVED_FOR_MAP")
         self.assertEqual(manifest["files"][0]["feature_count"], 1)
         self.assertEqual(manifest["files"][2]["validation_status"], "PDF_SIGNATURE_CHECKED_FACILITY_MATCHING_REQUIRED")
-        self.assertEqual(manifest["files"][3]["validation_status"], "BOUNDARY_GEOJSON_STRUCTURE_CHECKED_CURRENTNESS_UNVERIFIED")
+        self.assertEqual(manifest["files"][3]["validation_status"], "BOUNDARY_GEOJSON_STRUCTURE_CHECKED_LEGAL_STATUS_UNVERIFIED")
         self.assertTrue((self.output / "kerala_health_department_institutions_2024_25.pdf").exists())
         first_url = mocked_fetch.call_args_list[0].args[0]
         fallback_url = mocked_fetch.call_args_list[1].args[0]
