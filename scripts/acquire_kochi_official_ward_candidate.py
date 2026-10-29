@@ -213,7 +213,7 @@ def main() -> int:
         "source_feature_count": len(features),
         "processed_feature_count": len(annotated),
         "matched_official_ward_count": 76,\n        "source_name_mismatch_count": len(name_mismatches),
-        "match_method": "exact normalized official name match across source property values; no spatial/ordinal guessing",
+        "match_method": "explicit source Ward_No (unique values 1..76) matched to numeric suffix of SEC ward codes; source labels are retained and audited, not used to assign IDs",
         "geometry_validation": "all 76 features parsed as valid Polygon/MultiPolygon by Shapely; no automatic repair",
         "crs": "EPSG:4326 assumed from source coordinates; confirm source CRS metadata before metric calculations",
         "units": "longitude/latitude degrees",
