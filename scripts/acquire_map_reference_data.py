@@ -129,7 +129,7 @@ def acquire(output: Path) -> dict:
                     district_mismatches += 1
             record["invalid_point_count"] = invalid_coordinates
             record["district_filter_mismatch_count"] = district_mismatches
-            record["validation_status"] = "STRUCTURE_CHECKED_SPATIAL_ACCURACY_AND_LICENCE_UNVERIFIED"
+            record["validation_status"] = ("STRUCTURE_CHECKED_WITH_SPATIAL_QA_FLAGS" if invalid_coordinates or district_mismatches else "STRUCTURE_CHECKED_SPATIAL_ACCURACY_AND_LICENCE_UNVERIFIED")
             atomic_write(output / filename, json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8"))
         else:
             if not zipfile.is_zipfile(__import__("io").BytesIO(data)):
