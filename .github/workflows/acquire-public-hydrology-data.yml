@@ -32,7 +32,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install audit dependency
-        run: python -m pip install --disable-pip-version-check pandas
+        run: python -m pip install --disable-pip-version-check pandas rasterio
 
       - name: Test public-data acquisition safeguards
         run: python -m unittest discover -s tests -p 'test_public_data_acquisition.py' -v
@@ -70,6 +70,12 @@ jobs:
         id: map_acquisition
         continue-on-error: true
         run: python scripts/acquire_map_reference_data.py 2>&1 | tee map_acquisition.log
+
+      - name: Inspect raster CRS, bounds, units, NoData and sample values
+        id: raster_audit
+        if: always() && steps.map_acquisition.outcome == 'success'
+        continue-on-error: true
+        run: python scripts/audit_map_reference_raster.py --output data/external/map_reference/raster_metadata_audit.json
 
       - name: Upload raw data, audit and provenance as a short-lived artifact
         if: always()
