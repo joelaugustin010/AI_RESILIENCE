@@ -115,6 +115,7 @@ def acquire(output: Path) -> dict:
                 if batch_payload.get("type") != "FeatureCollection" or not isinstance(batch_payload.get("features"), list):
                     raise RuntimeError("Hospital service batch did not return a GeoJSON FeatureCollection.")
                 all_features.extend(batch_payload["features"])
+            source_feature_count = len(all_features)
             # The original source filter is applied locally and case-insensitively.
             filtered = []
             for feature in all_features:
@@ -148,6 +149,7 @@ def acquire(output: Path) -> dict:
                 if payload.get("type") != "FeatureCollection" or not isinstance(payload.get("features"), list):
                     raise RuntimeError("Hospital service did not return a GeoJSON FeatureCollection.")
                 features = payload["features"]
+                record["source_feature_count"] = source_feature_count
                 record["feature_count"] = len(features)
                 if not features:
                     raise RuntimeError("Hospital query returned zero features; refusing to treat an empty GeoJSON response as a successful data download. Check the source query and field values.")
