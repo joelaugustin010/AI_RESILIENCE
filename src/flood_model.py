@@ -63,6 +63,10 @@ REQUIRED_METADATA = (
     "feature_availability_cutoff",
     "time_zone",
     "prediction_horizon_hours",
+    "feature_source_map",
+    "independent_source_families",
+    "source_crosswalk_status",
+    "observation_alignment_window_hours",
 )
 
 
@@ -235,6 +239,42 @@ def audit_flood_dataset(
             blockers.append("Target labels have not been independently verified.")
         if metadata.get("prediction_horizon_hours") != 24:
             blockers.append("The target must be documented as a 24-hour prediction horizon.")
+
+        # Multi-source condition: each predictor must have traceable provenance,
+        # and a single dataset/source family must not masquerade as an ensemble.
+        source_map = metadata.get("feature_source_map")
+        if not isinstance(source_map, dict):
+            blockers.append("Feature provenance must map every model feature to a source ID.")
+        else:
+            unmapped_features = sorted(set(FEATURE_COLUMNS) - set(source_map))
+            if unmapped_features:
+                blockers.append("Feature provenance is missing: " + ", ".join(unmapped_features) + ".")
+            unmapped_sources = [
+                feature for feature in FEATURE_COLUMNS
+                if feature in source_map and not str(source_map[feature]).strip()
+            ]
+            if unmapped_sources:
+                blockers.append("Feature provenance contains blank source IDs for: " + ", ".join(unmapped_sources) + ".")
+
+        source_families = metadata.get("independent_source_families")
+        if not isinstance(source_families, list):
+            blockers.append("Independent source families must be documented as a list.")
+        else:
+            normalized_families = {
+                str(family).strip().casefold() for family in source_families if str(family).strip()
+            }
+            if len(normalized_families) < 3:
+                blockers.append(
+                    f"Only {len(normalized_families)} independent source families are documented; at least 3 are required."
+                )
+        if metadata.get("source_crosswalk_status") != "independently_verified":
+            blockers.append("The crosswalk linking model features to independent source records is not independently verified.")
+        try:
+            alignment_window = float(metadata.get("observation_alignment_window_hours"))
+        except (TypeError, ValueError):
+            alignment_window = 0.0
+        if not np.isfinite(alignment_window) or alignment_window <= 0 or alignment_window > 24:
+            blockers.append("Observation alignment window must be documented, positive, and no greater than 24 hours.")
 
     for column in LEAKAGE_REVIEW_COLUMNS:
         if column in frame and not metadata.get("feature_availability_cutoff"):
