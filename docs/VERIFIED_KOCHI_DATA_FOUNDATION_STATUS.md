@@ -5,6 +5,30 @@
 
 This report separates verified acquisition/structure checks from scientific and legal validation. A green acquisition workflow means files were retrieved and structural checks passed; it does not certify suitability for exposure analysis or model training.
 
+
+## 9. Multi-source flood evidence fusion (29 October 2026)
+
+A reviewed source inventory is now stored in `data/reference/flood_evidence_sources.json` and consumed by `src/evidence_fusion.py`. It records distinct evidence families rather than treating one raster or one station feed as sufficient:
+
+- KSDMA historical flood-return raster and official Ernakulam district hazard maps (context only until the exact product supports the requested spatial scale and raster semantics are resolved).
+- CWC rainfall observations (raw station-time conflicts, missingness and time alignment must be handled).
+- CWC river observations (gauge datum/reference and station identity must be established before threshold comparisons).
+- EIDC Kerala rainfall depth-duration-frequency estimates (mm, 0.12-degree grid, 1979–2020; catalogue says no licence provided).
+- EIDC Kerala gridded flood-frequency estimates (peak discharge in m³/s on a river-network grid; catalogue says no licence provided; not local inundation depth).
+- IMD forecast/warning products (not yet integrated; issue time, valid time, product and local coverage must be captured).
+- Terrain/drainage/infrastructure evidence (no validated Kochi layer is currently enabled in the model).
+
+The new evidence gate checks registry approval, source-family independence, finite numeric values, units, explicit timezone, age window and verified location/quality flags. Duplicate records or a second record from the same source family do not count as independent corroboration. The gate is deliberately **not a risk score** and never converts missing evidence into zero. A passing multi-source gate would permit only a research review, not an operational prediction.
+
+The current registry marks all sources as unapproved for automated numerical fusion because their unresolved conditions are real. This is a concrete model improvement: it provides a transparent path to adding independently checked sources without falsely implying the existing five-row demonstration dataset is trainable. The source inventory is visible in the Flood Model Readiness page. Tests are in `test_evidence_fusion.py`.
+
+Authoritative catalogue references:
+- KSDMA hazard maps: https://sdma.kerala.gov.in/hazard-maps/
+- EIDC rainfall depth-duration-frequency data: https://catalogue.ceh.ac.uk/documents/4a08e6f1-e508-4bb6-b571-b3145dd1588e
+- EIDC flood-frequency data: https://catalogue.ceh.ac.uk/documents/cba9f9db-4706-4f1e-aaf4-fd7769e00db0
+- IMD official weather portal: https://mausam.imd.gov.in/
+- Bhuvan geospatial portal: https://bhuvan.nrsc.gov.in/
+
 ## 1. Kochi boundary
 
 - The official Delimitation Commission ward-map portal describes the 2024 delimitation process and identifies Information Kerala Mission as technical support: https://wardmap.ksmart.live/
