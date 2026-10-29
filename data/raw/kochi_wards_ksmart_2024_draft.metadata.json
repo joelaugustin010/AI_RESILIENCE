@@ -1,0 +1,20 @@
+{
+  "dataset_id": "kochi_wards_ksmart_2024_draft",
+  "title": "Cochin corporation ward-map JSON linked from Kochi Corporation notification page",
+  "publisher": "Information Kerala Mission / Delimitation Commission portal (as attributed by the official portal)",
+  "source_url": "https://wardmap.ksmart.live/files/Ernakulam_Cochin_01JBBD7151DY27T8X2GJ2ZD40P.json",
+  "source_page": "https://kochicorporation.lsgkerala.gov.in/en/delimitation-commission-kerala-notification/590",
+  "final_url": "https://wardmap.ksmart.live/files/Ernakulam_Cochin_01JBBD7151DY27T8X2GJ2ZD40P.json",
+  "retrieved_at_utc": "2026-10-29T17:16:01.811968+00:00",
+  "content_type": "application/json",
+  "raw_bytes": 1176046,
+  "sha256": "c624dd6142dfe0febae3b0850d316b7f0844a2f685adc8a4cf23f2b940873f52",
+  "feature_count": 76,
+  "source_status": "DRAFT NOTIFICATION label shown on linked map page",
+  "reuse_terms": "Dataset-specific reuse terms not verified; retain attribution and review terms before redistribution.",
+  "limitations": [
+    "Candidate boundary only; the linked map page labels the map DRAFT NOTIFICATION.",
+    "A successful name/geometry audit does not establish legal finality or positional accuracy.",
+    "Not approved as a hazard-exposure mask or legal boundary."
+  ]
+}

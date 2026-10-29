@@ -1,0 +1,57 @@
+{
+  "dataset_id": "kochi_wards_ksmart_2024_draft_candidate",
+  "title": "Kochi 2024 draft ward-map candidate with explicit SEC name/code matches",
+  "source_url": "https://wardmap.ksmart.live/files/Ernakulam_Cochin_01JBBD7151DY27T8X2GJ2ZD40P.json",
+  "source_page": "https://kochicorporation.lsgkerala.gov.in/en/delimitation-commission-kerala-notification/590",
+  "publisher": "Information Kerala Mission / Delimitation Commission portal (as attributed by the official portal)",
+  "retrieved_at_utc": "2026-10-29T17:16:01.811968+00:00",
+  "source_sha256": "c624dd6142dfe0febae3b0850d316b7f0844a2f685adc8a4cf23f2b940873f52",
+  "processed_sha256": "29866a110884f92352c68af74aaccb77d84932187799c639182a37cce4957846",
+  "source_feature_count": 76,
+  "processed_feature_count": 76,
+  "matched_official_ward_count": 76,
+  "source_name_mismatch_count": 12,
+  "match_method": "explicit source Ward_No (unique values 1..76) matched to numeric suffix of SEC ward codes; source labels are retained and audited, not used to assign IDs",
+  "geometry_validation": "all 76 output features are valid Polygon/MultiPolygon geometries; any repairs use make_valid and are itemized below",
+  "geometry_repair_count": 3,
+  "geometry_repairs": [
+    {
+      "ward_number": 24,
+      "source_ward_name": "VADUTHALA WEST",
+      "method": "Shapely make_valid; retained polygonal components only",
+      "source_geometry_type": "Polygon",
+      "repaired_geometry_type": "Polygon",
+      "note": "Raw source geometry is preserved in the raw file; repaired geometry is only in the clearly marked draft candidate copy."
+    },
+    {
+      "ward_number": 22,
+      "source_ward_name": "PACHALAM",
+      "method": "Shapely make_valid; retained polygonal components only",
+      "source_geometry_type": "Polygon",
+      "repaired_geometry_type": "Polygon",
+      "note": "Raw source geometry is preserved in the raw file; repaired geometry is only in the clearly marked draft candidate copy."
+    },
+    {
+      "ward_number": 2,
+      "source_ward_name": "KALVATHY",
+      "method": "Shapely make_valid; retained polygonal components only",
+      "source_geometry_type": "Polygon",
+      "repaired_geometry_type": "MultiPolygon",
+      "note": "Raw source geometry is preserved in the raw file; repaired geometry is only in the clearly marked draft candidate copy."
+    }
+  ],
+  "crs": "EPSG:4326 assumed from source coordinates; confirm source CRS metadata before metric calculations",
+  "units": "longitude/latitude degrees",
+  "layer_role": "context",
+  "evidence_status": "provisional",
+  "status": "candidate_not_integrated",
+  "reuse_terms": "Dataset-specific reuse terms not verified; retain attribution and review terms before redistribution.",
+  "limitations": [
+    "Candidate boundary only; the linked map page labels the map DRAFT NOTIFICATION.",
+    "A successful name/geometry audit does not establish legal finality or positional accuracy.",
+    "Not approved as a hazard-exposure mask or legal boundary.",
+    "CRS assumption is not independently confirmed from a formal metadata record.",
+    "Candidate is not used for production exposure calculations.",
+    "Any geometry repairs are listed in geometry_repairs; repaired geometry is for candidate visualization only."
+  ]
+}

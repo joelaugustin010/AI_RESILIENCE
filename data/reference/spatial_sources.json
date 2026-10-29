@@ -893,6 +893,31 @@
       "feature_count": 76,
       "validation_status": "REFERENCE ONLY — NOT GEOMETRY",
       "evidence_status": "provisional"
+    },
+    {
+      "layer_id": "kochi_wards_ksmart_2024_draft_candidate",
+      "title": "Kochi 2024 draft ward-map candidate with explicit SEC name/code matches",
+      "status": "candidate_not_integrated",
+      "source_url": "https://wardmap.ksmart.live/files/Ernakulam_Cochin_01JBBD7151DY27T8X2GJ2ZD40P.json",
+      "publisher": "Information Kerala Mission / Delimitation Commission portal (as attributed by the official portal)",
+      "retrieved_on": "2026-10-29",
+      "publication_date": "2024-11-18 notification page; linked map itself labelled DRAFT NOTIFICATION",
+      "license": "Dataset-specific reuse terms not verified; retain attribution and review terms before redistribution.",
+      "crs": "EPSG:4326 assumed from source coordinates; confirm source CRS metadata before metric calculations",
+      "units": "longitude/latitude degrees",
+      "geographic_coverage": "Kochi Municipal Corporation; candidate 76-ward map",
+      "limitations": [
+        "Candidate boundary only; the linked map page labels the map DRAFT NOTIFICATION.",
+        "A successful name/geometry audit does not establish legal finality or positional accuracy.",
+        "Not approved as a hazard-exposure mask or legal boundary.",
+        "CRS assumption is not independently confirmed from a formal metadata record.",
+        "Candidate is not used for production exposure calculations.",
+        "Any geometry repairs are listed in geometry_repairs; repaired geometry is for candidate visualization only."
+      ],
+      "local_file": "data/processed/spatial_layers/kochi_wards_ksmart_2024_draft_candidate.geojson",
+      "feature_count": 76,
+      "validation_status": "STRUCTURE AND GEOMETRY CHECKED; LEGAL STATUS NOT APPROVED",
+      "evidence_status": "provisional"
     }
   ],
   "status_definitions_file": "data/reference/data_status_definitions.json"
