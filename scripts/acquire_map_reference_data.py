@@ -84,16 +84,16 @@ SOURCES = {
         ],
     },
     "kochi_corporation_boundary_candidate.geojson": {
-        "url": "https://raw.githubusercontent.com/yashveeeeeeer/india-geodata/main/data/urban/municipal-boundaries/kochi/KCH_Corporation_Boundary.geojson",
-        "publisher": "DataMeet Trust; curated mirror in India Geodata, sourced from Kerala OpenSDI",
-        "source_page": "https://opensdi.kerala.gov.in/layers/opensdi_data:geonode:KSUDP_KCH_Corporation_Boundary",
-        "reuse": "CC BY-SA 2.5 India, as stated in the source repository README; preserve attribution and share-alike terms.",
-        "purpose": "Candidate Kochi Corporation polygon for preliminary point-in-polygon screening of Ernakulam health-facility coordinates.",
+        "url": "https://wardmap.ksmart.live/files/Ernakulam_Cochin_01JBBD7151DY27T8XGJ2J2ZD40P.json",
+        "publisher": "Delimitation Commission, Kerala / Information Kerala Mission (official 18 November 2024 ward-map source)",
+        "source_page": "https://kochicorporation.lsgkerala.gov.in/en/delimitation-commission-kerala-notification/590",
+        "reuse": "No explicit data redistribution licence was established from the source page; retain attribution and verify reuse terms before republishing.",
+        "purpose": "Officially hosted 2024 Cochin Corporation ward-boundary candidate for preliminary point-in-polygon screening.",
         "limitations": [
-            "The source README does not establish that this polygon reflects the current 2024 delimitation; date/currentness remain unverified.",
-            "Kochi Corporation published a 2024 delimitation notification; compare this candidate with the current official ward map before treating it as the authoritative city boundary.",
+            "The linked ward map is described as a draft notification dated 18 November 2024; its current legal status must be checked before calling it the current authoritative boundary.",
+            "The ward file may contain multiple ward polygons; the workflow combines polygon geometry for preliminary screening and preserves the original downloaded source.",
             "Spatial inclusion is preliminary screening only and does not verify facility identity, positional accuracy, or current operating status.",
-            "Do not use this boundary or filtered points for final exposure analysis until the boundary version is confirmed."
+            "Do not use this boundary or filtered points for final exposure analysis until legal status, coordinate reference, topology and coverage are reviewed."
         ],
     },
 }
@@ -157,18 +157,40 @@ def point_in_geometry(point: tuple[float, float], geometry: dict) -> bool:
     return False
 
 
+def boundary_geometry_from_geojson(boundary_payload: dict) -> dict | None:
+    """Combine Polygon/MultiPolygon features without losing holes in ward polygons."""
+    features = (
+        [boundary_payload]
+        if boundary_payload.get("type") == "Feature"
+        else boundary_payload.get("features", [])
+        if boundary_payload.get("type") == "FeatureCollection"
+        else []
+    )
+    polygons = []
+    for feature in features:
+        geometry = (feature or {}).get("geometry") or {}
+        if geometry.get("type") == "Polygon":
+            polygons.append(geometry.get("coordinates") or [])
+        elif geometry.get("type") == "MultiPolygon":
+            polygons.extend(geometry.get("coordinates") or [])
+    if not polygons:
+        return None
+    if len(polygons) == 1:
+        return {"type": "Polygon", "coordinates": polygons[0]}
+    return {"type": "MultiPolygon", "coordinates": polygons}
+
+
 def add_boundary_screening(output: Path, manifest: dict) -> None:
-    """Record preliminary health-facility overlap with the candidate 2022-era city boundary."""
+    """Record preliminary overlap against the official-hosted 2024 ward-map candidate."""
     facility_file = output / "health_facilities_ernakulam.geojson"
     boundary_file = output / "kochi_corporation_boundary_candidate.geojson"
     if not facility_file.exists() or not boundary_file.exists():
         return
     facilities = json.loads(facility_file.read_text(encoding="utf-8"))
     boundary_payload = json.loads(boundary_file.read_text(encoding="utf-8-sig"))
-    boundary_feature = boundary_payload if boundary_payload.get("type") == "Feature" else None
-    if boundary_feature is None:
+    geometry = boundary_geometry_from_geojson(boundary_payload)
+    if geometry is None:
         return
-    geometry = boundary_feature.get("geometry") or {}
     inside = outside = invalid = 0
     for feature in facilities.get("features", []):
         point_geometry = feature.get("geometry") or {}
@@ -191,14 +213,14 @@ def add_boundary_screening(output: Path, manifest: dict) -> None:
         if item.get("filename") == "health_facilities_ernakulam.geojson":
             item["city_boundary_screening"] = {
                 "boundary_file": boundary_file.name,
-                "boundary_source": "DataMeet Trust / Kerala OpenSDI via India Geodata mirror",
-                "boundary_date": "not established by source metadata; ward reference is 2022 and current 2024 delimitation must be checked",
+                "boundary_source": "Delimitation Commission, Kerala / Information Kerala Mission, official-hosted 18 November 2024 ward-map candidate",
+                "boundary_date": "18 November 2024 draft notification; current legal status and final applicability unverified",
                 "candidate_facility_points": len(facilities.get("features", [])),
                 "points_inside_candidate_boundary": inside,
                 "points_outside_candidate_boundary": outside,
                 "invalid_points_for_boundary_test": invalid,
                 "status": "PRELIMINARY_SCREENING_ONLY_NOT_APPROVED",
-                "limitation": "A point outside the 2022-era candidate boundary may be a valid Ernakulam district facility; the boundary is not yet confirmed as the current Kochi Corporation polygon."
+                "limitation": "A point outside this 2024 ward-map candidate may be a valid Ernakulam district facility; the source is labelled draft and current legal status, topology and exact study-area coverage remain unverified."
             }
             break
 
@@ -371,13 +393,30 @@ def acquire(output: Path) -> dict:
                     boundary_payload = json.loads(data.decode("utf-8-sig"))
                 except (UnicodeDecodeError, json.JSONDecodeError) as error:
                     raise RuntimeError(f"Boundary response is not valid GeoJSON: {error}") from error
-                boundary_feature = boundary_payload if boundary_payload.get("type") == "Feature" else None
-                boundary_geometry = (boundary_feature or {}).get("geometry") or {}
-                if boundary_geometry.get("type") not in {"Polygon", "MultiPolygon"}:
-                    raise RuntimeError("Kochi boundary GeoJSON does not contain a Polygon or MultiPolygon feature.")
-                record["geometry_type"] = boundary_geometry.get("type")
-                record["boundary_properties"] = boundary_feature.get("properties") or {}
-                record["validation_status"] = "BOUNDARY_GEOJSON_STRUCTURE_CHECKED_CURRENTNESS_UNVERIFIED"
+                boundary_features = (
+                    [boundary_payload]
+                    if boundary_payload.get("type") == "Feature"
+                    else boundary_payload.get("features", [])
+                    if boundary_payload.get("type") == "FeatureCollection"
+                    else []
+                )
+                polygon_geometries = []
+                for boundary_feature in boundary_features:
+                    boundary_geometry = (boundary_feature or {}).get("geometry") or {}
+                    if boundary_geometry.get("type") == "Polygon":
+                        polygon_geometries.append(boundary_geometry.get("coordinates") or [])
+                    elif boundary_geometry.get("type") == "MultiPolygon":
+                        polygon_geometries.extend(boundary_geometry.get("coordinates") or [])
+                if not polygon_geometries:
+                    raise RuntimeError("Kochi boundary GeoJSON has no Polygon or MultiPolygon features.")
+                record["geometry_type"] = "MultiPolygon" if len(polygon_geometries) > 1 else "Polygon"
+                record["boundary_feature_count"] = len(boundary_features)
+                record["boundary_properties"] = {
+                    "feature_properties_sample": [
+                        (feature.get("properties") or {}) for feature in boundary_features[:5]
+                    ]
+                }
+                record["validation_status"] = "BOUNDARY_GEOJSON_STRUCTURE_CHECKED_LEGAL_STATUS_UNVERIFIED"
                 atomic_write(output / filename, data)
             else:
                 import io
