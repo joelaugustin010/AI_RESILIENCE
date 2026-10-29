@@ -18,6 +18,7 @@ from src.decision_workflow import (
     budget_summary,
     compare_action_combinations,
     evidence_inventory,
+    expand_hazards,
     hazard_evidence_checklist,
     mitigation_actions_for,
     report_html,
@@ -413,7 +414,7 @@ with st.expander("Kochi multi-hazard data acquisition board", expanded=True):
         "not that its files have been downloaded or validated. Restricted or unclear sources are not scraped."
     )
     catalog_records = get_catalog()
-    selected_hazards = set(scientific_frame["hazard_components"])
+    selected_hazards = set(expand_hazards(inputs["hazard"])) | {inputs["hazard"]}
     # Show highest-priority data relevant to the selected hazard while keeping
     # all other disaster sources available for project planning.
     relevant_records = [
