@@ -84,16 +84,21 @@ SOURCES = {
         ],
     },
     "kochi_corporation_boundary_candidate.geojson": {
-        "url": "https://wardmap.ksmart.live/files/Ernakulam_Cochin_01JBBD7151DY27T8XGJ2J2ZD40P.json",
-        "publisher": "Delimitation Commission, Kerala / Information Kerala Mission (official 18 November 2024 ward-map source)",
-        "source_page": "https://kochicorporation.lsgkerala.gov.in/en/delimitation-commission-kerala-notification/590",
-        "reuse": "No explicit data redistribution licence was established from the source page; retain attribution and verify reuse terms before republishing.",
-        "purpose": "Officially hosted 2024 Cochin Corporation ward-boundary candidate for preliminary point-in-polygon screening.",
+        "url": "https://raw.githubusercontent.com/yashveeeeeeer/india-geodata/main/data/urban/municipal-boundaries/kochi/KCH_Corporation_Boundary.geojson",
+        "publisher": "DataMeet Trust; curated mirror in India Geodata, sourced from Kerala OpenSDI",
+        "source_page": "https://opensdi.kerala.gov.in/layers/opensdi_data:geonode:KSUDP_KCH_Corporation_Boundary",
+        "reuse": "CC BY-SA 2.5 India, as stated in the source repository README; preserve attribution and share-alike terms.",
+        "purpose": "Candidate Kochi Corporation polygon for preliminary point-in-polygon screening of Ernakulam health-facility coordinates.",
+        "official_2024_source_attempt": {
+            "url": "https://wardmap.ksmart.live/files/Ernakulam_Cochin_01JBBD7151DY27T8XGJ2J2ZD40P.json",
+            "source_page": "https://kochicorporation.lsgkerala.gov.in/en/delimitation-commission-kerala-notification/590",
+            "observed_result": "HTTP 404 in workflow run 57 on 2026-10-29; retained as a failed source attempt rather than silently accepted."
+        },
         "limitations": [
-            "The linked ward map is described as a draft notification dated 18 November 2024; its current legal status must be checked before calling it the current authoritative boundary.",
-            "The ward file may contain multiple ward polygons; the workflow combines polygon geometry for preliminary screening and preserves the original downloaded source.",
+            "The mirror source does not establish that this polygon reflects the current 2024 delimitation; date/currentness remain unverified.",
+            "The official 2024 ward-map file linked from the delimitation page returned HTTP 404; retry or request an accessible official GIS export before treating any boundary as authoritative.",
             "Spatial inclusion is preliminary screening only and does not verify facility identity, positional accuracy, or current operating status.",
-            "Do not use this boundary or filtered points for final exposure analysis until legal status, coordinate reference, topology and coverage are reviewed."
+            "Do not use this boundary or filtered points for final exposure analysis until the boundary version is confirmed."
         ],
     },
 }
@@ -181,7 +186,7 @@ def boundary_geometry_from_geojson(boundary_payload: dict) -> dict | None:
 
 
 def add_boundary_screening(output: Path, manifest: dict) -> None:
-    """Record preliminary overlap against the official-hosted 2024 ward-map candidate."""
+    """Record preliminary overlap against the fallback Kochi Corporation boundary candidate."""
     facility_file = output / "health_facilities_ernakulam.geojson"
     boundary_file = output / "kochi_corporation_boundary_candidate.geojson"
     if not facility_file.exists() or not boundary_file.exists():
@@ -213,14 +218,14 @@ def add_boundary_screening(output: Path, manifest: dict) -> None:
         if item.get("filename") == "health_facilities_ernakulam.geojson":
             item["city_boundary_screening"] = {
                 "boundary_file": boundary_file.name,
-                "boundary_source": "Delimitation Commission, Kerala / Information Kerala Mission, official-hosted 18 November 2024 ward-map candidate",
-                "boundary_date": "18 November 2024 draft notification; current legal status and final applicability unverified",
+                "boundary_source": "DataMeet Trust / Kerala OpenSDI via India Geodata mirror",
+                "boundary_date": "not established by source metadata; current 2024 delimitation alignment unverified",
                 "candidate_facility_points": len(facilities.get("features", [])),
                 "points_inside_candidate_boundary": inside,
                 "points_outside_candidate_boundary": outside,
                 "invalid_points_for_boundary_test": invalid,
                 "status": "PRELIMINARY_SCREENING_ONLY_NOT_APPROVED",
-                "limitation": "A point outside this 2024 ward-map candidate may be a valid Ernakulam district facility; the source is labelled draft and current legal status, topology and exact study-area coverage remain unverified."
+                "limitation": "A point outside the candidate boundary may be a valid Ernakulam district facility; the mirror boundary is not verified against the current official 2024 delimitation."
             }
             break
 
