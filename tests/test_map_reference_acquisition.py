@@ -44,7 +44,7 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
             "type": "FeatureCollection",
             "features": [{
                 "type": "Feature",
-                "properties": {"state_name": "Kerala", "district_name": "Ernakulam"},
+                "properties": {"state_name": "Kerala", "district_name": "Ernakulam", "health_facility_name": "Test Hospital"},
                 "geometry": {"type": "Point", "coordinates": [76.3, 9.9]},
             }],
         }
@@ -72,7 +72,7 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
         hospitals = {
             "type": "FeatureCollection",
             "features": [{
-                "type": "Feature", "properties": {"state_name": "Kerala", "district_name": "Ernakulam"},
+                "type": "Feature", "properties": {"state_name": "Kerala", "district_name": "Ernakulam", "health_facility_name": "Test Hospital"},
                 "geometry": {"type": "Point", "coordinates": [76.3, 9.9]},
             }],
         }
@@ -90,7 +90,7 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
             "type": "FeatureCollection",
             "features": [{
                 "type": "Feature",
-                "properties": {"state_name": "Kerala", "district_name": "Ernakulam"},
+                "properties": {"state_name": "Kerala", "district_name": "Ernakulam", "health_facility_name": "Test Hospital"},
                 "geometry": {"type": "Point", "coordinates": [76.3, 9.9]},
             }],
         }
@@ -131,6 +131,8 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
         record = manifest["files"][0]
         self.assertEqual(record["invalid_point_count"], 1)
         self.assertEqual(record["district_filter_mismatch_count"], 1)
+        self.assertEqual(record["outside_kerala_screening_box_count"], 1)
+        self.assertEqual(record["missing_facility_name_count"], 1)
         self.assertEqual(record["validation_status"], "STRUCTURE_CHECKED_WITH_SPATIAL_QA_FLAGS")
         self.assertEqual(manifest["overall_status"], "RAW_CANDIDATES_NOT_APPROVED_FOR_MAP")
 
