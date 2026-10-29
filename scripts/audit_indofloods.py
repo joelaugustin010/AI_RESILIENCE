@@ -105,7 +105,8 @@ def build_report(input_dir: Path) -> dict[str, Any]:
         "kerala_gauge_ids": [],
         "event_rows_for_kerala_gauges": None,
         "event_ids_missing_from_precipitation_table": None,
-        "event_ids_missing_from_catchment_table": None,
+        "event_gauges_missing_from_metadata": None,
+        "event_gauges_missing_from_catchment_table": None,
     }
     if "metadata" in tables:
         metadata = tables["metadata"]
@@ -135,15 +136,17 @@ def build_report(input_dir: Path) -> dict[str, Any]:
                 event_gauges = set(event_ids.dropna().astype(str))
                 crosswalk["event_rows_for_kerala_gauges"] = int(event_ids.isin(gauge_ids).sum())
                 crosswalk["kerala_gauges_with_at_least_one_event"] = sorted(event_gauges.intersection(gauge_ids))
+                metadata_gauges = set(metadata["GaugeID"].dropna().astype(str))
+                crosswalk["event_gauges_missing_from_metadata"] = sorted(event_gauges - metadata_gauges)
                 if "precipitation" in tables and "EventID" in tables["precipitation"] and "EventID" in tables["events"]:
                     events = set(tables["events"]["EventID"].dropna().astype(str))
                     precip = set(tables["precipitation"]["EventID"].dropna().astype(str))
                     crosswalk["event_ids_missing_from_precipitation_table"] = len(events - precip)
                 if "catchment" in tables and "GaugeID" in tables["catchment"]:
-                    meta_gauges = set(metadata["GaugeID"].dropna().astype(str))
                     catchment_gauges = set(tables["catchment"]["GaugeID"].dropna().astype(str))
-                    crosswalk["metadata_gauges_missing_from_catchment_table"] = len(meta_gauges - catchment_gauges)
-                    crosswalk["catchment_gauges_missing_from_metadata"] = len(catchment_gauges - meta_gauges)
+                    crosswalk["metadata_gauges_missing_from_catchment_table"] = len(metadata_gauges - catchment_gauges)
+                    crosswalk["catchment_gauges_missing_from_metadata"] = len(catchment_gauges - metadata_gauges)
+                    crosswalk["event_gauges_missing_from_catchment_table"] = sorted(event_gauges - catchment_gauges)
 
     return {
         "report_version": 1,
