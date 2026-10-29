@@ -45,6 +45,17 @@ External raw datasets are stored in a short-lived private GitHub Actions artifac
 | Infrastructure failure | Asset condition, loading, failure history and network topology | Verified networks, redundancy, demand and backup duration | Time-stamped outages/closures and restoration |
 | Compound hazards | Time-aligned inputs for each component and explicit dependence/coupling assumptions | Shared assets and cascading dependencies | Joint event/impact records; separate single-hazard histories do not establish joint probability |
 
+## Heatwave output: current screening versus a validated forecast
+
+For Kochi, the interface now provides a transparent **coastal-station criteria screen** alongside the general consequence output. It uses the user's supplied maximum temperature and official station normal to calculate the temperature departure; it does not infer missing values.
+
+- Screening condition: maximum temperature **at least 37°C** and departure from normal **greater than 4.5°C** for a coastal station, following the IMD criterion published in its forecast bulletins.
+- The separate subdivision-level declaration check requires verifying that criteria are met at **at least two stations for at least two consecutive days**. User-entered counts are not independently verified, and the app does not declare an official heatwave or issue an alert.
+- The interface identifies consequence categories to investigate: heat exposure, hot nights and limited overnight recovery, vulnerable groups, outdoor workers, and health/service strain.
+- It does **not** calculate health outcomes, affected wards, an occurrence probability, or a calibrated forecast from temperature alone.
+
+Official criteria reference: [India Meteorological Department forecast bulletin definition/criteria](https://internal.imd.gov.in/press_release/20241118_pr_3409.pdf). A future heatwave prediction model still needs timestamped official station observations/forecasts, station normals and metadata, humidity/heat-stress measures where available, duration, spatial exposure, independent impact labels, and time-separated calibration/validation against a simple baseline.
+
 ## Release gates before numerical consequence estimates
 
 - Source terms, attribution, retrieval date, checksum, units, time zone, CRS/datum, temporal/spatial coverage and limitations are recorded.
