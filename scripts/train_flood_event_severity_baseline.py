@@ -51,7 +51,7 @@ def load_training_table(raw_dir: Path) -> pd.DataFrame:
 
     # Event IDs encode the same gauge identifier used in the other tables.
     events["GaugeID"] = events["EventID"].astype(str).str.extract(
-        r"(INDOFLOODS-gauge-\\d+)-"
+        r"(INDOFLOODS-gauge-\d+)-"
     )
     if events["GaugeID"].isna().any():
         raise ValueError("Some flood event IDs do not contain a recognized gauge ID.")
