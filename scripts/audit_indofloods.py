@@ -58,6 +58,12 @@ def summarize_table(path: Path, table_id: str) -> dict[str, Any]:
         ids = frame["GaugeID"].astype("string").str.strip()
         report["gauge_id_missing"] = int(ids.isna().sum() + ids.eq("").sum())
         report["unique_gauge_ids"] = int(ids.nunique(dropna=True))
+    if "Privacy" in frame.columns:
+        privacy = frame["Privacy"].astype("string").str.strip().str.casefold()
+        report["source_privacy_counts"] = {
+            str(label): int(count)
+            for label, count in privacy.fillna("<missing>").value_counts().items()
+        }
     if "EventID" in frame.columns:
         ids = frame["EventID"].astype("string").str.strip()
         report["event_id_missing"] = int(ids.isna().sum() + ids.eq("").sum())
@@ -116,6 +122,7 @@ def build_report(input_dir: Path) -> dict[str, Any]:
         "event_ids_missing_from_precipitation_table": None,
         "event_gauges_missing_from_metadata": None,
         "event_gauges_missing_from_catchment_table": None,
+        "kerala_gauge_privacy_counts": None,
     }
     if "metadata" in tables:
         metadata = tables["metadata"]
@@ -126,6 +133,14 @@ def build_report(input_dir: Path) -> dict[str, Any]:
             gauge_ids = sorted(kerala["GaugeID"].dropna().astype(str).str.strip().unique().tolist())
             crosswalk["kerala_gauge_count"] = len(gauge_ids)
             crosswalk["kerala_gauge_ids"] = gauge_ids
+            if "Privacy" in kerala.columns:
+                privacy = kerala["Privacy"].astype("string").str.strip().str.casefold()
+                crosswalk["kerala_gauge_privacy_counts"] = {
+                    str(label): int(count)
+                    for label, count in privacy.fillna("<missing>").value_counts().items()
+                }
+            else:
+                crosswalk["kerala_gauge_privacy_counts"] = {"<privacy_column_missing>": len(kerala)}
             crosswalk["kerala_station_names"] = (
                 sorted(kerala["Station"].dropna().astype(str).str.strip().unique().tolist())
                 if "Station" in kerala.columns else []
