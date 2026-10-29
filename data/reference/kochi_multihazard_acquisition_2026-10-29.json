@@ -118,10 +118,61 @@
         "precipitation_variables_indofloods.csv": "a2615f03e0e71591e336a242c329429f92415ff96e7aea5a75b2ee6fe1ab60b8"
       },
       "limitations": [
-        "Only records whose Privacy field permits use may be used in shareable derived products.",
-        "A few Periyar-area gauge candidates exist in Kerala, but no station crosswalk to local telemetry has been verified.",
-        "Event records alone lack a defensible non-event sample and must not be used directly as a calibrated flood probability model.",
-        "Event-scale precipitation features may include post-event information and require leakage checks."
+        "All 26 Kerala gauge metadata records are marked Privacy=Open in the acquired source; do not generalize this to the other 188 gauges, 59 of which are Restricted.",
+        "Candidate Periyar/Muvattupuzha gauges have historical event records, but their identities and coordinates have not been crosswalked to Kerala Surface Water/NWDP stations.",
+        "The INDOFLOODS event records end in 2020, while the newly acquired Kerala Surface Water telemetry begins in 2021; these datasets do not directly overlap in time.",
+        "A defensible flood probability model still needs event/no-event windows, verified gauge-specific thresholds, matched rainfall windows, missingness controls and leakage-free validation.",
+        "District/event mentions do not establish ward-level or station-hour flood outcomes."
+      ],
+      "kerala_event_rows": 531,
+      "kerala_gauges_with_events": 26,
+      "kerala_privacy_screen": "All 26 Kerala gauge records in this metadata join have Privacy=Open; other states contain restricted gauge records that must not be used in shareable derivatives.",
+      "candidate_periyar_and_muvattupuzha_gauges": [
+        {
+          "gauge_id": "INDOFLOODS-gauge-420",
+          "station": "Neeleeswaram",
+          "river": "Periyar",
+          "latitude": 10.1833,
+          "longitude": 76.5,
+          "events": 13,
+          "privacy": "Open"
+        },
+        {
+          "gauge_id": "INDOFLOODS-gauge-430",
+          "station": "Arangali",
+          "river": "Periyar/Chalakudy",
+          "latitude": 10.2814,
+          "longitude": 76.3153,
+          "events": 4,
+          "privacy": "Open"
+        },
+        {
+          "gauge_id": "INDOFLOODS-gauge-411",
+          "station": "Ramamangalam",
+          "river": "Muvattupuzha",
+          "latitude": 9.845,
+          "longitude": 76.4667,
+          "events": 4,
+          "privacy": "Open"
+        },
+        {
+          "gauge_id": "INDOFLOODS-gauge-412",
+          "station": "Kalampur",
+          "river": "Muvattupuzha (source field truncated)",
+          "latitude": 9.9906,
+          "longitude": 76.6322,
+          "events": 25,
+          "privacy": "Open"
+        },
+        {
+          "gauge_id": "INDOFLOODS-gauge-445",
+          "station": "Pallippady",
+          "river": "Kothamangalam",
+          "latitude": 10.04,
+          "longitude": 76.62,
+          "events": 1,
+          "privacy": "Open"
+        }
       ]
     },
     {
