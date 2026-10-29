@@ -294,8 +294,10 @@ with st.expander("Longer-term AI RESILIENCE roadmap"):
 _render_hydrology_explorer()
 
 st.header("1. Select a hazard and describe conditions")
+# Keep the hazard selector outside the form so Streamlit reruns immediately when
+# the user changes hazards; the visible inputs then update before submission.
+hazard = st.selectbox("Hazard or compound scenario", HAZARD_OPTIONS, key="wf_hazard")
 with st.form("decision_workflow_intake"):
-    hazard = st.selectbox("Hazard or compound scenario", HAZARD_OPTIONS, key="wf_hazard")
     location = st.text_input(
         "Location or area name",
         value="Kochi Municipal Corporation — area not specified",
@@ -313,23 +315,107 @@ with st.form("decision_workflow_intake"):
         help="Example: source name, timestamp, timezone, station, and averaging period. This app does not verify them.",
     )
 
-    st.caption("All numeric fields are optional. Empty means not supplied; the app does not fill in values.")
+    # Show only fields relevant to the selected hazard. Keep hidden fields explicitly
+    # unset so stale values from a previous selection cannot influence this assessment.
+    show_rainfall = hazard in {
+        "Flood", "Cyclone", "Landslide", "Drought",
+        "Compound: cyclone + flood",
+        "Compound: heavy rainfall + drainage failure",
+    }
+    show_river = hazard in {"Flood", "Compound: cyclone + flood"}
+    show_wind = hazard in {"Cyclone", "Compound: cyclone + flood"}
+    show_temperature = hazard == "Heatwave"
+    show_drainage = hazard in {
+        "Flood", "Compound: cyclone + flood",
+        "Compound: heavy rainfall + drainage failure",
+    }
+    show_earthquake = hazard == "Earthquake"
+    show_landslide = hazard == "Landslide"
+    show_drought = hazard == "Drought"
+    show_industrial = hazard == "Industrial incident"
+    show_infrastructure = hazard == "Infrastructure failure"
+    show_population = hazard in {
+        "Flood", "Cyclone", "Earthquake", "Landslide", "Heatwave",
+        "Drought", "Industrial incident", "Infrastructure failure",
+        "Compound: cyclone + flood",
+        "Compound: heavy rainfall + drainage failure",
+    }
+
+    # Hazard-specific inputs are optional context, not validated model inputs.
+    earthquake_magnitude = None
+    earthquake_depth_km = None
+    slope_condition = "Not supplied"
+    soil_condition = "Not supplied"
+    drought_indicator = "Not supplied"
+    water_supply_status = "Not supplied"
+    industrial_substance = ""
+    industrial_release_status = "Not supplied"
+    industrial_wind_direction = ""
+    failed_asset_type = "Not supplied"
+    failure_status = "Not supplied"
+
+    rainfall_mm = None
+    rainfall_period = "Not supplied"
+    river_level_m = None
+    river_station = ""
+    river_reference = ""
+    wind_speed_kmh = None
+    temperature_c = None
+    normal_max_temperature_c = None
+    heatwave_consecutive_days = None
+    heatwave_station_count = None
+    affected_population = None
+    drainage_status = "Not supplied"
+    infrastructure_status = "Not supplied"
+
+    st.caption("Only fields relevant to the selected hazard are shown. Empty means not supplied; the app does not fill in values.")
     col1, col2 = st.columns(2)
     with col1:
-        rainfall_mm = st.number_input("Rainfall (mm)", min_value=0.0, value=None, step=1.0, key="wf_rainfall")
-        rainfall_period = st.selectbox("Rainfall period", ["Not supplied", "Last 1 hour", "Last 24 hours", "Last 3 days", "Other / state in notes"], key="wf_rainfall_period")
-        river_level_m = st.number_input("River-level reading (m)", value=None, step=0.1, key="wf_river", help="Gauge readings can be below zero depending on the reference datum. The app does not compare this with a threshold.")
-        river_station = st.text_input("River station (if applicable)", key="wf_river_station")
-        river_reference = st.text_input("Gauge zero / datum reference (if known)", key="wf_river_reference")
+        if show_rainfall:
+            st.markdown("**Rainfall evidence**")
+            rainfall_mm = st.number_input("Rainfall (mm)", min_value=0.0, value=None, step=1.0, key="wf_rainfall")
+            rainfall_period = st.selectbox("Rainfall period", ["Not supplied", "Last 1 hour", "Last 24 hours", "Last 3 days", "Other / state in notes"], key="wf_rainfall_period")
+        if show_river:
+            st.markdown("**River evidence**")
+            river_level_m = st.number_input("River-level reading (m)", value=None, step=0.1, key="wf_river", help="Gauge readings can be below zero depending on the reference datum. The app does not compare this with a threshold.")
+            river_station = st.text_input("River station (if applicable)", key="wf_river_station")
+            river_reference = st.text_input("Gauge zero / datum reference (if known)", key="wf_river_reference")
+        if show_wind:
+            wind_speed_kmh = st.number_input("Wind speed (km/h)", min_value=0.0, value=None, step=1.0, key="wf_wind")
+        if show_drainage:
+            drainage_status = st.selectbox("Drainage condition", ["Not supplied", "Reported functioning", "Reported partially impaired", "Reported failed", "Hypothetical partial failure", "Not applicable"], key="wf_drainage")
+        if show_landslide:
+            st.markdown("**Slope and ground evidence**")
+            slope_condition = st.selectbox("Slope condition", ["Not supplied", "Stable / no movement reported", "Cracks or movement reported", "Recent slope failure reported", "Unknown"], key="wf_slope")
+            soil_condition = st.selectbox("Ground / soil condition", ["Not supplied", "Dry", "Saturated / waterlogged", "Loose / disturbed", "Unknown"], key="wf_soil")
+        if show_drought:
+            st.markdown("**Drought and water-supply evidence**")
+            drought_indicator = st.selectbox("Drought indicator", ["Not supplied", "SPI", "SPEI", "Standardised soil-moisture index", "Official drought category", "Other / specify in notes"], key="wf_drought_indicator")
+            water_supply_status = st.selectbox("Water supply status", ["Not supplied", "Normal", "Restricted", "Severely disrupted", "Unknown"], key="wf_water_supply")
+        if show_earthquake:
+            st.markdown("**Earthquake evidence**")
+            earthquake_magnitude = st.number_input("Reported magnitude (Mw; if sourced)", min_value=0.0, max_value=10.0, value=None, step=0.1, key="wf_eq_magnitude")
+            earthquake_depth_km = st.number_input("Reported focal depth (km; if sourced)", min_value=0.0, max_value=800.0, value=None, step=1.0, key="wf_eq_depth")
+        if show_industrial:
+            st.markdown("**Industrial incident evidence**")
+            industrial_substance = st.text_input("Substance or material involved (if known)", key="wf_industrial_substance")
+            industrial_release_status = st.selectbox("Release / incident status", ["Not supplied", "Suspected", "Reported by user", "Confirmed by cited authority", "No release reported", "Unknown"], key="wf_industrial_status")
+            industrial_wind_direction = st.text_input("Wind direction / weather context (if known)", key="wf_industrial_wind")
+        if show_infrastructure:
+            st.markdown("**Infrastructure failure evidence**")
+            failed_asset_type = st.selectbox("Asset type", ["Not supplied", "Road / bridge", "Electricity", "Drinking water", "Communications", "Drainage", "Building", "Other"], key="wf_failed_asset")
+            failure_status = st.selectbox("Failure status", ["Not supplied", "Suspected", "Reported by user", "Confirmed by cited authority", "Hypothetical", "Unknown"], key="wf_failure_status")
+        if hazard in {"Flood", "Cyclone", "Earthquake", "Infrastructure failure", "Compound: cyclone + flood", "Compound: heavy rainfall + drainage failure"}:
+            infrastructure_status = st.selectbox("Other infrastructure condition", ["Not supplied", "No disruption reported", "Possible / hypothetical disruption", "Disruption reported by user", "Not applicable"], key="wf_infrastructure")
     with col2:
-        wind_speed_kmh = st.number_input("Wind speed (km/h)", min_value=0.0, value=None, step=1.0, key="wf_wind")
-        temperature_c = st.number_input("Maximum temperature (°C)", value=None, step=0.5, key="wf_temperature")
-        normal_max_temperature_c = st.number_input("Normal daily maximum for this station (°C; heatwave screening)", value=None, step=0.5, key="wf_normal_temperature", help="Use an official station normal for the relevant date/period; leave blank if unknown.")
-        heatwave_consecutive_days = st.number_input("Consecutive days meeting the heatwave criteria (if verified)", min_value=0, value=None, step=1, key="wf_heatwave_days")
-        heatwave_station_count = st.number_input("Stations in the meteorological subdivision meeting criteria (if verified)", min_value=0, value=None, step=1, key="wf_heatwave_stations")
-        affected_population = st.number_input("Affected population context (people; optional)", min_value=0, value=None, step=1, key="wf_population")
-        drainage_status = st.selectbox("Drainage condition", ["Not supplied", "Reported functioning", "Reported partially impaired", "Reported failed", "Hypothetical partial failure", "Not applicable"], key="wf_drainage")
-        infrastructure_status = st.selectbox("Other infrastructure condition", ["Not supplied", "No disruption reported", "Possible / hypothetical disruption", "Disruption reported by user", "Not applicable"], key="wf_infrastructure")
+        if show_temperature:
+            st.markdown("**Heatwave evidence**")
+            temperature_c = st.number_input("Maximum temperature (°C)", value=None, step=0.5, key="wf_temperature")
+            normal_max_temperature_c = st.number_input("Normal daily maximum for this station (°C; heatwave screening)", value=None, step=0.5, key="wf_normal_temperature", help="Use an official station normal for the relevant date/period; leave blank if unknown.")
+            heatwave_consecutive_days = st.number_input("Consecutive days meeting the heatwave criteria (if verified)", min_value=0, value=None, step=1, key="wf_heatwave_days")
+            heatwave_station_count = st.number_input("Stations in the meteorological subdivision meeting criteria (if verified)", min_value=0, value=None, step=1, key="wf_heatwave_stations")
+        if show_population:
+            affected_population = st.number_input("Affected population context (people; optional)", min_value=0, value=None, step=1, key="wf_population")
 
     assets = st.multiselect(
         "Services or assets to review (user-nominated; location/exposure not verified)",
@@ -356,6 +442,17 @@ if submitted:
         "normal_max_temperature_c": normal_max_temperature_c,
         "heatwave_consecutive_days": heatwave_consecutive_days,
         "heatwave_station_count": heatwave_station_count,
+        "earthquake_magnitude": earthquake_magnitude,
+        "earthquake_depth_km": earthquake_depth_km,
+        "slope_condition": slope_condition,
+        "soil_condition": soil_condition,
+        "drought_indicator": drought_indicator,
+        "water_supply_status": water_supply_status,
+        "industrial_substance": industrial_substance,
+        "industrial_release_status": industrial_release_status,
+        "industrial_wind_direction": industrial_wind_direction,
+        "failed_asset_type": failed_asset_type,
+        "failure_status": failure_status,
         "affected_population": affected_population,
         "drainage_status": drainage_status,
         "infrastructure_status": infrastructure_status,
