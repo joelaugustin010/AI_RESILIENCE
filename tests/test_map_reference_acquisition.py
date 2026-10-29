@@ -125,7 +125,7 @@ class MapReferenceAcquisitionTests(unittest.TestCase):
                 },
                 {
                     "type": "Feature",
-                    "properties": {"state_name": "Tamil Nadu", "district_name": "Other", "health_facility_name": "Out-of-area test"},
+                    "properties": {"state_name": "Kerala", "district_name": "Ernakulam", "health_facility_name": "Out-of-area test"},
                     "geometry": {"type": "Point", "coordinates": [99, 9.9]},
                 },
             ],
