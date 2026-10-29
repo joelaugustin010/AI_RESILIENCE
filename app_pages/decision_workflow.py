@@ -14,6 +14,7 @@ from src.decision_workflow import (
     budget_summary,
     compare_action_combinations,
     evidence_inventory,
+    hazard_evidence_checklist,
     mitigation_actions_for,
     report_html,
     report_rows,
@@ -371,6 +372,18 @@ evidence = evidence_inventory(ROOT, st.session_state.get("rainfall_backtest_resu
 st.caption("The separate historical benchmark uses only the manual rainfall observations. Its results do not enter this qualitative assessment; conflicted CWC rainfall, unverified sample rows, and unresolved river levels remain excluded from model calculations.")
 st.dataframe(evidence, hide_index=True, width="stretch")
 
+st.subheader("Evidence readiness checklist for this hazard")
+st.caption(
+    "This checklist identifies evidence needed before stronger conclusions are justified. "
+    "A file/path being present does not prove its contents are suitable, current, licensed for reuse, or independently verified."
+)
+evidence_checklist = hazard_evidence_checklist(inputs, ROOT)
+st.dataframe(evidence_checklist, hide_index=True, width="stretch")
+st.info(
+    "Readiness status is descriptive, not a numerical risk score. Items marked not connected or unverified "
+    "must not be treated as evidence that the hazard or exposure is absent."
+)
+
 st.header("3. Assessment status")
 assessment = assessment_summary(inputs)
 st.error(assessment["status"], icon=":material/priority_high:")
@@ -432,7 +445,7 @@ st.dataframe(combinations, hide_index=True, width="stretch")
 st.caption("A combination is shown because you selected its actions. Affordability is cost arithmetic only; priority numbers are supplied by you.")
 
 st.header("7. Generate a report")
-report = report_rows(inputs, evidence, scenarios, actions, budget, combinations, ROOT)
+report = report_rows(inputs, evidence, scenarios, actions, budget, combinations, ROOT, evidence_checklist=evidence_checklist)
 report_slug = slug or "scenario"
 csv_bytes = report.to_csv(index=False).encode("utf-8-sig")
 html_bytes = report_html(report).encode("utf-8")

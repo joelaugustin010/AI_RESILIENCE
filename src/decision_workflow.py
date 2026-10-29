@@ -388,6 +388,88 @@ def evidence_inventory(
     return pd.DataFrame(rows)
 
 
+def hazard_evidence_checklist(inputs: dict[str, Any], project_root: Path) -> pd.DataFrame:
+    """Explain the evidence needed for the selected hazard without calculating a risk score.
+
+    Status labels are conservative: file presence alone never establishes scientific
+    suitability, local coverage, legal reuse, or independent verification.
+    """
+    hazard = str(inputs.get("hazard", ""))
+    if hazard == "Compound: cyclone + flood":
+        components = ["Flood", "Cyclone"]
+    elif hazard == "Compound: heavy rainfall + drainage failure":
+        components = ["Flood", "Infrastructure failure"]
+    else:
+        components = [hazard]
+
+    evidence_needs = {
+        "Flood": [
+            ("Time-matched rainfall and river/coastal observations", "data/raw/kerala.csv", "Raw rainfall file is present, but 324 station-time groups have conflicting values; telemetry datum and time zone require confirmation.", "Keep raw rows; reconcile against provider documentation and use verified local observations with timestamps and units."),
+            ("Local flood-hazard/depth evidence with permitted reuse", "data/raw/jrc_flood_depth", "JRC 100-year river-flood tiles are reviewed as modeled hazard data, but preview/use is withheld pending licence clarification.", "Resolve licence statements, inspect raster semantics and study-area overlap, then validate before analysis."),
+            ("Verified drainage, terrain and catchment context", "data/processed/spatial_layers", "No independently validated local drainage/terrain evidence is established by the current workflow.", "Acquire authoritative layers with provenance, CRS, units, coverage and licence; validate geometry and completeness."),
+            ("Verified exposed assets and safe access routes", "data/processed/spatial_layers", "Hospital and critical-facility locations/exposure are not independently validated; the ward boundary is provisional.", "Verify facility identities and coordinates and suitable road layers before any asset-level exposure claim."),
+        ],
+        "Cyclone": [
+            ("Current official cyclone/wind/rainfall bulletin", None, "No live official warning feed is connected to this assessment.", "Check the latest IMD bulletin and local authority instructions outside this prototype; record issue time and validity."),
+            ("Local wind, coastal-water and rainfall context", None, "User-entered values are not verified by the app and no local impact model is validated.", "Record station/source, observation or forecast time, units, averaging period and location."),
+            ("Verified shelters, access and critical-service continuity", None, "Shelter, road and service availability is not verified by this workflow.", "Use current authority-maintained inventories and verify capacity, accessibility and backup arrangements."),
+        ],
+        "Earthquake": [
+            ("Authoritative seismic context and site conditions", None, "No site-specific seismic or geotechnical assessment is connected.", "Use authoritative hazard sources and qualified engineering review for site-specific decisions."),
+            ("Verified building inventory and structural assessments", None, "The app cannot certify building safety or estimate building damage.", "Obtain qualified inspection records and verified building attributes."),
+            ("Critical-service continuity and safe access", None, "Facility backup duration and route availability are not verified.", "Confirm utility dependencies, emergency plans, backup capacity and alternate access."),
+        ],
+        "Landslide": [
+            ("Authoritative local landslide/slope and geology evidence", None, "No verified site-specific slope or geotechnical layer is established here.", "Acquire authoritative hazard layers and seek qualified geotechnical review."),
+            ("Time-matched rainfall and field observations", "data/raw/kerala.csv", "Rainfall observations contain conflicting station-time groups and are not independently reconciled.", "Resolve data-quality issues and confirm local station coverage, units and timing."),
+            ("Verified roads, settlements and response access", None, "Local exposure and access are not verified by this workflow.", "Validate authoritative asset and transport layers before identifying exposed places."),
+        ],
+        "Heatwave": [
+            ("Current official heat/weather bulletin", None, "No live official warning feed is connected.", "Check current IMD and local health-authority information and record issue time."),
+            ("Local temperature, humidity and health vulnerability evidence", None, "No validated local heat-exposure or health-outcome dataset is linked to this assessment.", "Use quality-controlled observations and approved health-planning data with clear units and coverage."),
+            ("Cooling, water and healthcare service capacity", None, "Service availability and backup duration are not verified.", "Confirm current facility inventories, operating status and continuity plans."),
+        ],
+        "Drought": [
+            ("Time-series rainfall and water-supply/reservoir evidence", "data/raw/rainfall_manual_hr_kerala-sw_kl_1991_2020.csv", "The local manual rainfall series covers 2000–2014 despite the filename label; it is historical and not a current supply indicator.", "Use current, authoritative rainfall and water-resource observations with documented temporal coverage."),
+            ("Local demand, supply and operational thresholds", None, "No verified local demand/supply balance or official trigger thresholds are connected.", "Obtain provider data and use approved local response plans."),
+            ("Essential-service water continuity", None, "Facility storage and replenishment capacity are not verified.", "Verify service-specific storage, demand, backup duration and replenishment plans."),
+        ],
+        "Industrial incident": [
+            ("Verified facility identity, hazard inventory and emissions/incident records", "data/raw/industrial", "Facility records in the current evidence inventory are incomplete or unverified; no source attribution is established.", "Use regulator/operator records with dates, facility identifiers, provenance and licence."),
+            ("Pollutant-specific monitoring and meteorology", "data/raw/air_pollution_data.csv", "Five sample rows have undocumented provenance; AQI alone cannot identify a source.", "Use quality-controlled station measurements, pollutant, units, averaging period, time and meteorology."),
+            ("Official response protocols and responsible contacts", None, "Facility-specific emergency procedures are not verified here.", "Use current regulator/operator emergency plans and official response channels."),
+        ],
+        "Infrastructure failure": [
+            ("Verified asset inventory and condition/maintenance records", None, "No validated, complete local infrastructure inventory is established by this workflow.", "Acquire authoritative asset registers and inspection/maintenance records."),
+            ("Service dependencies and backup capacity", None, "Power, water, communications and access dependencies are not mapped or verified.", "Confirm dependency links, responsible operators, backup duration and alternate routes."),
+            ("Failure history and response procedures", None, "No validated local failure/repair time series is linked.", "Use dated operator records and approved continuity plans."),
+        ],
+    }
+    rows: list[dict[str, str]] = []
+    for component in components:
+        needs = evidence_needs.get(component, [
+            ("Hazard-specific authoritative observations and validated method", None, "No hazard-specific evidence requirements are configured for this selection.", "Consult the responsible authority and document a reviewable method before quantifying risk.")
+        ])
+        for required, relative_path, limitation, next_step in needs:
+            if relative_path is None:
+                availability = "Not connected / not verified"
+            else:
+                path = project_root / relative_path
+                exists = path.exists()
+                availability = "File/path present; suitability unverified" if exists else "Not present at expected path"
+            rows.append({
+                "Hazard component": component,
+                "Evidence needed": required,
+                "Workspace check": availability,
+                "Known limitation": limitation,
+                "Next verification step": next_step,
+            })
+    return pd.DataFrame(rows, columns=[
+        "Hazard component", "Evidence needed", "Workspace check",
+        "Known limitation", "Next verification step"
+    ])
+
+
 def assessment_summary(inputs: dict[str, Any]) -> dict[str, str]:
     """Return a qualified non-numeric status; no unsupported estimates are generated."""
     hazards = expand_hazards(str(inputs.get("hazard", "")))
@@ -409,6 +491,7 @@ def report_rows(
     budget: Any,
     combinations: pd.DataFrame,
     project_root: Path,
+    evidence_checklist: pd.DataFrame | None = None,
 ) -> pd.DataFrame:
     """Build a flat, exportable report that records actual inputs and calculations."""
     rows: list[dict[str, str]] = []
@@ -426,6 +509,9 @@ def report_rows(
         add("Assessment", key, value)
     for _, row in evidence.iterrows():
         add("Evidence", str(row["Dataset / file"]), {k: row[k] for k in evidence.columns if k != "Dataset / file"})
+    if evidence_checklist is not None:
+        for index, row in evidence_checklist.iterrows():
+            add("Evidence readiness checklist", f"Requirement {index + 1}", row.to_dict())
     for _, row in scenarios.iterrows():
         add("Scenario comparison", str(row["Scenario"]), row.to_dict())
     for index, row in actions.iterrows():
