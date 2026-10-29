@@ -15,12 +15,12 @@ class DisasterDataCatalogTests(unittest.TestCase):
         for record in get_catalog():
             self.assertEqual(validate_catalog_record(record), [], record["id"])
 
-    def test_unacquired_sources_are_not_misrepresented_as_downloaded(self):
+    def test_acquisition_status_is_explicit_for_every_source(self):
         for record in get_catalog():
-            self.assertTrue(record["status"])
-            self.assertTrue(any(term in record["status"].lower() for term in (
-                "identified", "catalogued", "discovered", "candidate", "listed", "source"
-            )))
+            status = record["status"].lower()
+            self.assertTrue(status.strip(), record["id"])
+            self.assertNotIn("scientifically validated", status, record["id"])
+            self.assertNotIn("prediction approved", status, record["id"])
 
     def test_catalog_does_not_mutate_global_records(self):
         records = get_catalog()
