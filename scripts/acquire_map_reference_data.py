@@ -134,33 +134,32 @@ def acquire(output: Path) -> dict:
             source_feature_count = None
             payload = None
             if filename.endswith(".geojson"):
-                # First restrict the service query to Kerala. The previous where=1=1
-                # approach fetched the national directory and made CI unnecessarily slow.
-                # If the state attribute query returns no IDs, fall back to a broad
-                # Ernakulam-area envelope rather than downloading the entire country.
-                ids_url = url + "?" + urllib.parse.urlencode({
-                    "where": "statename='Kerala'",
+                # Query a bounded Ernakulam-area envelope first so the service does not
+                # need to scan/download the national directory. If the spatial query returns
+                # no IDs, try the Kerala state attribute as a secondary route.
+                ernakulam_envelope = json.dumps({
+                    "xmin": 75.9, "ymin": 9.5, "xmax": 77.0, "ymax": 10.6,
+                    "spatialReference": {"wkid": 4326},
+                }, separators=(",", ":"))
+                spatial_ids_url = url + "?" + urllib.parse.urlencode({
+                    "where": "1=1",
+                    "geometry": ernakulam_envelope,
+                    "geometryType": "esriGeometryEnvelope",
+                    "inSR": "4326",
+                    "spatialRel": "esriSpatialRelIntersects",
                     "returnIdsOnly": "true",
                     "f": "json",
                 })
-                ids_data, final_url, content_type = fetch(ids_url)
+                ids_data, final_url, content_type = fetch(spatial_ids_url)
                 ids_payload = json.loads(ids_data.decode("utf-8-sig"))
                 object_ids = ids_payload.get("objectIds")
                 if not isinstance(object_ids, list) or not object_ids:
-                    ernakulam_envelope = json.dumps({
-                        "xmin": 75.9, "ymin": 9.5, "xmax": 77.0, "ymax": 10.6,
-                        "spatialReference": {"wkid": 4326},
-                    }, separators=(",", ":"))
-                    spatial_ids_url = url + "?" + urllib.parse.urlencode({
-                        "where": "1=1",
-                        "geometry": ernakulam_envelope,
-                        "geometryType": "esriGeometryEnvelope",
-                        "inSR": "4326",
-                        "spatialRel": "esriSpatialRelIntersects",
+                    ids_url = url + "?" + urllib.parse.urlencode({
+                        "where": "statename='Kerala'",
                         "returnIdsOnly": "true",
                         "f": "json",
                     })
-                    ids_data, final_url, content_type = fetch(spatial_ids_url)
+                    ids_data, final_url, content_type = fetch(ids_url)
                     ids_payload = json.loads(ids_data.decode("utf-8-sig"))
                     object_ids = ids_payload.get("objectIds")
                 if not isinstance(object_ids, list) or not object_ids:
