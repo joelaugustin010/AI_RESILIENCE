@@ -1,0 +1,395 @@
+{
+  "status": "OFFICIAL_WARD_REGISTER_NAMES_ONLY_NO_GEOMETRY",
+  "publisher": "State Election Commission, Kerala",
+  "title": "Ward List of Kochi",
+  "source_url": "https://sec.kerala.gov.in/public/cnstncy/wd/d0f41644-754b-4b6e-a8dc-97ecbf5fee16",
+  "retrieved_on": "2026-10-30",
+  "count": 76,
+  "wards": [
+    {
+      "ward_number": 1,
+      "ward_code": "C07003001",
+      "ward_name": "FORT KOCHI"
+    },
+    {
+      "ward_number": 2,
+      "ward_code": "C07003002",
+      "ward_name": "KALVATHY"
+    },
+    {
+      "ward_number": 3,
+      "ward_code": "C07003003",
+      "ward_name": "EARAVELY"
+    },
+    {
+      "ward_number": 4,
+      "ward_code": "C07003004",
+      "ward_name": "KARIPPALAM"
+    },
+    {
+      "ward_number": 5,
+      "ward_code": "C07003005",
+      "ward_name": "CHERALAYI"
+    },
+    {
+      "ward_number": 6,
+      "ward_code": "C07003006",
+      "ward_name": "MATTANCHERY"
+    },
+    {
+      "ward_number": 7,
+      "ward_code": "C07003007",
+      "ward_name": "CHAKKAMADAM"
+    },
+    {
+      "ward_number": 8,
+      "ward_code": "C07003008",
+      "ward_name": "KARUVELIPPADY"
+    },
+    {
+      "ward_number": 9,
+      "ward_code": "C07003009",
+      "ward_name": "ISLAND NORTH"
+    },
+    {
+      "ward_number": 10,
+      "ward_code": "C07003010",
+      "ward_name": "RAVIPURAM"
+    },
+    {
+      "ward_number": 11,
+      "ward_code": "C07003011",
+      "ward_name": "ERNAKULAM SOUTH"
+    },
+    {
+      "ward_number": 12,
+      "ward_code": "C07003012",
+      "ward_name": "GANDHI NAGAR"
+    },
+    {
+      "ward_number": 13,
+      "ward_code": "C07003013",
+      "ward_name": "KATHRIKADAVU"
+    },
+    {
+      "ward_number": 14,
+      "ward_code": "C07003014",
+      "ward_name": "ERNAKULAM CENTRAL"
+    },
+    {
+      "ward_number": 15,
+      "ward_code": "C07003015",
+      "ward_name": "ERNAKULAM NORTH"
+    },
+    {
+      "ward_number": 16,
+      "ward_code": "C07003016",
+      "ward_name": "KALOOR SOUTH"
+    },
+    {
+      "ward_number": 17,
+      "ward_code": "C07003017",
+      "ward_name": "KALOOR-NORTH"
+    },
+    {
+      "ward_number": 18,
+      "ward_code": "C07003018",
+      "ward_name": "THRIKKANARVATTOM"
+    },
+    {
+      "ward_number": 19,
+      "ward_code": "C07003019",
+      "ward_name": "AYYAPPANKAVU"
+    },
+    {
+      "ward_number": 20,
+      "ward_code": "C07003020",
+      "ward_name": "POTTAKUZHY"
+    },
+    {
+      "ward_number": 21,
+      "ward_code": "C07003021",
+      "ward_name": "ELAMAKKARA SOUTH"
+    },
+    {
+      "ward_number": 22,
+      "ward_code": "C07003022",
+      "ward_name": "PACHALAM"
+    },
+    {
+      "ward_number": 23,
+      "ward_code": "C07003023",
+      "ward_name": "THATTAZHAM"
+    },
+    {
+      "ward_number": 24,
+      "ward_code": "C07003024",
+      "ward_name": "VADUTHALA WEST"
+    },
+    {
+      "ward_number": 25,
+      "ward_code": "C07003025",
+      "ward_name": "VADUTHALA EAST"
+    },
+    {
+      "ward_number": 26,
+      "ward_code": "C07003026",
+      "ward_name": "ELAMAKKARA NORTH"
+    },
+    {
+      "ward_number": 27,
+      "ward_code": "C07003027",
+      "ward_name": "PUTHUKKALAVATTAM"
+    },
+    {
+      "ward_number": 28,
+      "ward_code": "C07003028",
+      "ward_name": "KUNNUMPURAM"
+    },
+    {
+      "ward_number": 29,
+      "ward_code": "C07003029",
+      "ward_name": "PONEKKARA"
+    },
+    {
+      "ward_number": 30,
+      "ward_code": "C07003030",
+      "ward_name": "EDAPPALLY"
+    },
+    {
+      "ward_number": 31,
+      "ward_code": "C07003031",
+      "ward_name": "CHANGAMPUZHA"
+    },
+    {
+      "ward_number": 32,
+      "ward_code": "C07003032",
+      "ward_name": "DHEVANKULANGARA"
+    },
+    {
+      "ward_number": 33,
+      "ward_code": "C07003033",
+      "ward_name": "PALARIVATTAM"
+    },
+    {
+      "ward_number": 34,
+      "ward_code": "C07003034",
+      "ward_name": "STADIUM"
+    },
+    {
+      "ward_number": 35,
+      "ward_code": "C07003035",
+      "ward_name": "KARANAKKODAM"
+    },
+    {
+      "ward_number": 36,
+      "ward_code": "C07003036",
+      "ward_name": "PUTHIYAROAD"
+    },
+    {
+      "ward_number": 37,
+      "ward_code": "C07003037",
+      "ward_name": "PADIVATTAM"
+    },
+    {
+      "ward_number": 38,
+      "ward_code": "C07003038",
+      "ward_name": "VENNALA"
+    },
+    {
+      "ward_number": 39,
+      "ward_code": "C07003039",
+      "ward_name": "CHAKKARAPARAMBU"
+    },
+    {
+      "ward_number": 40,
+      "ward_code": "C07003040",
+      "ward_name": "CHALIKKAVATTAM"
+    },
+    {
+      "ward_number": 41,
+      "ward_code": "C07003041",
+      "ward_name": "THAMMANAM"
+    },
+    {
+      "ward_number": 42,
+      "ward_code": "C07003042",
+      "ward_name": "ELAMKULAM"
+    },
+    {
+      "ward_number": 43,
+      "ward_code": "C07003043",
+      "ward_name": "GIRINAGAR"
+    },
+    {
+      "ward_number": 44,
+      "ward_code": "C07003044",
+      "ward_name": "PONNURUNNI"
+    },
+    {
+      "ward_number": 45,
+      "ward_code": "C07003045",
+      "ward_name": "PONNURUNNI EAST"
+    },
+    {
+      "ward_number": 46,
+      "ward_code": "C07003046",
+      "ward_name": "VYTTILA"
+    },
+    {
+      "ward_number": 47,
+      "ward_code": "C07003047",
+      "ward_name": "POONITHURA"
+    },
+    {
+      "ward_number": 48,
+      "ward_code": "C07003048",
+      "ward_name": "VYTTILA JANATHA"
+    },
+    {
+      "ward_number": 49,
+      "ward_code": "C07003049",
+      "ward_name": "KADAVANTHRA"
+    },
+    {
+      "ward_number": 50,
+      "ward_code": "C07003050",
+      "ward_name": "PANAMPILLI NAGAR"
+    },
+    {
+      "ward_number": 51,
+      "ward_code": "C07003051",
+      "ward_name": "PERUMANOOR"
+    },
+    {
+      "ward_number": 52,
+      "ward_code": "C07003052",
+      "ward_name": "KONTHURUTHY"
+    },
+    {
+      "ward_number": 53,
+      "ward_code": "C07003053",
+      "ward_name": "THEVARA"
+    },
+    {
+      "ward_number": 54,
+      "ward_code": "C07003054",
+      "ward_name": "ISLAND SOUTH"
+    },
+    {
+      "ward_number": 55,
+      "ward_code": "C07003055",
+      "ward_name": "KADEBHAGAM"
+    },
+    {
+      "ward_number": 56,
+      "ward_code": "C07003056",
+      "ward_name": "PALLURUTHY EAST"
+    },
+    {
+      "ward_number": 57,
+      "ward_code": "C07003057",
+      "ward_name": "THAZHUPPU"
+    },
+    {
+      "ward_number": 58,
+      "ward_code": "C07003058",
+      "ward_name": "EADAKOCHI NORTH"
+    },
+    {
+      "ward_number": 59,
+      "ward_code": "C07003059",
+      "ward_name": "EDAKOCHI SOUTH"
+    },
+    {
+      "ward_number": 60,
+      "ward_code": "C07003060",
+      "ward_name": "PERUMBADAPPU"
+    },
+    {
+      "ward_number": 61,
+      "ward_code": "C07003061",
+      "ward_name": "KONAM"
+    },
+    {
+      "ward_number": 62,
+      "ward_code": "C07003062",
+      "ward_name": "PALLURUTHY-KACHERIPADY"
+    },
+    {
+      "ward_number": 63,
+      "ward_code": "C07003063",
+      "ward_name": "NAMBYAPURAM"
+    },
+    {
+      "ward_number": 64,
+      "ward_code": "C07003064",
+      "ward_name": "PALLURUTHY"
+    },
+    {
+      "ward_number": 65,
+      "ward_code": "C07003065",
+      "ward_name": "PULLARDESAM"
+    },
+    {
+      "ward_number": 66,
+      "ward_code": "C07003066",
+      "ward_name": "THAREBHAGAM"
+    },
+    {
+      "ward_number": 67,
+      "ward_code": "C07003067",
+      "ward_name": "THOPPUMPADY"
+    },
+    {
+      "ward_number": 68,
+      "ward_code": "C07003068",
+      "ward_name": "MUNDAMVELY EAST"
+    },
+    {
+      "ward_number": 69,
+      "ward_code": "C07003069",
+      "ward_name": "MUNDAMVELY"
+    },
+    {
+      "ward_number": 70,
+      "ward_code": "C07003070",
+      "ward_name": "MANASSERY"
+    },
+    {
+      "ward_number": 71,
+      "ward_code": "C07003071",
+      "ward_name": "MOOLAMKUZHY"
+    },
+    {
+      "ward_number": 72,
+      "ward_code": "C07003072",
+      "ward_name": "CHULLICKAL"
+    },
+    {
+      "ward_number": 73,
+      "ward_code": "C07003073",
+      "ward_name": "NASRATHU"
+    },
+    {
+      "ward_number": 74,
+      "ward_code": "C07003074",
+      "ward_name": "PANAYAPPILLY"
+    },
+    {
+      "ward_number": 75,
+      "ward_code": "C07003075",
+      "ward_name": "AMARAVATHY"
+    },
+    {
+      "ward_number": 76,
+      "ward_code": "C07003076",
+      "ward_name": "FORTKOCHI VELI"
+    }
+  ],
+  "limitations": [
+    "Names and codes transcribed from the official State Election Commission Kerala ward list.",
+    "This register contains no ward geometries and must not be used alone to assign names to polygons.",
+    "The source ward geometry file and 2024 candidate map each contain 74 features; this register contains 76 wards, so polygon-to-current-ward mapping requires the final official current boundary geometry."
+  ]
+}
