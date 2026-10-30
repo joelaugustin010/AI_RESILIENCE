@@ -109,6 +109,32 @@ class ScenarioAndAssessmentTests(unittest.TestCase):
         self.assertIn("not a verified exposed or affected population", combined)
         self.assertIn("hypothetical assumption", " ".join(result["Evidence class"].str.lower().unique()))
 
+    def test_24_hour_hypothetical_rainfall_gets_official_imd_category_not_flood_probability(self):
+        result = build_scenario_screening(valid_inputs(
+            rainfall_mm=100,
+            rainfall_period="Last 24 hours",
+        ))
+        category = result.loc[result["Scenario signal"].str.contains("IMD 24-hour station rainfall category")]
+        self.assertEqual(len(category), 1)
+        self.assertIn("Heavy", category.iloc[0]["Scenario signal"])
+        self.assertIn("not a Kochi flood prediction", category.iloc[0]["Conditional assessment"])
+        self.assertIn("mausam.imd.gov.in", category.iloc[0]["Next check / action"])
+
+    def test_non_24_hour_rainfall_does_not_get_daily_imd_category(self):
+        result = build_scenario_screening(valid_inputs(
+            rainfall_mm=100,
+            rainfall_period="Last 1 hour",
+        ))
+        self.assertFalse(result["Scenario signal"].str.contains("IMD 24-hour station rainfall category").any())
+
+    def test_every_hazard_returns_at_least_one_scenario_output(self):
+        for hazard in HAZARD_OPTIONS:
+            with self.subTest(hazard=hazard):
+                result = build_scenario_screening(valid_inputs(hazard=hazard))
+                self.assertGreater(len(result), 0)
+                self.assertTrue(result["Conditional assessment"].str.strip().ne("").all())
+                self.assertTrue(result["Next check / action"].str.strip().ne("").all())
+
     def test_scenario_screen_does_not_claim_river_level_is_dangerous_without_threshold(self):
         result = build_scenario_screening(valid_inputs(river_level_m=99.0))
         river = result.loc[result["Scenario signal"].str.contains("River-level assumption")]
