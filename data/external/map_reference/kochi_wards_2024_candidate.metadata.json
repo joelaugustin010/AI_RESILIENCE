@@ -13,7 +13,7 @@
   "catalogue_reported_ward_count": 74,
   "catalogue_reported_license": "Other (Public Domain) — catalogue label; independent rights verification not performed",
   "catalogue_reported_source": "livingatlas.esri.in",
-  "retrieved_at_utc": "2026-10-30T05:55:14.393511+00:00",
+  "retrieved_at_utc": "2026-10-30T05:55:41.105325+00:00",
   "status": "DOWNLOADED_RAW_CANDIDATE",
   "validation_status": "STRUCTURE_CHECKED_CANDIDATE_ONLY",
   "metadata_api_final_url": "https://data.opencity.in/api/3/action/resource_show?id=24a3de7a-4b14-436e-ae0c-e9ec7b1749e0",
@@ -261,5 +261,5 @@
     }
   },
   "overall_approval": "NOT_APPROVED_FOR_PRODUCTION_BOUNDARY_OR_EXPOSURE_ANALYSIS",
-  "updated_at_utc": "2026-10-30T05:55:17.818124+00:00"
+  "updated_at_utc": "2026-10-30T05:56:26.022129+00:00"
 }
