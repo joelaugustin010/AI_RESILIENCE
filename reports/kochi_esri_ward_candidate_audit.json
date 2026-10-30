@@ -1,0 +1,1755 @@
+{
+  "created_at_utc": "2026-10-30T15:38:31.989975+00:00",
+  "service_url": "https://livingatlas.esri.in/server1/rest/services/Wards/India_Ward_Boundaries/MapServer/0",
+  "item_url": "https://livingatlas.esri.in/sharing/rest/content/items/9ff2ac026dbb48ff85a0f4573b9987f1?f=json",
+  "status": "CANDIDATE_AUDITED_NOT_PROMOTED",
+  "limitations": [
+    "A public ArcGIS service is a candidate source, not proof that its boundaries match the final Gazette geometry.",
+    "Names are compared by exact normalized text only; no SEC identity is assigned to a polygon by ordinal number or fuzzy matching.",
+    "Geometry validity is not positional accuracy, topology between neighboring wards, legal status, or flood-model validation.",
+    "Reuse terms and source lineage must be confirmed before redistribution or production integration.",
+    "Raw geometry is not persisted by this audit script."
+  ],
+  "service_metadata": {
+    "url": "https://livingatlas.esri.in/server1/rest/services/Wards/India_Ward_Boundaries/MapServer/0?f=pjson",
+    "sha256": "b3bea0e99cd22144e725abc209e2a78072978285ec0382088a6c240c77cad9c5",
+    "layer_name": "India Ward Boundary",
+    "geometry_type": "esriGeometryPolygon",
+    "spatial_reference": {
+      "wkid": 102100,
+      "latestWkid": 3857,
+      "xyTolerance": 0.001,
+      "zTolerance": 0.001,
+      "mTolerance": 0.001,
+      "falseX": -20037700,
+      "falseY": -30241100,
+      "xyUnits": 10000,
+      "falseZ": -100000,
+      "zUnits": 10000,
+      "falseM": -100000,
+      "mUnits": 10000
+    },
+    "fields": [
+      {
+        "name": "objectid",
+        "alias": "OBJECTID",
+        "type": "esriFieldTypeOID"
+      },
+      {
+        "name": "id",
+        "alias": "UID",
+        "type": "esriFieldTypeInteger"
+      },
+      {
+        "name": "name",
+        "alias": "Ward Name",
+        "type": "esriFieldTypeString"
+      },
+      {
+        "name": "code",
+        "alias": "Ward Code",
+        "type": "esriFieldTypeString"
+      },
+      {
+        "name": "town",
+        "alias": "Town Name",
+        "type": "esriFieldTypeString"
+      },
+      {
+        "name": "district",
+        "alias": "District Name",
+        "type": "esriFieldTypeString"
+      },
+      {
+        "name": "state",
+        "alias": "State Name",
+        "type": "esriFieldTypeString"
+      },
+      {
+        "name": "link",
+        "alias": "Source Link",
+        "type": "esriFieldTypeString"
+      },
+      {
+        "name": "shape",
+        "alias": "Shape",
+        "type": "esriFieldTypeGeometry"
+      },
+      {
+        "name": "st_area(shape)",
+        "alias": "st_area(shape)",
+        "type": "esriFieldTypeDouble"
+      },
+      {
+        "name": "st_perimeter(shape)",
+        "alias": "st_perimeter(shape)",
+        "type": "esriFieldTypeDouble"
+      }
+    ],
+    "max_record_count": 2000,
+    "supported_query_formats": "JSON, geoJSON, PBF",
+    "capabilities": "Map,Query,Data",
+    "service_item_id": "9ff2ac026dbb48ff85a0f4573b9987f1",
+    "copyright_text": ""
+  },
+  "service_item_metadata": {
+    "error": "HTTPError: HTTP Error 404: Not Found"
+  },
+  "official_sec_register": {
+    "source_url": "https://sec.kerala.gov.in/public/cnstncy/wd/d0f41644-754b-4b6e-a8dc-97ecbf5fee16",
+    "retrieved_on": "2026-10-30",
+    "ward_count": 76
+  },
+  "district_query": {
+    "where": "state='Kerala' AND district='Ernakulam'",
+    "rows_scanned": 523,
+    "pages": [
+      {
+        "offset": 0,
+        "rows": 523,
+        "exceeded_transfer_limit": false,
+        "url": "https://livingatlas.esri.in/server1/rest/services/Wards/India_Ward_Boundaries/MapServer/0/query?where=state%3D%27Kerala%27+AND+district%3D%27Ernakulam%27&outFields=objectid%2Ctown%2Cdistrict%2Cstate&returnGeometry=false&orderByFields=objectid&resultOffset=0&resultRecordCount=1000&f=json",
+        "response_sha256": "e152050795b2167d28a8ff7c687e17b2185b1f153eca06f10912e59f0a4185d1"
+      }
+    ],
+    "unique_town_count": 14,
+    "matching_town_values": [
+      {
+        "town": "Kochi",
+        "count_in_Ernakulam_query": 76
+      }
+    ]
+  },
+  "candidate_towns": [
+    {
+      "town_value": "Kochi",
+      "where": "state='Kerala' AND district='Ernakulam' AND town='Kochi'",
+      "count_audit": {
+        "where": "state='Kerala' AND district='Ernakulam' AND town='Kochi'",
+        "count": 76,
+        "url": "https://livingatlas.esri.in/server1/rest/services/Wards/India_Ward_Boundaries/MapServer/0/query?where=state%3D%27Kerala%27+AND+district%3D%27Ernakulam%27+AND+town%3D%27Kochi%27&returnCountOnly=true&f=json",
+        "response_sha256": "79840451bc99676ead1a4c9d570dbb6427439577f0740fa1223c1752bb68396f"
+      },
+      "geometry_query": {
+        "url": "https://livingatlas.esri.in/server1/rest/services/Wards/India_Ward_Boundaries/MapServer/0/query?where=state%3D%27Kerala%27+AND+district%3D%27Ernakulam%27+AND+town%3D%27Kochi%27&outFields=objectid%2Cid%2Cname%2Ccode%2Ctown%2Cdistrict%2Cstate%2Clink&returnGeometry=true&outSR=4326&resultRecordCount=1000&f=geojson",
+        "http_success": true,
+        "response_bytes": 333361,
+        "response_sha256": "092d4c13aab580980c9c6b13b0603d50a5f90b952326b8a793f3610e7af08e3c",
+        "feature_count": 76,
+        "returned_geojson_type": "FeatureCollection",
+        "geometry_type_counts": {
+          "Polygon": 76
+        },
+        "valid_polygon_count": 76,
+        "invalid_geometry_count": 0,
+        "invalid_geometry_examples": [],
+        "missing_geometry_indices": [],
+        "source_name_count": 76,
+        "unique_source_code_count": 76,
+        "source_code_numbers_exactly_1_to_76": true,
+        "exact_SEC_name_match_count_any_number": 66,
+        "exact_SEC_name_match_count_by_source_code_number": 65,
+        "exact_final_PDF_label_match_count_by_source_code_number": 75,
+        "source_names_not_exactly_in_SEC_register": [
+          {
+            "source_name": "Chakkamadom",
+            "exact_SEC_name_match": false
+          },
+          {
+            "source_name": "Changamppuzha",
+            "exact_SEC_name_match": false
+          },
+          {
+            "source_name": "Devankulangara",
+            "exact_SEC_name_match": false
+          },
+          {
+            "source_name": "Edakochi North",
+            "exact_SEC_name_match": false
+          },
+          {
+            "source_name": "Moolamkuzhi",
+            "exact_SEC_name_match": false
+          },
+          {
+            "source_name": "Mundamveli",
+            "exact_SEC_name_match": false
+          },
+          {
+            "source_name": "Mundamveli  East",
+            "exact_SEC_name_match": false
+          },
+          {
+            "source_name": "Nazareth",
+            "exact_SEC_name_match": false
+          },
+          {
+            "source_name": "Pallluruthy",
+            "exact_SEC_name_match": false
+          },
+          {
+            "source_name": "Perumanur",
+            "exact_SEC_name_match": false
+          }
+        ],
+        "source_code_name_crosswalk": [
+          {
+            "source_code": "65",
+            "parsed_ward_number": 65,
+            "source_name": "Pullardesam",
+            "SEC_name_for_same_number": "PULLARDESAM",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "PULLARDESAM"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "27",
+            "parsed_ward_number": 27,
+            "source_name": "Puthukkalavattam",
+            "SEC_name_for_same_number": "PUTHUKKALAVATTAM",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "PUTHUKKALAVATTAM"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "10",
+            "parsed_ward_number": 10,
+            "source_name": "Ravipuram",
+            "SEC_name_for_same_number": "RAVIPURAM",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "RAVIPURAM"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "41",
+            "parsed_ward_number": 41,
+            "source_name": "Thammanam",
+            "SEC_name_for_same_number": "THAMMANAM",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "THAMMANAM"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "66",
+            "parsed_ward_number": 66,
+            "source_name": "Tharebhagam",
+            "SEC_name_for_same_number": "THAREBHAGAM",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "THAREBHAGAM"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "23",
+            "parsed_ward_number": 23,
+            "source_name": "Thattazham",
+            "SEC_name_for_same_number": "THATTAZHAM",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "THATTAZHAM"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "57",
+            "parsed_ward_number": 57,
+            "source_name": "Thazhuppu",
+            "SEC_name_for_same_number": "THAZHUPPU",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "THAZHUPPU"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "53",
+            "parsed_ward_number": 53,
+            "source_name": "Thevara",
+            "SEC_name_for_same_number": "THEVARA",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "THEVARA"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "67",
+            "parsed_ward_number": 67,
+            "source_name": "Thoppumpady",
+            "SEC_name_for_same_number": "THOPPUMPADY",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "THOPPUMPADY"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "18",
+            "parsed_ward_number": 18,
+            "source_name": "Thrikkanarvattom",
+            "SEC_name_for_same_number": "THRIKKANARVATTOM",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "THRIKKANARVATTOM"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "25",
+            "parsed_ward_number": 25,
+            "source_name": "Vaduthala East",
+            "SEC_name_for_same_number": "VADUTHALA EAST",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "VADUTHALA EAST"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "24",
+            "parsed_ward_number": 24,
+            "source_name": "Vaduthala West",
+            "SEC_name_for_same_number": "VADUTHALA WEST",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "VADUTHALA WEST"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "48",
+            "parsed_ward_number": 48,
+            "source_name": "Vyttila Janatha",
+            "SEC_name_for_same_number": "VYTTILA JANATHA",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "VYTTILA JANATHA"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "7",
+            "parsed_ward_number": 7,
+            "source_name": "Chakkamadom",
+            "SEC_name_for_same_number": "CHAKKAMADAM",
+            "exact_SEC_name_match_for_same_number": false,
+            "final_PDF_label_for_same_number": [
+              "CHAKKAMADOM"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "39",
+            "parsed_ward_number": 39,
+            "source_name": "Chakkaraparambu",
+            "SEC_name_for_same_number": "CHAKKARAPARAMBU",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "CHAKKARAPARAMBU"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "40",
+            "parsed_ward_number": 40,
+            "source_name": "Chalikkavattam",
+            "SEC_name_for_same_number": "CHALIKKAVATTAM",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "CHALIKKAVATTAM"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "46",
+            "parsed_ward_number": 46,
+            "source_name": "Vyttila",
+            "SEC_name_for_same_number": "VYTTILA",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "VYTTILA"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "5",
+            "parsed_ward_number": 5,
+            "source_name": "Cheralayi",
+            "SEC_name_for_same_number": "CHERALAYI",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "CHERALAYI"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "72",
+            "parsed_ward_number": 72,
+            "source_name": "Chullickal",
+            "SEC_name_for_same_number": "CHULLICKAL",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "CHULLICKAL"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "31",
+            "parsed_ward_number": 31,
+            "source_name": "Changamppuzha",
+            "SEC_name_for_same_number": "CHANGAMPUZHA",
+            "exact_SEC_name_match_for_same_number": false,
+            "final_PDF_label_for_same_number": [
+              "CHANGAMPPUZHA"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "75",
+            "parsed_ward_number": 75,
+            "source_name": "Amaravathy",
+            "SEC_name_for_same_number": "AMARAVATHY",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "AMARAVATHY"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "3",
+            "parsed_ward_number": 3,
+            "source_name": "Earavely",
+            "SEC_name_for_same_number": "EARAVELY",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "EARAVELY"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "58",
+            "parsed_ward_number": 58,
+            "source_name": "Edakochi North",
+            "SEC_name_for_same_number": "EADAKOCHI NORTH",
+            "exact_SEC_name_match_for_same_number": false,
+            "final_PDF_label_for_same_number": [
+              "EDAKOCHI NORTH"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "59",
+            "parsed_ward_number": 59,
+            "source_name": "Edakochi South",
+            "SEC_name_for_same_number": "EDAKOCHI SOUTH",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "EDAKOCHI SOUTH"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "30",
+            "parsed_ward_number": 30,
+            "source_name": "Edappally",
+            "SEC_name_for_same_number": "EDAPPALLY",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "EDAPPALLY"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "21",
+            "parsed_ward_number": 21,
+            "source_name": "Elamakkara South",
+            "SEC_name_for_same_number": "ELAMAKKARA SOUTH",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "ELAMAKKARA SOUTH"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "26",
+            "parsed_ward_number": 26,
+            "source_name": "Elamakkara North",
+            "SEC_name_for_same_number": "ELAMAKKARA NORTH",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "ELAMAKKARA NORTH"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "42",
+            "parsed_ward_number": 42,
+            "source_name": "Elamkulam",
+            "SEC_name_for_same_number": "ELAMKULAM",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "ELAMKULAM"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "14",
+            "parsed_ward_number": 14,
+            "source_name": "Ernakulam Central",
+            "SEC_name_for_same_number": "ERNAKULAM CENTRAL",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "ERNAKULAM CENTRAL"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "15",
+            "parsed_ward_number": 15,
+            "source_name": "Ernakulam North",
+            "SEC_name_for_same_number": "ERNAKULAM NORTH",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "ERNAKULAM NORTH"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "11",
+            "parsed_ward_number": 11,
+            "source_name": "Ernakulam South",
+            "SEC_name_for_same_number": "ERNAKULAM SOUTH",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "ERNAKULAM SOUTH"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "1",
+            "parsed_ward_number": 1,
+            "source_name": "Fort Kochi",
+            "SEC_name_for_same_number": "FORT KOCHI",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "FORT KOCHI"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "76",
+            "parsed_ward_number": 76,
+            "source_name": "Fortkochi Veli",
+            "SEC_name_for_same_number": "FORTKOCHI VELI",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "FORTKOCHI VELI"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "12",
+            "parsed_ward_number": 12,
+            "source_name": "Gandhi Nagar",
+            "SEC_name_for_same_number": "GANDHI NAGAR",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "GANDHI NAGAR"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "9",
+            "parsed_ward_number": 9,
+            "source_name": "Island North",
+            "SEC_name_for_same_number": "ISLAND NORTH",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "ISLAND NORTH"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "54",
+            "parsed_ward_number": 54,
+            "source_name": "Island South",
+            "SEC_name_for_same_number": "ISLAND SOUTH",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "ISLAND SOUTH"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "49",
+            "parsed_ward_number": 49,
+            "source_name": "Kadavanthra",
+            "SEC_name_for_same_number": "KADAVANTHRA",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "KADAVANTHRA"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "55",
+            "parsed_ward_number": 55,
+            "source_name": "Kadebhagam",
+            "SEC_name_for_same_number": "KADEBHAGAM",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "KADEBHAGAM"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "17",
+            "parsed_ward_number": 17,
+            "source_name": "Kaloor North",
+            "SEC_name_for_same_number": "KALOOR-NORTH",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "KALOOR NORTH"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "16",
+            "parsed_ward_number": 16,
+            "source_name": "Kaloor South",
+            "SEC_name_for_same_number": "KALOOR SOUTH",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "KALOOR SOUTH"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "2",
+            "parsed_ward_number": 2,
+            "source_name": "Kalvathy",
+            "SEC_name_for_same_number": "KALVATHY",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "KALVATHY"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "35",
+            "parsed_ward_number": 35,
+            "source_name": "Karanakkodam",
+            "SEC_name_for_same_number": "KARANAKKODAM",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "KARANAKKODAM"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "8",
+            "parsed_ward_number": 8,
+            "source_name": "Karuvelippady",
+            "SEC_name_for_same_number": "KARUVELIPPADY",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "KARUVELIPPADY"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "4",
+            "parsed_ward_number": 4,
+            "source_name": "Karippalam",
+            "SEC_name_for_same_number": "KARIPPALAM",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "KARIPPALAM"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "34",
+            "parsed_ward_number": 34,
+            "source_name": "Stadium",
+            "SEC_name_for_same_number": "STADIUM",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "STADIUM"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "13",
+            "parsed_ward_number": 13,
+            "source_name": "Kathrikadavu",
+            "SEC_name_for_same_number": "KATHRIKADAVU",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "KATHRIKADAVU"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "6",
+            "parsed_ward_number": 6,
+            "source_name": "Mattanchery",
+            "SEC_name_for_same_number": "MATTANCHERY",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "MATTANCHERY"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "61",
+            "parsed_ward_number": 61,
+            "source_name": "Konam",
+            "SEC_name_for_same_number": "KONAM",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "KONAM"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "52",
+            "parsed_ward_number": 52,
+            "source_name": "Konthuruthy",
+            "SEC_name_for_same_number": "KONTHURUTHY",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "KONTHURUTHY"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "19",
+            "parsed_ward_number": 19,
+            "source_name": "Ayyappankavu",
+            "SEC_name_for_same_number": "AYYAPPANKAVU",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "AYYAPPANKAVU"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "28",
+            "parsed_ward_number": 28,
+            "source_name": "Kunnumpuram",
+            "SEC_name_for_same_number": "KUNNUMPURAM",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "KUNNUMPURAM"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "33",
+            "parsed_ward_number": 33,
+            "source_name": "Palarivattam",
+            "SEC_name_for_same_number": "PALARIVATTAM",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "PALARIVATTAM"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "71",
+            "parsed_ward_number": 71,
+            "source_name": "Moolamkuzhi",
+            "SEC_name_for_same_number": "MOOLAMKUZHY",
+            "exact_SEC_name_match_for_same_number": false,
+            "final_PDF_label_for_same_number": [
+              "MOOLAMKUZHI"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "63",
+            "parsed_ward_number": 63,
+            "source_name": "Nambyapuram",
+            "SEC_name_for_same_number": "NAMBYAPURAM",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "NAMBYAPURAM"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "73",
+            "parsed_ward_number": 73,
+            "source_name": "Nazareth",
+            "SEC_name_for_same_number": "NASRATHU",
+            "exact_SEC_name_match_for_same_number": false,
+            "final_PDF_label_for_same_number": [
+              "NAZARETH"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "22",
+            "parsed_ward_number": 22,
+            "source_name": "Pachalam",
+            "SEC_name_for_same_number": "PACHALAM",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "PACHALAM"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "37",
+            "parsed_ward_number": 37,
+            "source_name": "Padivattam",
+            "SEC_name_for_same_number": "PADIVATTAM",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "PADIVATTAM"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "36",
+            "parsed_ward_number": 36,
+            "source_name": "Puthiya Road",
+            "SEC_name_for_same_number": "PUTHIYAROAD",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "PUTHIYA ROAD"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "62",
+            "parsed_ward_number": 62,
+            "source_name": "Palluruthy",
+            "SEC_name_for_same_number": "PALLURUTHY-KACHERIPADY",
+            "exact_SEC_name_match_for_same_number": false,
+            "final_PDF_label_for_same_number": [],
+            "exact_final_PDF_label_match_for_same_number": false,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "50",
+            "parsed_ward_number": 50,
+            "source_name": "Panampilli Nagar",
+            "SEC_name_for_same_number": "PANAMPILLI NAGAR",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "PANAMPILLI NAGAR"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "74",
+            "parsed_ward_number": 74,
+            "source_name": "Panayappilly",
+            "SEC_name_for_same_number": "PANAYAPPILLY",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "PANAYAPPILLY"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "51",
+            "parsed_ward_number": 51,
+            "source_name": "Perumanur",
+            "SEC_name_for_same_number": "PERUMANOOR",
+            "exact_SEC_name_match_for_same_number": false,
+            "final_PDF_label_for_same_number": [
+              "PERUMANUR"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "60",
+            "parsed_ward_number": 60,
+            "source_name": "Perumbadappu",
+            "SEC_name_for_same_number": "PERUMBADAPPU",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "PERUMBADAPPU"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "29",
+            "parsed_ward_number": 29,
+            "source_name": "Ponekkara",
+            "SEC_name_for_same_number": "PONEKKARA",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "PONEKKARA"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "44",
+            "parsed_ward_number": 44,
+            "source_name": "Ponnurunni",
+            "SEC_name_for_same_number": "PONNURUNNI",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "PONNURUNNI"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "45",
+            "parsed_ward_number": 45,
+            "source_name": "Ponnurunni East",
+            "SEC_name_for_same_number": "PONNURUNNI EAST",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "PONNURUNNI EAST"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "47",
+            "parsed_ward_number": 47,
+            "source_name": "Poonithura",
+            "SEC_name_for_same_number": "POONITHURA",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "POONITHURA"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "20",
+            "parsed_ward_number": 20,
+            "source_name": "Pottakuzhy",
+            "SEC_name_for_same_number": "POTTAKUZHY",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "POTTAKUZHY"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "68",
+            "parsed_ward_number": 68,
+            "source_name": "Mundamveli  East",
+            "SEC_name_for_same_number": "MUNDAMVELY EAST",
+            "exact_SEC_name_match_for_same_number": false,
+            "final_PDF_label_for_same_number": [
+              "MUNDAMVELI  EAST"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "64",
+            "parsed_ward_number": 64,
+            "source_name": "Pallluruthy",
+            "SEC_name_for_same_number": "PALLURUTHY",
+            "exact_SEC_name_match_for_same_number": false,
+            "final_PDF_label_for_same_number": [
+              "PALLLURUTHY"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "56",
+            "parsed_ward_number": 56,
+            "source_name": "Palluruthy East",
+            "SEC_name_for_same_number": "PALLURUTHY EAST",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "PALLURUTHY EAST"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "43",
+            "parsed_ward_number": 43,
+            "source_name": "Girinagar",
+            "SEC_name_for_same_number": "GIRINAGAR",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "GIRINAGAR"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "32",
+            "parsed_ward_number": 32,
+            "source_name": "Devankulangara",
+            "SEC_name_for_same_number": "DHEVANKULANGARA",
+            "exact_SEC_name_match_for_same_number": false,
+            "final_PDF_label_for_same_number": [
+              "DEVANKULANGARA"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "38",
+            "parsed_ward_number": 38,
+            "source_name": "Vennala",
+            "SEC_name_for_same_number": "VENNALA",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "VENNALA"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "70",
+            "parsed_ward_number": 70,
+            "source_name": "Manassery",
+            "SEC_name_for_same_number": "MANASSERY",
+            "exact_SEC_name_match_for_same_number": true,
+            "final_PDF_label_for_same_number": [
+              "MANASSERY"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          },
+          {
+            "source_code": "69",
+            "parsed_ward_number": 69,
+            "source_name": "Mundamveli",
+            "SEC_name_for_same_number": "MUNDAMVELY",
+            "exact_SEC_name_match_for_same_number": false,
+            "final_PDF_label_for_same_number": [
+              "MUNDAMVELI"
+            ],
+            "exact_final_PDF_label_match_for_same_number": true,
+            "note": "Diagnostic comparison only; no SEC identity is assigned to the source polygon."
+          }
+        ],
+        "topology_and_coverage": {
+          "comparison_crs": "EPSG:32643",
+          "valid_geometry_count_used": 76,
+          "ward_union_is_valid": true,
+          "ward_union_geometry_type": "Polygon",
+          "sum_of_individual_ward_areas_km2": 97.8017,
+          "ward_union_area_km2": 97.8017,
+          "sum_minus_union_area_km2_overlap_indicator": 0,
+          "pairwise_interior_overlap_pairs_over_1m2": 0,
+          "largest_pairwise_overlap_examples": [],
+          "configured_boundary_comparison": {
+            "boundary_path": "data/reference/kochi_corporation_boundary.geojson",
+            "boundary_is_valid": true,
+            "boundary_area_km2": 96.1376,
+            "intersection_area_km2": 93.7688,
+            "symmetric_difference_area_km2": 6.4018,
+            "intersection_over_union": 0.936091,
+            "candidate_outside_boundary_km2": 4.0329,
+            "boundary_uncovered_by_candidate_km2": 2.3689,
+            "status": "DIAGNOSTIC_ONLY_CONFIGURED_BOUNDARY_NOT_LEGAL_APPROVAL"
+          }
+        },
+        "source_feature_label_sample": [
+          {
+            "name": "Pullardesam",
+            "code": "65",
+            "id": 91018633,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 65
+          },
+          {
+            "name": "Puthukkalavattam",
+            "code": "27",
+            "id": 91018634,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 27
+          },
+          {
+            "name": "Ravipuram",
+            "code": "10",
+            "id": 91018635,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 10
+          },
+          {
+            "name": "Thammanam",
+            "code": "41",
+            "id": 91018636,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 41
+          },
+          {
+            "name": "Tharebhagam",
+            "code": "66",
+            "id": 91018637,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 66
+          },
+          {
+            "name": "Thattazham",
+            "code": "23",
+            "id": 91018638,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 23
+          },
+          {
+            "name": "Thazhuppu",
+            "code": "57",
+            "id": 91018639,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 57
+          },
+          {
+            "name": "Thevara",
+            "code": "53",
+            "id": 91018640,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 53
+          },
+          {
+            "name": "Thoppumpady",
+            "code": "67",
+            "id": 91018641,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 67
+          },
+          {
+            "name": "Thrikkanarvattom",
+            "code": "18",
+            "id": 91018642,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 18
+          },
+          {
+            "name": "Vaduthala East",
+            "code": "25",
+            "id": 91018643,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 25
+          },
+          {
+            "name": "Vaduthala West",
+            "code": "24",
+            "id": 91018644,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 24
+          },
+          {
+            "name": "Vyttila Janatha",
+            "code": "48",
+            "id": 91018645,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 48
+          },
+          {
+            "name": "Chakkamadom",
+            "code": "7",
+            "id": 91018646,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 7
+          },
+          {
+            "name": "Chakkaraparambu",
+            "code": "39",
+            "id": 91018647,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 39
+          },
+          {
+            "name": "Chalikkavattam",
+            "code": "40",
+            "id": 91018648,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 40
+          },
+          {
+            "name": "Vyttila",
+            "code": "46",
+            "id": 91018649,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 46
+          },
+          {
+            "name": "Cheralayi",
+            "code": "5",
+            "id": 91018650,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 5
+          },
+          {
+            "name": "Chullickal",
+            "code": "72",
+            "id": 91018651,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 72
+          },
+          {
+            "name": "Changamppuzha",
+            "code": "31",
+            "id": 91018652,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 31
+          },
+          {
+            "name": "Amaravathy",
+            "code": "75",
+            "id": 91018653,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 75
+          },
+          {
+            "name": "Earavely",
+            "code": "3",
+            "id": 91018654,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 3
+          },
+          {
+            "name": "Edakochi North",
+            "code": "58",
+            "id": 91018655,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 58
+          },
+          {
+            "name": "Edakochi South",
+            "code": "59",
+            "id": 91018656,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 59
+          },
+          {
+            "name": "Edappally",
+            "code": "30",
+            "id": 91018657,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 30
+          },
+          {
+            "name": "Elamakkara South",
+            "code": "21",
+            "id": 91018658,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 21
+          },
+          {
+            "name": "Elamakkara North",
+            "code": "26",
+            "id": 91018659,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 26
+          },
+          {
+            "name": "Elamkulam",
+            "code": "42",
+            "id": 91018660,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 42
+          },
+          {
+            "name": "Ernakulam Central",
+            "code": "14",
+            "id": 91018661,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 14
+          },
+          {
+            "name": "Ernakulam North",
+            "code": "15",
+            "id": 91018662,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 15
+          },
+          {
+            "name": "Ernakulam South",
+            "code": "11",
+            "id": 91018663,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 11
+          },
+          {
+            "name": "Fort Kochi",
+            "code": "1",
+            "id": 91018664,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 1
+          },
+          {
+            "name": "Fortkochi Veli",
+            "code": "76",
+            "id": 91018665,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 76
+          },
+          {
+            "name": "Gandhi Nagar",
+            "code": "12",
+            "id": 91018666,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 12
+          },
+          {
+            "name": "Island North",
+            "code": "9",
+            "id": 91018667,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 9
+          },
+          {
+            "name": "Island South",
+            "code": "54",
+            "id": 91018668,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 54
+          },
+          {
+            "name": "Kadavanthra",
+            "code": "49",
+            "id": 91018669,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 49
+          },
+          {
+            "name": "Kadebhagam",
+            "code": "55",
+            "id": 91018670,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 55
+          },
+          {
+            "name": "Kaloor North",
+            "code": "17",
+            "id": 91018671,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 17
+          },
+          {
+            "name": "Kaloor South",
+            "code": "16",
+            "id": 91018672,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 16
+          },
+          {
+            "name": "Kalvathy",
+            "code": "2",
+            "id": 91018673,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 2
+          },
+          {
+            "name": "Karanakkodam",
+            "code": "35",
+            "id": 91018674,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 35
+          },
+          {
+            "name": "Karuvelippady",
+            "code": "8",
+            "id": 91018675,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 8
+          },
+          {
+            "name": "Karippalam",
+            "code": "4",
+            "id": 91018676,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 4
+          },
+          {
+            "name": "Stadium",
+            "code": "34",
+            "id": 91018677,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 34
+          },
+          {
+            "name": "Kathrikadavu",
+            "code": "13",
+            "id": 91018678,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 13
+          },
+          {
+            "name": "Mattanchery",
+            "code": "6",
+            "id": 91018679,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 6
+          },
+          {
+            "name": "Konam",
+            "code": "61",
+            "id": 91018680,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 61
+          },
+          {
+            "name": "Konthuruthy",
+            "code": "52",
+            "id": 91018681,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 52
+          },
+          {
+            "name": "Ayyappankavu",
+            "code": "19",
+            "id": 91018682,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 19
+          },
+          {
+            "name": "Kunnumpuram",
+            "code": "28",
+            "id": 91018683,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 28
+          },
+          {
+            "name": "Palarivattam",
+            "code": "33",
+            "id": 91018684,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 33
+          },
+          {
+            "name": "Moolamkuzhi",
+            "code": "71",
+            "id": 91018685,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 71
+          },
+          {
+            "name": "Nambyapuram",
+            "code": "63",
+            "id": 91018686,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 63
+          },
+          {
+            "name": "Nazareth",
+            "code": "73",
+            "id": 91018687,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 73
+          },
+          {
+            "name": "Pachalam",
+            "code": "22",
+            "id": 91018688,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 22
+          },
+          {
+            "name": "Padivattam",
+            "code": "37",
+            "id": 91018689,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 37
+          },
+          {
+            "name": "Puthiya Road",
+            "code": "36",
+            "id": 91018690,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 36
+          },
+          {
+            "name": "Palluruthy",
+            "code": "62",
+            "id": 91018691,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 62
+          },
+          {
+            "name": "Panampilli Nagar",
+            "code": "50",
+            "id": 91018692,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 50
+          },
+          {
+            "name": "Panayappilly",
+            "code": "74",
+            "id": 91018693,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 74
+          },
+          {
+            "name": "Perumanur",
+            "code": "51",
+            "id": 91018694,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 51
+          },
+          {
+            "name": "Perumbadappu",
+            "code": "60",
+            "id": 91018695,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 60
+          },
+          {
+            "name": "Ponekkara",
+            "code": "29",
+            "id": 91018696,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 29
+          },
+          {
+            "name": "Ponnurunni",
+            "code": "44",
+            "id": 91018697,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 44
+          },
+          {
+            "name": "Ponnurunni East",
+            "code": "45",
+            "id": 91018698,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 45
+          },
+          {
+            "name": "Poonithura",
+            "code": "47",
+            "id": 91018699,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 47
+          },
+          {
+            "name": "Pottakuzhy",
+            "code": "20",
+            "id": 91018700,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 20
+          },
+          {
+            "name": "Mundamveli  East",
+            "code": "68",
+            "id": 91019164,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 68
+          },
+          {
+            "name": "Pallluruthy",
+            "code": "64",
+            "id": 91019165,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 64
+          },
+          {
+            "name": "Palluruthy East",
+            "code": "56",
+            "id": 91019166,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 56
+          },
+          {
+            "name": "Girinagar",
+            "code": "43",
+            "id": 91019167,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 43
+          },
+          {
+            "name": "Devankulangara",
+            "code": "32",
+            "id": 91019168,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 32
+          },
+          {
+            "name": "Vennala",
+            "code": "38",
+            "id": 91019169,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 38
+          },
+          {
+            "name": "Manassery",
+            "code": "70",
+            "id": 91019170,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 70
+          },
+          {
+            "name": "Mundamveli",
+            "code": "69",
+            "id": 91019171,
+            "town": "Kochi",
+            "link": "https://wardmap.ksmart.live",
+            "parsed_code_number": 69
+          }
+        ],
+        "spatial_reference_requested": "EPSG:4326 via outSR=4326"
+      },
+      "candidate_status": "AUDITED_CANDIDATE_ONLY_NOT_PROMOTED"
+    }
+  ],
+  "summary": {
+    "official_sec_wards": 76,
+    "district_records_scanned": 523,
+    "candidate_town_values": [
+      "Kochi"
+    ],
+    "candidate_feature_counts": [
+      76
+    ],
+    "production_geometry_promoted": false
+  }
+}
