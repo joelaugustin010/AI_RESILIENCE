@@ -525,7 +525,10 @@ else:
                 "Eligible pollutants": readiness["eligible_pollutant_count"],
                 "Reason": "; ".join(readiness["missing_requirements"])
                 if readiness["missing_requirements"]
-                else "Eligible for CPCB calculation",
+                else "; ".join(
+                    f"{item['pollutant']}: {item['reason']}"
+                    for item in readiness.get("excluded_records", [])
+                ) or "Eligible for CPCB calculation",
             }
         )
     st.dataframe(
