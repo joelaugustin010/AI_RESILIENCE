@@ -32,8 +32,17 @@ jobs:
             echo "No model artifacts or reports to commit."
           else
             git commit -m "Store weather hazard research baselines and evaluation"
-            git pull --rebase origin main
-          git push
+            for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git rebase origin/main
+            if git push; then
+              exit 0
+            fi
+            echo "Push race on attempt $attempt; retrying after refreshing main."
+            sleep $((attempt * 2))
+          done
+          echo "Could not push generated artifacts after five retries."
+          exit 1
           fi
       - name: Upload trained models and reports
         if: always()
