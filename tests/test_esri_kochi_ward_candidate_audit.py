@@ -53,7 +53,7 @@ class EsriKochiWardCandidateAuditTests(unittest.TestCase):
         self.assertLess(boundary["intersection_over_union"], 0.99)
         self.assertEqual(draft["common_valid_ward_numbers"], 73)
         self.assertLess(draft["mean_per_ward_iou"], 0.99)
-        self.assertIn("not legal approval", boundary["status"].casefold())
+        self.assertIn("not legal approval", boundary["status"].casefold().replace("_", " "))
 
     def test_catalog_marks_candidate_as_provisional_and_not_production(self):
         entries = [
