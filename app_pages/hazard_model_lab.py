@@ -59,10 +59,17 @@ else:
                 f"{model.get('threshold_units', '')}"
             )
             st.write(
-                f"**Historical split:** training target dates before "
-                f"{model.get('train_target_dates_before', 'N/A')}; test target dates from "
-                f"{model.get('test_target_dates_from', 'N/A')}."
+                f"**Temporal evaluation:** model-selection training target dates before "
+                f"{model.get('model_selection_train_target_dates_before', 'N/A')}; "
+                f"threshold validation: {model.get('threshold_validation_target_dates', 'not recorded')}; "
+                f"final training target dates before {model.get('final_train_target_dates_before', model.get('train_target_dates_before', 'N/A'))}; "
+                f"test target dates from {model.get('test_target_dates_from', 'N/A')}."
             )
+            if model.get("selected_probability_threshold") is not None:
+                st.write(
+                    f"**Selected probability threshold:** {model['selected_probability_threshold']:.2f} "
+                    f"(chosen using validation-period {model.get('threshold_selection_metric', 'metric not recorded')})."
+                )
             st.write("**Locations:** " + ", ".join(model.get("locations", [])))
             metrics = model.get("metrics", {})
             metric_rows = [
@@ -76,12 +83,22 @@ else:
             ]
             st.dataframe(pd.DataFrame(metric_rows), hide_index=True, width="stretch")
             if model.get("hazard") == "extreme_rainfall":
-                st.error(
-                    "The current 0.5-classification-threshold accuracy is below the majority-class "
-                    "baseline. ROC-AUC is not a substitute for useful event recall. This model "
-                    "needs threshold tuning on training-only validation data and further evaluation "
-                    "before any user-facing prediction."
-                )
+                if metrics.get("accuracy") is not None and metrics.get("majority_baseline_accuracy") is not None and metrics["accuracy"] < metrics["majority_baseline_accuracy"]:
+                    st.error(
+                        "Accuracy at the validation-selected probability threshold remains below the "
+                        "majority-class baseline. Review precision, recall and F1 together; do not "
+                        "present this baseline as a reliable rainfall warning."
+                    )
+                else:
+                    st.warning(
+                        "The threshold was selected on a separate historical validation period. "
+                        "This is still a research baseline, not a validated rainfall warning model; "
+                        "review event recall, false alarms, calibration and independent observations."
+                    )
+                validation_scores = model.get("validation_threshold_scores", [])
+                if validation_scores:
+                    st.write("**Validation-only threshold comparison**")
+                    st.dataframe(pd.DataFrame(validation_scores), hide_index=True, width="stretch")
             for limitation in model.get("limitations", []):
                 st.write(f"- {limitation}")
 
