@@ -266,7 +266,7 @@ if final_map_pdf_audit.get("pdf_signature_valid"):
         title="Final ward-map reference found — GIS boundaries still unverified",
     )
     st.markdown(
-        f"**Official final ward map PDF:** [Open the Delimitation Commission map]({FINAL_WARD_MAP_PDF})  \\n"
+        f"**Official final ward map PDF:** [Open the Delimitation Commission map]({FINAL_WARD_MAP_PDF})  \n"
         "**Official ward-name register:** [State Election Commission, Kerala](https://sec.kerala.gov.in/public/cnstncy/wd/d0f41644-754b-4b6e-a8dc-97ecbf5fee16)"
     )
     with st.expander("Inspect final-map source audit", expanded=False):
