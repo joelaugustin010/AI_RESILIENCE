@@ -168,6 +168,23 @@ class BudgetTests(unittest.TestCase):
         self.assertIn("missing or invalid", result.iloc[1]["Budget status"])
         self.assertIn("no risk reduction", result.iloc[0]["Basis"])
 
+    def test_combinations_flag_unknown_and_repeated_action_selections(self):
+        actions = pd.DataFrame({"Action": ["A", "B"], "Cost INR": [200, 100]})
+        result = compare_action_combinations(
+            actions, 500,
+            {"Unknown": ["A", "Typo"], "Repeated": ["A", "A"]},
+        ).set_index("Combination")
+        self.assertIn("not in the action table", result.loc["Unknown", "Budget status"])
+        self.assertIn("Unknown action: Typo", result.loc["Unknown", "Selection issues"])
+        self.assertIn("duplicate selections", result.loc["Repeated", "Budget status"])
+        self.assertIn("Repeated selection: A", result.loc["Repeated", "Selection issues"])
+
+    def test_combinations_flag_duplicate_action_rows(self):
+        actions = pd.DataFrame({"Action": ["A", "A"], "Cost INR": [200, 300]})
+        result = compare_action_combinations(actions, 1000, {"A": ["A"]})
+        self.assertIn("duplicate action names", result.iloc[0]["Budget status"])
+        self.assertIn("Duplicate action row: A", result.iloc[0]["Selection issues"])
+
 
 class EvidenceAndReportTests(unittest.TestCase):
     def test_flood_checklist_identifies_missing_verification(self):
