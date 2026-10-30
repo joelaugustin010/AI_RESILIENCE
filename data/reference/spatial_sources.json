@@ -900,6 +900,61 @@
       ],
       "audit_report": "reports/kochi_final_map_source_discovery.json",
       "spatial_use": "reference_only_not_geometry"
+    },
+    {
+      "layer_id": "kochi_wards_esri_kmap_candidate_2026",
+      "title": "Kochi ward polygons — Esri India Living Atlas, KSMART-linked candidate (not integrated)",
+      "status": "candidate_not_integrated",
+      "source_url": "https://livingatlas.esri.in/server1/rest/services/Wards/India_Ward_Boundaries/MapServer/0",
+      "query_url": "https://livingatlas.esri.in/server1/rest/services/Wards/India_Ward_Boundaries/MapServer/0/query",
+      "upstream_link_field": "https://wardmap.ksmart.live",
+      "publisher": "Esri India Living Atlas; feature link field points to the Kerala local-government ward-map portal",
+      "retrieved_on": "2026-10-30",
+      "publication_date": "Not exposed by the layer metadata; service item metadata endpoint returned HTTP 404 during the audit.",
+      "license": "No explicit reuse licence or copyright attribution was exposed by the layer metadata. Redistribution and production integration are blocked pending rights/source-lineage confirmation.",
+      "crs": "ArcGIS layer source spatial reference EPSG:3857; candidate geometry queried with outSR=4326 for audit only.",
+      "units": "Polygon geometry; areas calculated in EPSG:32643 for diagnostics.",
+      "geographic_coverage": "Kochi (town value Kochi), Ernakulam district, Kerala; 76 ward polygons.",
+      "feature_count": 76,
+      "validation_status": "76 POLYGONS VALID; NO INTERIOR OVERLAPS DETECTED; FINAL-BOUNDARY IDENTITY AND REUSE RIGHTS NOT VERIFIED",
+      "evidence_status": "provisional",
+      "local_file": null,
+      "candidate_response_sha256": "092d4c13aab580980c9c6b13b0603d50a5f90b952326b8a793f3610e7af08e3c",
+      "service_metadata_sha256": "b3bea0e99cd22144e725abc209e2a78072978285ec0382088a6c240c77cad9c5",
+      "audit_report": "reports/kochi_esri_ward_candidate_audit.json",
+      "spatial_use": "candidate_only_not_production",
+      "geometry_audit": {
+        "source_features": 76,
+        "unique_source_names": 76,
+        "unique_source_codes": 76,
+        "source_codes_are_1_to_76": true,
+        "polygon_geometries": 76,
+        "invalid_geometries": 0,
+        "pairwise_interior_overlaps_over_1m2": 0,
+        "union_geometry_valid": true,
+        "union_area_km2": 97.8017,
+        "exact_SEC_name_matches_by_source_code_number": 65,
+        "exact_final_PDF_label_matches_by_source_code_number": 75,
+        "source_code_name_differences_vs_SEC_by_number": 11,
+        "source_name_strings_not_found_in_SEC_register": 10
+      },
+      "comparison": {
+        "configured_boundary_source": "data/reference/kochi_corporation_boundary.geojson (provisional DataMeet copy of Kerala OpenSDI layer)",
+        "candidate_vs_configured_boundary_intersection_over_union": 0.936091,
+        "candidate_vs_configured_boundary_symmetric_difference_km2": 6.4018,
+        "candidate_outside_configured_boundary_km2": 4.0329,
+        "configured_boundary_uncovered_by_candidate_km2": 2.3689,
+        "candidate_vs_older_draft_mean_per_ward_intersection_over_union": 0.93165904,
+        "candidate_vs_older_draft_common_ward_union_intersection_over_union": 0.97236939
+      },
+      "limitations": [
+        "The public ArcGIS layer returns 76 valid polygons with unique names and codes 1–76, no pairwise interior overlaps over 1 m², and a valid ward union. These are structural/topological checks, not proof of legal boundary currency.",
+        "By numeric source code, 65 of 76 names match the current SEC register exactly; 11 code/name pairs differ. The source labels match 75 of the 76 numbered labels extractable from the final-notification PDF; ward 62's label was not extracted from the PDF text.",
+        "The union differs from the configured provisional corporation boundary by 6.4018 km² (IoU 0.936091). The configured boundary has no verified publication date or legal currency, so this is a discrepancy to resolve—not proof that either source is correct.",
+        "The Esri candidate and the older KSMART-linked draft candidate differ: mean per-ward IoU across 73 valid common polygons is 0.93165904. The older draft has three invalid polygons; invalid source geometry was excluded, not silently repaired.",
+        "The service's source item metadata endpoint returned HTTP 404 and the layer's copyright text is blank. Reuse terms, source lineage, publication date, and final Gazette alignment remain unverified.",
+        "Raw candidate geometry is not saved or integrated by this audit; it must not be used as a production ward layer or flood-exposure mask."
+      ]
     }
   ],
   "status_definitions_file": "data/reference/data_status_definitions.json"
