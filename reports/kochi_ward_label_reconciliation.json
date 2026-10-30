@@ -7,10 +7,15 @@
   "source_feature_count": 74,
   "candidate_named_ward_count": 74,
   "source_features_with_missing_ward_attributes": 6,
+  "source_features_with_missing_display_ward_name": 6,
+  "source_features_with_missing_boundary_name": 74,
+  "source_features_with_missing_ward_number": 6,
   "matches": [
     {
       "source_feature_index": 7,
       "source_ward_name_missing": true,
+      "source_boundary_name_missing": true,
+      "source_ward_name_source": "missing",
       "source_ward_number_missing": true,
       "best_candidate": {
         "candidate_name": "Cheralai",
@@ -29,6 +34,8 @@
     {
       "source_feature_index": 20,
       "source_ward_name_missing": true,
+      "source_boundary_name_missing": true,
+      "source_ward_name_source": "missing",
       "source_ward_number_missing": true,
       "best_candidate": {
         "candidate_name": "Edakochi South",
@@ -47,6 +54,8 @@
     {
       "source_feature_index": 31,
       "source_ward_name_missing": true,
+      "source_boundary_name_missing": true,
+      "source_ward_name_source": "missing",
       "source_ward_number_missing": true,
       "best_candidate": {
         "candidate_name": "Thattazham",
@@ -65,6 +74,8 @@
     {
       "source_feature_index": 35,
       "source_ward_name_missing": true,
+      "source_boundary_name_missing": true,
+      "source_ward_name_source": "missing",
       "source_ward_number_missing": true,
       "best_candidate": {
         "candidate_name": "Fort Kochi",
@@ -83,6 +94,8 @@
     {
       "source_feature_index": 48,
       "source_ward_name_missing": true,
+      "source_boundary_name_missing": true,
+      "source_ward_name_source": "missing",
       "source_ward_number_missing": true,
       "best_candidate": {
         "candidate_name": "Kathrukadavu",
@@ -101,6 +114,8 @@
     {
       "source_feature_index": 74,
       "source_ward_name_missing": true,
+      "source_boundary_name_missing": true,
+      "source_ward_name_source": "missing",
       "source_ward_number_missing": true,
       "best_candidate": {
         "candidate_name": "Fort Kochi",
@@ -117,7 +132,7 @@
       "automatic_assignment": false
     }
   ],
-  "method": "Projected each geometry to UTM zone 43N (EPSG:32643), ranked candidate polygons by intersection-over-union, and reported top two candidates.",
+  "method": "Normalized GIS field names; checked exact aliases and uniquely agreeing suffixed aliases; used a boundary-name fallback for display ward labels; projected geometries to UTM zone 43N (EPSG:32643) and ranked candidate polygons by intersection-over-union.",
   "limitations": [
     "OpenCity 2024 map is a candidate source, not independently confirmed as the final legally authoritative ward boundary.",
     "Geometry similarity is not proof that a ward name or number is legally/currently correct.",
