@@ -16,6 +16,10 @@ on:
       - ".github/workflows/tests.yml"
   workflow_dispatch:
 
+concurrency:
+  group: ai-resilience-tests-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
