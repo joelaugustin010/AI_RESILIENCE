@@ -7,6 +7,7 @@ import streamlit as st
 
 ROOT = Path(__file__).resolve().parent
 
+
 @st.cache_data(ttl=3600)
 def load_quality_summary() -> tuple[str, str]:
     """Read the two known hydrology issues for concise app-wide warnings."""
@@ -65,8 +66,6 @@ st.set_page_config(
     layout="wide",
 )
 
-
-
 pages = {
     "Explore": [
         st.Page(
@@ -95,6 +94,11 @@ pages = {
             icon=":material/fact_check:",
         ),
         st.Page(
+            "app_pages/hazard_model_lab.py",
+            title="Hazard Model Lab",
+            icon=":material/model_training:",
+        ),
+        st.Page(
             "app_pages/hospital_vulnerability.py",
             title="Hospital Vulnerability",
             icon=":material/local_hospital:",
@@ -110,7 +114,6 @@ pages = {
             icon=":material/fact_check:",
         ),
     ],
-
     "Plan": [
         st.Page(
             "app_pages/mitigation_planner.py",
