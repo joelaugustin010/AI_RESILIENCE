@@ -642,10 +642,42 @@ else:
         if comparison.empty:
             st.info("No pollutant fields have matching units and source period labels in both reports.")
         else:
+            august_mean = "August 2026 mean of daily report values"
+            september_mean = "September 2026 mean of daily report values"
+            if august_mean in comparison.columns and september_mean in comparison.columns:
+                august_values = pd.to_numeric(comparison[august_mean], errors="coerce")
+                september_values = pd.to_numeric(comparison[september_mean], errors="coerce")
+                comparison["Change in mean (%)"] = (
+                    (september_values - august_values)
+                    .div(august_values.where(august_values.ne(0)))
+                    .mul(100)
+                    .round(1)
+                )
+                comparison["Descriptive direction"] = "No change"
+                comparison.loc[
+                    september_values.gt(august_values), "Descriptive direction"
+                ] = "Higher in September"
+                comparison.loc[
+                    september_values.lt(august_values), "Descriptive direction"
+                ] = "Lower in September"
+                comparison.loc[
+                    august_values.eq(0) & september_values.ne(0),
+                    "Descriptive direction",
+                ] = "Change not expressed as % (August mean is zero)"
+                comparison.loc[
+                    august_values.eq(0) & september_values.eq(0),
+                    "Change in mean (%)",
+                ] = 0.0
+
             st.dataframe(
                 comparison,
                 hide_index=True,
-                alt="Descriptive August and September means for matching Eloor pollutant report fields",
+                alt="Descriptive August and September means and percentage changes for matching Eloor pollutant report fields",
+            )
+            st.caption(
+                "Percentage change is calculated from the two arithmetic means of dated report values. "
+                "It is descriptive only: the reports do not provide row-level QA, exact averaging "
+                "intervals, or a basis for statistical significance or source attribution."
             )
 
 st.markdown('<div id="namp-network"></div>', unsafe_allow_html=True)
