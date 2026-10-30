@@ -5,91 +5,79 @@
   "source_page": "https://kochicorporation.lsgkerala.gov.in/en/delimitation-commission-kerala-notification/590",
   "publisher": "Information Kerala Mission / Delimitation Commission portal (as attributed by the official portal)",
   "retrieved_on": "2026-10-30",
-  "retrieved_at_utc": "2026-10-30T13:53:31.116468+00:00",
+  "retrieved_at_utc": "2026-10-30T15:17:01.490010+00:00",
   "publication_date": "Not stated by source; linked map page displays DRAFT NOTIFICATION; corporation notification page posted 2024-11-19.",
   "license": "Reuse rights pending confirmation; attribution retained; candidate is for provisional educational review only, not approved for legal use or further redistribution.",
   "source_sha256": "c624dd6142dfe0febae3b0850d316b7f0844a2f685adc8a4cf23f2b940873f52",
   "source_snapshot_sha256": "c624dd6142dfe0febae3b0850d316b7f0844a2f685adc8a4cf23f2b940873f52",
-  "processed_sha256": "29866a110884f92352c68af74aaccb77d84932187799c639182a37cce4957846",
+  "processed_sha256": "13db3c73a1c1775d7f0c4da55cccc10026e47bd7ce66af9d6998f043191c066f",
   "source_feature_count": 76,
   "processed_feature_count": 76,
-  "matched_official_ward_count": 76,
-  "source_name_mismatch_count": 12,
+  "matched_official_ward_count": 66,
+  "source_name_mismatch_count": 10,
   "source_name_mismatches": [
     {
       "ward_number": 68,
-      "ward_code": "C07003068",
       "source_name": "MUNDAMVELLY EAST",
-      "official_sec_name": "MUNDAMVELY EAST"
+      "ordinal_name_for_comparison_only": "MUNDAMVELY EAST",
+      "official_identity_assigned": false
     },
     {
       "ward_number": 6,
-      "ward_code": "C07003006",
       "source_name": "KOCHANGADI",
-      "official_sec_name": "MATTANCHERY"
+      "ordinal_name_for_comparison_only": "MATTANCHERY",
+      "official_identity_assigned": false
     },
     {
       "ward_number": 69,
-      "ward_code": "C07003069",
       "source_name": "MUNDAMVELLY",
-      "official_sec_name": "MUNDAMVELY"
+      "ordinal_name_for_comparison_only": "MUNDAMVELY",
+      "official_identity_assigned": false
     },
     {
       "ward_number": 34,
-      "ward_code": "C07003034",
       "source_name": "KARUKAPPILLI",
-      "official_sec_name": "STADIUM"
-    },
-    {
-      "ward_number": 3,
-      "ward_code": "C07003003",
-      "source_name": "MATTANCHERY",
-      "official_sec_name": "EARAVELY"
+      "ordinal_name_for_comparison_only": "STADIUM",
+      "official_identity_assigned": false
     },
     {
       "ward_number": 51,
-      "ward_code": "C07003051",
       "source_name": "PERUMANUR",
-      "official_sec_name": "PERUMANOOR"
+      "ordinal_name_for_comparison_only": "PERUMANOOR",
+      "official_identity_assigned": false
     },
     {
       "ward_number": 31,
-      "ward_code": "C07003031",
       "source_name": "EDAPPALLY CHANGAMPPUZHA",
-      "official_sec_name": "CHANGAMPUZHA"
+      "ordinal_name_for_comparison_only": "CHANGAMPUZHA",
+      "official_identity_assigned": false
     },
     {
       "ward_number": 64,
-      "ward_code": "C07003064",
       "source_name": "PALLLURUTHY",
-      "official_sec_name": "PALLURUTHY"
+      "ordinal_name_for_comparison_only": "PALLURUTHY",
+      "official_identity_assigned": false
     },
     {
       "ward_number": 33,
-      "ward_code": "C07003033",
       "source_name": "MAMANGALAM",
-      "official_sec_name": "PALARIVATTAM"
+      "ordinal_name_for_comparison_only": "PALARIVATTAM",
+      "official_identity_assigned": false
     },
     {
       "ward_number": 7,
-      "ward_code": "C07003007",
       "source_name": "CHAKKAMADOM",
-      "official_sec_name": "CHAKKAMADAM"
+      "ordinal_name_for_comparison_only": "CHAKKAMADAM",
+      "official_identity_assigned": false
     },
     {
       "ward_number": 58,
-      "ward_code": "C07003058",
       "source_name": "EDAKOCHI NORTH",
-      "official_sec_name": "EADAKOCHI NORTH"
-    },
-    {
-      "ward_number": 36,
-      "ward_code": "C07003036",
-      "source_name": "PALARIVATTAM",
-      "official_sec_name": "PUTHIYAROAD"
+      "ordinal_name_for_comparison_only": "EADAKOCHI NORTH",
+      "official_identity_assigned": false
     }
   ],
-  "match_method": "explicit source Ward_No (unique values 1..76) matched to numeric suffix of SEC ward codes; source labels are retained and audited, not used to assign IDs",
+  "match_method": "exact normalized source ward-name match to the unique SEC roster; numeric draft ward order is diagnostic only and never assigns official codes/names",
   "geometry_validation": "Shapely reports valid Polygon/MultiPolygon output geometries after itemized make_valid repairs; the repository custom topology checker reports a conflicting invalid-feature result, so this candidate remains visual-only pending reconciliation",
   "geometry_repair_count": 3,
   "geometry_repairs": [
@@ -124,11 +112,11 @@
   "geographic_coverage": "Kochi Municipal Corporation; candidate 76-ward map",
   "layer_role": "context",
   "required_properties": [
-    "sec_ward_code",
-    "sec_ward_name"
+    "source_ward_name",
+    "draft_ward_number"
   ],
   "status": "candidate_not_integrated",
-  "validation_status": "DRAFT CANDIDATE ONLY — 76 features; legal status not approved",
+  "validation_status": "DRAFT CANDIDATE ONLY — 76 features; 66 exact SEC name matches; legal status not approved",
   "analysis_status": "Not approved as a legal boundary, hazard-exposure mask, or production risk-analysis input.",
   "reuse_terms": "Reuse rights pending confirmation; attribution retained; candidate is for provisional educational review only, not approved for legal use or further redistribution.",
   "limitations": [
@@ -136,13 +124,13 @@
     "A successful name/geometry audit does not establish legal finality or positional accuracy.",
     "Not approved as a hazard-exposure mask or legal boundary.",
     "CRS is interpreted as WGS 84 from GeoJSON semantics; no independent formal CRS record was supplied.",
-    "Twelve source Ward_Name values differ from the State Election Commission roster; source labels are retained and SEC names are added by explicit Ward_No only.",
+    "10 source Ward_Name values do not exactly match the State Election Commission roster; those features retain draft labels and receive no SEC code/name.",
     "Three invalid source geometries were repaired in the candidate copy; raw source bytes are preserved unchanged and repairs are itemized.",
     "Candidate is not approved for legal boundaries or production exposure calculations.",
     "Reuse rights require confirmation before further redistribution or non-educational reuse."
   ],
   "validation": {
-    "source_sha256": "29866a110884f92352c68af74aaccb77d84932187799c639182a37cce4957846",
+    "source_sha256": "13db3c73a1c1775d7f0c4da55cccc10026e47bd7ce66af9d6998f043191c066f",
     "source_snapshot_sha256": "c624dd6142dfe0febae3b0850d316b7f0844a2f685adc8a4cf23f2b940873f52",
     "feature_count": 76,
     "geometry_types": {
@@ -154,7 +142,7 @@
     "provenance_valid": true,
     "errors": [],
     "warnings": [
-      "12 source ward names differ from the SEC roster by Ward_No; SEC display names are added without overwriting source names.",
+      "10 source ward labels have no exact normalized SEC roster match; no official code/name is assigned to those draft features.",
       "3 invalid source geometries were repaired only in the candidate copy using Shapely make_valid; raw source remains unchanged.",
       "The linked map page labels this source DRAFT NOTIFICATION; no legal boundary or exposure-analysis approval is implied.",
       "Not admitted to the strict processed-layer ingestion pipeline: repository topology validation disagreed with Shapely on 52 feature records.",

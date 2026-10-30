@@ -1,0 +1,55 @@
+{
+  "source_page": "https://wardmap.ksmart.live/map?district=Ernakulam&localbody=Cochin&type=Corporation",
+  "final_url": "https://wardmap.ksmart.live/map?district=Ernakulam&localbody=Cochin&type=Corporation",
+  "retrieved_content_type": "text/html",
+  "retrieved_html_bytes": 681,
+  "page_title": "Ward Delimitation - Delimitation Commission, Kerala",
+  "page_indicates_final_notification": false,
+  "page_indicates_draft_notification": false,
+  "official_same_origin_scripts": [
+    {
+      "url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "content_type": "application/javascript",
+      "bytes_read": 546865
+    }
+  ],
+  "candidate_public_references": [
+    ")return`https://wardmap.ksmart.live/FinalN/notification/FinalBlock_${Td(e)}.pdf`;if(t===",
+    ")return`https://wardmap.ksmart.live/FinalN/notification/FinalDP_${ru(kd[e]||e)}.pdf`;const n=kd[r]||r;return`https://wardmap.ksmart.live/FinalN/notification/FinalN_${ru(n)}_${Td(e)}.pdf`}function HT(r,e){const t=kd[r]||r;return`https://wardmap.ksmart.live/FinalN/map/Map_FinalN_${ru(t)}_${Td(e)}.pdf`}async function qT(r,e){r.once(",
+    "https://wardmap.ksmart.live/FinalN/map/Map_FinalN_${ru(t)}_${Td(e)}.pdf`}async",
+    "https://wardmap.ksmart.live/FinalN/notification/FinalBlock_${Td(e)}.pdf`;if(t===",
+    "https://wardmap.ksmart.live/FinalN/notification/FinalDP_${ru(kd[e]||e)}.pdf`;const",
+    "https://wardmap.ksmart.live/FinalN/notification/FinalN_${ru(n)}_${Td(e)}.pdf`}function",
+    "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+    "https://wardmap.ksmart.live/map",
+    "https://wardmap.ksmart.live/map?district=${encodeURIComponent(e)}&type=${encodeURIComponent(t)}&localbody=${encodeURIComponent(n)}`)};return"
+  ],
+  "html_text_checks": [
+    {
+      "pattern": "FINAL\\s+NOTIFICATION",
+      "occurrences": 0
+    },
+    {
+      "pattern": "DRAFT\\s+NOTIFICATION",
+      "occurrences": 0
+    },
+    {
+      "pattern": "geojson",
+      "occurrences": 0
+    },
+    {
+      "pattern": "ward.?boundary",
+      "occurrences": 0
+    },
+    {
+      "pattern": "api/",
+      "occurrences": 0
+    }
+  ],
+  "status": "SOURCE_DISCOVERY_ONLY_NOT_GEOMETRY_VERIFICATION",
+  "limitations": [
+    "A final-notification page label is not by itself proof that a downloaded GIS geometry matches the legally notified boundary.",
+    "No geometry is approved or integrated by this script.",
+    "Only HTTPS resources on wardmap.ksmart.live are fetched."
+  ]
+}

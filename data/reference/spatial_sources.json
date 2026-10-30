@@ -911,14 +911,14 @@
         "A successful name/geometry audit does not establish legal finality or positional accuracy.",
         "Not approved as a hazard-exposure mask or legal boundary.",
         "CRS is interpreted as WGS 84 from GeoJSON semantics; no independent formal CRS record was supplied.",
-        "Twelve source Ward_Name values differ from the State Election Commission roster; source labels are retained and SEC names are added by explicit Ward_No only.",
+        "10 source Ward_Name values do not exactly match the State Election Commission roster; those features retain draft labels and receive no SEC code/name.",
         "Three invalid source geometries were repaired in the candidate copy; raw source bytes are preserved unchanged and repairs are itemized.",
         "Candidate is not approved for legal boundaries or production exposure calculations.",
         "Reuse rights require confirmation before further redistribution or non-educational reuse."
       ],
       "local_file": "data/candidates/kochi_wards_ksmart_2024_draft_candidate.geojson",
       "feature_count": 76,
-      "validation_status": "DRAFT CANDIDATE ONLY — 76 features; legal status not approved",
+      "validation_status": "DRAFT CANDIDATE ONLY — 76 features; 66 exact SEC name matches; legal status not approved",
       "evidence_status": "provisional"
     }
   ],
