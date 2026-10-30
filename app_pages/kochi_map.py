@@ -16,6 +16,8 @@ FLOOD_ACQUISITION_METADATA = ROOT / "data" / "raw" / "ksdma_flood_return_probabi
 HOSPITAL_REVIEW_METADATA = ROOT / "data" / "processed" / "nihfw_ernakulam_hospitals_coordinate_review.metadata.json"
 HOSPITAL_REVIEW_CSV = ROOT / "data" / "processed" / "nihfw_ernakulam_hospitals_coordinate_review.csv"
 WARD_RECONCILIATION_REPORT = ROOT / "reports" / "kochi_ward_label_reconciliation.json"
+PORTAL_WARD_AUDIT_REPORT = ROOT / "reports" / "kochi_portal_candidate_vs_sec_register.json"
+PORTAL_WARD_METADATA = ROOT / "data" / "external" / "map_reference" / "kochi_wards_ksmart_portal_candidate.metadata.json"
 
 
 def _normalize_property_key(value: object) -> str:
@@ -226,6 +228,41 @@ catalog_rows = [{
 st.subheader("Source and layer catalog")
 st.dataframe(pd.DataFrame(catalog_rows), hide_index=True, width="stretch", alt="Reviewed Kochi spatial source inventory with availability, coverage, CRS, and reuse status")
 
+portal_ward_audit = load_acquisition_metadata(PORTAL_WARD_AUDIT_REPORT) or {}
+portal_ward_metadata = load_acquisition_metadata(PORTAL_WARD_METADATA) or {}
+portal_audit_counts = portal_ward_metadata.get("audit", {})
+portal_alignment = portal_ward_audit.get("current_sec_count_alignment", {})
+portal_geometry_audit = portal_ward_audit.get("geometry_audit", {})
+if portal_ward_audit:
+    st.warning(
+        "A KSMART-linked map file contains 76 ward polygons, matching the current SEC ward count, "
+        f"but its source page is labelled DRAFT NOTIFICATION. The audit found "
+        f"{portal_geometry_audit.get('invalid_geometry_count', 'unknown')} invalid polygon(s) and "
+        f"{portal_ward_audit.get('ward_name_mismatch_count', 'unknown')} ward-name differences versus the current SEC register "
+        "(some may be spelling differences). This candidate is not used as the production boundary.",
+        title="76-ward candidate acquired — not approved for production",
+    )
+    with st.expander("Inspect 76-ward candidate audit", expanded=False):
+        st.write({
+            "Candidate feature count": portal_ward_audit.get("portal_feature_count"),
+            "Current SEC ward count": portal_ward_audit.get("official_sec_ward_count"),
+            "Unique candidate names": portal_ward_audit.get("unique_portal_names"),
+            "Ward-name differences": portal_ward_audit.get("ward_name_mismatch_count"),
+            "Invalid geometries": portal_geometry_audit.get("invalid_geometry_count"),
+            "Invalid feature indices": portal_geometry_audit.get("invalid_feature_indices"),
+            "Promotion decision": portal_ward_audit.get("promotion_decision"),
+        })
+        mismatch_rows = [
+            {
+                "Candidate ward no.": row.get("portal_ward_number"),
+                "Candidate name": row.get("portal_ward_name"),
+                "Current SEC name": row.get("sec_ward_name_for_number"),
+            }
+            for row in portal_ward_audit.get("ward_comparisons", [])
+            if row.get("name_mismatch")
+        ]
+        if mismatch_rows:
+            st.dataframe(pd.DataFrame(mismatch_rows), hide_index=True, width="stretch")
 ward_reconciliation = load_ward_reconciliation_report()
 ward_matches = ward_reconciliation.get("matches", [])
 ward_alignment = ward_reconciliation.get("ward_count_alignment", {})
