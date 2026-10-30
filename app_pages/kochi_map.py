@@ -59,6 +59,19 @@ def _first_property(properties: dict, candidates: tuple[str, ...], fallback: str
     return fallback
 
 
+def resolve_inspector_ward_name(ward_name: str, bound_name: str, ward_number: str, feature_index: int) -> str:
+    """Use the same conservative ward-name fallback in the feature inspector."""
+    ward_name = str(ward_name or "").strip()
+    bound_name = str(bound_name or "").strip()
+    if ward_name and not ward_name.casefold().startswith("ward name unavailable"):
+        return ward_name
+    if bound_name and not bound_name.casefold().startswith(("boundary label unavailable", "boundary feature ")):
+        return bound_name
+    if ward_number and ward_number.strip():
+        return f"Ward name unavailable (ward no. {ward_number.strip()}; source feature {feature_index})"
+    return f"Ward name unavailable (source feature {feature_index})"
+
+
 def normalize_geojson_for_tooltip(geojson: dict, fallback_name: str | None = None) -> dict:
     """Add display-only aliases while preserving every original property and geometry.
 
@@ -590,7 +603,16 @@ if processed_layers:
                     ),
                     f"Ward name unavailable (feature {int(feature_number)})",
                 )
-                # Never substitute a ward number or feature ID for a missing ward name.
+                inspected_ward_number = _first_property(
+                    properties,
+                    ("Ward_No", "Ward No", "ward_no", "ward_number", "wardnumber", "ward_id", "wardid"),
+                    "",
+                )
+                inspected_ward_name = resolve_inspector_ward_name(
+                    inspected_ward_name, inspected_bound_name, inspected_ward_number, int(feature_number)
+                )
+                # A missing ward name may fall back to a genuine boundary label;
+                # a numeric ward ID is never presented as the human-readable name.
                 detail_cols[0].metric("Bound Name", inspected_bound_name)
                 detail_cols[1].metric("Ward Name", inspected_ward_name)
                 if properties:
