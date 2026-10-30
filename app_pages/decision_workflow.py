@@ -13,6 +13,7 @@ from src.disaster_data_catalog import get_catalog, validate_catalog_record
 from src.consequence_data_requirements import HAZARD_REQUIREMENTS, requirements_for_hazard, requirements_table
 from src.consequence_assessment import build_consequence_assessment
 from src.scenario_input_quality import evaluate_scenario_readiness
+from src.scenario_screening import build_scenario_screening
 
 from src.decision_workflow import (
     HAZARD_OPTIONS,
@@ -607,16 +608,25 @@ st.info(
 
 st.header("3. Assessment status")
 assessment = assessment_summary(inputs)
-st.error(assessment["status"], icon=":material/priority_high:")
+st.success(assessment["status"], icon=":material/assignment_turned_in:")
 st.write("**Method:**", assessment["method"])
 st.write("**Selected hazard(s):**", assessment["hazards"])
 st.write("**Interpretation:**", assessment["interpretation"])
 st.warning(assessment["additional_caution"])
 st.caption("No user-entered value is treated as verified. River-level values are recorded in the report but never compared with a threshold in this workflow.")
 
+st.subheader("Scenario-based assessment from your entered assumptions")
+st.caption(
+    "This section does assess the scenario you entered: it explains conditional consequences and practical checks. "
+    "Hypothetical inputs are allowed. Results are qualitative and assumption-based, not a calibrated probability, "
+    "flood-depth estimate, affected-area map, or official warning."
+)
+scenario_screen = build_scenario_screening(inputs)
+st.dataframe(scenario_screen, hide_index=True, width="stretch")
+
 st.subheader("Scientific scenario frame and evidence gates")
 scientific_frame = build_scientific_scenario_frame(inputs)
-st.error(scientific_frame["evidence_gate"])
+st.info(scientific_frame["evidence_gate"])
 st.caption(
     "This frame structures the reasoning into hazard, exposure, vulnerability, and consequences to investigate. "
     "It does not calculate a probability, impact estimate, or warning."
@@ -647,7 +657,10 @@ for item in input_quality["evidence_factors_present"]:
     st.markdown(f"- ✓ Supplied in the form: {item}")
 for item in input_quality["evidence_factors_missing_or_unverified"]:
     st.markdown(f"- ☐ Missing or not independently verified: {item}")
-st.info(input_quality["reason"])
+st.info(
+    "Numerical prediction is not enabled because the required calibrated model and verified local evidence are not available. "
+    "Your hypothetical scenario has still been assessed qualitatively in the section above."
+)
 
 st.subheader("Consequence assessment: probability, affected areas and impacts")
 consequence_assessment = build_consequence_assessment(
