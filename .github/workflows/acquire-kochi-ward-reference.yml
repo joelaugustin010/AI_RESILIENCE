@@ -34,7 +34,7 @@ jobs:
           git commit -m "Store audited Kochi ward boundary candidate" || echo "No candidate changes to commit."
           for attempt in 1 2 3 4 5; do
             git fetch origin main
-            git rebase origin/main
+            git rebase -X theirs origin/main
             if git push; then
               exit 0
             fi
