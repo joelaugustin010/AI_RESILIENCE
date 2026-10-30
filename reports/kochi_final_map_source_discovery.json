@@ -75,7 +75,28 @@
       "snippet": "anathapuram\"},ZT={Alakode:\"Alakkode\",Badiadka:\"Badiyadka\",Guruvayur:\"Guruvayoor\",Irinjalakuda:\"Irinjalakkuda\",Kanhangad:\"Kanjhangad\",Kasaragod:\"Kasargod\",Kavanur:\"Kavannur\",Kochi:\"Cochin\",Kodungallur:\"Kodungalloor\",Koyilandy:\"Quilandy\",\"Lakkidi-perur\":\"Lakkidi-Perur\",\"Malayattoor Neeleeswaram\":\"Malayattoor Neeleswaram\",Mulumthuruthy:\"Mulamthuruthy\",Narikkuni:\"Narikunni\",Narippatta:\"Naripetta\",\"Padiyur kalliad\":\"Padiyur Kalliad\",Paravur:\"Paravoor\",\"Perumana klari\":\"Perumana Klari\",Pothanicad:\"Pot"
     }
   ],
-  "script_variable_evidence": [],
+  "script_variable_evidence": [
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "variable": "e1",
+      "snippet": "nhal\",\"Thirunelly\",\"Thondernad\",\"Vellamunda\",\"Vengappally\",\"Vythiri\"],Municipality:[\"Kalpetta\",\"Mananthavady\",\"Sulthan Bathery\"]}},Jx=\"https://kmapdev.ksmart.live/tiles/wb_kerala\",e1=\"https://kmapdev.ksmart.live/tiles/kerala_bp\";async function t1(){const r={},e=[];for(let n=191;n<=196;n++)for(let s=109;s<=119;s++)e.push({x:n,y:s,z:8});await Promise.all(e.map(async({x:n,y:s,z:a})=>{try{const l=await fetch(`${e1}/${a}/${n}/${s}`,{signal:AbortSignal.timeout(8e3)});if(!l.ok)return;const c=await l.arrayBuffer(),h=new Uint8Array(c);let g=0;const f=()=>{let v=0,w=0;for(;g<h.length;){const C=h[g++];if(v|=(C&127)<<w,!(C&128))break;w+=7}return v},m=v=>{const w=new TextDecoder().dec"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "variable": "Jx",
+      "snippet": "thadi\",\"Pozhuthana\",\"Pulpally\",\"Thariyode\",\"Thavinhal\",\"Thirunelly\",\"Thondernad\",\"Vellamunda\",\"Vengappally\",\"Vythiri\"],Municipality:[\"Kalpetta\",\"Mananthavady\",\"Sulthan Bathery\"]}},Jx=\"https://kmapdev.ksmart.live/tiles/wb_kerala\",e1=\"https://kmapdev.ksmart.live/tiles/kerala_bp\";async function t1(){const r={},e=[];for(let n=191;n<=196;n++)for(let s=109;s<=119;s++)e.push({x:n,y:s,z:8});await Promise.all(e.map(async({x:n,y:s,z:a})=>{try{const l=await fetch(`${e1}/${a}/${n}/${s}`,{signal:AbortSignal.timeout(8e3)});if(!l.ok)return;const c=await l.arrayBuffer(),h=new Uint8Array(c);let g=0;const f=()=>{let v=0,w=0;for(;g<h.length;){const C=h[g++];if(v|=(C&127)<<w,!(C&128))break;w"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "variable": "Fy",
+      "snippet": "body||\"\").trim();V&&D&&(r[V]||(r[V]=new Set),r[V].add(D))}}else _(C)}}catch{}}));const t={};for(const[n,s]of Object.entries(r))t[n]=[...s].sort((a,l)=>a.localeCompare(l));return t}const Fy=[];for(let r=191;r<=196;r++)for(let e=109;e<=119;e++)Fy.push({x:r,y:e,z:8});async function n1(r){const e=[];try{const t=new Uint8Array(r),n=new DataView(r);let s=0;const a=()=>{let f=0,m=0;for(;s<t.length;){const _=t[s++];if(f|=(_&127)<<m,!(_&128))break;m+=7}return f},l=f=>{const m=new TextDecoder().decode(t.slice(s,s+f));return s+=f,m},c=f=>{if(f===0)a();else if(f===2){const m=a();s+=m}else f===5?s+=4:f===1&&(s+=8)},h=[],g=[];for(;s<t.length;){const f=a(),m=f>>3,_=f&7;if(m===3&&_===2){"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "variable": "nR",
+      "snippet": "hildren:\"Localbody Type\"}),A.jsx(\"td\",{children:l.lsgdType})]}),A.jsxs(\"tr\",{children:[A.jsx(\"td\",{children:\"District\"}),\"     \",A.jsx(\"td\",{children:l.district})]})]})]})})]})]})}const nR=[{name:\"kerala_bp\",url:\"https://kmapdev.ksmart.live/tiles/kerala_bp/10/771/457\"},{name:\"kerala_bp (z8)\",url:\"https://kmapdev.ksmart.live/tiles/kerala_bp/8/193/114\"},{name:\"kerala_bp_with_lsgd\",url:\"https://kmapdev.ksmart.live/tiles/kerala_bp_with_lsgd/10/771/457\"},{name:\"kerala_bp_with_lsgd (z8)\",url:\"https://kmapdev.ksmart.live/tiles/kerala_bp_with_lsgd/8/193/114\"},{name:\"wb_kerala (reference)\",url:\"https://kmapdev.ksmart.live/tiles/wb_kerala/10/771/457\"}];async function iR(r){const e="
+    }
+  ],
   "final_map_pdf_audit": {
     "url": "https://wardmap.ksmart.live/FinalN/map/Map_FinalN_Ernakulam_Cochin.pdf",
     "final_url": "https://wardmap.ksmart.live/FinalN/map/Map_FinalN_Ernakulam_Cochin.pdf",
@@ -133,375 +154,798 @@
         "text_found": false
       }
     ],
-    "numbered_map_labels_extracted": 0,
-    "numbered_map_labels": [],
-    "numbered_comparison_exact_name_matches": 0,
+    "numbered_map_labels_extracted": 75,
+    "numbered_map_labels": [
+      {
+        "ward_number": 1,
+        "map_label": "FORT KOCHI"
+      },
+      {
+        "ward_number": 2,
+        "map_label": "KALVATHY"
+      },
+      {
+        "ward_number": 3,
+        "map_label": "EARAVELY"
+      },
+      {
+        "ward_number": 4,
+        "map_label": "KARIPPALAM"
+      },
+      {
+        "ward_number": 5,
+        "map_label": "CHERALAYI"
+      },
+      {
+        "ward_number": 6,
+        "map_label": "MATTANCHERY"
+      },
+      {
+        "ward_number": 7,
+        "map_label": "CHAKKAMADOM"
+      },
+      {
+        "ward_number": 8,
+        "map_label": "KARUVELIPPADY"
+      },
+      {
+        "ward_number": 9,
+        "map_label": "ISLAND NORTH"
+      },
+      {
+        "ward_number": 10,
+        "map_label": "RAVIPURAM"
+      },
+      {
+        "ward_number": 11,
+        "map_label": "ERNAKULAM SOUTH"
+      },
+      {
+        "ward_number": 12,
+        "map_label": "GANDHI NAGAR"
+      },
+      {
+        "ward_number": 13,
+        "map_label": "KATHRIKADAVU"
+      },
+      {
+        "ward_number": 14,
+        "map_label": "ERNAKULAM CENTRAL"
+      },
+      {
+        "ward_number": 15,
+        "map_label": "ERNAKULAM NORTH"
+      },
+      {
+        "ward_number": 16,
+        "map_label": "KALOOR SOUTH"
+      },
+      {
+        "ward_number": 17,
+        "map_label": "KALOOR NORTH"
+      },
+      {
+        "ward_number": 18,
+        "map_label": "THRIKKANARVATTOM"
+      },
+      {
+        "ward_number": 19,
+        "map_label": "AYYAPPANKAVU"
+      },
+      {
+        "ward_number": 20,
+        "map_label": "POTTAKUZHY"
+      },
+      {
+        "ward_number": 21,
+        "map_label": "ELAMAKKARA SOUTH"
+      },
+      {
+        "ward_number": 22,
+        "map_label": "PACHALAM"
+      },
+      {
+        "ward_number": 23,
+        "map_label": "THATTAZHAM"
+      },
+      {
+        "ward_number": 24,
+        "map_label": "VADUTHALA WEST"
+      },
+      {
+        "ward_number": 25,
+        "map_label": "VADUTHALA EAST"
+      },
+      {
+        "ward_number": 26,
+        "map_label": "ELAMAKKARA NORTH"
+      },
+      {
+        "ward_number": 27,
+        "map_label": "PUTHUKKALAVATTAM"
+      },
+      {
+        "ward_number": 28,
+        "map_label": "KUNNUMPURAM"
+      },
+      {
+        "ward_number": 29,
+        "map_label": "PONEKKARA"
+      },
+      {
+        "ward_number": 30,
+        "map_label": "EDAPPALLY"
+      },
+      {
+        "ward_number": 31,
+        "map_label": "CHANGAMPPUZHA"
+      },
+      {
+        "ward_number": 32,
+        "map_label": "DEVANKULANGARA"
+      },
+      {
+        "ward_number": 33,
+        "map_label": "PALARIVATTAM"
+      },
+      {
+        "ward_number": 34,
+        "map_label": "STADIUM"
+      },
+      {
+        "ward_number": 35,
+        "map_label": "KARANAKKODAM"
+      },
+      {
+        "ward_number": 36,
+        "map_label": "PUTHIYA ROAD"
+      },
+      {
+        "ward_number": 37,
+        "map_label": "PADIVATTAM"
+      },
+      {
+        "ward_number": 38,
+        "map_label": "VENNALA"
+      },
+      {
+        "ward_number": 39,
+        "map_label": "CHAKKARAPARAMBU"
+      },
+      {
+        "ward_number": 40,
+        "map_label": "CHALIKKAVATTAM"
+      },
+      {
+        "ward_number": 41,
+        "map_label": "THAMMANAM"
+      },
+      {
+        "ward_number": 42,
+        "map_label": "ELAMKULAM"
+      },
+      {
+        "ward_number": 43,
+        "map_label": "GIRINAGAR"
+      },
+      {
+        "ward_number": 44,
+        "map_label": "PONNURUNNI"
+      },
+      {
+        "ward_number": 45,
+        "map_label": "PONNURUNNI EAST"
+      },
+      {
+        "ward_number": 46,
+        "map_label": "VYTTILA"
+      },
+      {
+        "ward_number": 47,
+        "map_label": "POONITHURA"
+      },
+      {
+        "ward_number": 48,
+        "map_label": "VYTTILA JANATHA"
+      },
+      {
+        "ward_number": 49,
+        "map_label": "KADAVANTHRA"
+      },
+      {
+        "ward_number": 50,
+        "map_label": "PANAMPILLI NAGAR"
+      },
+      {
+        "ward_number": 51,
+        "map_label": "PERUMANUR"
+      },
+      {
+        "ward_number": 52,
+        "map_label": "KONTHURUTHY"
+      },
+      {
+        "ward_number": 53,
+        "map_label": "THEVARA"
+      },
+      {
+        "ward_number": 54,
+        "map_label": "ISLAND SOUTH"
+      },
+      {
+        "ward_number": 55,
+        "map_label": "KADEBHAGAM"
+      },
+      {
+        "ward_number": 56,
+        "map_label": "PALLURUTHY EAST"
+      },
+      {
+        "ward_number": 57,
+        "map_label": "THAZHUPPU"
+      },
+      {
+        "ward_number": 58,
+        "map_label": "EDAKOCHI NORTH"
+      },
+      {
+        "ward_number": 59,
+        "map_label": "EDAKOCHI SOUTH"
+      },
+      {
+        "ward_number": 60,
+        "map_label": "PERUMBADAPPU"
+      },
+      {
+        "ward_number": 61,
+        "map_label": "KONAM"
+      },
+      {
+        "ward_number": 63,
+        "map_label": "NAMBYAPURAM"
+      },
+      {
+        "ward_number": 64,
+        "map_label": "PALLLURUTHY"
+      },
+      {
+        "ward_number": 65,
+        "map_label": "PULLARDESAM"
+      },
+      {
+        "ward_number": 66,
+        "map_label": "THAREBHAGAM"
+      },
+      {
+        "ward_number": 67,
+        "map_label": "THOPPUMPADY"
+      },
+      {
+        "ward_number": 68,
+        "map_label": "MUNDAMVELI  EAST"
+      },
+      {
+        "ward_number": 69,
+        "map_label": "MUNDAMVELI"
+      },
+      {
+        "ward_number": 70,
+        "map_label": "MANASSERY"
+      },
+      {
+        "ward_number": 71,
+        "map_label": "MOOLAMKUZHI"
+      },
+      {
+        "ward_number": 72,
+        "map_label": "CHULLICKAL"
+      },
+      {
+        "ward_number": 73,
+        "map_label": "NAZARETH"
+      },
+      {
+        "ward_number": 74,
+        "map_label": "PANAYAPPILLY"
+      },
+      {
+        "ward_number": 75,
+        "map_label": "AMARAVATHY"
+      },
+      {
+        "ward_number": 76,
+        "map_label": "FORTKOCHI VELI"
+      }
+    ],
+    "numbered_comparison_exact_name_matches": 65,
     "numbered_comparison": [
       {
         "ward_number": 1,
         "official_sec_name": "FORT KOCHI",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "FORT KOCHI"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 2,
         "official_sec_name": "KALVATHY",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "KALVATHY"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 3,
         "official_sec_name": "EARAVELY",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "EARAVELY"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 4,
         "official_sec_name": "KARIPPALAM",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "KARIPPALAM"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 5,
         "official_sec_name": "CHERALAYI",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "CHERALAYI"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 6,
         "official_sec_name": "MATTANCHERY",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "MATTANCHERY"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 7,
         "official_sec_name": "CHAKKAMADAM",
-        "final_map_labels": [],
+        "final_map_labels": [
+          "CHAKKAMADOM"
+        ],
         "exact_normalized_match": false
       },
       {
         "ward_number": 8,
         "official_sec_name": "KARUVELIPPADY",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "KARUVELIPPADY"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 9,
         "official_sec_name": "ISLAND NORTH",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "ISLAND NORTH"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 10,
         "official_sec_name": "RAVIPURAM",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "RAVIPURAM"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 11,
         "official_sec_name": "ERNAKULAM SOUTH",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "ERNAKULAM SOUTH"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 12,
         "official_sec_name": "GANDHI NAGAR",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "GANDHI NAGAR"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 13,
         "official_sec_name": "KATHRIKADAVU",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "KATHRIKADAVU"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 14,
         "official_sec_name": "ERNAKULAM CENTRAL",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "ERNAKULAM CENTRAL"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 15,
         "official_sec_name": "ERNAKULAM NORTH",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "ERNAKULAM NORTH"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 16,
         "official_sec_name": "KALOOR SOUTH",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "KALOOR SOUTH"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 17,
         "official_sec_name": "KALOOR-NORTH",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "KALOOR NORTH"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 18,
         "official_sec_name": "THRIKKANARVATTOM",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "THRIKKANARVATTOM"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 19,
         "official_sec_name": "AYYAPPANKAVU",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "AYYAPPANKAVU"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 20,
         "official_sec_name": "POTTAKUZHY",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "POTTAKUZHY"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 21,
         "official_sec_name": "ELAMAKKARA SOUTH",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "ELAMAKKARA SOUTH"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 22,
         "official_sec_name": "PACHALAM",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "PACHALAM"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 23,
         "official_sec_name": "THATTAZHAM",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "THATTAZHAM"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 24,
         "official_sec_name": "VADUTHALA WEST",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "VADUTHALA WEST"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 25,
         "official_sec_name": "VADUTHALA EAST",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "VADUTHALA EAST"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 26,
         "official_sec_name": "ELAMAKKARA NORTH",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "ELAMAKKARA NORTH"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 27,
         "official_sec_name": "PUTHUKKALAVATTAM",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "PUTHUKKALAVATTAM"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 28,
         "official_sec_name": "KUNNUMPURAM",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "KUNNUMPURAM"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 29,
         "official_sec_name": "PONEKKARA",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "PONEKKARA"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 30,
         "official_sec_name": "EDAPPALLY",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "EDAPPALLY"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 31,
         "official_sec_name": "CHANGAMPUZHA",
-        "final_map_labels": [],
+        "final_map_labels": [
+          "CHANGAMPPUZHA"
+        ],
         "exact_normalized_match": false
       },
       {
         "ward_number": 32,
         "official_sec_name": "DHEVANKULANGARA",
-        "final_map_labels": [],
+        "final_map_labels": [
+          "DEVANKULANGARA"
+        ],
         "exact_normalized_match": false
       },
       {
         "ward_number": 33,
         "official_sec_name": "PALARIVATTAM",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "PALARIVATTAM"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 34,
         "official_sec_name": "STADIUM",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "STADIUM"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 35,
         "official_sec_name": "KARANAKKODAM",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "KARANAKKODAM"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 36,
         "official_sec_name": "PUTHIYAROAD",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "PUTHIYA ROAD"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 37,
         "official_sec_name": "PADIVATTAM",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "PADIVATTAM"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 38,
         "official_sec_name": "VENNALA",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "VENNALA"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 39,
         "official_sec_name": "CHAKKARAPARAMBU",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "CHAKKARAPARAMBU"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 40,
         "official_sec_name": "CHALIKKAVATTAM",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "CHALIKKAVATTAM"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 41,
         "official_sec_name": "THAMMANAM",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "THAMMANAM"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 42,
         "official_sec_name": "ELAMKULAM",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "ELAMKULAM"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 43,
         "official_sec_name": "GIRINAGAR",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "GIRINAGAR"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 44,
         "official_sec_name": "PONNURUNNI",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "PONNURUNNI"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 45,
         "official_sec_name": "PONNURUNNI EAST",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "PONNURUNNI EAST"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 46,
         "official_sec_name": "VYTTILA",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "VYTTILA"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 47,
         "official_sec_name": "POONITHURA",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "POONITHURA"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 48,
         "official_sec_name": "VYTTILA JANATHA",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "VYTTILA JANATHA"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 49,
         "official_sec_name": "KADAVANTHRA",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "KADAVANTHRA"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 50,
         "official_sec_name": "PANAMPILLI NAGAR",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "PANAMPILLI NAGAR"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 51,
         "official_sec_name": "PERUMANOOR",
-        "final_map_labels": [],
+        "final_map_labels": [
+          "PERUMANUR"
+        ],
         "exact_normalized_match": false
       },
       {
         "ward_number": 52,
         "official_sec_name": "KONTHURUTHY",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "KONTHURUTHY"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 53,
         "official_sec_name": "THEVARA",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "THEVARA"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 54,
         "official_sec_name": "ISLAND SOUTH",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "ISLAND SOUTH"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 55,
         "official_sec_name": "KADEBHAGAM",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "KADEBHAGAM"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 56,
         "official_sec_name": "PALLURUTHY EAST",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "PALLURUTHY EAST"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 57,
         "official_sec_name": "THAZHUPPU",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "THAZHUPPU"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 58,
         "official_sec_name": "EADAKOCHI NORTH",
-        "final_map_labels": [],
+        "final_map_labels": [
+          "EDAKOCHI NORTH"
+        ],
         "exact_normalized_match": false
       },
       {
         "ward_number": 59,
         "official_sec_name": "EDAKOCHI SOUTH",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "EDAKOCHI SOUTH"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 60,
         "official_sec_name": "PERUMBADAPPU",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "PERUMBADAPPU"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 61,
         "official_sec_name": "KONAM",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "KONAM"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 62,
@@ -512,86 +956,114 @@
       {
         "ward_number": 63,
         "official_sec_name": "NAMBYAPURAM",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "NAMBYAPURAM"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 64,
         "official_sec_name": "PALLURUTHY",
-        "final_map_labels": [],
+        "final_map_labels": [
+          "PALLLURUTHY"
+        ],
         "exact_normalized_match": false
       },
       {
         "ward_number": 65,
         "official_sec_name": "PULLARDESAM",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "PULLARDESAM"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 66,
         "official_sec_name": "THAREBHAGAM",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "THAREBHAGAM"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 67,
         "official_sec_name": "THOPPUMPADY",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "THOPPUMPADY"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 68,
         "official_sec_name": "MUNDAMVELY EAST",
-        "final_map_labels": [],
+        "final_map_labels": [
+          "MUNDAMVELI  EAST"
+        ],
         "exact_normalized_match": false
       },
       {
         "ward_number": 69,
         "official_sec_name": "MUNDAMVELY",
-        "final_map_labels": [],
+        "final_map_labels": [
+          "MUNDAMVELI"
+        ],
         "exact_normalized_match": false
       },
       {
         "ward_number": 70,
         "official_sec_name": "MANASSERY",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "MANASSERY"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 71,
         "official_sec_name": "MOOLAMKUZHY",
-        "final_map_labels": [],
+        "final_map_labels": [
+          "MOOLAMKUZHI"
+        ],
         "exact_normalized_match": false
       },
       {
         "ward_number": 72,
         "official_sec_name": "CHULLICKAL",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "CHULLICKAL"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 73,
         "official_sec_name": "NASRATHU",
-        "final_map_labels": [],
+        "final_map_labels": [
+          "NAZARETH"
+        ],
         "exact_normalized_match": false
       },
       {
         "ward_number": 74,
         "official_sec_name": "PANAYAPPILLY",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "PANAYAPPILLY"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 75,
         "official_sec_name": "AMARAVATHY",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "AMARAVATHY"
+        ],
+        "exact_normalized_match": true
       },
       {
         "ward_number": 76,
         "official_sec_name": "FORTKOCHI VELI",
-        "final_map_labels": [],
-        "exact_normalized_match": false
+        "final_map_labels": [
+          "FORTKOCHI VELI"
+        ],
+        "exact_normalized_match": true
       }
     ],
     "page_text_preview": [
