@@ -1,11 +1,22 @@
 {
-  "status": "GEOMETRIC_CROSSWALK_CANDIDATES_ONLY",
+  "status": "WARD_COUNT_MISMATCH_OFFICIAL_CURRENT_REGISTER",
   "source_file": "data/processed/spatial_layers/kochi_wards_datameet_2022.geojson",
   "source_sha256": "d27ee64ade27b5d4145eb11e55524f34d20f759eb8bc42b344211854aac86d40",
   "candidate_file": "data/external/map_reference/kochi_wards_2024_candidate.kml",
   "candidate_sha256": "e6376e6a2ac3a0ab28615cd77f4d649bfba5c48034d26c2e31ae295697d06238",
+  "official_register_file": "data/reference/kochi_official_ward_register_2026.json",
+  "official_register_sha256": "4366f75a310ab8c316cd88e2247be7f362279e9af53baa89c6cc4c4953c710b8",
+  "official_register_source_url": "https://sec.kerala.gov.in/public/cnstncy/wd/d0f41644-754b-4b6e-a8dc-97ecbf5fee16",
+  "official_register_retrieved_on": "2026-10-30",
+  "official_current_ward_count": 76,
   "source_feature_count": 74,
   "candidate_named_ward_count": 74,
+  "ward_count_alignment": {
+    "source_features": 74,
+    "candidate_named_wards": 74,
+    "official_register_wards": 76,
+    "all_counts_match": false
+  },
   "source_features_with_missing_ward_attributes": 6,
   "source_features_with_missing_display_ward_name": 6,
   "source_features_with_missing_boundary_name": 74,
@@ -48,7 +59,7 @@
         "intersection_over_union": 0.046679
       },
       "best_minus_second_iou": 0.824551,
-      "suggested_for_manual_review": true,
+      "suggested_for_manual_review": false,
       "automatic_assignment": false
     },
     {
@@ -134,9 +145,11 @@
   ],
   "method": "Normalized GIS field names; checked exact aliases and uniquely agreeing suffixed aliases; used a boundary-name fallback for display ward labels; projected geometries to UTM zone 43N (EPSG:32643) and ranked candidate polygons by intersection-over-union.",
   "limitations": [
-    "OpenCity 2024 map is a candidate source, not independently confirmed as the final legally authoritative ward boundary.",
+    "OpenCity 2024 map is a candidate source, not the final legally authoritative current ward geometry.",
+    "The official SEC ward register is a names-and-codes list without geometry; it cannot identify which polygon belongs to each current ward.",
+    "The current official register has 76 wards while the bundled source geometry and 2024 candidate each have 74 features; all geometric suggestions are therefore disabled until current official polygons are acquired.",
     "Geometry similarity is not proof that a ward name or number is legally/currently correct.",
     "No source geometry or attribute was changed; no ward number was inferred.",
-    "Suggested matches require manual inspection against official ward register and boundary notification before display as verified labels."
+    "Do not display geometric candidates as verified labels until the final official current boundary geometry and register align."
   ]
 }
