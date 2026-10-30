@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - "scripts/acquire_kochi_ward_boundary_candidate.py"
+      - "scripts/reconcile_kochi_ward_labels.py"
       - ".github/workflows/acquire-kochi-ward-reference.yml"
 permissions:
   contents: write
@@ -22,12 +23,14 @@ jobs:
         run: python -m pip install --upgrade pip shapely pyproj
       - name: Acquire and audit raw ward candidate
         run: python scripts/acquire_kochi_ward_boundary_candidate.py
-      - name: Commit source candidate and provenance
+      - name: Rank missing-label geometry matches without changing source data
+        run: python scripts/reconcile_kochi_ward_labels.py
+      - name: Commit source candidate, provenance, and reconciliation report
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+users.noreply.github.com"
-          git add -f data/external/map_reference/kochi_wards_2024_candidate.kml data/external/map_reference/kochi_wards_2024_candidate.metadata.json
+          git add -f data/external/map_reference/kochi_wards_2024_candidate.kml data/external/map_reference/kochi_wards_2024_candidate.metadata.json reports/kochi_ward_label_reconciliation.json
           git commit -m "Store audited Kochi ward boundary candidate" || echo "No candidate changes to commit."
           git pull --rebase origin main
           git push
@@ -36,6 +39,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: kochi-ward-boundary-candidate-audit
-          path: data/external/map_reference/kochi_wards_2024_candidate*
+          path: |
+            data/external/map_reference/kochi_wards_2024_candidate*
+            reports/kochi_ward_label_reconciliation.json
           if-no-files-found: warn
           retention-days: 30
