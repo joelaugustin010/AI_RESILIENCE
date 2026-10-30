@@ -251,11 +251,24 @@ def compare_action_combinations(
 ) -> pd.DataFrame:
     """Compare user-selected action combinations using costs only, never efficacy."""
     rows = []
+    action_names = actions.get("Action", pd.Series(dtype=object)).fillna("").astype(str).str.strip()
+    available_names = set(action_names[action_names.ne("")])
+    duplicate_names = sorted(name for name in available_names if int(action_names.eq(name).sum()) > 1)
     for label, selected_names in combinations.items():
-        chosen = actions.loc[actions["Action"].astype(str).isin(selected_names)] if selected_names else actions.iloc[0:0]
+        # Do not silently treat misspelled/renamed actions as a valid affordable plan.
+        requested = [str(name).strip() for name in selected_names if str(name).strip()]
+        unknown_names = sorted(set(requested) - available_names)
+        repeated_names = sorted(name for name in set(requested) if requested.count(name) > 1)
+        chosen = actions.loc[action_names.isin(requested)] if requested else actions.iloc[0:0]
         summary = budget_summary(chosen.get("Cost INR", pd.Series(dtype=object)), budget)
-        if not selected_names:
+        if not requested:
             status = "No actions selected"
+        elif unknown_names:
+            status = "Cannot confirm fit: one or more selected action names are not in the action table"
+        elif repeated_names:
+            status = "Review duplicate selections before comparing costs"
+        elif duplicate_names:
+            status = "Cannot confirm fit: action table contains duplicate action names"
         elif summary["budget"] is None:
             status = "Enter a budget to compare affordability"
         elif summary["unknown_or_invalid_count"]:
@@ -267,11 +280,16 @@ def compare_action_combinations(
         rows.append(
             {
                 "Combination": label,
-                "Actions selected by user": "; ".join(selected_names) if selected_names else "None",
+                "Actions selected by user": "; ".join(requested) if requested else "None",
                 "Entered cost total INR": float(summary["entered_total"]),
                 "Missing / invalid costs": summary["unknown_or_invalid_count"],
                 "Budget remaining INR": float(summary["remaining"]) if summary["remaining"] is not None else None,
                 "Budget status": status,
+                "Selection issues": "; ".join(
+                    [*(f"Unknown action: {name}" for name in unknown_names),
+                     *(f"Repeated selection: {name}" for name in repeated_names),
+                     *(f"Duplicate action row: {name}" for name in duplicate_names)]
+                ) or "None",
                 "Basis": "Arithmetic from user-selected actions and entered costs only; no risk reduction estimated.",
             }
         )
