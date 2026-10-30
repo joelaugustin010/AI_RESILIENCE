@@ -4,8 +4,7 @@
   "retrieved_content_type": "text/html",
   "retrieved_html_bytes": 681,
   "page_title": "Ward Delimitation - Delimitation Commission, Kerala",
-  "page_indicates_final_notification": false,
-  "page_indicates_draft_notification": false,
+  "html_shell_note": "The page is a client-rendered application; page labels may be rendered by JavaScript.",
   "official_same_origin_scripts": [
     {
       "url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
@@ -24,32 +23,125 @@
     "https://wardmap.ksmart.live/map",
     "https://wardmap.ksmart.live/map?district=${encodeURIComponent(e)}&type=${encodeURIComponent(t)}&localbody=${encodeURIComponent(n)}`)};return"
   ],
-  "html_text_checks": [
+  "keyword_evidence": [
     {
-      "pattern": "FINAL\\s+NOTIFICATION",
-      "occurrences": 0
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "FinalN/map",
+      "snippet": "e)}.pdf`;const n=kd[r]||r;return`https://wardmap.ksmart.live/FinalN/notification/FinalN_${ru(n)}_${Td(e)}.pdf`}function HT(r,e){const t=kd[r]||r;return`https://wardmap.ksmart.live/FinalN/map/Map_FinalN_${ru(t)}_${Td(e)}.pdf`}async function qT(r,e){r.once(\"rendercomplete\",()=>{const t=document.querySelector(\".ol-viewport canvas\");if(!t)return;const n=document.createElement(\"a\");n.download=e.replace(/\\s+/g,\"_\")+\"_Map.png\",n.href=t.toDataURL(\"image/png\"),n.click()}),r.renderSync()}function QT(r,e){"
     },
     {
-      "pattern": "DRAFT\\s+NOTIFICATION",
-      "occurrences": 0
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "FinalN/notification",
+      "snippet": "TV Puram\":\"Tv Puram\",Thaliparamba:\"Thalipparamba\",Tirur:\"Thirur\"};function Td(r){return ru(ZT[r]||r)}function $T(r,e,t){if(t===\"Block Panchayat\")return`https://wardmap.ksmart.live/FinalN/notification/FinalBlock_${Td(e)}.pdf`;if(t===\"District Panchayat\")return`https://wardmap.ksmart.live/FinalN/notification/FinalDP_${ru(kd[e]||e)}.pdf`;const n=kd[r]||r;return`https://wardmap.ksmart.live/FinalN/notification/FinalN_${ru(n)}_${Td(e)}.pdf`}function HT(r,e){const t=kd[r]||r;return`https://wardmap.ksma"
     },
     {
-      "pattern": "geojson",
-      "occurrences": 0
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "FinalN/notification",
+      "snippet": "n $T(r,e,t){if(t===\"Block Panchayat\")return`https://wardmap.ksmart.live/FinalN/notification/FinalBlock_${Td(e)}.pdf`;if(t===\"District Panchayat\")return`https://wardmap.ksmart.live/FinalN/notification/FinalDP_${ru(kd[e]||e)}.pdf`;const n=kd[r]||r;return`https://wardmap.ksmart.live/FinalN/notification/FinalN_${ru(n)}_${Td(e)}.pdf`}function HT(r,e){const t=kd[r]||r;return`https://wardmap.ksmart.live/FinalN/map/Map_FinalN_${ru(t)}_${Td(e)}.pdf`}async function qT(r,e){r.once(\"rendercomplete\",()=>{con"
     },
     {
-      "pattern": "ward.?boundary",
-      "occurrences": 0
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "FinalN/notification",
+      "snippet": "k_${Td(e)}.pdf`;if(t===\"District Panchayat\")return`https://wardmap.ksmart.live/FinalN/notification/FinalDP_${ru(kd[e]||e)}.pdf`;const n=kd[r]||r;return`https://wardmap.ksmart.live/FinalN/notification/FinalN_${ru(n)}_${Td(e)}.pdf`}function HT(r,e){const t=kd[r]||r;return`https://wardmap.ksmart.live/FinalN/map/Map_FinalN_${ru(t)}_${Td(e)}.pdf`}async function qT(r,e){r.once(\"rendercomplete\",()=>{const t=document.querySelector(\".ol-viewport canvas\");if(!t)return;const n=document.createElement(\"a\");n"
     },
     {
-      "pattern": "api/",
-      "occurrences": 0
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "fetch(",
+      "snippet": "Origin===\"use-credentials\"?a.credentials=\"include\":s.crossOrigin===\"anonymous\"?a.credentials=\"omit\":a.credentials=\"same-origin\",a}function n(s){if(s.ep)return;s.ep=!0;const a=t(s);fetch(s.href,a)}})();function Ey(r){return r&&r.__esModule&&Object.prototype.hasOwnProperty.call(r,\"default\")?r.default:r}var _h={exports:{}},Ao={},vh={exports:{}},Ae={};/**\n * @license React\n * react.production.min.js\n *\n * Copyright (c) Facebook, Inc. and its affiliates.\n *\n * This source code is licensed under the M"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "fetch(",
+      "snippet": "la_bp\";async function t1(){const r={},e=[];for(let n=191;n<=196;n++)for(let s=109;s<=119;s++)e.push({x:n,y:s,z:8});await Promise.all(e.map(async({x:n,y:s,z:a})=>{try{const l=await fetch(`${e1}/${a}/${n}/${s}`,{signal:AbortSignal.timeout(8e3)});if(!l.ok)return;const c=await l.arrayBuffer(),h=new Uint8Array(c);let g=0;const f=()=>{let v=0,w=0;for(;g<h.length;){const C=h[g++];if(v|=(C&127)<<w,!(C&128))break;w+=7}return v},m=v=>{const w=new TextDecoder().decode(h.slice(g,g+v));return g+=v,w},_=v=>{i"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "fetch(",
+      "snippet": ",type:k.Lsgd_Type.trim(),name:k.name.trim()})}}else c(_)}}catch{}return e}async function i1(){const r={},e=Fy.map(async({x:n,y:s,z:a})=>{try{const l=`${Jx}/${a}/${n}/${s}`,c=await fetch(l,{signal:AbortSignal.timeout(8e3)});if(!c.ok)return;const h=await c.arrayBuffer(),g=await n1(h);for(const{district:f,type:m,name:_}of g)r[f]||(r[f]={}),r[f][m]||(r[f][m]=new Set),r[f][m].add(_)}catch{}});await Promise.all(e);const t={};for(const[n,s]of Object.entries(r)){t[n]={};for(const[a,l]of Object.entries(s"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "fetch(",
+      "snippet": "igin\",s=\"same-origin\";t===\"anonymous\"||t===\"\"?(n=\"cors\",s=\"omit\"):t===\"use-credentials\"&&(n=\"cors\",s=\"include\");const a={mode:n,credentials:s,referrerPolicy:r.getReferrerPolicy()};fetch(e,a).then(l=>{if(!l.ok)throw new Error(`HTTP ${l.status}`);return l.blob()}).then(l=>createImageBitmap(l)).then(l=>{var g;const c=r.getImage();c.width=l.width,c.height=l.height,c.getContext(\"2d\").drawImage(l,0,0),(g=l.close)==null||g.call(l),c.dispatchEvent(new Event(\"load\"))}).catch(()=>{r.getImage().dispatchEve"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "fetch(",
+      "snippet": "push(P))}})}else l(g)}}catch(s){n.error=s.message}return n}function rR(){const[r,e]=ne.useState([]);return ne.useEffect(()=>{async function t(){for(const n of nR)try{const s=await fetch(n.url);if(!s.ok){e(c=>[...c,{name:n.name,error:`HTTP ${s.status}`}]);continue}const a=await s.arrayBuffer(),l=await iR(a);e(c=>[...c,{name:n.name,size:a.byteLength,...l}])}catch(s){e(a=>[...a,{name:n.name,error:s.message}])}}t()},[]),A.jsxs(\"div\",{style:{padding:20,fontFamily:\"monospace\",fontSize:13,background:\"#"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "Cochin",
+      "snippet": "anathapuram\"},ZT={Alakode:\"Alakkode\",Badiadka:\"Badiyadka\",Guruvayur:\"Guruvayoor\",Irinjalakuda:\"Irinjalakkuda\",Kanhangad:\"Kanjhangad\",Kasaragod:\"Kasargod\",Kavanur:\"Kavannur\",Kochi:\"Cochin\",Kodungallur:\"Kodungalloor\",Koyilandy:\"Quilandy\",\"Lakkidi-perur\":\"Lakkidi-Perur\",\"Malayattoor Neeleeswaram\":\"Malayattoor Neeleswaram\",Mulumthuruthy:\"Mulamthuruthy\",Narikkuni:\"Narikunni\",Narippatta:\"Naripetta\",\"Padiyur kalliad\":\"Padiyur Kalliad\",Paravur:\"Paravoor\",\"Perumana klari\":\"Perumana Klari\",Pothanicad:\"Pot"
     }
   ],
-  "status": "SOURCE_DISCOVERY_ONLY_NOT_GEOMETRY_VERIFICATION",
+  "final_map_pdf_audit": {
+    "url": "https://wardmap.ksmart.live/FinalN/map/Map_FinalN_Ernakulam_Cochin.pdf",
+    "final_url": "https://wardmap.ksmart.live/FinalN/map/Map_FinalN_Ernakulam_Cochin.pdf",
+    "http_content_type": "application/pdf",
+    "pdf_signature_valid": true,
+    "sha256": "262a63f880b59884a1f8c4b10445f0297c147d88b49fdaf96143c57905e2e9f3",
+    "bytes": 4277562,
+    "page_count": 1,
+    "extracted_text_characters": 2000,
+    "official_ward_name_text_matches": 67,
+    "official_ward_name_text_missing": [
+      {
+        "ward_code": "C07003007",
+        "official_name": "CHAKKAMADAM",
+        "text_found": false
+      },
+      {
+        "ward_code": "C07003031",
+        "official_name": "CHANGAMPUZHA",
+        "text_found": false
+      },
+      {
+        "ward_code": "C07003032",
+        "official_name": "DHEVANKULANGARA",
+        "text_found": false
+      },
+      {
+        "ward_code": "C07003051",
+        "official_name": "PERUMANOOR",
+        "text_found": false
+      },
+      {
+        "ward_code": "C07003058",
+        "official_name": "EADAKOCHI NORTH",
+        "text_found": false
+      },
+      {
+        "ward_code": "C07003068",
+        "official_name": "MUNDAMVELY EAST",
+        "text_found": false
+      },
+      {
+        "ward_code": "C07003069",
+        "official_name": "MUNDAMVELY",
+        "text_found": false
+      },
+      {
+        "ward_code": "C07003071",
+        "official_name": "MOOLAMKUZHY",
+        "text_found": false
+      },
+      {
+        "ward_code": "C07003073",
+        "official_name": "NASRATHU",
+        "text_found": false
+      }
+    ],
+    "page_text_preview": [
+      "59\n35\n13\n45\n36\n23\n9\n67\n6\n74\n65\n62\n63\n70\n40\n64\n73\n76\n8\n69\n68\n42\n75\n60\n4\n55\n18\n39\n20\n61\n58\n5\n19\n7\n66\n53\n54\n71\n22\n4114\n11\n16\n24\n26\n3\n72\n28\n44\n48\n56\n29\n30\n49\n27\n25\n21\n46\n57\n1\n38\n50\n12\n15\n2\n33\n37\n51\n52\n17\n43\n47\n32\n31\n34\n10\nKalamassery\nUdayamperur\nNjarakkal\nChellanam\nThiruvaniyoor\nNayarambalam\nEdathala\nCheranallur\nChottanikkara\nTripunithura\nMulamthuruthy\nAroor\nThrikkakara\nElamkunnapuzha\nMaradu\nKumbalangy\nVadavucode\nPuthen Cruz\nKunnathunad\nKumbalam\nMulavukad\nKadamakudy\nEloor\nKizhakkambalam\n10°9°55'\n10°9°55'\n76°20'76°15'\n76°20'76°15'\n0 2.5 5 7.5 101.25\nKilometers\nEsri, Garmin, NaturalVue\nEsri, Garmin, NaturalVue\nEsri, TomTom, Garmin, FAO, NOAA, USGS, Esri, GEBCO, Garmin, NaturalVue\nKerala\nDISTRICT NAME :ERRNAKULAM\nDelimitation Commission, Kerala\nCOCHIN\nCochin\nErrnakulam\nDate : 27-11-2025\n±\nWARD BOUNDARY\n1-FORT KOCHI\n2-KALVATHY\n3-EARAVELY\n4-KARIPPALAM\n5-CHERALAYI\n6-MATTANCHERY\n7-CHAKKAMADOM\n8-KAR"
+    ],
+    "status": "OFFICIAL_FINAL_MAP_PDF_REFERENCE_ONLY_NOT_GIS_GEOMETRY"
+  },
+  "status": "SOURCE_DISCOVERY_AND_PDF_TEXT_AUDIT_ONLY",
   "limitations": [
-    "A final-notification page label is not by itself proof that a downloaded GIS geometry matches the legally notified boundary.",
-    "No geometry is approved or integrated by this script.",
+    "A final-notification PDF and ward-name text checks do not establish that a GIS layer's polygons match the legally notified boundaries.",
+    "The PDF is retained as an official visual/reference source only; this script does not extract or approve boundary geometries.",
+    "No official geometry is promoted into the production map by this script.",
     "Only HTTPS resources on wardmap.ksmart.live are fetched."
   ]
 }
