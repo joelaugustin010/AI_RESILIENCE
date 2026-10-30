@@ -145,7 +145,8 @@ def main() -> None:
             "ward_name_source": "ward-name field" if has_value(ward_name) else (
                 "boundary-name fallback" if has_value(bound_name) else "missing"
             ),
-            "bound_name_present": has_value(bound_name),
+            "bound_name_field_present": has_value(bound_name),
+            "display_boundary_name_present": has_value(bound_name) or has_value(ward_name),
             "ward_no_present": has_value(ward_no),
             "geometry": geom,
         })
@@ -167,7 +168,8 @@ def main() -> None:
         matches.append({
             "source_feature_index": source_record["index"],
             "source_ward_name_missing": not source_record["ward_name_present"],
-            "source_boundary_name_missing": not source_record["bound_name_present"],
+            "source_boundary_name_missing": not source_record["display_boundary_name_present"],
+            "source_bound_name_field_missing": not source_record["bound_name_field_present"],
             "source_ward_name_source": source_record["ward_name_source"],
             "source_ward_number_missing": not source_record["ward_no_present"],
             "best_candidate": best,
@@ -204,7 +206,8 @@ def main() -> None:
         },
         "source_features_with_missing_ward_attributes": len(matches),
         "source_features_with_missing_display_ward_name": sum(not row["ward_name_present"] for row in source_records),
-        "source_features_with_missing_boundary_name": sum(not row["bound_name_present"] for row in source_records),
+        "source_features_with_missing_boundary_name": sum(not row["display_boundary_name_present"] for row in source_records),
+        "source_features_without_explicit_bound_name_field": sum(not row["bound_name_field_present"] for row in source_records),
         "source_features_with_missing_ward_number": sum(not row["ward_no_present"] for row in source_records),
         "matches": matches,
         "method": "Normalized GIS field names; checked exact aliases and uniquely agreeing suffixed aliases; used a boundary-name fallback for display ward labels; projected geometries to UTM zone 43N (EPSG:32643) and ranked candidate polygons by intersection-over-union.",
