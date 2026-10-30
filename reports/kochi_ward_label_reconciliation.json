@@ -19,13 +19,15 @@
   },
   "source_features_with_missing_ward_attributes": 6,
   "source_features_with_missing_display_ward_name": 6,
-  "source_features_with_missing_boundary_name": 74,
+  "source_features_with_missing_boundary_name": 6,
+  "source_features_without_explicit_bound_name_field": 74,
   "source_features_with_missing_ward_number": 6,
   "matches": [
     {
       "source_feature_index": 7,
       "source_ward_name_missing": true,
       "source_boundary_name_missing": true,
+      "source_bound_name_field_missing": true,
       "source_ward_name_source": "missing",
       "source_ward_number_missing": true,
       "best_candidate": {
@@ -46,6 +48,7 @@
       "source_feature_index": 20,
       "source_ward_name_missing": true,
       "source_boundary_name_missing": true,
+      "source_bound_name_field_missing": true,
       "source_ward_name_source": "missing",
       "source_ward_number_missing": true,
       "best_candidate": {
@@ -66,6 +69,7 @@
       "source_feature_index": 31,
       "source_ward_name_missing": true,
       "source_boundary_name_missing": true,
+      "source_bound_name_field_missing": true,
       "source_ward_name_source": "missing",
       "source_ward_number_missing": true,
       "best_candidate": {
@@ -86,6 +90,7 @@
       "source_feature_index": 35,
       "source_ward_name_missing": true,
       "source_boundary_name_missing": true,
+      "source_bound_name_field_missing": true,
       "source_ward_name_source": "missing",
       "source_ward_number_missing": true,
       "best_candidate": {
@@ -106,6 +111,7 @@
       "source_feature_index": 48,
       "source_ward_name_missing": true,
       "source_boundary_name_missing": true,
+      "source_bound_name_field_missing": true,
       "source_ward_name_source": "missing",
       "source_ward_number_missing": true,
       "best_candidate": {
@@ -126,6 +132,7 @@
       "source_feature_index": 74,
       "source_ward_name_missing": true,
       "source_boundary_name_missing": true,
+      "source_bound_name_field_missing": true,
       "source_ward_name_source": "missing",
       "source_ward_number_missing": true,
       "best_candidate": {
