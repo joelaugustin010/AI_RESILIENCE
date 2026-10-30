@@ -145,7 +145,7 @@ def calculate_ind_aqi(
     """Calculate IND-AQI from one station/location and one reporting window.
 
     Each record must contain pollutant, concentration, unit, averaging_period,
-    and valid_hours. A record is eligible only if its averaging period matches
+    valid_hours, and quality_flag="valid". A record is eligible only if its averaging period matches
     CPCB's pollutant-specific period and at least 16 valid hourly observations
     support it. Overall AQI requires at least three eligible pollutants,
     including PM2.5 or PM10. Missing pollutants are never treated as zero.
@@ -188,6 +188,10 @@ def calculate_ind_aqi(
             raise CPCBAQIError(f"Duplicate pollutant record: {pollutant}.")
         seen.add(pollutant)
 
+        quality_flag = record.get("quality_flag")
+        if quality_flag != "valid":
+            exclusions.append({"pollutant": pollutant, "reason": "Observation quality is not marked valid."})
+            continue
         unit = record.get("unit")
         if unit != CPCB_UNITS[pollutant]:
             exclusions.append({"pollutant": pollutant, "reason": f"Expected unit {CPCB_UNITS[pollutant]}."})
