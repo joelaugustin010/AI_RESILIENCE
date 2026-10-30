@@ -111,7 +111,8 @@
     "thiruvananthapuram",
     "wayanad"
   ],
-  "train_rows": 21884,
+  "model_selection_train_rows": 21884,
+  "train_rows": 29188,
   "test_rows": 8768,
   "train_positive_rate": 0.050602987529121554,
   "test_positive_rate": 0.11633211678832117,
