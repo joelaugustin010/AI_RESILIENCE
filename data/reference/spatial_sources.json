@@ -889,7 +889,7 @@
       "source_bytes": 4277562,
       "source_sha256": "262a63f880b59884a1f8c4b10445f0297c147d88b49fdaf96143c57905e2e9f3",
       "validation_status": "OFFICIAL FINAL MAP PDF FETCHED; NOT GIS GEOMETRY; WARD LABEL CROSS-CHECK HAS DISCREPANCIES",
-      "evidence_status": "reference_only",
+      "evidence_status": "provisional",
       "layer_role": null,
       "limitations": [
         "The official KSMART final map PDF was fetched successfully and had a valid PDF signature; its text identifies the date as 27-11-2025.",
