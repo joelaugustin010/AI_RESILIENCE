@@ -32,7 +32,8 @@ jobs:
             echo "No model artifacts or reports to commit."
           else
             git commit -m "Store weather hazard research baselines and evaluation"
-            git push
+            git pull --rebase origin main
+          git push
           fi
       - name: Upload trained models and reports
         if: always()
