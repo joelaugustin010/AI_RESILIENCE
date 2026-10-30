@@ -523,11 +523,12 @@ else:
                 "Application AQI": readiness["aqi"],
                 "Calculation status": readiness["status"],
                 "Eligible pollutants": readiness["eligible_pollutant_count"],
-                "Reason": "; ".join(readiness["missing_requirements"])
-                if readiness["missing_requirements"]
-                else "; ".join(
-                    f"{item['pollutant']}: {item['reason']}"
-                    for item in readiness.get("excluded_records", [])
+                "Reason": "; ".join(
+                    readiness.get("missing_requirements", [])
+                    + [
+                        f"{item['pollutant']}: {item['reason']}"
+                        for item in readiness.get("excluded_records", [])
+                    ]
                 ) or "Eligible for CPCB calculation",
             }
         )
