@@ -14,6 +14,7 @@ from src.decision_workflow import (
     budget_summary,
     compare_action_combinations,
     evidence_inventory,
+    evidence_provenance_summary,
     hazard_evidence_checklist,
     mitigation_actions_for,
     report_html,
@@ -186,6 +187,42 @@ class BudgetTests(unittest.TestCase):
         self.assertIn("Duplicate action row: A", result.iloc[0]["Selection issues"])
 
 
+class EvidenceProvenanceTests(unittest.TestCase):
+    def test_hypothetical_values_are_never_described_as_observations(self):
+        result = evidence_provenance_summary(valid_inputs(
+            input_classification="Hypothetical scenario assumption",
+            source_and_time="Example source note",
+        ))
+        self.assertIn("Hypothetical assumption", result["Provenance status"])
+        self.assertIn("not evidence", result["Permitted interpretation"])
+        self.assertIn("not independently checked", result["Source/time notes"])
+
+    def test_user_reported_observation_remains_unverified_even_with_source_notes(self):
+        result = evidence_provenance_summary(valid_inputs(
+            input_classification="User-reported observation (source not independently verified)",
+            source_and_time="Station XYZ, 2026-10-30 10:00",
+        ))
+        self.assertIn("unverified", result["Provenance status"])
+        self.assertIn("Confirm the original provider", result["Verification gate"])
+
+    def test_user_supplied_forecast_is_not_called_official_or_current(self):
+        result = evidence_provenance_summary(valid_inputs(
+            input_classification="Forecast supplied by user (not checked by app)",
+            source_and_time="Forecast screenshot",
+        ))
+        self.assertIn("not checked", result["Provenance status"])
+        self.assertIn("latest or official forecast", result["Permitted interpretation"])
+        self.assertIn("valid period", result["Verification gate"])
+
+    def test_missing_classification_and_source_notes_fail_closed(self):
+        result = evidence_provenance_summary(valid_inputs(
+            input_classification="",
+            source_and_time="",
+        ))
+        self.assertIn("Unknown", result["Provenance status"])
+        self.assertEqual(result["Source/time notes"], "Not supplied")
+
+
 class EvidenceAndReportTests(unittest.TestCase):
     def test_flood_checklist_identifies_missing_verification(self):
         checklist = hazard_evidence_checklist(valid_inputs(), Path(__file__).resolve().parent)
@@ -222,6 +259,9 @@ class EvidenceAndReportTests(unittest.TestCase):
         )
         rows = report.loc[report["Section"].eq("Evidence readiness checklist")]
         self.assertGreater(len(rows), 0)
+        provenance_rows = report.loc[report["Section"].eq("Evidence provenance gate")]
+        self.assertGreater(len(provenance_rows), 0)
+        self.assertTrue(provenance_rows["Value"].str.contains("Hypothetical assumption", regex=False).any())
 
     def test_missing_data_is_reported_without_blocking_inventory(self):
         inventory = evidence_inventory(Path(__file__).resolve().parent / "missing_project")

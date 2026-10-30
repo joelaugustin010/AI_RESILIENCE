@@ -488,6 +488,37 @@ def hazard_evidence_checklist(inputs: dict[str, Any], project_root: Path) -> pd.
     ])
 
 
+def evidence_provenance_summary(inputs: dict[str, Any]) -> dict[str, str]:
+    """Classify user-entered evidence conservatively; never certify it from notes alone."""
+    classification = str(inputs.get("input_classification", "")).strip()
+    source_notes = str(inputs.get("source_and_time", "")).strip()
+
+    if classification == "Hypothetical scenario assumption":
+        provenance = "Hypothetical assumption — not an observation or forecast"
+        interpretation = "Use only for conditional what-if discussion; it is not evidence that the event or condition exists."
+        verification = "No real-world claim can be made from this assumption."
+    elif classification == "User-reported observation (source not independently verified)":
+        provenance = "User-reported observation — unverified"
+        interpretation = "Treat as a report to investigate, not as a quality-controlled measurement."
+        verification = "Confirm the original provider, station/location, timestamp and time zone, units, measurement period, and any quality flags."
+    elif classification == "Forecast supplied by user (not checked by app)":
+        provenance = "User-supplied forecast — not checked by the app"
+        interpretation = "Do not present it as the latest or official forecast, or infer a local impact from it."
+        verification = "Check the issuing authority/provider, issue time, valid period, location, units, update status, and relevant official instructions."
+    else:
+        provenance = "Unknown / unverified evidence class"
+        interpretation = "Do not treat the entered values as measured facts or an official forecast."
+        verification = "Identify the evidence class and verify its origin, timing, units, location, and suitability before relying on it."
+
+    return {
+        "Input evidence class": classification or "Unknown / unverified",
+        "Provenance status": provenance,
+        "Source/time notes": "Supplied by user; not independently checked" if source_notes else "Not supplied",
+        "Permitted interpretation": interpretation,
+        "Verification gate": verification,
+    }
+
+
 def assessment_summary(inputs: dict[str, Any]) -> dict[str, str]:
     """Return a qualified non-numeric status; no unsupported estimates are generated."""
     hazards = expand_hazards(str(inputs.get("hazard", "")))
@@ -525,6 +556,8 @@ def report_rows(
         add("User inputs", key, value)
     for key, value in assessment_summary(inputs).items():
         add("Assessment", key, value)
+    for key, value in evidence_provenance_summary(inputs).items():
+        add("Evidence provenance gate", key, value)
     for _, row in evidence.iterrows():
         add("Evidence", str(row["Dataset / file"]), {k: row[k] for k in evidence.columns if k != "Dataset / file"})
     if evidence_checklist is not None:
