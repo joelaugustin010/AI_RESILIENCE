@@ -5,6 +5,7 @@ on:
     paths:
       - "scripts/acquire_kochi_ward_boundary_candidate.py"
       - "scripts/acquire_kochi_ksmart_ward_map.py"
+      - "scripts/audit_kochi_portal_candidate_vs_sec_register.py"
       - "scripts/reconcile_kochi_ward_labels.py"
       - ".github/workflows/acquire-kochi-ward-reference.yml"
 permissions:
@@ -26,6 +27,8 @@ jobs:
         run: python scripts/acquire_kochi_ward_boundary_candidate.py
       - name: Acquire and audit the official-portal Kochi ward map JSON
         run: python scripts/acquire_kochi_ksmart_ward_map.py
+      - name: Compare portal candidate ward names and numbers with the current SEC register
+        run: python scripts/audit_kochi_portal_candidate_vs_sec_register.py
       - name: Rank missing-label geometry matches without changing source data
         run: python scripts/reconcile_kochi_ward_labels.py
       - name: Commit source candidate, provenance, and reconciliation report
@@ -33,7 +36,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+users.noreply.github.com"
-          git add -f data/external/map_reference/kochi_wards_2024_candidate.kml data/external/map_reference/kochi_wards_2024_candidate.metadata.json data/external/map_reference/kochi_wards_ksmart_portal_candidate.json data/external/map_reference/kochi_wards_ksmart_portal_candidate.metadata.json reports/kochi_ward_label_reconciliation.json
+          git add -f data/external/map_reference/kochi_wards_2024_candidate.kml data/external/map_reference/kochi_wards_2024_candidate.metadata.json data/external/map_reference/kochi_wards_ksmart_portal_candidate.json data/external/map_reference/kochi_wards_ksmart_portal_candidate.metadata.json reports/kochi_ward_label_reconciliation.json reports/kochi_portal_candidate_vs_sec_register.json
           git commit -m "Store audited Kochi ward boundary candidate" || echo "No candidate changes to commit."
           for attempt in 1 2 3 4 5; do
             git fetch origin main
@@ -55,5 +58,6 @@ jobs:
             data/external/map_reference/kochi_wards_2024_candidate*
             data/external/map_reference/kochi_wards_ksmart_portal_candidate*
             reports/kochi_ward_label_reconciliation.json
+            reports/kochi_portal_candidate_vs_sec_register.json
           if-no-files-found: warn
           retention-days: 30
