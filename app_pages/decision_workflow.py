@@ -479,7 +479,16 @@ if inputs is None:
     st.info("Submit the form to continue. Missing GIS layers do not block a qualitative assessment; missing evidence does block a reliable numerical prediction.")
     st.stop()
 
-st.header("2. Review evidence")
+st.header("2. Immediate scenario result")
+st.caption(
+    "Your submitted hypothetical values are assessed here first. This output explains conditional consequences and, " 
+    "where an official threshold applies, the corresponding screening category. It is not a calibrated flood probability, " 
+    "flood-depth estimate, affected-area map, or official warning."
+)
+scenario_screen = build_scenario_screening(inputs)
+st.dataframe(scenario_screen, hide_index=True, width="stretch")
+
+st.header("3. Review evidence")
 evidence = evidence_inventory(ROOT, st.session_state.get("rainfall_backtest_result"))
 st.caption("The separate historical benchmark uses only the manual rainfall observations. Its results do not enter this qualitative assessment; conflicted CWC rainfall, unverified sample rows, and unresolved river levels remain excluded from model calculations.")
 st.dataframe(evidence, hide_index=True, width="stretch")
@@ -606,7 +615,7 @@ st.info(
     "must not be treated as evidence that the hazard or exposure is absent."
 )
 
-st.header("3. Assessment status")
+st.header("4. Assessment status")
 assessment = assessment_summary(inputs)
 st.success(assessment["status"], icon=":material/assignment_turned_in:")
 st.write("**Method:**", assessment["method"])
@@ -614,15 +623,6 @@ st.write("**Selected hazard(s):**", assessment["hazards"])
 st.write("**Interpretation:**", assessment["interpretation"])
 st.warning(assessment["additional_caution"])
 st.caption("No user-entered value is treated as verified. River-level values are recorded in the report but never compared with a threshold in this workflow.")
-
-st.subheader("Scenario-based assessment from your entered assumptions")
-st.caption(
-    "This section does assess the scenario you entered: it explains conditional consequences and practical checks. "
-    "Hypothetical inputs are allowed. Results are qualitative and assumption-based, not a calibrated probability, "
-    "flood-depth estimate, affected-area map, or official warning."
-)
-scenario_screen = build_scenario_screening(inputs)
-st.dataframe(scenario_screen, hide_index=True, width="stretch")
 
 st.subheader("Scientific scenario frame and evidence gates")
 scientific_frame = build_scientific_scenario_frame(inputs)
