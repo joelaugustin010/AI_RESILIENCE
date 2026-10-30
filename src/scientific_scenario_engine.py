@@ -103,7 +103,7 @@ def build_scientific_scenario_frame(inputs: dict[str, Any]) -> dict[str, Any]:
     return {
         "hazard": hazard, "components": components, "pathways": pathways,
         "required_evidence": required, "missing_provenance_fields": missing,
-        "evidence_gate": "QUALITATIVE SCENARIO ONLY — insufficient evidence/method for a validated numerical prediction",
+        "evidence_gate": "Qualitative scenario assessment available — numerical prediction is not validated or enabled",
         "prediction_permitted": False, "warning_permitted": False,
         "limitations": [
             "User-entered values are not independently verified by the application.",
