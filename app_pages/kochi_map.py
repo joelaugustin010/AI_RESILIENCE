@@ -181,14 +181,29 @@ def load_draft_ward_candidate() -> dict:
             raise ValueError(f"Draft ward candidate feature {index} has missing properties or geometry.")
         if geometry.get("type") not in {"Polygon", "MultiPolygon"}:
             raise ValueError(f"Draft ward candidate feature {index} is not a polygon.")
+        # Never attach an official SEC identity through a numeric/ordinal join.
+        # The draft source is known to disagree with the current roster on 12 labels.
+        source_name = _first_property(
+            properties,
+            ("source_ward_name", "Ward_Name", "Ward Name", "ward_name", "wardname", "name_en", "name"),
+            "",
+        )
         code = properties.get("sec_ward_code")
         name = properties.get("sec_ward_name")
-        if not code or not name:
-            raise ValueError(f"Draft ward candidate feature {index} lacks its SEC ward code/name.")
-        codes.append(str(code))
-        names.append(str(name))
-    if len(set(codes)) != 76 or len(set(names)) != 76:
-        raise ValueError("Draft ward candidate SEC codes/names are duplicated.")
+        if code or name:
+            if not code or not name:
+                raise ValueError(f"Draft ward candidate feature {index} has an incomplete SEC identity.")
+            if _normalize_property_key(source_name) != _normalize_property_key(name):
+                properties.pop("sec_ward_code", None)
+                properties.pop("sec_ward_name", None)
+                code = name = None
+        if code and name:
+            codes.append(str(code))
+            names.append(str(name))
+    if len(set(codes)) != len(codes) or len(set(names)) != len(names):
+        raise ValueError("Draft ward candidate contains duplicated SEC identities.")
+    if not codes:
+        raise ValueError("Draft ward candidate has no exact source-name matches to the SEC roster.")
     return {"geojson": candidate, "metadata": metadata}
 
 
@@ -463,7 +478,7 @@ if draft_ward_candidate:
         "The 76-ward layer is sourced from a map page labelled DRAFT NOTIFICATION. "
         f"Validation found {draft_metadata.get('source_name_mismatch_count', 0)} source-name differences "
         f"and {draft_metadata.get('geometry_repair_count', 0)} geometry repairs in the candidate copy. "
-        "Official SEC names are displayed using explicit Ward_No identifiers; original source names and raw geometries are retained for audit. "
+        "SEC names/codes are displayed only when the draft source label exactly matches the official roster after case/punctuation normalization; mismatched wards keep their original draft labels and receive no SEC identity. "
         "The repository's separate topology checker disagreed with Shapely on this source, so the candidate is visual-only. "
         "It is not a legally approved boundary or a flood-exposure mask. Reuse rights also require confirmation.",
         title="Kochi ward map: draft candidate, not final",
