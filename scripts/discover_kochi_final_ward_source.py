@@ -91,6 +91,9 @@ def audit_final_pdf() -> dict:
         page_text = [page.extract_text() or "" for page in reader.pages]
         full_text = "\n".join(page_text)
         normalized_text = normalize(full_text)
+        extracted_labels = []
+        for number, name in re.findall(r"(?m)^\\s*(\\d{1,2})\\s*[-–]\\s*([A-Z][A-Z ]{2,60})\\s*$", full_text):
+            extracted_labels.append({"ward_number": int(number), "map_label": name.strip()})
         roster_payload = json.loads(ROSTER.read_text(encoding="utf-8"))
         wards = roster_payload.get("wards", [])
         checks = []
@@ -98,6 +101,20 @@ def audit_final_pdf() -> dict:
             target = normalize(name)
             checks.append({"ward_code": code, "official_name": name, "text_found": bool(target and target in normalized_text)})
         found = sum(row["text_found"] for row in checks)
+        official_by_number = {int(code[-3:]): name for code, name in wards}
+        labels_by_number = {}
+        for row in extracted_labels:
+            labels_by_number.setdefault(row["ward_number"], []).append(row["map_label"])
+        numbered_comparison = []
+        for number in range(1, 77):
+            labels = labels_by_number.get(number, [])
+            official_name = official_by_number.get(number)
+            numbered_comparison.append({
+                "ward_number": number,
+                "official_sec_name": official_name,
+                "final_map_labels": labels,
+                "exact_normalized_match": any(normalize(label) == normalize(official_name or "") for label in labels),
+            })
         return {
             "url": PDF_URL,
             "final_url": final_url,
@@ -109,7 +126,11 @@ def audit_final_pdf() -> dict:
             "extracted_text_characters": len(full_text),
             "official_ward_name_text_matches": found,
             "official_ward_name_text_missing": [row for row in checks if not row["text_found"]],
-            "page_text_preview": [text[:900] for text in page_text[:3]],
+            "numbered_map_labels_extracted": len(extracted_labels),
+            "numbered_map_labels": extracted_labels,
+            "numbered_comparison_exact_name_matches": sum(row["exact_normalized_match"] for row in numbered_comparison),
+            "numbered_comparison": numbered_comparison,
+            "page_text_preview": [text[:2400] for text in page_text[:3]],
             "status": "OFFICIAL_FINAL_MAP_PDF_REFERENCE_ONLY_NOT_GIS_GEOMETRY",
         }
     except Exception as exc:
@@ -156,6 +177,18 @@ def main() -> int:
                 scripts.append({"url": url, "error": f"{type(exc).__name__}: {exc}"})
 
         pdf_audit = audit_final_pdf()
+        script_variable_evidence = []
+        for script in scripts:
+            if "url" not in script or not script.get("url", "").endswith(".js"):
+                continue
+            try:
+                script_bytes, _, _ = get(script["url"], MAX_SCRIPT_BYTES)
+                js = script_bytes.decode("utf-8", errors="replace")
+                for variable in ("e1", "Jx", "Fy", "nR", "n1", "iR"):
+                    for match in list(re.finditer(r"(?:const|let|var)?\\s*" + re.escape(variable) + r"\\s*=", js))[:6]:
+                        script_variable_evidence.append({"script_url": script["url"], "variable": variable, "snippet": js[max(0, match.start()-180):min(len(js), match.start()+500)]})
+            except Exception as exc:
+                script_variable_evidence.append({"script_url": script.get("url"), "error": f"{type(exc).__name__}: {exc}"})
         result = {
             "source_page": PAGE_URL,
             "final_url": final_url,
@@ -166,6 +199,7 @@ def main() -> int:
             "official_same_origin_scripts": scripts,
             "candidate_public_references": sorted(relevant_references),
             "keyword_evidence": keyword_evidence[:60],
+            "script_variable_evidence": script_variable_evidence[:40],
             "final_map_pdf_audit": pdf_audit,
             "status": "SOURCE_DISCOVERY_AND_PDF_TEXT_AUDIT_ONLY",
             "limitations": [
