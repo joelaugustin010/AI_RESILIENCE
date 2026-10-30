@@ -59,7 +59,7 @@ class FinalMapReferenceAuditTests(unittest.TestCase):
     def test_vector_tile_access_failures_do_not_promote_unverified_geometry(self):
         report = self.report
         self.assertIn("NOT_SPATIAL_LAYER_PROMOTION", report["vector_tile_sample_audit"]["status"])
-        self.assertIn("no GIS geometry", " ".join(report["limitations"]).casefold())
+        self.assertTrue(any("does not extract or approve boundary geometries" in item.casefold() for item in report["limitations"]))
 
 
 if __name__ == "__main__":
