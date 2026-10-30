@@ -1,0 +1,1307 @@
+{
+  "source_page": "https://wardmap.ksmart.live/map?district=Ernakulam&localbody=Cochin&type=Corporation",
+  "final_url": "https://wardmap.ksmart.live/map?district=Ernakulam&localbody=Cochin&type=Corporation",
+  "retrieved_content_type": "text/html",
+  "retrieved_html_bytes": 681,
+  "page_title": "Ward Delimitation - Delimitation Commission, Kerala",
+  "html_shell_note": "The page is a client-rendered application; page labels may be rendered by JavaScript.",
+  "official_same_origin_scripts": [
+    {
+      "url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "content_type": "application/javascript",
+      "bytes_read": 546865
+    }
+  ],
+  "candidate_public_references": [
+    ")return`https://wardmap.ksmart.live/FinalN/notification/FinalBlock_${Td(e)}.pdf`;if(t===",
+    ")return`https://wardmap.ksmart.live/FinalN/notification/FinalDP_${ru(kd[e]||e)}.pdf`;const n=kd[r]||r;return`https://wardmap.ksmart.live/FinalN/notification/FinalN_${ru(n)}_${Td(e)}.pdf`}function HT(r,e){const t=kd[r]||r;return`https://wardmap.ksmart.live/FinalN/map/Map_FinalN_${ru(t)}_${Td(e)}.pdf`}async function qT(r,e){r.once(",
+    "https://wardmap.ksmart.live/FinalN/map/Map_FinalN_${ru(t)}_${Td(e)}.pdf`}async",
+    "https://wardmap.ksmart.live/FinalN/notification/FinalBlock_${Td(e)}.pdf`;if(t===",
+    "https://wardmap.ksmart.live/FinalN/notification/FinalDP_${ru(kd[e]||e)}.pdf`;const",
+    "https://wardmap.ksmart.live/FinalN/notification/FinalN_${ru(n)}_${Td(e)}.pdf`}function",
+    "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+    "https://wardmap.ksmart.live/map",
+    "https://wardmap.ksmart.live/map?district=${encodeURIComponent(e)}&type=${encodeURIComponent(t)}&localbody=${encodeURIComponent(n)}`)};return"
+  ],
+  "keyword_evidence": [
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "FinalN/map",
+      "snippet": "e)}.pdf`;const n=kd[r]||r;return`https://wardmap.ksmart.live/FinalN/notification/FinalN_${ru(n)}_${Td(e)}.pdf`}function HT(r,e){const t=kd[r]||r;return`https://wardmap.ksmart.live/FinalN/map/Map_FinalN_${ru(t)}_${Td(e)}.pdf`}async function qT(r,e){r.once(\"rendercomplete\",()=>{const t=document.querySelector(\".ol-viewport canvas\");if(!t)return;const n=document.createElement(\"a\");n.download=e.replace(/\\s+/g,\"_\")+\"_Map.png\",n.href=t.toDataURL(\"image/png\"),n.click()}),r.renderSync()}function QT(r,e){"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "FinalN/notification",
+      "snippet": "TV Puram\":\"Tv Puram\",Thaliparamba:\"Thalipparamba\",Tirur:\"Thirur\"};function Td(r){return ru(ZT[r]||r)}function $T(r,e,t){if(t===\"Block Panchayat\")return`https://wardmap.ksmart.live/FinalN/notification/FinalBlock_${Td(e)}.pdf`;if(t===\"District Panchayat\")return`https://wardmap.ksmart.live/FinalN/notification/FinalDP_${ru(kd[e]||e)}.pdf`;const n=kd[r]||r;return`https://wardmap.ksmart.live/FinalN/notification/FinalN_${ru(n)}_${Td(e)}.pdf`}function HT(r,e){const t=kd[r]||r;return`https://wardmap.ksma"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "FinalN/notification",
+      "snippet": "n $T(r,e,t){if(t===\"Block Panchayat\")return`https://wardmap.ksmart.live/FinalN/notification/FinalBlock_${Td(e)}.pdf`;if(t===\"District Panchayat\")return`https://wardmap.ksmart.live/FinalN/notification/FinalDP_${ru(kd[e]||e)}.pdf`;const n=kd[r]||r;return`https://wardmap.ksmart.live/FinalN/notification/FinalN_${ru(n)}_${Td(e)}.pdf`}function HT(r,e){const t=kd[r]||r;return`https://wardmap.ksmart.live/FinalN/map/Map_FinalN_${ru(t)}_${Td(e)}.pdf`}async function qT(r,e){r.once(\"rendercomplete\",()=>{con"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "FinalN/notification",
+      "snippet": "k_${Td(e)}.pdf`;if(t===\"District Panchayat\")return`https://wardmap.ksmart.live/FinalN/notification/FinalDP_${ru(kd[e]||e)}.pdf`;const n=kd[r]||r;return`https://wardmap.ksmart.live/FinalN/notification/FinalN_${ru(n)}_${Td(e)}.pdf`}function HT(r,e){const t=kd[r]||r;return`https://wardmap.ksmart.live/FinalN/map/Map_FinalN_${ru(t)}_${Td(e)}.pdf`}async function qT(r,e){r.once(\"rendercomplete\",()=>{const t=document.querySelector(\".ol-viewport canvas\");if(!t)return;const n=document.createElement(\"a\");n"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "fetch(",
+      "snippet": "Origin===\"use-credentials\"?a.credentials=\"include\":s.crossOrigin===\"anonymous\"?a.credentials=\"omit\":a.credentials=\"same-origin\",a}function n(s){if(s.ep)return;s.ep=!0;const a=t(s);fetch(s.href,a)}})();function Ey(r){return r&&r.__esModule&&Object.prototype.hasOwnProperty.call(r,\"default\")?r.default:r}var _h={exports:{}},Ao={},vh={exports:{}},Ae={};/**\n * @license React\n * react.production.min.js\n *\n * Copyright (c) Facebook, Inc. and its affiliates.\n *\n * This source code is licensed under the M"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "fetch(",
+      "snippet": "la_bp\";async function t1(){const r={},e=[];for(let n=191;n<=196;n++)for(let s=109;s<=119;s++)e.push({x:n,y:s,z:8});await Promise.all(e.map(async({x:n,y:s,z:a})=>{try{const l=await fetch(`${e1}/${a}/${n}/${s}`,{signal:AbortSignal.timeout(8e3)});if(!l.ok)return;const c=await l.arrayBuffer(),h=new Uint8Array(c);let g=0;const f=()=>{let v=0,w=0;for(;g<h.length;){const C=h[g++];if(v|=(C&127)<<w,!(C&128))break;w+=7}return v},m=v=>{const w=new TextDecoder().decode(h.slice(g,g+v));return g+=v,w},_=v=>{i"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "fetch(",
+      "snippet": ",type:k.Lsgd_Type.trim(),name:k.name.trim()})}}else c(_)}}catch{}return e}async function i1(){const r={},e=Fy.map(async({x:n,y:s,z:a})=>{try{const l=`${Jx}/${a}/${n}/${s}`,c=await fetch(l,{signal:AbortSignal.timeout(8e3)});if(!c.ok)return;const h=await c.arrayBuffer(),g=await n1(h);for(const{district:f,type:m,name:_}of g)r[f]||(r[f]={}),r[f][m]||(r[f][m]=new Set),r[f][m].add(_)}catch{}});await Promise.all(e);const t={};for(const[n,s]of Object.entries(r)){t[n]={};for(const[a,l]of Object.entries(s"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "fetch(",
+      "snippet": "igin\",s=\"same-origin\";t===\"anonymous\"||t===\"\"?(n=\"cors\",s=\"omit\"):t===\"use-credentials\"&&(n=\"cors\",s=\"include\");const a={mode:n,credentials:s,referrerPolicy:r.getReferrerPolicy()};fetch(e,a).then(l=>{if(!l.ok)throw new Error(`HTTP ${l.status}`);return l.blob()}).then(l=>createImageBitmap(l)).then(l=>{var g;const c=r.getImage();c.width=l.width,c.height=l.height,c.getContext(\"2d\").drawImage(l,0,0),(g=l.close)==null||g.call(l),c.dispatchEvent(new Event(\"load\"))}).catch(()=>{r.getImage().dispatchEve"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "fetch(",
+      "snippet": "push(P))}})}else l(g)}}catch(s){n.error=s.message}return n}function rR(){const[r,e]=ne.useState([]);return ne.useEffect(()=>{async function t(){for(const n of nR)try{const s=await fetch(n.url);if(!s.ok){e(c=>[...c,{name:n.name,error:`HTTP ${s.status}`}]);continue}const a=await s.arrayBuffer(),l=await iR(a);e(c=>[...c,{name:n.name,size:a.byteLength,...l}])}catch(s){e(a=>[...a,{name:n.name,error:s.message}])}}t()},[]),A.jsxs(\"div\",{style:{padding:20,fontFamily:\"monospace\",fontSize:13,background:\"#"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "Cochin",
+      "snippet": "anathapuram\"},ZT={Alakode:\"Alakkode\",Badiadka:\"Badiyadka\",Guruvayur:\"Guruvayoor\",Irinjalakuda:\"Irinjalakkuda\",Kanhangad:\"Kanjhangad\",Kasaragod:\"Kasargod\",Kavanur:\"Kavannur\",Kochi:\"Cochin\",Kodungallur:\"Kodungalloor\",Koyilandy:\"Quilandy\",\"Lakkidi-perur\":\"Lakkidi-Perur\",\"Malayattoor Neeleeswaram\":\"Malayattoor Neeleswaram\",Mulumthuruthy:\"Mulamthuruthy\",Narikkuni:\"Narikunni\",Narippatta:\"Naripetta\",\"Padiyur kalliad\":\"Padiyur Kalliad\",Paravur:\"Paravoor\",\"Perumana klari\":\"Perumana Klari\",Pothanicad:\"Pot"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "wb_kerala",
+      "snippet": "ode\",\"Thavinhal\",\"Thirunelly\",\"Thondernad\",\"Vellamunda\",\"Vengappally\",\"Vythiri\"],Municipality:[\"Kalpetta\",\"Mananthavady\",\"Sulthan Bathery\"]}},Jx=\"https://kmapdev.ksmart.live/tiles/wb_kerala\",e1=\"https://kmapdev.ksmart.live/tiles/kerala_bp\";async function t1(){const r={},e=[];for(let n=191;n<=196;n++)for(let s=109;s<=119;s++)e.push({x:n,y:s,z:8});await Promise.all(e.map(async({x:n,y:s,z:a})=>{try{const l=await fetch(`${e1}/${a}/${n}/${s}`,{signal:AbortSignal.timeout(8e3)});if(!l.ok)return;const c"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "wb_kerala",
+      "snippet": "her:kT,layerRow:TT,layerLabel:RT,toggle:PT,toggleThumb:IT,labelToggleRow:MT,labelToggleText:LT,zoomBadge:AT,popup:OT,popClose:DT,popTable:FT},NT=\"https://kmapdev.ksmart.live/tiles/wb_kerala/{z}/{x}/{y}\",zT=\"https://kmapdev.ksmart.live/tiles/kerala_wb_insidepoint/{z}/{x}/{y}\",jT=\"https://kmapdev.ksmart.live/tiles/lb_kerala/{z}/{x}/{y}\",KT=\"https://kmapdev.ksmart.live/tiles/kerala_bp/{z}/{x}/{y}\",bT=\"https://kmapdev.ksmart.live/tiles/kerala_bp_insidepoint/{z}/{x}/{y}\",VT=\"https://kmapdev.ksmart.li"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "wb_kerala",
+      "snippet": ":\"https://kmapdev.ksmart.live/tiles/kerala_bp_with_lsgd/10/771/457\"},{name:\"kerala_bp_with_lsgd (z8)\",url:\"https://kmapdev.ksmart.live/tiles/kerala_bp_with_lsgd/8/193/114\"},{name:\"wb_kerala (reference)\",url:\"https://kmapdev.ksmart.live/tiles/wb_kerala/10/771/457\"}];async function iR(r){const e=new Uint8Array(r);let t=0;const n={layerName:\"\",keys:[],sampleValues:{},featureCount:0,error:null};try{const s=()=>{let c=0,h=0;for(;t<e.length;){const g=e[t++];if(c|=(g&127)<<h,!(g&128))break;h+=7}return "
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "wb_kerala",
+      "snippet": "/457\"},{name:\"kerala_bp_with_lsgd (z8)\",url:\"https://kmapdev.ksmart.live/tiles/kerala_bp_with_lsgd/8/193/114\"},{name:\"wb_kerala (reference)\",url:\"https://kmapdev.ksmart.live/tiles/wb_kerala/10/771/457\"}];async function iR(r){const e=new Uint8Array(r);let t=0;const n={layerName:\"\",keys:[],sampleValues:{},featureCount:0,error:null};try{const s=()=>{let c=0,h=0;for(;t<e.length;){const g=e[t++];if(c|=(g&127)<<h,!(g&128))break;h+=7}return c},a=c=>{const h=new TextDecoder().decode(e.slice(t,t+c));retu"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "MVT",
+      "snippet": ",minHeight:\"100vh\"},children:[A.jsx(\"h2\",{style:{color:\"#e6007e\"},children:\"Tile Field Name Debugger\"}),A.jsx(\"p\",{style:{color:\"#aaa\"},children:\"Fetching tiles to discover actual MVT field names...\"}),r.map((t,n)=>A.jsxs(\"div\",{style:{marginBottom:24,background:\"#252540\",padding:16,borderRadius:8},children:[A.jsx(\"h3\",{style:{color:\"#FFD700\",margin:\"0 0 8px\"},children:t.name}),t.error?A.jsxs(\"div\",{style:{color:\"#ff6b6b\"},children:[\"Error: \",t.error]}):A.jsxs(A.Fragment,{children:[A.jsxs(\"div\","
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "tileGrid",
+      "snippet": "id 0?e.axisOrientation:\"enu\",this.global_=e.global!==void 0?e.global:!1,this.canWrapX_=!!(this.global_&&this.extent_),this.getPointResolutionFunc_=e.getPointResolution,this.defaultTileGrid_=null,this.metersPerUnit_=e.metersPerUnit}canWrapX(){return this.canWrapX_}getCode(){return this.code_}getExtent(){return this.extent_}getUnits(){return this.units_}getMetersPerUnit(){return this.metersPerUnit_||Nd[this.units_]}getWorldExtent(){return this.worldExtent_}getAxisOrientation(){return this.axisOrie"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "tileGrid",
+      "snippet": "{return this.worldExtent_}getAxisOrientation(){return this.axisOrientation_}isGlobal(){return this.global_}setGlobal(e){this.global_=e,this.canWrapX_=!!(e&&this.extent_)}getDefaultTileGrid(){return this.defaultTileGrid_}setDefaultTileGrid(e){this.defaultTileGrid_=e}setExtent(e){this.extent_=e,this.canWrapX_=!!(this.global_&&e)}setWorldExtent(e){this.worldExtent_=e}setGetPointResolution(e){this.getPointResolutionFunc_=e}getPointResolutionFunc(){return this.getPointResolutionFunc_}}const da=637813"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "tileGrid",
+      "snippet": "xisOrientation(){return this.axisOrientation_}isGlobal(){return this.global_}setGlobal(e){this.global_=e,this.canWrapX_=!!(e&&this.extent_)}getDefaultTileGrid(){return this.defaultTileGrid_}setDefaultTileGrid(e){this.defaultTileGrid_=e}setExtent(e){this.extent_=e,this.canWrapX_=!!(this.global_&&e)}setWorldExtent(e){this.worldExtent_=e}setGetPointResolution(e){this.getPointResolutionFunc_=e}getPointResolutionFunc(){return this.getPointResolutionFunc_}}const da=6378137,As=Math.PI*da,dw=[-As,-As,As"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "tileGrid",
+      "snippet": "urn this.axisOrientation_}isGlobal(){return this.global_}setGlobal(e){this.global_=e,this.canWrapX_=!!(e&&this.extent_)}getDefaultTileGrid(){return this.defaultTileGrid_}setDefaultTileGrid(e){this.defaultTileGrid_=e}setExtent(e){this.extent_=e,this.canWrapX_=!!(this.global_&&e)}setWorldExtent(e){this.worldExtent_=e}setGetPointResolution(e){this.getPointResolutionFunc_=e}getPointResolutionFunc(){return this.getPointResolutionFunc_}}const da=6378137,As=Math.PI*da,dw=[-As,-As,As,As],fw=[-180,-85,18"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "tileGrid",
+      "snippet": "_}isGlobal(){return this.global_}setGlobal(e){this.global_=e,this.canWrapX_=!!(e&&this.extent_)}getDefaultTileGrid(){return this.defaultTileGrid_}setDefaultTileGrid(e){this.defaultTileGrid_=e}setExtent(e){this.extent_=e,this.canWrapX_=!!(this.global_&&e)}setWorldExtent(e){this.worldExtent_=e}setGetPointResolution(e){this.getPointResolutionFunc_=e}getPointResolutionFunc(){return this.getPointResolutionFunc_}}const da=6378137,As=Math.PI*da,dw=[-As,-As,As,As],fw=[-180,-85,180,85],Il=da*Math.log(Mat"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "tileGrid",
+      "snippet": " TS=.5;class K_ extends ma{constructor(e,t,n,s,a,l,c,h,g,f,m,_){super(a,re.IDLE,_),this.renderEdges_=m!==void 0?m:!1,this.pixelRatio_=c,this.gutter_=h,this.canvas_=null,this.sourceTileGrid_=t,this.targetTileGrid_=s,this.wrappedTileCoord_=l||a,this.sourceTiles_=[],this.sourcesListenerKeys_=null,this.sourceZ_=0,this.clipExtent_=e.canWrapX()?e.getExtent():void 0;const v=s.getTileCoordExtent(this.wrappedTileCoord_),w=this.targetTileGrid_.getExtent();let C=this.sourceTileGrid_.getExtent();const E=w?w"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "tileGrid",
+      "snippet": " ma{constructor(e,t,n,s,a,l,c,h,g,f,m,_){super(a,re.IDLE,_),this.renderEdges_=m!==void 0?m:!1,this.pixelRatio_=c,this.gutter_=h,this.canvas_=null,this.sourceTileGrid_=t,this.targetTileGrid_=s,this.wrappedTileCoord_=l||a,this.sourceTiles_=[],this.sourcesListenerKeys_=null,this.sourceZ_=0,this.clipExtent_=e.canWrapX()?e.getExtent():void 0;const v=s.getTileCoordExtent(this.wrappedTileCoord_),w=this.targetTileGrid_.getExtent();let C=this.sourceTileGrid_.getExtent();const E=w?wi(v,w):v;if(od(E)===0){"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "tileGrid",
+      "snippet": "sourceTiles_=[],this.sourcesListenerKeys_=null,this.sourceZ_=0,this.clipExtent_=e.canWrapX()?e.getExtent():void 0;const v=s.getTileCoordExtent(this.wrappedTileCoord_),w=this.targetTileGrid_.getExtent();let C=this.sourceTileGrid_.getExtent();const E=w?wi(v,w):v;if(od(E)===0){this.state=re.EMPTY;return}const k=e.getExtent();k&&(C?C=wi(C,k):C=k);const S=s.getResolution(this.wrappedTileCoord_[0]),P=ES(e,n,E,S);if(!isFinite(P)||P<=0){this.state=re.EMPTY;return}const T=f!==void 0?f:TS;if(this.triangul"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "tileSize",
+      "snippet": ",e.push({extent:a,clipExtent:l,image:n.getImage()})}}),this.sourceTiles_.length=0,e.length===0)this.state=re.ERROR;else{const t=this.wrappedTileCoord_[0],n=this.targetTileGrid_.getTileSize(t),s=typeof n==\"number\"?n:n[0],a=typeof n==\"number\"?n:n[1],l=this.targetTileGrid_.getResolution(t),c=this.sourceTileGrid_.getResolution(this.sourceZ_),h=this.targetTileGrid_.getTileCoordExtent(this.wrappedTileCoord_);this.canvas_=CS(s,a,this.pixelRatio_,c,this.sourceTileGrid_.getExtent(),l,h,this.triangulation"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "tileSize",
+      "snippet": ".resolution);f>=h.getMinZoom();--f){const m=h.getTileCoordForCoordAndZ(s,f),_=this.getTile(f,m[1],m[2],t);if(!_||_.getState()!==re.LOADED)continue;const v=h.getOrigin(f),w=Yt(h.getTileSize(f)),C=h.getResolution(f);let E;if(_ instanceof j_||_ instanceof K_)E=_.getImage();else if(_ instanceof iy){if(E=wd(_.getData()),!E)continue}else continue;const k=Math.floor(g*((s[0]-v[0])/C-m[1]*w[0])),S=Math.floor(g*((v[1]-s[1])/C-m[2]*w[1])),P=Math.round(g*c.getGutterForProjection(l.projection));return this."
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "tileSize",
+      "snippet": ".wrappedTileCoord),C=dr(w),E=[(f[0]-C[0])/h,(C[1]-f[1])/h],k=_.getSourceTiles().reduce((P,T)=>P.concat(T.getFeatures()),[]);let S=_.hitDetectionImageData[v];if(!S){const P=Yt(g.getTileSize(g.getZForResolution(h,a.zDirection))),T=this.renderedRotation_,I=[this.getRenderTransform(g.getTileCoordCenter(_.wrappedTileCoord),h,0,lr,P[0]*lr,P[1]*lr,0)];S=ek(P,I,k,s.getStyleFunction(),g.getTileCoordExtent(_.wrappedTileCoord),_.getReplayState(s).renderedResolution,T),_.hitDetectionImageData[v]=S}t(tk(E,k,"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "tileSize",
+      "snippet": "his.origin_&&!this.origins_&&(this.origin_=dr(n)),qe(!this.origin_&&this.origins_||this.origin_&&!this.origins_,\"Either `origin` or `origins` must be configured, never both\"),this.tileSizes_=null,e.tileSizes!==void 0&&(this.tileSizes_=e.tileSizes,qe(this.tileSizes_.length==this.resolutions_.length,\"Number of `tileSizes` and `resolutions` must be equal\")),this.tileSize_=e.tileSize!==void 0?e.tileSize:this.tileSizes_?null:rf,qe(!this.tileSize_&&this.tileSizes_||this.tileSize_&&!this.tileSizes_,\"Ei"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "tileSize",
+      "snippet": ".origins_&&(this.origin_=dr(n)),qe(!this.origin_&&this.origins_||this.origin_&&!this.origins_,\"Either `origin` or `origins` must be configured, never both\"),this.tileSizes_=null,e.tileSizes!==void 0&&(this.tileSizes_=e.tileSizes,qe(this.tileSizes_.length==this.resolutions_.length,\"Number of `tileSizes` and `resolutions` must be equal\")),this.tileSize_=e.tileSize!==void 0?e.tileSize:this.tileSizes_?null:rf,qe(!this.tileSize_&&this.tileSizes_||this.tileSize_&&!this.tileSizes_,\"Either `tileSize` or"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "tileSize",
+      "snippet": "r(n)),qe(!this.origin_&&this.origins_||this.origin_&&!this.origins_,\"Either `origin` or `origins` must be configured, never both\"),this.tileSizes_=null,e.tileSizes!==void 0&&(this.tileSizes_=e.tileSizes,qe(this.tileSizes_.length==this.resolutions_.length,\"Number of `tileSizes` and `resolutions` must be equal\")),this.tileSize_=e.tileSize!==void 0?e.tileSize:this.tileSizes_?null:rf,qe(!this.tileSize_&&this.tileSizes_||this.tileSize_&&!this.tileSizes_,\"Either `tileSize` or `tileSizes` must be confi"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "tileSize",
+      "snippet": "s.origin_&&this.origins_||this.origin_&&!this.origins_,\"Either `origin` or `origins` must be configured, never both\"),this.tileSizes_=null,e.tileSizes!==void 0&&(this.tileSizes_=e.tileSizes,qe(this.tileSizes_.length==this.resolutions_.length,\"Number of `tileSizes` and `resolutions` must be equal\")),this.tileSize_=e.tileSize!==void 0?e.tileSize:this.tileSizes_?null:rf,qe(!this.tileSize_&&this.tileSizes_||this.tileSize_&&!this.tileSizes_,\"Either `tileSize` or `tileSizes` must be configured, never "
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "tileSize",
+      "snippet": "igins_||this.origin_&&!this.origins_,\"Either `origin` or `origins` must be configured, never both\"),this.tileSizes_=null,e.tileSizes!==void 0&&(this.tileSizes_=e.tileSizes,qe(this.tileSizes_.length==this.resolutions_.length,\"Number of `tileSizes` and `resolutions` must be equal\")),this.tileSize_=e.tileSize!==void 0?e.tileSize:this.tileSizes_?null:rf,qe(!this.tileSize_&&this.tileSizes_||this.tileSize_&&!this.tileSizes_,\"Either `tileSize` or `tileSizes` must be configured, never both\"),this.extent"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "getTileUrlFunction",
+      "snippet": "tileUrlFunction=e.tileUrlFunction),this.urls=null,e.urls?this.setUrls(e.urls):e.url&&this.setUrl(e.url),this.tileLoadingKeys_={}}getTileLoadFunction(){return this.tileLoadFunction}getTileUrlFunction(){return Object.getPrototypeOf(this).tileUrlFunction===this.tileUrlFunction?this.tileUrlFunction.bind(this):this.tileUrlFunction}getUrls(){return this.urls}handleTileChange(e){const t=e.target,n=He(t),s=t.getState();let a;s==re.LOADING?(this.tileLoadingKeys_[n]=!0,a=$h.TILELOADSTART):n in this.tileLo"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "projection",
+      "snippet": "st d_=42,rf=256,Rh=0;class Jn extends si{constructor(e){super(),this.on,this.once,this.un,e=Object.assign({},e),this.hints_=[0,0],this.animations_=[],this.updateAnimationKey_,this.projection_=bd(e.projection,\"EPSG:3857\"),this.viewportSize_=[100,100],this.targetCenter_=null,this.targetResolution_,this.targetRotation_,this.nextCenter_=null,this.nextResolution_,this.nextRotation_,this.cancelAnchor_=void 0,e.projection&&Jy(),e.center&&(e.center=_i(e.center,this.projection_)),e.extent&&(e.extent=Os(e"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "projection",
+      "snippet": "h=0;class Jn extends si{constructor(e){super(),this.on,this.once,this.un,e=Object.assign({},e),this.hints_=[0,0],this.animations_=[],this.updateAnimationKey_,this.projection_=bd(e.projection,\"EPSG:3857\"),this.viewportSize_=[100,100],this.targetCenter_=null,this.targetResolution_,this.targetRotation_,this.nextCenter_=null,this.nextResolution_,this.nextRotation_,this.cancelAnchor_=void 0,e.projection&&Jy(),e.center&&(e.center=_i(e.center,this.projection_)),e.extent&&(e.extent=Os(e.extent,this.proj"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "projection",
+      "snippet": "ewportSize_=[100,100],this.targetCenter_=null,this.targetResolution_,this.targetRotation_,this.nextCenter_=null,this.nextResolution_,this.nextRotation_,this.cancelAnchor_=void 0,e.projection&&Jy(),e.center&&(e.center=_i(e.center,this.projection_)),e.extent&&(e.extent=Os(e.extent,this.projection_)),this.applyOptions_(e)}applyOptions_(e){const t=Object.assign({},e);for(const c in Gn)delete t[c];this.setProperties(t,!0);const n=_E(e);this.maxResolution_=n.maxResolution,this.minResolution_=n.minReso"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "projection",
+      "snippet": "getResolution_,this.targetRotation_,this.nextCenter_=null,this.nextResolution_,this.nextRotation_,this.cancelAnchor_=void 0,e.projection&&Jy(),e.center&&(e.center=_i(e.center,this.projection_)),e.extent&&(e.extent=Os(e.extent,this.projection_)),this.applyOptions_(e)}applyOptions_(e){const t=Object.assign({},e);for(const c in Gn)delete t[c];this.setProperties(t,!0);const n=_E(e);this.maxResolution_=n.maxResolution,this.minResolution_=n.minResolution,this.zoomFactor_=n.zoomFactor,this.resolutions_"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "projection",
+      "snippet": "_=null,this.nextResolution_,this.nextRotation_,this.cancelAnchor_=void 0,e.projection&&Jy(),e.center&&(e.center=_i(e.center,this.projection_)),e.extent&&(e.extent=Os(e.extent,this.projection_)),this.applyOptions_(e)}applyOptions_(e){const t=Object.assign({},e);for(const c in Gn)delete t[c];this.setProperties(t,!0);const n=_E(e);this.maxResolution_=n.maxResolution,this.minResolution_=n.minResolution,this.zoomFactor_=n.zoomFactor,this.resolutions_=e.resolutions,this.padding_=e.padding,this.minZoom"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "projection",
+      "snippet": "ting()&&this.resolveConstraints(0);const t=new Array(arguments.length);for(let n=0;n<t.length;++n){let s=arguments[n];s.center&&(s=Object.assign({},s),s.center=_i(s.center,this.getProjection())),s.anchor&&(s=Object.assign({},s),s.anchor=_i(s.anchor,this.getProjection())),t[n]=s}this.animateInternal.apply(this,t)}animateInternal(e){let t=arguments.length,n;t>1&&typeof arguments[t-1]==\"function\"&&(n=arguments[t-1],--t);let s=0;for(;s<t&&!this.isDef();++s){const f=arguments[s];f.center&&this.setCen"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "projection",
+      "snippet": "t n=0;n<t.length;++n){let s=arguments[n];s.center&&(s=Object.assign({},s),s.center=_i(s.center,this.getProjection())),s.anchor&&(s=Object.assign({},s),s.anchor=_i(s.anchor,this.getProjection())),t[n]=s}this.animateInternal.apply(this,t)}animateInternal(e){let t=arguments.length,n;t>1&&typeof arguments[t-1]==\"function\"&&(n=arguments[t-1],--t);let s=0;for(;s<t&&!this.isDef();++s){const f=arguments[s];f.center&&this.setCenterInternal(f.center),f.zoom!==void 0?this.setZoom(f.zoom):f.resolution&&this"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "projection",
+      "snippet": "Size(e){this.viewportSize_=Array.isArray(e)?e.slice():[100,100],this.getAnimating()||this.resolveConstraints(0)}getCenter(){const e=this.getCenterInternal();return e&&hd(e,this.getProjection())}getCenterInternal(){return this.get(Gn.CENTER)}getConstraints(){return this.constraints_}getConstrainResolution(){return this.get(\"constrainResolution\")}getHints(e){return e!==void 0?(e[0]=this.hints_[0],e[1]=this.hints_[1],e):this.hints_.slice()}calculateExtent(e){const t=this.calculateExtentInternal(e);"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "extent",
+      "snippet": "lse s=[r[0],r[1],r[2],r[1],r[2],r[3],r[0],r[3]];e(s,s,2);const a=[],l=[];for(let c=0,h=s.length;c<h;c+=2)a.push(s[c]),l.push(s[c+1]);return $1(a,l,t)}function iw(r,e){const t=e.getExtent(),n=Kr(r);if(e.canWrapX()&&(n[0]<t[0]||n[0]>=t[2])){const s=ot(t),l=Math.floor((n[0]-t[0])/s)*s;r[0]-=l,r[2]-=l}return r}function rw(r,e,t){if(e.canWrapX()){const n=e.getExtent();if(!isFinite(r[0])||!isFinite(r[2]))return[[n[0],r[1],n[2],r[3]]];iw(r,e);const s=ot(n);if(ot(r)>s,r[0]<n[0])return[[r[0]+s,r[1],n[2],"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "extent",
+      "snippet": "getExtent(),n=Kr(r);if(e.canWrapX()&&(n[0]<t[0]||n[0]>=t[2])){const s=ot(t),l=Math.floor((n[0]-t[0])/s)*s;r[0]-=l,r[2]-=l}return r}function rw(r,e,t){if(e.canWrapX()){const n=e.getExtent();if(!isFinite(r[0])||!isFinite(r[2]))return[[n[0],r[1],n[2],r[3]]];iw(r,e);const s=ot(n);if(ot(r)>s,r[0]<n[0])return[[r[0]+s,r[1],n[2],r[3]],[n[0],r[1],r[2],r[3]]];if(r[2]>n[2])return[[r[0],r[1],n[2],r[3]],[n[0],r[1],r[2]-s,r[3]]]}return[r]}function sw(r,e){return r[0]+=+e[0],r[1]+=+e[1],r}function Yl(r,e){let "
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "extent",
+      "snippet": "onst t=Math.cos(e),n=Math.sin(e),s=r[0]*t-r[1]*n,a=r[1]*t+r[0]*n;return r[0]=s,r[1]=a,r}function ow(r,e){return r[0]*=e,r[1]*=e,r}function Uy(r,e){if(e.canWrapX()){const t=ot(e.getExtent()),n=aw(r,e,t);n&&(r[0]-=n*t)}return r}function aw(r,e,t){const n=e.getExtent();let s=0;return e.canWrapX()&&(r[0]<n[0]||r[0]>n[2])&&(t=t||ot(n),s=Math.floor((r[0]-n[0])/t)),s}function lw(r,e,t){const n=Math.sqrt((e[0]-r[0])*(e[0]-r[0])+(e[1]-r[1])*(e[1]-r[1])),s=[(e[0]-r[0])/n,(e[1]-r[1])/n],a=[-s[1],s[0]],l=Ma"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "extent",
+      "snippet": ",r[1]=a,r}function ow(r,e){return r[0]*=e,r[1]*=e,r}function Uy(r,e){if(e.canWrapX()){const t=ot(e.getExtent()),n=aw(r,e,t);n&&(r[0]-=n*t)}return r}function aw(r,e,t){const n=e.getExtent();let s=0;return e.canWrapX()&&(r[0]<n[0]||r[0]>n[2])&&(t=t||ot(n),s=Math.floor((r[0]-n[0])/t)),s}function lw(r,e,t){const n=Math.sqrt((e[0]-r[0])*(e[0]-r[0])+(e[1]-r[1])*(e[1]-r[1])),s=[(e[0]-r[0])/n,(e[1]-r[1])/n],a=[-s[1],s[0]],l=Math.sqrt((t[0]-r[0])*(t[0]-r[0])+(t[1]-r[1])*(t[1]-r[1])),c=[(t[0]-r[0])/l,(t[1"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "extent",
+      "snippet": "e.warn(...r)}const Nd={radians:6370997/(2*Math.PI),degrees:2*Math.PI*6370997/360,ft:.3048,m:1,\"us-ft\":1200/3937};class mu{constructor(e){this.code_=e.code,this.units_=e.units,this.extent_=e.extent!==void 0?e.extent:null,this.worldExtent_=e.worldExtent!==void 0?e.worldExtent:null,this.axisOrientation_=e.axisOrientation!==void 0?e.axisOrientation:\"enu\",this.global_=e.global!==void 0?e.global:!1,this.canWrapX_=!!(this.global_&&this.extent_),this.getPointResolutionFunc_=e.getPointResolution,this.def"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "extent",
+      "snippet": "r)}const Nd={radians:6370997/(2*Math.PI),degrees:2*Math.PI*6370997/360,ft:.3048,m:1,\"us-ft\":1200/3937};class mu{constructor(e){this.code_=e.code,this.units_=e.units,this.extent_=e.extent!==void 0?e.extent:null,this.worldExtent_=e.worldExtent!==void 0?e.worldExtent:null,this.axisOrientation_=e.axisOrientation!==void 0?e.axisOrientation:\"enu\",this.global_=e.global!==void 0?e.global:!1,this.canWrapX_=!!(this.global_&&this.extent_),this.getPointResolutionFunc_=e.getPointResolution,this.defaultTileGr"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "extent",
+      "snippet": "ns:6370997/(2*Math.PI),degrees:2*Math.PI*6370997/360,ft:.3048,m:1,\"us-ft\":1200/3937};class mu{constructor(e){this.code_=e.code,this.units_=e.units,this.extent_=e.extent!==void 0?e.extent:null,this.worldExtent_=e.worldExtent!==void 0?e.worldExtent:null,this.axisOrientation_=e.axisOrientation!==void 0?e.axisOrientation:\"enu\",this.global_=e.global!==void 0?e.global:!1,this.canWrapX_=!!(this.global_&&this.extent_),this.getPointResolutionFunc_=e.getPointResolution,this.defaultTileGrid_=null,this.mete"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "pattern": "extent",
+      "snippet": ",degrees:2*Math.PI*6370997/360,ft:.3048,m:1,\"us-ft\":1200/3937};class mu{constructor(e){this.code_=e.code,this.units_=e.units,this.extent_=e.extent!==void 0?e.extent:null,this.worldExtent_=e.worldExtent!==void 0?e.worldExtent:null,this.axisOrientation_=e.axisOrientation!==void 0?e.axisOrientation:\"enu\",this.global_=e.global!==void 0?e.global:!1,this.canWrapX_=!!(this.global_&&this.extent_),this.getPointResolutionFunc_=e.getPointResolution,this.defaultTileGrid_=null,this.metersPerUnit_=e.metersPer"
+    }
+  ],
+  "script_variable_evidence": [
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "variable": "e1",
+      "snippet": "nhal\",\"Thirunelly\",\"Thondernad\",\"Vellamunda\",\"Vengappally\",\"Vythiri\"],Municipality:[\"Kalpetta\",\"Mananthavady\",\"Sulthan Bathery\"]}},Jx=\"https://kmapdev.ksmart.live/tiles/wb_kerala\",e1=\"https://kmapdev.ksmart.live/tiles/kerala_bp\";async function t1(){const r={},e=[];for(let n=191;n<=196;n++)for(let s=109;s<=119;s++)e.push({x:n,y:s,z:8});await Promise.all(e.map(async({x:n,y:s,z:a})=>{try{const l=await fetch(`${e1}/${a}/${n}/${s}`,{signal:AbortSignal.timeout(8e3)});if(!l.ok)return;const c=await l.arrayBuffer(),h=new Uint8Array(c);let g=0;const f=()=>{let v=0,w=0;for(;g<h.length;){const C=h[g++];if(v|=(C&127)<<w,!(C&128))break;w+=7}return v},m=v=>{const w=new TextDecoder().dec"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "variable": "Jx",
+      "snippet": "thadi\",\"Pozhuthana\",\"Pulpally\",\"Thariyode\",\"Thavinhal\",\"Thirunelly\",\"Thondernad\",\"Vellamunda\",\"Vengappally\",\"Vythiri\"],Municipality:[\"Kalpetta\",\"Mananthavady\",\"Sulthan Bathery\"]}},Jx=\"https://kmapdev.ksmart.live/tiles/wb_kerala\",e1=\"https://kmapdev.ksmart.live/tiles/kerala_bp\";async function t1(){const r={},e=[];for(let n=191;n<=196;n++)for(let s=109;s<=119;s++)e.push({x:n,y:s,z:8});await Promise.all(e.map(async({x:n,y:s,z:a})=>{try{const l=await fetch(`${e1}/${a}/${n}/${s}`,{signal:AbortSignal.timeout(8e3)});if(!l.ok)return;const c=await l.arrayBuffer(),h=new Uint8Array(c);let g=0;const f=()=>{let v=0,w=0;for(;g<h.length;){const C=h[g++];if(v|=(C&127)<<w,!(C&128))break;w"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "variable": "Fy",
+      "snippet": "body||\"\").trim();V&&D&&(r[V]||(r[V]=new Set),r[V].add(D))}}else _(C)}}catch{}}));const t={};for(const[n,s]of Object.entries(r))t[n]=[...s].sort((a,l)=>a.localeCompare(l));return t}const Fy=[];for(let r=191;r<=196;r++)for(let e=109;e<=119;e++)Fy.push({x:r,y:e,z:8});async function n1(r){const e=[];try{const t=new Uint8Array(r),n=new DataView(r);let s=0;const a=()=>{let f=0,m=0;for(;s<t.length;){const _=t[s++];if(f|=(_&127)<<m,!(_&128))break;m+=7}return f},l=f=>{const m=new TextDecoder().decode(t.slice(s,s+f));return s+=f,m},c=f=>{if(f===0)a();else if(f===2){const m=a();s+=m}else f===5?s+=4:f===1&&(s+=8)},h=[],g=[];for(;s<t.length;){const f=a(),m=f>>3,_=f&7;if(m===3&&_===2){"
+    },
+    {
+      "script_url": "https://wardmap.ksmart.live/assets/index-DurDMe0Y.js",
+      "variable": "nR",
+      "snippet": "hildren:\"Localbody Type\"}),A.jsx(\"td\",{children:l.lsgdType})]}),A.jsxs(\"tr\",{children:[A.jsx(\"td\",{children:\"District\"}),\"     \",A.jsx(\"td\",{children:l.district})]})]})]})})]})]})}const nR=[{name:\"kerala_bp\",url:\"https://kmapdev.ksmart.live/tiles/kerala_bp/10/771/457\"},{name:\"kerala_bp (z8)\",url:\"https://kmapdev.ksmart.live/tiles/kerala_bp/8/193/114\"},{name:\"kerala_bp_with_lsgd\",url:\"https://kmapdev.ksmart.live/tiles/kerala_bp_with_lsgd/10/771/457\"},{name:\"kerala_bp_with_lsgd (z8)\",url:\"https://kmapdev.ksmart.live/tiles/kerala_bp_with_lsgd/8/193/114\"},{name:\"wb_kerala (reference)\",url:\"https://kmapdev.ksmart.live/tiles/wb_kerala/10/771/457\"}];async function iR(r){const e="
+    }
+  ],
+  "final_map_pdf_audit": {
+    "url": "https://wardmap.ksmart.live/FinalN/map/Map_FinalN_Ernakulam_Cochin.pdf",
+    "final_url": "https://wardmap.ksmart.live/FinalN/map/Map_FinalN_Ernakulam_Cochin.pdf",
+    "http_content_type": "application/pdf",
+    "pdf_signature_valid": true,
+    "sha256": "262a63f880b59884a1f8c4b10445f0297c147d88b49fdaf96143c57905e2e9f3",
+    "bytes": 4277562,
+    "page_count": 1,
+    "extracted_text_characters": 2000,
+    "official_ward_name_text_matches": 67,
+    "official_ward_name_text_missing": [
+      {
+        "ward_code": "C07003007",
+        "official_name": "CHAKKAMADAM",
+        "text_found": false
+      },
+      {
+        "ward_code": "C07003031",
+        "official_name": "CHANGAMPUZHA",
+        "text_found": false
+      },
+      {
+        "ward_code": "C07003032",
+        "official_name": "DHEVANKULANGARA",
+        "text_found": false
+      },
+      {
+        "ward_code": "C07003051",
+        "official_name": "PERUMANOOR",
+        "text_found": false
+      },
+      {
+        "ward_code": "C07003058",
+        "official_name": "EADAKOCHI NORTH",
+        "text_found": false
+      },
+      {
+        "ward_code": "C07003068",
+        "official_name": "MUNDAMVELY EAST",
+        "text_found": false
+      },
+      {
+        "ward_code": "C07003069",
+        "official_name": "MUNDAMVELY",
+        "text_found": false
+      },
+      {
+        "ward_code": "C07003071",
+        "official_name": "MOOLAMKUZHY",
+        "text_found": false
+      },
+      {
+        "ward_code": "C07003073",
+        "official_name": "NASRATHU",
+        "text_found": false
+      }
+    ],
+    "numbered_map_labels_extracted": 75,
+    "numbered_map_labels": [
+      {
+        "ward_number": 1,
+        "map_label": "FORT KOCHI"
+      },
+      {
+        "ward_number": 2,
+        "map_label": "KALVATHY"
+      },
+      {
+        "ward_number": 3,
+        "map_label": "EARAVELY"
+      },
+      {
+        "ward_number": 4,
+        "map_label": "KARIPPALAM"
+      },
+      {
+        "ward_number": 5,
+        "map_label": "CHERALAYI"
+      },
+      {
+        "ward_number": 6,
+        "map_label": "MATTANCHERY"
+      },
+      {
+        "ward_number": 7,
+        "map_label": "CHAKKAMADOM"
+      },
+      {
+        "ward_number": 8,
+        "map_label": "KARUVELIPPADY"
+      },
+      {
+        "ward_number": 9,
+        "map_label": "ISLAND NORTH"
+      },
+      {
+        "ward_number": 10,
+        "map_label": "RAVIPURAM"
+      },
+      {
+        "ward_number": 11,
+        "map_label": "ERNAKULAM SOUTH"
+      },
+      {
+        "ward_number": 12,
+        "map_label": "GANDHI NAGAR"
+      },
+      {
+        "ward_number": 13,
+        "map_label": "KATHRIKADAVU"
+      },
+      {
+        "ward_number": 14,
+        "map_label": "ERNAKULAM CENTRAL"
+      },
+      {
+        "ward_number": 15,
+        "map_label": "ERNAKULAM NORTH"
+      },
+      {
+        "ward_number": 16,
+        "map_label": "KALOOR SOUTH"
+      },
+      {
+        "ward_number": 17,
+        "map_label": "KALOOR NORTH"
+      },
+      {
+        "ward_number": 18,
+        "map_label": "THRIKKANARVATTOM"
+      },
+      {
+        "ward_number": 19,
+        "map_label": "AYYAPPANKAVU"
+      },
+      {
+        "ward_number": 20,
+        "map_label": "POTTAKUZHY"
+      },
+      {
+        "ward_number": 21,
+        "map_label": "ELAMAKKARA SOUTH"
+      },
+      {
+        "ward_number": 22,
+        "map_label": "PACHALAM"
+      },
+      {
+        "ward_number": 23,
+        "map_label": "THATTAZHAM"
+      },
+      {
+        "ward_number": 24,
+        "map_label": "VADUTHALA WEST"
+      },
+      {
+        "ward_number": 25,
+        "map_label": "VADUTHALA EAST"
+      },
+      {
+        "ward_number": 26,
+        "map_label": "ELAMAKKARA NORTH"
+      },
+      {
+        "ward_number": 27,
+        "map_label": "PUTHUKKALAVATTAM"
+      },
+      {
+        "ward_number": 28,
+        "map_label": "KUNNUMPURAM"
+      },
+      {
+        "ward_number": 29,
+        "map_label": "PONEKKARA"
+      },
+      {
+        "ward_number": 30,
+        "map_label": "EDAPPALLY"
+      },
+      {
+        "ward_number": 31,
+        "map_label": "CHANGAMPPUZHA"
+      },
+      {
+        "ward_number": 32,
+        "map_label": "DEVANKULANGARA"
+      },
+      {
+        "ward_number": 33,
+        "map_label": "PALARIVATTAM"
+      },
+      {
+        "ward_number": 34,
+        "map_label": "STADIUM"
+      },
+      {
+        "ward_number": 35,
+        "map_label": "KARANAKKODAM"
+      },
+      {
+        "ward_number": 36,
+        "map_label": "PUTHIYA ROAD"
+      },
+      {
+        "ward_number": 37,
+        "map_label": "PADIVATTAM"
+      },
+      {
+        "ward_number": 38,
+        "map_label": "VENNALA"
+      },
+      {
+        "ward_number": 39,
+        "map_label": "CHAKKARAPARAMBU"
+      },
+      {
+        "ward_number": 40,
+        "map_label": "CHALIKKAVATTAM"
+      },
+      {
+        "ward_number": 41,
+        "map_label": "THAMMANAM"
+      },
+      {
+        "ward_number": 42,
+        "map_label": "ELAMKULAM"
+      },
+      {
+        "ward_number": 43,
+        "map_label": "GIRINAGAR"
+      },
+      {
+        "ward_number": 44,
+        "map_label": "PONNURUNNI"
+      },
+      {
+        "ward_number": 45,
+        "map_label": "PONNURUNNI EAST"
+      },
+      {
+        "ward_number": 46,
+        "map_label": "VYTTILA"
+      },
+      {
+        "ward_number": 47,
+        "map_label": "POONITHURA"
+      },
+      {
+        "ward_number": 48,
+        "map_label": "VYTTILA JANATHA"
+      },
+      {
+        "ward_number": 49,
+        "map_label": "KADAVANTHRA"
+      },
+      {
+        "ward_number": 50,
+        "map_label": "PANAMPILLI NAGAR"
+      },
+      {
+        "ward_number": 51,
+        "map_label": "PERUMANUR"
+      },
+      {
+        "ward_number": 52,
+        "map_label": "KONTHURUTHY"
+      },
+      {
+        "ward_number": 53,
+        "map_label": "THEVARA"
+      },
+      {
+        "ward_number": 54,
+        "map_label": "ISLAND SOUTH"
+      },
+      {
+        "ward_number": 55,
+        "map_label": "KADEBHAGAM"
+      },
+      {
+        "ward_number": 56,
+        "map_label": "PALLURUTHY EAST"
+      },
+      {
+        "ward_number": 57,
+        "map_label": "THAZHUPPU"
+      },
+      {
+        "ward_number": 58,
+        "map_label": "EDAKOCHI NORTH"
+      },
+      {
+        "ward_number": 59,
+        "map_label": "EDAKOCHI SOUTH"
+      },
+      {
+        "ward_number": 60,
+        "map_label": "PERUMBADAPPU"
+      },
+      {
+        "ward_number": 61,
+        "map_label": "KONAM"
+      },
+      {
+        "ward_number": 63,
+        "map_label": "NAMBYAPURAM"
+      },
+      {
+        "ward_number": 64,
+        "map_label": "PALLLURUTHY"
+      },
+      {
+        "ward_number": 65,
+        "map_label": "PULLARDESAM"
+      },
+      {
+        "ward_number": 66,
+        "map_label": "THAREBHAGAM"
+      },
+      {
+        "ward_number": 67,
+        "map_label": "THOPPUMPADY"
+      },
+      {
+        "ward_number": 68,
+        "map_label": "MUNDAMVELI  EAST"
+      },
+      {
+        "ward_number": 69,
+        "map_label": "MUNDAMVELI"
+      },
+      {
+        "ward_number": 70,
+        "map_label": "MANASSERY"
+      },
+      {
+        "ward_number": 71,
+        "map_label": "MOOLAMKUZHI"
+      },
+      {
+        "ward_number": 72,
+        "map_label": "CHULLICKAL"
+      },
+      {
+        "ward_number": 73,
+        "map_label": "NAZARETH"
+      },
+      {
+        "ward_number": 74,
+        "map_label": "PANAYAPPILLY"
+      },
+      {
+        "ward_number": 75,
+        "map_label": "AMARAVATHY"
+      },
+      {
+        "ward_number": 76,
+        "map_label": "FORTKOCHI VELI"
+      }
+    ],
+    "numbered_comparison_exact_name_matches": 65,
+    "numbered_comparison": [
+      {
+        "ward_number": 1,
+        "official_sec_name": "FORT KOCHI",
+        "final_map_labels": [
+          "FORT KOCHI"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 2,
+        "official_sec_name": "KALVATHY",
+        "final_map_labels": [
+          "KALVATHY"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 3,
+        "official_sec_name": "EARAVELY",
+        "final_map_labels": [
+          "EARAVELY"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 4,
+        "official_sec_name": "KARIPPALAM",
+        "final_map_labels": [
+          "KARIPPALAM"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 5,
+        "official_sec_name": "CHERALAYI",
+        "final_map_labels": [
+          "CHERALAYI"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 6,
+        "official_sec_name": "MATTANCHERY",
+        "final_map_labels": [
+          "MATTANCHERY"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 7,
+        "official_sec_name": "CHAKKAMADAM",
+        "final_map_labels": [
+          "CHAKKAMADOM"
+        ],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 8,
+        "official_sec_name": "KARUVELIPPADY",
+        "final_map_labels": [
+          "KARUVELIPPADY"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 9,
+        "official_sec_name": "ISLAND NORTH",
+        "final_map_labels": [
+          "ISLAND NORTH"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 10,
+        "official_sec_name": "RAVIPURAM",
+        "final_map_labels": [
+          "RAVIPURAM"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 11,
+        "official_sec_name": "ERNAKULAM SOUTH",
+        "final_map_labels": [
+          "ERNAKULAM SOUTH"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 12,
+        "official_sec_name": "GANDHI NAGAR",
+        "final_map_labels": [
+          "GANDHI NAGAR"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 13,
+        "official_sec_name": "KATHRIKADAVU",
+        "final_map_labels": [
+          "KATHRIKADAVU"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 14,
+        "official_sec_name": "ERNAKULAM CENTRAL",
+        "final_map_labels": [
+          "ERNAKULAM CENTRAL"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 15,
+        "official_sec_name": "ERNAKULAM NORTH",
+        "final_map_labels": [
+          "ERNAKULAM NORTH"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 16,
+        "official_sec_name": "KALOOR SOUTH",
+        "final_map_labels": [
+          "KALOOR SOUTH"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 17,
+        "official_sec_name": "KALOOR-NORTH",
+        "final_map_labels": [
+          "KALOOR NORTH"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 18,
+        "official_sec_name": "THRIKKANARVATTOM",
+        "final_map_labels": [
+          "THRIKKANARVATTOM"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 19,
+        "official_sec_name": "AYYAPPANKAVU",
+        "final_map_labels": [
+          "AYYAPPANKAVU"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 20,
+        "official_sec_name": "POTTAKUZHY",
+        "final_map_labels": [
+          "POTTAKUZHY"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 21,
+        "official_sec_name": "ELAMAKKARA SOUTH",
+        "final_map_labels": [
+          "ELAMAKKARA SOUTH"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 22,
+        "official_sec_name": "PACHALAM",
+        "final_map_labels": [
+          "PACHALAM"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 23,
+        "official_sec_name": "THATTAZHAM",
+        "final_map_labels": [
+          "THATTAZHAM"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 24,
+        "official_sec_name": "VADUTHALA WEST",
+        "final_map_labels": [
+          "VADUTHALA WEST"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 25,
+        "official_sec_name": "VADUTHALA EAST",
+        "final_map_labels": [
+          "VADUTHALA EAST"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 26,
+        "official_sec_name": "ELAMAKKARA NORTH",
+        "final_map_labels": [
+          "ELAMAKKARA NORTH"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 27,
+        "official_sec_name": "PUTHUKKALAVATTAM",
+        "final_map_labels": [
+          "PUTHUKKALAVATTAM"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 28,
+        "official_sec_name": "KUNNUMPURAM",
+        "final_map_labels": [
+          "KUNNUMPURAM"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 29,
+        "official_sec_name": "PONEKKARA",
+        "final_map_labels": [
+          "PONEKKARA"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 30,
+        "official_sec_name": "EDAPPALLY",
+        "final_map_labels": [
+          "EDAPPALLY"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 31,
+        "official_sec_name": "CHANGAMPUZHA",
+        "final_map_labels": [
+          "CHANGAMPPUZHA"
+        ],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 32,
+        "official_sec_name": "DHEVANKULANGARA",
+        "final_map_labels": [
+          "DEVANKULANGARA"
+        ],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 33,
+        "official_sec_name": "PALARIVATTAM",
+        "final_map_labels": [
+          "PALARIVATTAM"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 34,
+        "official_sec_name": "STADIUM",
+        "final_map_labels": [
+          "STADIUM"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 35,
+        "official_sec_name": "KARANAKKODAM",
+        "final_map_labels": [
+          "KARANAKKODAM"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 36,
+        "official_sec_name": "PUTHIYAROAD",
+        "final_map_labels": [
+          "PUTHIYA ROAD"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 37,
+        "official_sec_name": "PADIVATTAM",
+        "final_map_labels": [
+          "PADIVATTAM"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 38,
+        "official_sec_name": "VENNALA",
+        "final_map_labels": [
+          "VENNALA"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 39,
+        "official_sec_name": "CHAKKARAPARAMBU",
+        "final_map_labels": [
+          "CHAKKARAPARAMBU"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 40,
+        "official_sec_name": "CHALIKKAVATTAM",
+        "final_map_labels": [
+          "CHALIKKAVATTAM"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 41,
+        "official_sec_name": "THAMMANAM",
+        "final_map_labels": [
+          "THAMMANAM"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 42,
+        "official_sec_name": "ELAMKULAM",
+        "final_map_labels": [
+          "ELAMKULAM"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 43,
+        "official_sec_name": "GIRINAGAR",
+        "final_map_labels": [
+          "GIRINAGAR"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 44,
+        "official_sec_name": "PONNURUNNI",
+        "final_map_labels": [
+          "PONNURUNNI"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 45,
+        "official_sec_name": "PONNURUNNI EAST",
+        "final_map_labels": [
+          "PONNURUNNI EAST"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 46,
+        "official_sec_name": "VYTTILA",
+        "final_map_labels": [
+          "VYTTILA"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 47,
+        "official_sec_name": "POONITHURA",
+        "final_map_labels": [
+          "POONITHURA"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 48,
+        "official_sec_name": "VYTTILA JANATHA",
+        "final_map_labels": [
+          "VYTTILA JANATHA"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 49,
+        "official_sec_name": "KADAVANTHRA",
+        "final_map_labels": [
+          "KADAVANTHRA"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 50,
+        "official_sec_name": "PANAMPILLI NAGAR",
+        "final_map_labels": [
+          "PANAMPILLI NAGAR"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 51,
+        "official_sec_name": "PERUMANOOR",
+        "final_map_labels": [
+          "PERUMANUR"
+        ],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 52,
+        "official_sec_name": "KONTHURUTHY",
+        "final_map_labels": [
+          "KONTHURUTHY"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 53,
+        "official_sec_name": "THEVARA",
+        "final_map_labels": [
+          "THEVARA"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 54,
+        "official_sec_name": "ISLAND SOUTH",
+        "final_map_labels": [
+          "ISLAND SOUTH"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 55,
+        "official_sec_name": "KADEBHAGAM",
+        "final_map_labels": [
+          "KADEBHAGAM"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 56,
+        "official_sec_name": "PALLURUTHY EAST",
+        "final_map_labels": [
+          "PALLURUTHY EAST"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 57,
+        "official_sec_name": "THAZHUPPU",
+        "final_map_labels": [
+          "THAZHUPPU"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 58,
+        "official_sec_name": "EADAKOCHI NORTH",
+        "final_map_labels": [
+          "EDAKOCHI NORTH"
+        ],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 59,
+        "official_sec_name": "EDAKOCHI SOUTH",
+        "final_map_labels": [
+          "EDAKOCHI SOUTH"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 60,
+        "official_sec_name": "PERUMBADAPPU",
+        "final_map_labels": [
+          "PERUMBADAPPU"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 61,
+        "official_sec_name": "KONAM",
+        "final_map_labels": [
+          "KONAM"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 62,
+        "official_sec_name": "PALLURUTHY-KACHERIPADY",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 63,
+        "official_sec_name": "NAMBYAPURAM",
+        "final_map_labels": [
+          "NAMBYAPURAM"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 64,
+        "official_sec_name": "PALLURUTHY",
+        "final_map_labels": [
+          "PALLLURUTHY"
+        ],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 65,
+        "official_sec_name": "PULLARDESAM",
+        "final_map_labels": [
+          "PULLARDESAM"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 66,
+        "official_sec_name": "THAREBHAGAM",
+        "final_map_labels": [
+          "THAREBHAGAM"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 67,
+        "official_sec_name": "THOPPUMPADY",
+        "final_map_labels": [
+          "THOPPUMPADY"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 68,
+        "official_sec_name": "MUNDAMVELY EAST",
+        "final_map_labels": [
+          "MUNDAMVELI  EAST"
+        ],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 69,
+        "official_sec_name": "MUNDAMVELY",
+        "final_map_labels": [
+          "MUNDAMVELI"
+        ],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 70,
+        "official_sec_name": "MANASSERY",
+        "final_map_labels": [
+          "MANASSERY"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 71,
+        "official_sec_name": "MOOLAMKUZHY",
+        "final_map_labels": [
+          "MOOLAMKUZHI"
+        ],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 72,
+        "official_sec_name": "CHULLICKAL",
+        "final_map_labels": [
+          "CHULLICKAL"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 73,
+        "official_sec_name": "NASRATHU",
+        "final_map_labels": [
+          "NAZARETH"
+        ],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 74,
+        "official_sec_name": "PANAYAPPILLY",
+        "final_map_labels": [
+          "PANAYAPPILLY"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 75,
+        "official_sec_name": "AMARAVATHY",
+        "final_map_labels": [
+          "AMARAVATHY"
+        ],
+        "exact_normalized_match": true
+      },
+      {
+        "ward_number": 76,
+        "official_sec_name": "FORTKOCHI VELI",
+        "final_map_labels": [
+          "FORTKOCHI VELI"
+        ],
+        "exact_normalized_match": true
+      }
+    ],
+    "page_text_preview": [
+      "59\n35\n13\n45\n36\n23\n9\n67\n6\n74\n65\n62\n63\n70\n40\n64\n73\n76\n8\n69\n68\n42\n75\n60\n4\n55\n18\n39\n20\n61\n58\n5\n19\n7\n66\n53\n54\n71\n22\n4114\n11\n16\n24\n26\n3\n72\n28\n44\n48\n56\n29\n30\n49\n27\n25\n21\n46\n57\n1\n38\n50\n12\n15\n2\n33\n37\n51\n52\n17\n43\n47\n32\n31\n34\n10\nKalamassery\nUdayamperur\nNjarakkal\nChellanam\nThiruvaniyoor\nNayarambalam\nEdathala\nCheranallur\nChottanikkara\nTripunithura\nMulamthuruthy\nAroor\nThrikkakara\nElamkunnapuzha\nMaradu\nKumbalangy\nVadavucode\nPuthen Cruz\nKunnathunad\nKumbalam\nMulavukad\nKadamakudy\nEloor\nKizhakkambalam\n10°9°55'\n10°9°55'\n76°20'76°15'\n76°20'76°15'\n0 2.5 5 7.5 101.25\nKilometers\nEsri, Garmin, NaturalVue\nEsri, Garmin, NaturalVue\nEsri, TomTom, Garmin, FAO, NOAA, USGS, Esri, GEBCO, Garmin, NaturalVue\nKerala\nDISTRICT NAME :ERRNAKULAM\nDelimitation Commission, Kerala\nCOCHIN\nCochin\nErrnakulam\nDate : 27-11-2025\n±\nWARD BOUNDARY\n1-FORT KOCHI\n2-KALVATHY\n3-EARAVELY\n4-KARIPPALAM\n5-CHERALAYI\n6-MATTANCHERY\n7-CHAKKAMADOM\n8-KARUVELIPPADY\n9-ISLAND NORTH\n10-RAVIPURAM\n11-ERNAKULAM SOUTH\n12-GANDHI NAGAR\n13-KATHRIKADAVU\n14-ERNAKULAM CENTRAL\n15-ERNAKULAM NORTH\n16-KALOOR SOUTH\n17-KALOOR NORTH\n18-THRIKKANARVATTOM\n19-AYYAPPANKAVU\n20-POTTAKUZHY\n21-ELAMAKKARA SOUTH\n22-PACHALAM\n23-THATTAZHAM\n24-VADUTHALA WEST\n25-VADUTHALA EAST\n26-ELAMAKKARA NORTH\n27-PUTHUKKALAVATTAM\n28-KUNNUMPURAM\n29-PONEKKARA\n30-EDAPPALLY\n31-CHANGAMPPUZHA\n32-DEVANKULANGARA\n33-PALARIVATTAM\n34-STADIUM\n35-KARANAKKODAM\n36-PUTHIYA ROAD\n37-PADIVATTAM\n38-VENNALA\n39-CHAKKARAPARAMBU\n40-CHALIKKAVATTAM\n41-THAMMANAM\n42-ELAMKULAM\n43-GIRINAGAR\n44-PONNURUNNI\n45-PONNURUNNI EAST\n46-VYTTILA\n47-POONITHURA\n48-VYTTILA JANATHA\n49-KADAVANTHRA\n50-PANAMPILLI NAGAR\n51-PERUMANUR\n52-KONTHURUTHY\n53-THEVARA\n54-ISLAND SOUTH\n55-KADEBHAGAM\n56-PALLURUTHY EAST\n57-THAZHUPPU\n58-EDAKOCHI NORTH\n59-EDAKOCHI SOUTH\n60-PERUMBADAPPU\n61-KONAM\n62-PALLURUTHY-KACHERIPADY\n63-NAMBYAPURAM\n64-PALLLURUTHY\n65-PULLARDESAM\n66-THAREBHAGAM\n67-THOPPUMPADY\n68-MUNDAMVELI  EAST\n69-MUNDAMVELI\n70-MANASSERY\n71-MOOLAMKUZHI\n72-CHULLICKAL\n73-NAZARETH\n74-PANAYAPPILLY\n75-AMARAVATHY\n76-FORTKOCHI VELI\nLOCALBODY\nLOCALBODY"
+    ],
+    "status": "OFFICIAL_FINAL_MAP_PDF_REFERENCE_ONLY_NOT_GIS_GEOMETRY"
+  },
+  "vector_tile_sample_audit": {
+    "source_basis": "tile host and layer paths were observed in the official KSMART page's JavaScript",
+    "samples": [
+      {
+        "sample": "wb_kerala_z10",
+        "url": "https://kmapdev.ksmart.live/tiles/wb_kerala/10/771/457",
+        "error": "HTTPError: HTTP Error 403: Forbidden"
+      },
+      {
+        "sample": "wb_kerala_z8",
+        "url": "https://kmapdev.ksmart.live/tiles/wb_kerala/8/193/114",
+        "error": "HTTPError: HTTP Error 403: Forbidden"
+      },
+      {
+        "sample": "kerala_bp_z10",
+        "url": "https://kmapdev.ksmart.live/tiles/kerala_bp/10/771/457",
+        "error": "HTTPError: HTTP Error 403: Forbidden"
+      },
+      {
+        "sample": "kerala_bp_with_lsgd_z10",
+        "url": "https://kmapdev.ksmart.live/tiles/kerala_bp_with_lsgd/10/771/457",
+        "error": "HTTPError: HTTP Error 403: Forbidden"
+      },
+      {
+        "sample": "kerala_wb_insidepoint_z10",
+        "url": "https://kmapdev.ksmart.live/tiles/kerala_wb_insidepoint/10/771/457",
+        "error": "HTTPError: HTTP Error 403: Forbidden"
+      }
+    ],
+    "status": "VECTOR_TILE_SAMPLE_INSPECTION_ONLY_NOT_SPATIAL_LAYER_PROMOTION",
+    "limitations": [
+      "Tile coordinates and geometry transform must be established before converting tile coordinates to geographic coordinates.",
+      "A tile sample does not prove completeness of the 76-ward set or legal boundary alignment.",
+      "Do not integrate tile geometry until source layer schema, coordinate scheme, feature identity, and coverage are verified."
+    ]
+  },
+  "status": "SOURCE_DISCOVERY_AND_PDF_TEXT_AUDIT_ONLY",
+  "limitations": [
+    "A final-notification PDF and ward-name text checks do not establish that a GIS layer's polygons match the legally notified boundaries.",
+    "The PDF is retained as an official visual/reference source only; this script does not extract or approve boundary geometries.",
+    "No official geometry is promoted into the production map by this script.",
+    "Only HTTPS resources on wardmap.ksmart.live are fetched."
+  ]
+}
