@@ -169,7 +169,7 @@ def main() -> int:
                         relevant_references.add(absolute)
                 for match in re.findall(r"""['"]([^'"]{0,240}(?:geojson|wardboundary|ward_boundary|finaln|/api/)[^'"]{0,240})['"]""", text, flags=re.IGNORECASE):
                     relevant_references.add(match)
-                for pattern in ("FinalN/map", "FinalN/notification", "geojson", "fetch(", "axios", "Cochin"):
+                for pattern in ("FinalN/map", "FinalN/notification", "geojson", "fetch(", "axios", "Cochin", "wb_kerala", "VectorTile", "MVT", "tileGrid", "tileSize", "fromLonLat", "getTileUrlFunction", "projection", "extent", "wardBoundary"):
                     positions = [m.start() for m in re.finditer(re.escape(pattern), text, flags=re.IGNORECASE)][:8]
                     for pos in positions:
                         keyword_evidence.append({"script_url": landed, "pattern": pattern, "snippet": text[max(0, pos-180):min(len(text), pos+320)]})
