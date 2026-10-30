@@ -28,9 +28,9 @@ jobs:
           python-version: "3.11"
       - name: Install geometry validator
         run: python -m pip install --disable-pip-version-check shapely
-      - name: Acquire and validate official-portal candidate
+      - name: Acquire and validate portal candidate
         run: python scripts/acquire_kochi_official_ward_candidate.py
-      - name: Commit validated candidate data to PR branch
+      - name: Commit acquired candidate to PR branch
         env:
           BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
         run: |
@@ -40,10 +40,10 @@ jobs:
           if git diff --cached --quiet; then
             echo "Candidate data already up to date; no commit needed."
           else
-            git commit -m "Acquire and validate Kochi draft ward-map candidate"
+            git commit -m "Acquire and audit Kochi draft ward-map candidate"
             git push origin "HEAD:$BRANCH_NAME"
           fi
-      - name: Verify visual-only candidate integrity
+      - name: Verify candidate structure, matched identities, geometry, and hashes
         run: |
           python - <<'PY'
           import hashlib
@@ -56,29 +56,65 @@ jobs:
           metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
           candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
           features = candidate.get("features", [])
-          if len(features) != 76:
-              raise SystemExit(f"Expected 76 candidate features; got {len(features)}")
-          codes = [feature.get("properties", {}).get("sec_ward_code") for feature in features]
-          names = [feature.get("properties", {}).get("sec_ward_name") for feature in features]
-          if len(set(codes)) != 76 or len(set(names)) != 76 or any(not value for value in codes + names):
-              raise SystemExit("Candidate SEC ward codes/names are missing or duplicated.")
-          invalid = [
-              index + 1 for index, feature in enumerate(features)
-              if not feature.get("geometry") or not shape(feature["geometry"]).is_valid
-          ]
+          if candidate.get("type") != "FeatureCollection" or len(features) != 76:
+              raise SystemExit(f"Expected a 76-feature FeatureCollection; got {len(features)} features")
+
+          def norm(value):
+              return "".join(ch for ch in str(value).casefold() if ch.isalnum())
+
+          labels = []
+          codes = []
+          names = []
+          invalid = []
+          for index, feature in enumerate(features, start=1):
+              if not isinstance(feature, dict) or not isinstance(feature.get("properties"), dict):
+                  raise SystemExit(f"Feature {index} has no properties object")
+              props = feature["properties"]
+              source_name = props.get("source_ward_name")
+              code, name = props.get("sec_ward_code"), props.get("sec_ward_name")
+              if not source_name or not str(source_name).strip():
+                  raise SystemExit(f"Feature {index} has no preserved source ward label")
+              labels.append(norm(source_name))
+              if bool(code) != bool(name):
+                  raise SystemExit(f"Feature {index} has a partial SEC identity")
+              if code and name:
+                  if norm(source_name) != norm(name):
+                      raise SystemExit(f"Feature {index} has an SEC identity inconsistent with its source label")
+                  codes.append(str(code))
+                  names.append(str(name))
+              geometry = feature.get("geometry")
+              if not geometry:
+                  invalid.append(index)
+              else:
+                  try:
+                      geom = shape(geometry)
+                      if geom.geom_type not in {"Polygon", "MultiPolygon"} or geom.is_empty or not geom.is_valid:
+                          invalid.append(index)
+                  except Exception:
+                      invalid.append(index)
+          if len(set(labels)) != 76:
+              raise SystemExit("Source ward labels are missing or duplicated")
+          if len(codes) != len(set(codes)) or len(names) != len(set(names)):
+              raise SystemExit("Matched SEC identities are duplicated")
           if invalid:
-              raise SystemExit(f"Shapely reports invalid candidate geometries: {invalid[:12]}")
+              raise SystemExit(f"Invalid/non-polygon candidate geometries: {invalid[:12]}")
+          matched = len(codes)
+          if metadata.get("matched_official_ward_count") != matched:
+              raise SystemExit(f"Metadata says {metadata.get('matched_official_ward_count')} matched identities; audited {matched}")
+          if metadata.get("source_name_mismatch_count") != 76 - matched:
+              raise SystemExit("Mismatch count does not agree with exact-name identity matching")
           actual_hash = hashlib.sha256(candidate_path.read_bytes()).hexdigest()
           if metadata.get("processed_sha256") != actual_hash:
-              raise SystemExit("Candidate sidecar hash does not match the GeoJSON.")
+              raise SystemExit("Candidate sidecar hash does not match the GeoJSON")
+          if metadata.get("validation", {}).get("source_sha256") != actual_hash:
+              raise SystemExit("Candidate validation hash does not match the GeoJSON")
           print({
               "candidate_features": len(features),
-              "unique_SEC_codes": len(set(codes)),
-              "unique_SEC_names": len(set(names)),
-              "Shapely_valid_geometries": len(features) - len(invalid),
-              "source_name_mismatches": metadata.get("source_name_mismatch_count"),
-              "geometry_repairs": metadata.get("geometry_repair_count"),
+              "source_labels": len(set(labels)),
+              "exact_SEC_identity_matches": matched,
+              "unmatched_draft_labels": 76 - matched,
+              "valid_polygon_geometries": len(features) - len(invalid),
               "status": "DRAFT VISUAL CANDIDATE ONLY",
-              "warning": "Not in strict processed-layer ingestion; not for legal or exposure analysis.",
+              "warning": "Passing this audit does not establish final-Gazette geometry or authorize ward-level exposure analysis."
           })
           PY
