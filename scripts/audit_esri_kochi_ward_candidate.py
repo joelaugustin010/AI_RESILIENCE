@@ -25,6 +25,7 @@ LAYER_URL = BASE + "/0"
 ITEM_URL = "https://livingatlas.esri.in/sharing/rest/content/items/9ff2ac026dbb48ff85a0f4573b9987f1?f=json"
 REGISTER = Path("data/reference/kochi_official_ward_register_2026.json")
 BOUNDARY_PATH = Path("data/reference/kochi_corporation_boundary.geojson")
+DRAFT_CANDIDATE_PATH = Path("data/external/map_reference/kochi_wards_ksmart_portal_candidate.json")
 FINAL_MAP_REPORT = Path("reports/kochi_final_map_source_discovery.json")
 OUT = Path("reports/kochi_esri_ward_candidate_audit.json")
 UA = "AI_RESILIENCE educational GIS source audit; contact project maintainer via repository"
@@ -300,6 +301,93 @@ def query_town_geometry(
                 "error": f"{type(exc).__name__}: {exc}",
             }
     geometry_audit["topology_and_coverage"] = comparison
+
+    draft_comparison = {"status": "DRAFT_CANDIDATE_NOT_AVAILABLE"}
+    try:
+        draft_data = json.loads(DRAFT_CANDIDATE_PATH.read_text(encoding="utf-8"))
+        draft_features = draft_data.get("features", [])
+        draft_by_number = {}
+        draft_invalid_numbers = []
+        for index, draft_feature in enumerate(draft_features, start=1):
+            props = draft_feature.get("properties", {}) if isinstance(draft_feature, dict) else {}
+            raw_number = props.get("Ward_No")
+            try:
+                number = int(str(raw_number).strip())
+            except (TypeError, ValueError):
+                continue
+            geometry = draft_feature.get("geometry") if isinstance(draft_feature, dict) else None
+            if not geometry:
+                draft_invalid_numbers.append(number)
+                continue
+            try:
+                geom = shape(geometry)
+                if geom.is_empty or geom.geom_type not in {"Polygon", "MultiPolygon"} or not geom.is_valid:
+                    draft_invalid_numbers.append(number)
+                    continue
+                draft_by_number[number] = geom
+            except Exception:
+                draft_invalid_numbers.append(number)
+        esri_by_number = {}
+        for feature in features:
+            props = feature.get("properties", {}) if isinstance(feature, dict) else {}
+            try:
+                number = int(str(props.get("code")).strip())
+                geometry = feature.get("geometry")
+                if geometry:
+                    geom = shape(geometry)
+                    if not geom.is_empty and geom.is_valid and geom.geom_type in {"Polygon", "MultiPolygon"}:
+                        esri_by_number[number] = geom
+            except (TypeError, ValueError, Exception):
+                continue
+        common_numbers = sorted(set(draft_by_number) & set(esri_by_number))
+        transformer = Transformer.from_crs("EPSG:4326", "EPSG:32643", always_xy=True)
+        per_ward = []
+        for number in common_numbers:
+            draft_projected = shapely_transform(transformer.transform, draft_by_number[number])
+            esri_projected = shapely_transform(transformer.transform, esri_by_number[number])
+            inter_area = draft_projected.intersection(esri_projected).area
+            union_area = draft_projected.union(esri_projected).area
+            iou = inter_area / union_area if union_area else 1.0
+            per_ward.append({
+                "ward_number": number,
+                "intersection_over_union": round(iou, 8),
+                "symmetric_difference_area_km2": round(draft_projected.symmetric_difference(esri_projected).area / 1_000_000, 6),
+                "draft_area_km2": round(draft_projected.area / 1_000_000, 6),
+                "esri_area_km2": round(esri_projected.area / 1_000_000, 6),
+            })
+        draft_union = unary_union([
+            shapely_transform(transformer.transform, draft_by_number[n]) for n in common_numbers
+        ]) if common_numbers else None
+        esri_union_common = unary_union([
+            shapely_transform(transformer.transform, esri_by_number[n]) for n in common_numbers
+        ]) if common_numbers else None
+        union_intersection = draft_union.intersection(esri_union_common).area if draft_union and esri_union_common else 0.0
+        union_total = draft_union.union(esri_union_common).area if draft_union and esri_union_common else 0.0
+        ious = [row["intersection_over_union"] for row in per_ward]
+        draft_comparison = {
+            "status": "CANDIDATE_TO_CANDIDATE_GEOMETRY_COMPARISON_ONLY",
+            "draft_source_path": str(DRAFT_CANDIDATE_PATH),
+            "draft_feature_count": len(draft_features),
+            "draft_invalid_or_missing_ward_numbers": sorted(set(draft_invalid_numbers)),
+            "valid_draft_polygon_count": len(draft_by_number),
+            "valid_esri_polygon_count": len(esri_by_number),
+            "common_valid_ward_numbers": len(common_numbers),
+            "common_valid_ward_numbers_list": common_numbers,
+            "per_ward_comparisons": per_ward,
+            "ward_numbers_with_iou_at_least_0_99": sum(value >= 0.99 for value in ious),
+            "ward_numbers_with_iou_at_least_0_999": sum(value >= 0.999 for value in ious),
+            "mean_per_ward_iou": round(sum(ious) / len(ious), 8) if ious else None,
+            "minimum_per_ward_iou": min(ious) if ious else None,
+            "common_ward_union_iou": round(union_intersection / union_total, 8) if union_total else None,
+            "limitations": [
+                "The draft layer is explicitly labelled a draft candidate and contains invalid geometries.",
+                "This comparison cannot confer legal status on either source.",
+                "Invalid draft geometries were excluded rather than silently repaired.",
+            ],
+        }
+    except Exception as exc:
+        draft_comparison = {"status": "DRAFT_CANDIDATE_COMPARISON_FAILED", "error": f"{type(exc).__name__}: {exc}"}
+    geometry_audit["comparison_with_older_draft_candidate"] = draft_comparison
 
     result.update({
         "geometry_query": {
