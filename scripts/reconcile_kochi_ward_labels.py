@@ -18,6 +18,7 @@ from shapely.ops import transform, unary_union
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "data/processed/spatial_layers/kochi_wards_datameet_2022.geojson"
 CANDIDATE = ROOT / "data/external/map_reference/kochi_wards_2024_candidate.kml"
+OFFICIAL_REGISTER = ROOT / "data/reference/kochi_official_ward_register_2026.json"
 OUTPUT = ROOT / "reports/kochi_ward_label_reconciliation.json"
 TRANSFORMER = Transformer.from_crs("EPSG:4326", "EPSG:32643", always_xy=True)
 
@@ -119,8 +120,13 @@ WARD_NUMBER_ALIASES = (
 def main() -> None:
     source_bytes = SOURCE.read_bytes()
     candidate_bytes = CANDIDATE.read_bytes()
+    official_register_bytes = OFFICIAL_REGISTER.read_bytes()
     source = json.loads(source_bytes)
+    official_register = json.loads(official_register_bytes)
+    official_wards = official_register.get("wards", [])
+    official_ward_count = len(official_wards)
     candidate_wards = read_candidate_wards(CANDIDATE)
+    ward_counts_align = len(source.get("features", [])) == official_ward_count == len(candidate_wards)
     source_features = source.get("features", [])
     source_records = []
     for index, feature in enumerate(source_features, 1):
@@ -167,18 +173,35 @@ def main() -> None:
             "best_candidate": best,
             "second_best_candidate": second,
             "best_minus_second_iou": round(margin, 6) if margin is not None else None,
-            "suggested_for_manual_review": bool(best and best["intersection_over_union"] >= 0.75 and margin is not None and margin >= 0.15),
+            "suggested_for_manual_review": bool(
+                ward_counts_align and best and best["intersection_over_union"] >= 0.75
+                and margin is not None and margin >= 0.15
+            ),
             "automatic_assignment": False,
         })
 
     report = {
-        "status": "GEOMETRIC_CROSSWALK_CANDIDATES_ONLY",
+        "status": (
+            "GEOMETRIC_CROSSWALK_CANDIDATES_ONLY"
+            if ward_counts_align else "WARD_COUNT_MISMATCH_OFFICIAL_CURRENT_REGISTER"
+        ),
         "source_file": str(SOURCE.relative_to(ROOT)),
         "source_sha256": hashlib.sha256(source_bytes).hexdigest(),
         "candidate_file": str(CANDIDATE.relative_to(ROOT)),
         "candidate_sha256": hashlib.sha256(candidate_bytes).hexdigest(),
+        "official_register_file": str(OFFICIAL_REGISTER.relative_to(ROOT)),
+        "official_register_sha256": hashlib.sha256(official_register_bytes).hexdigest(),
+        "official_register_source_url": official_register.get("source_url"),
+        "official_register_retrieved_on": official_register.get("retrieved_on"),
+        "official_current_ward_count": official_ward_count,
         "source_feature_count": len(source_features),
         "candidate_named_ward_count": len(candidate_wards),
+        "ward_count_alignment": {
+            "source_features": len(source_features),
+            "candidate_named_wards": len(candidate_wards),
+            "official_register_wards": official_ward_count,
+            "all_counts_match": ward_counts_align,
+        },
         "source_features_with_missing_ward_attributes": len(matches),
         "source_features_with_missing_display_ward_name": sum(not row["ward_name_present"] for row in source_records),
         "source_features_with_missing_boundary_name": sum(not row["bound_name_present"] for row in source_records),
@@ -186,10 +209,12 @@ def main() -> None:
         "matches": matches,
         "method": "Normalized GIS field names; checked exact aliases and uniquely agreeing suffixed aliases; used a boundary-name fallback for display ward labels; projected geometries to UTM zone 43N (EPSG:32643) and ranked candidate polygons by intersection-over-union.",
         "limitations": [
-            "OpenCity 2024 map is a candidate source, not independently confirmed as the final legally authoritative ward boundary.",
+            "OpenCity 2024 map is a candidate source, not the final legally authoritative current ward geometry.",
+            "The official SEC ward register is a names-and-codes list without geometry; it cannot identify which polygon belongs to each current ward.",
+            "The current official register has 76 wards while the bundled source geometry and 2024 candidate each have 74 features; all geometric suggestions are therefore disabled until current official polygons are acquired.",
             "Geometry similarity is not proof that a ward name or number is legally/currently correct.",
             "No source geometry or attribute was changed; no ward number was inferred.",
-            "Suggested matches require manual inspection against official ward register and boundary notification before display as verified labels.",
+            "Do not display geometric candidates as verified labels until the final official current boundary geometry and register align.",
         ],
     }
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
@@ -198,6 +223,8 @@ def main() -> None:
         "status": report["status"],
         "source_features": len(source_features),
         "candidate_wards": len(candidate_wards),
+        "official_current_ward_count": official_ward_count,
+        "ward_count_alignment": ward_counts_align,
         "missing_display_ward_names": report["source_features_with_missing_display_ward_name"],
         "missing_boundary_names": report["source_features_with_missing_boundary_name"],
         "missing_ward_numbers": report["source_features_with_missing_ward_number"],
