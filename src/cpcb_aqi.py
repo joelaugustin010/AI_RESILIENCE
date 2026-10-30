@@ -241,7 +241,8 @@ def calculate_ind_aqi(
             "method_source": CPCB_AQI_REPORT_URL,
         }
 
-    dominant = max(eligible, key=lambda item: (item["sub_index"], item["pollutant"]))
+    # Python max preserves the first record on a tie, keeping the dominant-pollutant label stable.
+    dominant = max(eligible, key=lambda item: item["sub_index"])
     aqi = dominant["sub_index"]
     category, health_statement = cpcb_aqi_category(aqi)
     return {
