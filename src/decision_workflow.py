@@ -475,10 +475,10 @@ def assessment_summary(inputs: dict[str, Any]) -> dict[str, str]:
     hazards = expand_hazards(str(inputs.get("hazard", "")))
     joined = ", ".join(hazards) if hazards else str(inputs.get("hazard", "Not selected"))
     return {
-        "status": "Insufficient evidence for a reliable numerical prediction",
-        "method": "Qualitative evidence review only. The separate historical rainfall measurement benchmark is not used here; no verified local exposure join or validated numerical hazard method is available.",
+        "status": "Qualitative scenario assessment completed — numerical prediction not validated",
+        "method": "Conditional, rule-transparent scenario review based on the values and assumptions entered by the user, plus evidence and preparedness checks. No calibrated probability, flood depth, affected-area estimate, casualty/damage estimate, or risk-reduction estimate is produced.",
         "hazards": joined,
-        "interpretation": "The submitted values are scenario inputs (observations, forecasts, or assumptions as labelled by the user). The workflow organizes evidence and preparedness questions; it does not estimate probability, severity, depth, casualties, damage, or risk reduction.",
+        "interpretation": "Hypothetical values are valid inputs for exploring what-if consequences and preparedness actions. Findings are conditional on those assumptions and do not mean the event will occur. Real-world prediction remains unavailable until suitable local data, a hazard-specific model, and independent validation are established.",
         "additional_caution": "The legacy demonstration thresholds in assessment.py are not used here and are not official warning thresholds. The historical rainfall model predicts recorded rainfall values only and is not a flood model. Unresolved river-level references and rainfall conflicts prevent threshold comparisons.",
     }
 
