@@ -26,6 +26,7 @@ Each record represents one pollutant at one station/location and one reporting w
 - `unit`: exactly `ug/m3`, except CO which is `mg/m3`.
 - `averaging_period`: 24-hour for PM2.5, PM10, NO2, SO2, NH3, Pb; 8-hour for CO and O3.
 - `valid_hours`: number of valid hourly observations contributing to the reported averaging window; must be at least 16.
+- `quality_flag`: must be `valid`; suspect, invalid, unassessed, or missing quality status is excluded.
 
 The function does not calculate averages from raw hourly samples. Acquisition and preprocessing must establish the averaging window and valid-hour count. It also does not verify that multiple records share the same station, date, instrument, or reporting window; the caller must enforce that grouping before calculation.
 
