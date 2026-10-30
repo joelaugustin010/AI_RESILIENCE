@@ -1,0 +1,41 @@
+name: Audit public ArcGIS Kochi ward candidate
+
+on:
+  push:
+    branches: [research/kochi-esri-ward-layer-audit-20261030]
+    paths:
+      - "scripts/audit_esri_kochi_ward_candidate.py"
+      - ".github/workflows/audit-kochi-esri-ward-candidate.yml"
+      - "data/reference/kochi_official_ward_register_2026.json"
+  pull_request:
+    branches: [main]
+    paths:
+      - "scripts/audit_esri_kochi_ward_candidate.py"
+      - ".github/workflows/audit-kochi-esri-ward-candidate.yml"
+      - "data/reference/kochi_official_ward_register_2026.json"
+
+permissions:
+  contents: read
+
+jobs:
+  audit-public-arcgis-candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install geometry validator
+        run: python -m pip install --disable-pip-version-check shapely
+      - name: Query and audit public ArcGIS candidate without promoting it
+        run: python scripts/audit_esri_kochi_ward_candidate.py
+      - name: Upload read-only audit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: kochi-esri-ward-candidate-audit
+          path: reports/kochi_esri_ward_candidate_audit.json
+          if-no-files-found: error
+          retention-days: 14
