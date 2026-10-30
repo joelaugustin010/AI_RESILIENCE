@@ -92,7 +92,7 @@ def audit_final_pdf() -> dict:
         full_text = "\n".join(page_text)
         normalized_text = normalize(full_text)
         extracted_labels = []
-        for number, name in re.findall(r"(?m)^\\s*(\\d{1,2})\\s*[-–]\\s*([A-Z][A-Z ]{2,60})\\s*$", full_text):
+        for number, name in re.findall(r"(?m)^\s*(\d{1,2})\s*[-–]\s*([A-Z][A-Z ]{2,60})\s*$", full_text):
             extracted_labels.append({"ward_number": int(number), "map_label": name.strip()})
         roster_payload = json.loads(ROSTER.read_text(encoding="utf-8"))
         wards = roster_payload.get("wards", [])
@@ -185,7 +185,7 @@ def main() -> int:
                 script_bytes, _, _ = get(script["url"], MAX_SCRIPT_BYTES)
                 js = script_bytes.decode("utf-8", errors="replace")
                 for variable in ("e1", "Jx", "Fy", "nR", "n1", "iR"):
-                    for match in list(re.finditer(r"(?:const|let|var)?\\s*" + re.escape(variable) + r"\\s*=", js))[:6]:
+                    for match in list(re.finditer(r"(?:const|let|var)?\s*" + re.escape(variable) + r"\s*=", js))[:6]:
                         script_variable_evidence.append({"script_url": script["url"], "variable": variable, "snippet": js[max(0, match.start()-180):min(len(js), match.start()+500)]})
             except Exception as exc:
                 script_variable_evidence.append({"script_url": script.get("url"), "error": f"{type(exc).__name__}: {exc}"})
