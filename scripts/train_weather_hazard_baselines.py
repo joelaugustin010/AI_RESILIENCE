@@ -143,7 +143,8 @@ def fit_target(df: pd.DataFrame, target_col: str, source_target: str, hazard: st
         "validation_rows": int(len(validation)),
         "final_train_target_dates_before": TRAIN_END, "test_target_dates_from": TRAIN_END,
         "locations": sorted(data["location"].unique().tolist()),
-        "model_selection_train_rows": int(len(train)), "train_rows": int(len(final_train)),\n        "test_rows": int(len(test)),
+        "model_selection_train_rows": int(len(train)), "train_rows": int(len(final_train)),
+        "test_rows": int(len(test)),
         "train_positive_rate": prevalence, "test_positive_rate": float(test["target"].mean()),
         "features": feature_cols, "metrics": metrics,
         "limitations": [
