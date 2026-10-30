@@ -504,23 +504,131 @@ else:
             weather_dates = pd.to_datetime(monthly_weather["observed_at"]).dt.date
             selected_weather = monthly_weather.loc[
                 (weather_dates >= selected_start) & (weather_dates <= selected_end)
-            ]
-            with st.expander("Daily Eloor weather summaries for the selected dates"):
-                st.dataframe(
-                    selected_weather[
-                        [
-                            "observed_at", "wind_speed", "wind_speed_unit", "wind_direction",
-                            "wind_direction_unit", "temperature", "temperature_unit",
-                            "relative_humidity", "relative_humidity_unit",
-                        ]
-                    ],
-                    hide_index=True,
-                    alt="Historical KSPCB Eloor daily weather summaries by report date",
+            ].copy()
+            st.markdown("**Meteorological context — source-data quality review**")
+            st.caption(
+                "KSPCB-published daily weather summaries for Eloor, shown separately from pollutant "
+                "measurements. These are contextual observations, not a dispersion model."
+            )
+            if selected_weather.empty:
+                st.info("No weather summaries are available for the selected dates.")
+            else:
+                numeric_weather = (
+                    "wind_speed", "wind_direction", "temperature", "relative_humidity"
                 )
+                for field in numeric_weather:
+                    selected_weather[field] = pd.to_numeric(
+                        selected_weather[field], errors="coerce"
+                    )
+
+                humidity_invalid = (
+                    selected_weather["relative_humidity"].notna()
+                    & ~selected_weather["relative_humidity"].between(0, 100)
+                )
+                direction_invalid = (
+                    selected_weather["wind_direction"].notna()
+                    & ~selected_weather["wind_direction"].between(0, 360, inclusive="left")
+                )
+                negative_wind = (
+                    selected_weather["wind_speed"].notna()
+                    & selected_weather["wind_speed"].lt(0)
+                )
+                high_wind_review = (
+                    selected_weather["wind_speed"].notna()
+                    & selected_weather["wind_speed"].gt(20)
+                )
+
+                weather_metrics = st.columns(3)
+                weather_metrics[0].metric(
+                    "Dated weather records", len(selected_weather)
+                )
+                weather_metrics[1].metric(
+                    "Humidity outside 0–100%", int(humidity_invalid.sum())
+                )
+                weather_metrics[2].metric(
+                    "Wind speed >20 m/s · review", int(high_wind_review.sum())
+                )
+
+                temperature_series = selected_weather.dropna(
+                    subset=["temperature"]
+                ).set_index("observed_at")["temperature"]
+                wind_series = selected_weather.dropna(
+                    subset=["wind_speed"]
+                ).set_index("observed_at")["wind_speed"]
+                humidity_series = selected_weather.loc[
+                    ~humidity_invalid & selected_weather["relative_humidity"].notna()
+                ].set_index("observed_at")["relative_humidity"]
+
+                weather_left, weather_right = st.columns(2)
+                with weather_left:
+                    st.markdown("**Reported daily temperature**")
+                    if not temperature_series.empty:
+                        st.line_chart(
+                            temperature_series,
+                            y_label="Temperature (°C)",
+                            alt="KSPCB-reported daily Eloor temperature summaries",
+                        )
+                    else:
+                        st.info("No numeric temperature summaries are available.")
+                with weather_right:
+                    st.markdown("**Reported daily wind speed**")
+                    if not wind_series.empty:
+                        st.line_chart(
+                            wind_series,
+                            y_label="Wind speed (m/s)",
+                            alt="KSPCB-reported daily Eloor wind-speed summaries",
+                        )
+                    else:
+                        st.info("No numeric wind-speed summaries are available.")
+
+                st.markdown("**Relative humidity — physically valid values only**")
+                if not humidity_series.empty:
+                    st.line_chart(
+                        humidity_series,
+                        y_label="Relative humidity (%)",
+                        alt="KSPCB-reported Eloor relative humidity after excluding values outside 0 to 100 percent",
+                    )
+                else:
+                    st.info("No relative-humidity values pass the 0–100% physical range check.")
+
+                flagged_weather = selected_weather.loc[
+                    humidity_invalid | direction_invalid | negative_wind | high_wind_review
+                ].copy()
+                if not flagged_weather.empty:
+                    flagged_weather["App review note"] = ""
+                    flagged_weather.loc[humidity_invalid, "App review note"] += (
+                        "Relative humidity outside physical 0–100% range; "
+                    )
+                    flagged_weather.loc[direction_invalid, "App review note"] += (
+                        "Wind direction outside 0–360° range; "
+                    )
+                    flagged_weather.loc[negative_wind, "App review note"] += (
+                        "Negative wind speed; "
+                    )
+                    flagged_weather.loc[high_wind_review, "App review note"] += (
+                        "Wind speed above 20 m/s review threshold; not automatically rejected; "
+                    )
+                    st.markdown("**Records requiring review**")
+                    st.dataframe(
+                        flagged_weather[
+                            [
+                                "observed_at", "wind_speed", "wind_direction",
+                                "temperature", "relative_humidity", "App review note",
+                            ]
+                        ],
+                        hide_index=True,
+                        alt="Eloor daily weather records flagged by transparent physical-range and review checks",
+                    )
+                else:
+                    st.success("No values triggered the displayed weather review checks.")
+
                 st.caption(
-                    "Weather values are daily summaries. Exact averaging windows and station coordinates "
-                    "are unavailable; same-date summaries alone do not provide subdaily meteorological "
-                    "alignment for source attribution."
+                    "Humidity outside 0–100% is excluded from its chart. Wind speeds above 20 m/s "
+                    "are flagged for source review only and remain visible in the wind chart; this "
+                    "app threshold is not a KSPCB quality flag. The source does not state exact "
+                    "averaging windows or station coordinates. Daily same-date summaries cannot "
+                    "establish subdaily wind alignment, atmospheric dispersion, or an industrial "
+                    "source relationship."
                 )
 
     if len(monthly_reports) == 2:
