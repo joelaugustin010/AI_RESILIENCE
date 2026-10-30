@@ -96,6 +96,9 @@ try:
 except (OSError, json.JSONDecodeError):
     summary_metadata = {}
 
+# Read-only audit data is shared by the overview and provenance sections.
+air_readiness = audit_air_quality_datasets(ROOT)
+
 overview_tab, measurements_tab, eloor_tab, industry_tab, sources_tab = st.tabs(
     [
         "Overview",
@@ -532,7 +535,7 @@ with sources_tab:
     # This read-only audit is intentionally separate from AQI calculation and
     # industrial attribution. A passed file-integrity check is not a data-quality
     # certification or approval for forecasting.
-    air_readiness = audit_air_quality_datasets(ROOT)
+    # Audit was computed once above so the overview can use the same result.
     st.subheader("Air-quality dataset readiness")
     st.caption(
         f"Read-only audit: {air_readiness['dataset_count']} datasets; "
