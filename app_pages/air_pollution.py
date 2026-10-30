@@ -40,7 +40,83 @@ def read_csv(path: Path) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-st.title("Air quality in Kochi")
+st.markdown(
+    """
+    <style>
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 3rem;
+        max-width: 1450px;
+    }
+
+    .air-hero {
+        padding: 26px 30px;
+        border: 1px solid rgba(91, 164, 190, 0.22);
+        border-radius: 18px;
+        background: linear-gradient(
+            120deg,
+            rgba(225, 244, 251, 0.95),
+            rgba(241, 250, 245, 0.95)
+        );
+        margin-bottom: 22px;
+    }
+
+    .air-eyebrow {
+        color: #28768b;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    .air-heading {
+        color: #173d50;
+        font-size: 2.15rem;
+        font-weight: 750;
+        margin: 8px 0;
+    }
+
+    .air-description {
+        color: #496675;
+        font-size: 1rem;
+        line-height: 1.65;
+        margin-bottom: 0;
+    }
+
+    div[data-testid="stDataFrame"] {
+        border: 1px solid rgba(100, 160, 180, 0.20);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    div[data-testid="stExpander"] {
+        border: 1px solid rgba(100, 160, 180, 0.22);
+        border-radius: 12px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+st.markdown(
+    """
+    <div class="air-hero">
+        <div class="air-eyebrow">
+            AI RESILIENCE · ENVIRONMENTAL MONITORING
+        </div>
+        <div class="air-heading">
+            Air Quality Intelligence
+        </div>
+        <p class="air-description">
+            Historical air-quality observations, monitoring-network coverage,
+            pollutant trends and scientific evidence assessment for
+            Kochi, Eloor and Edayar, Kerala.
+        </p>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
 try:
     register = load_source_register()
