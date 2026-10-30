@@ -21,6 +21,7 @@ from src.decision_workflow import (
     build_scenario_comparison,
     budget_summary,
     compare_action_combinations,
+    decision_readiness_summary,
     evidence_inventory,
     evidence_provenance_summary,
     expand_hazards,
@@ -666,6 +667,21 @@ for item in input_quality["evidence_factors_present"]:
     st.markdown(f"- ✓ Supplied in the form: {item}")
 for item in input_quality["evidence_factors_missing_or_unverified"]:
     st.markdown(f"- ☐ Missing or not independently verified: {item}")
+
+readiness_plan = decision_readiness_summary(inputs, input_quality)
+st.subheader("Decision readiness and next actions")
+st.warning(f"**{readiness_plan['decision_status']}**")
+st.write("**Numerical prediction gate:**", readiness_plan["numerical_prediction_gate"])
+if readiness_plan["critical_input_errors"]:
+    st.error("Resolve these input errors before interpreting the scenario:")
+    for item in readiness_plan["critical_input_errors"]:
+        st.markdown(f"- {item}")
+if readiness_plan["hazard_specific_gaps"]:
+    st.warning("Hazard-specific evidence gaps:")
+    for item in readiness_plan["hazard_specific_gaps"]:
+        st.markdown(f"- {item}")
+st.dataframe(pd.DataFrame(readiness_plan["next_steps"]), hide_index=True, width="stretch")
+st.caption(readiness_plan["interpretation"])
 st.info(
     "Numerical prediction is not enabled because the required calibrated model and verified local evidence are not available. "
     "Your hypothetical scenario has still been assessed qualitatively in the section above."
@@ -760,7 +776,7 @@ st.dataframe(combinations, hide_index=True, width="stretch")
 st.caption("A combination is shown because you selected its actions. Affordability is cost arithmetic only; priority numbers are supplied by you.")
 
 st.header("7. Generate a report")
-report = report_rows(inputs, evidence, scenarios, actions, budget, combinations, ROOT, evidence_checklist=evidence_checklist)
+report = report_rows(inputs, evidence, scenarios, actions, budget, combinations, ROOT, evidence_checklist=evidence_checklist, readiness_summary=readiness_plan)
 # Include the same evidence-gated scientific frame in exports so caveats survive outside the app.
 frame_rows = [
     {"Section": "Scientific scenario frame", "Item": row["Reasoning stage"],
