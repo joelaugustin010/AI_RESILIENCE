@@ -17,6 +17,7 @@ from io import BytesIO
 from pathlib import Path
 
 from pypdf import PdfReader
+import mapbox_vector_tile
 
 BASE = "https://wardmap.ksmart.live"
 PAGE_URL = BASE + "/map?district=Ernakulam&localbody=Cochin&type=Corporation"
@@ -26,6 +27,7 @@ ROSTER = Path("data/reference/kochi_official_ward_roster_2025.json")
 UA = "AI_RESILIENCE educational project; official-source provenance discovery"
 MAX_SCRIPT_BYTES = 1_500_000
 MAX_PDF_BYTES = 30_000_000
+MAX_TILE_BYTES = 5_000_000
 MAX_SCRIPTS = 20
 
 
@@ -141,6 +143,72 @@ def audit_final_pdf() -> dict:
         }
 
 
+
+def audit_tile_samples() -> dict:
+    """Inspect small vector-tile samples referenced by the official KSMART app."""
+    base = "https://kmapdev.ksmart.live/tiles"
+    samples = [
+        ("wb_kerala_z10", f"{base}/wb_kerala/10/771/457"),
+        ("wb_kerala_z8", f"{base}/wb_kerala/8/193/114"),
+        ("kerala_bp_z10", f"{base}/kerala_bp/10/771/457"),
+        ("kerala_bp_with_lsgd_z10", f"{base}/kerala_bp_with_lsgd/10/771/457"),
+        ("kerala_wb_insidepoint_z10", f"{base}/kerala_wb_insidepoint/10/771/457"),
+    ]
+    results = []
+    for label, url in samples:
+        try:
+            parsed = urllib.parse.urlparse(url)
+            if parsed.scheme != "https" or parsed.hostname != "kmapdev.ksmart.live":
+                raise ValueError("Tile URL host is not the exact host referenced by official KSMART JavaScript")
+            req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "application/vnd.mapbox-vector-tile,application/x-protobuf,*/*"})
+            with urllib.request.urlopen(req, timeout=30) as response:
+                data = response.read(MAX_TILE_BYTES + 1)
+                ctype = response.headers.get("Content-Type", "")
+                final_url = response.geturl()
+            if len(data) > MAX_TILE_BYTES:
+                raise ValueError("Tile exceeds configured size limit")
+            if not data:
+                raise ValueError("Tile response is empty")
+            decoded = mapbox_vector_tile.decode(data)
+            layer_info = []
+            for layer_name, layer in decoded.items():
+                features = layer.get("features", [])
+                samples_by_key = {}
+                for feature in features[:8]:
+                    for key, value in feature.get("properties", {}).items():
+                        if key not in samples_by_key and value is not None:
+                            samples_by_key[key] = value
+                layer_info.append({
+                    "layer_name": layer_name,
+                    "extent": layer.get("extent"),
+                    "feature_count": len(features),
+                    "property_keys": sorted({key for feature in features for key in feature.get("properties", {})}),
+                    "sample_properties": samples_by_key,
+                    "geometry_types": sorted({feature.get("geometry", {}).get("type", "unknown") for feature in features}),
+                    "sample_feature_properties": [feature.get("properties", {}) for feature in features[:3]],
+                })
+            results.append({
+                "sample": label,
+                "url": url,
+                "final_url": final_url,
+                "content_type": ctype,
+                "bytes": len(data),
+                "sha256": hashlib.sha256(data).hexdigest(),
+                "decoded_layers": layer_info,
+            })
+        except Exception as exc:
+            results.append({"sample": label, "url": url, "error": f"{type(exc).__name__}: {exc}"})
+    return {
+        "source_basis": "tile host and layer paths were observed in the official KSMART page's JavaScript",
+        "samples": results,
+        "status": "VECTOR_TILE_SAMPLE_INSPECTION_ONLY_NOT_SPATIAL_LAYER_PROMOTION",
+        "limitations": [
+            "Tile coordinates and geometry transform must be established before converting tile coordinates to geographic coordinates.",
+            "A tile sample does not prove completeness of the 76-ward set or legal boundary alignment.",
+            "Do not integrate tile geometry until source layer schema, coordinate scheme, feature identity, and coverage are verified."
+        ]
+    }
+
 def main() -> int:
     try:
         raw, final_url, content_type = get(PAGE_URL, MAX_SCRIPT_BYTES)
@@ -177,6 +245,7 @@ def main() -> int:
                 scripts.append({"url": url, "error": f"{type(exc).__name__}: {exc}"})
 
         pdf_audit = audit_final_pdf()
+        tile_audit = audit_tile_samples()
         script_variable_evidence = []
         for script in scripts:
             if "url" not in script or not script.get("url", "").endswith(".js"):
@@ -201,6 +270,7 @@ def main() -> int:
             "keyword_evidence": keyword_evidence[:60],
             "script_variable_evidence": script_variable_evidence[:40],
             "final_map_pdf_audit": pdf_audit,
+            "vector_tile_sample_audit": tile_audit,
             "status": "SOURCE_DISCOVERY_AND_PDF_TEXT_AUDIT_ONLY",
             "limitations": [
                 "A final-notification PDF and ward-name text checks do not establish that a GIS layer's polygons match the legally notified boundaries.",
