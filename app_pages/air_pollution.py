@@ -191,6 +191,11 @@ st.markdown(
             pollutant trends and scientific evidence assessment for
             Kochi, Eloor and Edayar, Kerala.
         </p>
+        <div class="air-meta">
+            <span>KOCHI · KERALA · INDIA</span>
+            <span>ELOOR–EDAYAR INDUSTRIAL BELT</span>
+            <span>HISTORICAL EVIDENCE VIEW</span>
+        </div>
     </div>
     """,
     unsafe_allow_html=True,
@@ -256,13 +261,12 @@ st.caption(
 )
 with st.expander("How to read this dashboard"):
     st.markdown(
-        "- **Source-reported AQI** is reproduced from the cited KSPCB report.
-"
-        "- **Calculated indicator** is shown only when CPCB input requirements are demonstrated.
-"
-        "- **Historical pollutant trends** describe reported observations; they do not identify an emitting facility.
-"
-        "- **Industrial candidates** are evidence leads, not accusations or ranked pollution sources."
+        """
+        - **Source-reported AQI** is reproduced from the cited KSPCB report.
+        - **Calculated indicator** is shown only when CPCB input requirements are demonstrated.
+        - **Historical pollutant trends** describe reported observations; they do not identify an emitting facility.
+        - **Industrial candidates** are evidence leads, not accusations or ranked pollution sources.
+        """
     )
 
 st.divider()
