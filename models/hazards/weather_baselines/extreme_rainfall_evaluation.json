@@ -5,7 +5,105 @@
   "threshold": 25.9,
   "threshold_units": "mm/day",
   "threshold_training_period": "2000-01-01 through 2019-12-31",
-  "train_target_dates_before": "2020-01-01",
+  "model_selection_train_target_dates_before": "2015-01-01",
+  "threshold_validation_target_dates": "2015-01-01 through 2019-12-31",
+  "threshold_selection_metric": "F1, tie-break by recall then precision",
+  "selected_probability_threshold": 0.4,
+  "validation_threshold_scores": [
+    {
+      "threshold": 0.05,
+      "f1": 0.12793406199605806,
+      "recall": 0.9807692307692307,
+      "precision": 0.0684301322599195,
+      "balanced_accuracy": 0.6402405231655952
+    },
+    {
+      "threshold": 0.1,
+      "f1": 0.16495338273966054,
+      "recall": 0.9478021978021978,
+      "precision": 0.09033778476040849,
+      "balanced_accuracy": 0.7236129144630585
+    },
+    {
+      "threshold": 0.15,
+      "f1": 0.1951073985680191,
+      "recall": 0.8983516483516484,
+      "precision": 0.10943775100401607,
+      "balanced_accuracy": 0.7574611267694842
+    },
+    {
+      "threshold": 0.2,
+      "f1": 0.2185792349726776,
+      "recall": 0.8241758241758241,
+      "precision": 0.12599748005039899,
+      "balanced_accuracy": 0.7621599581974221
+    },
+    {
+      "threshold": 0.25,
+      "f1": 0.24261138067931187,
+      "recall": 0.7554945054945055,
+      "precision": 0.14450867052023122,
+      "balanced_accuracy": 0.760456186464832
+    },
+    {
+      "threshold": 0.3,
+      "f1": 0.25405405405405407,
+      "recall": 0.6456043956043956,
+      "precision": 0.15814266487213996,
+      "balanced_accuracy": 0.7326725148050797
+    },
+    {
+      "threshold": 0.35,
+      "f1": 0.26657552973342447,
+      "recall": 0.5357142857142857,
+      "precision": 0.17743403093721566,
+      "balanced_accuracy": 0.7027274598600247
+    },
+    {
+      "threshold": 0.4,
+      "f1": 0.27615780445969124,
+      "recall": 0.4423076923076923,
+      "precision": 0.20074812967581046,
+      "balanced_accuracy": 0.6749722899578807
+    },
+    {
+      "threshold": 0.45,
+      "f1": 0.2702702702702703,
+      "recall": 0.3434065934065934,
+      "precision": 0.22281639928698752,
+      "balanced_accuracy": 0.6402911929568991
+    },
+    {
+      "threshold": 0.5,
+      "f1": 0.2462787550744249,
+      "recall": 0.25,
+      "precision": 0.24266666666666667,
+      "balanced_accuracy": 0.6045389048991354
+    },
+    {
+      "threshold": 0.6,
+      "f1": 0.13627254509018036,
+      "recall": 0.09340659340659341,
+      "precision": 0.2518518518518518,
+      "balanced_accuracy": 0.539426639642778
+    },
+    {
+      "threshold": 0.7,
+      "f1": 0.03970223325062035,
+      "recall": 0.02197802197802198,
+      "precision": 0.20512820512820512,
+      "balanced_accuracy": 0.5087555815941983
+    },
+    {
+      "threshold": 0.8,
+      "f1": 0.0,
+      "recall": 0.0,
+      "precision": 0.0,
+      "balanced_accuracy": 0.49971181556195965
+    }
+  ],
+  "validation_rows": 7304,
+  "final_train_target_dates_before": "2020-01-01",
   "test_target_dates_from": "2020-01-01",
   "locations": [
     "kochi",
@@ -13,7 +111,7 @@
     "thiruvananthapuram",
     "wayanad"
   ],
-  "train_rows": 29188,
+  "train_rows": 21884,
   "test_rows": 8768,
   "train_positive_rate": 0.05026038097848431,
   "test_positive_rate": 0.07572992700729927,
@@ -48,11 +146,11 @@
     "year"
   ],
   "metrics": {
-    "accuracy": 0.9031706204379562,
-    "balanced_accuracy": 0.6047266558831575,
-    "precision": 0.32245681381957775,
-    "recall": 0.25301204819277107,
-    "f1": 0.28354430379746837,
+    "accuracy": 0.880588503649635,
+    "balanced_accuracy": 0.6637158208351669,
+    "precision": 0.292972972972973,
+    "recall": 0.40813253012048195,
+    "f1": 0.3410950283196979,
     "roc_auc": 0.8257420104901343,
     "majority_baseline_accuracy": 0.9242700729927007
   },
@@ -60,6 +158,7 @@
     "Historical reanalysis/grid-point data are not station observations.",
     "Only four Kerala locations; performance may not generalize outside these grid points.",
     "The 95th-percentile threshold is a research event definition, not an IMD heatwave or official extreme-rainfall warning definition.",
+    "Probability threshold is tuned on 2015-2019 validation predictions; the 2020+ test set is not used for tuning.",
     "A single future-period holdout is preliminary; assess calibration, drift and independent station data before any real-world use.",
     "Not an emergency-warning or scientifically approved operational model."
   ]
