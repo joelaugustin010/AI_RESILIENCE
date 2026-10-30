@@ -13,6 +13,7 @@ from src.air_quality import (
     time_series_summary,
 )
 from src.air_quality_attribution import assess_industrial_sources
+from src.air_quality_readiness import audit_air_quality_datasets
 from src.air_quality_monthly_reports import (
     MonthlyReportError,
     compare_monthly_report_values,
@@ -41,6 +42,53 @@ def read_csv(path: Path) -> pd.DataFrame:
 
 
 st.title("Air quality in Kochi")
+
+# This read-only audit is intentionally separate from AQI calculation and
+# industrial attribution. A passed file-integrity check is not a data-quality
+# certification or approval for forecasting.
+air_readiness = audit_air_quality_datasets(ROOT)
+st.subheader("Air-quality dataset readiness")
+st.caption(
+    f"Read-only audit: {air_readiness['dataset_count']} datasets; "
+    f"{air_readiness['status_counts']['provisional']} provisional, "
+    f"{air_readiness['status_counts']['unavailable']} unavailable, "
+    f"{air_readiness['status_counts']['unsuitable']} unsuitable."
+)
+readiness_rows = [
+    {
+        "Dataset": item["name"],
+        "Status": item["status"],
+        "Rows": item["row_count"],
+        "Coverage": (
+            f"{item['date_start']} to {item['date_end']}"
+            if item["date_start"] and item["date_end"] else "Not established"
+        ),
+        "Permitted use": item["permitted_use"],
+    }
+    for item in air_readiness["datasets"]
+]
+st.dataframe(
+    pd.DataFrame(readiness_rows),
+    hide_index=True,
+    width="stretch",
+    alt="Read-only readiness audit of processed air-quality datasets",
+)
+st.info(air_readiness["conclusion"])
+with st.expander("Dataset audit details and blockers"):
+    for item in air_readiness["datasets"]:
+        st.markdown(f"**{item['name']} — {item['status']}**")
+        st.caption(
+            f"Integrity: {item['integrity_check']} | "
+            f"Schema: {item['schema_check']} | "
+            f"Forecast eligible: {item['forecast_training_eligible']}"
+        )
+        for limitation in item["limitations"]:
+            st.write(f"- {limitation}")
+        for error in item["errors"]:
+            st.warning(error)
+    for error in air_readiness["catalog_errors"]:
+        st.warning(error)
+
 
 try:
     register = load_source_register()
