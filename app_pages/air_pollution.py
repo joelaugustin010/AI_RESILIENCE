@@ -346,6 +346,42 @@ else:
         }
     )
     st.dataframe(display_aqi, hide_index=True, alt="Historical KSPCB station AQI and pollutant values")
+
+    # A focused Eloor snapshot makes the industrial-belt report easier to scan.
+    # Values are copied from the dated KSPCB extract; no unit conversion or averaging is applied.
+    eloor_rows = daily_aqi.loc[
+        daily_aqi["station"].astype(str).str.strip().str.casefold().eq("eloor")
+    ]
+    if not eloor_rows.empty:
+        eloor_row = eloor_rows.iloc[0]
+        st.markdown("#### Eloor pollutant snapshot")
+        st.caption("KSPCB source-reported values · 16 October 2026 · historical, not live")
+        snapshot_pollutants = (
+            ("PM2.5", "PM2.5_value", "unit_PM2.5"),
+            ("PM10", "PM10_value", "unit_PM10"),
+            ("Nitrogen dioxide (NO₂)", "NO2_value", "unit_NO2"),
+            ("Sulphur dioxide (SO₂)", "SO2_value", "unit_SO2"),
+            ("Ozone (O₃)", "O3_value", "unit_O3"),
+            ("Carbon monoxide (CO)", "CO_value", "unit_CO"),
+        )
+        available_snapshot = []
+        for label, value_column, unit_column in snapshot_pollutants:
+            value = pd.to_numeric(pd.Series([eloor_row.get(value_column)]), errors="coerce").iloc[0]
+            if pd.notna(value):
+                unit = str(eloor_row.get(unit_column, "")).strip()
+                available_snapshot.append((label, f"{value:g} {unit}".strip()))
+        for start in range(0, len(available_snapshot), 3):
+            metric_columns = st.columns(3)
+            for metric_column, (label, value) in zip(
+                metric_columns, available_snapshot[start:start + 3]
+            ):
+                metric_column.metric(label, value)
+        st.caption(
+            "These are the values as published in the daily extract. The report does not identify "
+            "the precise averaging interval or provide valid-hour counts and row-level QA; "
+            "do not compare them with health thresholds as if those conditions were verified."
+        )
+
     st.caption(
         "The report does not give exact per-pollutant averaging intervals, data completeness, "
         "station identifiers, or coordinates. Pollutant driver is not calculated. Source: "
