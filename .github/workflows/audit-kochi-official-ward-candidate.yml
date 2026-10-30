@@ -35,7 +35,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install geometry validator
-        run: python -m pip install --disable-pip-version-check shapely pypdf
+        run: python -m pip install --disable-pip-version-check shapely pypdf mapbox-vector-tile
       - name: Discover official final-notification map data references
         run: python scripts/discover_kochi_final_ward_source.py
       - name: Acquire and validate portal candidate
