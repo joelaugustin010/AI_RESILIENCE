@@ -1,6 +1,13 @@
 name: Audit official Kochi ward-map candidate
 
 on:
+  push:
+    branches: [fix/kochi-current-ward-count-guardrail]
+    paths:
+      - "scripts/acquire_kochi_official_ward_candidate.py"
+      - ".github/workflows/audit-kochi-official-ward-candidate.yml"
+      - "data/reference/kochi_official_ward_roster_2025.json"
+      - "data/reference/spatial_sources.json"
   pull_request:
     branches: [main]
     paths:
@@ -14,14 +21,14 @@ permissions:
 
 jobs:
   acquire-and-audit:
-    if: github.event.pull_request.number == 10 && github.event.pull_request.head.repo.full_name == github.repository
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/fix/kochi-current-ward-count-guardrail') || (github.event_name == 'pull_request' && github.event.pull_request.number == 10 && github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Check out PR branch
+      - name: Check out PR or audit branch
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || github.ref_name }}
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -31,6 +38,7 @@ jobs:
       - name: Acquire and validate portal candidate
         run: python scripts/acquire_kochi_official_ward_candidate.py
       - name: Commit acquired candidate to PR branch
+        if: github.event_name == 'pull_request'
         env:
           BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
         run: |
