@@ -1,5 +1,5 @@
 {
-  "created_at_utc": "2026-10-30T15:38:31.989975+00:00",
+  "created_at_utc": "2026-10-30T15:41:43.651466+00:00",
   "service_url": "https://livingatlas.esri.in/server1/rest/services/Wards/India_Ward_Boundaries/MapServer/0",
   "item_url": "https://livingatlas.esri.in/sharing/rest/content/items/9ff2ac026dbb48ff85a0f4573b9987f1?f=json",
   "status": "CANDIDATE_AUDITED_NOT_PROMOTED",
@@ -1125,6 +1125,617 @@
             "boundary_uncovered_by_candidate_km2": 2.3689,
             "status": "DIAGNOSTIC_ONLY_CONFIGURED_BOUNDARY_NOT_LEGAL_APPROVAL"
           }
+        },
+        "comparison_with_older_draft_candidate": {
+          "status": "CANDIDATE_TO_CANDIDATE_GEOMETRY_COMPARISON_ONLY",
+          "draft_source_path": "data/external/map_reference/kochi_wards_ksmart_portal_candidate.json",
+          "draft_feature_count": 76,
+          "draft_invalid_or_missing_ward_numbers": [
+            2,
+            22,
+            24
+          ],
+          "valid_draft_polygon_count": 73,
+          "valid_esri_polygon_count": 76,
+          "common_valid_ward_numbers": 73,
+          "common_valid_ward_numbers_list": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            23,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76
+          ],
+          "per_ward_comparisons": [
+            {
+              "ward_number": 1,
+              "intersection_over_union": 0.52208685,
+              "symmetric_difference_area_km2": 1.34666,
+              "draft_area_km2": 1.541535,
+              "esri_area_km2": 2.747391
+            },
+            {
+              "ward_number": 3,
+              "intersection_over_union": 0.97090045,
+              "symmetric_difference_area_km2": 0.012031,
+              "draft_area_km2": 0.404354,
+              "esri_area_km2": 0.410512
+            },
+            {
+              "ward_number": 4,
+              "intersection_over_union": 0.97467741,
+              "symmetric_difference_area_km2": 0.010142,
+              "draft_area_km2": 0.393926,
+              "esri_area_km2": 0.396976
+            },
+            {
+              "ward_number": 5,
+              "intersection_over_union": 0.9882053,
+              "symmetric_difference_area_km2": 0.009429,
+              "draft_area_km2": 0.794251,
+              "esri_area_km2": 0.795249
+            },
+            {
+              "ward_number": 6,
+              "intersection_over_union": 0.886914,
+              "symmetric_difference_area_km2": 0.157327,
+              "draft_area_km2": 1.356571,
+              "esri_area_km2": 1.268531
+            },
+            {
+              "ward_number": 7,
+              "intersection_over_union": 0.67580489,
+              "symmetric_difference_area_km2": 0.151515,
+              "draft_area_km2": 0.338833,
+              "esri_area_km2": 0.444368
+            },
+            {
+              "ward_number": 8,
+              "intersection_over_union": 0.97060285,
+              "symmetric_difference_area_km2": 0.021392,
+              "draft_area_km2": 0.712438,
+              "esri_area_km2": 0.721539
+            },
+            {
+              "ward_number": 9,
+              "intersection_over_union": 0.88753357,
+              "symmetric_difference_area_km2": 1.238846,
+              "draft_area_km2": 10.988938,
+              "esri_area_km2": 9.802722
+            },
+            {
+              "ward_number": 10,
+              "intersection_over_union": 0.98168332,
+              "symmetric_difference_area_km2": 0.04447,
+              "draft_area_km2": 2.415538,
+              "esri_area_km2": 2.395657
+            },
+            {
+              "ward_number": 11,
+              "intersection_over_union": 0.97795422,
+              "symmetric_difference_area_km2": 0.048308,
+              "draft_area_km2": 2.174377,
+              "esri_area_km2": 2.159848
+            },
+            {
+              "ward_number": 12,
+              "intersection_over_union": 0.91412581,
+              "symmetric_difference_area_km2": 0.117607,
+              "draft_area_km2": 1.259119,
+              "esri_area_km2": 1.362322
+            },
+            {
+              "ward_number": 13,
+              "intersection_over_union": 0.98903028,
+              "symmetric_difference_area_km2": 0.012693,
+              "draft_area_km2": 1.150635,
+              "esri_area_km2": 1.150909
+            },
+            {
+              "ward_number": 14,
+              "intersection_over_union": 0.97439728,
+              "symmetric_difference_area_km2": 0.022365,
+              "draft_area_km2": 0.864657,
+              "esri_area_km2": 0.86008
+            },
+            {
+              "ward_number": 15,
+              "intersection_over_union": 0.70204186,
+              "symmetric_difference_area_km2": 0.777414,
+              "draft_area_km2": 2.600093,
+              "esri_area_km2": 1.84077
+            },
+            {
+              "ward_number": 16,
+              "intersection_over_union": 0.97648234,
+              "symmetric_difference_area_km2": 0.026276,
+              "draft_area_km2": 1.11037,
+              "esri_area_km2": 1.097947
+            },
+            {
+              "ward_number": 17,
+              "intersection_over_union": 0.92440603,
+              "symmetric_difference_area_km2": 0.058875,
+              "draft_area_km2": 0.724227,
+              "esri_area_km2": 0.774549
+            },
+            {
+              "ward_number": 18,
+              "intersection_over_union": 0.97693321,
+              "symmetric_difference_area_km2": 0.014444,
+              "draft_area_km2": 0.622109,
+              "esri_area_km2": 0.615785
+            },
+            {
+              "ward_number": 19,
+              "intersection_over_union": 0.97518555,
+              "symmetric_difference_area_km2": 0.045258,
+              "draft_area_km2": 1.801159,
+              "esri_area_km2": 1.801313
+            },
+            {
+              "ward_number": 20,
+              "intersection_over_union": 0.91070495,
+              "symmetric_difference_area_km2": 0.058872,
+              "draft_area_km2": 0.643233,
+              "esri_area_km2": 0.616498
+            },
+            {
+              "ward_number": 21,
+              "intersection_over_union": 0.98789632,
+              "symmetric_difference_area_km2": 0.008966,
+              "draft_area_km2": 0.73432,
+              "esri_area_km2": 0.738266
+            },
+            {
+              "ward_number": 23,
+              "intersection_over_union": 0.90224724,
+              "symmetric_difference_area_km2": 0.257651,
+              "draft_area_km2": 2.629505,
+              "esri_area_km2": 2.384325
+            },
+            {
+              "ward_number": 25,
+              "intersection_over_union": 0.98199466,
+              "symmetric_difference_area_km2": 0.018501,
+              "draft_area_km2": 1.013485,
+              "esri_area_km2": 1.0231
+            },
+            {
+              "ward_number": 26,
+              "intersection_over_union": 0.98862851,
+              "symmetric_difference_area_km2": 0.010382,
+              "draft_area_km2": 0.90647,
+              "esri_area_km2": 0.90905
+            },
+            {
+              "ward_number": 27,
+              "intersection_over_union": 0.95349562,
+              "symmetric_difference_area_km2": 0.053945,
+              "draft_area_km2": 1.133759,
+              "esri_area_km2": 1.132307
+            },
+            {
+              "ward_number": 28,
+              "intersection_over_union": 0.83488222,
+              "symmetric_difference_area_km2": 0.352434,
+              "draft_area_km2": 2.071569,
+              "esri_area_km2": 1.844872
+            },
+            {
+              "ward_number": 29,
+              "intersection_over_union": 0.97227417,
+              "symmetric_difference_area_km2": 0.024201,
+              "draft_area_km2": 0.868273,
+              "esri_area_km2": 0.853253
+            },
+            {
+              "ward_number": 30,
+              "intersection_over_union": 0.97356402,
+              "symmetric_difference_area_km2": 0.042115,
+              "draft_area_km2": 1.575695,
+              "esri_area_km2": 1.568379
+            },
+            {
+              "ward_number": 31,
+              "intersection_over_union": 0.98903195,
+              "symmetric_difference_area_km2": 0.011902,
+              "draft_area_km2": 1.08219,
+              "esri_area_km2": 1.076233
+            },
+            {
+              "ward_number": 32,
+              "intersection_over_union": 0.98529724,
+              "symmetric_difference_area_km2": 0.01464,
+              "draft_area_km2": 0.990385,
+              "esri_area_km2": 0.986452
+            },
+            {
+              "ward_number": 33,
+              "intersection_over_union": 0.99016552,
+              "symmetric_difference_area_km2": 0.010294,
+              "draft_area_km2": 1.039643,
+              "esri_area_km2": 1.043462
+            },
+            {
+              "ward_number": 34,
+              "intersection_over_union": 0.9850842,
+              "symmetric_difference_area_km2": 0.019317,
+              "draft_area_km2": 1.286197,
+              "esri_area_km2": 1.284571
+            },
+            {
+              "ward_number": 35,
+              "intersection_over_union": 0.98702377,
+              "symmetric_difference_area_km2": 0.012958,
+              "draft_area_km2": 0.990844,
+              "esri_area_km2": 0.99345
+            },
+            {
+              "ward_number": 36,
+              "intersection_over_union": 0.98899088,
+              "symmetric_difference_area_km2": 0.010557,
+              "draft_area_km2": 0.954514,
+              "esri_area_km2": 0.952724
+            },
+            {
+              "ward_number": 37,
+              "intersection_over_union": 0.97726692,
+              "symmetric_difference_area_km2": 0.044989,
+              "draft_area_km2": 1.94859,
+              "esri_area_km2": 1.964451
+            },
+            {
+              "ward_number": 38,
+              "intersection_over_union": 0.6248709,
+              "symmetric_difference_area_km2": 0.492722,
+              "draft_area_km2": 0.826135,
+              "esri_area_km2": 1.308089
+            },
+            {
+              "ward_number": 39,
+              "intersection_over_union": 0.63559214,
+              "symmetric_difference_area_km2": 0.514127,
+              "draft_area_km2": 1.400859,
+              "esri_area_km2": 0.906725
+            },
+            {
+              "ward_number": 40,
+              "intersection_over_union": 0.95911513,
+              "symmetric_difference_area_km2": 0.043932,
+              "draft_area_km2": 1.05921,
+              "esri_area_km2": 1.04591
+            },
+            {
+              "ward_number": 41,
+              "intersection_over_union": 0.96470117,
+              "symmetric_difference_area_km2": 0.046667,
+              "draft_area_km2": 1.288751,
+              "esri_area_km2": 1.308718
+            },
+            {
+              "ward_number": 42,
+              "intersection_over_union": 0.91555397,
+              "symmetric_difference_area_km2": 0.10998,
+              "draft_area_km2": 1.299634,
+              "esri_area_km2": 1.195116
+            },
+            {
+              "ward_number": 43,
+              "intersection_over_union": 0.98820429,
+              "symmetric_difference_area_km2": 0.017863,
+              "draft_area_km2": 1.504395,
+              "esri_area_km2": 1.506494
+            },
+            {
+              "ward_number": 44,
+              "intersection_over_union": 0.97333424,
+              "symmetric_difference_area_km2": 0.029123,
+              "draft_area_km2": 1.082425,
+              "esri_area_km2": 1.072763
+            },
+            {
+              "ward_number": 45,
+              "intersection_over_union": 0.9748982,
+              "symmetric_difference_area_km2": 0.028998,
+              "draft_area_km2": 1.139827,
+              "esri_area_km2": 1.141598
+            },
+            {
+              "ward_number": 46,
+              "intersection_over_union": 0.94775092,
+              "symmetric_difference_area_km2": 0.087979,
+              "draft_area_km2": 1.642698,
+              "esri_area_km2": 1.637015
+            },
+            {
+              "ward_number": 47,
+              "intersection_over_union": 0.96064065,
+              "symmetric_difference_area_km2": 0.045889,
+              "draft_area_km2": 1.140575,
+              "esri_area_km2": 1.145308
+            },
+            {
+              "ward_number": 48,
+              "intersection_over_union": 0.98024755,
+              "symmetric_difference_area_km2": 0.02412,
+              "draft_area_km2": 1.216781,
+              "esri_area_km2": 1.20132
+            },
+            {
+              "ward_number": 49,
+              "intersection_over_union": 0.98626574,
+              "symmetric_difference_area_km2": 0.025982,
+              "draft_area_km2": 1.871902,
+              "esri_area_km2": 1.885699
+            },
+            {
+              "ward_number": 50,
+              "intersection_over_union": 0.97731256,
+              "symmetric_difference_area_km2": 0.022852,
+              "draft_area_km2": 0.995928,
+              "esri_area_km2": 0.995721
+            },
+            {
+              "ward_number": 51,
+              "intersection_over_union": 0.9630816,
+              "symmetric_difference_area_km2": 0.034221,
+              "draft_area_km2": 0.919479,
+              "esri_area_km2": 0.900164
+            },
+            {
+              "ward_number": 52,
+              "intersection_over_union": 0.96678855,
+              "symmetric_difference_area_km2": 0.040705,
+              "draft_area_km2": 1.198398,
+              "esri_area_km2": 1.21215
+            },
+            {
+              "ward_number": 53,
+              "intersection_over_union": 0.98194109,
+              "symmetric_difference_area_km2": 0.058074,
+              "draft_area_km2": 3.173349,
+              "esri_area_km2": 3.200249
+            },
+            {
+              "ward_number": 54,
+              "intersection_over_union": 0.98283605,
+              "symmetric_difference_area_km2": 0.047117,
+              "draft_area_km2": 2.732532,
+              "esri_area_km2": 2.710546
+            },
+            {
+              "ward_number": 55,
+              "intersection_over_union": 0.66955905,
+              "symmetric_difference_area_km2": 0.288951,
+              "draft_area_km2": 0.624127,
+              "esri_area_km2": 0.835802
+            },
+            {
+              "ward_number": 56,
+              "intersection_over_union": 0.98112556,
+              "symmetric_difference_area_km2": 0.007745,
+              "draft_area_km2": 0.407055,
+              "esri_area_km2": 0.405863
+            },
+            {
+              "ward_number": 57,
+              "intersection_over_union": 0.69072333,
+              "symmetric_difference_area_km2": 0.288479,
+              "draft_area_km2": 0.892423,
+              "esri_area_km2": 0.684604
+            },
+            {
+              "ward_number": 58,
+              "intersection_over_union": 0.95931074,
+              "symmetric_difference_area_km2": 0.096177,
+              "draft_area_km2": 2.280536,
+              "esri_area_km2": 2.350658
+            },
+            {
+              "ward_number": 59,
+              "intersection_over_union": 0.86223138,
+              "symmetric_difference_area_km2": 0.525809,
+              "draft_area_km2": 3.378931,
+              "esri_area_km2": 3.728485
+            },
+            {
+              "ward_number": 60,
+              "intersection_over_union": 0.92959123,
+              "symmetric_difference_area_km2": 0.049975,
+              "draft_area_km2": 0.663498,
+              "esri_area_km2": 0.706102
+            },
+            {
+              "ward_number": 61,
+              "intersection_over_union": 0.7828292,
+              "symmetric_difference_area_km2": 0.292835,
+              "draft_area_km2": 1.067224,
+              "esri_area_km2": 1.336755
+            },
+            {
+              "ward_number": 62,
+              "intersection_over_union": 0.98735402,
+              "symmetric_difference_area_km2": 0.008969,
+              "draft_area_km2": 0.705006,
+              "esri_area_km2": 0.704479
+            },
+            {
+              "ward_number": 63,
+              "intersection_over_union": 0.98807425,
+              "symmetric_difference_area_km2": 0.00666,
+              "draft_area_km2": 0.554608,
+              "esri_area_km2": 0.55567
+            },
+            {
+              "ward_number": 64,
+              "intersection_over_union": 0.985204,
+              "symmetric_difference_area_km2": 0.006865,
+              "draft_area_km2": 0.459838,
+              "esri_area_km2": 0.46124
+            },
+            {
+              "ward_number": 65,
+              "intersection_over_union": 0.98773575,
+              "symmetric_difference_area_km2": 0.007408,
+              "draft_area_km2": 0.602455,
+              "esri_area_km2": 0.598206
+            },
+            {
+              "ward_number": 66,
+              "intersection_over_union": 0.98132619,
+              "symmetric_difference_area_km2": 0.022687,
+              "draft_area_km2": 1.202657,
+              "esri_area_km2": 1.204489
+            },
+            {
+              "ward_number": 67,
+              "intersection_over_union": 0.98529826,
+              "symmetric_difference_area_km2": 0.019324,
+              "draft_area_km2": 1.303665,
+              "esri_area_km2": 1.30582
+            },
+            {
+              "ward_number": 68,
+              "intersection_over_union": 0.97168475,
+              "symmetric_difference_area_km2": 0.014658,
+              "draft_area_km2": 0.514562,
+              "esri_area_km2": 0.506143
+            },
+            {
+              "ward_number": 69,
+              "intersection_over_union": 0.9795276,
+              "symmetric_difference_area_km2": 0.025553,
+              "draft_area_km2": 1.232675,
+              "esri_area_km2": 1.238128
+            },
+            {
+              "ward_number": 70,
+              "intersection_over_union": 0.96397423,
+              "symmetric_difference_area_km2": 0.023263,
+              "draft_area_km2": 0.642833,
+              "esri_area_km2": 0.625391
+            },
+            {
+              "ward_number": 71,
+              "intersection_over_union": 0.96469736,
+              "symmetric_difference_area_km2": 0.01854,
+              "draft_area_km2": 0.513297,
+              "esri_area_km2": 0.518518
+            },
+            {
+              "ward_number": 72,
+              "intersection_over_union": 0.97705844,
+              "symmetric_difference_area_km2": 0.010784,
+              "draft_area_km2": 0.466674,
+              "esri_area_km2": 0.462636
+            },
+            {
+              "ward_number": 73,
+              "intersection_over_union": 0.96783469,
+              "symmetric_difference_area_km2": 0.012202,
+              "draft_area_km2": 0.376598,
+              "esri_area_km2": 0.369935
+            },
+            {
+              "ward_number": 74,
+              "intersection_over_union": 0.98371301,
+              "symmetric_difference_area_km2": 0.010033,
+              "draft_area_km2": 0.61156,
+              "esri_area_km2": 0.610438
+            },
+            {
+              "ward_number": 75,
+              "intersection_over_union": 0.97730684,
+              "symmetric_difference_area_km2": 0.009604,
+              "draft_area_km2": 0.418283,
+              "esri_area_km2": 0.418501
+            },
+            {
+              "ward_number": 76,
+              "intersection_over_union": 0.97430195,
+              "symmetric_difference_area_km2": 0.014914,
+              "draft_area_km2": 0.573443,
+              "esri_area_km2": 0.572324
+            }
+          ],
+          "ward_numbers_with_iou_at_least_0_99": 1,
+          "ward_numbers_with_iou_at_least_0_999": 0,
+          "mean_per_ward_iou": 0.93165904,
+          "minimum_per_ward_iou": 0.52208685,
+          "common_ward_union_iou": 0.97236939,
+          "limitations": [
+            "The draft layer is explicitly labelled a draft candidate and contains invalid geometries.",
+            "This comparison cannot confer legal status on either source.",
+            "Invalid draft geometries were excluded rather than silently repaired."
+          ]
         },
         "source_feature_label_sample": [
           {
