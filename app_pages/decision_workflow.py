@@ -22,6 +22,7 @@ from src.decision_workflow import (
     budget_summary,
     compare_action_combinations,
     evidence_inventory,
+    evidence_provenance_summary,
     expand_hazards,
     hazard_evidence_checklist,
     mitigation_actions_for,
@@ -614,6 +615,14 @@ st.info(
     "Readiness status is descriptive, not a numerical risk score. Items marked not connected or unverified "
     "must not be treated as evidence that the hazard or exposure is absent."
 )
+
+st.subheader("Evidence provenance gate")
+provenance = evidence_provenance_summary(inputs)
+st.warning(f"**{provenance['Provenance status']}**")
+st.write("**Source/time notes:**", provenance["Source/time notes"])
+st.write("**Permitted interpretation:**", provenance["Permitted interpretation"])
+st.write("**Required verification:**", provenance["Verification gate"])
+st.caption("Typing a source name or selecting a classification does not independently verify the source, its freshness, or its fitness for this hazard.")
 
 st.header("4. Assessment status")
 assessment = assessment_summary(inputs)
