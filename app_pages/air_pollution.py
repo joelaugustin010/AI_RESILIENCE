@@ -289,12 +289,26 @@ latest_extract_date = (
     else None
 )
 station_count = int(daily_aqi["station"].nunique()) if not daily_aqi.empty and "station" in daily_aqi.columns else 0
+eloor_daily_rows = (
+    daily_aqi.loc[daily_aqi["station"].astype(str).str.strip().str.casefold().eq("eloor")]
+    if not daily_aqi.empty and "station" in daily_aqi.columns
+    else pd.DataFrame()
+)
+eloor_source_aqi = "Unavailable"
+if not eloor_daily_rows.empty and "source_aqi" in eloor_daily_rows.columns:
+    raw_eloor_aqi = pd.to_numeric(
+        pd.Series([eloor_daily_rows.iloc[0]["source_aqi"]]), errors="coerce"
+    ).iloc[0]
+    if pd.notna(raw_eloor_aqi) and 0 <= int(raw_eloor_aqi) <= 500:
+        eloor_category = cpcb_aqi_category(int(raw_eloor_aqi))[0]
+        eloor_source_aqi = f"{int(raw_eloor_aqi)} · {eloor_category}"
 st.markdown("### Air quality at a glance")
-overview = st.columns(4)
+overview = st.columns(5)
 overview[0].metric("Latest loaded report", latest_extract_date.strftime("%d %b %Y") if latest_extract_date else "Unavailable")
-overview[1].metric("Stations in daily extract", station_count)
-overview[2].metric("Eloor monthly reports", len(monthly_reports), help="August and September 2026 source reports when both pass ingestion checks.")
-overview[3].metric("AQI calculation", "Evidence-gated", help="The app calculates AQI only when averaging period, valid hours and QA flags meet CPCB requirements.")
+overview[1].metric("Eloor source AQI", eloor_source_aqi, help="Source-reported value from the 16 October 2026 KSPCB daily extract; not a live reading.")
+overview[2].metric("Stations in daily extract", station_count)
+overview[3].metric("Eloor monthly reports", len(monthly_reports), help="August and September 2026 source reports when both pass ingestion checks.")
+overview[4].metric("AQI calculation", "Evidence-gated", help="The app calculates AQI only when averaging period, valid hours and QA flags meet CPCB requirements.")
 st.caption(
     "This is a historical research dashboard, not a live public warning service. "
     "Each chart and table retains its source date, unit and evidence limitations."
