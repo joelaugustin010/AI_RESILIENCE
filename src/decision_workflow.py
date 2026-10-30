@@ -519,6 +519,79 @@ def evidence_provenance_summary(inputs: dict[str, Any]) -> dict[str, str]:
     }
 
 
+def decision_readiness_summary(inputs: dict[str, Any], input_quality: dict[str, Any]) -> dict[str, Any]:
+    """Translate hazard-specific evidence gaps into an ordered, non-numeric decision plan."""
+    hazard = str(inputs.get("hazard", "Unknown hazard"))
+    missing = list(dict.fromkeys(
+        str(item).strip()
+        for item in input_quality.get("evidence_factors_missing_or_unverified", [])
+        if str(item).strip()
+    ))
+    errors = list(dict.fromkeys(str(item) for item in input_quality.get("errors", [])))
+    warnings = list(dict.fromkeys(str(item) for item in input_quality.get("warnings", [])))
+    classification = str(inputs.get("input_classification", "")).strip()
+    source_notes = str(inputs.get("source_and_time", "")).strip()
+
+    next_steps = []
+    next_steps.append({
+        "Priority": 1,
+        "Action": "Verify the input provenance",
+        "Why it matters": (
+            "The scenario is hypothetical; keep it explicitly conditional."
+            if classification == "Hypothetical scenario assumption"
+            else "Source notes are absent; the entered values cannot be independently traced."
+            if not source_notes
+            else "Source notes were user-entered and have not been independently checked."
+        ),
+        "Completion evidence": "Original source/provider, issue or observation time, location, units, valid period, and quality flags recorded.",
+    })
+    if missing:
+        next_steps.append({
+            "Priority": 2,
+            "Action": f"Resolve {len(missing)} hazard-specific evidence gap(s)",
+            "Why it matters": "; ".join(missing),
+            "Completion evidence": "Each item is supported by a suitable source or clearly marked unavailable; no gap is silently treated as absence.",
+        })
+    next_steps.append({
+        "Priority": 3 if missing else 2,
+        "Action": "Check exposed assets and vulnerability",
+        "Why it matters": "A hazard signal alone does not establish which people, hospitals, roads, or services are exposed or vulnerable.",
+        "Completion evidence": "Suitable geospatial layers or facility records with coverage, date, coordinate reference system, provenance, and quality checks.",
+    })
+    next_steps.append({
+        "Priority": 4 if missing else 3,
+        "Action": "Establish model and outcome validation",
+        "Why it matters": "A complete form and plausible values do not validate a consequence model or produce a reliable probability.",
+        "Completion evidence": "Documented local event/outcome labels, appropriate baseline comparison, held-out evaluation, uncertainty analysis, and independent review.",
+    })
+    next_steps.append({
+        "Priority": 5 if missing else 4,
+        "Action": "Review actions, owners, prerequisites, and documented costs",
+        "Why it matters": "Budget fit is arithmetic only; it does not demonstrate effectiveness, optimality, or risk reduction.",
+        "Completion evidence": "Named responsible owner, evidence-backed prerequisites, dated cost source/scope, and locally approved plan.",
+    })
+
+    if errors:
+        status = "INPUT REVIEW REQUIRED — do not rely on this scenario until errors are resolved"
+    elif classification == "Hypothetical scenario assumption":
+        status = "WHAT-IF PLANNING ONLY — assumptions are not evidence of current conditions"
+    elif missing or warnings:
+        status = "EVIDENCE GAPS REMAIN — use for preparation planning, not real-world prediction"
+    else:
+        status = "QUALITATIVE REVIEW ONLY — numerical prediction is not validated"
+
+    return {
+        "hazard": hazard,
+        "decision_status": status,
+        "numerical_prediction_gate": "CLOSED — no validated local hazard-specific consequence model is enabled",
+        "critical_input_errors": errors,
+        "hazard_specific_gaps": missing,
+        "input_warnings": warnings,
+        "next_steps": next_steps,
+        "interpretation": "This is an ordered work plan, not a risk score, forecast, official warning, or estimate of mitigation effectiveness.",
+    }
+
+
 def assessment_summary(inputs: dict[str, Any]) -> dict[str, str]:
     """Return a qualified non-numeric status; no unsupported estimates are generated."""
     hazards = expand_hazards(str(inputs.get("hazard", "")))
@@ -541,6 +614,7 @@ def report_rows(
     combinations: pd.DataFrame,
     project_root: Path,
     evidence_checklist: pd.DataFrame | None = None,
+    readiness_summary: dict[str, Any] | None = None,
 ) -> pd.DataFrame:
     """Build a flat, exportable report that records actual inputs and calculations."""
     rows: list[dict[str, str]] = []
@@ -558,6 +632,9 @@ def report_rows(
         add("Assessment", key, value)
     for key, value in evidence_provenance_summary(inputs).items():
         add("Evidence provenance gate", key, value)
+    if readiness_summary is not None:
+        for key, value in readiness_summary.items():
+            add("Decision readiness", key, value)
     for _, row in evidence.iterrows():
         add("Evidence", str(row["Dataset / file"]), {k: row[k] for k in evidence.columns if k != "Dataset / file"})
     if evidence_checklist is not None:

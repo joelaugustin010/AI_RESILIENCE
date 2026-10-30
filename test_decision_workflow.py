@@ -13,6 +13,7 @@ from src.decision_workflow import (
     build_scenario_comparison,
     budget_summary,
     compare_action_combinations,
+    decision_readiness_summary,
     evidence_inventory,
     evidence_provenance_summary,
     hazard_evidence_checklist,
@@ -185,6 +186,45 @@ class BudgetTests(unittest.TestCase):
         result = compare_action_combinations(actions, 1000, {"A": ["A"]})
         self.assertIn("duplicate action names", result.iloc[0]["Budget status"])
         self.assertIn("Duplicate action row: A", result.iloc[0]["Selection issues"])
+
+
+class DecisionReadinessSummaryTests(unittest.TestCase):
+    def test_hypothetical_scenario_is_explicitly_limited_to_what_if_planning(self):
+        result = decision_readiness_summary(
+            valid_inputs(),
+            {
+                "errors": [],
+                "warnings": ["This is a hypothetical scenario."],
+                "evidence_factors_missing_or_unverified": ["river level + station/datum"],
+            },
+        )
+        self.assertIn("WHAT-IF PLANNING ONLY", result["decision_status"])
+        self.assertIn("CLOSED", result["numerical_prediction_gate"])
+        self.assertGreaterEqual(len(result["next_steps"]), 4)
+        self.assertIn("not a risk score", result["interpretation"])
+
+    def test_source_notes_do_not_count_as_independent_verification(self):
+        result = decision_readiness_summary(
+            valid_inputs(source_and_time="Official source, today"),
+            {
+                "errors": [],
+                "warnings": [],
+                "evidence_factors_missing_or_unverified": [],
+            },
+        )
+        self.assertIn("not been independently checked", result["next_steps"][0]["Why it matters"])
+        self.assertIn("QUALITATIVE REVIEW ONLY", result["decision_status"])
+
+    def test_input_errors_block_decision_readiness(self):
+        result = decision_readiness_summary(
+            valid_inputs(),
+            {
+                "errors": ["Rainfall must be numeric."],
+                "warnings": [],
+                "evidence_factors_missing_or_unverified": [],
+            },
+        )
+        self.assertIn("INPUT REVIEW REQUIRED", result["decision_status"])
 
 
 class EvidenceProvenanceTests(unittest.TestCase):
