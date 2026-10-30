@@ -871,6 +871,35 @@
         "symmetric_difference_fraction_of_union": 0.21062676,
         "status": "COMPLETED_SHAPE_COMPARISON_NOT_LEGAL_APPROVAL"
       }
+    },
+    {
+      "layer_id": "kochi_final_ward_map_pdf_reference",
+      "title": "Kochi Corporation final ward-map PDF (official reference; not GIS geometry)",
+      "status": "official_final_map_pdf_reference_only_not_integrated",
+      "source_url": "https://wardmap.ksmart.live/FinalN/map/Map_FinalN_Ernakulam_Cochin.pdf",
+      "source_page": "https://wardmap.ksmart.live/map?district=Ernakulam&localbody=Cochin&type=Corporation",
+      "publisher": "Delimitation Commission, Kerala; portal identifies Information Kerala Mission as technology support",
+      "retrieved_on": "2026-10-30",
+      "publication_date": "27 November 2025, as extracted from the official PDF text",
+      "license": "No dataset-specific reuse terms confirmed; retain official attribution and review reuse terms before redistribution.",
+      "crs": "Not applicable to the PDF as supplied; no georeferenced GIS geometry was extracted or validated.",
+      "units": "One-page cartographic map; not a spatial feature dataset.",
+      "geographic_coverage": "Kochi (Cochin) Municipal Corporation, Ernakulam district; final ward map reference",
+      "feature_count": 0,
+      "source_bytes": 4277562,
+      "source_sha256": "262a63f880b59884a1f8c4b10445f0297c147d88b49fdaf96143c57905e2e9f3",
+      "validation_status": "OFFICIAL FINAL MAP PDF FETCHED; NOT GIS GEOMETRY; WARD LABEL CROSS-CHECK HAS DISCREPANCIES",
+      "evidence_status": "provisional",
+      "layer_role": null,
+      "limitations": [
+        "The official KSMART final map PDF was fetched successfully and had a valid PDF signature; its text identifies the date as 27-11-2025.",
+        "Automated PDF text extraction found 75 numbered ward labels; 65 labels exactly matched the current SEC register names by ward number, 10 extracted labels differed, and one ward label was not extracted. These are audit flags, not proof of legal identity mismatch; inspect the source PDF and authoritative registers before resolving them.",
+        "The final PDF is a visual/cartographic reference and was not converted into GIS polygons. It must not be used as a substitute for validated ward-boundary geometry or as a flood-exposure mask.",
+        "The KSMART front-end references vector-tile endpoints on kmapdev.ksmart.live, but read-only requests from the audit environment returned HTTP 403. No access restriction was bypassed; no tile geometry was ingested.",
+        "Source layer licensing, georeferencing, positional accuracy, and a GIS export matching the final notification remain unverified."
+      ],
+      "audit_report": "reports/kochi_final_map_source_discovery.json",
+      "spatial_use": "reference_only_not_geometry"
     }
   ],
   "status_definitions_file": "data/reference/data_status_definitions.json"

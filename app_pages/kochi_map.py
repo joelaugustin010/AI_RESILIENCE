@@ -18,6 +18,8 @@ HOSPITAL_REVIEW_CSV = ROOT / "data" / "processed" / "nihfw_ernakulam_hospitals_c
 WARD_RECONCILIATION_REPORT = ROOT / "reports" / "kochi_ward_label_reconciliation.json"
 PORTAL_WARD_AUDIT_REPORT = ROOT / "reports" / "kochi_portal_candidate_vs_sec_register.json"
 PORTAL_WARD_METADATA = ROOT / "data" / "external" / "map_reference" / "kochi_wards_ksmart_portal_candidate.metadata.json"
+FINAL_WARD_MAP_PDF = "https://wardmap.ksmart.live/FinalN/map/Map_FinalN_Ernakulam_Cochin.pdf"
+FINAL_WARD_MAP_SOURCE_REPORT = ROOT / "reports" / "kochi_final_map_source_discovery.json"
 
 
 def _normalize_property_key(value: object) -> str:
@@ -240,6 +242,53 @@ catalog_rows = [{
 } for item in catalog["datasets"]]
 st.subheader("Source and layer catalog")
 st.dataframe(pd.DataFrame(catalog_rows), hide_index=True, width="stretch", alt="Reviewed Kochi spatial source inventory with availability, coverage, CRS, and reuse status")
+
+final_map_source_report = load_acquisition_metadata(FINAL_WARD_MAP_SOURCE_REPORT) or {}
+final_map_pdf_audit = final_map_source_report.get("final_map_pdf_audit", {})
+if final_map_pdf_audit.get("pdf_signature_valid"):
+    labels_extracted = final_map_pdf_audit.get("numbered_map_labels_extracted", 0)
+    exact_matches = final_map_pdf_audit.get("numbered_comparison_exact_name_matches", 0)
+    comparison_rows = [
+        {
+            "Ward no.": row.get("ward_number"),
+            "SEC official name": row.get("official_sec_name"),
+            "Final PDF label extracted": ", ".join(row.get("final_map_labels", [])) or "Not extracted from PDF text",
+            "Exact normalized name match": row.get("exact_normalized_match", False),
+        }
+        for row in final_map_pdf_audit.get("numbered_comparison", [])
+        if not row.get("exact_normalized_match", False)
+    ]
+    st.info(
+        "An official KSMART final-notification map PDF is available as a reference. "
+        f"Automated text extraction found {labels_extracted} numbered labels and "
+        f"{exact_matches}/76 exact normalized name matches against the current SEC register. "
+        "This is a text cross-check only: it does not verify polygon geometry or authorize flood-exposure analysis.",
+        title="Final ward-map reference found — GIS boundaries still unverified",
+    )
+    st.markdown(
+        f"**Official final ward map PDF:** [Open the Delimitation Commission map]({FINAL_WARD_MAP_PDF})  \n"
+        "**Official ward-name register:** [State Election Commission, Kerala](https://sec.kerala.gov.in/public/cnstncy/wd/d0f41644-754b-4b6e-a8dc-97ecbf5fee16)"
+    )
+    with st.expander("Inspect final-map source audit", expanded=False):
+        st.write({
+            "Publication date printed in PDF": "27 November 2025",
+            "PDF SHA-256": final_map_pdf_audit.get("sha256"),
+            "PDF size (bytes)": final_map_pdf_audit.get("bytes"),
+            "PDF pages": final_map_pdf_audit.get("page_count"),
+            "Numbered labels extracted": labels_extracted,
+            "Exact SEC name matches": exact_matches,
+            "Extracted label differences / missing text labels": len(comparison_rows),
+            "GIS boundary promotion": "Not approved; PDF is not a GIS feature layer",
+        })
+        if comparison_rows:
+            st.dataframe(pd.DataFrame(comparison_rows), hide_index=True, width="stretch")
+        tile_samples = final_map_source_report.get("vector_tile_sample_audit", {}).get("samples", [])
+        denied_samples = [sample.get("sample") for sample in tile_samples if "error" in sample]
+        if denied_samples:
+            st.warning(
+                "The official web app's referenced vector-tile endpoints returned HTTP 403 to read-only audit requests. "
+                "No access restriction was bypassed and no tile geometry was ingested."
+            )
 
 portal_ward_audit = load_acquisition_metadata(PORTAL_WARD_AUDIT_REPORT) or {}
 portal_ward_metadata = load_acquisition_metadata(PORTAL_WARD_METADATA) or {}
