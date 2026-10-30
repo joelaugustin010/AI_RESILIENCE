@@ -1,4 +1,4 @@
-""""Transparent dashboard for hazard-specific model training status."""
+"""Transparent dashboard for hazard-specific model training status."""
 from __future__ import annotations
 
 import json
