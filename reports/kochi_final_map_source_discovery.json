@@ -1261,6 +1261,42 @@
     ],
     "status": "OFFICIAL_FINAL_MAP_PDF_REFERENCE_ONLY_NOT_GIS_GEOMETRY"
   },
+  "vector_tile_sample_audit": {
+    "source_basis": "tile host and layer paths were observed in the official KSMART page's JavaScript",
+    "samples": [
+      {
+        "sample": "wb_kerala_z10",
+        "url": "https://kmapdev.ksmart.live/tiles/wb_kerala/10/771/457",
+        "error": "HTTPError: HTTP Error 403: Forbidden"
+      },
+      {
+        "sample": "wb_kerala_z8",
+        "url": "https://kmapdev.ksmart.live/tiles/wb_kerala/8/193/114",
+        "error": "HTTPError: HTTP Error 403: Forbidden"
+      },
+      {
+        "sample": "kerala_bp_z10",
+        "url": "https://kmapdev.ksmart.live/tiles/kerala_bp/10/771/457",
+        "error": "HTTPError: HTTP Error 403: Forbidden"
+      },
+      {
+        "sample": "kerala_bp_with_lsgd_z10",
+        "url": "https://kmapdev.ksmart.live/tiles/kerala_bp_with_lsgd/10/771/457",
+        "error": "HTTPError: HTTP Error 403: Forbidden"
+      },
+      {
+        "sample": "kerala_wb_insidepoint_z10",
+        "url": "https://kmapdev.ksmart.live/tiles/kerala_wb_insidepoint/10/771/457",
+        "error": "HTTPError: HTTP Error 403: Forbidden"
+      }
+    ],
+    "status": "VECTOR_TILE_SAMPLE_INSPECTION_ONLY_NOT_SPATIAL_LAYER_PROMOTION",
+    "limitations": [
+      "Tile coordinates and geometry transform must be established before converting tile coordinates to geographic coordinates.",
+      "A tile sample does not prove completeness of the 76-ward set or legal boundary alignment.",
+      "Do not integrate tile geometry until source layer schema, coordinate scheme, feature identity, and coverage are verified."
+    ]
+  },
   "status": "SOURCE_DISCOVERY_AND_PDF_TEXT_AUDIT_ONLY",
   "limitations": [
     "A final-notification PDF and ward-name text checks do not establish that a GIS layer's polygons match the legally notified boundaries.",
