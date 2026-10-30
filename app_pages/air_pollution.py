@@ -331,6 +331,31 @@ with eloor_tab:
         )
 
         if not verified_monthly.empty:
+            st.markdown("**Measurement quality status**")
+            quality_counts = (
+                verified_monthly.groupby("quality_flag", dropna=False)
+                .size()
+                .rename("row_count")
+                .reset_index()
+                .sort_values("quality_flag", kind="stable")
+            )
+            st.dataframe(
+                quality_counts,
+                hide_index=True,
+                alt="Counts of Eloor observations by source quality-assessment flag",
+            )
+            st.warning(
+                "The preserved Eloor reports do not provide row-level quality or completeness checks. "
+                "Their pollutant rows are therefore marked unassessed, not independently verified."
+            )
+            include_unassessed = st.checkbox(
+                "Include unassessed source-reported values in descriptive charts",
+                value=False,
+                help=(
+                    "These values are shown only when you explicitly opt in. They remain unassessed "
+                    "and must not be treated as quality-certified measurements."
+                ),
+            )
             station_inventory = sorted(verified_monthly["station"].dropna().unique().tolist())
             station = st.selectbox("Monitoring station", station_inventory, key="report_station")
             station_data = verified_monthly.loc[verified_monthly["station"].eq(station)]
@@ -350,20 +375,33 @@ with eloor_tab:
             else:
                 selected_start = selected_end = selected_range
 
-            series = time_series_summary(
-                station_data, pollutant, include_unassessed=True
-            )
-            series_dates = pd.to_datetime(series["observed_at"]).dt.date
-            series = series.loc[(series_dates >= selected_start) & (series_dates <= selected_end)]
+            eligible_flags = {"valid", "unassessed"} if include_unassessed else {"valid"}
+            eligible_rows = station_data.loc[
+                station_data["quality_flag"].isin(eligible_flags)
+                & station_data["pollutant"].eq(pollutant)
+            ]
             unit = station_data.loc[station_data["pollutant"].eq(pollutant), "unit"].iloc[0]
-            if series.empty:
-                st.info("No source-reported values are available for the selected pollutant and dates.")
-            else:
-                st.line_chart(
-                    series.set_index("observed_at")["mean_value"],
-                    y_label=f"{pollutant} ({unit})",
-                    alt=f"Historical daily KSPCB-reported {pollutant} values at Eloor from August through September 2026",
+            if eligible_rows.empty:
+                st.info(
+                    "No quality-assessed observations are available for this selection. "
+                    "The source rows are unassessed; enable the option above to inspect them descriptively."
                 )
+            else:
+                series = time_series_summary(
+                    station_data, pollutant, include_unassessed=include_unassessed
+                )
+                series_dates = pd.to_datetime(series["observed_at"]).dt.date
+                series = series.loc[
+                    (series_dates >= selected_start) & (series_dates <= selected_end)
+                ]
+                if series.empty:
+                    st.info("No eligible source-reported values are available for the selected dates.")
+                else:
+                    st.line_chart(
+                        series.set_index("observed_at")["mean_value"],
+                        y_label=f"{pollutant} ({unit})",
+                        alt=f"Historical daily KSPCB-reported {pollutant} values at Eloor from August through September 2026",
+                    )
 
             if not monthly_aqi.empty:
                 st.markdown("**Historical source-reported Eloor AQI trend**")
