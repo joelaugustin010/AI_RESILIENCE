@@ -20,6 +20,7 @@ PORTAL_WARD_AUDIT_REPORT = ROOT / "reports" / "kochi_portal_candidate_vs_sec_reg
 PORTAL_WARD_METADATA = ROOT / "data" / "external" / "map_reference" / "kochi_wards_ksmart_portal_candidate.metadata.json"
 FINAL_WARD_MAP_PDF = "https://wardmap.ksmart.live/FinalN/map/Map_FinalN_Ernakulam_Cochin.pdf"
 FINAL_WARD_MAP_SOURCE_REPORT = ROOT / "reports" / "kochi_final_map_source_discovery.json"
+ESRI_WARD_AUDIT_REPORT = ROOT / "reports" / "kochi_esri_ward_candidate_audit.json"
 
 
 def _normalize_property_key(value: object) -> str:
@@ -289,6 +290,62 @@ if final_map_pdf_audit.get("pdf_signature_valid"):
                 "The official web app's referenced vector-tile endpoints returned HTTP 403 to read-only audit requests. "
                 "No access restriction was bypassed and no tile geometry was ingested."
             )
+
+esri_ward_source_report = load_acquisition_metadata(ESRI_WARD_AUDIT_REPORT) or {}
+if esri_ward_source_report.get("candidate_towns"):
+    esri_candidate = esri_ward_source_report["candidate_towns"][0]
+    esri_geometry_audit = esri_candidate.get("geometry_query", {})
+    esri_topology = esri_geometry_audit.get("topology_and_coverage", {})
+    esri_boundary_comparison = esri_topology.get("configured_boundary_comparison", {})
+    esri_draft_comparison = esri_geometry_audit.get("comparison_with_older_draft_candidate", {})
+    st.warning(
+        "A public Esri India Living Atlas service exposes 76 Kochi ward polygons with unique codes 1–76, "
+        f"{esri_geometry_audit.get('invalid_geometry_count', 'unknown')} invalid geometries, and "
+        f"{esri_topology.get('pairwise_interior_overlap_pairs_over_1m2', 'unknown')} detected interior-overlap pairs. "
+        f"However, only {esri_geometry_audit.get('exact_SEC_name_match_count_by_source_code_number', 'unknown')}/76 "
+        "source-code/name pairs exactly match the current SEC register, and the service's reuse terms and legal boundary currency are unverified. "
+        "This is a promising candidate for review, not the production ward layer.",
+        title="76-polygon candidate found — not approved for production",
+    )
+    with st.expander("Inspect Esri/KSMART-linked candidate audit", expanded=False):
+        st.write({
+            "Source service": esri_ward_source_report.get("service_url"),
+            "Source code numbers exactly 1–76": esri_geometry_audit.get("source_code_numbers_exactly_1_to_76"),
+            "Unique names / codes": f"{esri_geometry_audit.get('source_name_count')} / {esri_geometry_audit.get('unique_source_code_count')}",
+            "Valid polygon geometries": esri_geometry_audit.get("valid_polygon_count"),
+            "Invalid geometries": esri_geometry_audit.get("invalid_geometry_count"),
+            "Interior-overlap pairs over 1 m²": esri_topology.get("pairwise_interior_overlaps_over_1m2"),
+            "Ward union area (km²)": esri_topology.get("ward_union_area_km2"),
+            "Exact SEC name matches by source code": esri_geometry_audit.get("exact_SEC_name_match_count_by_source_code_number"),
+            "Final-PDF label matches by source code": esri_geometry_audit.get("exact_final_PDF_label_match_count_by_source_code_number"),
+            "Candidate vs configured provisional boundary IoU": esri_boundary_comparison.get("intersection_over_union"),
+            "Symmetric difference vs configured boundary (km²)": esri_boundary_comparison.get("symmetric_difference_area_km2"),
+            "Candidate outside configured boundary (km²)": esri_boundary_comparison.get("candidate_outside_boundary_km2"),
+            "Configured boundary not covered by candidate (km²)": esri_boundary_comparison.get("boundary_uncovered_by_candidate_km2"),
+            "Mean per-ward IoU vs older draft (73 valid common wards)": esri_draft_comparison.get("mean_per_ward_iou"),
+            "Reuse licence": "Not confirmed; candidate not integrated",
+            "Decision": "Do not use for production exposure analysis until legal source, licence, and boundary discrepancies are resolved.",
+        })
+        crosswalk_rows = [
+            {
+                "Source code / ward no.": row.get("source_code"),
+                "Esri source name": row.get("source_name"),
+                "Current SEC name at same number": row.get("SEC_name_for_same_number"),
+                "Exact SEC name match": row.get("exact_SEC_name_match_for_same_number"),
+                "Final PDF label": ", ".join(row.get("final_PDF_label_for_same_number", [])) or "Not extracted",
+                "Exact final PDF text match": row.get("exact_final_PDF_label_match_for_same_number"),
+            }
+            for row in esri_geometry_audit.get("source_code_name_crosswalk", [])
+        ]
+        if crosswalk_rows:
+            st.dataframe(pd.DataFrame(crosswalk_rows), hide_index=True, width="stretch")
+        source_names_not_found = esri_geometry_audit.get("source_names_not_exactly_in_SEC_register", [])
+        if source_names_not_found:
+            st.caption(
+                "The source labels below are not exact matches to any name in the current SEC register; "
+                "they are preserved as source data and are not silently corrected."
+            )
+            st.dataframe(pd.DataFrame(source_names_not_found), hide_index=True, width="stretch")
 
 portal_ward_audit = load_acquisition_metadata(PORTAL_WARD_AUDIT_REPORT) or {}
 portal_ward_metadata = load_acquisition_metadata(PORTAL_WARD_METADATA) or {}
