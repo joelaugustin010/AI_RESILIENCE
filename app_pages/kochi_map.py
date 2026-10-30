@@ -475,22 +475,29 @@ if processed_layers:
                 properties = inspected.get("properties") or {}
                 st.markdown("**Key location details**")
                 detail_cols = st.columns(2)
-                detail_cols[0].metric(
-                    "Bound Name",
-                    _first_property(
-                        properties,
-                        ("Bound_Name", "Bound Name", "bound_name", "boundname", "boundary_name", "name"),
-                        "Not available in source data",
+                # Use the same alias resolver as map tooltips so GIS exports with
+                # spaces, case changes, or suffixed fields (e.g. Ward_Name_1) resolve
+                # consistently in the inspector as well.
+                inspected_bound_name = _first_property(
+                    properties,
+                    (
+                        "Bound_Name", "Bound Name", "bound_name", "boundname", "bound_name_1",
+                        "boundname_1", "boundary_name", "boundaryname", "ward_boundary_name",
+                        "Ward_Name", "Ward Name", "ward_name", "wardname", "name_en", "name",
                     ),
+                    f"Boundary label unavailable (feature {int(feature_number)})",
                 )
-                detail_cols[1].metric(
-                    "Ward Name",
-                    _first_property(
-                        properties,
-                        ("Ward_Name", "Ward Name", "ward_name", "wardname"),
-                        "Not available in source data",
+                inspected_ward_name = _first_property(
+                    properties,
+                    (
+                        "Ward_Name", "Ward Name", "ward_name", "wardname", "ward_name_en",
+                        "wardnameen", "ward_label", "wardname_1", "name_en", "name",
                     ),
+                    f"Ward name unavailable (feature {int(feature_number)})",
                 )
+                # Never substitute a ward number or feature ID for a missing ward name.
+                detail_cols[0].metric("Bound Name", inspected_bound_name)
+                detail_cols[1].metric("Ward Name", inspected_ward_name)
                 if properties:
                     st.markdown("**All original source attributes**")
                     st.json(properties)
