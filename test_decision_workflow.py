@@ -205,7 +205,7 @@ class DecisionReadinessSummaryTests(unittest.TestCase):
 
     def test_source_notes_do_not_count_as_independent_verification(self):
         result = decision_readiness_summary(
-            valid_inputs(source_and_time="Official source, today"),
+            valid_inputs(input_classification="User-reported observation (source not independently verified)", source_and_time="Official source, today"),
             {
                 "errors": [],
                 "warnings": [],
