@@ -228,6 +228,19 @@ st.dataframe(pd.DataFrame(catalog_rows), hide_index=True, width="stretch", alt="
 
 ward_reconciliation = load_ward_reconciliation_report()
 ward_matches = ward_reconciliation.get("matches", [])
+ward_alignment = ward_reconciliation.get("ward_count_alignment", {})
+if ward_reconciliation.get("status") == "WARD_COUNT_MISMATCH_OFFICIAL_CURRENT_REGISTER" or (
+    ward_alignment and not ward_alignment.get("all_counts_match", False)
+):
+    st.error(
+        "The bundled ward polygons are not aligned with the current official ward register: "
+        f"{ward_alignment.get('source_features', ward_reconciliation.get('source_feature_count', 'unknown'))} source polygons, "
+        f"{ward_alignment.get('candidate_named_wards', ward_reconciliation.get('candidate_named_ward_count', 'unknown'))} "
+        f"candidate polygons, and {ward_alignment.get('official_register_wards', ward_reconciliation.get('official_current_ward_count', 'unknown'))} "
+        "official wards. Current ward names/numbers must not be assigned to these older polygons. "
+        "Acquire the final official current boundary geometry before treating map labels as current.",
+        title="Ward geometry version mismatch — current labels not verified",
+    )
 if ward_matches:
     st.warning(
         f"The ward source contains {len(ward_matches)} feature(s) with missing ward attributes. "
