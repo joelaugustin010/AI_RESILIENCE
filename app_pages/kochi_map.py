@@ -47,8 +47,12 @@ def _first_property(properties: dict, candidates: tuple[str, ...], fallback: str
             value for key, value in normalized.items()
             if key.startswith(candidate) and key != candidate and _has_display_value(value)
         ]
-        if len(matches) == 1:
-            return str(matches[0]).strip()
+        # Duplicate GIS exports can carry the same value under several suffixed
+        # aliases. Treat identical populated values as unambiguous; if values
+        # disagree, preserve the fallback rather than guessing which field wins.
+        distinct_values = {str(value).strip() for value in matches}
+        if len(distinct_values) == 1:
+            return next(iter(distinct_values))
     return fallback
 
 
