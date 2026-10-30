@@ -4,7 +4,7 @@ import json
 import unittest
 from pathlib import Path
 
-from app_pages.kochi_map import normalize_geojson_for_tooltip
+from app_pages.kochi_map import load_draft_ward_candidate, normalize_geojson_for_tooltip
 
 
 class MapNameFallbackTests(unittest.TestCase):
@@ -40,6 +40,25 @@ class MapNameFallbackTests(unittest.TestCase):
         props = result["features"][0]["properties"]
         self.assertEqual(props["display_ward"], "Test Ward")
         self.assertEqual(props["display_bound"], "Test Boundary")
+
+
+    def test_draft_candidate_never_keeps_official_identity_for_mismatched_source_label(self):
+        candidate = load_draft_ward_candidate()["geojson"]
+        features = candidate["features"]
+        self.assertEqual(len(features), 76)
+        matched = 0
+        for index, feature in enumerate(features, start=1):
+            props = feature["properties"]
+            source_name = str(props.get("source_ward_name") or "").strip()
+            official_name = props.get("sec_ward_name")
+            official_code = props.get("sec_ward_code")
+            if official_name or official_code:
+                self.assertTrue(official_name and official_code, f"Incomplete SEC identity at feature {index}")
+                normalize = lambda value: "".join(ch for ch in str(value).casefold() if ch.isalnum())
+                self.assertEqual(normalize(source_name), normalize(official_name), f"Unsafe ordinal name join at feature {index}")
+                matched += 1
+        self.assertGreater(matched, 0)
+        self.assertLess(matched, 76, "Mismatched draft labels must not receive SEC identities")
 
     def test_all_retained_legacy_ward_features_render_nonempty_labels(self):
         root = Path(__file__).resolve().parents[1]
