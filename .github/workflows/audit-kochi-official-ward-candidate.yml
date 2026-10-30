@@ -5,6 +5,7 @@ on:
     branches: [fix/kochi-current-ward-count-guardrail]
     paths:
       - "scripts/acquire_kochi_official_ward_candidate.py"
+      - "scripts/discover_kochi_final_ward_source.py"
       - ".github/workflows/audit-kochi-official-ward-candidate.yml"
       - "data/reference/kochi_official_ward_roster_2025.json"
       - "data/reference/spatial_sources.json"
@@ -34,7 +35,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install geometry validator
-        run: python -m pip install --disable-pip-version-check shapely
+        run: python -m pip install --disable-pip-version-check shapely pypdf
       - name: Discover official final-notification map data references
         run: python scripts/discover_kochi_final_ward_source.py
       - name: Acquire and validate portal candidate
