@@ -215,7 +215,8 @@ class EvidenceAndReportTests(unittest.TestCase):
         actions.loc[actions.index[0], "Cost INR"] = 125000
         combinations = compare_action_combinations(actions, 200000, {"Selected": actions["Action"].tolist()})
         report = report_rows(inputs, evidence, scenarios, actions, 200000, combinations, Path(__file__).resolve().parent)
-        self.assertTrue(report["Value"].str.contains("Insufficient evidence", regex=False).any())
+        self.assertTrue(report["Value"].str.contains("numerical prediction not validated", case=False, regex=False).any())
+        self.assertTrue(report["Value"].str.contains("Qualitative scenario assessment completed", regex=False).any())
         self.assertTrue(report["Value"].str.contains("125000", regex=False).any())
         rendered = report_html(report)
         self.assertIn("&lt;script&gt;", rendered)
