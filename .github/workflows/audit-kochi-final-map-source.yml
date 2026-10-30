@@ -1,0 +1,57 @@
+name: Audit official Kochi final ward-map reference
+
+on:
+  push:
+    branches: [fix/kochi-final-map-reference-audit-20261030]
+    paths:
+      - "scripts/discover_kochi_final_ward_source.py"
+      - ".github/workflows/audit-kochi-final-map-source.yml"
+      - "data/reference/kochi_official_ward_register_2026.json"
+  pull_request:
+    branches: [main]
+    paths:
+      - "scripts/discover_kochi_final_ward_source.py"
+      - ".github/workflows/audit-kochi-final-map-source.yml"
+      - "data/reference/kochi_official_ward_register_2026.json"
+
+permissions:
+  contents: read
+
+jobs:
+  audit-final-map-reference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install read-only audit dependencies
+        run: python -m pip install --disable-pip-version-check pypdf mapbox-vector-tile
+      - name: Re-fetch official final map PDF and inspect source references
+        run: python scripts/discover_kochi_final_ward_source.py
+      - name: Validate audit report structure
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path("reports/kochi_final_map_source_discovery.json").read_text(encoding="utf-8"))
+          pdf = report["final_map_pdf_audit"]
+          if not pdf.get("pdf_signature_valid") or pdf.get("page_count", 0) < 1:
+              raise SystemExit("Official final map PDF was not successfully verified as a PDF document.")
+          if len(pdf.get("numbered_comparison", [])) != 76:
+              raise SystemExit("Expected comparison coverage for all 76 SEC ward numbers.")
+          if pdf.get("status") != "OFFICIAL_FINAL_MAP_PDF_REFERENCE_ONLY_NOT_GIS_GEOMETRY":
+              raise SystemExit("Unexpected status: the PDF must remain reference-only.")
+          print({
+              "pdf_sha256": pdf.get("sha256"),
+              "pdf_pages": pdf.get("page_count"),
+              "numbered_labels_extracted": pdf.get("numbered_map_labels_extracted"),
+              "exact_SEC_name_matches": pdf.get("numbered_comparison_exact_name_matches"),
+              "tile_sample_status": report.get("vector_tile_sample_audit", {}).get("status"),
+              "result": "PASS — source reference audit only; no GIS geometry approved"
+          })
+          PY
