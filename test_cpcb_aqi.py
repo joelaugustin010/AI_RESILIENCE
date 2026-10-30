@@ -20,6 +20,7 @@ def record(pollutant, concentration, *, unit=None, averaging_period=None, valid_
         "unit": unit or CPCB_UNITS[pollutant],
         "averaging_period": averaging_period or CPCB_AVERAGING_PERIODS[pollutant],
         "valid_hours": valid_hours,
+        "quality_flag": "valid",
     }
 
 
@@ -117,6 +118,16 @@ class CPCBOverallAQITests(unittest.TestCase):
         ])
         self.assertEqual(result["status"], "insufficient_data")
         self.assertIn("Requires 8-hour averaging.", result["excluded_records"][0]["reason"])
+
+    def test_unassessed_observations_are_excluded(self):
+        result = calculate_ind_aqi([
+            record("PM2.5", 20),
+            {**record("NO2", 20), "quality_flag": "unassessed"},
+            record("SO2", 20),
+        ])
+        self.assertEqual(result["status"], "insufficient_data")
+        self.assertEqual(result["eligible_pollutant_count"], 2)
+        self.assertIn("not marked valid", result["excluded_records"][0]["reason"])
 
     def test_unit_mismatch_is_excluded_not_silently_converted(self):
         result = calculate_ind_aqi([
