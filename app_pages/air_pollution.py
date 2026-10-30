@@ -141,6 +141,32 @@ st.markdown(
         font-weight: 780;
     }
 
+    .air-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 10px 0 18px;
+        margin-bottom: 8px;
+        border-bottom: 1px solid rgba(92, 148, 164, 0.18);
+    }
+
+    .air-nav a {
+        display: inline-block;
+        padding: 7px 11px;
+        border: 1px solid rgba(71, 132, 151, 0.20);
+        border-radius: 999px;
+        color: #285b6c !important;
+        background: rgba(255,255,255,0.78);
+        text-decoration: none !important;
+        font-size: 0.78rem;
+        font-weight: 650;
+    }
+
+    .air-nav a:hover {
+        background: #e5f3f6;
+        border-color: rgba(71, 132, 151, 0.42);
+    }
+
     div[data-testid="stDataFrame"] {
         border: 1px solid rgba(100, 160, 180, 0.22);
         border-radius: 13px;
@@ -212,6 +238,20 @@ st.warning(
     "No live AQI feed is connected to this dashboard. The latest acquired station report is dated "
     "16 October 2026; the values below are historical source reports, not live readings."
 )
+st.markdown(
+    """
+    <nav class="air-nav">
+        <a href="#latest-report">Latest report</a>
+        <a href="#eloor-trends">Eloor trends</a>
+        <a href="#namp-network">NAMP network</a>
+        <a href="#annual-aqi">Annual AQI</a>
+        <a href="#cpcb-method">CPCB method</a>
+        <a href="#industrial-evidence">Industrial evidence</a>
+        <a href="#sources">Sources</a>
+    </nav>
+    """,
+    unsafe_allow_html=True,
+)
 
 daily_aqi = read_csv(REPORTS / "kspcb_daily_aqi_2026-10-16.csv")
 daily_status = read_csv(REPORTS / "kspcb_daily_aqi_status_2026-10-16.csv")
@@ -270,6 +310,7 @@ with st.expander("How to read this dashboard"):
     )
 
 st.divider()
+st.markdown('<div id="latest-report"></div>', unsafe_allow_html=True)
 st.subheader("Latest available station AQI report")
 if daily_aqi.empty:
     st.info("The acquired daily AQI report extract is unavailable in this checkout.")
@@ -324,6 +365,7 @@ else:
             alt="Stations marked unavailable in the KSPCB daily AQI report",
         )
 
+st.markdown('<div id="eloor-trends"></div>', unsafe_allow_html=True)
 st.subheader("Dated Eloor pollutant trends")
 st.caption(
     "Historical KSPCB Eloor monthly reports: August and September 2026. These are source-reported "
@@ -448,6 +490,7 @@ else:
                 alt="Descriptive August and September means for matching Eloor pollutant report fields",
             )
 
+st.markdown('<div id="namp-network"></div>', unsafe_allow_html=True)
 st.subheader("NAMP report observations and station references")
 if namp_records.empty:
     st.info("The KSPCB NAMP report extract is unavailable in this checkout.")
@@ -496,6 +539,7 @@ except (OSError, json.JSONDecodeError):
 if annual.empty:
     st.error("The validated KSPCB annual AQI summary is unavailable in this checkout.")
 else:
+    st.markdown('<div id="annual-aqi"></div>', unsafe_allow_html=True)
     st.subheader("Latest source-reported annual AQI summary")
     available_years = sorted(annual["year"].dropna().astype(int).unique().tolist())
     latest_year = max(available_years)
@@ -573,6 +617,7 @@ else:
             "was acquired, not when the air was measured."
         )
 
+st.markdown('<div id="cpcb-method"></div>', unsafe_allow_html=True)
 st.subheader("AQI categories and CPCB method")
 category_table = pd.DataFrame(
     [
@@ -663,6 +708,7 @@ st.caption(
     "reference system."
 )
 
+st.markdown('<div id="industrial-evidence"></div>', unsafe_allow_html=True)
 st.subheader("Potential industrial contributors: unranked candidates")
 facility_candidates = read_csv(INDUSTRIAL / "edayar_candidate_facilities.csv")
 industry_type_counts = read_csv(INDUSTRIAL / "edayar_estate_industry_type_counts.csv")
@@ -780,6 +826,7 @@ st.markdown(
     "potential-source ranking."
 )
 
+st.markdown('<div id="sources"></div>', unsafe_allow_html=True)
 st.subheader("Sources, retrieval metadata and limitations")
 for source in register["sources"]:
     st.markdown(f"- [{source['publisher']}]({source['url']}) — {source['status']}")
