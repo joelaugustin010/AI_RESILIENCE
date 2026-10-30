@@ -11,6 +11,27 @@ from typing import Any
 import pandas as pd
 
 
+def _imd_24h_rainfall_category(rainfall_mm: float) -> str:
+    """Return the IMD station rainfall category for a 24-hour accumulation.
+
+    Thresholds are the IMD published 24-hour station categories. This is a
+    meteorological rainfall category only, not a flood-risk classification.
+    Source: https://mausam.imd.gov.in/imd_latest/contents/pdf/pubbrochures/Heavy%20Rainfall%20Warning%20Services.pdf
+    """
+    amount = float(rainfall_mm)
+    if amount < 2.5:
+        return "Very light / trace"
+    if amount < 15.6:
+        return "Light"
+    if amount < 64.5:
+        return "Moderate"
+    if amount < 115.6:
+        return "Heavy"
+    if amount < 204.5:
+        return "Very heavy"
+    return "Extremely heavy"
+
+
 def build_scenario_screening(inputs: dict[str, Any]) -> pd.DataFrame:
     """Return conditional findings and concrete checks for the selected hazard."""
     hazard = str(inputs.get("hazard", ""))
@@ -45,9 +66,16 @@ def build_scenario_screening(inputs: dict[str, Any]) -> pd.DataFrame:
         if rainfall is not None:
             add(
                 f"Rainfall assumption: {rainfall:g} mm ({period})",
-                "This amount and accumulation period are part of the scenario forcing. The app has no approved local rainfall-to-flood threshold, so it does not convert this value into a risk category or probability.",
+                "This amount and accumulation period are part of the scenario forcing. The app has no approved local rainfall-to-flood threshold, so it does not convert this value into a flood-risk category or probability.",
                 "Check the exact accumulation window, local forecast/observation source, catchment response, and official warnings.",
             )
+            if period == "Last 24 hours":
+                rainfall_category = _imd_24h_rainfall_category(float(rainfall))
+                add(
+                    f"IMD 24-hour station rainfall category: {rainfall_category}",
+                    f"For the entered 24-hour amount, the India Meteorological Department's station rainfall categories classify {rainfall:g} mm as {rainfall_category.lower()} rainfall. This describes rainfall amount only; it is not a Kochi flood prediction, alert, or estimate of inundation depth.",
+                    "Confirm the measurement is a station total for the relevant 24-hour window (IMD daily totals commonly end at 0830 IST), and check current IMD/KSDMA bulletins and local water levels. Reference: https://mausam.imd.gov.in/imd_latest/contents/pdf/pubbrochures/Heavy%20Rainfall%20Warning%20Services.pdf",
+                )
         if river is not None:
             station = str(inputs.get("river_station") or "").strip() or "station not supplied"
             datum = str(inputs.get("river_reference") or "").strip() or "gauge reference not supplied"
