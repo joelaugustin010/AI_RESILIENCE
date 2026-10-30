@@ -15,6 +15,7 @@ SOURCE_CATALOG_PATH = ROOT / "data" / "reference" / "spatial_sources.json"
 FLOOD_ACQUISITION_METADATA = ROOT / "data" / "raw" / "ksdma_flood_return_probability_historical_10_25_50.metadata.json"
 HOSPITAL_REVIEW_METADATA = ROOT / "data" / "processed" / "nihfw_ernakulam_hospitals_coordinate_review.metadata.json"
 HOSPITAL_REVIEW_CSV = ROOT / "data" / "processed" / "nihfw_ernakulam_hospitals_coordinate_review.csv"
+WARD_RECONCILIATION_REPORT = ROOT / "reports" / "kochi_ward_label_reconciliation.json"
 
 
 def _normalize_property_key(value: object) -> str:
@@ -161,6 +162,17 @@ def load_source_catalog() -> dict:
 
 
 @st.cache_data
+def load_ward_reconciliation_report() -> dict:
+    """Load geometry-ranked ward label candidates without applying them to source data."""
+    try:
+        with WARD_RECONCILIATION_REPORT.open(encoding="utf-8") as source:
+            payload = json.load(source)
+        return payload if isinstance(payload, dict) else {}
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+@st.cache_data
 def load_acquisition_metadata(path: Path) -> dict | None:
     """Read acquisition sidecars for datasets that are not eligible map layers."""
     try:
@@ -213,6 +225,35 @@ catalog_rows = [{
 } for item in catalog["datasets"]]
 st.subheader("Source and layer catalog")
 st.dataframe(pd.DataFrame(catalog_rows), hide_index=True, width="stretch", alt="Reviewed Kochi spatial source inventory with availability, coverage, CRS, and reuse status")
+
+ward_reconciliation = load_ward_reconciliation_report()
+ward_matches = ward_reconciliation.get("matches", [])
+if ward_matches:
+    st.warning(
+        f"The ward source contains {len(ward_matches)} feature(s) with missing ward attributes. "
+        "A separate 2024 candidate map was compared geometrically; suggestions below are unverified and are not written into the source layer.",
+        title="Ward label reconciliation is still under review",
+    )
+    rows = []
+    for item in ward_matches:
+        best = item.get("best_candidate") or {}
+        second = item.get("second_best_candidate") or {}
+        rows.append({
+            "Source feature": item.get("source_feature_index"),
+            "Missing ward name": item.get("source_ward_name_missing"),
+            "Missing ward number": item.get("source_ward_number_missing"),
+            "Best candidate (unverified)": best.get("candidate_name", "No match"),
+            "Best IoU": best.get("intersection_over_union"),
+            "Second candidate": second.get("candidate_name", ""),
+            "Score gap": item.get("best_minus_second_iou"),
+            "Manual review suggested": item.get("suggested_for_manual_review", False),
+        })
+    with st.expander("Inspect missing ward-label candidates", expanded=False):
+        st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
+        st.caption(
+            "IoU is geometric overlap, not legal proof. No automatic names or ward numbers are assigned. "
+            "Only one feature currently meets the report's high-overlap review threshold; official ward-register reconciliation remains required."
+        )
 ward_candidate = next(
     (item for item in catalog["datasets"] if item.get("layer_id") == "kochi_wards_opencity_2024_candidate"),
     None,
