@@ -169,21 +169,36 @@ def validate_and_annotate(
             geometry_errors.append(f"ward {number}: geometry parse/repair error: {exc}")
             continue
 
-        code, official_name = roster_by_number[number]
         source_name = extract_source_ward_name(feature)
-        if normalize(source_name) != normalize(official_name):
+        # Join to the current SEC roster by the source ward label, never by
+        # ordinal number: the 2024 draft numbering differs from the current list.
+        official_match = next(
+            (
+                (code, name)
+                for code, name in roster
+                if normalize(source_name) == normalize(name)
+            ),
+            None,
+        ) if source_name else None
+        if official_match is None:
+            ordinal_name = roster_by_number[number][1]
             name_mismatches.append({
                 "ward_number": number,
-                "ward_code": code,
                 "source_name": source_name or None,
-                "official_sec_name": official_name,
+                "ordinal_name_for_comparison_only": ordinal_name,
+                "official_identity_assigned": False,
             })
         copied = json.loads(json.dumps(feature))
         copied.setdefault("properties", {})
         copied["geometry"] = mapping(output_geometry)
         copied["properties"]["source_ward_name"] = source_name or None
-        copied["properties"]["sec_ward_code"] = code
-        copied["properties"]["sec_ward_name"] = official_name
+        copied["properties"]["draft_ward_number"] = number
+        if official_match is not None:
+            copied["properties"]["sec_ward_code"] = official_match[0]
+            copied["properties"]["sec_ward_name"] = official_match[1]
+        else:
+            copied["properties"].pop("sec_ward_code", None)
+            copied["properties"].pop("sec_ward_name", None)
         copied["properties"]["boundary_status"] = "draft_candidate_not_approved"
         copied["properties"]["geometry_repaired_for_candidate"] = repair_record is not None
         annotated.append(copied)
@@ -252,10 +267,11 @@ def main() -> int:
     )
     validation_warnings = []
     if name_mismatches:
-        validation_warnings.append(f"{len(name_mismatches)} source ward names differ from the SEC roster by Ward_No; SEC display names are added without overwriting source names.")
+        validation_warnings.append(f"{len(name_mismatches)} source ward labels have no exact normalized SEC roster match; no official code/name is assigned to those draft features.")
     if geometry_repairs:
         validation_warnings.append(f"{len(geometry_repairs)} invalid source geometries were repaired only in the candidate copy using Shapely make_valid; raw source remains unchanged.")
     validation_warnings.append("The linked map page labels this source DRAFT NOTIFICATION; no legal boundary or exposure-analysis approval is implied.")
+    matched_official_ward_count = sum(1 for feature in annotated if feature.get("properties", {}).get("sec_ward_code") and feature.get("properties", {}).get("sec_ward_name"))
     candidate_metadata = {
         "dataset_id": "kochi_wards_ksmart_2024_draft_candidate",
         "title": "Kochi 2024 draft ward-map candidate with explicit SEC name/code matches",
@@ -271,10 +287,10 @@ def main() -> int:
         "processed_sha256": candidate_sha,
         "source_feature_count": len(features),
         "processed_feature_count": len(annotated),
-        "matched_official_ward_count": 76,
+        "matched_official_ward_count": matched_official_ward_count,
         "source_name_mismatch_count": len(name_mismatches),
         "source_name_mismatches": name_mismatches,
-        "match_method": "explicit source Ward_No (unique values 1..76) matched to numeric suffix of SEC ward codes; source labels are retained and audited, not used to assign IDs",
+        "match_method": "exact normalized source ward-name match to the unique SEC roster; numeric draft ward order is diagnostic only and never assigns official codes/names",
         "geometry_validation": "Shapely reports valid Polygon/MultiPolygon output geometries after itemized make_valid repairs; the repository custom topology checker reports a conflicting invalid-feature result, so this candidate remains visual-only pending reconciliation",
         "geometry_repair_count": len(geometry_repairs),
         "geometry_repairs": geometry_repairs,
@@ -283,14 +299,14 @@ def main() -> int:
         "units": "longitude/latitude degrees",
         "geographic_coverage": "Kochi Municipal Corporation; candidate 76-ward map",
         "layer_role": "context",
-        "required_properties": ["sec_ward_code", "sec_ward_name"],
+        "required_properties": ["source_ward_name", "draft_ward_number"],
         "status": "candidate_not_integrated",
-        "validation_status": "DRAFT CANDIDATE ONLY — 76 features; legal status not approved",
+        "validation_status": f"DRAFT CANDIDATE ONLY — 76 features; {matched_official_ward_count} exact SEC name matches; legal status not approved",
         "analysis_status": "Not approved as a legal boundary, hazard-exposure mask, or production risk-analysis input.",
         "reuse_terms": rights_statement,
         "limitations": raw_metadata["limitations"] + [
             "CRS is interpreted as WGS 84 from GeoJSON semantics; no independent formal CRS record was supplied.",
-            "Twelve source Ward_Name values differ from the State Election Commission roster; source labels are retained and SEC names are added by explicit Ward_No only.",
+            f"{len(name_mismatches)} source Ward_Name values do not exactly match the State Election Commission roster; those features retain draft labels and receive no SEC code/name.",
             "Three invalid source geometries were repaired in the candidate copy; raw source bytes are preserved unchanged and repairs are itemized.",
             "Candidate is not approved for legal boundaries or production exposure calculations.",
             "Reuse rights require confirmation before further redistribution or non-educational reuse.",
