@@ -276,14 +276,6 @@ def query_town_geometry(
             "sum_minus_union_area_km2_overlap_indicator": round((area_sum - ward_union.area) / 1_000_000, 6),
             "pairwise_interior_overlap_pairs_over_1m2": len(overlap_pairs),
             "largest_pairwise_overlap_examples": sorted(overlap_pairs, key=lambda item: item["intersection_area_m2"], reverse=True)[:20],
-            "ward_union_bounds_lonlat": list(shape({
-                "type": "Polygon",
-                "coordinates": [[
-                    [float(x), float(y)] for x, y in [
-                        # bounds are reported below from source coordinates instead;
-                    ]
-                ]]
-            }).bounds) if False else None,
         }
         try:
             boundary_data = json.loads(BOUNDARY_PATH.read_text(encoding="utf-8"))
