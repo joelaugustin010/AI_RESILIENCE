@@ -45,54 +45,131 @@ st.markdown(
     """
     <style>
     .block-container {
-        padding-top: 2rem;
-        padding-bottom: 3rem;
-        max-width: 1450px;
+        padding-top: 1.55rem;
+        padding-bottom: 3.5rem;
+        max-width: 1480px;
+    }
+
+    [data-testid="stAppViewContainer"] {
+        background:
+            radial-gradient(circle at 8% 2%, rgba(111, 190, 210, 0.10), transparent 27rem),
+            linear-gradient(180deg, rgba(244, 249, 250, 0.45), transparent 24rem);
     }
 
     .air-hero {
-        padding: 26px 30px;
-        border: 1px solid rgba(91, 164, 190, 0.22);
-        border-radius: 18px;
-        background: linear-gradient(
-            120deg,
-            rgba(225, 244, 251, 0.95),
-            rgba(241, 250, 245, 0.95)
-        );
-        margin-bottom: 22px;
+        position: relative;
+        overflow: hidden;
+        padding: 34px 36px 30px;
+        border: 1px solid rgba(91, 164, 190, 0.28);
+        border-radius: 22px;
+        background: linear-gradient(118deg, #e6f4f8 0%, #f1f8f6 54%, #f8fbfa 100%);
+        box-shadow: 0 12px 34px rgba(27, 73, 91, 0.07);
+        margin: 4px 0 22px;
+    }
+
+    .air-hero:after {
+        content: "";
+        position: absolute;
+        width: 240px;
+        height: 240px;
+        right: -70px;
+        top: -115px;
+        border: 1px solid rgba(44, 129, 151, 0.18);
+        border-radius: 50%;
+        box-shadow: 0 0 0 26px rgba(44, 129, 151, 0.035), 0 0 0 54px rgba(44, 129, 151, 0.025);
+        pointer-events: none;
     }
 
     .air-eyebrow {
         color: #28768b;
-        font-size: 0.78rem;
-        font-weight: 700;
-        letter-spacing: 2px;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 2.2px;
         text-transform: uppercase;
     }
 
     .air-heading {
         color: #173d50;
-        font-size: 2.15rem;
-        font-weight: 750;
-        margin: 8px 0;
+        font-size: clamp(2rem, 4vw, 2.7rem);
+        font-weight: 800;
+        letter-spacing: -1.2px;
+        line-height: 1.12;
+        margin: 10px 0 12px;
     }
 
     .air-description {
         color: #496675;
-        font-size: 1rem;
-        line-height: 1.65;
+        font-size: 1.02rem;
+        line-height: 1.7;
+        max-width: 850px;
         margin-bottom: 0;
     }
 
+    .air-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 20px;
+    }
+
+    .air-meta span {
+        display: inline-block;
+        padding: 6px 11px;
+        border: 1px solid rgba(47, 119, 139, 0.18);
+        border-radius: 999px;
+        color: #315e6d;
+        background: rgba(255,255,255,0.62);
+        font-size: 0.76rem;
+        font-weight: 650;
+    }
+
+    div[data-testid="stMetric"] {
+        background: rgba(255, 255, 255, 0.82);
+        border: 1px solid rgba(87, 143, 160, 0.19);
+        border-radius: 15px;
+        padding: 15px 17px;
+        box-shadow: 0 5px 18px rgba(31, 76, 92, 0.045);
+    }
+
+    div[data-testid="stMetricLabel"] {
+        color: #587481;
+        font-weight: 650;
+    }
+
+    div[data-testid="stMetricValue"] {
+        color: #183f51;
+        font-weight: 780;
+    }
+
     div[data-testid="stDataFrame"] {
-        border: 1px solid rgba(100, 160, 180, 0.20);
-        border-radius: 12px;
+        border: 1px solid rgba(100, 160, 180, 0.22);
+        border-radius: 13px;
         overflow: hidden;
+        background: rgba(255,255,255,0.86);
     }
 
     div[data-testid="stExpander"] {
-        border: 1px solid rgba(100, 160, 180, 0.22);
-        border-radius: 12px;
+        border: 1px solid rgba(100, 160, 180, 0.24);
+        border-radius: 13px;
+        background: rgba(255,255,255,0.62);
+    }
+
+    h2, h3 {
+        color: #1d4c5e;
+        letter-spacing: -0.35px;
+    }
+
+    hr {
+        border-color: rgba(92, 148, 164, 0.18);
+    }
+
+    @media (max-width: 700px) {
+        .air-hero {
+            padding: 25px 21px;
+        }
+        .air-heading {
+            font-size: 2rem;
+        }
     }
     </style>
     """,
@@ -159,6 +236,36 @@ verified_monthly = (
 )
 namp_records = read_csv(REPORTS / "kspcb_namp_ernakulam_2025-06.csv")
 
+# Executive overview: show only facts that are directly available in the loaded extracts.
+latest_extract_date = (
+    pd.to_datetime(daily_aqi["observed_at"], errors="coerce").max().date()
+    if not daily_aqi.empty and "observed_at" in daily_aqi.columns
+    and pd.to_datetime(daily_aqi["observed_at"], errors="coerce").notna().any()
+    else None
+)
+station_count = int(daily_aqi["station"].nunique()) if not daily_aqi.empty and "station" in daily_aqi.columns else 0
+st.markdown("### Air quality at a glance")
+overview = st.columns(4)
+overview[0].metric("Latest loaded report", latest_extract_date.strftime("%d %b %Y") if latest_extract_date else "Unavailable")
+overview[1].metric("Stations in daily extract", station_count)
+overview[2].metric("Eloor monthly reports", len(monthly_reports), help="August and September 2026 source reports when both pass ingestion checks.")
+overview[3].metric("AQI calculation", "Evidence-gated", help="The app calculates AQI only when averaging period, valid hours and QA flags meet CPCB requirements.")
+st.caption(
+    "This is a historical research dashboard, not a live public warning service. "
+    "Each chart and table retains its source date, unit and evidence limitations."
+)
+with st.expander("How to read this dashboard"):
+    st.markdown(
+        "- **Source-reported AQI** is reproduced from the cited KSPCB report.
+"
+        "- **Calculated indicator** is shown only when CPCB input requirements are demonstrated.
+"
+        "- **Historical pollutant trends** describe reported observations; they do not identify an emitting facility.
+"
+        "- **Industrial candidates** are evidence leads, not accusations or ranked pollution sources."
+    )
+
+st.divider()
 st.subheader("Latest available station AQI report")
 if daily_aqi.empty:
     st.info("The acquired daily AQI report extract is unavailable in this checkout.")
