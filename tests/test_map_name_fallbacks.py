@@ -4,7 +4,7 @@ import json
 import unittest
 from pathlib import Path
 
-from app_pages.kochi_map import normalize_geojson_for_tooltip
+from app_pages.kochi_map import normalize_geojson_for_tooltip, resolve_inspector_ward_name
 
 
 class MapNameFallbackTests(unittest.TestCase):
@@ -40,6 +40,20 @@ class MapNameFallbackTests(unittest.TestCase):
         props = result["features"][0]["properties"]
         self.assertEqual(props["display_ward"], "Test Ward")
         self.assertEqual(props["display_bound"], "Test Boundary")
+
+    def test_inspector_uses_boundary_name_when_ward_name_is_missing(self):
+        self.assertEqual(
+            resolve_inspector_ward_name("Ward name unavailable (feature 4)", "Example Boundary", "12", 4),
+            "Example Boundary",
+        )
+        self.assertEqual(
+            resolve_inspector_ward_name("Ward name unavailable (feature 4)", "Boundary label unavailable (feature 4)", "12", 4),
+            "Ward name unavailable (ward no. 12; source feature 4)",
+        )
+        self.assertEqual(
+            resolve_inspector_ward_name("Ward name unavailable (feature 4)", "Boundary label unavailable (feature 4)", "", 4),
+            "Ward name unavailable (source feature 4)",
+        )
 
     def test_all_retained_legacy_ward_features_render_nonempty_labels(self):
         root = Path(__file__).resolve().parents[1]
