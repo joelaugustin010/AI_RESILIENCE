@@ -75,6 +75,7 @@
       "snippet": "anathapuram\"},ZT={Alakode:\"Alakkode\",Badiadka:\"Badiyadka\",Guruvayur:\"Guruvayoor\",Irinjalakuda:\"Irinjalakkuda\",Kanhangad:\"Kanjhangad\",Kasaragod:\"Kasargod\",Kavanur:\"Kavannur\",Kochi:\"Cochin\",Kodungallur:\"Kodungalloor\",Koyilandy:\"Quilandy\",\"Lakkidi-perur\":\"Lakkidi-Perur\",\"Malayattoor Neeleeswaram\":\"Malayattoor Neeleswaram\",Mulumthuruthy:\"Mulamthuruthy\",Narikkuni:\"Narikunni\",Narippatta:\"Naripetta\",\"Padiyur kalliad\":\"Padiyur Kalliad\",Paravur:\"Paravoor\",\"Perumana klari\":\"Perumana Klari\",Pothanicad:\"Pot"
     }
   ],
+  "script_variable_evidence": [],
   "final_map_pdf_audit": {
     "url": "https://wardmap.ksmart.live/FinalN/map/Map_FinalN_Ernakulam_Cochin.pdf",
     "final_url": "https://wardmap.ksmart.live/FinalN/map/Map_FinalN_Ernakulam_Cochin.pdf",
@@ -132,8 +133,469 @@
         "text_found": false
       }
     ],
+    "numbered_map_labels_extracted": 0,
+    "numbered_map_labels": [],
+    "numbered_comparison_exact_name_matches": 0,
+    "numbered_comparison": [
+      {
+        "ward_number": 1,
+        "official_sec_name": "FORT KOCHI",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 2,
+        "official_sec_name": "KALVATHY",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 3,
+        "official_sec_name": "EARAVELY",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 4,
+        "official_sec_name": "KARIPPALAM",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 5,
+        "official_sec_name": "CHERALAYI",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 6,
+        "official_sec_name": "MATTANCHERY",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 7,
+        "official_sec_name": "CHAKKAMADAM",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 8,
+        "official_sec_name": "KARUVELIPPADY",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 9,
+        "official_sec_name": "ISLAND NORTH",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 10,
+        "official_sec_name": "RAVIPURAM",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 11,
+        "official_sec_name": "ERNAKULAM SOUTH",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 12,
+        "official_sec_name": "GANDHI NAGAR",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 13,
+        "official_sec_name": "KATHRIKADAVU",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 14,
+        "official_sec_name": "ERNAKULAM CENTRAL",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 15,
+        "official_sec_name": "ERNAKULAM NORTH",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 16,
+        "official_sec_name": "KALOOR SOUTH",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 17,
+        "official_sec_name": "KALOOR-NORTH",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 18,
+        "official_sec_name": "THRIKKANARVATTOM",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 19,
+        "official_sec_name": "AYYAPPANKAVU",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 20,
+        "official_sec_name": "POTTAKUZHY",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 21,
+        "official_sec_name": "ELAMAKKARA SOUTH",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 22,
+        "official_sec_name": "PACHALAM",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 23,
+        "official_sec_name": "THATTAZHAM",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 24,
+        "official_sec_name": "VADUTHALA WEST",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 25,
+        "official_sec_name": "VADUTHALA EAST",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 26,
+        "official_sec_name": "ELAMAKKARA NORTH",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 27,
+        "official_sec_name": "PUTHUKKALAVATTAM",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 28,
+        "official_sec_name": "KUNNUMPURAM",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 29,
+        "official_sec_name": "PONEKKARA",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 30,
+        "official_sec_name": "EDAPPALLY",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 31,
+        "official_sec_name": "CHANGAMPUZHA",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 32,
+        "official_sec_name": "DHEVANKULANGARA",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 33,
+        "official_sec_name": "PALARIVATTAM",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 34,
+        "official_sec_name": "STADIUM",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 35,
+        "official_sec_name": "KARANAKKODAM",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 36,
+        "official_sec_name": "PUTHIYAROAD",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 37,
+        "official_sec_name": "PADIVATTAM",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 38,
+        "official_sec_name": "VENNALA",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 39,
+        "official_sec_name": "CHAKKARAPARAMBU",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 40,
+        "official_sec_name": "CHALIKKAVATTAM",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 41,
+        "official_sec_name": "THAMMANAM",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 42,
+        "official_sec_name": "ELAMKULAM",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 43,
+        "official_sec_name": "GIRINAGAR",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 44,
+        "official_sec_name": "PONNURUNNI",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 45,
+        "official_sec_name": "PONNURUNNI EAST",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 46,
+        "official_sec_name": "VYTTILA",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 47,
+        "official_sec_name": "POONITHURA",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 48,
+        "official_sec_name": "VYTTILA JANATHA",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 49,
+        "official_sec_name": "KADAVANTHRA",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 50,
+        "official_sec_name": "PANAMPILLI NAGAR",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 51,
+        "official_sec_name": "PERUMANOOR",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 52,
+        "official_sec_name": "KONTHURUTHY",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 53,
+        "official_sec_name": "THEVARA",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 54,
+        "official_sec_name": "ISLAND SOUTH",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 55,
+        "official_sec_name": "KADEBHAGAM",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 56,
+        "official_sec_name": "PALLURUTHY EAST",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 57,
+        "official_sec_name": "THAZHUPPU",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 58,
+        "official_sec_name": "EADAKOCHI NORTH",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 59,
+        "official_sec_name": "EDAKOCHI SOUTH",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 60,
+        "official_sec_name": "PERUMBADAPPU",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 61,
+        "official_sec_name": "KONAM",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 62,
+        "official_sec_name": "PALLURUTHY-KACHERIPADY",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 63,
+        "official_sec_name": "NAMBYAPURAM",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 64,
+        "official_sec_name": "PALLURUTHY",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 65,
+        "official_sec_name": "PULLARDESAM",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 66,
+        "official_sec_name": "THAREBHAGAM",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 67,
+        "official_sec_name": "THOPPUMPADY",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 68,
+        "official_sec_name": "MUNDAMVELY EAST",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 69,
+        "official_sec_name": "MUNDAMVELY",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 70,
+        "official_sec_name": "MANASSERY",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 71,
+        "official_sec_name": "MOOLAMKUZHY",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 72,
+        "official_sec_name": "CHULLICKAL",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 73,
+        "official_sec_name": "NASRATHU",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 74,
+        "official_sec_name": "PANAYAPPILLY",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 75,
+        "official_sec_name": "AMARAVATHY",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      },
+      {
+        "ward_number": 76,
+        "official_sec_name": "FORTKOCHI VELI",
+        "final_map_labels": [],
+        "exact_normalized_match": false
+      }
+    ],
     "page_text_preview": [
-      "59\n35\n13\n45\n36\n23\n9\n67\n6\n74\n65\n62\n63\n70\n40\n64\n73\n76\n8\n69\n68\n42\n75\n60\n4\n55\n18\n39\n20\n61\n58\n5\n19\n7\n66\n53\n54\n71\n22\n4114\n11\n16\n24\n26\n3\n72\n28\n44\n48\n56\n29\n30\n49\n27\n25\n21\n46\n57\n1\n38\n50\n12\n15\n2\n33\n37\n51\n52\n17\n43\n47\n32\n31\n34\n10\nKalamassery\nUdayamperur\nNjarakkal\nChellanam\nThiruvaniyoor\nNayarambalam\nEdathala\nCheranallur\nChottanikkara\nTripunithura\nMulamthuruthy\nAroor\nThrikkakara\nElamkunnapuzha\nMaradu\nKumbalangy\nVadavucode\nPuthen Cruz\nKunnathunad\nKumbalam\nMulavukad\nKadamakudy\nEloor\nKizhakkambalam\n10°9°55'\n10°9°55'\n76°20'76°15'\n76°20'76°15'\n0 2.5 5 7.5 101.25\nKilometers\nEsri, Garmin, NaturalVue\nEsri, Garmin, NaturalVue\nEsri, TomTom, Garmin, FAO, NOAA, USGS, Esri, GEBCO, Garmin, NaturalVue\nKerala\nDISTRICT NAME :ERRNAKULAM\nDelimitation Commission, Kerala\nCOCHIN\nCochin\nErrnakulam\nDate : 27-11-2025\n±\nWARD BOUNDARY\n1-FORT KOCHI\n2-KALVATHY\n3-EARAVELY\n4-KARIPPALAM\n5-CHERALAYI\n6-MATTANCHERY\n7-CHAKKAMADOM\n8-KAR"
+      "59\n35\n13\n45\n36\n23\n9\n67\n6\n74\n65\n62\n63\n70\n40\n64\n73\n76\n8\n69\n68\n42\n75\n60\n4\n55\n18\n39\n20\n61\n58\n5\n19\n7\n66\n53\n54\n71\n22\n4114\n11\n16\n24\n26\n3\n72\n28\n44\n48\n56\n29\n30\n49\n27\n25\n21\n46\n57\n1\n38\n50\n12\n15\n2\n33\n37\n51\n52\n17\n43\n47\n32\n31\n34\n10\nKalamassery\nUdayamperur\nNjarakkal\nChellanam\nThiruvaniyoor\nNayarambalam\nEdathala\nCheranallur\nChottanikkara\nTripunithura\nMulamthuruthy\nAroor\nThrikkakara\nElamkunnapuzha\nMaradu\nKumbalangy\nVadavucode\nPuthen Cruz\nKunnathunad\nKumbalam\nMulavukad\nKadamakudy\nEloor\nKizhakkambalam\n10°9°55'\n10°9°55'\n76°20'76°15'\n76°20'76°15'\n0 2.5 5 7.5 101.25\nKilometers\nEsri, Garmin, NaturalVue\nEsri, Garmin, NaturalVue\nEsri, TomTom, Garmin, FAO, NOAA, USGS, Esri, GEBCO, Garmin, NaturalVue\nKerala\nDISTRICT NAME :ERRNAKULAM\nDelimitation Commission, Kerala\nCOCHIN\nCochin\nErrnakulam\nDate : 27-11-2025\n±\nWARD BOUNDARY\n1-FORT KOCHI\n2-KALVATHY\n3-EARAVELY\n4-KARIPPALAM\n5-CHERALAYI\n6-MATTANCHERY\n7-CHAKKAMADOM\n8-KARUVELIPPADY\n9-ISLAND NORTH\n10-RAVIPURAM\n11-ERNAKULAM SOUTH\n12-GANDHI NAGAR\n13-KATHRIKADAVU\n14-ERNAKULAM CENTRAL\n15-ERNAKULAM NORTH\n16-KALOOR SOUTH\n17-KALOOR NORTH\n18-THRIKKANARVATTOM\n19-AYYAPPANKAVU\n20-POTTAKUZHY\n21-ELAMAKKARA SOUTH\n22-PACHALAM\n23-THATTAZHAM\n24-VADUTHALA WEST\n25-VADUTHALA EAST\n26-ELAMAKKARA NORTH\n27-PUTHUKKALAVATTAM\n28-KUNNUMPURAM\n29-PONEKKARA\n30-EDAPPALLY\n31-CHANGAMPPUZHA\n32-DEVANKULANGARA\n33-PALARIVATTAM\n34-STADIUM\n35-KARANAKKODAM\n36-PUTHIYA ROAD\n37-PADIVATTAM\n38-VENNALA\n39-CHAKKARAPARAMBU\n40-CHALIKKAVATTAM\n41-THAMMANAM\n42-ELAMKULAM\n43-GIRINAGAR\n44-PONNURUNNI\n45-PONNURUNNI EAST\n46-VYTTILA\n47-POONITHURA\n48-VYTTILA JANATHA\n49-KADAVANTHRA\n50-PANAMPILLI NAGAR\n51-PERUMANUR\n52-KONTHURUTHY\n53-THEVARA\n54-ISLAND SOUTH\n55-KADEBHAGAM\n56-PALLURUTHY EAST\n57-THAZHUPPU\n58-EDAKOCHI NORTH\n59-EDAKOCHI SOUTH\n60-PERUMBADAPPU\n61-KONAM\n62-PALLURUTHY-KACHERIPADY\n63-NAMBYAPURAM\n64-PALLLURUTHY\n65-PULLARDESAM\n66-THAREBHAGAM\n67-THOPPUMPADY\n68-MUNDAMVELI  EAST\n69-MUNDAMVELI\n70-MANASSERY\n71-MOOLAMKUZHI\n72-CHULLICKAL\n73-NAZARETH\n74-PANAYAPPILLY\n75-AMARAVATHY\n76-FORTKOCHI VELI\nLOCALBODY\nLOCALBODY"
     ],
     "status": "OFFICIAL_FINAL_MAP_PDF_REFERENCE_ONLY_NOT_GIS_GEOMETRY"
   },
