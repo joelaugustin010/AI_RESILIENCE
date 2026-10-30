@@ -13,6 +13,7 @@ from src.air_quality import (
     time_series_summary,
 )
 from src.air_quality_attribution import assess_industrial_sources
+from src.cpcb_aqi import calculate_ind_aqi
 from src.air_quality_monthly_reports import (
     MonthlyReportError,
     compare_monthly_report_values,
@@ -478,6 +479,65 @@ st.markdown(
     "See the official [CPCB AQI method](https://www.cpcb.nic.in/displaypdf.php?id=bmF0aW9uYWwtYWlyLXF1YWxpdHktaW5kZXgvSG93X0FRSV9DYWxjdWxhdGVkLnBkZg%3D%3D) "
     "and [CPCB AQI category table](https://airquality.cpcb.gov.in/ccr_docs/About_AQI.pdf)."
 )
+
+st.subheader("CPCB calculation eligibility — acquired daily report")
+st.caption(
+    "The calculation engine is connected to the acquired station records. It only calculates "
+    "an application AQI when each included pollutant has a valid quality flag, the prescribed "
+    "averaging period, at least 16 valid hours, and the station has at least three eligible "
+    "pollutants including PM2.5 or PM10."
+)
+if daily_aqi.empty:
+    st.info("No acquired daily report is available to assess for CPCB calculation eligibility.")
+else:
+    eligibility_rows = []
+    pollutant_fields = (
+        ("PM2.5", "PM2.5_value", "unit_PM2.5"),
+        ("PM10", "PM10_value", "unit_PM10"),
+        ("NO2", "NO2_value", "unit_NO2"),
+        ("SO2", "SO2_value", "unit_SO2"),
+        ("CO", "CO_value", "unit_CO"),
+        ("O3", "O3_value", "unit_O3"),
+        ("NH3", "NH3_value", "unit_NH3"),
+    )
+    for _, source_row in daily_aqi.iterrows():
+        records = []
+        for pollutant, value_column, unit_column in pollutant_fields:
+            value = source_row.get(value_column)
+            if pd.notna(value):
+                records.append(
+                    {
+                        "pollutant": pollutant,
+                        "concentration": value,
+                        "unit": source_row.get(unit_column),
+                        "averaging_period": source_row.get("averaging_period"),
+                        "valid_hours": None,
+                        "quality_flag": source_row.get("quality_flag"),
+                    }
+                )
+        readiness = calculate_ind_aqi(records)
+        eligibility_rows.append(
+            {
+                "Station": source_row.get("station"),
+                "Source-reported AQI": source_row.get("source_aqi"),
+                "Application AQI": readiness["aqi"],
+                "Calculation status": readiness["status"],
+                "Eligible pollutants": readiness["eligible_pollutant_count"],
+                "Reason": "; ".join(readiness["missing_requirements"])
+                if readiness["missing_requirements"]
+                else "Eligible for CPCB calculation",
+            }
+        )
+    st.dataframe(
+        pd.DataFrame(eligibility_rows),
+        hide_index=True,
+        use_container_width=True,
+    )
+    st.caption(
+        "No application-calculated AQI is produced for the current extract: its averaging "
+        "interval is unspecified, row-level quality is unassessed, and valid-hour counts are "
+        "not supplied. Source-reported AQI remains displayed separately and is not overwritten."
+    )
 
 st.subheader("Documented NAMP network reference")
 stations = pd.DataFrame(register["kspcb_namp_ernakulam_stations"])
