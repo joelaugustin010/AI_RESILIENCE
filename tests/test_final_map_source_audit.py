@@ -28,7 +28,7 @@ class FinalMapReferenceAuditTests(unittest.TestCase):
         self.assertEqual(len(entries), 1)
         entry = entries[0]
         self.assertEqual(entry["spatial_use"], "reference_only_not_geometry")
-        self.assertEqual(entry["evidence_status"], "reference_only")
+        self.assertEqual(entry["evidence_status"], "provisional")
         self.assertIn("NOT GIS GEOMETRY", entry["validation_status"])
         self.assertEqual(entry["source_sha256"], self.report["final_map_pdf_audit"]["sha256"])
 
