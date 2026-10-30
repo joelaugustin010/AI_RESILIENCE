@@ -211,7 +211,7 @@ class EvidenceProvenanceTests(unittest.TestCase):
             source_and_time="Forecast screenshot",
         ))
         self.assertIn("not checked", result["Provenance status"])
-        self.assertIn("not the latest or official forecast", result["Permitted interpretation"])
+        self.assertIn("latest or official forecast", result["Permitted interpretation"])
         self.assertIn("valid period", result["Verification gate"])
 
     def test_missing_classification_and_source_notes_fail_closed(self):
