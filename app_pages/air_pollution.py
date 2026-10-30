@@ -42,8 +42,6 @@ def read_csv(path: Path) -> pd.DataFrame:
 
 
 st.title("Air quality in Kochi")
-
-st.title("Air quality in Kochi")
 st.caption("Evidence-led air-quality monitoring for Kochi and Ernakulam. Historical reports are clearly distinguished from live measurements and model outputs.")
 
 try:
