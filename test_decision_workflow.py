@@ -5,6 +5,8 @@ from pathlib import Path
 
 import pandas as pd
 
+from src.scenario_screening import build_scenario_screening
+
 from src.decision_workflow import (
     HAZARD_OPTIONS,
     assessment_summary,
@@ -83,11 +85,35 @@ class ScenarioAndAssessmentTests(unittest.TestCase):
         self.assertIn("Hypothetical", scenarios.iloc[2]["Classification"])
         self.assertTrue(all(any(word in text.lower() for word in ("calculated", "unknown", "estimated")) for text in scenarios["Possible consequences to review"]))
 
-    def test_assessment_refuses_unsupported_probability(self):
+    def test_hypothetical_inputs_complete_a_qualitative_assessment_without_claiming_prediction(self):
         result = assessment_summary(valid_inputs())
-        self.assertIn("Insufficient evidence", result["status"])
+        self.assertIn("Qualitative scenario assessment completed", result["status"])
+        self.assertIn("numerical prediction not validated", result["status"])
+        self.assertIn("Hypothetical values are valid inputs", result["interpretation"])
         self.assertNotIn("%", result["interpretation"])
         self.assertIn("not used", result["additional_caution"])
+
+    def test_flood_hypothetical_values_produce_conditional_assessment(self):
+        result = build_scenario_screening(valid_inputs(
+            rainfall_mm=120,
+            rainfall_period="Last 24 hours",
+            drainage_status="Hypothetical partial failure",
+            river_level_m=3.2,
+            river_station="Example gauge",
+            river_reference="hypothetical datum",
+            affected_population=500,
+        ))
+        self.assertGreaterEqual(len(result), 4)
+        combined = " ".join(result["Conditional assessment"].tolist()).lower()
+        self.assertIn("surface-water accumulation", combined)
+        self.assertIn("not a verified exposed or affected population", combined)
+        self.assertIn("hypothetical assumption", " ".join(result["Evidence class"].str.lower().unique()))
+
+    def test_scenario_screen_does_not_claim_river_level_is_dangerous_without_threshold(self):
+        result = build_scenario_screening(valid_inputs(river_level_m=99.0))
+        river = result.loc[result["Scenario signal"].str.contains("River-level assumption")]
+        self.assertEqual(len(river), 1)
+        self.assertIn("cannot establish whether the river is dangerous", river.iloc[0]["Conditional assessment"])
 
     def test_mitigation_candidates_have_no_fabricated_cost_or_effectiveness(self):
         actions = mitigation_actions_for("Flood")
