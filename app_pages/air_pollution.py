@@ -87,7 +87,12 @@ def audit_daily_extract(data: pd.DataFrame) -> tuple[dict, pd.DataFrame]:
     aqi_raw = data["source_aqi"] if "source_aqi" in data.columns else pd.Series(pd.NA, index=data.index)
     missing_aqi_count = int(aqi_raw.isna().sum() + aqi_raw.astype("string").str.strip().eq("").sum())
     aqi_present = aqi_raw.notna() & aqi_raw.astype("string").str.strip().ne("")
-    invalid_aqi_count = int((aqi_present & (aqi_values.isna() | ~aqi_values.between(0, 500))).sum())
+    invalid_aqi_mask = (
+        aqi_values.isna()
+        | ~aqi_values.between(0, 500)
+        | aqi_values.mod(1).ne(0)
+    )
+    invalid_aqi_count = int((aqi_present & invalid_aqi_mask).sum())
 
     pollutant_specs = (
         ("PM2.5", "PM2.5_value", "unit_PM2.5", "ug/m3"),
@@ -463,7 +468,11 @@ if not eloor_daily_rows.empty and "source_aqi" in eloor_daily_rows.columns:
     raw_eloor_aqi = pd.to_numeric(
         pd.Series([eloor_daily_rows.iloc[0]["source_aqi"]]), errors="coerce"
     ).iloc[0]
-    if pd.notna(raw_eloor_aqi) and 0 <= int(raw_eloor_aqi) <= 500:
+    if (
+        pd.notna(raw_eloor_aqi)
+        and float(raw_eloor_aqi).is_integer()
+        and 0 <= float(raw_eloor_aqi) <= 500
+    ):
         eloor_category = cpcb_aqi_category(int(raw_eloor_aqi))[0]
         eloor_source_aqi = f"{int(raw_eloor_aqi)} · {eloor_category}"
 st.markdown("### Air quality at a glance")

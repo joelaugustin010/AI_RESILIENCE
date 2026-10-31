@@ -101,6 +101,8 @@ class AirQualityAcquisitionTests(unittest.TestCase):
         self.assertIn('register["sources"]', self.page)
         self.assertIn("Dated Eloor pollutant trends", self.page)
         self.assertIn("observation date range", self.page.lower())
+        self.assertIn("aqi_values.mod(1).ne(0)", self.page)
+        self.assertIn("float(raw_eloor_aqi).is_integer()", self.page)
 
     def test_page_separates_current_aqi_annual_summary_and_factory_assessment(self):
         self.assertIn("not live readings", self.page)
