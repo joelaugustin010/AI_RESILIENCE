@@ -9,12 +9,12 @@ REFERENCE = ROOT / "data" / "reference" / "ksdma_ernakulam_flood_return_period_s
 
 def test_flood_reference_is_scoped_to_ernakulam_district_and_source_traced():
     data = json.loads(REFERENCE.read_text(encoding="utf-8"))
-    assert "KSDMA" in data["publisher"]
+    assert "Kerala State Disaster Management Authority" in data["publisher"]
     assert data["source_url"].startswith("https://")
     assert data["geographic_coverage"] == "Ernakulam district aggregate, not Kochi Corporation or individual wards"
     assert len(data["historical_scenario"]) == 6
     assert len(data["rcp_8_5_scenario"]) == 6
-    assert any("not be assigned to Kochi Corporation" in item for item in data["limitations"])
+    assert any("cannot be assigned to Kochi Corporation" in item for item in data["limitations"])
 
 
 def test_flood_reference_periods_and_statistics_are_ordered_and_nonnegative():
