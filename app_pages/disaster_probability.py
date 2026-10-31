@@ -14,7 +14,6 @@ from src.evidence_fusion import SOURCE_REGISTRY, audit_multisource_evidence
 from src.flood_model import FEATURE_COLUMNS, audit_flood_dataset, load_flood_data
 
 
-st.set_page_config(page_title="Kochi Multi-Hazard Intelligence", layout="wide")
 
 HAZARDS = {
     "Flood & urban waterlogging": {
