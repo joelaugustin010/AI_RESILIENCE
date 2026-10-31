@@ -10,6 +10,7 @@ import streamlit as st
 ROOT = Path(__file__).resolve().parents[1]
 TRAINING_REPORT = ROOT / "reports" / "weather_hazard_training.json"
 ACQUISITION_REPORT = ROOT / "reports" / "hazard_data_acquisition_manifest.json"
+READINESS_REPORT = ROOT / "reports" / "hazard_dataset_readiness.json"
 
 
 def read_json(path: Path) -> dict:
@@ -107,18 +108,47 @@ if blocked:
     for hazard, reason in blocked.items():
         st.error(f"{hazard}: {reason}")
 
-st.subheader("Other hazard tracks")
-remaining = [
-    ("Earthquake", "Event catalogue acquired; suitable impact labels and exposure/shaking predictors are still needed."),
-    ("Cyclone", "North Indian Ocean track data acquired; a storm-held-out forecast dataset is still needed."),
-    ("Landslide", "Global event catalogue acquired; defensible background samples and spatial-bias checks are still needed."),
-    ("Drought", "India drought-monitor files acquired; definitions, structure and aligned predictors need validation."),
-    ("Wildfire", "Satellite access and defensible non-fire/background examples are still needed."),
-    ("Tsunami", "Historical event records cannot alone support short-term occurrence prediction; coastal impact modelling needs suitable data."),
-    ("Air pollution", "Validated CPCB/OpenAQ station time series and time-aligned predictors are still needed."),
-]
-for hazard, status in remaining:
-    st.markdown(f"**{hazard}:** {status}")
+st.subheader("Scientific data readiness by hazard")
+readiness = read_json(READINESS_REPORT)
+readiness_hazards = readiness.get("hazards", [])
+if not readiness_hazards:
+    st.warning(
+        "The local source-readiness audit is missing or unreadable. Re-run "
+        "`python scripts/audit_hazard_datasets.py` to regenerate it."
+    )
+else:
+    readiness_rows = []
+    for item in readiness_hazards:
+        raw_sources = item.get("raw_sources", [])
+        present_sources = [
+            source for source in raw_sources
+            if source.get("exists") and source.get("status") != "PRESENT_BUT_UNREADABLE"
+        ]
+        curated = item.get("curated_training_table", {})
+        readiness_rows.append({
+            "Hazard": item.get("label", item.get("hazard_id", "Unknown")),
+            "Raw source files": f"{len(present_sources)} / {len(raw_sources)}",
+            "Curated training table": curated.get("status", "Not audited"),
+            "Model readiness": item.get("model_status", "Not established"),
+        })
+    st.dataframe(pd.DataFrame(readiness_rows), hide_index=True, width="stretch")
+    for item in readiness_hazards:
+        with st.expander(f"{item.get('label', item.get('hazard_id', 'Hazard'))}: evidence and blockers"):
+            for source in item.get("raw_sources", []):
+                st.markdown(
+                    f"**{source.get('file', 'Source file')}** — "
+                    f"{source.get('status', 'Not audited')}"
+                )
+                if source.get("sha256"):
+                    st.caption(f"SHA-256: {source['sha256']}")
+                if source.get("error"):
+                    st.error(source["error"])
+            curated = item.get("curated_training_table", {})
+            st.markdown(f"**Training table:** {curated.get('status', 'Not audited')}")
+            for issue in curated.get("issues", []):
+                st.write(f"- {issue}")
+            st.write(f"**Scientific limitation:** {item.get('scientific_limitation', 'Not documented')}")
+    st.caption(readiness.get("warning", ""))
 
 with st.expander("Source acquisition manifest"):
     entries = acquisition.get("downloads", [])
