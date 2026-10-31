@@ -125,10 +125,12 @@ else:
             if source.get("exists") and source.get("status") != "PRESENT_BUT_UNREADABLE"
         ]
         curated = item.get("curated_training_table", {})
+        baseline = item.get("research_baseline") or {}
         readiness_rows.append({
             "Hazard": item.get("label", item.get("hazard_id", "Unknown")),
             "Raw source files": f"{len(present_sources)} / {len(raw_sources)}",
             "Curated training table": curated.get("status", "Not audited"),
+            "Research baseline": baseline.get("status", "None recorded"),
             "Model readiness": item.get("model_status", "Not established"),
         })
     st.dataframe(pd.DataFrame(readiness_rows), hide_index=True, width="stretch")
@@ -147,6 +149,19 @@ else:
             st.markdown(f"**Training table:** {curated.get('status', 'Not audited')}")
             for issue in curated.get("issues", []):
                 st.write(f"- {issue}")
+            baseline = item.get("research_baseline") or {}
+            if baseline:
+                st.info(f"Separate research baseline: {baseline.get('status', 'Status not recorded')}")
+                if baseline.get("test_target_dates_from"):
+                    st.caption(f"Historical test period begins: {baseline['test_target_dates_from']}")
+                if baseline.get("locations"):
+                    st.caption("Training/evaluation locations: " + ", ".join(baseline["locations"]))
+                if baseline.get("metrics"):
+                    st.dataframe(
+                        pd.DataFrame([baseline["metrics"]]),
+                        hide_index=True,
+                        width="stretch",
+                    )
             st.write(f"**Scientific limitation:** {item.get('scientific_limitation', 'Not documented')}")
     st.caption(readiness.get("warning", ""))
 
