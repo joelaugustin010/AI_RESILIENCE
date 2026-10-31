@@ -69,7 +69,8 @@ def audit_daily_extract(data: pd.DataFrame) -> tuple[dict, pd.DataFrame]:
         & duplicate_keys.duplicated(keep="first")
     )
     raw_dates = data["observed_at"] if "observed_at" in data.columns else pd.Series(pd.NA, index=data.index)
-    invalid_date_count = int((raw_dates.notna() & parsed_dates.isna()).sum())
+    missing_date_count = int(raw_dates.isna().sum() + raw_dates.astype("string").str.strip().eq("").sum())
+    invalid_date_count = int((raw_dates.notna() & raw_dates.astype("string").str.strip().ne("") & parsed_dates.isna()).sum())
     missing_station_count = int(station_values.isna().sum() + station_values.eq("").sum())
 
     aqi_values = (
@@ -77,7 +78,9 @@ def audit_daily_extract(data: pd.DataFrame) -> tuple[dict, pd.DataFrame]:
         if "source_aqi" in data.columns
         else pd.Series(float("nan"), index=data.index)
     )
-    aqi_present = data["source_aqi"].notna() if "source_aqi" in data.columns else pd.Series(False, index=data.index)
+    aqi_raw = data["source_aqi"] if "source_aqi" in data.columns else pd.Series(pd.NA, index=data.index)
+    missing_aqi_count = int(aqi_raw.isna().sum() + aqi_raw.astype("string").str.strip().eq("").sum())
+    aqi_present = aqi_raw.notna() & aqi_raw.astype("string").str.strip().ne("")
     invalid_aqi_count = int((aqi_present & (aqi_values.isna() | ~aqi_values.between(0, 500))).sum())
 
     pollutant_specs = (
@@ -140,10 +143,12 @@ def audit_daily_extract(data: pd.DataFrame) -> tuple[dict, pd.DataFrame]:
     )
     summary = {
         "rows": len(data),
-        "stations": int(station_values.loc[station_values.ne("")].nunique()),
+        "stations": int(station_values.dropna().loc[lambda values: values.ne("")].nunique()),
         "duplicate_rows": int(duplicate_mask.sum()),
+        "missing_dates": missing_date_count,
         "invalid_dates": invalid_date_count,
         "missing_stations": missing_station_count,
+        "missing_aqi": missing_aqi_count,
         "invalid_aqi": invalid_aqi_count,
         "unassessed_rows": int(quality_flags.eq("unassessed").sum()),
         "missing_qa_rows": int(quality_flags.isna().sum() + quality_flags.eq("").sum()),
@@ -551,6 +556,46 @@ else:
         "station identifiers, or coordinates. Pollutant driver is not calculated. Source: "
         "[KSPCB Water and Air Quality Directory](https://kspcb.kerala.gov.in/water-and-air-quality-directory)."
     )
+    st.markdown("**Daily extract data-quality audit**")
+    audit_summary, pollutant_audit = audit_daily_extract(daily_aqi)
+    audit_metrics = st.columns(5)
+    audit_metrics[0].metric("Extract rows", audit_summary.get("rows", 0))
+    audit_metrics[1].metric("Duplicate station-date rows", audit_summary.get("duplicate_rows", 0))
+    audit_metrics[2].metric(
+        "Missing / invalid dates",
+        audit_summary.get("missing_dates", 0) + audit_summary.get("invalid_dates", 0),
+    )
+    audit_metrics[3].metric(
+        "Missing / invalid AQI",
+        audit_summary.get("missing_aqi", 0) + audit_summary.get("invalid_aqi", 0),
+    )
+    audit_metrics[4].metric("Rows marked QA unassessed", audit_summary.get("unassessed_rows", 0))
+    if not pollutant_audit.empty:
+        display_dataframe(
+            pollutant_audit,
+            hide_index=True,
+            use_container_width=True,
+            alt="Missing, non-numeric, negative and unit-mismatch counts in the daily pollutant extract",
+        )
+    st.caption(
+        "This is a structural audit of the preserved CSV, not independent certification of "
+        "the KSPCB measurements. Missing means no value is present; non-numeric means a "
+        "non-empty value could not be parsed. Duplicate counts represent extra rows sharing "
+        "the same station and report date. Source QA marked unassessed remains unassessed."
+    )
+    if (
+        audit_summary.get("duplicate_rows", 0)
+        or audit_summary.get("missing_dates", 0)
+        or audit_summary.get("invalid_dates", 0)
+        or audit_summary.get("missing_aqi", 0)
+        or audit_summary.get("invalid_aqi", 0)
+        or audit_summary.get("missing_stations", 0)
+    ):
+        st.warning(
+            "The daily extract has structural issues that should be reviewed before "
+            "using it in comparisons or calculations."
+        )
+
     if not daily_status.empty:
         # Summarise only the station records present in these two dated extracts.
         # A missing AQI is a reporting-availability issue, not evidence of clean air.
@@ -593,37 +638,6 @@ else:
                 status_columns = st.columns(min(3, len(status_summary)))
                 for column, (status_label, count) in zip(status_columns, status_summary.items()):
                     column.metric(str(status_label).title(), int(count))
-
-        st.markdown("**Daily extract data-quality audit**")
-        audit_summary, pollutant_audit = audit_daily_extract(daily_aqi)
-        audit_metrics = st.columns(5)
-        audit_metrics[0].metric("Extract rows", audit_summary.get("rows", 0))
-        audit_metrics[1].metric("Duplicate station-date rows", audit_summary.get("duplicate_rows", 0))
-        audit_metrics[2].metric("Invalid dates", audit_summary.get("invalid_dates", 0))
-        audit_metrics[3].metric("Invalid AQI values", audit_summary.get("invalid_aqi", 0))
-        audit_metrics[4].metric("Rows marked QA unassessed", audit_summary.get("unassessed_rows", 0))
-        display_dataframe(
-            pollutant_audit,
-            hide_index=True,
-            use_container_width=True,
-            alt="Missing, non-numeric, negative and unit-mismatch counts in the daily pollutant extract",
-        )
-        st.caption(
-            "This is a structural audit of the preserved CSV, not independent certification of "
-            "the KSPCB measurements. Missing means no value is present; non-numeric means a "
-            "non-empty value could not be parsed. Duplicate counts represent extra rows sharing "
-            "the same station and report date. Source QA marked unassessed remains unassessed."
-        )
-        if (
-            audit_summary.get("duplicate_rows", 0)
-            or audit_summary.get("invalid_dates", 0)
-            or audit_summary.get("invalid_aqi", 0)
-            or audit_summary.get("missing_stations", 0)
-        ):
-            st.warning(
-                "The daily extract has structural issues that should be reviewed before "
-                "using it in comparisons or calculations."
-            )
 
         st.write("Stations without a reported AQI in this report:")
         display_dataframe(
