@@ -777,6 +777,22 @@ else:
         station_inventory = sorted(verified_monthly["station"].dropna().unique().tolist())
         station = st.selectbox("Monitoring station", station_inventory, key="report_station")
         station_data = verified_monthly.loc[verified_monthly["station"].eq(station)]
+        qa_counts = (
+            station_data["quality_flag"].astype("string").str.strip().str.casefold()
+            .value_counts()
+        )
+        st.markdown("**Source QA status for the selected station**")
+        qa_columns = st.columns(4)
+        for column, flag, label in zip(
+            qa_columns,
+            ("valid", "unassessed", "suspect", "invalid"),
+            ("QA-valid rows", "Unassessed rows", "Suspect rows", "Invalid rows"),
+        ):
+            column.metric(label, int(qa_counts.get(flag, 0)))
+        st.caption(
+            "Schema validation confirms that records can be parsed for descriptive review; "
+            "it does not turn source-unassessed records into QA-valid measurements."
+        )
         pollutants = sorted(station_data["pollutant"].unique().tolist())
         pollutant = st.selectbox("Pollutant", pollutants, key="report_pollutant")
         dates = pd.to_datetime(station_data["observed_at"])
@@ -793,8 +809,18 @@ else:
         else:
             selected_start = selected_end = selected_range
 
+        trend_basis = st.radio(
+            "Trend inclusion",
+            (
+                "All eligible source rows (includes unassessed)",
+                "Only source QA-valid rows",
+            ),
+            horizontal=True,
+            key="air_trend_qa_basis",
+        )
+        include_unassessed = trend_basis.startswith("All eligible")
         series = time_series_summary(
-            station_data, pollutant, include_unassessed=True
+            station_data, pollutant, include_unassessed=include_unassessed
         )
         series_dates = pd.to_datetime(series["observed_at"]).dt.date
         series = series.loc[(series_dates >= selected_start) & (series_dates <= selected_end)]
@@ -807,6 +833,17 @@ else:
                 y_label=f"{pollutant} ({unit})",
                 alt=f"Historical daily KSPCB-reported {pollutant} values at Eloor from August through September 2026",
             )
+            if include_unassessed:
+                st.caption(
+                    "Trend includes source rows marked valid or unassessed. Unassessed values "
+                    "remain visibly unassessed in the QA summary above and must not be treated "
+                    "as certified measurements."
+                )
+            else:
+                st.caption(
+                    "Trend includes only rows explicitly marked QA-valid by the source. "
+                    "This filter does not independently certify the monitoring programme."
+                )
 
         if not monthly_aqi.empty:
             st.markdown("**Historical source-reported Eloor AQI trend**")
