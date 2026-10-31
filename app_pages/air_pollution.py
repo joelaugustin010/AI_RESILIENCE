@@ -604,7 +604,7 @@ else:
                     & selected_weather["wind_speed"].gt(20)
                 )
 
-                weather_metrics = st.columns(3)
+                weather_metrics = st.columns(5)
                 weather_metrics[0].metric(
                     "Dated weather records", len(selected_weather)
                 )
@@ -612,15 +612,24 @@ else:
                     "Humidity outside 0–100%", int(humidity_invalid.sum())
                 )
                 weather_metrics[2].metric(
+                    "Invalid wind direction", int(direction_invalid.sum())
+                )
+                weather_metrics[3].metric(
+                    "Negative wind speed", int(negative_wind.sum())
+                )
+                weather_metrics[4].metric(
                     "Wind speed >20 m/s · review", int(high_wind_review.sum())
                 )
 
                 temperature_series = selected_weather.dropna(
                     subset=["temperature"]
                 ).set_index("observed_at")["temperature"]
-                wind_series = selected_weather.dropna(
-                    subset=["wind_speed"]
-                ).set_index("observed_at")["wind_speed"]
+                # Negative wind speed is physically invalid and is excluded from
+                # the chart; unusually high positive speeds remain visible for review.
+                wind_series = selected_weather.loc[
+                    selected_weather["wind_speed"].notna()
+                    & selected_weather["wind_speed"].ge(0)
+                ].set_index("observed_at")["wind_speed"]
                 humidity_series = selected_weather.loc[
                     ~humidity_invalid & selected_weather["relative_humidity"].notna()
                 ].set_index("observed_at")["relative_humidity"]
@@ -689,8 +698,9 @@ else:
                     st.success("No values triggered the displayed weather review checks.")
 
                 st.caption(
-                    "Humidity outside 0–100% is excluded from its chart. Wind speeds above 20 m/s "
-                    "are flagged for source review only and remain visible in the wind chart; this "
+                    "Humidity outside 0–100% and negative wind speeds are excluded from their "
+                    "charts. Wind speeds above 20 m/s are flagged for source review only and remain "
+                    "visible in the wind chart; this "
                     "app threshold is not a KSPCB quality flag. The source does not state exact "
                     "averaging windows or station coordinates. Daily same-date summaries cannot "
                     "establish subdaily wind alignment, atmospheric dispersion, or an industrial "
