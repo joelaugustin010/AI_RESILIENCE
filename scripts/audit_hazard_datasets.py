@@ -163,6 +163,21 @@ def build_report(root: Path = ROOT, data_dir: Path | None = None) -> dict[str, A
     curated_dir = Path(data_dir) if data_dir is not None else root / "data" / "external" / "hazards"
     if not curated_dir.is_absolute():
         curated_dir = root / curated_dir
+    training_path = root / "reports" / "weather_hazard_training.json"
+    try:
+        training_report = json.loads(training_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        training_report = {}
+    baseline_map = {
+        "high_temperature": "heatwave",
+        "extreme_rainfall": "severe_storm",
+    }
+    research_baselines = {
+        baseline_map.get(model.get("hazard"), model.get("hazard", "unknown")): model
+        for model in training_report.get("models", [])
+        if isinstance(model, dict)
+    }
+
     hazards = []
     for item in registry["hazards"]:
         hazard_id = item["id"]
@@ -180,6 +195,13 @@ def build_report(root: Path = ROOT, data_dir: Path | None = None) -> dict[str, A
                 "issues": ["No curated, explicitly labelled training table exists at this path."],
             }
         )
+        baseline = research_baselines.get(hazard_id)
+        if baseline:
+            model_status = "RESEARCH_BASELINE_EXISTS_NOT_VALIDATED"
+        elif curated["status"] == "CANDIDATE_READY_FOR_REVIEW":
+            model_status = "CURATED_TABLE_CANDIDATE_REQUIRES_INDEPENDENT_REVIEW"
+        else:
+            model_status = "NO_CURATED_TRAINING_TABLE"
         hazards.append({
             "hazard_id": hazard_id,
             "label": item["label"],
@@ -188,7 +210,14 @@ def build_report(root: Path = ROOT, data_dir: Path | None = None) -> dict[str, A
             "raw_sources": sources,
             "raw_source_count": sum(source["exists"] and source["status"] != "PRESENT_BUT_UNREADABLE" for source in sources),
             "curated_training_table": curated,
-            "model_status": "NOT_READY" if curated["status"] != "CANDIDATE_READY_FOR_REVIEW" else "REQUIRES_INDEPENDENT_REVIEW",
+            "research_baseline": {
+                "status": baseline.get("status", "Status not recorded"),
+                "hazard": baseline.get("hazard"),
+                "metrics": baseline.get("metrics", {}),
+                "test_target_dates_from": baseline.get("test_target_dates_from"),
+                "locations": baseline.get("locations", []),
+            } if baseline else None,
+            "model_status": model_status,
             "scientific_limitation": item.get("limitation", "Target and evaluation design require review."),
         })
     present = sum(hazard["raw_source_count"] > 0 for hazard in hazards)
@@ -197,10 +226,10 @@ def build_report(root: Path = ROOT, data_dir: Path | None = None) -> dict[str, A
         "generated_at_utc": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat(),
         "raw_sources_available_for_hazards": present,
         "hazard_tracks": len(hazards),
-        "trained_models_claimed_by_this_report": 0,
+        "research_baselines_found_in_separate_report": len(research_baselines),
         "warning": (
-            "Raw data availability, a candidate training table, a trained research baseline, and a validated "
-            "local prediction model are separate states. This report does not certify a scientific forecast."
+            "Raw data availability, a curated training table, a research baseline, and a validated local "
+            "prediction model are separate states. Research baselines referenced here are not certified forecasts."
         ),
         "hazards": hazards,
     }
@@ -219,7 +248,7 @@ def main() -> int:
         "output": str(output),
         "hazard_tracks": report["hazard_tracks"],
         "raw_sources_available_for_hazards": report["raw_sources_available_for_hazards"],
-        "trained_models_claimed_by_this_report": 0,
+        "research_baselines_found_in_separate_report": report["research_baselines_found_in_separate_report"],
     }, indent=2))
     return 0
 
