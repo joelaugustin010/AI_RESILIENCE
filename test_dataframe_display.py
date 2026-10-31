@@ -4,6 +4,7 @@ import pandas as pd
 import pyarrow as pa
 
 from src.dataframe_display import normalize_mixed_columns_for_display
+from src.hazard_manifest import build_hazard_manifest_frame
 
 
 class MixedColumnDisplayTests(unittest.TestCase):
@@ -21,15 +22,30 @@ class MixedColumnDisplayTests(unittest.TestCase):
         self.assertEqual(source["Rows"].tolist(), [7, ""])
 
     def test_valid_integers_and_missing_values_remain_integer_and_null(self):
-        source = pd.DataFrame(
-            {"Rows": pd.Series([4, None, pd.NA, float("nan")], dtype=object)}
-        )
+        source = pd.DataFrame({"Rows": pd.Series([4, None], dtype=object)})
 
         display = normalize_mixed_columns_for_display(source)
         table = pa.Table.from_pandas(display)
 
         self.assertEqual(str(display["Rows"].dtype), "Int64")
-        self.assertEqual(table.column("Rows").to_pylist(), [4, None, None, None])
+        self.assertEqual(table.column("Rows").to_pylist(), [4, None])
+
+    def test_nan_is_preserved_as_a_nullable_missing_value(self):
+        source = pd.DataFrame({"Rows": pd.Series([4, float("nan")], dtype=object)})
+
+        display = normalize_mixed_columns_for_display(source)
+        table = pa.Table.from_pandas(display)
+
+        self.assertEqual(str(display["Rows"].dtype), "Int64")
+        self.assertEqual(table.column("Rows").to_pylist(), [4, None])
+
+    def test_whitespace_only_blank_is_a_missing_numeric_value(self):
+        source = pd.DataFrame({"Rows": [4, "  "]})
+
+        display = normalize_mixed_columns_for_display(source)
+        table = pa.Table.from_pandas(display)
+
+        self.assertEqual(table.column("Rows").to_pylist(), [4, None])
 
     def test_fractional_numeric_values_keep_numeric_type_and_blank_as_missing(self):
         source = pd.DataFrame({"Rows": [1.5, 2, ""]})
@@ -58,6 +74,29 @@ class MixedColumnDisplayTests(unittest.TestCase):
 
         self.assertEqual(display["Ward_Name"].tolist(), ["Ward 1", ""])
         self.assertEqual(table.column("Ward_Name").to_pylist(), ["Ward 1", ""])
+
+    def test_hazard_manifest_frame_serializes_integer_rows_and_missing_rows(self):
+        entries = [
+            {
+                "file": "observations.csv",
+                "status": "downloaded",
+                "data_rows": 47,
+                "bytes": 1024,
+            },
+            {
+                "file": "skipped.csv",
+                "status": "skipped",
+                "data_rows": None,
+                "bytes": None,
+            },
+        ]
+
+        frame = build_hazard_manifest_frame(entries)
+        table = pa.Table.from_pandas(frame)
+
+        self.assertEqual(table.column("Rows").to_pylist(), [47, None])
+        self.assertEqual(table.column("Bytes").to_pylist(), [1024, None])
+        self.assertEqual(entries[1]["data_rows"], None)
 
 
 if __name__ == "__main__":

@@ -7,6 +7,8 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
+from src.hazard_manifest import build_hazard_manifest_frame
+
 ROOT = Path(__file__).resolve().parents[1]
 TRAINING_REPORT = ROOT / "reports" / "weather_hazard_training.json"
 ACQUISITION_REPORT = ROOT / "reports" / "hazard_data_acquisition_manifest.json"
@@ -185,26 +187,8 @@ else:
 with st.expander("Source acquisition manifest"):
     entries = acquisition.get("downloads", [])
     if entries:
-        rows = []
-        for item in entries:
-            # Normalize every manifest cell before pandas infers column types.
-            # In particular, data_rows/bytes can be integers for downloaded
-            # files and absent for failed/skipped downloads. Mixing those
-            # integers with empty strings can break Streamlit's Arrow export.
-            rows.append({
-                "File": str(item.get("file") or ""),
-                "Status": str(item.get("status") or "Not recorded"),
-                "Rows": "" if item.get("data_rows") is None else str(item["data_rows"]),
-                "Bytes": "" if item.get("bytes") is None else str(item["bytes"]),
-                "Retrieved": str(item.get("retrieved_at") or ""),
-                "SHA-256": str(item.get("sha256") or ""),
-            })
-        manifest_frame = pd.DataFrame(
-            rows,
-            columns=["File", "Status", "Rows", "Bytes", "Retrieved", "SHA-256"],
-        ).astype("string")
         st.dataframe(
-            manifest_frame,
+            build_hazard_manifest_frame(entries),
             hide_index=True,
             width="stretch",
         )
