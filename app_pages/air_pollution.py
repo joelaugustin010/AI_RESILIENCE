@@ -11,6 +11,7 @@ import streamlit as st
 from src.dataframe_display import display_dataframe
 
 from src.air_quality import (
+    AirQualityDataError,
     CPCB_AQI_CATEGORIES,
     cpcb_aqi_category,
     safe_cpcb_aqi_category,
@@ -819,14 +820,27 @@ else:
             key="air_trend_qa_basis",
         )
         include_unassessed = trend_basis.startswith("All eligible")
-        series = time_series_summary(
-            station_data, pollutant, include_unassessed=include_unassessed
-        )
-        series_dates = pd.to_datetime(series["observed_at"]).dt.date
-        series = series.loc[(series_dates >= selected_start) & (series_dates <= selected_end)]
-        unit = station_data.loc[station_data["pollutant"].eq(pollutant), "unit"].iloc[0]
+        series_error = None
+        try:
+            series = time_series_summary(
+                station_data, pollutant, include_unassessed=include_unassessed
+            )
+        except AirQualityDataError as error:
+            series = pd.DataFrame()
+            series_error = str(error)
+        if not series.empty:
+            series_dates = pd.to_datetime(series["observed_at"]).dt.date
+            series = series.loc[
+                (series_dates >= selected_start) & (series_dates <= selected_end)
+            ]
+        unit = station_data.loc[
+            station_data["pollutant"].eq(pollutant), "unit"
+        ].iloc[0]
         if series.empty:
-            st.info("No source-reported values are available for the selected pollutant and dates.")
+            st.info(
+                series_error
+                or "No source-reported values are available for the selected pollutant and dates."
+            )
         else:
             st.line_chart(
                 series.set_index("observed_at")["mean_value"],
