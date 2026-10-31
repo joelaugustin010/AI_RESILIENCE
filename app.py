@@ -1,4 +1,4 @@
-"""AI RESILIENCE prototype entry point and shared navigation."""
+""""AI RESILIENCE prototype entry point and shared navigation."""
 
 from pathlib import Path
 
@@ -110,8 +110,8 @@ pages = {
         ),
         st.Page(
             "app_pages/disaster_probability.py",
-            title="Flood Model Readiness",
-            icon=":material/fact_check:",
+            title="Disaster Probability",
+            icon=":material/analytics:",
         ),
     ],
     "Plan": [
@@ -143,3 +143,4 @@ st.info(
 )
 
 page.run()
+"
