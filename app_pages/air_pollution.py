@@ -1372,12 +1372,73 @@ st.markdown(
 
 st.markdown('<div id="sources"></div>', unsafe_allow_html=True)
 st.subheader("Sources, retrieval metadata and limitations")
+
+source_review_rows = []
 for source in register["sources"]:
-    st.markdown(f"- [{source['publisher']}]({source['url']}) — {source['status']}")
+    reviewed_value = source.get("reviewed_on")
+    try:
+        reviewed_date = date.fromisoformat(str(reviewed_value))
+        review_age_days = (date.today() - reviewed_date).days
+        review_date_check = (
+            "Future date — check register" if review_age_days < 0 else "Valid date"
+        )
+    except (TypeError, ValueError):
+        reviewed_date = None
+        review_age_days = None
+        review_date_check = "Missing or invalid date"
+
+    source_review_rows.append(
+        {
+            "Publisher": source.get("publisher", "Publisher not recorded"),
+            "Evidence status": source.get("evidence_status", "Not classified"),
+            "Source status": source.get("status", "Status not recorded"),
+            "Reviewed on": reviewed_value or "Not recorded",
+            "Days since review": review_age_days if review_age_days is not None else "—",
+            "Date check": review_date_check,
+        }
+    )
+
+source_review_table = pd.DataFrame(source_review_rows)
+if not source_review_table.empty:
+    display_dataframe(
+        source_review_table,
+        hide_index=True,
+        use_container_width=True,
+        alt="Source register review dates and evidence status",
+    )
+    invalid_review_dates = int(
+        source_review_table["Date check"].ne("Valid date").sum()
+    )
+    st.caption(
+        f"{len(source_review_table)} source records are listed in the register. "
+        "Review age is calculated from each record's reviewed_on date; it is not "
+        "the publication date or the age of the underlying observation."
+    )
+    if invalid_review_dates:
+        st.warning(
+            f"{invalid_review_dates} source record(s) have a missing, invalid or future "
+            "review date. Check the source register before relying on their review metadata."
+        )
+
+for source in register["sources"]:
+    publisher = source.get("publisher", "Publisher not recorded")
+    source_url = str(source.get("url") or "").strip()
+    if source_url.startswith("https://"):
+        st.markdown(
+            f"- [{publisher}]({source_url}) — {source.get('status', 'Status not recorded')}"
+        )
+    else:
+        st.warning(
+            f"{publisher}: no valid HTTPS source link is recorded; verify the register entry."
+        )
+
 with st.expander("Evidence and reuse notes"):
     for source in register["sources"]:
-        st.markdown(f"**{source['publisher']}**")
-        st.write(source["evidence"])
-        st.caption(f"Coverage: {source['geographic_coverage']}")
-        st.caption(f"Limitations/blocker: {source['blocker']}")
-        st.caption(f"Reuse: {source['reuse_status']} | Reviewed: {source['reviewed_on']}")
+        st.markdown(f"**{source.get('publisher', 'Publisher not recorded')}**")
+        st.write(source.get("evidence", "No evidence description recorded."))
+        st.caption(f"Coverage: {source.get('geographic_coverage', 'Not recorded')}")
+        st.caption(f"Limitations/blocker: {source.get('blocker', 'Not recorded')}")
+        st.caption(
+            f"Reuse: {source.get('reuse_status', 'Not recorded')} | "
+            f"Reviewed: {source.get('reviewed_on', 'Not recorded')}"
+        )
