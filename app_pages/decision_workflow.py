@@ -496,13 +496,8 @@ if submitted:
 
 inputs = st.session_state.get("decision_workflow_inputs")
 if inputs is None:
-    st.header("2. Evidence available to review")
-    st.dataframe(
-        evidence_inventory(ROOT, st.session_state.get("rainfall_backtest_result")),
-        hide_index=True,
-        width="stretch",
-    )
-    st.info("Submit the form to continue. Missing GIS layers do not block a qualitative assessment; missing evidence does block a reliable numerical prediction.")
+    # Keep the page focused on the scenario form until the user submits it.
+    # The evidence inventory is shown in the results section after submission.
     st.stop()
 
 st.header("2. Immediate scenario result")
