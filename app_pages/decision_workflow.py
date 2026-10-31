@@ -14,6 +14,7 @@ from src.consequence_data_requirements import HAZARD_REQUIREMENTS, requirements_
 from src.consequence_assessment import build_consequence_assessment
 from src.scenario_input_quality import evaluate_scenario_readiness
 from src.scenario_screening import build_scenario_screening
+from src.scenario_output_model import HAZARDS as PREDICTABLE_HAZARDS, predict_scenario_outcome
 
 from src.decision_workflow import (
     HAZARD_OPTIONS,
@@ -487,6 +488,24 @@ st.caption(
     "where an official threshold applies, the corresponding screening category. It is not a calibrated flood probability, " 
     "flood-depth estimate, affected-area map, or official warning."
 )
+prediction = predict_scenario_outcome(inputs)
+st.subheader("Conditional scenario output")
+st.metric("Scenario concern", prediction["concern_level"])
+st.markdown("**Potential outcome**")
+st.write(prediction["conditional_outcome"])
+st.caption(f"Output engine: {prediction['model_type']}. Numerical probability: not available. This is not a trained ML forecast or official warning.")
+with st.expander("Why the model produced this output", expanded=True):
+    st.markdown("**Evidence used**")
+    for item in prediction["evidence_used"]:
+        st.markdown(f"- {item}")
+    st.markdown("**Recommended verification / next checks**")
+    for item in prediction["recommended_checks"]:
+        st.markdown(f"- {item}")
+    st.markdown("**Basis and limitations**")
+    st.write(prediction["basis"])
+    for item in prediction["limitations"]:
+        st.caption(f"• {item}")
+
 scenario_screen = build_scenario_screening(inputs)
 st.dataframe(scenario_screen, hide_index=True, width="stretch")
 
