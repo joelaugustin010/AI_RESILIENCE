@@ -1,8 +1,10 @@
 
 """Kochi Multi-Hazard Intelligence Dashboard."""
 
-import streamlit as st
 import pandas as pd
+import streamlit as st
+
+from src.dataframe_display import display_dataframe
 
 from src.evidence_fusion import (
     SOURCE_REGISTRY,
@@ -422,7 +424,7 @@ with tabs[4]:
             }
         )
 
-    st.dataframe(
+    display_dataframe(
         pd.DataFrame(rows),
         hide_index=True,
         width="stretch",

@@ -5,6 +5,8 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
+from src.dataframe_display import display_dataframe
+
 from src.ingestion_audit import DATA_STATUS_DEFINITIONS, build_ingestion_report
 
 
@@ -49,7 +51,7 @@ source_rows = [
     for item in report["recovered_sources"]
 ]
 if source_rows:
-    st.dataframe(
+    display_dataframe(
         pd.DataFrame(source_rows).astype("string"),
         hide_index=True,
         width="stretch",
@@ -89,7 +91,7 @@ spatial_rows = [
     for item in report["spatial_catalog"]
 ]
 if spatial_rows:
-    st.dataframe(
+    display_dataframe(
         pd.DataFrame(spatial_rows).astype("string"),
         hide_index=True,
         width="stretch",
@@ -131,7 +133,7 @@ try:
         }
         for row in flood_rows
     ])
-    st.dataframe(flood_frame, hide_index=True, width="stretch")
+    display_dataframe(flood_frame, hide_index=True, width="stretch")
     st.caption(
         f"Publisher: {flood_reference['publisher']} · Published: {flood_reference['publication_date']} · "
         f"Coverage: {flood_reference['geographic_coverage']}."

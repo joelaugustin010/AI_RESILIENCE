@@ -7,6 +7,8 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
+from src.dataframe_display import display_dataframe
+
 from src.hazard_manifest import build_hazard_manifest_frame
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -78,7 +80,7 @@ else:
             selection_results = model.get("model_selection_results", [])
             if selection_results:
                 st.write("**Validation-only estimator comparison**")
-                st.dataframe(pd.DataFrame(selection_results), hide_index=True, width="stretch")
+                display_dataframe(pd.DataFrame(selection_results), hide_index=True, width="stretch")
             metrics = model.get("metrics", {})
             metric_rows = [
                 {"Metric": "Accuracy", "Value": metrics.get("accuracy")},
@@ -95,7 +97,7 @@ else:
                 {"Metric": "Persistence baseline balanced accuracy", "Value": metrics.get("persistence_baseline_balanced_accuracy")},
                 {"Metric": "Persistence baseline F1", "Value": metrics.get("persistence_baseline_f1")},
             ]
-            st.dataframe(pd.DataFrame(metric_rows), hide_index=True, width="stretch")
+            display_dataframe(pd.DataFrame(metric_rows), hide_index=True, width="stretch")
             if metrics.get("confusion_matrix_tn_fp_fn_tp") is not None:
                 tn, fp, fn, tp = metrics["confusion_matrix_tn_fp_fn_tp"]
                 st.caption(
@@ -118,7 +120,7 @@ else:
                 validation_scores = model.get("validation_threshold_scores", [])
                 if validation_scores:
                     st.write("**Validation-only threshold comparison**")
-                    st.dataframe(pd.DataFrame(validation_scores), hide_index=True, width="stretch")
+                    display_dataframe(pd.DataFrame(validation_scores), hide_index=True, width="stretch")
             for limitation in model.get("limitations", []):
                 st.write(f"- {limitation}")
 
@@ -152,7 +154,7 @@ else:
             "Research baseline": baseline.get("status", "None recorded"),
             "Model readiness": item.get("model_status", "Not established"),
         })
-    st.dataframe(pd.DataFrame(readiness_rows), hide_index=True, width="stretch")
+    display_dataframe(pd.DataFrame(readiness_rows), hide_index=True, width="stretch")
     for item in readiness_hazards:
         with st.expander(f"{item.get('label', item.get('hazard_id', 'Hazard'))}: evidence and blockers"):
             for source in item.get("raw_sources", []):
@@ -176,7 +178,7 @@ else:
                 if baseline.get("locations"):
                     st.caption("Training/evaluation locations: " + ", ".join(baseline["locations"]))
                 if baseline.get("metrics"):
-                    st.dataframe(
+                    display_dataframe(
                         pd.DataFrame([baseline["metrics"]]),
                         hide_index=True,
                         width="stretch",
@@ -187,7 +189,7 @@ else:
 with st.expander("Source acquisition manifest"):
     entries = acquisition.get("downloads", [])
     if entries:
-        st.dataframe(
+        display_dataframe(
             build_hazard_manifest_frame(entries),
             hide_index=True,
             width="stretch",

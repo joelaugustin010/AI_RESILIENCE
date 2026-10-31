@@ -92,6 +92,9 @@ no compatible validated asset and vector hazard layers. The JRC image preview
 is contextual raster display, not a vector overlay. Counts and geometry checks
 are QA summaries, not risk estimates. No distance, area, flood depth at an
 asset, probability, vulnerability, or safety conclusion is derived from OSM.
+Uploaded-point CSV tables pass through the shared display-only Arrow
+normalization boundary. Map layers and calculations use their separate point
+frame, so table rendering does not alter them.
 
 ## Existing layers and project behavior preserved
 

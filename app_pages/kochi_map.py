@@ -7,7 +7,7 @@ import pandas as pd
 import pydeck as pdk
 import streamlit as st
 
-from src.dataframe_display import normalize_mixed_columns_for_display
+from src.dataframe_display import display_dataframe
 from src.spatial_data import classify_exposure, processed_layer_issues, read_processed_layers, validate_geojson
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -243,7 +243,7 @@ catalog_rows = [{
     "Licence / reuse": item["license"],
 } for item in catalog["datasets"]]
 st.subheader("Source and layer catalog")
-st.dataframe(pd.DataFrame(catalog_rows), hide_index=True, width="stretch", alt="Reviewed Kochi spatial source inventory with availability, coverage, CRS, and reuse status")
+display_dataframe(pd.DataFrame(catalog_rows), hide_index=True, width="stretch", alt="Reviewed Kochi spatial source inventory with availability, coverage, CRS, and reuse status")
 
 final_map_source_report = load_acquisition_metadata(FINAL_WARD_MAP_SOURCE_REPORT) or {}
 final_map_pdf_audit = final_map_source_report.get("final_map_pdf_audit", {})
@@ -283,7 +283,7 @@ if final_map_pdf_audit.get("pdf_signature_valid"):
             "GIS boundary promotion": "Not approved; PDF is not a GIS feature layer",
         })
         if comparison_rows:
-            st.dataframe(pd.DataFrame(comparison_rows), hide_index=True, width="stretch")
+            display_dataframe(pd.DataFrame(comparison_rows), hide_index=True, width="stretch")
         tile_samples = final_map_source_report.get("vector_tile_sample_audit", {}).get("samples", [])
         denied_samples = [sample.get("sample") for sample in tile_samples if "error" in sample]
         if denied_samples:
@@ -339,14 +339,14 @@ if esri_ward_source_report.get("candidate_towns"):
             for row in esri_geometry_audit.get("source_code_name_crosswalk", [])
         ]
         if crosswalk_rows:
-            st.dataframe(pd.DataFrame(crosswalk_rows), hide_index=True, width="stretch")
+            display_dataframe(pd.DataFrame(crosswalk_rows), hide_index=True, width="stretch")
         source_names_not_found = esri_geometry_audit.get("source_names_not_exactly_in_SEC_register", [])
         if source_names_not_found:
             st.caption(
                 "The source labels below are not exact matches to any name in the current SEC register; "
                 "they are preserved as source data and are not silently corrected."
             )
-            st.dataframe(pd.DataFrame(source_names_not_found), hide_index=True, width="stretch")
+            display_dataframe(pd.DataFrame(source_names_not_found), hide_index=True, width="stretch")
 
 portal_ward_audit = load_acquisition_metadata(PORTAL_WARD_AUDIT_REPORT) or {}
 portal_ward_metadata = load_acquisition_metadata(PORTAL_WARD_METADATA) or {}
@@ -382,7 +382,7 @@ if portal_ward_audit:
             if row.get("name_mismatch")
         ]
         if mismatch_rows:
-            st.dataframe(pd.DataFrame(mismatch_rows), hide_index=True, width="stretch")
+            display_dataframe(pd.DataFrame(mismatch_rows), hide_index=True, width="stretch")
 ward_reconciliation = load_ward_reconciliation_report()
 ward_matches = ward_reconciliation.get("matches", [])
 ward_alignment = ward_reconciliation.get("ward_count_alignment", {})
@@ -419,7 +419,7 @@ if ward_matches:
             "Manual review suggested": item.get("suggested_for_manual_review", False),
         })
     with st.expander("Inspect missing ward-label candidates", expanded=False):
-        st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
+        display_dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
         st.caption(
             "IoU is geometric overlap, not legal proof. No automatic names or ward numbers are assigned. "
             "Only one feature currently meets the report's high-overlap review threshold; official ward-register reconciliation remains required."
@@ -517,7 +517,7 @@ if flood_metadata or hospital_metadata:
                     "Pincode", "coordinate_pair_parse_status", "duplicate_coordinate_pair_count_in_subset",
                     "Flood sampling eligibility",
                 ]
-                st.dataframe(
+                display_dataframe(
                     review[display_columns], hide_index=True, width="stretch",
                     alt="Source-preserving audit of 180 NIHFW Ernakulam hospital records; every row is marked ineligible for flood sampling until its coordinates are verified",
                 )
@@ -567,7 +567,7 @@ if processed_layers:
         "Source database date": item["metadata"].get("source_database_timestamp", "Not stated"),
         "Coverage": item["metadata"].get("geographic_coverage", "Not stated"),
     } for item in processed_layers]
-    st.dataframe(
+    display_dataframe(
         pd.DataFrame(current_layer_rows), hide_index=True, width="stretch",
         alt="Current processed Kochi map layers with validation status, feature counts, retrieval dates, source snapshot dates, and coverage",
     )
@@ -743,7 +743,7 @@ if processed_layers:
             asset_features = [feature for label in selected_assets for feature in asset_options[label]["features"]]
             hazard_features = [feature for label in selected_hazards for feature in hazard_options[label]["features"]]
             results = classify_exposure(asset_features, hazard_features)
-            st.dataframe(pd.DataFrame(results), hide_index=True, width="stretch", alt="Asset-by-asset geometry intersection results and uncertainty labels")
+            display_dataframe(pd.DataFrame(results), hide_index=True, width="stretch", alt="Asset-by-asset geometry intersection results and uncertainty labels")
             st.caption("Intersection method: planar topological geometry overlay in EPSG:4326; boundary contact counts as intersection. No distance, depth, probability, vulnerability, or safety is inferred. A result with no detected intersection applies only within the selected hazard layer's documented coverage.")
 else:
     st.info("No processed source-reviewed geometry layers are available yet. The layer-ingestion instructions are in data/reference/SPATIAL_DATA_FOUNDATION.md.")
@@ -785,8 +785,8 @@ if uploaded is not None:
                     ))
                     legend_rows.append((category, color_hex, f"{len(group)} uploaded point(s)"))
                 st.caption("Uploaded coordinates and source claims are displayed as supplied; this app does not independently authenticate locations, completeness, or positional accuracy. Points are not automatically clipped to the boundary.")
-                st.dataframe(
-                    normalize_mixed_columns_for_display(valid),
+                display_dataframe(
+                    valid,
                     hide_index=True,
                     width="stretch",
                     alt="User-uploaded point records, not independently verified",
@@ -805,7 +805,7 @@ else:
     st.info("Turn on at least one layer to display the map.")
 if legend_rows:
     st.markdown("**Legend**")
-    st.dataframe(pd.DataFrame(legend_rows, columns=["Layer", "Symbol", "Meaning"]), hide_index=True, width="stretch")
+    display_dataframe(pd.DataFrame(legend_rows, columns=["Layer", "Symbol", "Meaning"]), hide_index=True, width="stretch")
 
 st.info(
     "OpenStreetMap roads, transit, mapped waterways, and any tagged facilities shown here are provisional community-mapped context. "

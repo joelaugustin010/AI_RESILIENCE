@@ -7,6 +7,8 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
+from src.dataframe_display import display_dataframe
+
 from src.air_quality import (
     CPCB_AQI_CATEGORIES,
     cpcb_aqi_category,
@@ -360,7 +362,7 @@ else:
             "NO2_value": "NO₂ (µg/m³)",
         }
     )
-    st.dataframe(display_aqi, hide_index=True, alt="Historical KSPCB station AQI and pollutant values")
+    display_dataframe(display_aqi, hide_index=True, alt="Historical KSPCB station AQI and pollutant values")
 
     # A focused Eloor snapshot makes the industrial-belt report easier to scan.
     # Values are copied from the dated KSPCB extract; no unit conversion or averaging is applied.
@@ -404,7 +406,7 @@ else:
     )
     if not daily_status.empty:
         st.write("Stations without a reported AQI in this report:")
-        st.dataframe(
+        display_dataframe(
             daily_status.rename(
                 columns={
                     "station": "KSPCB station label",
@@ -439,7 +441,7 @@ else:
         ignore_index=True,
     )
     st.markdown("**Report coverage and missing observations**")
-    st.dataframe(
+    display_dataframe(
         coverage,
         hide_index=True,
         alt="Expected, reported, and missing dates for Eloor pollutant, AQI, and weather series",
@@ -610,7 +612,7 @@ else:
                         "Wind speed above 20 m/s review threshold; not automatically rejected; "
                     )
                     st.markdown("**Records requiring review**")
-                    st.dataframe(
+                    display_dataframe(
                         flagged_weather[
                             [
                                 "observed_at", "wind_speed", "wind_direction",
@@ -670,7 +672,7 @@ else:
                     "Change in mean (%)",
                 ] = 0.0
 
-            st.dataframe(
+            display_dataframe(
                 comparison,
                 hide_index=True,
                 alt="Descriptive August and September means and percentage changes for matching Eloor pollutant report fields",
@@ -707,7 +709,7 @@ else:
                 "Coordinate note": "report value; CRS not stated" if coordinates_consistent else "conflicting row-level coordinates",
             }
         )
-    st.dataframe(
+    display_dataframe(
         pd.DataFrame(station_rows),
         hide_index=True,
         alt="NAMP report station identifiers and source coordinates",
@@ -748,7 +750,7 @@ else:
             "endpoint does not state the exact measurement cutoff or any observation timestamp. "
             "The 2026 summary may be year-to-date. The year label is not a current-reading timestamp."
         )
-        st.dataframe(
+        display_dataframe(
             latest[["reference_station", "source_station_code", "source_station", "monitoring_mode", "average_aqi"]]
             .rename(
                 columns={
@@ -783,7 +785,7 @@ else:
         stations = sorted(matched["reference_station"].unique().tolist())
         selected_station = st.selectbox("Monitoring station", stations)
         selected = matched.loc[matched["reference_station"].eq(selected_station)].sort_values("year")
-        st.dataframe(
+        display_dataframe(
             selected[["year", "source_station", "source_station_code", "monitoring_mode", "average_aqi"]]
             .rename(
                 columns={
@@ -816,7 +818,7 @@ category_table = pd.DataFrame(
         for low, high, category, meaning in CPCB_AQI_CATEGORIES
     ]
 )
-st.dataframe(category_table, hide_index=True, alt="CPCB AQI categories and health meanings")
+display_dataframe(category_table, hide_index=True, alt="CPCB AQI categories and health meanings")
 st.markdown(
     "CPCB uses 24-hour averages for PM2.5, PM10, SO2, NO2, NH3 and Pb, and 8-hour averages "
     "for CO and O3; the highest sub-index is the AQI. Overall AQI requires at least three "
@@ -879,7 +881,7 @@ else:
                 ) or "Eligible for CPCB calculation",
             }
         )
-    st.dataframe(
+    display_dataframe(
         pd.DataFrame(eligibility_rows),
         hide_index=True,
         use_container_width=True,
@@ -987,7 +989,7 @@ if timeline_events:
         timeline if selected_stream == "All evidence streams"
         else timeline.loc[timeline["Evidence stream"].eq(selected_stream)]
     )
-    st.dataframe(
+    display_dataframe(
         visible_timeline,
         hide_index=True,
         use_container_width=True,
@@ -1019,7 +1021,7 @@ st.info(
 
 st.subheader("Documented NAMP network reference")
 stations = pd.DataFrame(register["kspcb_namp_ernakulam_stations"])
-st.dataframe(stations, hide_index=True, alt="KSPCB Ernakulam NAMP monitoring-station inventory")
+display_dataframe(stations, hide_index=True, alt="KSPCB Ernakulam NAMP monitoring-station inventory")
 st.caption(
     "The KSPCB directory station inventory is a network reference. June 2025 report pages also "
     "contain station codes and row-level coordinates; the report does not specify their coordinate "
@@ -1058,7 +1060,7 @@ else:
             "ranking_status": "Assessment status",
         }
     )
-    st.dataframe(
+    display_dataframe(
         display_candidates,
         hide_index=True,
         alt="Edayar facilities listed as candidates with current evidence gaps",
@@ -1105,7 +1107,7 @@ else:
     evidence_table = facility_candidates[evidence_fields].rename(
         columns=evidence_labels
     )
-    st.dataframe(
+    display_dataframe(
         evidence_table,
         hide_index=True,
         use_container_width=True,
@@ -1183,7 +1185,7 @@ else:
             }
         )
     pollutant_comparison = pd.DataFrame(comparison_rows)
-    st.dataframe(
+    display_dataframe(
         pollutant_comparison,
         hide_index=True,
         use_container_width=True,
@@ -1198,7 +1200,7 @@ else:
 
 if not industry_type_counts.empty:
     st.markdown("**Estate-level trade-effluent industry categories reported by KWA**")
-    st.dataframe(
+    display_dataframe(
         industry_type_counts,
         hide_index=True,
         alt="Edayar estate industry-type counts from KWA",
@@ -1248,7 +1250,7 @@ if source_assessment["candidates"]:
             for candidate in source_assessment["candidates"]
         ]
     )
-    st.dataframe(
+    display_dataframe(
         readiness_table,
         hide_index=True,
         alt="Evidence readiness for each unranked Edayar candidate facility",

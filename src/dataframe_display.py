@@ -1,8 +1,18 @@
 """Display-only normalization for mixed-type tabular data."""
 
+import inspect
+import logging
+from collections import Counter
 from numbers import Number
+from pathlib import Path
+from typing import Any
 
 import pandas as pd
+import pyarrow as pa
+import streamlit as st
+
+
+logger = logging.getLogger(__name__)
 
 
 def normalize_mixed_columns_for_display(frame: pd.DataFrame) -> pd.DataFrame:
@@ -57,3 +67,39 @@ def normalize_mixed_columns_for_display(frame: pd.DataFrame) -> pd.DataFrame:
             display[column] = values.mask(blank_strings, pd.NA).astype("string")
 
     return display
+
+
+def display_dataframe(
+    frame: pd.DataFrame,
+    *args: Any,
+    **kwargs: Any,
+) -> Any:
+    """Render a normalized copy and log safe schema diagnostics on Arrow errors."""
+    display = normalize_mixed_columns_for_display(frame)
+    caller = inspect.currentframe()
+    caller_frame = caller.f_back if caller is not None else None
+    location = (
+        f"{Path(caller_frame.f_code.co_filename).name}:{caller_frame.f_lineno}"
+        f" ({caller_frame.f_code.co_name})"
+        if caller_frame is not None
+        else "unknown"
+    )
+    try:
+        return st.dataframe(display, *args, **kwargs)
+    except pa.ArrowInvalid:
+        object_columns = {}
+        for position, label in enumerate(frame.columns):
+            source_column = frame.iloc[:, position]
+            if source_column.dtype == object:
+                object_columns[str(label)] = {
+                    "dtype": str(source_column.dtype),
+                    "value_types": dict(
+                        sorted(Counter(type(value).__name__ for value in source_column).items())
+                    ),
+                }
+        logger.error(
+            "DataFrame Arrow serialization failed at %s; object-column schema: %s",
+            location,
+            object_columns,
+        )
+        raise
