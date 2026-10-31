@@ -1,6 +1,8 @@
 """Tests for provenance-checked Eloor monthly report loading and comparison."""
 
+import json
 import unittest
+from datetime import date, timedelta
 from pathlib import Path
 from unittest.mock import patch
 
@@ -96,6 +98,26 @@ class EloorMonthlyReportTests(unittest.TestCase):
             ]
         )
         self.assertTrue(compare_monthly_report_values([first, second]).empty)
+
+    def test_invalid_or_future_retrieval_dates_fail_provenance_checks(self):
+        metadata_path = REPORTS / "kspcb_caaqms_eloor_2026-09.metadata.json"
+        original_read_text = Path.read_text
+
+        def load_with_retrieval_date(value):
+            def altered_read_text(path: Path, *args, **kwargs):
+                content = original_read_text(path, *args, **kwargs)
+                if path == metadata_path:
+                    metadata = json.loads(content)
+                    metadata["sources"]["kspcb_caaqms_eloor_2026_09"]["retrieved_on"] = value
+                    return json.dumps(metadata)
+                return content
+            return altered_read_text
+
+        for retrieval_date in ("not-a-date", (date.today() + timedelta(days=1)).isoformat()):
+            with self.subTest(retrieval_date=retrieval_date):
+                with patch.object(Path, "read_text", load_with_retrieval_date(retrieval_date)):
+                    with self.assertRaisesRegex(MonthlyReportError, "retrieval date"):
+                        load_eloor_monthly_report(REPORTS, "2026-09")
 
     def test_modified_csv_fails_its_provenance_hash_check(self):
         daily_path = REPORTS / "kspcb_caaqms_eloor_daily_2026-09.csv"
