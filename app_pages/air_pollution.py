@@ -899,9 +899,13 @@ st.caption(
 
 timeline_events = []
 for report_month, report in monthly_reports.items():
-    coverage_dates = report.get("source", {}).get("time_coverage", {})
-    start_date = coverage_dates.get("start")
-    end_date = coverage_dates.get("end")
+    # Derive the observed date span from the verified day-precision extract.
+    # Do not require optional metadata fields that older source records lack.
+    report_dates = pd.to_datetime(
+        report["observations"]["observed_at"], format="%Y-%m-%d", errors="coerce"
+    ).dropna()
+    start_date = report_dates.min().strftime("%Y-%m-%d") if not report_dates.empty else None
+    end_date = report_dates.max().strftime("%Y-%m-%d") if not report_dates.empty else None
     if start_date and end_date:
         timeline_events.append(
             {
