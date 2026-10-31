@@ -1,6 +1,6 @@
 {
   "status": "RAW_SOURCE_AUDIT_AND_TRAINING_READINESS",
-  "generated_at_utc": "2026-10-31T09:02:29.321847+00:00",
+  "generated_at_utc": "2026-10-31T09:12:28.140335+00:00",
   "raw_sources_available_for_hazards": 7,
   "hazard_tracks": 9,
   "research_baselines_found_in_separate_report": 2,
@@ -371,7 +371,7 @@
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
           "bytes": 360514,
-          "sha256": "30d1865dc91c868eec0456941a9ef45e3bcc189fd959a0eeb211e0b8f6929ddd",
+          "sha256": "c8e0eccefabe79898d5e55b2c108d3c71915af25bf52f347bbb58c28f3d0ef2e",
           "format": "json",
           "json_root_type": "dict",
           "top_level_keys": [
@@ -392,7 +392,7 @@
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
           "bytes": 361713,
-          "sha256": "2f9a42c7da6aaefb01590eea94d6b3752c268a5ff44d252ada4d6aa192d2b0fb",
+          "sha256": "7070f396ac0bb1339b53e0d1a5c3ebfb97f05e916251cc89bfae27d3dfb82dc5",
           "format": "json",
           "json_root_type": "dict",
           "top_level_keys": [
@@ -413,7 +413,7 @@
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
           "bytes": 359692,
-          "sha256": "16f4812e8338644de81ad4297d2c09cd7150a01b6a39b9a3f57941bdbece5776",
+          "sha256": "befad978e434576f279e5f0f52578f5b3529f3b82427a978a7d012497b23781e",
           "format": "json",
           "json_root_type": "dict",
           "top_level_keys": [
@@ -434,7 +434,7 @@
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
           "bytes": 361957,
-          "sha256": "0c06c1d2e691ce9bcdac5d16c33b59cdfbb6497a483b35fd71922e8f5ed1830f",
+          "sha256": "e34e6a51aa07bd25807966927b7996f65fadfa572de3ef15cc3e0bc91c24fd09",
           "format": "json",
           "json_root_type": "dict",
           "top_level_keys": [
@@ -529,7 +529,7 @@
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
           "bytes": 360514,
-          "sha256": "30d1865dc91c868eec0456941a9ef45e3bcc189fd959a0eeb211e0b8f6929ddd",
+          "sha256": "c8e0eccefabe79898d5e55b2c108d3c71915af25bf52f347bbb58c28f3d0ef2e",
           "format": "json",
           "json_root_type": "dict",
           "top_level_keys": [
@@ -550,7 +550,7 @@
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
           "bytes": 361713,
-          "sha256": "2f9a42c7da6aaefb01590eea94d6b3752c268a5ff44d252ada4d6aa192d2b0fb",
+          "sha256": "7070f396ac0bb1339b53e0d1a5c3ebfb97f05e916251cc89bfae27d3dfb82dc5",
           "format": "json",
           "json_root_type": "dict",
           "top_level_keys": [
@@ -571,7 +571,7 @@
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
           "bytes": 359692,
-          "sha256": "16f4812e8338644de81ad4297d2c09cd7150a01b6a39b9a3f57941bdbece5776",
+          "sha256": "befad978e434576f279e5f0f52578f5b3529f3b82427a978a7d012497b23781e",
           "format": "json",
           "json_root_type": "dict",
           "top_level_keys": [
@@ -592,7 +592,7 @@
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
           "bytes": 361957,
-          "sha256": "0c06c1d2e691ce9bcdac5d16c33b59cdfbb6497a483b35fd71922e8f5ed1830f",
+          "sha256": "e34e6a51aa07bd25807966927b7996f65fadfa572de3ef15cc3e0bc91c24fd09",
           "format": "json",
           "json_root_type": "dict",
           "top_level_keys": [
