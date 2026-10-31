@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import calendar
 import hashlib
+from datetime import date
 import json
 from pathlib import Path
 from typing import Any, Iterable
@@ -81,9 +82,20 @@ def _source_metadata(reports_dir: Path, month: str) -> tuple[dict[str, Any], dic
     except ValueError:
         valid_source_url = False
 
-    if not valid_source_url or not source.get("retrieved_on"):
+    if not valid_source_url:
         raise MonthlyReportError(
-            f"Source URL is not a valid HTTPS web address or retrieval date is missing for {month}."
+            f"Source URL is not a valid HTTPS web address for {month}."
+        )
+    retrieved_on = source.get("retrieved_on")
+    try:
+        retrieval_date = date.fromisoformat(str(retrieved_on))
+    except (TypeError, ValueError):
+        raise MonthlyReportError(
+            f"Source retrieval date is missing or not a valid YYYY-MM-DD date for {month}."
+        ) from None
+    if retrieval_date > date.today():
+        raise MonthlyReportError(
+            f"Source retrieval date is in the future for {month}; review the provenance metadata."
         )
     return config, source
 
