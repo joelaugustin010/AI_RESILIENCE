@@ -593,7 +593,7 @@ else:
                 )
                 direction_invalid = (
                     selected_weather["wind_direction"].notna()
-                    & ~selected_weather["wind_direction"].between(0, 360, inclusive="left")
+                    & ~selected_weather["wind_direction"].between(0, 360, inclusive="both")
                 )
                 negative_wind = (
                     selected_weather["wind_speed"].notna()
