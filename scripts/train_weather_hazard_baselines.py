@@ -9,7 +9,7 @@ import json
 from pathlib import Path
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import ExtraTreesClassifier, RandomForestClassifier
 from sklearn.impute import SimpleImputer
 from sklearn.metrics import (accuracy_score, balanced_accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, average_precision_score, brier_score_loss, confusion_matrix)
 from sklearn.pipeline import Pipeline
@@ -106,34 +106,65 @@ def fit_target(df: pd.DataFrame, target_col: str, source_target: str, hazard: st
             f"train={len(train)}, validation={len(validation)}, final_train={len(final_train)}, test={len(test)}"
         )
 
-    def new_model():
+    def new_model(model_type: str):
+        if model_type == "random_forest":
+            classifier = RandomForestClassifier(
+                n_estimators=300, min_samples_leaf=10,
+                class_weight="balanced_subsample", random_state=42, n_jobs=-1,
+            )
+        elif model_type == "extra_trees":
+            classifier = ExtraTreesClassifier(
+                n_estimators=400, min_samples_leaf=5,
+                class_weight="balanced", random_state=42, n_jobs=-1,
+            )
+        else:
+            raise ValueError(f"Unsupported model type: {model_type}")
         return Pipeline([
             ("imputer", SimpleImputer(strategy="median")),
-            ("rf", RandomForestClassifier(n_estimators=300, min_samples_leaf=10,
-                                          class_weight="balanced_subsample", random_state=42, n_jobs=-1)),
+            ("classifier", classifier),
         ])
 
-    # Choose a probability threshold using 2015-2019 validation only; never tune on 2020+ test data.
-    selection_model = new_model()
-    selection_model.fit(train[feature_cols], train["target"])
-    val_prob = selection_model.predict_proba(validation[feature_cols])[:, list(selection_model.named_steps["rf"].classes_).index(1)]
+    # Compare two tree ensembles and tune their decision thresholds on 2015-2019 only.
+    # The 2020+ test period is not used to select the model or threshold.
     candidates = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7, 0.8]
-    threshold_scores = []
-    for probability_threshold in candidates:
-        val_pred = (val_prob >= probability_threshold).astype(int)
-        threshold_scores.append({
-            "threshold": probability_threshold,
-            "f1": float(f1_score(validation["target"], val_pred, zero_division=0)),
-            "recall": float(recall_score(validation["target"], val_pred, zero_division=0)),
-            "precision": float(precision_score(validation["target"], val_pred, zero_division=0)),
-            "balanced_accuracy": float(balanced_accuracy_score(validation["target"], val_pred)),
+    candidate_results = []
+    for model_type in ("random_forest", "extra_trees"):
+        selection_model = new_model(model_type)
+        selection_model.fit(train[feature_cols], train["target"])
+        class_values = list(selection_model.named_steps["classifier"].classes_)
+        val_prob = selection_model.predict_proba(validation[feature_cols])[:, class_values.index(1)]
+        threshold_scores = []
+        for probability_threshold in candidates:
+            val_pred = (val_prob >= probability_threshold).astype(int)
+            threshold_scores.append({
+                "threshold": probability_threshold,
+                "f1": float(f1_score(validation["target"], val_pred, zero_division=0)),
+                "recall": float(recall_score(validation["target"], val_pred, zero_division=0)),
+                "precision": float(precision_score(validation["target"], val_pred, zero_division=0)),
+                "balanced_accuracy": float(balanced_accuracy_score(validation["target"], val_pred)),
+            })
+        chosen = max(threshold_scores, key=lambda item: (item["f1"], item["recall"], item["precision"]))
+        candidate_results.append({
+            "model_type": model_type,
+            "best_validation_threshold": float(chosen["threshold"]),
+            "best_validation_f1": chosen["f1"],
+            "best_validation_recall": chosen["recall"],
+            "best_validation_precision": chosen["precision"],
+            "best_validation_balanced_accuracy": chosen["balanced_accuracy"],
+            "threshold_scores": threshold_scores,
         })
-    chosen = max(threshold_scores, key=lambda item: (item["f1"], item["recall"], item["precision"]))
-    probability_threshold = float(chosen["threshold"])
 
-    model = new_model()
+    selected = max(candidate_results, key=lambda item: (
+        item["best_validation_f1"], item["best_validation_recall"], item["best_validation_precision"]
+    ))
+    selected_model_type = selected["model_type"]
+    probability_threshold = selected["best_validation_threshold"]
+    threshold_scores = selected["threshold_scores"]
+
+    model = new_model(selected_model_type)
     model.fit(final_train[feature_cols], final_train["target"])
-    prob = model.predict_proba(test[feature_cols])[:, list(model.named_steps["rf"].classes_).index(1)]
+    class_values = list(model.named_steps["classifier"].classes_)
+    prob = model.predict_proba(test[feature_cols])[:, class_values.index(1)]
     pred = (prob >= probability_threshold).astype(int)
     prevalence = float(final_train["target"].mean())
     baseline = np.full(len(test), int(prevalence >= 0.5), dtype=int)
@@ -167,7 +198,10 @@ def fit_target(df: pd.DataFrame, target_col: str, source_target: str, hazard: st
         "threshold_training_period": "2000-01-01 through 2014-12-31 (training target dates only)",
         "model_selection_train_target_dates_before": "2015-01-01",
         "threshold_validation_target_dates": "2015-01-01 through 2019-12-31",
-        "threshold_selection_metric": "F1, tie-break by recall then precision",
+        "model_selection_metric": "Validation F1, tie-break by recall then precision; 2015-2019 only",
+        "model_selection_results": [{k: v for k, v in result.items() if k != "threshold_scores"} for result in candidate_results],
+        "selected_model_type": selected_model_type,
+        "threshold_selection_metric": "F1, tie-break by recall then precision; validation period only",
         "selected_probability_threshold": probability_threshold,
         "validation_threshold_scores": threshold_scores,
         "validation_rows": int(len(validation)),
@@ -181,7 +215,7 @@ def fit_target(df: pd.DataFrame, target_col: str, source_target: str, hazard: st
             "Historical reanalysis/grid-point data are not station observations.",
             "Only four Kerala locations; performance may not generalize outside these grid points.",
             "The 95th-percentile threshold is a research event definition, not an IMD heatwave or official extreme-rainfall warning definition.",
-            "The event-definition percentile is estimated from pre-2015 training target dates only; probability threshold is tuned on 2015-2019 validation predictions.",
+            "The event-definition percentile is estimated from pre-2015 training target dates only; Random Forest and Extra Trees are compared on 2015-2019 validation data, and the decision threshold is selected there.",
             "The next-day forecast now includes current-day observations, which are assumed available when the forecast is issued; real forecast availability must be checked before operational use.",
             "Metrics include a majority baseline, a simple persistence baseline, average precision, Brier score and a confusion matrix; these remain retrospective research metrics.",
             "A single future-period holdout is preliminary; assess calibration, drift and independent station data before any real-world use.",
