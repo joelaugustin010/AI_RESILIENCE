@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 import pandas as pd
+from urllib.parse import urlsplit
 
 from src.air_quality import AirQualityDataError, SUPPORTED_POLLUTANTS, validate_observations
 
@@ -68,8 +69,22 @@ def _source_metadata(reports_dir: Path, month: str) -> tuple[dict[str, Any], dic
         raise MonthlyReportError(f"Provenance entry for {month} is not an object.")
     if source.get("publisher") != KSPCB_PUBLISHER:
         raise MonthlyReportError(f"Unexpected publisher for {month} Eloor report.")
-    if not str(source.get("source_url", "")).startswith("https://") or not source.get("retrieved_on"):
-        raise MonthlyReportError(f"Source URL or retrieval date is missing for {month}.")
+    source_url = str(source.get("source_url", "")).strip()
+    try:
+        parsed_source_url = urlsplit(source_url)
+        valid_source_url = (
+            parsed_source_url.scheme == "https"
+            and bool(parsed_source_url.hostname)
+            and parsed_source_url.username is None
+            and parsed_source_url.password is None
+        )
+    except ValueError:
+        valid_source_url = False
+
+    if not valid_source_url or not source.get("retrieved_on"):
+        raise MonthlyReportError(
+            f"Source URL is not a valid HTTPS web address or retrieval date is missing for {month}."
+        )
     return config, source
 
 
