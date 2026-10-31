@@ -235,7 +235,25 @@ except (OSError, json.JSONDecodeError) as error:
     st.error(f"Air-pollution acquisition status could not be loaded: {error}")
     st.stop()
 
-st.caption(f"Source review: {register['reviewed_on']}")
+register_review_value = register.get("reviewed_on")
+try:
+    register_review_date = date.fromisoformat(str(register_review_value))
+    register_review_age_days = (date.today() - register_review_date).days
+    if register_review_age_days < 0:
+        st.warning(
+            f"The source register review date ({register_review_date:%d %b %Y}) is in the future. "
+            "Verify the register metadata before relying on its review status."
+        )
+    else:
+        st.caption(
+            f"Source register reviewed: {register_review_date:%d %b %Y} "
+            f"({register_review_age_days} days ago)."
+        )
+except (TypeError, ValueError):
+    st.warning(
+        "The source register has a missing or invalid top-level reviewed_on date. "
+        "Verify the register metadata; individual source review dates are shown below."
+    )
 st.markdown(
     """
     <nav class="air-nav">
