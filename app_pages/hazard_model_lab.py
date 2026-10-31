@@ -187,16 +187,24 @@ with st.expander("Source acquisition manifest"):
     if entries:
         rows = []
         for item in entries:
+            # Normalize every manifest cell before pandas infers column types.
+            # In particular, data_rows/bytes can be integers for downloaded
+            # files and absent for failed/skipped downloads. Mixing those
+            # integers with empty strings can break Streamlit's Arrow export.
             rows.append({
-                "File": item.get("file", ""),
-                "Status": item.get("status", "Not recorded"),
-                "Rows": item.get("data_rows", ""),
-                "Bytes": item.get("bytes", ""),
-                "Retrieved": item.get("retrieved_at", ""),
-                "SHA-256": item.get("sha256", ""),
+                "File": str(item.get("file") or ""),
+                "Status": str(item.get("status") or "Not recorded"),
+                "Rows": "" if item.get("data_rows") is None else str(item["data_rows"]),
+                "Bytes": "" if item.get("bytes") is None else str(item["bytes"]),
+                "Retrieved": str(item.get("retrieved_at") or ""),
+                "SHA-256": str(item.get("sha256") or ""),
             })
+        manifest_frame = pd.DataFrame(
+            rows,
+            columns=["File", "Status", "Rows", "Bytes", "Retrieved", "SHA-256"],
+        ).astype("string")
         st.dataframe(
-            pd.DataFrame(rows).astype("string"),
+            manifest_frame,
             hide_index=True,
             width="stretch",
         )
