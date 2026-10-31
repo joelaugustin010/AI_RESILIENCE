@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.impute import SimpleImputer
-from sklearn.metrics import accuracy_score, balanced_accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+from sklearn.metrics import (accuracy_score, balanced_accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, average_precision_score, brier_score_loss, confusion_matrix)
 from sklearn.pipeline import Pipeline
 
 ROOT = Path("data/external/hazards/raw/weather")
@@ -58,18 +58,31 @@ def make_features(df: pd.DataFrame) -> pd.DataFrame:
     out["target_date"] = out["date"] + pd.Timedelta(days=1)
     return out
 
+def feature_columns(df: pd.DataFrame) -> list[str]:
+    """Return predictors available at the end of the current day for a next-day forecast."""
+    current_observations = [
+        "temperature_2m_max", "temperature_2m_min", "precipitation_sum",
+        "wind_speed_10m_max", "wind_gusts_10m_max",
+    ]
+    lagged_observations = [
+        c for c in df.columns
+        if c.endswith(("_lag1", "_lag2", "_lag3", "_lag7", "_prior7_mean"))
+    ]
+    return current_observations + lagged_observations + ["doy_sin", "doy_cos", "year"]
+
+
 def fit_target(df: pd.DataFrame, target_col: str, source_target: str, hazard: str) -> dict:
-    train_period = df["date"] < pd.Timestamp(TRAIN_END)
-    train_values = df.loc[train_period, source_target].dropna()
+    validation_start = pd.Timestamp("2015-01-01")
+    # Keep the event-definition threshold strictly inside the model-selection training era.
+    # Using all pre-2020 observations would leak validation-era outcomes into target definition.
+    train_values = df.loc[df["target_date"] < validation_start, target_col].dropna()
     if len(train_values) < 100:
-        raise RuntimeError(f"Insufficient pre-2020 observations for {hazard}")
+        raise RuntimeError(f"Insufficient pre-2015 training outcomes for {hazard}")
     threshold = float(train_values.quantile(0.95))
     data = df.dropna(subset=[target_col, "target_date"]).copy()
     data["target"] = (data[target_col] >= threshold).astype(int)
     cutoff = pd.Timestamp(TRAIN_END)
-    validation_start = pd.Timestamp("2015-01-01")
-    feature_cols = [c for c in df.columns if c.endswith(("_lag1", "_lag2", "_lag3", "_lag7", "_prior7_mean"))]
-    feature_cols += ["doy_sin", "doy_cos", "year"]
+    feature_cols = feature_columns(df)
     data = df.dropna(subset=[target_col, "target_date"]).copy()
     data["target"] = (data[target_col] >= threshold).astype(int)
     data = data.dropna(subset=feature_cols).copy()
@@ -118,6 +131,9 @@ def fit_target(df: pd.DataFrame, target_col: str, source_target: str, hazard: st
     pred = (prob >= probability_threshold).astype(int)
     prevalence = float(final_train["target"].mean())
     baseline = np.full(len(test), int(prevalence >= 0.5), dtype=int)
+    persistence_mask = test[source_target].notna()
+    persistence_actual = test.loc[persistence_mask, "target"]
+    persistence_pred = (test.loc[persistence_mask, source_target] >= threshold).astype(int)
     metrics = {
         "accuracy": float(accuracy_score(test["target"], pred)),
         "balanced_accuracy": float(balanced_accuracy_score(test["target"], pred)),
@@ -125,7 +141,15 @@ def fit_target(df: pd.DataFrame, target_col: str, source_target: str, hazard: st
         "recall": float(recall_score(test["target"], pred, zero_division=0)),
         "f1": float(f1_score(test["target"], pred, zero_division=0)),
         "roc_auc": float(roc_auc_score(test["target"], prob)) if test["target"].nunique() == 2 else None,
+        "average_precision": float(average_precision_score(test["target"], prob)) if test["target"].nunique() == 2 else None,
+        "brier_score": float(brier_score_loss(test["target"], prob)),
+        "confusion_matrix_tn_fp_fn_tp": [int(v) for v in confusion_matrix(test["target"], pred, labels=[0, 1]).ravel()],
         "majority_baseline_accuracy": float(accuracy_score(test["target"], baseline)),
+        "majority_baseline_balanced_accuracy": float(balanced_accuracy_score(test["target"], baseline)),
+        "majority_baseline_f1": float(f1_score(test["target"], baseline, zero_division=0)),
+        "persistence_baseline_rows": int(persistence_mask.sum()),
+        "persistence_baseline_balanced_accuracy": float(balanced_accuracy_score(persistence_actual, persistence_pred)) if len(persistence_actual) else None,
+        "persistence_baseline_f1": float(f1_score(persistence_actual, persistence_pred, zero_division=0)) if len(persistence_actual) else None,
     }
     OUT.mkdir(parents=True, exist_ok=True)
     import joblib
@@ -134,7 +158,7 @@ def fit_target(df: pd.DataFrame, target_col: str, source_target: str, hazard: st
         "status": "RESEARCH_BASELINE_TRAINED_NOT_VALIDATED",
         "hazard": hazard, "target_definition": f"next-day {source_target} >= training-period 95th percentile",
         "threshold": threshold, "threshold_units": "°C" if "temperature" in source_target else "mm/day",
-        "threshold_training_period": f"2000-01-01 through 2019-12-31",
+        "threshold_training_period": "2000-01-01 through 2014-12-31 (training target dates only)",
         "model_selection_train_target_dates_before": "2015-01-01",
         "threshold_validation_target_dates": "2015-01-01 through 2019-12-31",
         "threshold_selection_metric": "F1, tie-break by recall then precision",
@@ -151,7 +175,9 @@ def fit_target(df: pd.DataFrame, target_col: str, source_target: str, hazard: st
             "Historical reanalysis/grid-point data are not station observations.",
             "Only four Kerala locations; performance may not generalize outside these grid points.",
             "The 95th-percentile threshold is a research event definition, not an IMD heatwave or official extreme-rainfall warning definition.",
-            "Probability threshold is tuned on 2015-2019 validation predictions; the 2020+ test set is not used for tuning.",
+            "The event-definition percentile is estimated from pre-2015 training target dates only; probability threshold is tuned on 2015-2019 validation predictions.",
+            "The next-day forecast now includes current-day observations, which are assumed available when the forecast is issued; real forecast availability must be checked before operational use.",
+            "Metrics include a majority baseline, a simple persistence baseline, average precision, Brier score and a confusion matrix; these remain retrospective research metrics.",
             "A single future-period holdout is preliminary; assess calibration, drift and independent station data before any real-world use.",
             "Not an emergency-warning or scientifically approved operational model."
         ]
