@@ -624,7 +624,11 @@ else:
             "The daily extract has structural issues that should be reviewed before "
             "using it in comparisons or calculations."
         )
-    elif audit_summary.get("unassessed_rows", 0) or audit_summary.get("missing_qa_rows", 0):
+    elif (
+        audit_summary.get("unassessed_rows", 0)
+        or audit_summary.get("missing_qa_rows", 0)
+        or audit_summary.get("suspect_qa_rows", 0)
+    ):
         st.info(
             "Basic structural checks did not identify the listed issues, but source QA is "
             "unassessed or incomplete. These records are not certified as validated measurements."
