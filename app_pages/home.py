@@ -60,7 +60,7 @@ for i in range(0, len(tools), 4):
 st.divider()
 status1, status2, status3 = st.columns(3)
 with status1:
-    st.metric("Workspaces", "11", help="One command centre, nine Explore tools, and two Plan tools.")
+    st.metric("Workspaces", "12", help="One command centre, nine Explore tools, and two Plan tools.")
 with status2:
     st.metric("Official alerts", "Not enabled", help="The app does not issue official warnings.")
 with status3:
