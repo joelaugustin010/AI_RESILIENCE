@@ -1,10 +1,6 @@
 """AI RESILIENCE prototype entry point and shared navigation."""
 
-from pathlib import Path
-
 import streamlit as st
-
-ROOT = Path(__file__).resolve().parent
 
 
 st.set_page_config(
