@@ -228,7 +228,7 @@
     {
       "file": "data/external/hazards/raw/landslide/nasa_global_landslide_catalog.csv",
       "source_url": "https://data.nasa.gov/docs/legacy/Global_Landslide_Catalog_Export/Global_Landslide_Catalog_Export_rows.csv",
-      "final_url": "https://data-nasa-bucket-production.s3.us-east-1.amazonaws.com/legacy/Global_Landslide_Catalog_Export/Global_Landslide_Catalog_Export_rows.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZJ34W7PDFVUAUPRY%2F20261031%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20261031T091117Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEIH%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJIMEYCIQD447BlmqCjLyAinx6BhhgjXP0fXTb%2FMFppk%2FUipw9q%2FwIhANS5Rdo8ZjNEyZf8BCBe4pYPqZhPoGUpnETOFNPan2nFKpYFCEoQABoMNjM5Njc0ODA5Mjg2IgwG4%2BD0FQTPhSXbtrcq8wRm%2F%2FeuI%2BqWAE0J94Cr6T1NfX9MsuosFsHknVquMd%2FYAsaoro9i2hnNBlmPqaX%2F7gWtijAizfJAsqTTpQL6fcEGD6bdy6hbdMRdKq5oY3jJnut8TuJxAmW7O1NZ%2FWbRfUO%2F1zADBLvFuhKF3bjrbzl73i7EMqbI8zFG%2FBMoy%2FtJ1hnfXfc3jymAcdiaxBEO%2FiPO0779c39t9rPgfMUcxmx1StY66DGmSxj1od126Eu9L0IOp0oZv2DFX8F16qGJqVpbffdQem8TV3UJyuNEOotM9gsPG1JEkNRLY53lM7DACY8lD1c2tJsaS39E5Xp%2BuWTOWTyT1m9K3frR7rsKk9GFBm%2F0vCfFczJBQaIwDLhuBUQ8LBaOT%2BavUdsvdwi4VBQjfIEL4x5h9MlgnuvcT8dqSlVTXccwHFu%2BS3lrff2ryZaFSqEpTO%2BbiTgXtAKgxDHiN%2FIIqxw3l56kMS2%2F84IIbEH3Sk%2B1IiUl1PQRYiizuqE6sCa8MJthDYAxxvkc1G0jUIeTKrzMVG1CyYjpZ%2FHDO56GAFTZ3o8na%2B4XdTA%2F%2Bp431GfPYQpkIX8dszHLsP1ZzvX20ogV%2Bsfd548ZY5IukbRwePvt9Gh5VvfBTtKPSZokezf2kEFIlDvSJ9V3gTJMI0nxanwzejLkFDj7jSNvZtZT9F1qqHtaFOqZy81jX%2BLjSK1apSNz%2Byr4GpRvTdxVrGqiySW50CrcTnULGgyYJV9OCinn49X85BufoMR8YwJVu%2BFqs9hbj2fDT9j0%2BKi54sLRIFjMsA59phjfdG1WwtEBr6Lv7l%2Bg3whFFN9za1mAjxawv6jbYtk19xJEsbGQkfMwmtmW1wY6mAE59lEPcW2BVvqnuaoZSb6GoMdWRmO5IBc7xV0PTQiQSg1vUviGwbuoDX6m5jpysn3JYy5PC40B1fDAUKNPbvODskJLa8phn46s6lTcZe5HJO9RLJh%2BpFcFLUXO1ckLLbS431Ze1mqLBmyS0veUjQipUGi3t4ku9U1M9%2FuLDXoRidd9BoZDyA0yKLg5PEmPgSfPGlL52b6LtA%3D%3D&X-Amz-Signature=04868c1d82e1cc561f40fea86d65d10cfaf5383e5f0eb2a791947e145dc07f34&X-Amz-SignedHeaders=host&x-id=GetObject",
+      "final_url": "https://data-nasa-bucket-production.s3.us-east-1.amazonaws.com/legacy/Global_Landslide_Catalog_Export/Global_Landslide_Catalog_Export_rows.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZJ34W7PDGAIM646S%2F20261031%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20261031T112752Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEIP%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJIMEYCIQDX8B%2BfW%2BkHCtq1H3EyZd5tRdXkdLE2pxkU%2B3UTKDGDhAIhAMAEsWFTuvTsVRcUOAiFZuLDYtvY3mHd6Q5Mvhe42EE2KpYFCEwQABoMNjM5Njc0ODA5Mjg2Igxe7hnHu5tWENM6tx4q8wQVx%2FnnghvaYULdDLQVD1Nsw4r7%2FBBa0YEORvePbj%2FWneuJx6Wn2F29JsKO1MzIfKO0RFYSbD0Y6gK8X0HIlN4b7hScxvaWSHcLDRTcZ4yvCwziCI1L2kAnubgrHDQVxSfHqOZqrxAHL2PMYtasMZv%2FCRmiboAlFGYCZ%2BybOh6V1jd8znvt%2BjYU5C4FMWNKjSk1LBOyOy0eQimJ3HoDsrMjaS4tWS8f2FZ0c%2FSzhBmg2l%2BLlLtpHLXZOWSnGAwdO%2FZkdWi2QGj5YpD743NHKpp9El9wrNGyBpKBenQSs%2FJLzJU57B4HLT%2FnEeqvNldqgGzOm1UWaQNbYtOqhMxyKUOqal9h7FVAUEP1jj3DIvqzEKQMPnviOAP73GO%2BH5LKbEbwi9ne0HOwoGXWHIRpnWjXYOL6awfGexJJab5UEv4rg4Ffy%2FY320V%2FGIN0Llmsx2XCUCskaapLxFFE7LuyBjTKeWR4msdDGVkMHhk0MY9mn%2FQZI4F5gX%2FAHxCOnDG9ZuLApJyGmpOs7Re%2By5Zd7AJCbTJEyNrN0AujbpX%2FFDIsRUt0VGkJgMTPtdIQwTLrNWvWPUatooNWCfPgCfX35yCWaV27fJHET1lc1ib%2F50oO4XtgNWr6w7ZNsLpOOcSsvCSx2MGaEflwPhCvanGMhMogRp2iX77PMpdtwgvgbAK6r6WZfcmaoNfZDprx%2BALm1b6NZ5TMZeJCChXzRTwsbg2bV4Xmh5%2BFB1l21qcTaXs6Kvx8CbMfBEcwsmlcJBtvaD%2BD8SdVqEbrhuB0gQYbA4YeMg%2FAQwpcMMOm9IzKNd7dI%2F5y08kni3heBg8q%2FFOLuU%2FK9kgwjIuX1wY6mAEMv%2BRIrWcJ%2FlwPyDZbUsqWZ01ga1Z3%2FORrM%2FgVqYYKSQaPsSM7NglC4%2F7%2B323yyFwH9%2B1ia%2F47Hd1pYe4kGWIe2AGBZyJGUVcvbV39tOOde0koQJ7gYtupBq8LVOLMDhhviYlLI8vS4q%2FtQIc9gc2HEWmoYvS8amkbNk86tidF7HVXC63dn8vlDmhsR39MgC41sqPC5mm4ww%3D%3D&X-Amz-Signature=75b714709b6493fca6e6ac3eb7719e4b886f8d7048d9d2d1bf35e2dc67c588f1&X-Amz-SignedHeaders=host&x-id=GetObject",
       "retrieved_at": "2026-10-31",
       "status": "DOWNLOADED",
       "bytes": 8479717,
@@ -296,7 +296,7 @@
       "retrieved_at": "2026-10-31",
       "status": "DOWNLOADED",
       "bytes": 360514,
-      "sha256": "c8e0eccefabe79898d5e55b2c108d3c71915af25bf52f347bbb58c28f3d0ef2e",
+      "sha256": "0774cb205643cc9ee71a6bc8ddf7aa8137970016db89303cd9c855c05838029d",
       "content_type": "application/json; charset=utf-8"
     },
     {
@@ -306,7 +306,7 @@
       "retrieved_at": "2026-10-31",
       "status": "DOWNLOADED",
       "bytes": 361713,
-      "sha256": "7070f396ac0bb1339b53e0d1a5c3ebfb97f05e916251cc89bfae27d3dfb82dc5",
+      "sha256": "37bfdb199b26ba2a90b9e17fe8b2f5be5377caa04129f14b884099e5dc0a9b9f",
       "content_type": "application/json; charset=utf-8"
     },
     {
@@ -316,7 +316,7 @@
       "retrieved_at": "2026-10-31",
       "status": "DOWNLOADED",
       "bytes": 359692,
-      "sha256": "befad978e434576f279e5f0f52578f5b3529f3b82427a978a7d012497b23781e",
+      "sha256": "d62a0aa85849dd2efa4668f1bb65c56b7c4cef32dcd9b9bfe10db065b5b6539e",
       "content_type": "application/json; charset=utf-8"
     },
     {
@@ -326,7 +326,7 @@
       "retrieved_at": "2026-10-31",
       "status": "DOWNLOADED",
       "bytes": 361957,
-      "sha256": "e34e6a51aa07bd25807966927b7996f65fadfa572de3ef15cc3e0bc91c24fd09",
+      "sha256": "95034172d5a19f754bf64c86d8b5d6920507a347a750e6e12cda66bf740c0887",
       "content_type": "application/json; charset=utf-8"
     }
   ],
