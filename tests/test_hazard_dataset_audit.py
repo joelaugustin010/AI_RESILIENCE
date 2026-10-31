@@ -30,7 +30,7 @@ def test_nested_raw_source_is_found_without_claiming_model_readiness(tmp_path: P
     assert hazard["raw_sources"][0]["has_explicit_target_column"] is False
     assert hazard["curated_training_table"]["status"] == "MISSING_CURATED_TRAINING_TABLE"
     assert hazard["model_status"] == "NOT_READY"
-    assert report["trained_models_claimed_by_this_report"] == 0
+    assert report["research_baselines_found_in_separate_report"] == 0
 
 
 def test_missing_raw_source_is_not_confused_with_curated_training_table(tmp_path: Path):
@@ -52,3 +52,30 @@ def test_missing_raw_source_is_not_confused_with_curated_training_table(tmp_path
     assert hazard["raw_source_count"] == 0
     assert hazard["curated_training_table"]["status"] == "MISSING_CURATED_TRAINING_TABLE"
     assert hazard["model_status"] == "NOT_READY"
+
+
+def test_existing_weather_research_baselines_are_not_hidden_by_missing_curated_tables(tmp_path: Path):
+    registry = tmp_path / "data" / "external" / "hazard_dataset_registry.json"
+    registry.parent.mkdir(parents=True)
+    registry.write_text(json.dumps({
+        "hazards": [
+            {"id": "heatwave", "label": "Heatwave", "source": "weather", "url": "https://example.org"},
+            {"id": "severe_storm", "label": "Rain", "source": "weather", "url": "https://example.org"},
+        ]
+    }), encoding="utf-8")
+    reports = tmp_path / "reports"
+    reports.mkdir()
+    (reports / "weather_hazard_training.json").write_text(json.dumps({
+        "models": [
+            {"hazard": "high_temperature", "status": "RESEARCH_BASELINE_TRAINED_NOT_VALIDATED",
+             "metrics": {"f1": 0.6}, "test_target_dates_from": "2020-01-01", "locations": ["kochi"]},
+            {"hazard": "extreme_rainfall", "status": "RESEARCH_BASELINE_TRAINED_NOT_VALIDATED",
+             "metrics": {"f1": 0.3}, "test_target_dates_from": "2020-01-01", "locations": ["kochi"]},
+        ]
+    }), encoding="utf-8")
+
+    report = build_report(tmp_path)
+    assert report["research_baselines_found_in_separate_report"] == 2
+    assert report["hazards"][0]["model_status"] == "RESEARCH_BASELINE_EXISTS_NOT_VALIDATED"
+    assert report["hazards"][0]["research_baseline"]["metrics"]["f1"] == 0.6
+    assert report["hazards"][1]["model_status"] == "RESEARCH_BASELINE_EXISTS_NOT_VALIDATED"
