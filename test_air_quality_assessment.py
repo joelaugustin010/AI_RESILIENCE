@@ -77,6 +77,23 @@ class AssessmentObservationValidationTests(unittest.TestCase):
         # Validation returns a copy and leaves the source record intact.
         self.assertEqual(source.loc[0, "observed_at"], "2026-10-25")
 
+    def test_source_urls_require_a_valid_https_host_without_credentials(self):
+        invalid_urls = (
+            "http://kspcb.kerala.gov.in/report.pdf",
+            "https://",
+            "https://user:password@kspcb.kerala.gov.in/report.pdf",
+            "https://kspcb.kerala.gov.in:invalid/report.pdf",
+            "https://kspcb.kerala.gov.in/reports/air quality.pdf",
+        )
+        for source_url in invalid_urls:
+            with self.subTest(source_url=source_url):
+                source = ambient_rows()
+                source.loc[0, "source_url"] = source_url
+                with self.assertRaisesRegex(AirQualityDataError, "HTTPS source_url"):
+                    validate_attribution_observations(
+                        source, ["Eloor"], provenance_verified=True, as_of="2026-10-25"
+                    )
+
     def test_missing_timestamp_and_unit_are_rejected(self):
         missing_timestamp = ambient_rows()
         missing_timestamp.loc[0, "observed_at"] = None
