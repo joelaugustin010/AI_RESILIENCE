@@ -277,9 +277,29 @@ def _render_hydrology_explorer() -> None:
         st.caption("Data-source and limitation register: `data/reference/hydrology_data_sources.json`.")
 
 
-st.title("Unified disaster decision workflow")
-st.caption("Select a hazard → describe the area and conditions → review evidence → compare scenarios and actions → check budget fit → export a report.")
-st.warning("This prototype does not issue official warnings or validated predictions. Inputs are user-described and are not verified observations unless the user supplies and checks their source.")
+st.markdown("""
+<style>
+.wf-hero{padding:2rem 2.2rem;border-radius:24px;color:#f8fafc;background:linear-gradient(120deg,#071a2b,#104766 58%,#087e8b);box-shadow:0 18px 45px rgba(7,40,61,.16);margin:.2rem 0 1.1rem}
+.wf-kicker{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:#a5f3fc;margin-bottom:.65rem}
+.wf-title{font-size:clamp(2rem,3.5vw,3rem);font-weight:850;letter-spacing:-.04em;line-height:1.08;color:#fff;margin:0 0 .75rem}
+.wf-copy{max-width:850px;color:#dbeafe;font-size:1rem;line-height:1.65;margin:0}
+.wf-steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.65rem;margin:1rem 0 1.4rem}
+.wf-step{border:1px solid #dce7ee;background:rgba(255,255,255,.9);border-radius:14px;padding:.85rem .9rem;color:#526579;font-size:.8rem}
+.wf-step strong{display:block;color:#102a43;font-size:.9rem;margin-bottom:.2rem}
+@media(max-width:760px){.wf-steps{grid-template-columns:repeat(2,minmax(0,1fr))}.wf-hero{padding:1.4rem;border-radius:18px}}
+</style>
+<section class="wf-hero">
+<div class="wf-kicker">AI RESILIENCE · KOCHI · PLANNING WORKSPACE</div>
+<div class="wf-title">Disaster decision workflow</div>
+<p class="wf-copy">Turn a clearly described scenario into an evidence checklist, compare possible preparedness actions, review budget arithmetic, and export a traceable report. The workflow supports planning—not official warnings or validated predictions.</p>
+</section>
+<div class="wf-steps">
+<div class="wf-step"><strong>01 · Describe</strong>Choose hazard and area</div>
+<div class="wf-step"><strong>02 · Review</strong>Check inputs and evidence</div>
+<div class="wf-step"><strong>03 · Assess</strong>Understand missing proof</div>
+<div class="wf-step"><strong>04 · Plan</strong>Compare actions and costs</div>
+<div class="wf-step"><strong>05 · Export</strong>Keep a report record</div>
+</div>
 st.caption("A historical rainfall measurement benchmark is available in the evidence explorer. It is separate from the assessment and is not a current rainfall or flood forecast.")
 st.page_link("app_pages/kochi_map.py", label="Open the Kochi map", icon=":material/map:")
 st.info(
