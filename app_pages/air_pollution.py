@@ -15,7 +15,7 @@ from src.air_quality import (
     cpcb_aqi_category,
     time_series_summary,
 )
-from src.air_quality_attribution import assess_industrial_sources
+from src.air_quality_attribution import assess_industrial_sources, evidence_action_plan
 from src.cpcb_aqi import calculate_ind_aqi
 from src.air_quality_monthly_reports import (
     MonthlyReportError,
@@ -1539,6 +1539,58 @@ if source_assessment["candidates"]:
         hide_index=True,
         alt="Evidence readiness for each unranked Edayar candidate facility",
     )
+
+    st.markdown("**Actionable evidence-gap register**")
+    st.caption(
+        "This register translates each evidence gate into a specific data request. "
+        "It is a research checklist, not a facility score or source ranking."
+    )
+    action_rows = []
+    for candidate in source_assessment["candidates"]:
+        for item in evidence_action_plan(candidate["evidence"]):
+            action_rows.append(
+                {
+                    "Candidate facility": candidate["facility_name"],
+                    "Evidence domain": item["evidence_domain"].replace("_", " ").title(),
+                    "Status": item["status"],
+                    "Evidence requirement": item["requirement"],
+                    "Recommended next action": item["next_action"],
+                }
+            )
+    action_plan = pd.DataFrame(action_rows)
+    if not action_plan.empty:
+        missing_actions = action_plan.loc[action_plan["Status"].eq("Missing")].copy()
+        total_gates = len(action_plan)
+        available_gates = total_gates - len(missing_actions)
+        action_metrics = st.columns(3)
+        action_metrics[0].metric("Evidence checks", total_gates)
+        action_metrics[1].metric("Available for review", available_gates)
+        action_metrics[2].metric("Open evidence gaps", len(missing_actions))
+        if missing_actions.empty:
+            st.success(
+                "All minimum evidence domains are marked available. Independent scientific "
+                "method review is still required; this is not permission to attribute pollution."
+            )
+        else:
+            display_dataframe(
+                missing_actions,
+                hide_index=True,
+                use_container_width=True,
+                alt="Actionable missing evidence requests for each industrial candidate",
+            )
+            st.warning(
+                f"{len(missing_actions)} evidence requirement(s) remain open across "
+                f"{len(source_assessment['candidates'])} candidate record(s). No source ranking "
+                "or causal attribution is produced."
+            )
+        with st.expander("View all evidence requirements"):
+            display_dataframe(
+                action_plan,
+                hide_index=True,
+                use_container_width=True,
+                alt="Complete industrial source evidence checklist",
+            )
+
 st.caption(
     "The August and September Eloor values are historical, day-level source-reported concentrations. Their exact "
     "averaging windows are unspecified and row-level QA is unassessed. Facility coordinates, "
