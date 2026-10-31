@@ -1,9 +1,15 @@
+import ast
+from pathlib import Path
 import unittest
+from unittest.mock import patch
 
 import pandas as pd
 import pyarrow as pa
 
-from src.dataframe_display import normalize_mixed_columns_for_display
+from src.dataframe_display import (
+    display_dataframe,
+    normalize_mixed_columns_for_display,
+)
 from src.hazard_manifest import build_hazard_manifest_frame
 
 
@@ -97,6 +103,60 @@ class MixedColumnDisplayTests(unittest.TestCase):
         self.assertEqual(table.column("Rows").to_pylist(), [47, None])
         self.assertEqual(table.column("Bytes").to_pylist(), [1024, None])
         self.assertEqual(entries[1]["data_rows"], None)
+
+    def test_display_boundary_passes_arrow_serializable_copy_to_streamlit(self):
+        source = pd.DataFrame({"Rows": [7, ""], "Label": ["uploaded", ""]})
+
+        with patch("src.dataframe_display.st.dataframe") as render:
+            display_dataframe(source, hide_index=True)
+
+        rendered = render.call_args.args[0]
+        table = pa.Table.from_pandas(rendered)
+
+        self.assertEqual(table.column("Rows").to_pylist(), [7, None])
+        self.assertEqual(table.column("Label").to_pylist(), ["uploaded", ""])
+        self.assertEqual(source["Rows"].tolist(), [7, ""])
+
+    def test_arrow_failure_logs_display_location_and_types_without_values(self):
+        source = pd.DataFrame({"Rows": [7, "private uploaded value"]})
+
+        with self.assertLogs("src.dataframe_display", level="ERROR") as captured:
+            with patch(
+                "src.dataframe_display.st.dataframe",
+                side_effect=pa.ArrowInvalid("private uploaded value"),
+            ):
+                with self.assertRaises(pa.ArrowInvalid):
+                    display_dataframe(source)
+
+        diagnostic = "\n".join(captured.output)
+        self.assertIn("test_dataframe_display.py:", diagnostic)
+        self.assertIn("Rows", diagnostic)
+        self.assertIn("int", diagnostic)
+        self.assertIn("str", diagnostic)
+        self.assertNotIn("private uploaded value", diagnostic)
+
+    def test_app_dataframe_and_table_calls_use_the_shared_display_boundary(self):
+        app_pages = Path(__file__).parent / "app_pages"
+        unguarded_calls = []
+        wrapped_calls = 0
+
+        for path in app_pages.rglob("*.py"):
+            tree = ast.parse(path.read_text(encoding="utf-8-sig"))
+            for node in ast.walk(tree):
+                if not isinstance(node, ast.Call):
+                    continue
+                if isinstance(node.func, ast.Name) and node.func.id == "display_dataframe":
+                    wrapped_calls += 1
+                if (
+                    isinstance(node.func, ast.Attribute)
+                    and node.func.attr in {"dataframe", "table"}
+                    and isinstance(node.func.value, ast.Name)
+                    and node.func.value.id == "st"
+                ):
+                    unguarded_calls.append(f"{path}:{node.lineno}")
+
+        self.assertGreater(wrapped_calls, 0)
+        self.assertEqual(unguarded_calls, [])
 
 
 if __name__ == "__main__":

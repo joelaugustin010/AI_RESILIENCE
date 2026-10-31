@@ -7,6 +7,8 @@ import json
 import pandas as pd
 import streamlit as st
 
+from src.dataframe_display import display_dataframe
+
 from src.scientific_scenario_engine import build_scientific_scenario_frame
 from src.source_registry import build_source_registry, source_fitness_summary
 from src.disaster_data_catalog import get_catalog, validate_catalog_record
@@ -112,7 +114,7 @@ def _render_rainfall_backtest(station: str) -> None:
                 "RMSE (mm)": metrics["gradient_boosting"]["rmse_mm"],
             },
         ]
-        st.dataframe(pd.DataFrame(metric_rows), hide_index=True, width="stretch")
+        display_dataframe(pd.DataFrame(metric_rows), hide_index=True, width="stretch")
         st.caption(
             f"Training: {summary['train_pairs']:,} exact one-hour pairs ending before "
             f"{summary['train_end_exclusive']}; test: {summary['test_pairs']:,} pairs from "
@@ -121,7 +123,7 @@ def _render_rainfall_backtest(station: str) -> None:
             f"test coverage is {summary['test_stations']} of {summary['all_stations']} stations."
         )
         st.write("**Per-station holdout metrics**")
-        st.dataframe(result["per_station"], hide_index=True, width="stretch")
+        display_dataframe(result["per_station"], hide_index=True, width="stretch")
         selected_station = result["predictions"].loc[
             result["predictions"]["station"].eq(station)
         ].copy()
@@ -236,7 +238,7 @@ def _render_hydrology_explorer() -> None:
 
         if spec.mode == "rainfall" and qa["duplicate_station_time_groups"] == 0:
             st.markdown("**Station comparison (raw recorded values)**")
-            st.dataframe(rainfall_station_comparison(observations), hide_index=True, width="stretch")
+            display_dataframe(rainfall_station_comparison(observations), hide_index=True, width="stretch")
             st.caption("Stations share the mm unit. Uneven time coverage means the table compares recorded samples, not complete-period rainfall totals.")
             if dataset_id == "rainfall_manual":
                 _render_rainfall_backtest(station)
@@ -518,12 +520,12 @@ with st.expander("Why the model produced this output", expanded=True):
         st.caption(f"• {item}")
 
 scenario_screen = build_scenario_screening(inputs)
-st.dataframe(scenario_screen, hide_index=True, width="stretch")
+display_dataframe(scenario_screen, hide_index=True, width="stretch")
 
 st.header("3. Review evidence")
 evidence = evidence_inventory(ROOT, st.session_state.get("rainfall_backtest_result"))
 st.caption("The separate historical benchmark uses only the manual rainfall observations. Its results do not enter this qualitative assessment; conflicted CWC rainfall, unverified sample rows, and unresolved river levels remain excluded from model calculations.")
-st.dataframe(evidence, hide_index=True, width="stretch")
+display_dataframe(evidence, hide_index=True, width="stretch")
 
 with st.expander("Dataset provenance and scientific fitness register", expanded=True):
     st.caption(
@@ -550,7 +552,7 @@ with st.expander("Dataset provenance and scientific fitness register", expanded=
             "Known limitation": record["known_limitation"],
             "Source URL": record["source_url"],
         })
-    st.dataframe(pd.DataFrame(registry_view), hide_index=True, width="stretch")
+    display_dataframe(pd.DataFrame(registry_view), hide_index=True, width="stretch")
     st.warning(
         "No dataset in this registry is approved by this app for numerical disaster prediction or official warnings. "
         "Source metadata completeness and scientific validation are different checks."
@@ -581,7 +583,7 @@ with st.expander("Kochi multi-hazard data acquisition board", expanded=True):
         row for row in catalog_records if row not in relevant_records
     ]
     st.markdown("**Priority order:** P0 = core baseline evidence; P1 = important supporting evidence; P2 = later extension.")
-    st.dataframe(pd.DataFrame([{
+    display_dataframe(pd.DataFrame([{
         "Priority": row["priority"],
         "Hazard(s)": ", ".join(row["hazards"]),
         "Theme": row["theme"],
@@ -626,14 +628,14 @@ with st.expander("Consequence-model data requirements by disaster", expanded=Tru
     )
     req = requirements_for_hazard(requirement_hazard)
     st.markdown(f"**Candidate model family:** {req['model_family']}")
-    st.dataframe(pd.DataFrame(requirements_table(requirement_hazard)), hide_index=True, width="stretch")
+    display_dataframe(pd.DataFrame(requirements_table(requirement_hazard)), hide_index=True, width="stretch")
     st.markdown("**Specific blockers before consequence estimates:**")
     st.warning(req["current_blockers"])
     st.markdown("**Potential authoritative starting sources:**")
     st.write(req["starter_sources"])
     st.markdown("**Validation rule:** every hazard needs independent event/outcome evidence, a baseline comparison, event- or time-separated evaluation, uncertainty reporting, and a documented intended-use boundary.")
     with st.expander("Shared minimum requirements across every hazard"):
-        st.dataframe(pd.DataFrame(req["common_requirements"]), hide_index=True, width="stretch")
+        display_dataframe(pd.DataFrame(req["common_requirements"]), hide_index=True, width="stretch")
 
 st.subheader("Evidence readiness checklist for this hazard")
 st.caption(
@@ -641,7 +643,7 @@ st.caption(
     "A file/path being present does not prove its contents are suitable, current, licensed for reuse, or independently verified."
 )
 evidence_checklist = hazard_evidence_checklist(inputs, ROOT)
-st.dataframe(evidence_checklist, hide_index=True, width="stretch")
+display_dataframe(evidence_checklist, hide_index=True, width="stretch")
 st.info(
     "Readiness status is descriptive, not a numerical risk score. Items marked not connected or unverified "
     "must not be treated as evidence that the hazard or exposure is absent."
@@ -672,7 +674,7 @@ st.caption(
     "It does not calculate a probability, impact estimate, or warning."
 )
 if scientific_frame["pathways"]:
-    st.dataframe(pd.DataFrame(scientific_frame["pathways"]), hide_index=True, width="stretch")
+    display_dataframe(pd.DataFrame(scientific_frame["pathways"]), hide_index=True, width="stretch")
 else:
     st.warning("No pathway template exists for this selection. The app will not guess one.")
 st.markdown("**Evidence required before stronger conclusions:**")
@@ -710,7 +712,7 @@ if readiness_plan["hazard_specific_gaps"]:
     st.warning("Hazard-specific evidence gaps:")
     for item in readiness_plan["hazard_specific_gaps"]:
         st.markdown(f"- {item}")
-st.dataframe(pd.DataFrame(readiness_plan["next_steps"]), hide_index=True, width="stretch")
+display_dataframe(pd.DataFrame(readiness_plan["next_steps"]), hide_index=True, width="stretch")
 st.caption(readiness_plan["interpretation"])
 st.info(
     "Numerical prediction is not enabled because the required calibrated model and verified local evidence are not available. "
@@ -757,7 +759,7 @@ st.caption(consequence_assessment["probability_semantics"])
 st.header("4. Compare hypothetical scenarios")
 st.caption("The following cases differ only by their stated assumptions. Possible pathways are planning prompts, not calculated impacts.")
 scenarios = build_scenario_comparison(inputs)
-st.dataframe(scenarios, hide_index=True, width="stretch")
+display_dataframe(scenarios, hide_index=True, width="stretch")
 
 st.header("5. Compare mitigation actions")
 st.write("Candidate actions below are qualitative planning prompts. Costs and impact estimates start blank and must be supported by your own documented evidence.")
@@ -802,7 +804,7 @@ elif overall_budget["within_budget"]:
 else:
     st.warning("Entered action costs exceed the available budget.")
 combinations = compare_action_combinations(actions, budget, {"A": combination_a, "B": combination_b})
-st.dataframe(combinations, hide_index=True, width="stretch")
+display_dataframe(combinations, hide_index=True, width="stretch")
 st.caption("A combination is shown because you selected its actions. Affordability is cost arithmetic only; priority numbers are supplied by you.")
 
 st.header("7. Generate a report")
@@ -842,4 +844,4 @@ download_col2.download_button(
     width="stretch",
 )
 with st.expander("Preview report contents"):
-    st.dataframe(report, hide_index=True, width="stretch")
+    display_dataframe(report, hide_index=True, width="stretch")

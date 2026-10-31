@@ -1,6 +1,9 @@
-import streamlit as st
-import plotly.graph_objects as go
 import numpy as np
+import plotly.graph_objects as go
+import streamlit as st
+
+from src.dataframe_display import display_dataframe
+
 st.set_page_config(
     page_title="Smart Mitigation Design Studio",
     page_icon="🏗️",
@@ -457,7 +460,7 @@ if summary_items:
 
     summary_df = pd.DataFrame(summary_items)
 
-    st.dataframe(
+    display_dataframe(
         summary_df,
         use_container_width=True,
         hide_index=True,
@@ -1079,5 +1082,4 @@ st.download_button(
     mime="text/plain",
     use_container_width=True,
 )
-
 
