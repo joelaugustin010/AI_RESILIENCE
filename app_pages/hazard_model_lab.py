@@ -55,6 +55,7 @@ else:
         with st.expander(label, expanded=True):
             st.caption(model.get("status", "Status not recorded"))
             st.write(f"**Research target:** {model.get('target_definition', 'Not documented')}")
+            st.write(f"**Selected estimator:** {model.get('selected_model_type', 'Not recorded')}")
             st.write(
                 f"**Threshold:** {model.get('threshold', 'N/A')} "
                 f"{model.get('threshold_units', '')}"
@@ -72,6 +73,10 @@ else:
                     f"(chosen using validation-period {model.get('threshold_selection_metric', 'metric not recorded')})."
                 )
             st.write("**Locations:** " + ", ".join(model.get("locations", [])))
+            selection_results = model.get("model_selection_results", [])
+            if selection_results:
+                st.write("**Validation-only estimator comparison**")
+                st.dataframe(pd.DataFrame(selection_results), hide_index=True, width="stretch")
             metrics = model.get("metrics", {})
             metric_rows = [
                 {"Metric": "Accuracy", "Value": metrics.get("accuracy")},
@@ -80,9 +85,21 @@ else:
                 {"Metric": "Recall", "Value": metrics.get("recall")},
                 {"Metric": "F1 score", "Value": metrics.get("f1")},
                 {"Metric": "ROC-AUC", "Value": metrics.get("roc_auc")},
+                {"Metric": "Average precision (rare-event ranking)", "Value": metrics.get("average_precision")},
+                {"Metric": "Brier score (probability error; lower is better)", "Value": metrics.get("brier_score")},
                 {"Metric": "Majority baseline accuracy", "Value": metrics.get("majority_baseline_accuracy")},
+                {"Metric": "Majority baseline balanced accuracy", "Value": metrics.get("majority_baseline_balanced_accuracy")},
+                {"Metric": "Majority baseline F1", "Value": metrics.get("majority_baseline_f1")},
+                {"Metric": "Persistence baseline balanced accuracy", "Value": metrics.get("persistence_baseline_balanced_accuracy")},
+                {"Metric": "Persistence baseline F1", "Value": metrics.get("persistence_baseline_f1")},
             ]
             st.dataframe(pd.DataFrame(metric_rows), hide_index=True, width="stretch")
+            if metrics.get("confusion_matrix_tn_fp_fn_tp") is not None:
+                tn, fp, fn, tp = metrics["confusion_matrix_tn_fp_fn_tp"]
+                st.caption(
+                    f"Untouched test-set confusion matrix — true negatives: {tn}; false positives: {fp}; "
+                    f"false negatives: {fn}; true positives: {tp}."
+                )
             if model.get("hazard") == "extreme_rainfall":
                 if metrics.get("accuracy") is not None and metrics.get("majority_baseline_accuracy") is not None and metrics["accuracy"] < metrics["majority_baseline_accuracy"]:
                     st.error(
