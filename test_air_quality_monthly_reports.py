@@ -113,6 +113,14 @@ class EloorMonthlyReportTests(unittest.TestCase):
             with self.assertRaisesRegex(MonthlyReportError, "Unexpected source weather unit"):
                 load_eloor_monthly_report(REPORTS, "2026-09")
 
+    def test_out_of_range_humidity_is_preserved_for_explicit_review(self):
+        humidity = pd.to_numeric(self.september["weather"]["relative_humidity"], errors="coerce")
+        out_of_range = humidity.loc[~humidity.between(0, 100)]
+        self.assertGreater(len(out_of_range), 0)
+        self.assertTrue((out_of_range > 100).all())
+        # Ingestion preserves the source-reported values; the page flags and
+        # excludes them from the humidity chart instead of silently correcting them.
+
     def test_invalid_or_future_retrieval_dates_fail_provenance_checks(self):
         metadata_path = REPORTS / "kspcb_caaqms_eloor_2026-09.metadata.json"
         original_read_text = Path.read_text
