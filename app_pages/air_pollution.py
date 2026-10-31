@@ -351,8 +351,12 @@ else:
     display_aqi["CPCB AQI category"] = display_aqi["source_aqi"].map(
         lambda value: cpcb_aqi_category(value)[0]
     )
+    report_date_label = (
+        latest_extract_date.strftime("%d %B %Y")
+        if latest_extract_date else "date unavailable"
+    )
     st.caption(
-        "KSPCB source report date: 16 October 2026. AQI values are source-reported; "
+        f"KSPCB source report date: {report_date_label}. AQI values are source-reported; "
         "the category label is mapped to CPCB's official band. These are historical readings."
     )
     columns = [
@@ -387,7 +391,9 @@ else:
     if not eloor_rows.empty:
         eloor_row = eloor_rows.iloc[0]
         st.markdown("#### Eloor pollutant snapshot")
-        st.caption("KSPCB source-reported values · 16 October 2026 · historical, not live")
+        st.caption(
+            f"KSPCB source-reported values · {report_date_label} · historical, not live"
+        )
         snapshot_pollutants = (
             ("PM2.5", "PM2.5_value", "unit_PM2.5"),
             ("PM10", "PM10_value", "unit_PM10"),
