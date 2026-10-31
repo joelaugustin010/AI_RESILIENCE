@@ -1,0 +1,21 @@
+{
+  "dataset_id": "kerala_health_ernakulam_institution_directory_latest",
+  "source_url": "https://health.kerala.gov.in/index.php/institutionSearch?district=EKM",
+  "retrieved_at_utc": "2026-10-30T03:30:19.017549+00:00",
+  "record_count": 115,
+  "source_format": "searchable HTML table; no documented download/export endpoint",
+  "district_filter": "EKM / Ernakulam",
+  "source_status": "directory snapshot, not a live availability feed",
+  "current_availability_records": 0,
+  "records_with_operating_status": 0,
+  "records_with_valid_through": 0,
+  "records_with_icu_capacity": 0,
+  "records_with_functional_beds": 115,
+  "raw_html_sha256": "a1c9be600a899949db966caac365ad7dc8dd418c45a4a8fe572dd863dbc2890b",
+  "limitations": [
+    "The page provides no per-record last-updated date or source-defined validity period.",
+    "Functional and sanctioned beds are preserved as directory values, not current capacity or availability.",
+    "No current operating status, emergency operating status, ICU capacity, or validity field is supplied.",
+    "Map button attributes are not promoted to verified coordinates; rows with incomplete attributes remain incomplete."
+  ]
+}

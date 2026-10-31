@@ -1,0 +1,17 @@
+{
+  "dataset_id": "kerala_health_ernakulam_institutions_2024_25",
+  "source_name": "Kerala Department of Health Services",
+  "source_url": "https://health.kerala.gov.in/assets/backend/uploads/Galleryitem/17506790021511401637.pdf",
+  "source_title": "List of Modern Medicine Institutions 2024-25",
+  "source_date": "2024-25",
+  "source_sha256": "EF8DB702560C76E42AB28ACE75D2EE3F21F0826E85B7528FE3A0B1A81A3C676B",
+  "publisher": "Government of Kerala, Department of Health Services, Health Information Cell",
+  "geographic_scope": "Ernakulam district records only",
+  "coordinate_status": "Source-reported latitude/longitude columns; CRS and positional accuracy are not stated, so these are not used as verified spatial points.",
+  "limitations": [
+    "This overlay contains nine clearly extractable Ernakulam hospital rows from the official register, not a complete district-wide hospital inventory.",
+    "Per-facility bed counts are not copied from the district aggregate tables; current capacity is not inferred.",
+    "Records are kept separate from NIHFW rows because identity matching and stable cross-source keys were not established for every facility."
+  ],
+  "license_or_reuse_terms": "Official government publication; attribution retained. Confirm current reuse terms before redistribution."
+}
