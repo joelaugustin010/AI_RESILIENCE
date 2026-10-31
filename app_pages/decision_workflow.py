@@ -300,6 +300,7 @@ st.markdown("""
 <div class="wf-step"><strong>04 · Plan</strong>Compare actions and costs</div>
 <div class="wf-step"><strong>05 · Export</strong>Keep a report record</div>
 </div>
+""")
 st.caption("A historical rainfall measurement benchmark is available in the evidence explorer. It is separate from the assessment and is not a current rainfall or flood forecast.")
 st.page_link("app_pages/kochi_map.py", label="Open the Kochi map", icon=":material/map:")
 st.info(
