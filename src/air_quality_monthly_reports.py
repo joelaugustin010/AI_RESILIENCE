@@ -23,6 +23,12 @@ from src.air_quality import AirQualityDataError, SUPPORTED_POLLUTANTS, validate_
 KSPCB_PUBLISHER = "Kerala State Pollution Control Board"
 MONTHLY_POLLUTANTS = ("PM10", "PM2.5", "SO2", "CO", "NO", "NO2", "NOx", "NH3", "O3")
 WEATHER_VALUE_COLUMNS = ("wind_speed", "wind_direction", "temperature", "relative_humidity")
+WEATHER_UNIT_COLUMNS = {
+    "wind_speed_unit": "m/s",
+    "wind_direction_unit": "degrees",
+    "temperature_unit": "°C",
+    "relative_humidity_unit": "%",
+}
 REPORT_FILES = {
     "2026-08": {
         "metadata_file": "kspcb_air_reports.metadata.json",
@@ -182,7 +188,10 @@ def load_eloor_monthly_report(
     required = {
         "observations": {"observed_at", "station", "pollutant", "value", "unit", "averaging_period", "quality_flag", "source_url"},
         "aqi": {"observed_at", "station", "source_aqi", "source_url"},
-        "weather": {"observed_at", "station", *WEATHER_VALUE_COLUMNS, "source_url"},
+        "weather": {
+            "observed_at", "station", *WEATHER_VALUE_COLUMNS,
+            *WEATHER_UNIT_COLUMNS, "source_url",
+        },
     }
     for name, frame in (("observations", observations), ("aqi", aqi), ("weather", weather)):
         missing = sorted(required[name] - set(frame.columns))
@@ -223,6 +232,20 @@ def load_eloor_monthly_report(
         if (nonblank & numeric.isna()).any():
             raise MonthlyReportError(f"Non-numeric source weather values in {month}: {value_column}.")
         weather[value_column] = numeric
+
+    for unit_column, expected_unit in WEATHER_UNIT_COLUMNS.items():
+        source_units = weather[unit_column].astype("string").str.strip()
+        if source_units.isna().any() or source_units.eq("").any():
+            raise MonthlyReportError(
+                f"Missing source weather units in {month}: {unit_column}."
+            )
+        unexpected_units = sorted(set(source_units.dropna()) - {expected_unit})
+        if unexpected_units:
+            raise MonthlyReportError(
+                f"Unexpected source weather unit(s) in {month} for {unit_column}: "
+                + ", ".join(unexpected_units)
+                + f"; expected {expected_unit!r}."
+            )
 
     numeric_values = pd.to_numeric(observations["value"], errors="coerce")
     nonblank_values = observations["value"].notna() & observations["value"].astype("string").str.strip().ne("")
