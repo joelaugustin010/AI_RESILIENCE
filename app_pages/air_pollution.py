@@ -426,6 +426,48 @@ else:
         "[KSPCB Water and Air Quality Directory](https://kspcb.kerala.gov.in/water-and-air-quality-directory)."
     )
     if not daily_status.empty:
+        # Summarise only the station records present in these two dated extracts.
+        # A missing AQI is a reporting-availability issue, not evidence of clean air.
+        aqi_station_labels = (
+            daily_aqi["station"].dropna().astype(str).str.strip()
+            if "station" in daily_aqi.columns else pd.Series(dtype="string")
+        )
+        status_station_labels = (
+            daily_status["station"].dropna().astype(str).str.strip()
+            if "station" in daily_status.columns else pd.Series(dtype="string")
+        )
+        aqi_station_keys = set(aqi_station_labels.str.casefold())
+        status_station_keys = set(status_station_labels.str.casefold())
+        status_only_count = len(status_station_keys - aqi_station_keys)
+        station_record_count = len(aqi_station_keys | status_station_keys)
+
+        st.markdown("**Monitoring-network reporting coverage in this extract**")
+        coverage_columns = st.columns(3)
+        coverage_columns[0].metric("Stations with AQI rows", len(aqi_station_keys))
+        coverage_columns[1].metric("Status-only stations", status_only_count)
+        coverage_columns[2].metric("Distinct station records", station_record_count)
+        st.caption(
+            "Counts describe station labels in this dated report pair only; they are not a "
+            "complete inventory of all operating KSPCB monitors."
+        )
+
+        if "source_status" in daily_status.columns:
+            status_summary = (
+                daily_status.assign(
+                    _station_key=daily_status["station"].astype("string").str.strip().str.casefold(),
+                    _status_label=daily_status["source_status"].astype("string").str.strip(),
+                )
+                .dropna(subset=["_status_label"])
+                .drop_duplicates(subset=["_station_key", "_status_label"])
+                .groupby("_status_label")["_station_key"]
+                .nunique()
+                .sort_values(ascending=False)
+            )
+            if not status_summary.empty:
+                status_columns = st.columns(min(3, len(status_summary)))
+                for column, (status_label, count) in zip(status_columns, status_summary.items()):
+                    column.metric(str(status_label).title(), int(count))
+
         st.write("Stations without a reported AQI in this report:")
         display_dataframe(
             daily_status.rename(
