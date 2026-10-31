@@ -243,6 +243,7 @@ st.markdown(
     <nav class="air-nav">
         <a href="#latest-report">Latest report</a>
         <a href="#eloor-trends">Eloor trends</a>
+        <a href="#evidence-timeline">Evidence timeline</a>
         <a href="#namp-network">NAMP network</a>
         <a href="#annual-aqi">Annual AQI</a>
         <a href="#cpcb-method">CPCB method</a>
@@ -888,6 +889,129 @@ else:
         "interval is unspecified, row-level quality is unassessed, and valid-hour counts are "
         "not supplied. Source-reported AQI remains displayed separately and is not overwritten."
     )
+
+st.markdown('<div id="evidence-timeline"></div>', unsafe_allow_html=True)
+st.subheader("Eloor–Edayar pollution evidence timeline")
+st.caption(
+    "Chronology of dated ambient-air reporting and documented consent events. "
+    "Timeline proximity is not evidence that a facility caused an ambient concentration."
+)
+
+timeline_events = []
+for report_month, report in monthly_reports.items():
+    coverage_dates = report.get("source", {}).get("time_coverage", {})
+    start_date = coverage_dates.get("start")
+    end_date = coverage_dates.get("end")
+    if start_date and end_date:
+        timeline_events.append(
+            {
+                "Date": start_date,
+                "Evidence stream": "Ambient monitoring",
+                "Event": (
+                    f"Eloor CAAQMS daily report period: {start_date} to {end_date}"
+                ),
+                "Evidence note": (
+                    "KSPCB source-reported daily ambient observations; exact averaging "
+                    "interval and row-level QA/completeness are not stated."
+                ),
+                "Source / record": report.get("source_url", ""),
+            }
+        )
+
+consent_records = read_csv(INDUSTRIAL / "edayar_consent_records.csv")
+if not consent_records.empty:
+    for _, record in consent_records.iterrows():
+        facility_name = str(record.get("facility_name_in_record", "")).strip()
+        consent_type = str(record.get("consent_type", "")).strip()
+        decision = str(record.get("decision", "")).strip()
+        submitted_on = str(record.get("application_submitted_on", "")).strip()
+        decision_date = str(record.get("decision_or_issue_date", "")).strip()
+        valid_until = str(record.get("valid_until", "")).strip()
+        source_url = str(record.get("source_url", "")).strip()
+        record_id = str(record.get("record_id", "")).strip()
+
+        if submitted_on and submitted_on.casefold() != "nan":
+            timeline_events.append(
+                {
+                    "Date": submitted_on,
+                    "Evidence stream": "Consent application",
+                    "Event": f"{facility_name}: {consent_type} application submitted",
+                    "Evidence note": f"Application {record.get('application_number', '')}; submission date as transcribed in the reviewed register.",
+                    "Source / record": source_url,
+                }
+            )
+        if decision_date and decision_date.casefold() != "nan":
+            timeline_events.append(
+                {
+                    "Date": decision_date,
+                    "Evidence stream": "Consent decision",
+                    "Event": f"{facility_name}: {consent_type} — {decision}",
+                    "Evidence note": (
+                        f"Record {record_id}. This records the application decision, "
+                        "not proof of present operation or ambient emissions."
+                    ),
+                    "Source / record": source_url,
+                }
+            )
+        if valid_until and valid_until.casefold() != "nan":
+            timeline_events.append(
+                {
+                    "Date": valid_until,
+                    "Evidence stream": "Consent validity date",
+                    "Event": f"{facility_name}: stated validity end for {consent_type}",
+                    "Evidence note": (
+                        "Expiry date printed in the indexed record; later renewal, "
+                        "revocation or replacement may not be represented here."
+                    ),
+                    "Source / record": source_url,
+                }
+            )
+
+if timeline_events:
+    timeline = pd.DataFrame(timeline_events)
+    timeline["_sort_date"] = pd.to_datetime(timeline["Date"], format="%Y-%m-%d", errors="coerce")
+    timeline = timeline.sort_values(["_sort_date", "Evidence stream", "Event"]).drop(
+        columns="_sort_date"
+    )
+    stream_options = ["All evidence streams"] + sorted(timeline["Evidence stream"].unique().tolist())
+    selected_stream = st.selectbox(
+        "Filter timeline",
+        stream_options,
+        key="evidence_timeline_stream",
+    )
+    visible_timeline = (
+        timeline if selected_stream == "All evidence streams"
+        else timeline.loc[timeline["Evidence stream"].eq(selected_stream)]
+    )
+    st.dataframe(
+        visible_timeline,
+        hide_index=True,
+        use_container_width=True,
+        column_config={
+            "Source / record": st.column_config.LinkColumn(
+                "Source / record",
+                display_text="Open source record",
+            )
+        },
+        alt="Chronological timeline of Eloor ambient monitoring periods and Edayar consent records",
+    )
+    st.caption(
+        f"Showing {len(visible_timeline)} dated events from the records currently available "
+        "in this project. Dates describe the source record; they are not continuous monitoring "
+        "coverage. Consent-to-establish (CTE), consent-to-operate (CTO), rejected applications, "
+        "and stated expiry dates remain distinct."
+    )
+else:
+    st.info(
+        "No dated ambient-report or facility consent events are available to build the timeline."
+    )
+
+st.info(
+    "Evidence boundary: the Eloor reports contain ambient station summaries, while the Edayar "
+    "register contains consent/application history. The reviewed inventory has no verified "
+    "facility coordinates or measured stack-emission results. This chronology cannot establish "
+    "a facility-to-ambient pollution link."
+)
 
 st.subheader("Documented NAMP network reference")
 stations = pd.DataFrame(register["kspcb_namp_ernakulam_stations"])
