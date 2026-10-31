@@ -1118,6 +1118,82 @@ else:
         "are currently verified in this inventory."
     )
 
+    st.markdown("**Pollutant-by-pollutant evidence comparison**")
+    st.caption(
+        "Ambient counts below come from the provenance-checked Eloor monthly extracts. "
+        "A dated row is not automatically a QA-validated measurement. Facility stack evidence "
+        "is assessed separately and is not inferred from ambient concentrations or permit limits."
+    )
+    pollutant_inventory = [
+        ("PM2.5", ("PM2.5", "PM2_5")),
+        ("PM10", ("PM10",)),
+        ("NO₂", ("NO2",)),
+        ("NO", ("NO",)),
+        ("NOx", ("NOx",)),
+        ("SO₂", ("SO2",)),
+        ("O₃", ("O3",)),
+        ("CO", ("CO",)),
+        ("NH₃", ("NH3",)),
+    ]
+    comparison_rows = []
+    for display_name, source_names in pollutant_inventory:
+        ambient_rows = (
+            monthly_observations.loc[
+                monthly_observations["pollutant"].astype(str).str.upper().isin(
+                    {name.upper() for name in source_names}
+                )
+            ].copy()
+            if not monthly_observations.empty
+            else pd.DataFrame()
+        )
+        numeric_values = (
+            pd.to_numeric(ambient_rows["value"], errors="coerce")
+            if not ambient_rows.empty else pd.Series(dtype="float64")
+        )
+        dated_values = int(numeric_values.notna().sum())
+        qa_valid_values = (
+            int(
+                numeric_values.notna()
+                & ambient_rows["quality_flag"].astype(str).str.casefold().eq("valid")
+            )
+            if not ambient_rows.empty else 0
+        )
+        report_month_count = (
+            int(ambient_rows["observed_at"].astype(str).str.slice(0, 7).nunique())
+            if not ambient_rows.empty else 0
+        )
+        source_units = (
+            ", ".join(sorted(ambient_rows["unit"].dropna().astype(str).unique()))
+            if not ambient_rows.empty else "—"
+        )
+        comparison_rows.append(
+            {
+                "Pollutant": display_name,
+                "Eloor dated ambient values": dated_values,
+                "Months represented": report_month_count,
+                "Source unit(s)": source_units,
+                "Rows explicitly QA-valid": qa_valid_values,
+                "Facility measured stack results": "Not located",
+                "Evidence interpretation": (
+                    "Historical ambient records; QA unassessed"
+                    if dated_values else "No dated ambient values in loaded extracts"
+                ),
+            }
+        )
+    pollutant_comparison = pd.DataFrame(comparison_rows)
+    st.dataframe(
+        pollutant_comparison,
+        hide_index=True,
+        use_container_width=True,
+        alt="Pollutant-level comparison of Eloor ambient report coverage and Edayar facility stack evidence",
+    )
+    st.caption(
+        "The current Edayar inventory records no actual measured stack-emission results for "
+        "the candidate facilities. Historical permit limits, where present, are not measurements "
+        "and are not substituted into this table. ‘Not located’ means absent from the reviewed "
+        "project records, not proof that measurements do not exist elsewhere."
+    )
+
 if not industry_type_counts.empty:
     st.markdown("**Estate-level trade-effluent industry categories reported by KWA**")
     st.dataframe(
