@@ -1,0 +1,42 @@
+{
+  "dataset_id": "ksdma_ernakulam_flood_return_period_statistics_2022",
+  "title": "Ernakulam district flood hazard probability and exposed facilities by return period",
+  "publisher": "Kerala State Emergency Operations Centre / Kerala State Disaster Management Authority",
+  "source_url": "https://sdma.kerala.gov.in/wp-content/uploads/2022/06/Flood-Probability-Report-2022_Final.pdf",
+  "catalogue_url": "https://sdma.kerala.gov.in/hazard-maps/",
+  "publication_date": "2022-06-01",
+  "retrieved_on": "2026-10-31",
+  "source_section": "Section 5.1, Ernakulam district, pages 49-50 in the PDF report",
+  "method_context": "KSDMA report describes hydrological simulation with the Continuum model and hydraulic flood-hazard mapping; the historical and RCP 8.5 scenarios are distinct.",
+  "geographic_coverage": "Ernakulam district aggregate, not Kochi Corporation or individual wards",
+  "units": {
+    "area_affected": "square kilometres",
+    "hospitals_exposed": "count reported by source",
+    "schools_exposed": "count reported by source"
+  },
+  "return_period_definition": "Approximate annual exceedance probability is 1 divided by the return period; for example, a 10-year event corresponds to about 10% in any given year. This is a statistical scenario, not a forecast that the event occurs once every N years.",
+  "return_periods_years": [10, 25, 50, 100, 200, 500],
+  "historical_scenario": [
+    {"return_period_years": 10, "annual_exceedance_probability_percent": 10.0, "area_affected_sq_km": 458.67, "hospitals_exposed": 10, "schools_exposed": 88},
+    {"return_period_years": 25, "annual_exceedance_probability_percent": 4.0, "area_affected_sq_km": 489.20, "hospitals_exposed": 13, "schools_exposed": 104},
+    {"return_period_years": 50, "annual_exceedance_probability_percent": 2.0, "area_affected_sq_km": 511.40, "hospitals_exposed": 16, "schools_exposed": 111},
+    {"return_period_years": 100, "annual_exceedance_probability_percent": 1.0, "area_affected_sq_km": 533.96, "hospitals_exposed": 17, "schools_exposed": 128},
+    {"return_period_years": 200, "annual_exceedance_probability_percent": 0.5, "area_affected_sq_km": 558.31, "hospitals_exposed": 25, "schools_exposed": 140},
+    {"return_period_years": 500, "annual_exceedance_probability_percent": 0.2, "area_affected_sq_km": 596.45, "hospitals_exposed": 32, "schools_exposed": 171}
+  ],
+  "rcp_8_5_scenario": [
+    {"return_period_years": 10, "annual_exceedance_probability_percent": 10.0, "area_affected_sq_km": 652.59, "hospitals_exposed": 21, "schools_exposed": 134},
+    {"return_period_years": 25, "annual_exceedance_probability_percent": 4.0, "area_affected_sq_km": 710.25, "hospitals_exposed": 28, "schools_exposed": 165},
+    {"return_period_years": 50, "annual_exceedance_probability_percent": 2.0, "area_affected_sq_km": 785.60, "hospitals_exposed": 32, "schools_exposed": 195},
+    {"return_period_years": 100, "annual_exceedance_probability_percent": 1.0, "area_affected_sq_km": 847.07, "hospitals_exposed": 34, "schools_exposed": 236},
+    {"return_period_years": 200, "annual_exceedance_probability_percent": 0.5, "area_affected_sq_km": 901.49, "hospitals_exposed": 42, "schools_exposed": 270},
+    {"return_period_years": 500, "annual_exceedance_probability_percent": 0.2, "area_affected_sq_km": 983.88, "hospitals_exposed": 55, "schools_exposed": 325}
+  ],
+  "limitations": [
+    "These are source-reported district aggregates and cannot be assigned to Kochi Corporation, a ward, or a specific hospital.",
+    "Exposure counts depend on the source's facility inventory and methodology; they are not an independent revalidation by this project.",
+    "Historical and RCP 8.5 scenario results must not be mixed.",
+    "The statistics do not document the numeric units/semantics of the separate KSDMA GeoTIFF pixel values; raster-based spatial overlay remains blocked until those are verified.",
+    "This report supports historical/scenario context only, not live flood prediction or emergency warnings."
+  ]
+}

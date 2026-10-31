@@ -56,7 +56,11 @@ jobs:
             echo "No new or changed data files to commit."
           else
             git commit -m "Add acquired multi-hazard source data and provenance"
-            git push
+            # Feature branches can advance while this network-heavy job runs.
+            # Rebase the generated data/report commit onto the latest branch before pushing.
+            git fetch origin "$GITHUB_REF_NAME:refs/remotes/origin/$GITHUB_REF_NAME"
+            git rebase "origin/$GITHUB_REF_NAME"
+            git push origin "HEAD:$GITHUB_REF_NAME"
           fi
       - name: Upload source-data archive and provenance reports
         if: always()
