@@ -18,7 +18,7 @@ def test_nested_raw_source_is_found_without_claiming_model_readiness(tmp_path: P
         }]
     }), encoding="utf-8")
 
-    raw = tmp_path / "data" / "external" / "hazards" / "raw" / "earthquake" / "events.csv"
+    raw = tmp_path / "data" / "external" / "hazards" / "raw" / "earthquake" / "usgs_india_events_2000_present.csv"
     raw.parent.mkdir(parents=True)
     raw.write_text("time,latitude,longitude,mag\n2020-01-01,10,76,3.1\n", encoding="utf-8")
 
