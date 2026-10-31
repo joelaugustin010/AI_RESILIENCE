@@ -513,7 +513,10 @@ def evidence_provenance_summary(inputs: dict[str, Any]) -> dict[str, str]:
     return {
         "Input evidence class": classification or "Unknown / unverified",
         "Provenance status": provenance,
-        "Source/time notes": "Supplied by user; not independently checked" if source_notes else "Not supplied",
+        "Source/time notes": (
+            f"User-entered (not independently verified; not independently checked): {source_notes}"
+            if source_notes else "Not supplied"
+        ),
         "Permitted interpretation": interpretation,
         "Verification gate": verification,
     }

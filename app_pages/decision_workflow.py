@@ -300,6 +300,7 @@ st.markdown("""
 <div class="wf-step"><strong>04 · Plan</strong>Compare actions and costs</div>
 <div class="wf-step"><strong>05 · Export</strong>Keep a report record</div>
 </div>
+""")
 st.caption("A historical rainfall measurement benchmark is available in the evidence explorer. It is separate from the assessment and is not a current rainfall or flood forecast.")
 st.page_link("app_pages/kochi_map.py", label="Open the Kochi map", icon=":material/map:")
 st.info(
@@ -333,10 +334,12 @@ with st.form("decision_workflow_intake"):
         ["Hypothetical scenario assumption", "User-reported observation (source not independently verified)", "Forecast supplied by user (not checked by app)", "Unknown / unverified"],
         key="wf_classification",
     )
-    source_and_time = st.text_input(
+    source_and_time = st.text_area(
         "Source, observation/forecast time, and units (if known)",
         key="wf_source_time",
-        help="Example: source name, timestamp, timezone, station, and averaging period. This app does not verify them.",
+        height=90,
+        placeholder="Example: IMD bulletin; issued 31 Oct 2026, 10:00 IST; valid until 31 Oct 2026, 20:30 IST; wind in km/h; station/area: Kochi.",
+        help="Enter the provider/source, observation time or forecast issue and valid times, timezone, station/area, units, and averaging period where known. Leave unknown details blank. This app does not independently verify the entry.",
     )
 
     # Show only fields relevant to the selected hazard. Keep hidden fields explicitly
@@ -493,13 +496,8 @@ if submitted:
 
 inputs = st.session_state.get("decision_workflow_inputs")
 if inputs is None:
-    st.header("2. Evidence available to review")
-    st.dataframe(
-        evidence_inventory(ROOT, st.session_state.get("rainfall_backtest_result")),
-        hide_index=True,
-        width="stretch",
-    )
-    st.info("Submit the form to continue. Missing GIS layers do not block a qualitative assessment; missing evidence does block a reliable numerical prediction.")
+    # Keep the page focused on the scenario form until the user submits it.
+    # The evidence inventory is shown in the results section after submission.
     st.stop()
 
 st.header("2. Immediate scenario result")

@@ -69,7 +69,6 @@ hydraulic calculations, dimensions, costs, and local requirements.
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("")
 
 
 st.markdown("## 🏙️ Project Configuration")
@@ -898,7 +897,7 @@ st.plotly_chart(fig3d, use_container_width=True)
 # LIVE RAINFALL STATUS
 # ==============================
 
-st.markdown("### 🌧️ Live Design Scenario")
+st.markdown("### 🌧️ Selected Design Scenario")
 
 status_col1, status_col2, status_col3 = st.columns(3)
 
@@ -948,10 +947,6 @@ st.caption(
     "It does not calculate actual flood probability or safety."
 )
 
-use_rain_garden = st.checkbox(
-    "Include Rain Garden",
-    value=True
-)
 # ==============================
 # DESIGN SUMMARY
 # ==============================
@@ -969,10 +964,10 @@ with summary_col1:
     if use_storage:
         st.write("• Stormwater storage pond")
 
-    if use_rain_garden:
+    if use_garden:
         st.write("• Rain garden / infiltration zone")
 
-    if not any([use_drains, use_storage, use_rain_garden]):
+    if not any([use_drains, use_storage, use_garden]):
         st.info("No mitigation components selected.")
 
 with summary_col2:
@@ -988,29 +983,6 @@ st.warning(
     "establish flood protection performance. Professional site surveys, "
     "hydraulic calculations, and engineering review are required."
 )
-# 10. Engineering concept summary
-st.markdown("### 🏗️ Flood-Management Design Summary")
-
-summary_col1, summary_col2, summary_col3 = st.columns(3)
-
-with summary_col1:
-    st.metric("Drainage", "Included" if use_drains else "Disabled")
-    st.caption("Conceptual stormwater channel")
-
-with summary_col2:
-    st.metric("Green Infrastructure", "Included" if use_garden else "Disabled")
-    st.caption("Rain garden and infiltration zone")
-
-with summary_col3:
-    st.metric("Monitoring", "Included" if use_sensors else "Disabled")
-    st.caption("Conceptual water-level sensors")
-
-st.info(
-    "Engineering status: CONCEPT ONLY. "
-    "No validated flood prediction, hydraulic capacity, "
-    "structural safety, or construction dimensions are provided."
-)
-
 # ==========================================
 # INTERACTIVE MODEL — ENGINEERING STATUS
 # ==========================================

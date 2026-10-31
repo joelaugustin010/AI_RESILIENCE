@@ -2,8 +2,6 @@
 
 import streamlit as st
 
-from src.prototype_data import load_dataset
-
 
 st.header("What happens if hazards occur together?")
 st.write("Select hazards and exposed services to organize a planning discussion. This is a qualitative scenario worksheet, not a local impact model or forecast.")
@@ -44,11 +42,3 @@ if submitted:
         st.write("**Conditions entered:**", conditions.strip() or "None")
         st.warning("No probability, damage, casualty, service-outage, or monetary impact estimate is available from this worksheet. Confirm conditions and response actions with local authorities and official guidance.")
 
-try:
-    examples = load_dataset("compound_disaster_data.csv", ["event_id", "district", "event_date", "compound_impact_severity_class"])
-except (FileNotFoundError, ValueError):
-    examples = None
-if examples is not None:
-    with st.expander("View the project's five unverified example rows"):
-        st.caption("No source documentation is present in this project; these rows do not calculate the scenario.")
-        st.dataframe(examples, hide_index=True, width="stretch")
