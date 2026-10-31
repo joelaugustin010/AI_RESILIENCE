@@ -655,8 +655,6 @@ def report_rows(
     add("Budget", "Fit status", "Complete-cost actions fit budget" if budget_result["within_budget"] is True else "Complete-cost actions exceed budget" if budget_result["within_budget"] is False else "Cannot confirm fit; budget or one or more costs are missing/invalid")
     for _, row in combinations.iterrows():
         add("User-selected budget comparison", str(row["Combination"]), row.to_dict())
-    add("Data quality", "Rainfall", "Audit found 324 station-time groups with conflicting rainfall values; raw observations remain unchanged.")
-    add("Data quality", "River level", "F.C.S. Mananthavadi telemetry has a 701.962 m value change across a 69-day gap; datum/reference is unconfirmed. No correction or threshold comparison was applied.")
     add("Priority explanation", "Basis", "Action priority and combination selection are user-entered. Budget-fit results are arithmetic and do not imply effectiveness or optimality.")
     return pd.DataFrame(rows, columns=["Section", "Field", "Value"])
 
