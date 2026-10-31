@@ -5,7 +5,8 @@ from src.independent_model_evaluation import evaluate_classifier, evaluate_regre
 def test_classifier_reports_imbalance_aware_metrics_and_confusion_matrix():
     result = evaluate_classifier([0, 0, 0, 1], [0, 0, 1, 1], labels=[0, 1])
     assert result["n_test"] == 4
-    assert result["balanced_accuracy"] == pytest.approx(2 / 3)
+    # Class 0 recall is 2/3 and class 1 recall is 1; their mean is 5/6.
+    assert result["balanced_accuracy"] == pytest.approx(5 / 6)
     assert result["confusion_matrix"] == [[2, 1], [0, 1]]
     assert result["probability_metrics_available"] is False
 
