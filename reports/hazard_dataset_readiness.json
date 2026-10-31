@@ -1,124 +1,814 @@
 {
-  "status": "READINESS_AUDIT_ONLY",
-  "trained_models": 0,
-  "warning": "This report does not claim any model is trained or scientifically validated.",
+  "status": "RAW_SOURCE_AUDIT_AND_TRAINING_READINESS",
+  "generated_at_utc": "2026-10-31T09:02:29.321847+00:00",
+  "raw_sources_available_for_hazards": 7,
+  "hazard_tracks": 9,
+  "research_baselines_found_in_separate_report": 2,
+  "warning": "Raw data availability, a curated training table, a research baseline, and a validated local prediction model are separate states. Research baselines referenced here are not certified forecasts.",
   "hazards": [
     {
       "hazard_id": "earthquake",
       "label": "Earthquake shaking impact",
       "source": "USGS ComCat",
       "source_url": "https://earthquake.usgs.gov/fdsnws/event/1/",
-      "exists": false,
-      "audit": {
-        "status": "MISSING_DATA",
+      "raw_sources": [
+        {
+          "file": "data/external/hazards/raw/earthquake/usgs_india_events_2000_present.csv",
+          "exists": true,
+          "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
+          "bytes": 3448711,
+          "sha256": "2ea76bdea07f11e329ff44a1a29af332d755059fa3f1126e15a7e3b5c58de548",
+          "format": "csv",
+          "columns_sample": [
+            "time",
+            "latitude",
+            "longitude",
+            "depth",
+            "mag",
+            "magType",
+            "nst",
+            "gap",
+            "dmin",
+            "rms",
+            "net",
+            "id",
+            "updated",
+            "place",
+            "type",
+            "horizontalError",
+            "depthError",
+            "magError",
+            "magNst",
+            "status",
+            "locationSource",
+            "magSource"
+          ],
+          "has_explicit_target_column": false
+        }
+      ],
+      "raw_source_count": 1,
+      "curated_training_table": {
+        "file": "data/external/hazards/earthquake.csv",
+        "status": "MISSING_CURATED_TRAINING_TABLE",
         "issues": [
-          "No local dataset file found; no model trained."
+          "No curated, explicitly labelled training table exists at this path."
         ]
-      }
+      },
+      "research_baseline": null,
+      "model_status": "NO_CURATED_TRAINING_TABLE",
+      "scientific_limitation": "An event catalogue alone cannot predict earthquake occurrence; use for event catalogue analysis or impact modelling only with appropriate labels and exposure/shaking features."
     },
     {
       "hazard_id": "cyclone",
       "label": "Tropical cyclone",
       "source": "NOAA IBTrACS",
       "source_url": "https://www.ncei.noaa.gov/products/international-best-track-archive",
-      "exists": false,
-      "audit": {
-        "status": "MISSING_DATA",
+      "raw_sources": [
+        {
+          "file": "data/external/hazards/raw/cyclone/ibtracs_north_indian_ocean_v04r01.csv",
+          "exists": true,
+          "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
+          "bytes": 25623827,
+          "sha256": "11e21e388602d8976f9be0042717813fc9b16decca2c17bd305532a0ae812661",
+          "format": "csv",
+          "columns_sample": [
+            "SID",
+            "SEASON",
+            "NUMBER",
+            "BASIN",
+            "SUBBASIN",
+            "NAME",
+            "ISO_TIME",
+            "NATURE",
+            "LAT",
+            "LON",
+            "WMO_WIND",
+            "WMO_PRES",
+            "WMO_AGENCY",
+            "TRACK_TYPE",
+            "DIST2LAND",
+            "LANDFALL",
+            "IFLAG",
+            "USA_AGENCY",
+            "USA_ATCF_ID",
+            "USA_LAT",
+            "USA_LON",
+            "USA_RECORD",
+            "USA_STATUS",
+            "USA_WIND",
+            "USA_PRES",
+            "USA_SSHS",
+            "USA_R34_NE",
+            "USA_R34_SE",
+            "USA_R34_SW",
+            "USA_R34_NW",
+            "USA_R50_NE",
+            "USA_R50_SE",
+            "USA_R50_SW",
+            "USA_R50_NW",
+            "USA_R64_NE",
+            "USA_R64_SE",
+            "USA_R64_SW",
+            "USA_R64_NW",
+            "USA_POCI",
+            "USA_ROCI",
+            "USA_RMW",
+            "USA_EYE",
+            "TOKYO_LAT",
+            "TOKYO_LON",
+            "TOKYO_GRADE",
+            "TOKYO_WIND",
+            "TOKYO_PRES",
+            "TOKYO_R50_DIR",
+            "TOKYO_R50_LONG",
+            "TOKYO_R50_SHORT",
+            "TOKYO_R30_DIR",
+            "TOKYO_R30_LONG",
+            "TOKYO_R30_SHORT",
+            "TOKYO_LAND",
+            "CMA_LAT",
+            "CMA_LON",
+            "CMA_CAT",
+            "CMA_WIND",
+            "CMA_PRES",
+            "HKO_LAT",
+            "HKO_LON",
+            "HKO_CAT",
+            "HKO_WIND",
+            "HKO_PRES",
+            "KMA_LAT",
+            "KMA_LON",
+            "KMA_CAT",
+            "KMA_WIND",
+            "KMA_PRES",
+            "KMA_R50_DIR",
+            "KMA_R50_LONG",
+            "KMA_R50_SHORT",
+            "KMA_R30_DIR",
+            "KMA_R30_LONG",
+            "KMA_R30_SHORT",
+            "NEWDELHI_LAT",
+            "NEWDELHI_LON",
+            "NEWDELHI_GRADE",
+            "NEWDELHI_WIND",
+            "NEWDELHI_PRES",
+            "NEWDELHI_CI",
+            "NEWDELHI_DP",
+            "NEWDELHI_POCI",
+            "REUNION_LAT",
+            "REUNION_LON",
+            "REUNION_TYPE",
+            "REUNION_WIND",
+            "REUNION_PRES",
+            "REUNION_TNUM",
+            "REUNION_CI",
+            "REUNION_RMW",
+            "REUNION_R34_NE",
+            "REUNION_R34_SE",
+            "REUNION_R34_SW",
+            "REUNION_R34_NW",
+            "REUNION_R50_NE",
+            "REUNION_R50_SE",
+            "REUNION_R50_SW",
+            "REUNION_R50_NW",
+            "REUNION_R64_NE",
+            "REUNION_R64_SE",
+            "REUNION_R64_SW",
+            "REUNION_R64_NW",
+            "BOM_LAT",
+            "BOM_LON",
+            "BOM_TYPE",
+            "BOM_WIND",
+            "BOM_PRES",
+            "BOM_TNUM",
+            "BOM_CI",
+            "BOM_RMW",
+            "BOM_R34_NE",
+            "BOM_R34_SE",
+            "BOM_R34_SW",
+            "BOM_R34_NW",
+            "BOM_R50_NE",
+            "BOM_R50_SE",
+            "BOM_R50_SW",
+            "BOM_R50_NW",
+            "BOM_R64_NE",
+            "BOM_R64_SE",
+            "BOM_R64_SW",
+            "BOM_R64_NW",
+            "BOM_ROCI",
+            "BOM_POCI",
+            "BOM_EYE",
+            "BOM_POS_METHOD",
+            "BOM_PRES_METHOD",
+            "NADI_LAT",
+            "NADI_LON",
+            "NADI_CAT",
+            "NADI_WIND",
+            "NADI_PRES",
+            "WELLINGTON_LAT",
+            "WELLINGTON_LON",
+            "WELLINGTON_WIND",
+            "WELLINGTON_PRES",
+            "DS824_LAT",
+            "DS824_LON",
+            "DS824_STAGE",
+            "DS824_WIND",
+            "DS824_PRES",
+            "TD9636_LAT",
+            "TD9636_LON",
+            "TD9636_STAGE",
+            "TD9636_WIND",
+            "TD9636_PRES",
+            "TD9635_LAT",
+            "TD9635_LON",
+            "TD9635_WIND",
+            "TD9635_PRES",
+            "TD9635_ROCI",
+            "NEUMANN_LAT",
+            "NEUMANN_LON",
+            "NEUMANN_CLASS",
+            "NEUMANN_WIND",
+            "NEUMANN_PRES",
+            "MLC_LAT",
+            "MLC_LON",
+            "MLC_CLASS",
+            "MLC_WIND",
+            "MLC_PRES",
+            "USA_GUST",
+            "BOM_GUST",
+            "BOM_GUST_PER",
+            "REUNION_GUST",
+            "REUNION_GUST_PER",
+            "USA_SEAHGT",
+            "USA_SEARAD_NE",
+            "USA_SEARAD_SE",
+            "USA_SEARAD_SW",
+            "USA_SEARAD_NW",
+            "STORM_SPEED",
+            "STORM_DIR"
+          ],
+          "has_explicit_target_column": false
+        }
+      ],
+      "raw_source_count": 1,
+      "curated_training_table": {
+        "file": "data/external/hazards/cyclone.csv",
+        "status": "MISSING_CURATED_TRAINING_TABLE",
         "issues": [
-          "No local dataset file found; no model trained."
+          "No curated, explicitly labelled training table exists at this path."
         ]
-      }
+      },
+      "research_baseline": null,
+      "model_status": "NO_CURATED_TRAINING_TABLE",
+      "scientific_limitation": "Track data alone is not a validated local landfall forecast; split by storm/season and use forecast-time predictors only."
     },
     {
       "hazard_id": "landslide",
       "label": "Landslide susceptibility",
       "source": "NASA Global Landslide Catalog / USGS inventories",
       "source_url": "https://data.nasa.gov/",
-      "exists": false,
-      "audit": {
-        "status": "MISSING_DATA",
+      "raw_sources": [
+        {
+          "file": "data/external/hazards/raw/landslide/nasa_global_landslide_catalog.csv",
+          "exists": true,
+          "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
+          "bytes": 8479717,
+          "sha256": "2c4898899dd4f373c4320e121c5b655ebb5394d431fa42e57ec4828d07d48b04",
+          "format": "csv",
+          "columns_sample": [
+            "source_name",
+            "source_link",
+            "event_id",
+            "event_date",
+            "event_time",
+            "event_title",
+            "event_description",
+            "location_description",
+            "location_accuracy",
+            "landslide_category",
+            "landslide_trigger",
+            "landslide_size",
+            "landslide_setting",
+            "fatality_count",
+            "injury_count",
+            "storm_name",
+            "photo_link",
+            "notes",
+            "event_import_source",
+            "event_import_id",
+            "country_name",
+            "country_code",
+            "admin_division_name",
+            "admin_division_population",
+            "gazeteer_closest_point",
+            "gazeteer_distance",
+            "submitted_date",
+            "created_date",
+            "last_edited_date",
+            "longitude",
+            "latitude"
+          ],
+          "has_explicit_target_column": false
+        }
+      ],
+      "raw_source_count": 1,
+      "curated_training_table": {
+        "file": "data/external/hazards/landslide.csv",
+        "status": "MISSING_CURATED_TRAINING_TABLE",
         "issues": [
-          "No local dataset file found; no model trained."
+          "No curated, explicitly labelled training table exists at this path."
         ]
-      }
+      },
+      "research_baseline": null,
+      "model_status": "NO_CURATED_TRAINING_TABLE",
+      "scientific_limitation": "Event-only inventories are biased by reporting and do not by themselves provide negatives."
     },
     {
       "hazard_id": "drought",
       "label": "Drought conditions",
       "source": "NASA Earth observation and climate data",
       "source_url": "https://earthdata.nasa.gov/",
-      "exists": false,
-      "audit": {
-        "status": "MISSING_DATA",
+      "raw_sources": [
+        {
+          "file": "data/external/hazards/raw/drought/india_current_cdi.txt",
+          "exists": true,
+          "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
+          "bytes": 101181,
+          "sha256": "f07694bd78935baecd49a822033c568d845bd014b7095bdd5220aeb1288ec30c",
+          "format": "txt",
+          "line_count": 4537
+        },
+        {
+          "file": "data/external/hazards/raw/drought/india_drought_area_timeseries.txt",
+          "exists": true,
+          "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
+          "bytes": 14597,
+          "sha256": "81b01a875da05789dcc8e4a246ff52baf0b00a493521eb218ed93b03ad10bcf2",
+          "format": "txt",
+          "line_count": 277
+        }
+      ],
+      "raw_source_count": 2,
+      "curated_training_table": {
+        "file": "data/external/hazards/drought.csv",
+        "status": "MISSING_CURATED_TRAINING_TABLE",
         "issues": [
-          "No local dataset file found; no model trained."
+          "No curated, explicitly labelled training table exists at this path."
         ]
-      }
+      },
+      "research_baseline": null,
+      "model_status": "NO_CURATED_TRAINING_TABLE",
+      "scientific_limitation": "Requires a defined drought index, temporal coverage, and leakage-safe time split."
     },
     {
       "hazard_id": "heatwave",
       "label": "Extreme heat",
       "source": "NOAA climate data / ERA5",
       "source_url": "https://www.ncei.noaa.gov/; https://cds.climate.copernicus.eu/",
-      "exists": false,
-      "audit": {
-        "status": "MISSING_DATA",
+      "raw_sources": [
+        {
+          "file": "data/external/hazards/raw/weather/kochi_daily_weather_2000_2025.json",
+          "exists": true,
+          "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
+          "bytes": 360514,
+          "sha256": "30d1865dc91c868eec0456941a9ef45e3bcc189fd959a0eeb211e0b8f6929ddd",
+          "format": "json",
+          "json_root_type": "dict",
+          "top_level_keys": [
+            "latitude",
+            "longitude",
+            "generationtime_ms",
+            "utc_offset_seconds",
+            "timezone",
+            "timezone_abbreviation",
+            "elevation",
+            "daily_units",
+            "daily"
+          ],
+          "daily_record_count": 9497
+        },
+        {
+          "file": "data/external/hazards/raw/weather/kottayam_daily_weather_2000_2025.json",
+          "exists": true,
+          "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
+          "bytes": 361713,
+          "sha256": "2f9a42c7da6aaefb01590eea94d6b3752c268a5ff44d252ada4d6aa192d2b0fb",
+          "format": "json",
+          "json_root_type": "dict",
+          "top_level_keys": [
+            "latitude",
+            "longitude",
+            "generationtime_ms",
+            "utc_offset_seconds",
+            "timezone",
+            "timezone_abbreviation",
+            "elevation",
+            "daily_units",
+            "daily"
+          ],
+          "daily_record_count": 9497
+        },
+        {
+          "file": "data/external/hazards/raw/weather/wayanad_daily_weather_2000_2025.json",
+          "exists": true,
+          "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
+          "bytes": 359692,
+          "sha256": "16f4812e8338644de81ad4297d2c09cd7150a01b6a39b9a3f57941bdbece5776",
+          "format": "json",
+          "json_root_type": "dict",
+          "top_level_keys": [
+            "latitude",
+            "longitude",
+            "generationtime_ms",
+            "utc_offset_seconds",
+            "timezone",
+            "timezone_abbreviation",
+            "elevation",
+            "daily_units",
+            "daily"
+          ],
+          "daily_record_count": 9497
+        },
+        {
+          "file": "data/external/hazards/raw/weather/thiruvananthapuram_daily_weather_2000_2025.json",
+          "exists": true,
+          "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
+          "bytes": 361957,
+          "sha256": "0c06c1d2e691ce9bcdac5d16c33b59cdfbb6497a483b35fd71922e8f5ed1830f",
+          "format": "json",
+          "json_root_type": "dict",
+          "top_level_keys": [
+            "latitude",
+            "longitude",
+            "generationtime_ms",
+            "utc_offset_seconds",
+            "timezone",
+            "timezone_abbreviation",
+            "elevation",
+            "daily_units",
+            "daily"
+          ],
+          "daily_record_count": 9497
+        }
+      ],
+      "raw_source_count": 4,
+      "curated_training_table": {
+        "file": "data/external/hazards/heatwave.csv",
+        "status": "MISSING_CURATED_TRAINING_TABLE",
         "issues": [
-          "No local dataset file found; no model trained."
+          "No curated, explicitly labelled training table exists at this path."
         ]
-      }
+      },
+      "research_baseline": {
+        "status": "RESEARCH_BASELINE_TRAINED_NOT_VALIDATED",
+        "hazard": "high_temperature",
+        "metrics": {
+          "accuracy": 0.9153740875912408,
+          "balanced_accuracy": 0.8546397805379251,
+          "precision": 0.6065950920245399,
+          "recall": 0.7754901960784314,
+          "f1": 0.6807228915662651,
+          "roc_auc": 0.9603758591717535,
+          "majority_baseline_accuracy": 0.8836678832116789
+        },
+        "test_target_dates_from": "2020-01-01",
+        "locations": [
+          "kochi",
+          "kottayam",
+          "thiruvananthapuram",
+          "wayanad"
+        ]
+      },
+      "model_status": "RESEARCH_BASELINE_EXISTS_NOT_VALIDATED",
+      "scientific_limitation": "Threshold and local calibration must be specified; historical temperatures alone do not prove health impact."
     },
     {
       "hazard_id": "wildfire",
       "label": "Wildfire occurrence / burned area",
       "source": "NASA FIRMS and MODIS/VIIRS burned-area products",
       "source_url": "https://firms.modaps.eosdis.nasa.gov/; https://lpdaac.usgs.gov/",
-      "exists": false,
-      "audit": {
-        "status": "MISSING_DATA",
+      "raw_sources": [],
+      "raw_source_count": 0,
+      "curated_training_table": {
+        "file": "data/external/hazards/wildfire.csv",
+        "status": "MISSING_CURATED_TRAINING_TABLE",
         "issues": [
-          "No local dataset file found; no model trained."
+          "No curated, explicitly labelled training table exists at this path."
         ]
-      }
+      },
+      "research_baseline": null,
+      "model_status": "NO_CURATED_TRAINING_TABLE",
+      "scientific_limitation": "Satellite detections have coverage/cloud/overpass biases and need exposure and weather predictors."
     },
     {
       "hazard_id": "tsunami",
       "label": "Tsunami coastal exposure",
       "source": "NOAA/NCEI tsunami event database",
       "source_url": "https://www.ngdc.noaa.gov/hazel/view/hazards/tsunami/event-search",
-      "exists": false,
-      "audit": {
-        "status": "MISSING_DATA",
+      "raw_sources": [],
+      "raw_source_count": 0,
+      "curated_training_table": {
+        "file": "data/external/hazards/tsunami.csv",
+        "status": "MISSING_CURATED_TRAINING_TABLE",
         "issues": [
-          "No local dataset file found; no model trained."
+          "No curated, explicitly labelled training table exists at this path."
         ]
-      }
+      },
+      "research_baseline": null,
+      "model_status": "NO_CURATED_TRAINING_TABLE",
+      "scientific_limitation": "Rare-event catalogues are not sufficient for reliable local probability prediction."
     },
     {
       "hazard_id": "severe_storm",
       "label": "Severe storm / extreme rainfall",
       "source": "IMD and Copernicus Climate Data Store",
       "source_url": "https://mausam.imd.gov.in/; https://cds.climate.copernicus.eu/",
-      "exists": false,
-      "audit": {
-        "status": "MISSING_DATA",
+      "raw_sources": [
+        {
+          "file": "data/external/hazards/raw/weather/kochi_daily_weather_2000_2025.json",
+          "exists": true,
+          "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
+          "bytes": 360514,
+          "sha256": "30d1865dc91c868eec0456941a9ef45e3bcc189fd959a0eeb211e0b8f6929ddd",
+          "format": "json",
+          "json_root_type": "dict",
+          "top_level_keys": [
+            "latitude",
+            "longitude",
+            "generationtime_ms",
+            "utc_offset_seconds",
+            "timezone",
+            "timezone_abbreviation",
+            "elevation",
+            "daily_units",
+            "daily"
+          ],
+          "daily_record_count": 9497
+        },
+        {
+          "file": "data/external/hazards/raw/weather/kottayam_daily_weather_2000_2025.json",
+          "exists": true,
+          "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
+          "bytes": 361713,
+          "sha256": "2f9a42c7da6aaefb01590eea94d6b3752c268a5ff44d252ada4d6aa192d2b0fb",
+          "format": "json",
+          "json_root_type": "dict",
+          "top_level_keys": [
+            "latitude",
+            "longitude",
+            "generationtime_ms",
+            "utc_offset_seconds",
+            "timezone",
+            "timezone_abbreviation",
+            "elevation",
+            "daily_units",
+            "daily"
+          ],
+          "daily_record_count": 9497
+        },
+        {
+          "file": "data/external/hazards/raw/weather/wayanad_daily_weather_2000_2025.json",
+          "exists": true,
+          "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
+          "bytes": 359692,
+          "sha256": "16f4812e8338644de81ad4297d2c09cd7150a01b6a39b9a3f57941bdbece5776",
+          "format": "json",
+          "json_root_type": "dict",
+          "top_level_keys": [
+            "latitude",
+            "longitude",
+            "generationtime_ms",
+            "utc_offset_seconds",
+            "timezone",
+            "timezone_abbreviation",
+            "elevation",
+            "daily_units",
+            "daily"
+          ],
+          "daily_record_count": 9497
+        },
+        {
+          "file": "data/external/hazards/raw/weather/thiruvananthapuram_daily_weather_2000_2025.json",
+          "exists": true,
+          "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
+          "bytes": 361957,
+          "sha256": "0c06c1d2e691ce9bcdac5d16c33b59cdfbb6497a483b35fd71922e8f5ed1830f",
+          "format": "json",
+          "json_root_type": "dict",
+          "top_level_keys": [
+            "latitude",
+            "longitude",
+            "generationtime_ms",
+            "utc_offset_seconds",
+            "timezone",
+            "timezone_abbreviation",
+            "elevation",
+            "daily_units",
+            "daily"
+          ],
+          "daily_record_count": 9497
+        }
+      ],
+      "raw_source_count": 4,
+      "curated_training_table": {
+        "file": "data/external/hazards/severe_storm.csv",
+        "status": "MISSING_CURATED_TRAINING_TABLE",
         "issues": [
-          "No local dataset file found; no model trained."
+          "No curated, explicitly labelled training table exists at this path."
         ]
-      }
+      },
+      "research_baseline": {
+        "status": "RESEARCH_BASELINE_TRAINED_NOT_VALIDATED",
+        "hazard": "extreme_rainfall",
+        "metrics": {
+          "accuracy": 0.880588503649635,
+          "balanced_accuracy": 0.6637158208351669,
+          "precision": 0.292972972972973,
+          "recall": 0.40813253012048195,
+          "f1": 0.3410950283196979,
+          "roc_auc": 0.8257420104901343,
+          "majority_baseline_accuracy": 0.9242700729927007
+        },
+        "test_target_dates_from": "2020-01-01",
+        "locations": [
+          "kochi",
+          "kottayam",
+          "thiruvananthapuram",
+          "wayanad"
+        ]
+      },
+      "model_status": "RESEARCH_BASELINE_EXISTS_NOT_VALIDATED",
+      "scientific_limitation": "Needs time-aligned predictors and event/non-event periods; no mixing observed future values into features."
     },
     {
       "hazard_id": "air_pollution",
       "label": "Air-quality episode",
       "source": "CPCB / OpenAQ",
       "source_url": "https://cpcb.nic.in/; https://openaq.org/",
-      "exists": false,
-      "audit": {
-        "status": "MISSING_DATA",
+      "raw_sources": [
+        {
+          "file": "data/processed/air_quality/kspcb_caaqms_eloor_aqi_2026-08.csv",
+          "exists": true,
+          "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
+          "bytes": 6900,
+          "sha256": "1f02e9770233d6090778d01783df8d844d9ff3f80ff445dc7e7464c2b1b340cd",
+          "format": "csv",
+          "columns_sample": [
+            "observed_at",
+            "station",
+            "source_aqi",
+            "source_aqi_category",
+            "source_url"
+          ],
+          "has_explicit_target_column": false
+        },
+        {
+          "file": "data/processed/air_quality/kspcb_caaqms_eloor_aqi_2026-09.csv",
+          "exists": true,
+          "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
+          "bytes": 6680,
+          "sha256": "f03df29a4e771e75835d2b94fbebff6b0cc0feddce4c130442a920b3d239f927",
+          "format": "csv",
+          "columns_sample": [
+            "observed_at",
+            "station",
+            "source_aqi",
+            "source_aqi_category",
+            "source_url"
+          ],
+          "has_explicit_target_column": false
+        },
+        {
+          "file": "data/processed/air_quality/kspcb_caaqms_eloor_daily_2026-08.csv",
+          "exists": true,
+          "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
+          "bytes": 93253,
+          "sha256": "56902f96ebf02afa65126f7fb6575c71a4c2b76f4927ee2ba5dd832c02c9ae55",
+          "format": "csv",
+          "columns_sample": [
+            "observed_at",
+            "station",
+            "pollutant",
+            "value",
+            "unit",
+            "averaging_period",
+            "quality_flag",
+            "quality_note",
+            "source_aqi",
+            "source_url"
+          ],
+          "has_explicit_target_column": false
+        },
+        {
+          "file": "data/processed/air_quality/kspcb_caaqms_eloor_daily_2026-09.csv",
+          "exists": true,
+          "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
+          "bytes": 90248,
+          "sha256": "ffc8ebc564f69b57562e3d862db8c3a704b6c664ce98248cfa037027d6a635cc",
+          "format": "csv",
+          "columns_sample": [
+            "observed_at",
+            "station",
+            "pollutant",
+            "value",
+            "unit",
+            "averaging_period",
+            "quality_flag",
+            "quality_note",
+            "source_aqi",
+            "source_url"
+          ],
+          "has_explicit_target_column": false
+        },
+        {
+          "file": "data/processed/air_quality/kspcb_daily_aqi_2026-10-16.csv",
+          "exists": true,
+          "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
+          "bytes": 2074,
+          "sha256": "c8d1af5bc458436d5078b1a3adfcf9d644a79da4e36b1b746b56dc4de45b0993",
+          "format": "csv",
+          "columns_sample": [
+            "observed_at",
+            "station",
+            "source_aqi",
+            "source_remark",
+            "source_url",
+            "SO2_value",
+            "CO_value",
+            "PM2.5_value",
+            "O3_value",
+            "PM10_value",
+            "NH3_value",
+            "NOx_value",
+            "NO_value",
+            "NO2_value",
+            "unit_SO2",
+            "unit_CO",
+            "unit_PM2.5",
+            "unit_O3",
+            "unit_PM10",
+            "unit_NH3",
+            "unit_NOx",
+            "unit_NO",
+            "unit_NO2",
+            "averaging_period",
+            "quality_flag"
+          ],
+          "has_explicit_target_column": false
+        },
+        {
+          "file": "data/processed/air_quality/kspcb_namp_ernakulam_2025-06.csv",
+          "exists": true,
+          "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
+          "bytes": 18151,
+          "sha256": "0524aac512a42aa5122fbbd6a11b2e3680e0376b02f8e879a76e31a31cb825b4",
+          "format": "csv",
+          "columns_sample": [
+            "station_code",
+            "observed_at",
+            "station",
+            "latitude",
+            "longitude",
+            "location_attributes_source",
+            "SO2_06_10_4h_source_value",
+            "SO2_10_14_4h_source_value",
+            "SO2_14_18_4h_source_value",
+            "SO2_18_22_4h_source_value",
+            "SO2_22_02_4h_source_value",
+            "SO2_02_06_4h_source_value",
+            "SO2_24h_average_source_value",
+            "source_page",
+            "NO2_06_10_4h_source_value",
+            "NO2_10_14_4h_source_value",
+            "NO2_14_18_4h_source_value",
+            "NO2_18_22_4h_source_value",
+            "NO2_22_02_4h_source_value",
+            "NO2_02_06_4h_source_value",
+            "NO2_24h_average_source_value",
+            "RSPM_06_14_8h_source_value",
+            "RSPM_14_22_8h_source_value",
+            "RSPM_22_06_8h_source_value",
+            "RSPM_24h_average_source_value",
+            "PM2.5_source_value",
+            "temperature_source_value",
+            "weather_source_value",
+            "unit_status",
+            "coordinate_reference_system"
+          ],
+          "has_explicit_target_column": false
+        }
+      ],
+      "raw_source_count": 6,
+      "curated_training_table": {
+        "file": "data/external/hazards/air_pollution.csv",
+        "status": "MISSING_CURATED_TRAINING_TABLE",
         "issues": [
-          "No local dataset file found; no model trained."
+          "No curated, explicitly labelled training table exists at this path."
         ]
-      }
+      },
+      "research_baseline": null,
+      "model_status": "NO_CURATED_TRAINING_TABLE",
+      "scientific_limitation": "Station observations do not identify a responsible factory; source attribution needs emissions/dispersion evidence."
     }
   ]
 }
