@@ -351,8 +351,12 @@ else:
     display_aqi["CPCB AQI category"] = display_aqi["source_aqi"].map(
         lambda value: cpcb_aqi_category(value)[0]
     )
+    report_date_label = (
+        latest_extract_date.strftime("%d %B %Y")
+        if latest_extract_date else "date unavailable"
+    )
     st.caption(
-        "KSPCB source report date: 16 October 2026. AQI values are source-reported; "
+        f"KSPCB source report date: {report_date_label}. AQI values are source-reported; "
         "the category label is mapped to CPCB's official band. These are historical readings."
     )
     columns = [
@@ -387,7 +391,9 @@ else:
     if not eloor_rows.empty:
         eloor_row = eloor_rows.iloc[0]
         st.markdown("#### Eloor pollutant snapshot")
-        st.caption("KSPCB source-reported values · 16 October 2026 · historical, not live")
+        st.caption(
+            f"KSPCB source-reported values · {report_date_label} · historical, not live"
+        )
         snapshot_pollutants = (
             ("PM2.5", "PM2.5_value", "unit_PM2.5"),
             ("PM10", "PM10_value", "unit_PM10"),
@@ -420,6 +426,48 @@ else:
         "[KSPCB Water and Air Quality Directory](https://kspcb.kerala.gov.in/water-and-air-quality-directory)."
     )
     if not daily_status.empty:
+        # Summarise only the station records present in these two dated extracts.
+        # A missing AQI is a reporting-availability issue, not evidence of clean air.
+        aqi_station_labels = (
+            daily_aqi["station"].dropna().astype(str).str.strip()
+            if "station" in daily_aqi.columns else pd.Series(dtype="string")
+        )
+        status_station_labels = (
+            daily_status["station"].dropna().astype(str).str.strip()
+            if "station" in daily_status.columns else pd.Series(dtype="string")
+        )
+        aqi_station_keys = set(aqi_station_labels.str.casefold())
+        status_station_keys = set(status_station_labels.str.casefold())
+        status_only_count = len(status_station_keys - aqi_station_keys)
+        station_record_count = len(aqi_station_keys | status_station_keys)
+
+        st.markdown("**Monitoring-network reporting coverage in this extract**")
+        coverage_columns = st.columns(3)
+        coverage_columns[0].metric("Stations with AQI rows", len(aqi_station_keys))
+        coverage_columns[1].metric("Status-only stations", status_only_count)
+        coverage_columns[2].metric("Distinct station records", station_record_count)
+        st.caption(
+            "Counts describe station labels in this dated report pair only; they are not a "
+            "complete inventory of all operating KSPCB monitors."
+        )
+
+        if "source_status" in daily_status.columns:
+            status_summary = (
+                daily_status.assign(
+                    _station_key=daily_status["station"].astype("string").str.strip().str.casefold(),
+                    _status_label=daily_status["source_status"].astype("string").str.strip(),
+                )
+                .dropna(subset=["_status_label"])
+                .drop_duplicates(subset=["_station_key", "_status_label"])
+                .groupby("_status_label")["_station_key"]
+                .nunique()
+                .sort_values(ascending=False)
+            )
+            if not status_summary.empty:
+                status_columns = st.columns(min(3, len(status_summary)))
+                for column, (status_label, count) in zip(status_columns, status_summary.items()):
+                    column.metric(str(status_label).title(), int(count))
+
         st.write("Stations without a reported AQI in this report:")
         display_dataframe(
             daily_status.rename(
@@ -545,7 +593,7 @@ else:
                 )
                 direction_invalid = (
                     selected_weather["wind_direction"].notna()
-                    & ~selected_weather["wind_direction"].between(0, 360, inclusive="left")
+                    & ~selected_weather["wind_direction"].between(0, 360, inclusive="both")
                 )
                 negative_wind = (
                     selected_weather["wind_speed"].notna()
@@ -556,7 +604,7 @@ else:
                     & selected_weather["wind_speed"].gt(20)
                 )
 
-                weather_metrics = st.columns(3)
+                weather_metrics = st.columns(5)
                 weather_metrics[0].metric(
                     "Dated weather records", len(selected_weather)
                 )
@@ -564,15 +612,24 @@ else:
                     "Humidity outside 0–100%", int(humidity_invalid.sum())
                 )
                 weather_metrics[2].metric(
+                    "Invalid wind direction", int(direction_invalid.sum())
+                )
+                weather_metrics[3].metric(
+                    "Negative wind speed", int(negative_wind.sum())
+                )
+                weather_metrics[4].metric(
                     "Wind speed >20 m/s · review", int(high_wind_review.sum())
                 )
 
                 temperature_series = selected_weather.dropna(
                     subset=["temperature"]
                 ).set_index("observed_at")["temperature"]
-                wind_series = selected_weather.dropna(
-                    subset=["wind_speed"]
-                ).set_index("observed_at")["wind_speed"]
+                # Negative wind speed is physically invalid and is excluded from
+                # the chart; unusually high positive speeds remain visible for review.
+                wind_series = selected_weather.loc[
+                    selected_weather["wind_speed"].notna()
+                    & selected_weather["wind_speed"].ge(0)
+                ].set_index("observed_at")["wind_speed"]
                 humidity_series = selected_weather.loc[
                     ~humidity_invalid & selected_weather["relative_humidity"].notna()
                 ].set_index("observed_at")["relative_humidity"]
@@ -641,8 +698,9 @@ else:
                     st.success("No values triggered the displayed weather review checks.")
 
                 st.caption(
-                    "Humidity outside 0–100% is excluded from its chart. Wind speeds above 20 m/s "
-                    "are flagged for source review only and remain visible in the wind chart; this "
+                    "Humidity outside 0–100% and negative wind speeds are excluded from their "
+                    "charts. Wind speeds above 20 m/s are flagged for source review only and remain "
+                    "visible in the wind chart; this "
                     "app threshold is not a KSPCB quality flag. The source does not state exact "
                     "averaging windows or station coordinates. Daily same-date summaries cannot "
                     "establish subdaily wind alignment, atmospheric dispersion, or an industrial "
@@ -990,38 +1048,57 @@ if not consent_records.empty:
 
 if timeline_events:
     timeline = pd.DataFrame(timeline_events)
-    timeline["_sort_date"] = pd.to_datetime(timeline["Date"], format="%Y-%m-%d", errors="coerce")
-    timeline = timeline.sort_values(["_sort_date", "Evidence stream", "Event"]).drop(
-        columns="_sort_date"
+    timeline["_sort_date"] = pd.to_datetime(
+        timeline["Date"], format="%Y-%m-%d", errors="coerce"
     )
-    stream_options = ["All evidence streams"] + sorted(timeline["Evidence stream"].unique().tolist())
-    selected_stream = st.selectbox(
-        "Filter timeline",
-        stream_options,
-        key="evidence_timeline_stream",
-    )
-    visible_timeline = (
-        timeline if selected_stream == "All evidence streams"
-        else timeline.loc[timeline["Evidence stream"].eq(selected_stream)]
-    )
-    display_dataframe(
-        visible_timeline,
-        hide_index=True,
-        use_container_width=True,
-        column_config={
-            "Source / record": st.column_config.LinkColumn(
-                "Source / record",
-                display_text="Open source record",
+    undated_event_count = int(timeline["_sort_date"].isna().sum())
+    timeline = timeline.loc[timeline["_sort_date"].notna()].copy()
+
+    if timeline.empty:
+        st.warning(
+            f"{undated_event_count} timeline record(s) were found, but none had a valid "
+            "YYYY-MM-DD date. They are excluded from the chronological display."
+        )
+    else:
+        timeline = timeline.sort_values(
+            ["_sort_date", "Evidence stream", "Event"]
+        ).drop(columns="_sort_date")
+        stream_options = ["All evidence streams"] + sorted(
+            timeline["Evidence stream"].unique().tolist()
+        )
+        selected_stream = st.selectbox(
+            "Filter timeline",
+            stream_options,
+            key="evidence_timeline_stream",
+        )
+        visible_timeline = (
+            timeline if selected_stream == "All evidence streams"
+            else timeline.loc[timeline["Evidence stream"].eq(selected_stream)]
+        )
+        display_dataframe(
+            visible_timeline,
+            hide_index=True,
+            use_container_width=True,
+            column_config={
+                "Source / record": st.column_config.LinkColumn(
+                    "Source / record",
+                    display_text="Open source record",
+                )
+            },
+            alt="Chronological timeline of Eloor ambient monitoring periods and Edayar consent records",
+        )
+        st.caption(
+            f"Showing {len(visible_timeline)} dated events from the records currently available "
+            "in this project. Dates describe the source record; they are not continuous monitoring "
+            "coverage. Consent-to-establish (CTE), consent-to-operate (CTO), rejected applications, "
+            "and stated expiry dates remain distinct."
+        )
+        if undated_event_count:
+            st.warning(
+                f"{undated_event_count} timeline record(s) had missing or invalid dates and "
+                "were excluded from the chronological display. Check the source register before "
+                "using those records in a date-based comparison."
             )
-        },
-        alt="Chronological timeline of Eloor ambient monitoring periods and Edayar consent records",
-    )
-    st.caption(
-        f"Showing {len(visible_timeline)} dated events from the records currently available "
-        "in this project. Dates describe the source record; they are not continuous monitoring "
-        "coverage. Consent-to-establish (CTE), consent-to-operate (CTO), rejected applications, "
-        "and stated expiry dates remain distinct."
-    )
 else:
     st.info(
         "No dated ambient-report or facility consent events are available to build the timeline."
@@ -1295,12 +1372,73 @@ st.markdown(
 
 st.markdown('<div id="sources"></div>', unsafe_allow_html=True)
 st.subheader("Sources, retrieval metadata and limitations")
+
+source_review_rows = []
 for source in register["sources"]:
-    st.markdown(f"- [{source['publisher']}]({source['url']}) — {source['status']}")
+    reviewed_value = source.get("reviewed_on")
+    try:
+        reviewed_date = date.fromisoformat(str(reviewed_value))
+        review_age_days = (date.today() - reviewed_date).days
+        review_date_check = (
+            "Future date — check register" if review_age_days < 0 else "Valid date"
+        )
+    except (TypeError, ValueError):
+        reviewed_date = None
+        review_age_days = None
+        review_date_check = "Missing or invalid date"
+
+    source_review_rows.append(
+        {
+            "Publisher": source.get("publisher", "Publisher not recorded"),
+            "Evidence status": source.get("evidence_status", "Not classified"),
+            "Source status": source.get("status", "Status not recorded"),
+            "Reviewed on": reviewed_value or "Not recorded",
+            "Days since review": review_age_days if review_age_days is not None else "—",
+            "Date check": review_date_check,
+        }
+    )
+
+source_review_table = pd.DataFrame(source_review_rows)
+if not source_review_table.empty:
+    display_dataframe(
+        source_review_table,
+        hide_index=True,
+        use_container_width=True,
+        alt="Source register review dates and evidence status",
+    )
+    invalid_review_dates = int(
+        source_review_table["Date check"].ne("Valid date").sum()
+    )
+    st.caption(
+        f"{len(source_review_table)} source records are listed in the register. "
+        "Review age is calculated from each record's reviewed_on date; it is not "
+        "the publication date or the age of the underlying observation."
+    )
+    if invalid_review_dates:
+        st.warning(
+            f"{invalid_review_dates} source record(s) have a missing, invalid or future "
+            "review date. Check the source register before relying on their review metadata."
+        )
+
+for source in register["sources"]:
+    publisher = source.get("publisher", "Publisher not recorded")
+    source_url = str(source.get("url") or "").strip()
+    if source_url.startswith("https://"):
+        st.markdown(
+            f"- [{publisher}]({source_url}) — {source.get('status', 'Status not recorded')}"
+        )
+    else:
+        st.warning(
+            f"{publisher}: no valid HTTPS source link is recorded; verify the register entry."
+        )
+
 with st.expander("Evidence and reuse notes"):
     for source in register["sources"]:
-        st.markdown(f"**{source['publisher']}**")
-        st.write(source["evidence"])
-        st.caption(f"Coverage: {source['geographic_coverage']}")
-        st.caption(f"Limitations/blocker: {source['blocker']}")
-        st.caption(f"Reuse: {source['reuse_status']} | Reviewed: {source['reviewed_on']}")
+        st.markdown(f"**{source.get('publisher', 'Publisher not recorded')}**")
+        st.write(source.get("evidence", "No evidence description recorded."))
+        st.caption(f"Coverage: {source.get('geographic_coverage', 'Not recorded')}")
+        st.caption(f"Limitations/blocker: {source.get('blocker', 'Not recorded')}")
+        st.caption(
+            f"Reuse: {source.get('reuse_status', 'Not recorded')} | "
+            f"Reviewed: {source.get('reviewed_on', 'Not recorded')}"
+        )
