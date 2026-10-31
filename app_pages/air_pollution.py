@@ -3,6 +3,7 @@
 import json
 from datetime import date
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import pandas as pd
 import streamlit as st
@@ -1441,13 +1442,25 @@ if not source_review_table.empty:
 for source in register["sources"]:
     publisher = source.get("publisher", "Publisher not recorded")
     source_url = str(source.get("url") or "").strip()
-    if source_url.startswith("https://"):
+    try:
+        parsed_source_url = urlsplit(source_url)
+        valid_https_url = (
+            parsed_source_url.scheme == "https"
+            and bool(parsed_source_url.hostname)
+            and parsed_source_url.username is None
+            and parsed_source_url.password is None
+        )
+    except ValueError:
+        valid_https_url = False
+
+    if valid_https_url:
         st.markdown(
             f"- [{publisher}]({source_url}) — {source.get('status', 'Status not recorded')}"
         )
     else:
         st.warning(
-            f"{publisher}: no valid HTTPS source link is recorded; verify the register entry."
+            f"{publisher}: the source URL is missing or is not a valid HTTPS web address. "
+            "Verify the register entry before using the link."
         )
 
 with st.expander("Evidence and reuse notes"):
