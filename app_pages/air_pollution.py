@@ -236,10 +236,6 @@ except (OSError, json.JSONDecodeError) as error:
     st.stop()
 
 st.caption(f"Source review: {register['reviewed_on']}")
-st.warning(
-    "No live AQI feed is connected to this dashboard. The latest acquired station report is dated "
-    "16 October 2026; the values below are historical source reports, not live readings."
-)
 st.markdown(
     """
     <nav class="air-nav">
@@ -291,6 +287,24 @@ latest_extract_date = (
     and pd.to_datetime(daily_aqi["observed_at"], errors="coerce").notna().any()
     else None
 )
+
+# Report freshness is calculated from the source observation date, not retrieval time.
+report_age_days = (date.today() - latest_extract_date).days if latest_extract_date else None
+if report_age_days is None:
+    st.warning(
+        "No dated station report is available. This dashboard does not have a live AQI feed."
+    )
+elif report_age_days < 0:
+    st.warning(
+        f"The latest source report is dated {latest_extract_date:%d %b %Y}, which is in the future "
+        "relative to the application date. Check the source date before interpreting this extract."
+    )
+else:
+    st.warning(
+        f"No live AQI feed is connected. The latest acquired KSPCB station report is dated "
+        f"{latest_extract_date:%d %b %Y} ({report_age_days} days old). All displayed readings "
+        "are historical source reports, not live measurements."
+    )
 station_count = int(daily_aqi["station"].nunique()) if not daily_aqi.empty and "station" in daily_aqi.columns else 0
 eloor_daily_rows = (
     daily_aqi.loc[daily_aqi["station"].astype(str).str.strip().str.casefold().eq("eloor")]
@@ -306,12 +320,13 @@ if not eloor_daily_rows.empty and "source_aqi" in eloor_daily_rows.columns:
         eloor_category = cpcb_aqi_category(int(raw_eloor_aqi))[0]
         eloor_source_aqi = f"{int(raw_eloor_aqi)} · {eloor_category}"
 st.markdown("### Air quality at a glance")
-overview = st.columns(5)
+overview = st.columns(6)
 overview[0].metric("Latest loaded report", latest_extract_date.strftime("%d %b %Y") if latest_extract_date else "Unavailable")
-overview[1].metric("Eloor source AQI", eloor_source_aqi, help="Source-reported value from the 16 October 2026 KSPCB daily extract; not a live reading.")
-overview[2].metric("Stations in daily extract", station_count)
-overview[3].metric("Eloor monthly reports", len(monthly_reports), help="August and September 2026 source reports when both pass ingestion checks.")
-overview[4].metric("AQI calculation", "Evidence-gated", help="The app calculates AQI only when averaging period, valid hours and QA flags meet CPCB requirements.")
+overview[1].metric("Report age", f"{report_age_days} days" if report_age_days is not None and report_age_days >= 0 else "Review date", help="Days since the source observation date; this is a freshness indicator, not a pollution measure.")
+overview[2].metric("Eloor source AQI", eloor_source_aqi, help="Source-reported value from the dated KSPCB daily extract; not a live reading.")
+overview[3].metric("Stations in daily extract", station_count)
+overview[4].metric("Eloor monthly reports", len(monthly_reports), help="August and September 2026 source reports when both pass ingestion checks.")
+overview[5].metric("AQI calculation", "Evidence-gated", help="The app calculates AQI only when averaging period, valid hours and QA flags meet CPCB requirements.")
 st.caption(
     "This is a historical research dashboard, not a live public warning service. "
     "Each chart and table retains its source date, unit and evidence limitations."
