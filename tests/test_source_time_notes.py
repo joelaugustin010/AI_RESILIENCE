@@ -11,7 +11,9 @@ def test_source_time_notes_are_shown_verbatim_as_unverified():
     })
 
     assert notes in result["Source/time notes"]
-    assert result["Source/time notes"].startswith("User-entered (not independently verified):")
+    assert result["Source/time notes"].startswith("User-entered (")
+    assert "not independently verified" in result["Source/time notes"]
+    assert "not independently checked" in result["Source/time notes"]
     assert "not checked by the app" in result["Provenance status"].lower()
 
 
