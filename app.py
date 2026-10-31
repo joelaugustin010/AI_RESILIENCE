@@ -67,6 +67,13 @@ st.set_page_config(
 )
 
 pages = {
+    "Home": [
+        st.Page(
+            "app_pages/home.py",
+            title="Command Centre",
+            icon=":material/dashboard:",
+        ),
+    ],
     "Explore": [
         st.Page(
             "app_pages/decision_workflow.py",
@@ -206,32 +213,15 @@ st.markdown(
 
 st.markdown(
     """
-    <section class="ar-hero">
-      <div class="ar-eyebrow">Kochi · Multi-hazard intelligence</div>
-      <h1>AI RESILIENCE</h1>
-      <p>Turn disaster evidence into clearer decisions. Explore hazard context, review data quality,
-      compare preparedness scenarios and plan practical mitigation—without confusing assumptions
-      with verified facts.</p>
-      <span class="ar-chip">Evidence-first workflow</span>
-      <span class="ar-chip">City resilience planning</span>
-      <span class="ar-chip">SDG-aligned project</span>
-    </section>
+    <div style="display:flex;align-items:center;gap:.55rem;margin:.1rem 0 1rem;color:#526579;font-size:.82rem">
+      <span style="display:inline-block;width:.55rem;height:.55rem;border-radius:50%;background:#087e8b"></span>
+      <span><strong style="color:#102a43">AI RESILIENCE</strong> · Kochi multi-hazard planning workspace</span>
+    </div>
     """,
     unsafe_allow_html=True,
 )
 
-metric_a, metric_b, metric_c = st.columns(3)
-with metric_a:
-    st.metric("Project workspaces", "11", help="Explore and Plan sections in the application.")
-with metric_b:
-    st.metric("Official alerts issued", "0", help="This educational prototype does not issue official alerts.")
-with metric_c:
-    st.metric("Validated live predictions", "Not enabled", help="Numerical disaster predictions remain gated until data and models pass validation.")
-
-st.markdown('<div class="ar-section-label">Current operating boundaries</div>', unsafe_allow_html=True)
-st.caption("Designed for evidence review and preparedness planning—not emergency dispatch or official forecasting.")
-
-with st.expander("Review data-quality notices", expanded=False):
+with st.expander("Review app-wide data-quality notices", expanded=False):
     rainfall_warning, river_warning = load_quality_summary()
     st.warning(rainfall_warning, icon=":material/water_drop:")
     st.warning(river_warning, icon=":material/water:")
