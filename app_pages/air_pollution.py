@@ -141,6 +141,7 @@ def audit_daily_extract(data: pd.DataFrame) -> tuple[dict, pd.DataFrame]:
         if "quality_flag" in data.columns
         else pd.Series("not supplied", index=data.index, dtype="string")
     )
+    pollutant_audit = pd.DataFrame(pollutant_rows)
     summary = {
         "rows": len(data),
         "stations": int(station_values.dropna().loc[lambda values: values.ne("")].nunique()),
@@ -152,8 +153,11 @@ def audit_daily_extract(data: pd.DataFrame) -> tuple[dict, pd.DataFrame]:
         "invalid_aqi": invalid_aqi_count,
         "unassessed_rows": int(quality_flags.eq("unassessed").sum()),
         "missing_qa_rows": int(quality_flags.isna().sum() + quality_flags.eq("").sum()),
+        "pollutant_nonnumeric": int(pollutant_audit["Non-numeric values"].sum()),
+        "pollutant_negative": int(pollutant_audit["Negative values"].sum()),
+        "pollutant_unit_mismatches": int(pollutant_audit["Unit mismatches"].sum()),
     }
-    return summary, pd.DataFrame(pollutant_rows)
+    return summary, pollutant_audit
 
 
 st.markdown(
@@ -558,7 +562,7 @@ else:
     )
     st.markdown("**Daily extract data-quality audit**")
     audit_summary, pollutant_audit = audit_daily_extract(daily_aqi)
-    audit_metrics = st.columns(5)
+    audit_metrics = st.columns(4)
     audit_metrics[0].metric("Extract rows", audit_summary.get("rows", 0))
     audit_metrics[1].metric("Duplicate station-date rows", audit_summary.get("duplicate_rows", 0))
     audit_metrics[2].metric(
@@ -569,7 +573,11 @@ else:
         "Missing / invalid AQI",
         audit_summary.get("missing_aqi", 0) + audit_summary.get("invalid_aqi", 0),
     )
-    audit_metrics[4].metric("Rows marked QA unassessed", audit_summary.get("unassessed_rows", 0))
+    detail_metrics = st.columns(4)
+    detail_metrics[0].metric("Non-numeric pollutants", audit_summary.get("pollutant_nonnumeric", 0))
+    detail_metrics[1].metric("Negative pollutant values", audit_summary.get("pollutant_negative", 0))
+    detail_metrics[2].metric("Unit mismatches", audit_summary.get("pollutant_unit_mismatches", 0))
+    detail_metrics[3].metric("Rows QA-unassessed", audit_summary.get("unassessed_rows", 0))
     if not pollutant_audit.empty:
         display_dataframe(
             pollutant_audit,
@@ -590,10 +598,23 @@ else:
         or audit_summary.get("missing_aqi", 0)
         or audit_summary.get("invalid_aqi", 0)
         or audit_summary.get("missing_stations", 0)
+        or audit_summary.get("pollutant_nonnumeric", 0)
+        or audit_summary.get("pollutant_negative", 0)
+        or audit_summary.get("pollutant_unit_mismatches", 0)
     ):
         st.warning(
             "The daily extract has structural issues that should be reviewed before "
             "using it in comparisons or calculations."
+        )
+    elif audit_summary.get("unassessed_rows", 0) or audit_summary.get("missing_qa_rows", 0):
+        st.info(
+            "Basic structural checks did not identify the listed issues, but source QA is "
+            "unassessed or incomplete. These records are not certified as validated measurements."
+        )
+    else:
+        st.success(
+            "No issues were detected by these basic structural checks. This does not replace "
+            "the monitoring agency's quality-assurance review."
         )
 
     if not daily_status.empty:
