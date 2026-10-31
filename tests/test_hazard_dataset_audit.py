@@ -1,0 +1,54 @@
+"""Tests for separating raw-source acquisition from supervised-model readiness."""
+import json
+from pathlib import Path
+
+from scripts.audit_hazard_datasets import build_report
+
+
+def test_nested_raw_source_is_found_without_claiming_model_readiness(tmp_path: Path):
+    registry = tmp_path / "data" / "external" / "hazard_dataset_registry.json"
+    registry.parent.mkdir(parents=True)
+    registry.write_text(json.dumps({
+        "hazards": [{
+            "id": "earthquake",
+            "label": "Earthquake",
+            "source": "USGS",
+            "url": "https://example.org",
+            "limitation": "Event catalogue only.",
+        }]
+    }), encoding="utf-8")
+
+    raw = tmp_path / "data" / "external" / "hazards" / "raw" / "earthquake" / "events.csv"
+    raw.parent.mkdir(parents=True)
+    raw.write_text("time,latitude,longitude,mag\n2020-01-01,10,76,3.1\n", encoding="utf-8")
+
+    report = build_report(tmp_path)
+    hazard = report["hazards"][0]
+
+    assert hazard["raw_source_count"] == 1
+    assert hazard["raw_sources"][0]["status"] == "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION"
+    assert hazard["raw_sources"][0]["has_explicit_target_column"] is False
+    assert hazard["curated_training_table"]["status"] == "MISSING_CURATED_TRAINING_TABLE"
+    assert hazard["model_status"] == "NOT_READY"
+    assert report["trained_models_claimed_by_this_report"] == 0
+
+
+def test_missing_raw_source_is_not_confused_with_curated_training_table(tmp_path: Path):
+    registry = tmp_path / "data" / "external" / "hazard_dataset_registry.json"
+    registry.parent.mkdir(parents=True)
+    registry.write_text(json.dumps({
+        "hazards": [{
+            "id": "wildfire",
+            "label": "Wildfire",
+            "source": "NASA",
+            "url": "https://example.org",
+            "limitation": "No background samples.",
+        }]
+    }), encoding="utf-8")
+
+    report = build_report(tmp_path)
+    hazard = report["hazards"][0]
+
+    assert hazard["raw_source_count"] == 0
+    assert hazard["curated_training_table"]["status"] == "MISSING_CURATED_TRAINING_TABLE"
+    assert hazard["model_status"] == "NOT_READY"
