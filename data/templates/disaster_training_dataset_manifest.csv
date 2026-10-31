@@ -1,0 +1,11 @@
+hazard,dataset_name,publisher,source_url,retrieved_date,publication_or_version_date,licence,geographic_coverage,start_time,end_time,time_zone,spatial_resolution,crs_or_datum,units,target_definition,label_source,event_count,non_event_count,missingness_report,duplicate_check,quality_checks,split_method,leakage_audit,reviewer,status,limitations
+Flood,,,,,,,,,,,,,,,,,,,,,,,,,candidate - not approved
+Cyclone,,,,,,,,,,,,,,,,,,,,,,,,,candidate - not approved
+Earthquake,,,,,,,,,,,,,,,,,,,,,,,,,candidate - not approved
+Landslide,,,,,,,,,,,,,,,,,,,,,,,,,candidate - not approved
+Heatwave,,,,,,,,,,,,,,,,,,,,,,,,,candidate - not approved
+Drought,,,,,,,,,,,,,,,,,,,,,,,,,candidate - not approved
+Industrial incident,,,,,,,,,,,,,,,,,,,,,,,,,candidate - not approved
+Infrastructure failure,,,,,,,,,,,,,,,,,,,,,,,,,candidate - not approved
+Compound: cyclone + flood,,,,,,,,,,,,,,,,,,,,,,,,,candidate - not approved
+Compound: heavy rainfall + drainage failure,,,,,,,,,,,,,,,,,,,,,,,,,candidate - not approved
