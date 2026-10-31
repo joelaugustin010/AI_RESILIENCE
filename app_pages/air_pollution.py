@@ -1153,8 +1153,10 @@ else:
         dated_values = int(numeric_values.notna().sum())
         qa_valid_values = (
             int(
-                numeric_values.notna()
-                & ambient_rows["quality_flag"].astype(str).str.casefold().eq("valid")
+                (
+                    numeric_values.notna()
+                    & ambient_rows["quality_flag"].astype(str).str.casefold().eq("valid")
+                ).sum()
             )
             if not ambient_rows.empty else 0
         )
