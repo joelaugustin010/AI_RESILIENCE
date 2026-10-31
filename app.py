@@ -1,4 +1,4 @@
-""""AI RESILIENCE prototype entry point and shared navigation."""
+"""AI RESILIENCE prototype entry point and shared navigation."""
 
 from pathlib import Path
 
@@ -143,4 +143,3 @@ st.info(
 )
 
 page.run()
-"
