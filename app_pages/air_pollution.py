@@ -936,6 +936,60 @@ else:
         alt="Edayar facilities listed as candidates with current evidence gaps",
     )
 
+    # Summarise the newer facility-level evidence fields without treating
+    # historical records or permit limits as current measured emissions.
+    st.markdown("**Facility evidence coverage**")
+    evidence_columns = st.columns(4)
+    evidence_columns[0].metric("Candidate facilities", len(facility_candidates))
+    evidence_columns[1].metric(
+        "Identity records verified",
+        int(facility_candidates["identity_status"].eq("verified").sum()),
+    )
+    evidence_columns[2].metric(
+        "Verified facility coordinates",
+        int(facility_candidates["coordinates_status"].eq("verified").sum()),
+    )
+    evidence_columns[3].metric(
+        "Measured stack results verified",
+        int(facility_candidates["measured_emissions_status"].eq("verified").sum()),
+    )
+
+    evidence_fields = [
+        "official_name",
+        "address_as_published",
+        "coordinates_status",
+        "current_consent_evidence_status",
+        "emissions_limits_status",
+        "measured_emissions_status",
+        "environmental_clearance_evidence_status",
+        "ranking_evidence_status",
+    ]
+    evidence_labels = {
+        "official_name": "Registered / matched name",
+        "address_as_published": "Published facility address",
+        "coordinates_status": "Facility coordinates",
+        "current_consent_evidence_status": "Current consent evidence",
+        "emissions_limits_status": "Emission limits",
+        "measured_emissions_status": "Measured stack emissions",
+        "environmental_clearance_evidence_status": "Environmental clearance",
+        "ranking_evidence_status": "Source-ranking evidence",
+    }
+    evidence_table = facility_candidates[evidence_fields].rename(
+        columns=evidence_labels
+    )
+    st.dataframe(
+        evidence_table,
+        hide_index=True,
+        use_container_width=True,
+        alt="Facility-level evidence status for eight Edayar candidate facilities",
+    )
+    st.caption(
+        "Status labels describe the evidence located in this project’s reviewed records. "
+        "A historical consent or emission limit is not a current consent verification or "
+        "an actual stack measurement. No facility coordinates or measured stack results "
+        "are currently verified in this inventory."
+    )
+
 if not industry_type_counts.empty:
     st.markdown("**Estate-level trade-effluent industry categories reported by KWA**")
     st.dataframe(
