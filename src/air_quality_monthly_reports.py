@@ -12,9 +12,9 @@ import hashlib
 import json
 from pathlib import Path
 from typing import Any, Iterable
+from urllib.parse import urlsplit
 
 import pandas as pd
-from urllib.parse import urlsplit
 
 from src.air_quality import AirQualityDataError, SUPPORTED_POLLUTANTS, validate_observations
 
