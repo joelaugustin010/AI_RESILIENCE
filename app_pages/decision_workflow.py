@@ -333,10 +333,12 @@ with st.form("decision_workflow_intake"):
         ["Hypothetical scenario assumption", "User-reported observation (source not independently verified)", "Forecast supplied by user (not checked by app)", "Unknown / unverified"],
         key="wf_classification",
     )
-    source_and_time = st.text_input(
+    source_and_time = st.text_area(
         "Source, observation/forecast time, and units (if known)",
         key="wf_source_time",
-        help="Example: source name, timestamp, timezone, station, and averaging period. This app does not verify them.",
+        height=90,
+        placeholder="Example: IMD bulletin; issued 31 Oct 2026, 10:00 IST; valid until 31 Oct 2026, 20:30 IST; wind in km/h; station/area: Kochi.",
+        help="Enter the provider/source, observation time or forecast issue and valid times, timezone, station/area, units, and averaging period where known. Leave unknown details blank. This app does not independently verify the entry.",
     )
 
     # Show only fields relevant to the selected hazard. Keep hidden fields explicitly
