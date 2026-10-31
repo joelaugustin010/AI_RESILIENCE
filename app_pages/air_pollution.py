@@ -1009,9 +1009,10 @@ else:
 
                 st.caption(
                     "Humidity outside 0–100% and negative wind speeds are excluded from their "
-                    "charts. Wind speeds above 20 m/s are flagged for source review only and remain "
-                    "visible in the wind chart; this "
-                    "app threshold is not a KSPCB quality flag. The source does not state exact "
+                    "charts, but the original source-reported values remain unchanged in the "
+                    "review table. No values are silently corrected or replaced. Wind speeds above "
+                    "20 m/s are flagged for source review only and remain visible in the wind chart; "
+                    "this app threshold is not a KSPCB quality flag. The source does not state exact "
                     "averaging windows or station coordinates. Daily same-date summaries cannot "
                     "establish subdaily wind alignment, atmospheric dispersion, or an industrial "
                     "source relationship."
