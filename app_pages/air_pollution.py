@@ -1048,38 +1048,57 @@ if not consent_records.empty:
 
 if timeline_events:
     timeline = pd.DataFrame(timeline_events)
-    timeline["_sort_date"] = pd.to_datetime(timeline["Date"], format="%Y-%m-%d", errors="coerce")
-    timeline = timeline.sort_values(["_sort_date", "Evidence stream", "Event"]).drop(
-        columns="_sort_date"
+    timeline["_sort_date"] = pd.to_datetime(
+        timeline["Date"], format="%Y-%m-%d", errors="coerce"
     )
-    stream_options = ["All evidence streams"] + sorted(timeline["Evidence stream"].unique().tolist())
-    selected_stream = st.selectbox(
-        "Filter timeline",
-        stream_options,
-        key="evidence_timeline_stream",
-    )
-    visible_timeline = (
-        timeline if selected_stream == "All evidence streams"
-        else timeline.loc[timeline["Evidence stream"].eq(selected_stream)]
-    )
-    display_dataframe(
-        visible_timeline,
-        hide_index=True,
-        use_container_width=True,
-        column_config={
-            "Source / record": st.column_config.LinkColumn(
-                "Source / record",
-                display_text="Open source record",
+    undated_event_count = int(timeline["_sort_date"].isna().sum())
+    timeline = timeline.loc[timeline["_sort_date"].notna()].copy()
+
+    if timeline.empty:
+        st.warning(
+            f"{undated_event_count} timeline record(s) were found, but none had a valid "
+            "YYYY-MM-DD date. They are excluded from the chronological display."
+        )
+    else:
+        timeline = timeline.sort_values(
+            ["_sort_date", "Evidence stream", "Event"]
+        ).drop(columns="_sort_date")
+        stream_options = ["All evidence streams"] + sorted(
+            timeline["Evidence stream"].unique().tolist()
+        )
+        selected_stream = st.selectbox(
+            "Filter timeline",
+            stream_options,
+            key="evidence_timeline_stream",
+        )
+        visible_timeline = (
+            timeline if selected_stream == "All evidence streams"
+            else timeline.loc[timeline["Evidence stream"].eq(selected_stream)]
+        )
+        display_dataframe(
+            visible_timeline,
+            hide_index=True,
+            use_container_width=True,
+            column_config={
+                "Source / record": st.column_config.LinkColumn(
+                    "Source / record",
+                    display_text="Open source record",
+                )
+            },
+            alt="Chronological timeline of Eloor ambient monitoring periods and Edayar consent records",
+        )
+        st.caption(
+            f"Showing {len(visible_timeline)} dated events from the records currently available "
+            "in this project. Dates describe the source record; they are not continuous monitoring "
+            "coverage. Consent-to-establish (CTE), consent-to-operate (CTO), rejected applications, "
+            "and stated expiry dates remain distinct."
+        )
+        if undated_event_count:
+            st.warning(
+                f"{undated_event_count} timeline record(s) had missing or invalid dates and "
+                "were excluded from the chronological display. Check the source register before "
+                "using those records in a date-based comparison."
             )
-        },
-        alt="Chronological timeline of Eloor ambient monitoring periods and Edayar consent records",
-    )
-    st.caption(
-        f"Showing {len(visible_timeline)} dated events from the records currently available "
-        "in this project. Dates describe the source record; they are not continuous monitoring "
-        "coverage. Consent-to-establish (CTE), consent-to-operate (CTO), rejected applications, "
-        "and stated expiry dates remain distinct."
-    )
 else:
     st.info(
         "No dated ambient-report or facility consent events are available to build the timeline."
