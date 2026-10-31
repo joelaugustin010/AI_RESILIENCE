@@ -7,7 +7,27 @@
   "threshold_training_period": "2000-01-01 through 2014-12-31 (training target dates only)",
   "model_selection_train_target_dates_before": "2015-01-01",
   "threshold_validation_target_dates": "2015-01-01 through 2019-12-31",
-  "threshold_selection_metric": "F1, tie-break by recall then precision",
+  "model_selection_metric": "Validation F1, tie-break by recall then precision; 2015-2019 only",
+  "model_selection_results": [
+    {
+      "model_type": "random_forest",
+      "best_validation_threshold": 0.6,
+      "best_validation_f1": 0.7177914110429447,
+      "best_validation_recall": 0.8181818181818182,
+      "best_validation_precision": 0.639344262295082,
+      "best_validation_balanced_accuracy": 0.8894830659536542
+    },
+    {
+      "model_type": "extra_trees",
+      "best_validation_threshold": 0.7,
+      "best_validation_f1": 0.7133333333333334,
+      "best_validation_recall": 0.7482517482517482,
+      "best_validation_precision": 0.6815286624203821,
+      "best_validation_balanced_accuracy": 0.8592714475067416
+    }
+  ],
+  "selected_model_type": "random_forest",
+  "threshold_selection_metric": "F1, tie-break by recall then precision; validation period only",
   "selected_probability_threshold": 0.6,
   "validation_threshold_scores": [
     {
@@ -177,7 +197,7 @@
     "Historical reanalysis/grid-point data are not station observations.",
     "Only four Kerala locations; performance may not generalize outside these grid points.",
     "The 95th-percentile threshold is a research event definition, not an IMD heatwave or official extreme-rainfall warning definition.",
-    "The event-definition percentile is estimated from pre-2015 training target dates only; probability threshold is tuned on 2015-2019 validation predictions.",
+    "The event-definition percentile is estimated from pre-2015 training target dates only; Random Forest and Extra Trees are compared on 2015-2019 validation data, and the decision threshold is selected there.",
     "The next-day forecast now includes current-day observations, which are assumed available when the forecast is issued; real forecast availability must be checked before operational use.",
     "Metrics include a majority baseline, a simple persistence baseline, average precision, Brier score and a confusion matrix; these remain retrospective research metrics.",
     "A single future-period holdout is preliminary; assess calibration, drift and independent station data before any real-world use.",
