@@ -143,8 +143,10 @@ def audit_daily_extract(data: pd.DataFrame) -> tuple[dict, pd.DataFrame]:
     quality_flags = (
         data["quality_flag"].astype("string").str.strip().str.casefold()
         if "quality_flag" in data.columns
-        else pd.Series("not supplied", index=data.index, dtype="string")
+        else pd.Series(pd.NA, index=data.index, dtype="string")
     )
+    known_quality_flags = {"valid", "suspect", "invalid", "unassessed"}
+    present_quality_flags = quality_flags.notna() & quality_flags.ne("")
     pollutant_audit = pd.DataFrame(pollutant_rows)
     summary = {
         "rows": len(data),
@@ -155,8 +157,12 @@ def audit_daily_extract(data: pd.DataFrame) -> tuple[dict, pd.DataFrame]:
         "missing_stations": missing_station_count,
         "missing_aqi": missing_aqi_count,
         "invalid_aqi": invalid_aqi_count,
+        "valid_qa_rows": int(quality_flags.eq("valid").sum()),
+        "suspect_qa_rows": int(quality_flags.eq("suspect").sum()),
+        "invalid_qa_rows": int(quality_flags.eq("invalid").sum()),
         "unassessed_rows": int(quality_flags.eq("unassessed").sum()),
-        "missing_qa_rows": int(quality_flags.isna().sum() + quality_flags.eq("").sum()),
+        "missing_qa_rows": int((~present_quality_flags).sum()),
+        "unknown_qa_rows": int((present_quality_flags & ~quality_flags.isin(known_quality_flags)).sum()),
         "pollutant_nonnumeric": int(pollutant_audit["Non-numeric values"].sum()),
         "pollutant_negative": int(pollutant_audit["Negative values"].sum()),
         "pollutant_unit_mismatches": int(pollutant_audit["Unit mismatches"].sum()),
@@ -582,6 +588,11 @@ else:
     detail_metrics[1].metric("Negative pollutant values", audit_summary.get("pollutant_negative", 0))
     detail_metrics[2].metric("Unit mismatches", audit_summary.get("pollutant_unit_mismatches", 0))
     detail_metrics[3].metric("Rows QA-unassessed", audit_summary.get("unassessed_rows", 0))
+    qa_metrics = st.columns(4)
+    qa_metrics[0].metric("QA valid", audit_summary.get("valid_qa_rows", 0))
+    qa_metrics[1].metric("QA suspect", audit_summary.get("suspect_qa_rows", 0))
+    qa_metrics[2].metric("QA invalid", audit_summary.get("invalid_qa_rows", 0))
+    qa_metrics[3].metric("Unknown QA flags", audit_summary.get("unknown_qa_rows", 0))
     if not pollutant_audit.empty:
         display_dataframe(
             pollutant_audit,
@@ -593,7 +604,8 @@ else:
         "This is a structural audit of the preserved CSV, not independent certification of "
         "the KSPCB measurements. Missing means no value is present; non-numeric means a "
         "non-empty value could not be parsed. Duplicate counts represent extra rows sharing "
-        "the same station and report date. Source QA marked unassessed remains unassessed."
+        "the same station and report date. QA flags are counted exactly as recorded; unknown "
+        "flags are not silently treated as valid, and suspect/invalid rows are not promoted."
     )
     if (
         audit_summary.get("duplicate_rows", 0)
@@ -605,6 +617,8 @@ else:
         or audit_summary.get("pollutant_nonnumeric", 0)
         or audit_summary.get("pollutant_negative", 0)
         or audit_summary.get("pollutant_unit_mismatches", 0)
+        or audit_summary.get("invalid_qa_rows", 0)
+        or audit_summary.get("unknown_qa_rows", 0)
     ):
         st.warning(
             "The daily extract has structural issues that should be reviewed before "
