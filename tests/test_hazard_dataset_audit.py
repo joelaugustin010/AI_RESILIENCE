@@ -1,4 +1,4 @@
-"""Tests for separating raw-source acquisition from supervised-model readiness."""
+""""Tests for separating raw-source acquisition from supervised-model readiness."""
 import json
 from pathlib import Path
 
@@ -20,7 +20,7 @@ def test_nested_raw_source_is_found_without_claiming_model_readiness(tmp_path: P
 
     raw = tmp_path / "data" / "external" / "hazards" / "raw" / "earthquake" / "usgs_india_events_2000_present.csv"
     raw.parent.mkdir(parents=True)
-    raw.write_text("time,latitude,longitude,mag\n2020-01-01,10,76,3.1\n", encoding="utf-8")
+    raw.write_text("time,latitude,longitude,mag\\n2020-01-01,10,76,3.1\\n", encoding="utf-8")
 
     report = build_report(tmp_path)
     hazard = report["hazards"][0]
@@ -51,7 +51,7 @@ def test_missing_raw_source_is_not_confused_with_curated_training_table(tmp_path
 
     assert hazard["raw_source_count"] == 0
     assert hazard["curated_training_table"]["status"] == "MISSING_CURATED_TRAINING_TABLE"
-    assert hazard["model_status"] == "NOT_READY"
+    assert hazard["model_status"] == "NO_CURATED_TRAINING_TABLE"
 
 
 def test_existing_weather_research_baselines_are_not_hidden_by_missing_curated_tables(tmp_path: Path):
