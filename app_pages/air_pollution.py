@@ -13,6 +13,7 @@ from src.dataframe_display import display_dataframe
 from src.air_quality import (
     CPCB_AQI_CATEGORIES,
     cpcb_aqi_category,
+    safe_cpcb_aqi_category,
     time_series_summary,
 )
 from src.air_quality_attribution import (
@@ -46,14 +47,6 @@ def read_csv(path: Path) -> pd.DataFrame:
         return pd.read_csv(path)
     except (OSError, pd.errors.ParserError):
         return pd.DataFrame()
-
-
-def safe_cpcb_aqi_category(value: object) -> str:
-    """Classify a source AQI value without allowing one bad cell to break the page."""
-    try:
-        return cpcb_aqi_category(value)[0]
-    except (TypeError, ValueError, OverflowError):
-        return "Unavailable / invalid"
 
 
 def audit_daily_extract(data: pd.DataFrame) -> tuple[dict, pd.DataFrame]:
