@@ -10,104 +10,124 @@
       "status": "RESEARCH_BASELINE_TRAINED_NOT_VALIDATED",
       "hazard": "high_temperature",
       "target_definition": "next-day temperature_2m_max >= training-period 95th percentile",
-      "threshold": 33.0,
+      "threshold": 32.8,
       "threshold_units": "\u00b0C",
-      "threshold_training_period": "2000-01-01 through 2019-12-31",
+      "threshold_training_period": "2000-01-01 through 2014-12-31 (training target dates only)",
       "model_selection_train_target_dates_before": "2015-01-01",
       "threshold_validation_target_dates": "2015-01-01 through 2019-12-31",
-      "threshold_selection_metric": "F1, tie-break by recall then precision",
+      "model_selection_metric": "Validation F1, tie-break by recall then precision; 2015-2019 only",
+      "model_selection_results": [
+        {
+          "model_type": "random_forest",
+          "best_validation_threshold": 0.6,
+          "best_validation_f1": 0.7177914110429447,
+          "best_validation_recall": 0.8181818181818182,
+          "best_validation_precision": 0.639344262295082,
+          "best_validation_balanced_accuracy": 0.8894830659536542
+        },
+        {
+          "model_type": "extra_trees",
+          "best_validation_threshold": 0.7,
+          "best_validation_f1": 0.7133333333333334,
+          "best_validation_recall": 0.7482517482517482,
+          "best_validation_precision": 0.6815286624203821,
+          "best_validation_balanced_accuracy": 0.8592714475067416
+        }
+      ],
+      "selected_model_type": "random_forest",
+      "threshold_selection_metric": "F1, tie-break by recall then precision; validation period only",
       "selected_probability_threshold": 0.6,
       "validation_threshold_scores": [
         {
           "threshold": 0.05,
-          "f1": 0.42416561047739754,
-          "recall": 0.9901380670611439,
-          "precision": 0.2698924731182796,
-          "balanced_accuracy": 0.8951720201423125
+          "f1": 0.4668587896253602,
+          "recall": 0.9912587412587412,
+          "precision": 0.3053311793214863,
+          "balanced_accuracy": 0.899818318935966
         },
         {
           "threshold": 0.1,
-          "f1": 0.4853801169590643,
-          "recall": 0.9822485207100592,
-          "precision": 0.32233009708737864,
-          "balanced_accuracy": 0.914104987146261
+          "f1": 0.5230339692880409,
+          "recall": 0.9825174825174825,
+          "precision": 0.3563728598604946,
+          "balanced_accuracy": 0.9158725261666438
         },
         {
           "threshold": 0.15,
-          "f1": 0.527448869752422,
-          "recall": 0.9664694280078896,
-          "precision": 0.3626943005181347,
-          "balanced_accuracy": 0.9198979477835534
+          "f1": 0.5615268709191361,
+          "recall": 0.9772727272727273,
+          "precision": 0.3939393939393939,
+          "balanced_accuracy": 0.9247623291740938
         },
         {
           "threshold": 0.2,
-          "f1": 0.5602305475504322,
-          "recall": 0.9585798816568047,
-          "precision": 0.3957654723127036,
-          "balanced_accuracy": 0.9247070366059513
+          "f1": 0.5920344456404736,
+          "recall": 0.9615384615384616,
+          "precision": 0.4276827371695179,
+          "balanced_accuracy": 0.9261049408108232
         },
         {
           "threshold": 0.25,
-          "f1": 0.5850673194614443,
-          "recall": 0.9428007889546351,
-          "precision": 0.4241348713398403,
-          "balanced_accuracy": 0.9236587437490551
+          "f1": 0.6140845070422535,
+          "recall": 0.9527972027972028,
+          "precision": 0.45303408146300916,
+          "balanced_accuracy": 0.9275275378216554
         },
         {
           "threshold": 0.3,
-          "f1": 0.606020942408377,
-          "recall": 0.9132149901380671,
-          "precision": 0.4534769833496572,
-          "balanced_accuracy": 0.9155599741039018
+          "f1": 0.6390532544378699,
+          "recall": 0.9440559440559441,
+          "precision": 0.48300536672629696,
+          "balanced_accuracy": 0.929098679098679
         },
         {
           "threshold": 0.35,
-          "f1": 0.6201232032854209,
-          "recall": 0.893491124260355,
-          "precision": 0.4748427672955975,
-          "balanced_accuracy": 0.9098910675001937
+          "f1": 0.6588380716934487,
+          "recall": 0.9318181818181818,
+          "precision": 0.5095602294455067,
+          "balanced_accuracy": 0.927807486631016
         },
         {
           "threshold": 0.4,
-          "f1": 0.6370157819225251,
-          "recall": 0.8757396449704142,
-          "precision": 0.5005636978579482,
-          "balanced_accuracy": 0.9052819160559
+          "f1": 0.6778566817301485,
+          "recall": 0.9178321678321678,
+          "precision": 0.5373592630501536,
+          "balanced_accuracy": 0.9253450797568444
         },
         {
           "threshold": 0.45,
-          "f1": 0.6460843373493976,
-          "recall": 0.8461538461538461,
-          "precision": 0.5225334957369062,
-          "balanced_accuracy": 0.8942406717895904
+          "f1": 0.6918918918918919,
+          "recall": 0.8951048951048951,
+          "precision": 0.5638766519823789,
+          "balanced_accuracy": 0.9181406828465652
         },
         {
           "threshold": 0.5,
-          "f1": 0.6482213438735178,
-          "recall": 0.8086785009861933,
-          "precision": 0.5408970976253298,
-          "balanced_accuracy": 0.878739721289036
+          "f1": 0.7019027484143763,
+          "recall": 0.8706293706293706,
+          "precision": 0.5879574970484062,
+          "balanced_accuracy": 0.9093937108642991
         },
         {
           "threshold": 0.6,
-          "f1": 0.6595365418894831,
-          "recall": 0.7297830374753451,
-          "precision": 0.6016260162601627,
-          "balanced_accuracy": 0.8468688616830897
+          "f1": 0.7177914110429447,
+          "recall": 0.8181818181818182,
+          "precision": 0.639344262295082,
+          "balanced_accuracy": 0.8894830659536542
         },
         {
           "threshold": 0.7,
-          "f1": 0.6514399205561072,
-          "recall": 0.6469428007889546,
-          "precision": 0.656,
-          "balanced_accuracy": 0.8108187595235048
+          "f1": 0.717206132879046,
+          "recall": 0.736013986013986,
+          "precision": 0.6993355481727574,
+          "balanced_accuracy": 0.8545637369166781
         },
         {
           "threshold": 0.8,
-          "f1": 0.6002239641657335,
-          "recall": 0.5285996055226825,
-          "precision": 0.694300518134715,
-          "balanced_accuracy": 0.7556195026289299
+          "f1": 0.6925996204933587,
+          "recall": 0.6381118881118881,
+          "precision": 0.7572614107883817,
+          "balanced_accuracy": 0.8103661044837516
         }
       ],
       "validation_rows": 7304,
@@ -122,9 +142,14 @@
       "model_selection_train_rows": 21884,
       "train_rows": 29188,
       "test_rows": 8768,
-      "train_positive_rate": 0.050602987529121554,
-      "test_positive_rate": 0.11633211678832117,
+      "train_positive_rate": 0.05718103330135672,
+      "test_positive_rate": 0.12887773722627738,
       "features": [
+        "temperature_2m_max",
+        "temperature_2m_min",
+        "precipitation_sum",
+        "wind_speed_10m_max",
+        "wind_gusts_10m_max",
         "temperature_2m_max_lag1",
         "temperature_2m_max_lag2",
         "temperature_2m_max_lag3",
@@ -155,19 +180,34 @@
         "year"
       ],
       "metrics": {
-        "accuracy": 0.9153740875912408,
-        "balanced_accuracy": 0.8546397805379251,
-        "precision": 0.6065950920245399,
-        "recall": 0.7754901960784314,
-        "f1": 0.6807228915662651,
-        "roc_auc": 0.9603758591717535,
-        "majority_baseline_accuracy": 0.8836678832116789
+        "accuracy": 0.9279197080291971,
+        "balanced_accuracy": 0.8983053989484344,
+        "precision": 0.6726768377253814,
+        "recall": 0.8584070796460177,
+        "f1": 0.7542768273716952,
+        "roc_auc": 0.9714703149367278,
+        "average_precision": 0.8186757739802198,
+        "brier_score": 0.05721904383144654,
+        "confusion_matrix_tn_fp_fn_tp": [
+          7166,
+          472,
+          160,
+          970
+        ],
+        "majority_baseline_accuracy": 0.8711222627737226,
+        "majority_baseline_balanced_accuracy": 0.5,
+        "majority_baseline_f1": 0.0,
+        "persistence_baseline_rows": 8768,
+        "persistence_baseline_balanced_accuracy": 0.8501576885020635,
+        "persistence_baseline_f1": 0.7389380530973452
       },
       "limitations": [
         "Historical reanalysis/grid-point data are not station observations.",
         "Only four Kerala locations; performance may not generalize outside these grid points.",
         "The 95th-percentile threshold is a research event definition, not an IMD heatwave or official extreme-rainfall warning definition.",
-        "Probability threshold is tuned on 2015-2019 validation predictions; the 2020+ test set is not used for tuning.",
+        "The event-definition percentile is estimated from pre-2015 training target dates only; Random Forest and Extra Trees are compared on 2015-2019 validation data, and the decision threshold is selected there.",
+        "The next-day forecast now includes current-day observations, which are assumed available when the forecast is issued; real forecast availability must be checked before operational use.",
+        "Metrics include a majority baseline, a simple persistence baseline, average precision, Brier score and a confusion matrix; these remain retrospective research metrics.",
         "A single future-period holdout is preliminary; assess calibration, drift and independent station data before any real-world use.",
         "Not an emergency-warning or scientifically approved operational model."
       ]
@@ -178,102 +218,122 @@
       "target_definition": "next-day precipitation_sum >= training-period 95th percentile",
       "threshold": 25.9,
       "threshold_units": "mm/day",
-      "threshold_training_period": "2000-01-01 through 2019-12-31",
+      "threshold_training_period": "2000-01-01 through 2014-12-31 (training target dates only)",
       "model_selection_train_target_dates_before": "2015-01-01",
       "threshold_validation_target_dates": "2015-01-01 through 2019-12-31",
-      "threshold_selection_metric": "F1, tie-break by recall then precision",
-      "selected_probability_threshold": 0.4,
+      "model_selection_metric": "Validation F1, tie-break by recall then precision; 2015-2019 only",
+      "model_selection_results": [
+        {
+          "model_type": "random_forest",
+          "best_validation_threshold": 0.5,
+          "best_validation_f1": 0.3546694648478489,
+          "best_validation_recall": 0.4642857142857143,
+          "best_validation_precision": 0.2869269949066214,
+          "best_validation_balanced_accuracy": 0.7018834911486209
+        },
+        {
+          "model_type": "extra_trees",
+          "best_validation_threshold": 0.4,
+          "best_validation_f1": 0.3516653756777692,
+          "best_validation_recall": 0.6236263736263736,
+          "best_validation_precision": 0.24487594390507011,
+          "best_validation_balanced_accuracy": 0.7613809101561263
+        }
+      ],
+      "selected_model_type": "random_forest",
+      "threshold_selection_metric": "F1, tie-break by recall then precision; validation period only",
+      "selected_probability_threshold": 0.5,
       "validation_threshold_scores": [
         {
           "threshold": 0.05,
-          "f1": 0.12793406199605806,
+          "f1": 0.15256410256410258,
           "recall": 0.9807692307692307,
-          "precision": 0.0684301322599195,
-          "balanced_accuracy": 0.6402405231655952
+          "precision": 0.08271547729379054,
+          "balanced_accuracy": 0.7051540678341831
         },
         {
           "threshold": 0.1,
-          "f1": 0.16495338273966054,
-          "recall": 0.9478021978021978,
-          "precision": 0.09033778476040849,
-          "balanced_accuracy": 0.7236129144630585
+          "f1": 0.21016311166875784,
+          "recall": 0.9203296703296703,
+          "precision": 0.11862606232294617,
+          "balanced_accuracy": 0.7808420685942299
         },
         {
           "threshold": 0.15,
-          "f1": 0.1951073985680191,
-          "recall": 0.8983516483516484,
-          "precision": 0.10943775100401607,
-          "balanced_accuracy": 0.7574611267694842
+          "f1": 0.25029797377830754,
+          "recall": 0.8653846153846154,
+          "precision": 0.14630747793776128,
+          "balanced_accuracy": 0.8002715584127689
         },
         {
           "threshold": 0.2,
-          "f1": 0.2185792349726776,
-          "recall": 0.8241758241758241,
-          "precision": 0.12599748005039899,
-          "balanced_accuracy": 0.7621599581974221
+          "f1": 0.27318874019381634,
+          "recall": 0.8131868131868132,
+          "precision": 0.1641708264004437,
+          "balanced_accuracy": 0.7980199195617064
         },
         {
           "threshold": 0.25,
-          "f1": 0.24261138067931187,
-          "recall": 0.7554945054945055,
-          "precision": 0.14450867052023122,
-          "balanced_accuracy": 0.760456186464832
+          "f1": 0.3036649214659686,
+          "recall": 0.7967032967032966,
+          "precision": 0.18758085381630013,
+          "balanced_accuracy": 0.8078617348069798
         },
         {
           "threshold": 0.3,
-          "f1": 0.25405405405405407,
-          "recall": 0.6456043956043956,
-          "precision": 0.15814266487213996,
-          "balanced_accuracy": 0.7326725148050797
+          "f1": 0.3256090314913844,
+          "recall": 0.7527472527472527,
+          "precision": 0.20773313115996966,
+          "balanced_accuracy": 0.801085441935586
         },
         {
           "threshold": 0.35,
-          "f1": 0.26657552973342447,
-          "recall": 0.5357142857142857,
-          "precision": 0.17743403093721566,
-          "balanced_accuracy": 0.7027274598600247
+          "f1": 0.3415941058271936,
+          "recall": 0.7005494505494505,
+          "precision": 0.22586359610274578,
+          "balanced_accuracy": 0.7873064255629096
         },
         {
           "threshold": 0.4,
-          "f1": 0.27615780445969124,
-          "recall": 0.4423076923076923,
-          "precision": 0.20074812967581046,
-          "balanced_accuracy": 0.6749722899578807
+          "f1": 0.3440366972477064,
+          "recall": 0.6181318681318682,
+          "precision": 0.23834745762711865,
+          "balanced_accuracy": 0.7572647813281819
         },
         {
           "threshold": 0.45,
-          "f1": 0.2702702702702703,
-          "recall": 0.3434065934065934,
-          "precision": 0.22281639928698752,
-          "balanced_accuracy": 0.6402911929568991
+          "f1": 0.3514719000892061,
+          "recall": 0.5412087912087912,
+          "precision": 0.26023778071334214,
+          "balanced_accuracy": 0.7302585742787472
         },
         {
           "threshold": 0.5,
-          "f1": 0.2462787550744249,
-          "recall": 0.25,
-          "precision": 0.24266666666666667,
-          "balanced_accuracy": 0.6045389048991354
+          "f1": 0.3546694648478489,
+          "recall": 0.4642857142857143,
+          "precision": 0.2869269949066214,
+          "balanced_accuracy": 0.7018834911486209
         },
         {
           "threshold": 0.6,
-          "f1": 0.13627254509018036,
-          "recall": 0.09340659340659341,
-          "precision": 0.2518518518518518,
-          "balanced_accuracy": 0.539426639642778
+          "f1": 0.3150074294205052,
+          "recall": 0.29120879120879123,
+          "precision": 0.343042071197411,
+          "balanced_accuracy": 0.630979035373848
         },
         {
           "threshold": 0.7,
-          "f1": 0.03970223325062035,
-          "recall": 0.02197802197802198,
-          "precision": 0.20512820512820512,
-          "balanced_accuracy": 0.5087555815941983
+          "f1": 0.18295218295218296,
+          "recall": 0.12087912087912088,
+          "precision": 0.37606837606837606,
+          "balanced_accuracy": 0.5551801944453241
         },
         {
           "threshold": 0.8,
-          "f1": 0.0,
-          "recall": 0.0,
-          "precision": 0.0,
-          "balanced_accuracy": 0.49971181556195965
+          "f1": 0.03571428571428571,
+          "recall": 0.019230769230769232,
+          "precision": 0.25,
+          "balanced_accuracy": 0.5081024163156728
         }
       ],
       "validation_rows": 7304,
@@ -291,6 +351,11 @@
       "train_positive_rate": 0.05026038097848431,
       "test_positive_rate": 0.07572992700729927,
       "features": [
+        "temperature_2m_max",
+        "temperature_2m_min",
+        "precipitation_sum",
+        "wind_speed_10m_max",
+        "wind_gusts_10m_max",
         "temperature_2m_max_lag1",
         "temperature_2m_max_lag2",
         "temperature_2m_max_lag3",
@@ -321,19 +386,34 @@
         "year"
       ],
       "metrics": {
-        "accuracy": 0.880588503649635,
-        "balanced_accuracy": 0.6637158208351669,
-        "precision": 0.292972972972973,
-        "recall": 0.40813253012048195,
-        "f1": 0.3410950283196979,
-        "roc_auc": 0.8257420104901343,
-        "majority_baseline_accuracy": 0.9242700729927007
+        "accuracy": 0.911382299270073,
+        "balanced_accuracy": 0.6845221458390324,
+        "precision": 0.41529235382308843,
+        "recall": 0.4171686746987952,
+        "f1": 0.41622839969947406,
+        "roc_auc": 0.8758163825093066,
+        "average_precision": 0.38244400881106255,
+        "brier_score": 0.0668832220891096,
+        "confusion_matrix_tn_fp_fn_tp": [
+          7714,
+          390,
+          387,
+          277
+        ],
+        "majority_baseline_accuracy": 0.9242700729927007,
+        "majority_baseline_balanced_accuracy": 0.5,
+        "majority_baseline_f1": 0.0,
+        "persistence_baseline_rows": 8768,
+        "persistence_baseline_balanced_accuracy": 0.6830778196695965,
+        "persistence_baseline_f1": 0.4141566265060241
       },
       "limitations": [
         "Historical reanalysis/grid-point data are not station observations.",
         "Only four Kerala locations; performance may not generalize outside these grid points.",
         "The 95th-percentile threshold is a research event definition, not an IMD heatwave or official extreme-rainfall warning definition.",
-        "Probability threshold is tuned on 2015-2019 validation predictions; the 2020+ test set is not used for tuning.",
+        "The event-definition percentile is estimated from pre-2015 training target dates only; Random Forest and Extra Trees are compared on 2015-2019 validation data, and the decision threshold is selected there.",
+        "The next-day forecast now includes current-day observations, which are assumed available when the forecast is issued; real forecast availability must be checked before operational use.",
+        "Metrics include a majority baseline, a simple persistence baseline, average precision, Brier score and a confusion matrix; these remain retrospective research metrics.",
         "A single future-period holdout is preliminary; assess calibration, drift and independent station data before any real-world use.",
         "Not an emergency-warning or scientifically approved operational model."
       ]
