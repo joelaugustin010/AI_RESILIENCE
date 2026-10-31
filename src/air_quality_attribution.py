@@ -32,6 +32,32 @@ INSUFFICIENT_ATTRIBUTION_MESSAGE = (
 )
 AMBIENT_EVIDENCE_TYPES = {"measured", "estimated", "illustrative", "unverified", "missing"}
 
+SOURCE_EVIDENCE_ACTIONS = {
+    "observation_window": "Obtain station-specific timestamps, averaging periods, valid-hour counts and row-level QA flags from the monitoring authority.",
+    "facility_locations": "Obtain facility-specific coordinates from an authoritative record, including the coordinate reference system and retrieval date.",
+    "pollutant_emissions": "Obtain dated, pollutant-specific measured stack-test results with units, reporting authority and source document. Permit limits are not measurements.",
+    "source_signatures": "Obtain independently reviewed process or emissions evidence that documents a plausible pollutant signature for the specific facility.",
+    "time_aligned_meteorology": "Obtain quality-reviewed wind speed and direction with timestamps, averaging periods, verified monitoring-site location and source provenance matching the ambient observation window.",
+    "alternatives_and_background": "Document background concentrations and competing sources such as traffic and other industrial activity for the same place and period.",
+    "transport_method": "Specify a scientifically reviewed transport or dispersion method, its input data, assumptions, validation and limitations.",
+}
+
+
+def evidence_action_plan(evidence: Mapping[str, bool]) -> list[dict[str, str]]:
+    """Explain every evidence gate and give a concrete next data request."""
+    unknown = set(evidence) - set(SOURCE_EVIDENCE_REQUIREMENTS)
+    if unknown:
+        raise ValueError("Unknown source-evidence field(s): " + ", ".join(sorted(unknown)))
+    return [
+        {
+            "evidence_domain": field,
+            "requirement": description,
+            "status": "Available for review" if evidence.get(field) is True else "Missing",
+            "next_action": SOURCE_EVIDENCE_ACTIONS[field],
+        }
+        for field, description in SOURCE_EVIDENCE_REQUIREMENTS.items()
+    ]
+
 
 def _valid_https_url(value: object) -> bool:
     """Accept only absolute HTTPS URLs with a host and no embedded credentials."""
