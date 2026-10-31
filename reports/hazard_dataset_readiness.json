@@ -1,6 +1,6 @@
 {
   "status": "RAW_SOURCE_AUDIT_AND_TRAINING_READINESS",
-  "generated_at_utc": "2026-10-31T09:12:28.140335+00:00",
+  "generated_at_utc": "2026-10-31T11:30:31.653795+00:00",
   "raw_sources_available_for_hazards": 7,
   "hazard_tracks": 9,
   "research_baselines_found_in_separate_report": 2,
@@ -371,7 +371,7 @@
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
           "bytes": 360514,
-          "sha256": "c8e0eccefabe79898d5e55b2c108d3c71915af25bf52f347bbb58c28f3d0ef2e",
+          "sha256": "0774cb205643cc9ee71a6bc8ddf7aa8137970016db89303cd9c855c05838029d",
           "format": "json",
           "json_root_type": "dict",
           "top_level_keys": [
@@ -392,7 +392,7 @@
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
           "bytes": 361713,
-          "sha256": "7070f396ac0bb1339b53e0d1a5c3ebfb97f05e916251cc89bfae27d3dfb82dc5",
+          "sha256": "37bfdb199b26ba2a90b9e17fe8b2f5be5377caa04129f14b884099e5dc0a9b9f",
           "format": "json",
           "json_root_type": "dict",
           "top_level_keys": [
@@ -413,7 +413,7 @@
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
           "bytes": 359692,
-          "sha256": "befad978e434576f279e5f0f52578f5b3529f3b82427a978a7d012497b23781e",
+          "sha256": "d62a0aa85849dd2efa4668f1bb65c56b7c4cef32dcd9b9bfe10db065b5b6539e",
           "format": "json",
           "json_root_type": "dict",
           "top_level_keys": [
@@ -434,7 +434,7 @@
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
           "bytes": 361957,
-          "sha256": "e34e6a51aa07bd25807966927b7996f65fadfa572de3ef15cc3e0bc91c24fd09",
+          "sha256": "95034172d5a19f754bf64c86d8b5d6920507a347a750e6e12cda66bf740c0887",
           "format": "json",
           "json_root_type": "dict",
           "top_level_keys": [
@@ -463,13 +463,26 @@
         "status": "RESEARCH_BASELINE_TRAINED_NOT_VALIDATED",
         "hazard": "high_temperature",
         "metrics": {
-          "accuracy": 0.9153740875912408,
-          "balanced_accuracy": 0.8546397805379251,
-          "precision": 0.6065950920245399,
-          "recall": 0.7754901960784314,
-          "f1": 0.6807228915662651,
-          "roc_auc": 0.9603758591717535,
-          "majority_baseline_accuracy": 0.8836678832116789
+          "accuracy": 0.9279197080291971,
+          "balanced_accuracy": 0.8983053989484344,
+          "precision": 0.6726768377253814,
+          "recall": 0.8584070796460177,
+          "f1": 0.7542768273716952,
+          "roc_auc": 0.9714703149367278,
+          "average_precision": 0.8186757739802198,
+          "brier_score": 0.05721904383144654,
+          "confusion_matrix_tn_fp_fn_tp": [
+            7166,
+            472,
+            160,
+            970
+          ],
+          "majority_baseline_accuracy": 0.8711222627737226,
+          "majority_baseline_balanced_accuracy": 0.5,
+          "majority_baseline_f1": 0.0,
+          "persistence_baseline_rows": 8768,
+          "persistence_baseline_balanced_accuracy": 0.8501576885020635,
+          "persistence_baseline_f1": 0.7389380530973452
         },
         "test_target_dates_from": "2020-01-01",
         "locations": [
@@ -529,7 +542,7 @@
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
           "bytes": 360514,
-          "sha256": "c8e0eccefabe79898d5e55b2c108d3c71915af25bf52f347bbb58c28f3d0ef2e",
+          "sha256": "0774cb205643cc9ee71a6bc8ddf7aa8137970016db89303cd9c855c05838029d",
           "format": "json",
           "json_root_type": "dict",
           "top_level_keys": [
@@ -550,7 +563,7 @@
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
           "bytes": 361713,
-          "sha256": "7070f396ac0bb1339b53e0d1a5c3ebfb97f05e916251cc89bfae27d3dfb82dc5",
+          "sha256": "37bfdb199b26ba2a90b9e17fe8b2f5be5377caa04129f14b884099e5dc0a9b9f",
           "format": "json",
           "json_root_type": "dict",
           "top_level_keys": [
@@ -571,7 +584,7 @@
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
           "bytes": 359692,
-          "sha256": "befad978e434576f279e5f0f52578f5b3529f3b82427a978a7d012497b23781e",
+          "sha256": "d62a0aa85849dd2efa4668f1bb65c56b7c4cef32dcd9b9bfe10db065b5b6539e",
           "format": "json",
           "json_root_type": "dict",
           "top_level_keys": [
@@ -592,7 +605,7 @@
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
           "bytes": 361957,
-          "sha256": "e34e6a51aa07bd25807966927b7996f65fadfa572de3ef15cc3e0bc91c24fd09",
+          "sha256": "95034172d5a19f754bf64c86d8b5d6920507a347a750e6e12cda66bf740c0887",
           "format": "json",
           "json_root_type": "dict",
           "top_level_keys": [
@@ -621,13 +634,26 @@
         "status": "RESEARCH_BASELINE_TRAINED_NOT_VALIDATED",
         "hazard": "extreme_rainfall",
         "metrics": {
-          "accuracy": 0.880588503649635,
-          "balanced_accuracy": 0.6637158208351669,
-          "precision": 0.292972972972973,
-          "recall": 0.40813253012048195,
-          "f1": 0.3410950283196979,
-          "roc_auc": 0.8257420104901343,
-          "majority_baseline_accuracy": 0.9242700729927007
+          "accuracy": 0.911382299270073,
+          "balanced_accuracy": 0.6845221458390324,
+          "precision": 0.41529235382308843,
+          "recall": 0.4171686746987952,
+          "f1": 0.41622839969947406,
+          "roc_auc": 0.8758163825093066,
+          "average_precision": 0.38244400881106255,
+          "brier_score": 0.0668832220891096,
+          "confusion_matrix_tn_fp_fn_tp": [
+            7714,
+            390,
+            387,
+            277
+          ],
+          "majority_baseline_accuracy": 0.9242700729927007,
+          "majority_baseline_balanced_accuracy": 0.5,
+          "majority_baseline_f1": 0.0,
+          "persistence_baseline_rows": 8768,
+          "persistence_baseline_balanced_accuracy": 0.6830778196695965,
+          "persistence_baseline_f1": 0.4141566265060241
         },
         "test_target_dates_from": "2020-01-01",
         "locations": [
