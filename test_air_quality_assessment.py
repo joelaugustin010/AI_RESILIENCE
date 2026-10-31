@@ -59,6 +59,14 @@ def facility(facility_id="E-1", **updates):
 
 
 class AssessmentObservationValidationTests(unittest.TestCase):
+    def test_safe_aqi_category_handles_invalid_display_values(self):
+        from src.air_quality import safe_cpcb_aqi_category
+
+        self.assertEqual(safe_cpcb_aqi_category(62), "Satisfactory")
+        self.assertEqual(safe_cpcb_aqi_category(None), "Unavailable / invalid")
+        self.assertEqual(safe_cpcb_aqi_category("not reported"), "Unavailable / invalid")
+        self.assertEqual(safe_cpcb_aqi_category(501), "Unavailable / invalid")
+
     def test_valid_measurement_preserves_source_units_dates_station_and_provenance(self):
         source = ambient_rows(observed_at="2026-10-25")
         validated = validate_attribution_observations(
