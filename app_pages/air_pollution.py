@@ -48,6 +48,14 @@ def read_csv(path: Path) -> pd.DataFrame:
         return pd.DataFrame()
 
 
+def safe_cpcb_aqi_category(value: object) -> str:
+    """Classify a source AQI value without allowing one bad cell to break the page."""
+    try:
+        return cpcb_aqi_category(value)[0]
+    except (TypeError, ValueError, OverflowError):
+        return "Unavailable / invalid"
+
+
 def audit_daily_extract(data: pd.DataFrame) -> tuple[dict, pd.DataFrame]:
     """Describe completeness and basic validity without certifying source QA."""
     if data.empty:
@@ -493,9 +501,15 @@ if daily_aqi.empty:
     st.info("The acquired daily AQI report extract is unavailable in this checkout.")
 else:
     display_aqi = daily_aqi.copy()
-    display_aqi["CPCB AQI category"] = display_aqi["source_aqi"].map(
-        lambda value: cpcb_aqi_category(value)[0]
-    )
+    if "source_aqi" in display_aqi.columns:
+        display_aqi["CPCB AQI category"] = display_aqi["source_aqi"].map(
+            safe_cpcb_aqi_category
+        )
+    else:
+        st.warning(
+            "The daily extract has no source_aqi column. AQI categories are unavailable "
+            "for this file; pollutant fields will be displayed only when present."
+        )
     report_date_label = (
         latest_extract_date.strftime("%d %B %Y")
         if latest_extract_date else "date unavailable"
@@ -509,7 +523,21 @@ else:
         "SO2_value", "CO_value", "PM2.5_value", "O3_value", "PM10_value", "NH3_value",
         "NOx_value", "NO_value", "NO2_value",
     ]
-    display_aqi = display_aqi[columns].rename(
+    available_display_columns = [
+        column for column in columns if column in display_aqi.columns
+    ]
+    missing_display_columns = [
+        column for column in columns
+        if column not in display_aqi.columns and column != "CPCB AQI category"
+    ]
+    if missing_display_columns:
+        st.caption(
+            "Optional report fields absent from this extract: "
+            + ", ".join(missing_display_columns)
+        )
+    if not available_display_columns:
+        st.warning("No recognised station-report columns are available to display.")
+    display_aqi = display_aqi[available_display_columns].rename(
         columns={
             "station": "KSPCB station label",
             "observed_at": "Report date",
@@ -530,9 +558,13 @@ else:
 
     # A focused Eloor snapshot makes the industrial-belt report easier to scan.
     # Values are copied from the dated KSPCB extract; no unit conversion or averaging is applied.
-    eloor_rows = daily_aqi.loc[
-        daily_aqi["station"].astype(str).str.strip().str.casefold().eq("eloor")
-    ]
+    eloor_rows = (
+        daily_aqi.loc[
+            daily_aqi["station"].astype(str).str.strip().str.casefold().eq("eloor")
+        ]
+        if "station" in daily_aqi.columns
+        else pd.DataFrame()
+    )
     if not eloor_rows.empty:
         eloor_row = eloor_rows.iloc[0]
         st.markdown("#### Eloor pollutant snapshot")
@@ -666,34 +698,54 @@ else:
         )
 
         if "source_status" in daily_status.columns:
-            status_summary = (
-                daily_status.assign(
-                    _station_key=daily_status["station"].astype("string").str.strip().str.casefold(),
-                    _status_label=daily_status["source_status"].astype("string").str.strip(),
+            if "station" in daily_status.columns:
+                status_summary = (
+                    daily_status.assign(
+                        _station_key=daily_status["station"].astype("string").str.strip().str.casefold(),
+                        _status_label=daily_status["source_status"].astype("string").str.strip(),
+                    )
+                    .dropna(subset=["_status_label"])
+                    .drop_duplicates(subset=["_station_key", "_status_label"])
+                    .groupby("_status_label")["_station_key"]
+                    .nunique()
+                    .sort_values(ascending=False)
                 )
-                .dropna(subset=["_status_label"])
-                .drop_duplicates(subset=["_station_key", "_status_label"])
-                .groupby("_status_label")["_station_key"]
-                .nunique()
-                .sort_values(ascending=False)
-            )
+            else:
+                status_summary = pd.Series(dtype="int64")
+                st.warning(
+                    "The station-status extract has no station column, so station-level "
+                    "status counts cannot be calculated."
+                )
             if not status_summary.empty:
                 status_columns = st.columns(min(3, len(status_summary)))
                 for column, (status_label, count) in zip(status_columns, status_summary.items()):
                     column.metric(str(status_label).title(), int(count))
 
         st.write("Stations without a reported AQI in this report:")
-        display_dataframe(
-            daily_status.rename(
-                columns={
-                    "station": "KSPCB station label",
-                    "observed_at": "Report date",
-                    "source_status": "Reported status",
-                }
-            )[["KSPCB station label", "Report date", "Reported status"]],
-            hide_index=True,
-            alt="Stations marked unavailable in the KSPCB daily AQI report",
+        status_display = daily_status.rename(
+            columns={
+                "station": "KSPCB station label",
+                "observed_at": "Report date",
+                "source_status": "Reported status",
+            }
         )
+        status_display_columns = [
+            column for column in (
+                "KSPCB station label", "Report date", "Reported status"
+            )
+            if column in status_display.columns
+        ]
+        if status_display_columns:
+            display_dataframe(
+                status_display[status_display_columns],
+                hide_index=True,
+                alt="Stations marked unavailable in the KSPCB daily AQI report",
+            )
+        else:
+            st.warning(
+                "The station-status extract is present but contains none of the recognised "
+                "station, date or status columns."
+            )
 
 st.markdown('<div id="eloor-trends"></div>', unsafe_allow_html=True)
 st.subheader("Dated Eloor pollutant trends")
