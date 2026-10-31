@@ -94,6 +94,25 @@ class AssessmentObservationValidationTests(unittest.TestCase):
                         source, ["Eloor"], provenance_verified=True, as_of="2026-10-25"
                     )
 
+    def test_evidence_action_plan_explains_all_gates_and_missing_actions(self):
+        from src.air_quality_attribution import (
+            SOURCE_EVIDENCE_REQUIREMENTS,
+            evidence_action_plan,
+        )
+
+        plan = evidence_action_plan({"observation_window": True})
+        self.assertEqual(len(plan), len(SOURCE_EVIDENCE_REQUIREMENTS))
+        self.assertEqual(plan[0]["status"], "Available for review")
+        self.assertEqual(plan[1]["status"], "Missing")
+        self.assertTrue(all(item["next_action"].strip() for item in plan))
+        self.assertIn("Permit limits are not measurements", plan[2]["next_action"])
+
+    def test_evidence_action_plan_rejects_unknown_fields(self):
+        from src.air_quality_attribution import evidence_action_plan
+
+        with self.assertRaisesRegex(ValueError, "Unknown source-evidence"):
+            evidence_action_plan({"factory_distance": True})
+
     def test_missing_timestamp_and_unit_are_rejected(self):
         missing_timestamp = ambient_rows()
         missing_timestamp.loc[0, "observed_at"] = None
