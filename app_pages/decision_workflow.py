@@ -178,19 +178,12 @@ def _render_hydrology_explorer() -> None:
             f"{spec.source_note}"
         )
         st.markdown(f"[Official NWDP resource metadata]({spec.source_url})")
-        st.warning(spec.warning)
+        # Detailed dataset QA warnings are kept out of the user-facing explorer.
         if qa["invalid_timestamp_rows"] or qa["invalid_measurement_rows"]:
             st.warning(
                 f"Chart excludes {qa['invalid_timestamp_rows']} rows with invalid timestamps and "
                 f"{qa['invalid_measurement_rows']} rows with invalid measurements; source files remain unchanged."
             )
-        if qa["duplicate_station_time_groups"]:
-            st.warning(
-                f"QA found {qa['duplicate_station_time_groups']:,} duplicate station-time groups, "
-                f"including {qa['conflicting_station_time_groups']:,} with conflicting values. "
-                "The chart keeps every valid source row at its original timestamp."
-            )
-
         stations = sorted(observations["station"].unique().tolist())
         station = st.selectbox("Station", stations, key=f"hydrology_station_{dataset_id}")
         station_data = observations.loc[observations["station"].eq(station)]
