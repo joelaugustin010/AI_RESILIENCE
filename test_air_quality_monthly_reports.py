@@ -99,6 +99,20 @@ class EloorMonthlyReportTests(unittest.TestCase):
         )
         self.assertTrue(compare_monthly_report_values([first, second]).empty)
 
+    def test_unexpected_weather_units_fail_report_validation(self):
+        original_read_csv = pd.read_csv
+        weather_path = REPORTS / "kspcb_caaqms_eloor_weather_2026-09.csv"
+
+        def altered_weather_units(path, *args, **kwargs):
+            frame = original_read_csv(path, *args, **kwargs)
+            if Path(path) == weather_path:
+                frame.loc[frame.index[0], "wind_speed_unit"] = "km/h"
+            return frame
+
+        with patch("src.air_quality_monthly_reports.pd.read_csv", side_effect=altered_weather_units):
+            with self.assertRaisesRegex(MonthlyReportError, "Unexpected source weather unit"):
+                load_eloor_monthly_report(REPORTS, "2026-09")
+
     def test_invalid_or_future_retrieval_dates_fail_provenance_checks(self):
         metadata_path = REPORTS / "kspcb_caaqms_eloor_2026-09.metadata.json"
         original_read_text = Path.read_text
