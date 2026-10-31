@@ -71,14 +71,20 @@ def feature_columns(df: pd.DataFrame) -> list[str]:
     return current_observations + lagged_observations + ["doy_sin", "doy_cos", "year"]
 
 
+def training_event_threshold(
+    df: pd.DataFrame, target_col: str, validation_start: str = "2015-01-01"
+) -> float:
+    """Estimate the 95th-percentile event threshold from training-era target dates only."""
+    train_values = df.loc[df["target_date"] < pd.Timestamp(validation_start), target_col].dropna()
+    if len(train_values) < 100:
+        raise RuntimeError("Insufficient pre-validation training outcomes to estimate event threshold.")
+    return float(train_values.quantile(0.95))
+
+
 def fit_target(df: pd.DataFrame, target_col: str, source_target: str, hazard: str) -> dict:
     validation_start = pd.Timestamp("2015-01-01")
-    # Keep the event-definition threshold strictly inside the model-selection training era.
-    # Using all pre-2020 observations would leak validation-era outcomes into target definition.
-    train_values = df.loc[df["target_date"] < validation_start, target_col].dropna()
-    if len(train_values) < 100:
-        raise RuntimeError(f"Insufficient pre-2015 training outcomes for {hazard}")
-    threshold = float(train_values.quantile(0.95))
+    # Using all pre-2020 observations here would leak validation-era outcomes into target definition.
+    threshold = training_event_threshold(df, target_col, str(validation_start.date()))
     data = df.dropna(subset=[target_col, "target_date"]).copy()
     data["target"] = (data[target_col] >= threshold).astype(int)
     cutoff = pd.Timestamp(TRAIN_END)
