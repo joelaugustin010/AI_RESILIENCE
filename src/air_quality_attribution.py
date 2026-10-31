@@ -10,6 +10,7 @@ import math
 import re
 from collections.abc import Mapping
 from datetime import date
+from urllib.parse import urlsplit
 
 import pandas as pd
 
@@ -30,6 +31,25 @@ INSUFFICIENT_ATTRIBUTION_MESSAGE = (
     "Insufficient evidence to reliably identify the pollution source."
 )
 AMBIENT_EVIDENCE_TYPES = {"measured", "estimated", "illustrative", "unverified", "missing"}
+
+
+def _valid_https_url(value: object) -> bool:
+    """Accept only absolute HTTPS URLs with a host and no embedded credentials."""
+    text = str(value).strip() if value is not None else ""
+    if not text or any(character.isspace() for character in text):
+        return False
+    try:
+        parsed = urlsplit(text)
+        # Accessing .port also rejects malformed or out-of-range port values.
+        parsed.port
+    except ValueError:
+        return False
+    return (
+        parsed.scheme == "https"
+        and bool(parsed.hostname)
+        and parsed.username is None
+        and parsed.password is None
+    )
 
 
 def source_attribution_readiness(evidence: Mapping[str, bool]) -> dict[str, object]:
@@ -75,8 +95,7 @@ def validate_attribution_observations(
         raise AirQualityDataError("Observations must be provided as a pandas DataFrame.")
     if "source_url" not in observations.columns:
         raise AirQualityDataError("A source_url is required for every ambient observation.")
-    urls = observations["source_url"].astype("string").str.strip()
-    if urls.isna().any() or urls.eq("").any() or not urls.str.startswith("https://").all():
+    if not observations["source_url"].map(_valid_https_url).all():
         raise AirQualityDataError("Every ambient observation must have an HTTPS source_url.")
 
     frame = observations.copy()
@@ -135,7 +154,7 @@ def _verified_documented_evidence(value: object) -> bool:
         isinstance(value, Mapping)
         and value.get("evidence_status") == "verified"
         and bool(str(value.get("description") or "").strip())
-        and str(value.get("source_url") or "").strip().startswith("https://")
+        and _valid_https_url(value.get("source_url"))
         and _retrieval_date_present(value.get("retrieved_on"))
     )
 
@@ -192,7 +211,7 @@ def _verified_coordinates(facility: Mapping[str, object]) -> bool:
         and -90 <= latitude <= 90
         and -180 <= longitude <= 180
         and bool(crs)
-        and source.startswith("https://")
+        and _valid_https_url(source)
         and _retrieval_date_present(retrieved_on)
     )
 
@@ -227,7 +246,7 @@ def _verified_stack_measurements(
             and sampled_at is not None
             and sampled_at <= as_of
             and str(record.get("reporting_authority") or "").strip()
-            and str(record.get("source_url") or "").strip().startswith("https://")
+            and _valid_https_url(record.get("source_url"))
             and _retrieval_date_present(record.get("retrieved_on"))
         ):
             return True
@@ -286,7 +305,7 @@ def _time_aligned_meteorology(
         for row in valid_ambient.itertuples(index=False)
     ):
         return False
-    if not meteorology["source_url"].astype("string").str.startswith("https://").all():
+    if not meteorology["source_url"].map(_valid_https_url).all():
         return False
     if not meteorology["wind_speed_unit"].astype("string").str.casefold().eq("m/s").all():
         return False
