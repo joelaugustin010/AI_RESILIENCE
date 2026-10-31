@@ -44,6 +44,113 @@ def read_csv(path: Path) -> pd.DataFrame:
         return pd.DataFrame()
 
 
+def audit_daily_extract(data: pd.DataFrame) -> tuple[dict, pd.DataFrame]:
+    """Describe completeness and basic validity without certifying source QA."""
+    if data.empty:
+        return {}, pd.DataFrame()
+
+    parsed_dates = (
+        pd.to_datetime(data["observed_at"], errors="coerce")
+        if "observed_at" in data.columns
+        else pd.Series(pd.NaT, index=data.index)
+    )
+    station_values = (
+        data["station"].astype("string").str.strip().str.casefold()
+        if "station" in data.columns
+        else pd.Series(pd.NA, index=data.index, dtype="string")
+    )
+    duplicate_keys = pd.DataFrame(
+        {"station": station_values, "date": parsed_dates}, index=data.index
+    )
+    duplicate_mask = (
+        duplicate_keys["station"].notna()
+        & duplicate_keys["station"].ne("")
+        & duplicate_keys["date"].notna()
+        & duplicate_keys.duplicated(keep="first")
+    )
+    raw_dates = data["observed_at"] if "observed_at" in data.columns else pd.Series(pd.NA, index=data.index)
+    invalid_date_count = int((raw_dates.notna() & parsed_dates.isna()).sum())
+    missing_station_count = int(station_values.isna().sum() + station_values.eq("").sum())
+
+    aqi_values = (
+        pd.to_numeric(data["source_aqi"], errors="coerce")
+        if "source_aqi" in data.columns
+        else pd.Series(float("nan"), index=data.index)
+    )
+    aqi_present = data["source_aqi"].notna() if "source_aqi" in data.columns else pd.Series(False, index=data.index)
+    invalid_aqi_count = int((aqi_present & (aqi_values.isna() | ~aqi_values.between(0, 500))).sum())
+
+    pollutant_specs = (
+        ("PM2.5", "PM2.5_value", "unit_PM2.5", "ug/m3"),
+        ("PM10", "PM10_value", "unit_PM10", "ug/m3"),
+        ("SO₂", "SO2_value", "unit_SO2", "ug/m3"),
+        ("NO₂", "NO2_value", "unit_NO2", "ug/m3"),
+        ("NO", "NO_value", "unit_NO", "ug/m3"),
+        ("NOx", "NOx_value", "unit_NOx", "ug/m3"),
+        ("O₃", "O3_value", "unit_O3", "ug/m3"),
+        ("NH₃", "NH3_value", "unit_NH3", "ug/m3"),
+        ("CO", "CO_value", "unit_CO", "mg/m3"),
+    )
+    pollutant_rows = []
+    for label, value_column, unit_column, expected_unit in pollutant_specs:
+        if value_column not in data.columns:
+            pollutant_rows.append({
+                "Pollutant": label,
+                "Numeric values": 0,
+                "Missing values": len(data),
+                "Non-numeric values": 0,
+                "Negative values": 0,
+                "Unit mismatches": len(data),
+            })
+            continue
+
+        raw_values = data[value_column]
+        present = raw_values.notna() & raw_values.astype("string").str.strip().ne("")
+        numeric_values = pd.to_numeric(raw_values, errors="coerce")
+        missing_count = int((~present).sum())
+        nonnumeric_count = int((present & numeric_values.isna()).sum())
+        negative_count = int((numeric_values.notna() & numeric_values.lt(0)).sum())
+
+        if unit_column in data.columns:
+            units = (
+                data[unit_column].astype("string").str.strip().str.casefold()
+                .str.replace("μ", "u", regex=False)
+                .str.replace("µ", "u", regex=False)
+                .str.replace("³", "3", regex=False)
+            )
+            unit_mismatch_count = int(
+                (present & units.ne(expected_unit)).sum()
+            )
+        else:
+            unit_mismatch_count = int(present.sum())
+
+        pollutant_rows.append({
+            "Pollutant": label,
+            "Numeric values": int(numeric_values.notna().sum()),
+            "Missing values": missing_count,
+            "Non-numeric values": nonnumeric_count,
+            "Negative values": negative_count,
+            "Unit mismatches": unit_mismatch_count,
+        })
+
+    quality_flags = (
+        data["quality_flag"].astype("string").str.strip().str.casefold()
+        if "quality_flag" in data.columns
+        else pd.Series("not supplied", index=data.index, dtype="string")
+    )
+    summary = {
+        "rows": len(data),
+        "stations": int(station_values.loc[station_values.ne("")].nunique()),
+        "duplicate_rows": int(duplicate_mask.sum()),
+        "invalid_dates": invalid_date_count,
+        "missing_stations": missing_station_count,
+        "invalid_aqi": invalid_aqi_count,
+        "unassessed_rows": int(quality_flags.eq("unassessed").sum()),
+        "missing_qa_rows": int(quality_flags.isna().sum() + quality_flags.eq("").sum()),
+    }
+    return summary, pd.DataFrame(pollutant_rows)
+
+
 st.markdown(
     """
     <style>
@@ -486,6 +593,37 @@ else:
                 status_columns = st.columns(min(3, len(status_summary)))
                 for column, (status_label, count) in zip(status_columns, status_summary.items()):
                     column.metric(str(status_label).title(), int(count))
+
+        st.markdown("**Daily extract data-quality audit**")
+        audit_summary, pollutant_audit = audit_daily_extract(daily_aqi)
+        audit_metrics = st.columns(5)
+        audit_metrics[0].metric("Extract rows", audit_summary.get("rows", 0))
+        audit_metrics[1].metric("Duplicate station-date rows", audit_summary.get("duplicate_rows", 0))
+        audit_metrics[2].metric("Invalid dates", audit_summary.get("invalid_dates", 0))
+        audit_metrics[3].metric("Invalid AQI values", audit_summary.get("invalid_aqi", 0))
+        audit_metrics[4].metric("Rows marked QA unassessed", audit_summary.get("unassessed_rows", 0))
+        display_dataframe(
+            pollutant_audit,
+            hide_index=True,
+            use_container_width=True,
+            alt="Missing, non-numeric, negative and unit-mismatch counts in the daily pollutant extract",
+        )
+        st.caption(
+            "This is a structural audit of the preserved CSV, not independent certification of "
+            "the KSPCB measurements. Missing means no value is present; non-numeric means a "
+            "non-empty value could not be parsed. Duplicate counts represent extra rows sharing "
+            "the same station and report date. Source QA marked unassessed remains unassessed."
+        )
+        if (
+            audit_summary.get("duplicate_rows", 0)
+            or audit_summary.get("invalid_dates", 0)
+            or audit_summary.get("invalid_aqi", 0)
+            or audit_summary.get("missing_stations", 0)
+        ):
+            st.warning(
+                "The daily extract has structural issues that should be reviewed before "
+                "using it in comparisons or calculations."
+            )
 
         st.write("Stations without a reported AQI in this report:")
         display_dataframe(
