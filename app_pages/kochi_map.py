@@ -7,6 +7,7 @@ import pandas as pd
 import pydeck as pdk
 import streamlit as st
 
+from src.dataframe_display import normalize_mixed_columns_for_display
 from src.spatial_data import classify_exposure, processed_layer_issues, read_processed_layers, validate_geojson
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -784,7 +785,12 @@ if uploaded is not None:
                     ))
                     legend_rows.append((category, color_hex, f"{len(group)} uploaded point(s)"))
                 st.caption("Uploaded coordinates and source claims are displayed as supplied; this app does not independently authenticate locations, completeness, or positional accuracy. Points are not automatically clipped to the boundary.")
-                st.dataframe(valid, hide_index=True, width="stretch", alt="User-uploaded point records, not independently verified")
+                st.dataframe(
+                    normalize_mixed_columns_for_display(valid),
+                    hide_index=True,
+                    width="stretch",
+                    alt="User-uploaded point records, not independently verified",
+                )
     except (UnicodeDecodeError, pd.errors.ParserError, ValueError) as error:
         st.error(f"Could not read the uploaded CSV: {error}")
 

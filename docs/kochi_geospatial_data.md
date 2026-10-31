@@ -30,6 +30,12 @@ each candidate and shows only the newest snapshot for a logical layer; if that
 newest file fails its hash check, the map does not silently fall back to an older
 snapshot.
 
+Rows from user-uploaded point CSVs are displayed only when they pass the
+existing coordinate and metadata checks, and their source columns are retained.
+The table uses a display-only copy: empty cells in otherwise numeric columns
+are treated as missing, and genuinely mixed-type columns are rendered as text.
+This does not alter uploaded values used for mapping.
+
 ## Acquisition method
 
 Run `python scripts/acquire_kochi_osm_layers.py --retries 2` from the repository
