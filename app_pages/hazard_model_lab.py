@@ -178,7 +178,11 @@ with st.expander("Source acquisition manifest"):
                 "Retrieved": item.get("retrieved_at", ""),
                 "SHA-256": item.get("sha256", ""),
             })
-        st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
+        st.dataframe(
+            pd.DataFrame(rows).astype("string"),
+            hide_index=True,
+            width="stretch",
+        )
     else:
         st.info("No acquisition manifest entries are available.")
 
