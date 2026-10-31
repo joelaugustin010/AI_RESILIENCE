@@ -29,7 +29,7 @@ def test_nested_raw_source_is_found_without_claiming_model_readiness(tmp_path: P
     assert hazard["raw_sources"][0]["status"] == "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION"
     assert hazard["raw_sources"][0]["has_explicit_target_column"] is False
     assert hazard["curated_training_table"]["status"] == "MISSING_CURATED_TRAINING_TABLE"
-    assert hazard["model_status"] == "NOT_READY"
+    assert hazard["model_status"] == "NO_CURATED_TRAINING_TABLE"
     assert report["research_baselines_found_in_separate_report"] == 0
 
 
