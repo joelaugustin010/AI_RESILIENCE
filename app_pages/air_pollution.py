@@ -15,7 +15,11 @@ from src.air_quality import (
     cpcb_aqi_category,
     time_series_summary,
 )
-from src.air_quality_attribution import assess_industrial_sources, evidence_action_plan
+from src.air_quality_attribution import (
+    SOURCE_EVIDENCE_REQUIREMENTS,
+    assess_industrial_sources,
+    evidence_action_plan,
+)
 from src.cpcb_aqi import calculate_ind_aqi
 from src.air_quality_monthly_reports import (
     MonthlyReportError,
@@ -1547,7 +1551,11 @@ if source_assessment["candidates"]:
     )
     action_rows = []
     for candidate in source_assessment["candidates"]:
-        for item in evidence_action_plan(candidate["evidence"]):
+        required_evidence = {
+            field: candidate["evidence"].get(field)
+            for field in SOURCE_EVIDENCE_REQUIREMENTS
+        }
+        for item in evidence_action_plan(required_evidence):
             action_rows.append(
                 {
                     "Candidate facility": candidate["facility_name"],
