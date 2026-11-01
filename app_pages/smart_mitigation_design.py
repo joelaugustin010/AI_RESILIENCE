@@ -164,7 +164,7 @@ div[data-testid="stExpander"] {
 }
 
 /* Professional report download button */
-.stDownloadButton button {
+   .stDownloadButton button {
     background: linear-gradient(100deg, #b9e1fa, #bcebd8);
     color: #245675;
     border: 1px solid #b4d9df;
