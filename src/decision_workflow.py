@@ -12,78 +12,133 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
+from src.evidence_quality import evidence_quality_inventory
+from src.infrastructure_dependencies import dependency_review_table
+from src.uncertainty import build_uncertainty_register
 
 
-HAZARD_OPTIONS = [
-    "Flood",
-    "Cyclone",
-    "Earthquake",
-    "Landslide",
-    "Heatwave",
-    "Drought",
-    "Industrial incident",
-    "Infrastructure failure",
-    "Compound: cyclone + flood",
-    "Compound: heavy rainfall + drainage failure",
-]
+HAZARD_OPTIONS = ['Flood',
+ 'Cyclone',
+ 'Earthquake',
+ 'Landslide',
+ 'Heatwave',
+ 'Drought',
+ 'Industrial incident',
+ 'Infrastructure failure',
+ 'Compound: cyclone + flood',
+ 'Compound: heavy rainfall + drainage failure']
 
-HAZARD_NOTES = {
-    "Flood": "Review local inundation evidence, drainage condition, safe access, water and sanitation continuity.",
-    "Cyclone": "Review wind-related damage pathways, shelter access, and timing with rainfall or coastal water.",
-    "Earthquake": "Review structural and non-structural building safety, utility isolation, and response access.",
-    "Landslide": "Review locally verified slope/ground evidence, rainfall context, access routes, and safe-area plans.",
-    "Heatwave": "Review heat-health plans, cooling access, water supply, outdoor worker exposure, and backup power.",
-    "Drought": "Review water-source reliability, demand management, and health and livelihood dependencies.",
-    "Industrial incident": "Review facility-specific hazard information, monitoring, isolation procedures, and official response protocols.",
-    "Infrastructure failure": "Review dependencies and cascading failures across power, water, transport, drainage, and communications.",
-}
+HAZARD_NOTES = {'Flood': 'Review local inundation evidence, drainage condition, safe access, water and sanitation '
+          'continuity.',
+ 'Cyclone': 'Review wind-related damage pathways, shelter access, and timing with rainfall or '
+            'coastal water.',
+ 'Earthquake': 'Review structural and non-structural building safety, utility isolation, and '
+               'response access.',
+ 'Landslide': 'Review locally verified slope/ground evidence, rainfall context, access routes, and '
+              'safe-area plans.',
+ 'Heatwave': 'Review heat-health plans, cooling access, water supply, outdoor worker exposure, and '
+             'backup power.',
+ 'Drought': 'Review water-source reliability, demand management, and health and livelihood '
+            'dependencies.',
+ 'Industrial incident': 'Review facility-specific hazard information, monitoring, isolation '
+                        'procedures, and official response protocols.',
+ 'Infrastructure failure': 'Review dependencies and cascading failures across power, water, '
+                           'transport, drainage, and communications.',
+ 'Heavy rainfall': 'Review rainfall amount, accumulation period, timing, gauge location, and '
+                   'drainage response.',
+ 'Drainage failure': 'Review drainage asset condition, maintenance, receiving-water constraints, '
+                     'and service dependencies.'}
 
-MITIGATION_CATALOG = {
-    "Flood": [
-        ("Drainage inspection and maintenance", "Can identify blocked or damaged assets before heavy rain.", "Verified asset register, inspection route, maintenance logs, disposal plan."),
-        ("Drainage capacity improvement study", "Can identify locations for engineered capacity changes; no local benefit is quantified.", "Hydraulic survey/model, design review, permits, lifecycle maintenance plan."),
-        ("Hospital continuity and flood preparedness", "Can improve continuity planning for essential care during access or utility disruption.", "Verified facility list, site-specific flood review, backup power/water duration."),
-        ("Evacuation route and shelter review", "Can identify route and shelter gaps for planning; no routes are verified in this app.", "Authoritative road/shelter layers, accessibility review, local drills."),
-    ],
-    "Cyclone": [
-        ("Emergency communication readiness", "Supports timely coordination if communications are disrupted.", "Operator contacts, backup channels, tested procedures."),
-        ("Hospital continuity and cyclone preparedness", "Supports continuity of essential care during wind or utility disruption.", "Verified facilities, structural review, backup-duration records."),
-        ("Evacuation and shelter readiness", "Supports preparedness where official warnings and local plans call for action.", "Official routes/shelters, accessibility and capacity review, drills."),
-    ],
-    "Earthquake": [
-        ("Critical-building structural inspection", "Documents condition and retrofit needs; this app does not assess structural safety.", "Qualified engineering inspection and building inventory."),
-        ("Utility isolation and emergency drills", "Supports safer response and continuity after a damaging event.", "Facility plans, responsible operators, tested drill records."),
-    ],
-    "Landslide": [
-        ("Slope and drainage inspection", "Supports site monitoring and maintenance where a local assessment identifies concern.", "Verified slope/hazard map, field inspection, geotechnical review."),
-        ("Safe-route and response planning", "Supports response planning around access disruption.", "Verified routes, local authority review, accessible alternatives."),
-    ],
-    "Heatwave": [
-        ("Heat-health preparedness", "Supports early outreach, cooling access, and continuity of care.", "Local heat-health plan, population and facility data, service capacity."),
-        ("Water and power continuity review", "Supports continuity of essential cooling and water services.", "Utility dependency inventory and backup-duration checks."),
-    ],
-    "Drought": [
-        ("Water-source and demand contingency planning", "Supports staged response to supply constraints.", "Reservoir/source data, demand records, official trigger/action plan."),
-        ("Essential-service water continuity", "Supports continued operation of health and emergency services.", "Facility inventory, storage and replenishment records."),
-    ],
-    "Industrial incident": [
-        ("Pollutant-specific monitoring and source investigation", "Can improve evidence for investigation; AQI alone cannot identify a source.", "Verified station data, pollutant-specific observations, facility emissions and meteorology."),
-        ("Industrial incident response coordination", "Supports coordinated notification, isolation, and response.", "Facility-specific emergency plans, official contacts, drills."),
-    ],
-    "Infrastructure failure": [
-        ("Critical-infrastructure dependency review", "Can identify service dependencies and continuity gaps.", "Verified asset/utility inventory, operators, backup duration and failure logs."),
-        ("Infrastructure inspection and resilience study", "Can prioritize engineering review; no benefit is quantified here.", "Condition survey, engineering scope, design review and lifecycle costs."),
-        ("Emergency communications readiness", "Supports coordination through service disruptions.", "Tested backup channels and responsible operators."),
-    ],
-}
+MITIGATION_CATALOG = {'Flood': [('Drainage inspection and maintenance',
+            'Can identify blocked or damaged assets before heavy rain.',
+            'Verified asset register, inspection route, maintenance logs, disposal plan.'),
+           ('Drainage capacity improvement study',
+            'Can identify locations for engineered capacity changes; no local benefit is '
+            'quantified.',
+            'Hydraulic survey/model, design review, permits, lifecycle maintenance plan.'),
+           ('Hospital continuity and flood preparedness',
+            'Can improve continuity planning for essential care during access or utility '
+            'disruption.',
+            'Verified facility list, site-specific flood review, backup power/water duration.'),
+           ('Evacuation route and shelter review',
+            'Can identify route and shelter gaps for planning; no routes are verified in this app.',
+            'Authoritative road/shelter layers, accessibility review, local drills.')],
+ 'Cyclone': [('Emergency communication readiness',
+              'Supports timely coordination if communications are disrupted.',
+              'Operator contacts, backup channels, tested procedures.'),
+             ('Hospital continuity and cyclone preparedness',
+              'Supports continuity of essential care during wind or utility disruption.',
+              'Verified facilities, structural review, backup-duration records.'),
+             ('Evacuation and shelter readiness',
+              'Supports preparedness where official warnings and local plans call for action.',
+              'Official routes/shelters, accessibility and capacity review, drills.')],
+ 'Earthquake': [('Critical-building structural inspection',
+                 'Documents condition and retrofit needs; this app does not assess structural '
+                 'safety.',
+                 'Qualified engineering inspection and building inventory.'),
+                ('Utility isolation and emergency drills',
+                 'Supports safer response and continuity after a damaging event.',
+                 'Facility plans, responsible operators, tested drill records.')],
+ 'Landslide': [('Slope and drainage inspection',
+                'Supports site monitoring and maintenance where a local assessment identifies '
+                'concern.',
+                'Verified slope/hazard map, field inspection, geotechnical review.'),
+               ('Safe-route and response planning',
+                'Supports response planning around access disruption.',
+                'Verified routes, local authority review, accessible alternatives.')],
+ 'Heatwave': [('Heat-health preparedness',
+               'Supports early outreach, cooling access, and continuity of care.',
+               'Local heat-health plan, population and facility data, service capacity.'),
+              ('Water and power continuity review',
+               'Supports continuity of essential cooling and water services.',
+               'Utility dependency inventory and backup-duration checks.')],
+ 'Drought': [('Water-source and demand contingency planning',
+              'Supports staged response to supply constraints.',
+              'Reservoir/source data, demand records, official trigger/action plan.'),
+             ('Essential-service water continuity',
+              'Supports continued operation of health and emergency services.',
+              'Facility inventory, storage and replenishment records.')],
+ 'Industrial incident': [('Pollutant-specific monitoring and source investigation',
+                          'Can improve evidence for investigation; AQI alone cannot identify a '
+                          'source.',
+                          'Verified station data, pollutant-specific observations, facility '
+                          'emissions and meteorology.'),
+                         ('Industrial incident response coordination',
+                          'Supports coordinated notification, isolation, and response.',
+                          'Facility-specific emergency plans, official contacts, drills.')],
+ 'Infrastructure failure': [('Critical-infrastructure dependency review',
+                             'Can identify service dependencies and continuity gaps.',
+                             'Verified asset/utility inventory, operators, backup duration and '
+                             'failure logs.'),
+                            ('Infrastructure inspection and resilience study',
+                             'Can prioritize engineering review; no benefit is quantified here.',
+                             'Condition survey, engineering scope, design review and lifecycle '
+                             'costs.'),
+                            ('Emergency communications readiness',
+                             'Supports coordination through service disruptions.',
+                             'Tested backup channels and responsible operators.')],
+ 'Heavy rainfall': [('Rainfall-source and accumulation verification',
+                     'Confirms whether rainfall values, units, timing, and station context are '
+                     'suitable for local review.',
+                     'Authoritative observation or forecast, station/location, timezone, averaging '
+                     'period, and quality flags.')],
+ 'Drainage failure': [('Drainage inspection and maintenance',
+                       'Can identify blocked or damaged assets before heavy rain.',
+                       'Verified asset register, inspection route, maintenance logs, disposal '
+                       'plan.'),
+                      ('Drainage capacity improvement study',
+                       'Can identify locations for engineered capacity changes; no local benefit '
+                       'is quantified.',
+                       'Hydraulic survey/model, design review, permits, lifecycle maintenance '
+                       'plan.')]}
 
 
 def expand_hazards(selection: str) -> list[str]:
-    """Expand compound labels into their component hazards without scoring them."""
+    """Expand compound labels into distinct drivers without scoring or combining them."""
     if selection == "Compound: cyclone + flood":
         return ["Cyclone", "Flood"]
     if selection == "Compound: heavy rainfall + drainage failure":
-        return ["Flood", "Infrastructure failure"]
+        return ["Heavy rainfall", "Drainage failure"]
     return [selection] if selection in HAZARD_NOTES else []
 
 
@@ -93,8 +148,25 @@ def validate_workflow_inputs(inputs: dict[str, Any]) -> list[str]:
     hazard = inputs.get("hazard")
     if hazard not in HAZARD_OPTIONS:
         problems.append("Select a hazard from the available list.")
-    if not str(inputs.get("location", "")).strip():
+    location = inputs.get("location")
+    if not isinstance(location, str) or not location.strip():
         problems.append("Enter a location or area name. Coordinates are not required.")
+    classification = inputs.get("input_classification")
+    if not isinstance(classification, str) or classification not in INPUT_CLASSIFICATIONS:
+        problems.append("Choose how the entered conditions should be classified.")
+
+    assets = inputs.get("assets", [])
+    if not isinstance(assets, (list, tuple)) or any(not isinstance(asset, str) for asset in assets):
+        problems.append("Assets must be provided as a list of names or left empty.")
+    elif any(asset not in ASSET_OPTIONS for asset in assets):
+        problems.append("Select assets from the available list.")
+    for field, label, options in (
+        ("drainage_status", "Drainage condition", DRAINAGE_STATUS_OPTIONS),
+        ("infrastructure_status", "Infrastructure condition", INFRASTRUCTURE_STATUS_OPTIONS),
+    ):
+        value = inputs.get(field)
+        if value is not None and (not isinstance(value, str) or value not in options):
+            problems.append(f"Select a valid {label.lower()} or leave it blank.")
 
     for field, label in (
         ("rainfall_mm", "Rainfall"),
@@ -114,9 +186,17 @@ def validate_workflow_inputs(inputs: dict[str, Any]) -> list[str]:
         if not math.isfinite(numeric) or (numeric < 0 and field in {"rainfall_mm", "wind_speed_kmh", "affected_population"}):
             qualifier = "non-negative " if field in {"rainfall_mm", "wind_speed_kmh", "affected_population"} else ""
             problems.append(f"{label} must be a finite, {qualifier}value.")
+        elif field == "affected_population" and not numeric.is_integer():
+            problems.append("Affected population must be a whole number of people.")
 
-    if inputs.get("rainfall_mm") is not None and str(inputs.get("rainfall_period", "")).strip() in {"", "Not supplied"}:
-        problems.append("Choose a rainfall time period for the entered rainfall value.")
+    if inputs.get("rainfall_mm") is not None:
+        rainfall_period = str(inputs.get("rainfall_period", "")).strip()
+        if rainfall_period not in RAINFALL_PERIOD_OPTIONS:
+            problems.append("Choose a valid rainfall time period for the entered rainfall value.")
+        elif rainfall_period == "Not supplied":
+            problems.append("Choose a rainfall time period for the entered rainfall value.")
+        elif rainfall_period == "Other / state in notes" and not str(inputs.get("condition_notes", "")).strip():
+            problems.append("Describe the rainfall time period in the condition notes.")
     return problems
 
 
@@ -681,4 +761,369 @@ def report_html(report: pd.DataFrame) -> str:
         "<table><thead><tr><th>Section</th><th>Item</th><th>Value</th></tr></thead><tbody>"
         + table_rows
         + "</tbody></table></body></html>"
+    )
+
+INPUT_CLASSIFICATIONS = {
+    "Hypothetical scenario assumption",
+    "User-reported observation (source not independently verified)",
+    "Forecast supplied by user (not checked by app)",
+    "Unknown / unverified",
+}
+
+RAINFALL_PERIOD_OPTIONS = {
+    "Not supplied",
+    "Last 1 hour",
+    "Last 24 hours",
+    "Last 3 days",
+    "Other / state in notes",
+}
+
+ASSET_OPTIONS = (
+    "Hospitals",
+    "Roads and bridges",
+    "Electricity",
+    "Drinking water",
+    "Communications",
+    "Shelters",
+    "Schools",
+    "Drainage",
+    "Industrial facilities",
+    "Residential buildings",
+)
+
+DRAINAGE_STATUS_OPTIONS = (
+    "Not supplied",
+    "Reported functioning",
+    "Reported partially impaired",
+    "Reported failed",
+    "Hypothetical partial failure",
+    "Not applicable",
+)
+
+INFRASTRUCTURE_STATUS_OPTIONS = (
+    "Not supplied",
+    "No disruption reported",
+    "Possible / hypothetical disruption",
+    "Disruption reported by user",
+    "Not applicable",
+)
+
+PRIORITIZATION_CRITERIA = (
+    "expected_risk_reduction",
+    "population_affected",
+    "infrastructure_importance",
+    "feasibility",
+    "implementation_cost",
+    "implementation_time",
+    "uncertainty",
+)
+
+def recommendation_candidates(inputs: dict[str, Any]) -> pd.DataFrame:
+    """Create unranked planning candidates linked to entered conditions and evidence gaps."""
+    selected_hazard = str(inputs.get("hazard", ""))
+    components = expand_hazards(selected_hazard)
+    assets = inputs.get("assets", [])
+    nominated_assets = (
+        {asset for asset in assets if isinstance(asset, str)}
+        if isinstance(assets, (list, tuple))
+        else set()
+    )
+    classification = str(inputs.get("input_classification", "Unknown / unverified"))
+    rows: list[dict[str, str]] = []
+
+    def add(
+        action: str,
+        basis: str,
+        trigger: str,
+        rationale: str,
+        prerequisites: str,
+    ) -> None:
+        rows.append(
+            {
+                "Action candidate": action,
+                "Basis": basis,
+                "Assessment evidence / trigger": trigger,
+                "Why it may help": rationale,
+                "Evidence or authority needed": prerequisites,
+                "Priority": "Not ranked; local review required",
+            }
+        )
+
+    for component in components:
+        for action, rationale, prerequisites in MITIGATION_CATALOG.get(component, []):
+            action_lower = action.casefold()
+            if "hospital" in action_lower and "Hospitals" not in nominated_assets:
+                continue
+            if ("evacuation" in action_lower or "route" in action_lower) and not nominated_assets.intersection(
+                {"Roads and bridges", "Shelters"}
+            ):
+                continue
+
+            trigger = (
+                f"Selected scenario: {selected_hazard}; conditions are classified as "
+                f"{classification} and are not independently verified."
+            )
+            if "drainage" in action_lower:
+                drainage_status = str(inputs.get("drainage_status", "Not supplied"))
+                if drainage_status not in {"", "Not supplied", "Not applicable"}:
+                    trigger += f" User-described drainage condition: {drainage_status}."
+                else:
+                    trigger += " Drainage condition was not supplied; verify locally before selecting an intervention."
+            if "hospital" in action_lower:
+                trigger += " Hospitals were nominated for review; their locations and hazard exposure are not verified."
+            if "evacuation" in action_lower or "route" in action_lower:
+                trigger += " Roads/bridges or shelters were nominated; route accessibility and exposure are not verified."
+            add(action, "Selected hazard scenario", trigger, rationale, prerequisites)
+
+    source_and_time = str(inputs.get("source_and_time", "")).strip()
+    provenance_detail = (
+        "Source/time notes were supplied but have not been independently checked."
+        if source_and_time
+        else "Source/time notes are absent."
+    )
+    add(
+        "Verify condition source, location, units, and time",
+        "Input provenance gap",
+        f"Input classification: {classification}. {provenance_detail} User-entered values are never authenticated by this workflow.",
+        "Establishes whether the scenario inputs can be compared with authoritative local observations, forecasts, or warnings.",
+        "Record publisher, source URL or identifier, station/location, timestamp and timezone, units, averaging period, and quality flags.",
+    )
+
+    if inputs.get("river_level_m") is not None and (
+        not str(inputs.get("river_station", "")).strip()
+        or not str(inputs.get("river_reference", "")).strip()
+    ):
+        add(
+            "Confirm river gauge identity and reference",
+            "River-level metadata gap",
+            "A river-level value was entered without both a station name and gauge reference/datum.",
+            "Prevents an unreferenced level from being mistaken for a comparable water-surface elevation or warning threshold.",
+            "Confirm station identity, gauge zero/datum, provider, timestamp, units, and applicable official thresholds.",
+        )
+
+    if nominated_assets:
+        add(
+            "Verify asset locations and hazard overlap",
+            "Exposure evidence gap",
+            f"User-nominated assets/services: {', '.join(sorted(nominated_assets))}; no location-specific exposure join is performed by this workflow.",
+            "Determines whether the nominated assets are actually within the relevant hazard footprint and which access or service dependencies matter.",
+            "Use an authoritative asset register and a dated, spatially compatible hazard layer; verify coordinate reference system and positional quality.",
+        )
+
+    if not rows:
+        add(
+            "Collect location-specific hazard and impact evidence",
+            "Evidence gap",
+            "The selected scenario has no available action template in the current catalog.",
+            "Provides the minimum local evidence needed for a responsible review without assigning a risk level.",
+            "Consult the relevant disaster-management authority and document hazard, exposed assets, vulnerability, and response capacity evidence.",
+        )
+    return pd.DataFrame(
+        rows,
+        columns=[
+            "Action candidate",
+            "Basis",
+            "Assessment evidence / trigger",
+            "Why it may help",
+            "Evidence or authority needed",
+            "Priority",
+        ],
+    )
+
+def recommendation_priority_readiness(
+    criteria: dict[str, dict[str, Any]],
+) -> dict[str, Any]:
+    """Gate prioritization on sourced evidence; never produce an implicit score."""
+    blockers: list[str] = []
+    benefit_status = "Not supplied"
+    for criterion in PRIORITIZATION_CRITERIA:
+        detail = criteria.get(criterion)
+        if not isinstance(detail, dict):
+            blockers.append(f"{criterion}: no evidence record supplied")
+            continue
+        if detail.get("value") is None or str(detail.get("value")).strip() == "":
+            blockers.append(f"{criterion}: value missing")
+        if not str(detail.get("unit", "")).strip():
+            blockers.append(f"{criterion}: unit or scale definition missing")
+        if not str(detail.get("source", "")).strip():
+            blockers.append(f"{criterion}: evidence source missing")
+        if detail.get("evidence_state") != "Verified":
+            blockers.append(f"{criterion}: evidence is not Verified")
+        if criterion == "expected_risk_reduction":
+            benefit_status = str(detail.get("benefit_status", "Not supplied"))
+            if benefit_status not in {"Validated estimate", "Demonstrated benefit"}:
+                blockers.append("expected_risk_reduction: distinguish a validated estimate from a demonstrated benefit")
+
+    if blockers:
+        return {
+            "status": "Not ranked; evidence is insufficient",
+            "blockers": blockers,
+            "benefit_status": benefit_status,
+            "ranking_basis": "No score or priority order produced.",
+        }
+    return {
+        "status": "Evidence gate passed; stakeholder weighting still required",
+        "blockers": [],
+        "benefit_status": benefit_status,
+        "ranking_basis": (
+            "No score or priority order produced. Authorities and affected communities must "
+            "define transparent, comparable scales and policy weights before prioritization."
+        ),
+    }
+
+def assessment_evidence_matrix(
+    inputs: dict[str, Any],
+    evidence: pd.DataFrame | None = None,
+) -> pd.DataFrame:
+    """Show which risk dimensions are supported, unverified, or still unassessed."""
+    input_problems = validate_workflow_inputs(inputs)
+    classification = str(inputs.get("input_classification", "Unknown / unverified"))
+    source_and_time = str(inputs.get("source_and_time", "")).strip()
+    components = expand_hazards(str(inputs.get("hazard", "")))
+    assets = inputs.get("assets", [])
+    nominated_assets = [asset for asset in assets if isinstance(asset, str)] if isinstance(assets, (list, tuple)) else []
+    user_conditions = []
+    for field, label in (
+        ("rainfall_mm", "rainfall"),
+        ("river_level_m", "river level"),
+        ("wind_speed_kmh", "wind speed"),
+        ("temperature_c", "temperature"),
+    ):
+        if inputs.get(field) is not None:
+            user_conditions.append(f"{label} supplied")
+    for field, label in (
+        ("drainage_status", "drainage"),
+        ("infrastructure_status", "infrastructure"),
+    ):
+        value = str(inputs.get(field, "Not supplied"))
+        if value not in {"", "Not supplied", "Not applicable"}:
+            user_conditions.append(f"{label}: {value}")
+
+    evidence_status = "Evidence register not supplied to this review."
+    evidence_quality_status = "No item-level quality states available."
+    if evidence is not None and {"Available", "Dataset / file"}.issubset(evidence.columns):
+        available_count = int(evidence["Available"].eq("Yes").sum())
+        evidence_status = (
+            f"{available_count} of {len(evidence)} listed evidence records are present in the workspace; "
+            "presence does not mean they are validated or used in this assessment."
+        )
+        if "Evidence state" in evidence.columns:
+            state_counts = evidence["Evidence state"].value_counts().to_dict()
+            evidence_quality_status = f"Evidence-state counts: {state_counts}."
+            conflicts = evidence.loc[
+                evidence["Evidence state"].eq("Conflicting"), "Dataset / file"
+            ].astype(str).tolist()
+            if conflicts:
+                evidence_quality_status += f" Conflicting records: {', '.join(conflicts)}."
+
+    hazard_text = ", ".join(components) if components else "No valid hazard selected"
+    conditions_text = ", ".join(user_conditions) if user_conditions else "No hazard-condition measurements supplied"
+    if nominated_assets:
+        exposure_text = f"Nominated by user: {', '.join(nominated_assets)}."
+    else:
+        exposure_text = "No assets or services nominated."
+    population = inputs.get("affected_population")
+    if population is not None:
+        exposure_text += f" Population context entered: {population}; not independently verified."
+    vulnerability_text = "; ".join(
+        f"{label}: {inputs.get(field)}"
+        for field, label in (
+            ("drainage_status", "Drainage"),
+            ("infrastructure_status", "Other infrastructure"),
+        )
+        if str(inputs.get(field, "Not supplied")) not in {"", "Not supplied", "Not applicable"}
+    ) or "No vulnerability or service-condition information supplied."
+
+    compound_status = "No compound interaction assessed for this single-hazard selection."
+    compound_evidence = "No event interaction or cascading effect is calculated."
+    if len(components) > 1:
+        compound_status = "Components identified separately; interaction not modeled."
+        compound_evidence = f"Selected components: {hazard_text}. Components are not converted into or added as scores."
+
+    rows = [
+        {
+            "Dimension": "Input validation and provenance",
+            "Status": "Blocked by invalid input" if input_problems else "Structurally valid; provenance unverified",
+            "Evidence available": (
+                "; ".join(input_problems)
+                if input_problems
+                else f"Classification: {classification}. "
+                + (f"Source/time notes supplied: {source_and_time}" if source_and_time else "No source/time notes supplied.")
+            ),
+            "Gap / uncertainty": "User-entered values and source details are not independently authenticated.",
+            "Required next check": "Verify source identity, timestamp/timezone, units, location, and measurement/forecast meaning.",
+        },
+        {
+            "Dimension": "Data availability and quality",
+            "Status": "Catalogued; conflicts or gaps remain" if "Conflicting" in evidence_quality_status or "Incomplete" in evidence_quality_status else "Catalogued only",
+            "Evidence available": f"{evidence_status} {evidence_quality_status}",
+            "Gap / uncertainty": "Available files may be unverified, conflicting, stale, incomplete, or spatially incompatible; the inventory does not imply suitability for this assessment.",
+            "Required next check": "Check each source's metadata, quality flags, coverage, units, licence, and provenance before analysis.",
+        },
+        {
+            "Dimension": "Hazard",
+            "Status": "Scenario supplied; event not independently verified",
+            "Evidence available": f"Selected scenario: {hazard_text}; {conditions_text}.",
+            "Gap / uncertainty": "No current official warning, locally calibrated hazard intensity, or validated threshold is applied.",
+            "Required next check": "Match event conditions to an authoritative, location- and time-relevant hazard source.",
+        },
+        {
+            "Dimension": "Exposure",
+            "Status": "User-nominated only; spatial exposure not assessed",
+            "Evidence available": exposure_text,
+            "Gap / uncertainty": "No verified population/asset inventory is joined to a compatible hazard footprint.",
+            "Required next check": "Validate asset/population locations, dates, coverage, and coordinate reference system; perform a documented spatial join.",
+        },
+        {
+            "Dimension": "Vulnerability",
+            "Status": "User-described only" if vulnerability_text != "No vulnerability or service-condition information supplied." else "Not assessed",
+            "Evidence available": vulnerability_text,
+            "Gap / uncertainty": "No validated structural, social, health, service-condition, or fragility evidence is available for this location.",
+            "Required next check": "Collect asset-specific condition and vulnerability evidence with a documented method and responsible authority.",
+        },
+        {
+            "Dimension": "Compound interactions",
+            "Status": compound_status,
+            "Evidence available": compound_evidence,
+            "Gap / uncertainty": (
+                "Temporal overlap, spatial overlap, hazard dependence, and shared infrastructure failure pathways are unknown; "
+                "component scores must not be added."
+            ),
+            "Required next check": "Establish event sequence, compatible hazard footprints, dependencies, and observed cascading outcomes.",
+        },
+        {
+            "Dimension": "Consequences",
+            "Status": "Pathways for review only; impacts not calculated",
+            "Evidence available": "Hazard-specific planning prompts and user-nominated assets only.",
+            "Gap / uncertainty": "No location-linked impact, service-loss, casualty, damage, or recovery data supports an estimate.",
+            "Required next check": "Link validated event footprints to exposed assets and observed impact records.",
+        },
+        {
+            "Dimension": "Risk",
+            "Status": "Not estimated; no risk class assigned",
+            "Evidence available": "No calibrated combination of hazard, exposure, vulnerability, and capacity is used.",
+            "Gap / uncertainty": "Missing compatible, validated inputs prevent a defensible probability, severity, or risk category.",
+            "Required next check": "Develop and validate a suitable method only after the required local evidence and target outcomes are available.",
+        },
+        {
+            "Dimension": "Capacity and resilience",
+            "Status": "Not assessed",
+            "Evidence available": "No response, service continuity, coping, or recovery capacity data is measured.",
+            "Gap / uncertainty": "Preparedness prompts do not establish resilience or intervention effectiveness.",
+            "Required next check": "Document locally verified response plans, service dependencies, backup capacity, and recovery indicators.",
+        },
+        {
+            "Dimension": "Infrastructure dependencies",
+            "Status": "Conceptual pathways only; local links unverified",
+            "Evidence available": (
+                f"{len(dependency_review_table())} candidate physical, co-occurrence, service, and exposure relationships "
+                "are listed for investigation; no local evidence is attached."
+            ),
+            "Gap / uncertainty": "A road-to-hospital or utility cascade is not an observed vulnerability claim.",
+            "Required next check": "Verify asset topology, service dependencies, redundancy, event timing, and disruption records.",
+        },
+    ]
+    return pd.DataFrame(
+        rows,
+        columns=["Dimension", "Status", "Evidence available", "Gap / uncertainty", "Required next check"],
     )
