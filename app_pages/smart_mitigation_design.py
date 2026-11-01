@@ -347,7 +347,8 @@ rainfall_scenario = st.slider(
     min_value=0,
     max_value=150,
     value=50,
-    step=5
+    step=5,
+    key="rainfall_scenario_slider"
 )
 
 if rainfall_scenario < 30:
