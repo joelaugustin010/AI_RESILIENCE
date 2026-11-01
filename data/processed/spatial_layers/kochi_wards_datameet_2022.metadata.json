@@ -32,7 +32,7 @@
   "processed_file": "kochi_wards_datameet_2022.geojson",
   "validation": {
     "dataset_id": "kochi_wards_datameet_2022",
-    "source_file": "C:\\Users\\LENOVO\\OneDrive\\Desktop\\AI_RESILIENCE\\data\\processed\\spatial_layers\\kochi_wards_datameet_2022.geojson",
+    "source_file": "data/processed/spatial_layers/kochi_wards_datameet_2022.geojson",
     "source_sha256": "d27ee64ade27b5d4145eb11e55524f34d20f759eb8bc42b344211854aac86d40",
     "provenance_valid": true,
     "feature_count": 74,

@@ -1,0 +1,7 @@
+# Optional PDF extraction support for official air-quality report ingestion.
+pypdf>=6.0,<7
+# Optional geospatial validation support for research data acquisition.
+pyshp>=2.3,<3
+pyproj>=3.6,<4
+rasterio>=1.4,<2
+openpyxl>=3.1,<4
