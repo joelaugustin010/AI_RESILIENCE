@@ -1,6 +1,6 @@
 # AI_RESILIENCE Phase 1B: scientific intelligence and repository integrity
 
-**Review date:** 2026-11-01  
+**Review date:** 2026-11-01
 **Scope:** Existing decision workflow, evidence quality, uncertainty, compound hazards,
 infrastructure dependencies, recommendation readiness, and historical-validation readiness.
 

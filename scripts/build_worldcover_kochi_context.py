@@ -16,7 +16,11 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from src.landcover_context import WORLD_COVER_CLASSES, colorize_worldcover
+from src.landcover_context import (
+    WORLD_COVER_CLASSES,
+    colorize_worldcover,
+    validate_worldcover_preview,
+)
 
 
 SOURCE = (
@@ -182,18 +186,21 @@ def build_preview(*, replace: bool = False) -> dict[str, Any]:
 
 
 def verify_preview() -> dict[str, Any]:
-    """Verify source hash, derivative hash, dimensions and geographic metadata."""
-    source_metadata = _metadata()
+    """Verify the published preview and pinned source provenance."""
     if not OUTPUT.is_file() or not OUTPUT_METADATA.is_file():
         raise FileNotFoundError(f"WorldCover preview or sidecar is missing: {OUTPUT}")
     record = json.loads(OUTPUT_METADATA.read_text(encoding="utf-8"))
-    if record.get("source_sha256") != source_metadata.get("sha256"):
-        raise ValueError("Processed metadata source hash does not match the acquired tile.")
-    actual_hash = _sha256(OUTPUT)
-    if actual_hash != record.get("processing", {}).get("preview_sha256"):
-        raise ValueError("Processed preview hash does not match its provenance sidecar.")
-    with Image.open(OUTPUT) as image:
-        image.verify()
+    if SOURCE.is_file() or SOURCE_METADATA.is_file():
+        source_metadata = _metadata()
+        if record.get("source_sha256") != source_metadata.get("sha256"):
+            raise ValueError("Processed metadata source hash does not match the acquired tile.")
+    elif (
+        record.get("source_sha256") != SOURCE_SHA256
+        or record.get("license")
+        != "Creative Commons Attribution 4.0 International (CC BY 4.0)"
+    ):
+        raise ValueError("Processed metadata does not match the reviewed source provenance.")
+    validate_worldcover_preview(OUTPUT.read_bytes(), record)
     return record
 
 

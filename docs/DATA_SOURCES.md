@@ -1,6 +1,6 @@
 # Phase 2 data sources
 
-**Snapshot/review date:** 2026-11-02  
+**Snapshot/review date:** 2026-11-02
 **Scope:** Public or already-present data relevant to Kochi and Ernakulam. A source
 being official, open, or checksum-valid does not by itself establish accuracy,
 completeness, fitness for a particular analysis, or permission to redistribute.

@@ -1,6 +1,6 @@
 # Model validation report
 
-**Status date:** 2026-11-02  
+**Status date:** 2026-11-02
 **Overall finding:** The rainfall measurement method has a limited
 chronological retrospective benchmark. None of the ten disaster-hazard or
 consequence models has independent local historical validation or supports a

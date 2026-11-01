@@ -1,7 +1,7 @@
 # Phase 2 data acquisition report
 
-**Acquisition dates:** 2026-11-01 and 2026-11-02  
-**Acquisition code:** `scripts/acquire_phase2_data.py`; `scripts/acquire_kochidata_foundation.py`; `scripts/acquire_census_kochidata.py`; `scripts/validate_ibtracs_north_indian.py`  
+**Acquisition dates:** 2026-11-01 and 2026-11-02
+**Acquisition code:** `scripts/acquire_phase2_data.py`; `scripts/acquire_kochidata_foundation.py`; `scripts/acquire_census_kochidata.py`; `scripts/validate_ibtracs_north_indian.py`
 **Rebuild inventory:** `.venv\Scripts\python.exe scripts\acquire_phase2_data.py inventory`
 
 ## Downloaded and inspected

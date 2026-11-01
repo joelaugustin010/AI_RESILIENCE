@@ -7,6 +7,7 @@ import json
 import pandas as pd
 import streamlit as st
 
+from src.dataframe_display import display_dataframe
 from src.decision_workflow import (
     ASSET_OPTIONS,
     DRAINAGE_STATUS_OPTIONS,
@@ -404,14 +405,14 @@ def _render_disaster_assessment(result: dict) -> None:
             {"Component": name, "Status": component["status"], "Indicators": json.dumps(component["indicators"], ensure_ascii=False, default=str)}
             for name, component in components.items()
         ]
-        st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
+        display_dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
         st.info("Compound interaction remains unresolved. Component indicators are separate and are not added.")
     elif indicators:
         rows = [
             {"Indicator": key.replace("_", " ").capitalize(), "Result": json.dumps(value, ensure_ascii=False, default=str)}
             for key, value in indicators.items()
         ]
-        st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
+        display_dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
 
     consequences = result["potential_consequences"]
     st.write("**Potential consequences:**", consequences["status"])
@@ -441,7 +442,7 @@ def _render_disaster_assessment(result: dict) -> None:
                 "Evidence required": "; ".join(category["data_requirements"]),
             }
         )
-    st.dataframe(
+    display_dataframe(
         pd.DataFrame(category_rows),
         hide_index=True,
         width="stretch",
@@ -825,7 +826,7 @@ if submitted:
 inputs = st.session_state.get("decision_workflow_inputs")
 if inputs is None:
     st.header("2. Evidence available to review")
-    st.dataframe(
+    display_dataframe(
         evidence_inventory(ROOT, st.session_state.get("rainfall_backtest_result")),
         hide_index=True,
         width="stretch",
@@ -836,7 +837,7 @@ if inputs is None:
 st.header("2. Review evidence")
 evidence = evidence_inventory(ROOT, st.session_state.get("rainfall_backtest_result"))
 st.caption("The separate historical benchmark uses only the manual rainfall observations. Its results do not enter this qualitative assessment; conflicted CWC rainfall, unverified sample rows, and unresolved river levels remain excluded from model calculations.")
-st.dataframe(evidence, hide_index=True, width="stretch")
+display_dataframe(evidence, hide_index=True, width="stretch")
 
 st.header("3. Assessment status")
 assessment = assessment_summary(inputs)
@@ -864,24 +865,24 @@ st.caption("No user-entered value is treated as verified. River-level values are
 st.subheader("Evidence by decision dimension")
 st.caption("Statuses below describe evidence readiness, not hazard severity or risk class.")
 dimension_matrix = assessment_evidence_matrix(inputs, evidence)
-st.dataframe(dimension_matrix, hide_index=True, width="stretch")
+display_dataframe(dimension_matrix, hide_index=True, width="stretch")
 st.subheader("Uncertainty register")
 uncertainty_register = build_uncertainty_register(inputs, evidence)
 st.caption("Measurement, data quality, spatial, temporal, model, and scenario uncertainty are reported separately. Unknown values are not interpreted as zero risk.")
-st.dataframe(uncertainty_register, hide_index=True, width="stretch")
+display_dataframe(uncertainty_register, hide_index=True, width="stretch")
 st.subheader("Conceptual infrastructure dependencies")
 st.caption("These are generic pathways to investigate, not verified Kochi networks or claims of actual vulnerability. Simultaneous occurrence and causal/service dependencies are distinct; every listed local link remains unverified.")
-st.dataframe(dependency_review_table(), hide_index=True, width="stretch")
+display_dataframe(dependency_review_table(), hide_index=True, width="stretch")
 
 st.header("4. Compare hypothetical scenarios")
 st.caption("The following cases differ only by their stated assumptions. Possible pathways are planning prompts, not calculated impacts.")
 scenarios = build_scenario_comparison(inputs)
-st.dataframe(scenarios, hide_index=True, width="stretch")
+display_dataframe(scenarios, hide_index=True, width="stretch")
 
 st.header("5. Evidence-linked recommendation candidates")
 recommendations = recommendation_candidates(inputs)
 st.caption("Candidates are linked to the selected scenario, entered conditions, or evidence gaps. They are unranked planning prompts; no benefit or risk reduction is quantified.")
-st.dataframe(recommendations, hide_index=True, width="stretch")
+display_dataframe(recommendations, hide_index=True, width="stretch")
 priority_gate = recommendation_priority_readiness({})
 st.info(
     f"Recommendation priority: {priority_gate['status']}. "
@@ -936,7 +937,7 @@ elif overall_budget["within_budget"]:
 else:
     st.warning("Entered action costs exceed the available budget.")
 combinations = compare_action_combinations(actions, budget, {"A": combination_a, "B": combination_b})
-st.dataframe(combinations, hide_index=True, width="stretch")
+display_dataframe(combinations, hide_index=True, width="stretch")
 st.caption("A combination is shown because you selected its actions. Affordability is cost arithmetic only; priority numbers are supplied by you.")
 
 st.header("8. Generate a report")
@@ -948,7 +949,7 @@ report = report_rows(
     budget,
     combinations,
     ROOT,
-    disaster_assessment,
+    disaster_assessment=disaster_assessment,
 )
 report_slug = slug or "scenario"
 csv_bytes = report.to_csv(index=False).encode("utf-8-sig")
@@ -969,4 +970,4 @@ download_col2.download_button(
     width="stretch",
 )
 with st.expander("Preview report contents"):
-    st.dataframe(report, hide_index=True, width="stretch")
+    display_dataframe(report, hide_index=True, width="stretch")

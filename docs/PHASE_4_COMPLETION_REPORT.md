@@ -1,7 +1,7 @@
 # Phase 4 completion report
 
-**Review date:** 2026-11-02  
-**Project:** AI_RESILIENCE — Kochi / Ernakulam  
+**Review date:** 2026-11-02
+**Project:** AI_RESILIENCE — Kochi / Ernakulam
 **Outcome:** Phase 4 software work is complete within the evidence available.
 This does not mean that ten local disaster-prediction systems are trained,
 operational, or scientifically validated.

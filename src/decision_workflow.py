@@ -134,12 +134,19 @@ MITIGATION_CATALOG = {'Flood': [('Drainage inspection and maintenance',
 
 
 def expand_hazards(selection: str) -> list[str]:
-    """Expand compound labels into distinct drivers without scoring or combining them."""
+    """Expand compounds into established hazard categories without scoring them."""
     if selection == "Compound: cyclone + flood":
         return ["Cyclone", "Flood"]
     if selection == "Compound: heavy rainfall + drainage failure":
-        return ["Heavy rainfall", "Drainage failure"]
+        return ["Flood", "Infrastructure failure"]
     return [selection] if selection in HAZARD_NOTES else []
+
+
+def expand_hazard_drivers(selection: str) -> list[str]:
+    """Return the explicitly named physical drivers for a selected scenario."""
+    if selection == "Compound: heavy rainfall + drainage failure":
+        return ["Heavy rainfall", "Drainage failure"]
+    return expand_hazards(selection)
 
 
 def validate_workflow_inputs(inputs: dict[str, Any]) -> list[str]:
@@ -234,7 +241,7 @@ def describe_entered_conditions(inputs: dict[str, Any]) -> str:
 def build_scenario_comparison(inputs: dict[str, Any]) -> pd.DataFrame:
     """Build three qualitative scenario variants; no impacts are numerically modeled."""
     selected = str(inputs.get("hazard", ""))
-    components = expand_hazards(selected)
+    components = expand_hazard_drivers(selected)
     component_text = ", ".join(components) if components else selected
     assets = inputs.get("assets", [])
     asset_text = ", ".join(assets) if assets else "No assets selected"
@@ -698,6 +705,7 @@ def report_rows(
     project_root: Path,
     evidence_checklist: pd.DataFrame | None = None,
     readiness_summary: dict[str, Any] | None = None,
+    disaster_assessment: dict[str, Any] | None = None,
 ) -> pd.DataFrame:
     """Build a flat, exportable report that records actual inputs and calculations."""
     rows: list[dict[str, str]] = []
@@ -713,6 +721,18 @@ def report_rows(
         add("User inputs", key, value)
     for key, value in assessment_summary(inputs).items():
         add("Assessment", key, value)
+    if disaster_assessment is not None:
+        for key, value in disaster_assessment.items():
+            if key != "component_assessments":
+                add("Hazard-specific scientific assessment", key, value)
+        for component, result in disaster_assessment.get("component_assessments", {}).items():
+            add("Compound component assessment", component, result)
+    for _, row in assessment_evidence_matrix(inputs, evidence).iterrows():
+        add("Assessment dimensions", str(row["Dimension"]), row.to_dict())
+    for _, row in build_uncertainty_register(inputs, evidence).iterrows():
+        add("Uncertainty register", str(row["Uncertainty type"]), row.to_dict())
+    for _, row in dependency_review_table().iterrows():
+        add("Conceptual infrastructure dependency", f"{row['From']} → {row['To']}", row.to_dict())
     for key, value in evidence_provenance_summary(inputs).items():
         add("Evidence provenance gate", key, value)
     if readiness_summary is not None:
@@ -725,6 +745,13 @@ def report_rows(
             add("Evidence readiness checklist", f"Requirement {index + 1}", row.to_dict())
     for _, row in scenarios.iterrows():
         add("Scenario comparison", str(row["Scenario"]), row.to_dict())
+    for index, row in recommendation_candidates(inputs).iterrows():
+        add("Evidence-linked recommendation candidate", f"Candidate {index + 1}", row.to_dict())
+    add(
+        "Recommendation prioritization",
+        "Evidence gate",
+        recommendation_priority_readiness({}),
+    )
     for index, row in actions.iterrows():
         add("Mitigation action", f"Action {index + 1}", row.to_dict())
     budget_result = budget_summary(actions.get("Cost INR", pd.Series(dtype=object)), budget)
@@ -735,6 +762,11 @@ def report_rows(
     add("Budget", "Fit status", "Complete-cost actions fit budget" if budget_result["within_budget"] is True else "Complete-cost actions exceed budget" if budget_result["within_budget"] is False else "Cannot confirm fit; budget or one or more costs are missing/invalid")
     for _, row in combinations.iterrows():
         add("User-selected budget comparison", str(row["Combination"]), row.to_dict())
+    add(
+        "Data quality",
+        "Assessment handling",
+        "Evidence inventory availability and limitations are reported as context only; no listed dataset is automatically joined to the selected scenario or used to calculate risk.",
+    )
     add("Priority explanation", "Basis", "Action priority and combination selection are user-entered. Budget-fit results are arithmetic and do not imply effectiveness or optimality.")
     return pd.DataFrame(rows, columns=["Section", "Field", "Value"])
 
@@ -821,7 +853,7 @@ PRIORITIZATION_CRITERIA = (
 def recommendation_candidates(inputs: dict[str, Any]) -> pd.DataFrame:
     """Create unranked planning candidates linked to entered conditions and evidence gaps."""
     selected_hazard = str(inputs.get("hazard", ""))
-    components = expand_hazards(selected_hazard)
+    components = expand_hazard_drivers(selected_hazard)
     assets = inputs.get("assets", [])
     nominated_assets = (
         {asset for asset in assets if isinstance(asset, str)}
@@ -979,7 +1011,7 @@ def assessment_evidence_matrix(
     input_problems = validate_workflow_inputs(inputs)
     classification = str(inputs.get("input_classification", "Unknown / unverified"))
     source_and_time = str(inputs.get("source_and_time", "")).strip()
-    components = expand_hazards(str(inputs.get("hazard", "")))
+    components = expand_hazard_drivers(str(inputs.get("hazard", "")))
     assets = inputs.get("assets", [])
     nominated_assets = [asset for asset in assets if isinstance(asset, str)] if isinstance(assets, (list, tuple)) else []
     user_conditions = []

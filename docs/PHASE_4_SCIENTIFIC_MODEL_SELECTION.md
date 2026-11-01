@@ -1,7 +1,7 @@
 # Phase 4 scientific model selection
 
-**Review date:** 2026-11-02  
-**Project focus:** Kochi and Ernakulam  
+**Review date:** 2026-11-02
+**Project focus:** Kochi and Ernakulam
 **Decision rule:** select a method from the physical process and verified
 inputs available. A computable value is not, by itself, a prediction.
 

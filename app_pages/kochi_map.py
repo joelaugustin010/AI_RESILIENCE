@@ -11,7 +11,6 @@ import pydeck as pdk
 import streamlit as st
 
 from src.spatial_data import classify_exposure, processed_layer_issues, read_processed_layers, validate_geojson
-from src.flood_raster import FloodRasterError
 from src.landcover_context import validate_worldcover_preview
 from src.map_integration import MAP_CONTEXT_KEY, selected_feature_properties
 
@@ -20,8 +19,6 @@ BOUNDARY_PATH = ROOT / "data" / "reference" / "kochi_corporation_boundary.geojso
 SOURCE_CATALOG_PATH = ROOT / "data" / "reference" / "spatial_sources.json"
 FLOOD_ACQUISITION_METADATA = ROOT / "data" / "raw" / "ksdma_flood_return_probability_historical_10_25_50.metadata.json"
 HOSPITAL_REVIEW_METADATA = ROOT / "data" / "processed" / "nihfw_ernakulam_hospitals_coordinate_review.metadata.json"
-JRC_PREVIEW_PATH = ROOT / "data" / "processed" / "spatial_layers" / "jrc_glofas_rp100_kochi_preview.png"
-JRC_PREVIEW_METADATA = JRC_PREVIEW_PATH.with_name("jrc_glofas_rp100_kochi_preview.metadata.json")
 WORLDCOVER_PREVIEW_PATH = ROOT / "data" / "processed" / "spatial_layers" / "worldcover_2021_kochi_context.png"
 WORLDCOVER_PREVIEW_METADATA = WORLDCOVER_PREVIEW_PATH.with_name(
     "worldcover_2021_kochi_context.metadata.json"
@@ -248,7 +245,7 @@ if isinstance(map_context, dict):
     )
     conditions = map_context.get("conditions", {})
     if conditions:
-        st.dataframe(
+        display_dataframe(
             pd.DataFrame(
                 [
                     {"Condition": name.replace("_", " ").capitalize(), "User-supplied value": value}
@@ -272,7 +269,7 @@ if isinstance(map_context, dict):
             st.write("**Assessment interpretation:**", hazard_result.get("severity", "Not classified"))
             indicators = hazard_result.get("indicators")
             if indicators:
-                st.dataframe(
+                display_dataframe(
                     pd.DataFrame(
                         [
                             {
@@ -325,7 +322,7 @@ catalog_rows = [{
     "Licence / reuse": item["license"],
 } for item in catalog["datasets"]]
 st.subheader("Source and layer catalog")
-st.dataframe(pd.DataFrame(catalog_rows), hide_index=True, width="stretch", alt="Reviewed Kochi spatial source inventory with availability, coverage, CRS, and reuse status")
+display_dataframe(pd.DataFrame(catalog_rows), hide_index=True, width="stretch", alt="Reviewed Kochi spatial source inventory with availability, coverage, CRS, and reuse status")
 for item in catalog["datasets"]:
     with st.expander(item["title"]):
         source_ref = item["source_url"]
@@ -390,7 +387,7 @@ if flood_metadata or hospital_metadata:
                     "Pincode", "coordinate_pair_parse_status", "duplicate_coordinate_pair_count_in_subset",
                     "Flood sampling eligibility",
                 ]
-                st.dataframe(
+                display_dataframe(
                     review[display_columns], hide_index=True, width="stretch",
                     alt="Source-preserving audit of 180 NIHFW Ernakulam hospital records; every row is marked ineligible for flood sampling until its coordinates are verified",
                 )
@@ -435,46 +432,17 @@ show_boundary = st.checkbox("Kochi Corporation administrative boundary", value=T
 st.caption("Blue outline = administrative boundary only. It must not be interpreted as a hazard zone or as the full Greater Kochi urban area.")
 deck_layers = []
 legend_rows = []
-flood_context_hazards = {"Flood", "Compound: cyclone + flood"}
-if active_hazard is None or active_hazard in flood_context_hazards:
-    show_jrc_flood = st.checkbox(
-        "JRC modeled river flood depth (RP100 scenario; map context only)",
-        value=True,
-        key=f"kochimap_jrc_flood_{active_hazard or 'standalone'}",
-    )
-else:
-    show_jrc_flood = False
+if active_hazard and active_hazard not in {"Flood", "Compound: cyclone + flood"}:
     st.info(
         f"No compatible {active_hazard} hazard layer is currently available. "
         "Flood-scenario pixels are hidden rather than shown as if they represented this disaster."
     )
-if show_jrc_flood:
-    try:
-        jrc_metadata = load_acquisition_metadata(JRC_PREVIEW_METADATA)
-        if jrc_metadata and JRC_PREVIEW_PATH.is_file():
-            jrc_bounds = jrc_metadata["processing"]["bounds_epsg4326"]
-            jrc_image = base64.b64encode(JRC_PREVIEW_PATH.read_bytes()).decode("ascii")
-            deck_layers.append(pdk.Layer(
-                "BitmapLayer", id="jrc-rp100-depth-preview",
-                image=f"data:image/png;base64,{jrc_image}",
-                bounds=[jrc_bounds[0], jrc_bounds[1], jrc_bounds[2], jrc_bounds[3]],
-                opacity=0.7,
-            ))
-            legend_rows.append(("JRC modeled RP100 river-flood depth", "Blue translucent cells", "Model scenario; transparent = zero, NoData, or outside source coverage"))
-            st.caption(
-                "Blue pixels visualize positive modeled depth in the JRC 100-year return-period scenario. "
-                "This is a global river-flood model at about 90 m resolution, not an observed or forecast flood. "
-                "Transparent pixels combine zero depth, NoData, and outside-coverage cells, so they do not establish safety. "
-                "The image is cropped to the provisional boundary's bounding rectangle for display only; that invalid boundary is not used as an analysis mask."
-            )
-            st.markdown(
-                "[JRC dataset documentation](https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/flood_hazard/README.txt) | "
-                "[Reuse terms](https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/copyright.txt)"
-            )
-        else:
-            st.warning("The downloaded JRC raster preview or its provenance metadata is missing; the flood raster is unavailable on this map.")
-    except (OSError, KeyError, TypeError, FloodRasterError) as error:
-        st.warning(f"The JRC raster preview could not be loaded: {error}")
+st.warning(
+    "The JRC RP100 raster preview is withheld. Its dataset README lists ODbL 1.0, while the linked JRC copyright "
+    "notice lists CC BY 4.0; no clarification has been obtained. Do not redistribute or publicly deploy the local "
+    "raster or preview until the applicable terms are confirmed.",
+    title="JRC flood preview withheld pending licence clarification",
+)
 
 landcover_hazards = {
     "Flood",
@@ -545,7 +513,7 @@ if active_hazard is None or active_hazard in landcover_hazards:
                 }
                 for code, definition in landcover_processing["classes"].items()
             ]
-            st.dataframe(
+            display_dataframe(
                 pd.DataFrame(class_rows),
                 hide_index=True,
                 width="stretch",
@@ -641,7 +609,7 @@ if processed_layers:
             asset_features = [feature for label in selected_assets for feature in asset_options[label]["features"]]
             hazard_features = [feature for label in selected_hazards for feature in hazard_options[label]["features"]]
             results = classify_exposure(asset_features, hazard_features)
-            st.dataframe(pd.DataFrame(results), hide_index=True, width="stretch", alt="Asset-by-asset geometry intersection results and uncertainty labels")
+            display_dataframe(pd.DataFrame(results), hide_index=True, width="stretch", alt="Asset-by-asset geometry intersection results and uncertainty labels")
             st.caption("Intersection method: planar topological geometry overlay in EPSG:4326; boundary contact counts as intersection. No distance, depth, probability, vulnerability, or safety is inferred. A result with no detected intersection applies only within the selected hazard layer's documented coverage.")
 else:
     st.info("No processed source-reviewed geometry layers are available yet. The layer-ingestion instructions are in data/reference/SPATIAL_DATA_FOUNDATION.md.")
@@ -683,7 +651,7 @@ if uploaded is not None:
                     ))
                     legend_rows.append((category, color_hex, f"{len(group)} uploaded point(s)"))
                 st.caption("Uploaded coordinates and source claims are displayed as supplied; this app does not independently authenticate locations, completeness, or positional accuracy. Points are not automatically clipped to the boundary.")
-                st.dataframe(valid, hide_index=True, width="stretch", alt="User-uploaded point records, not independently verified")
+                display_dataframe(valid, hide_index=True, width="stretch", alt="User-uploaded point records, not independently verified")
     except (UnicodeDecodeError, pd.errors.ParserError, ValueError) as error:
         st.error(f"Could not read the uploaded CSV: {error}")
 
@@ -707,7 +675,7 @@ if deck_layers:
             "These are source feature attributes only. They are not ward-level hazard, "
             "population, infrastructure-exposure, or consequence estimates."
         )
-        st.dataframe(
+        display_dataframe(
             pd.DataFrame(picked_properties),
             hide_index=True,
             width="stretch",
@@ -717,7 +685,7 @@ else:
     st.info("Turn on at least one layer to display the map.")
 if legend_rows:
     st.markdown("**Legend**")
-    st.dataframe(pd.DataFrame(legend_rows, columns=["Layer", "Symbol", "Meaning"]), hide_index=True, width="stretch")
+    display_dataframe(pd.DataFrame(legend_rows, columns=["Layer", "Symbol", "Meaning"]), hide_index=True, width="stretch")
 
 st.warning("No roads, drainage assets, hospitals, factories, air-monitor coordinates, or hazard boundaries are currently displayed as verified map layers. Proximity to the administrative outline or a facility must not be treated as proof of exposure, vulnerability, or pollution causation.")
 

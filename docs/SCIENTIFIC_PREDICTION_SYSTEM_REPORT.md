@@ -1,6 +1,6 @@
 # Scientific consequence prediction system report
 
-**Review date:** 2026-11-02  
+**Review date:** 2026-11-02
 **Project:** AI_RESILIENCE — Kochi / Ernakulam
 
 ## Result

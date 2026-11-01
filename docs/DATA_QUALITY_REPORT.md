@@ -1,6 +1,6 @@
 # Phase 2 data quality report
 
-**Review date:** 2026-11-02  
+**Review date:** 2026-11-02
 **Quality state:** New data are research-only. The classifications below are
 question-specific; a government publisher does not make a dataset inherently
 verified for every use.

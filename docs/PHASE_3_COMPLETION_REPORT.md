@@ -1,6 +1,6 @@
 # Phase 3 scientific model implementation report
 
-**Date:** 2026-11-02  
+**Date:** 2026-11-02
 **Scope:** Ten exact hazard/compound selections in the current Decision
 Workflow. The milestone is **implemented as evidence-gated screening and
 scenario models, not as ten validated local risk predictions**.

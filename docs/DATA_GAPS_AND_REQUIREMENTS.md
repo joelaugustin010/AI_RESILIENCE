@@ -1,6 +1,6 @@
 # Data gaps and requirements for consequence prediction
 
-**Review date:** 2026-11-02  
+**Review date:** 2026-11-02
 **Data policy:** Existing repository data were inspected; no new records are
 inferred from URLs, illustrative files, or unverified coordinates. Local
 predictions must remain disabled until evidence is fit for the specific model.

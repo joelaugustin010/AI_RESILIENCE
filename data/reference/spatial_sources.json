@@ -974,7 +974,8 @@
         "Map service does not provide raw vector export; WFS is disabled.",
         "Feature definitions, update date, completeness, positional accuracy, and reuse terms are unresolved."
       ],
-      "blocker": "Only public WMS portrayal is exposed; source features and metadata are unavailable for validation or integration."
+      "blocker": "Only public WMS portrayal is exposed; source features and metadata are unavailable for validation or integration.",
+      "evidence_status": "provisional"
     },
     {
       "layer_id": "watersheds_lris",
@@ -994,7 +995,8 @@
         "Map service does not provide raw vector export; WFS is disabled.",
         "Hydrologic hierarchy, delineation method, date, completeness, positional accuracy, and reuse terms are unresolved."
       ],
-      "blocker": "Only public WMS portrayal is exposed; source features and metadata are unavailable for validation or integration."
+      "blocker": "Only public WMS portrayal is exposed; source features and metadata are unavailable for validation or integration.",
+      "evidence_status": "provisional"
     },
     {
       "layer_id": "openstreetmap_candidate",
@@ -1037,7 +1039,8 @@
         }
       ],
       "processing_script": "scripts/prepare_osm_kochi_context.py",
-      "layer_role": "context"
+      "layer_role": "context",
+      "evidence_status": "provisional"
     },
     {
       "layer_id": "copernicus_dem_glo30_kochi_tile",
@@ -1062,7 +1065,8 @@
         "A 100 x 100 sample window around the Kochi reference point had 10,000 valid cells, with values from -3.039 to 21.821; this sample is not an elevation accuracy assessment.",
         "Vertical reference, urban drainage suitability, hydrologic conditioning, and local positional accuracy need confirmation."
       ],
-      "layer_role": null
+      "layer_role": null,
+      "evidence_status": "provisional"
     },
     {
       "layer_id": "esa_worldcover_2021_v200_kochi_tile",
@@ -1098,7 +1102,8 @@
         "A 100 x 100 cell sample around the reference point had no NoData, but this is not a classification accuracy assessment.",
         "Use as dated contextual land-cover evidence only; do not infer drainage capacity or building exposure.",
         "The processed image is downsampled from an explicit approximate Kochi review rectangle, not clipped to a legal or validated municipal boundary."
-      ]
+      ],
+      "evidence_status": "provisional"
     },
     {
       "layer_id": "worldpop_india_2025_constrained_population",
@@ -1131,7 +1136,8 @@
         "NoData in the sample window is not zero population; much of the window may be water or outside the model mask.",
         "Dataset-specific reuse terms are not established; not integrated until rights and local accuracy are confirmed."
       ],
-      "layer_role": null
+      "layer_role": null,
+      "evidence_status": "provisional"
     }
   ],
   "status_definitions_file": "data/reference/data_status_definitions.json"

@@ -1,6 +1,6 @@
 # Phase 4 validation report
 
-**Review date:** 2026-11-02  
+**Review date:** 2026-11-02
 **Overall status:** The rainfall measurement model has a reproducible
 chronological historical benchmark. No disaster-impact predictor has
 independent local validation. Every hazard's predictive status remains

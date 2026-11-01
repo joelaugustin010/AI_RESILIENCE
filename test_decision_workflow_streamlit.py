@@ -5,9 +5,15 @@ import unittest
 from streamlit.testing.v1 import AppTest
 
 
+def _workflow_app(timeout: int) -> AppTest:
+    app = AppTest.from_file("app.py", default_timeout=timeout).run()
+    app.switch_page("app_pages/decision_workflow.py").run()
+    return app
+
+
 class DecisionWorkflowStreamlitTests(unittest.TestCase):
     def test_default_intake_renders_assessment_evidence_and_reports(self):
-        app = AppTest.from_file("app.py", default_timeout=45).run()
+        app = _workflow_app(45)
         self.assertEqual(len(app.exception), 0)
         app.form_submit_button[0].click().run()
         self.assertEqual(len(app.exception), 0)
@@ -43,7 +49,7 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
         self.assertGreaterEqual(len(app.dataframe), 6)
 
     def test_compound_model_renders_component_separation_in_existing_workflow(self):
-        app = AppTest.from_file("app.py", default_timeout=60).run()
+        app = _workflow_app(60)
         app.session_state["wf_hazard"] = "Compound: cyclone + flood"
         app.run()
         app.form_submit_button[0].click().run()
@@ -56,7 +62,7 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
         )
 
     def test_drainage_scenario_inputs_render_the_dynamic_capacity_consequence(self):
-        app = AppTest.from_file("app.py", default_timeout=60).run()
+        app = _workflow_app(60)
         for key, value in {
             "wf_hazard": "Compound: heavy rainfall + drainage failure",
             "wf_rainfall": 24.0,
@@ -82,8 +88,8 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
         self.assertIn("scenario_runoff_exceeds_user_supplied_capacity", infrastructure["Model output"])
         self.assertIn("surcharge or inundation is not calculated or confirmed", infrastructure["Interpretation"])
 
-    def test_optional_phase2_context_is_available_without_replacing_workflow(self):
-        app = AppTest.from_file("app.py", default_timeout=60).run()
+    def test_optional_phase2_context_reports_missing_snapshots_without_replacing_workflow(self):
+        app = _workflow_app(60)
         self.assertEqual(len(app.exception), 0)
         load_button = next(
             button
@@ -92,15 +98,16 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
         )
         load_button.click().run()
         self.assertEqual(len(app.exception), 0)
-        rendered_text = "\n".join(str(element.value) for element in app.markdown)
-        self.assertIn("IMD 0.25-degree daily rainfall", rendered_text)
-        self.assertIn("NASA POWER daily gridded/model-derived data", rendered_text)
-        self.assertIn("OpenStreetMap road context", rendered_text)
-        self.assertIn("USGS catalog query", rendered_text)
+        notices = [
+            str(element.value)
+            for collection in (app.info, app.warning, app.error)
+            for element in collection
+        ]
+        self.assertTrue(any("unavailable" in notice.lower() for notice in notices))
         self.assertIn("Unified disaster decision workflow", [e.value for e in app.title])
 
     def test_map_navigation_preserves_submitted_hazard_and_assessment_context(self):
-        app = AppTest.from_file("app.py", default_timeout=90).run()
+        app = _workflow_app(90)
         app.session_state["wf_hazard"] = "Flood"
         app.session_state["wf_rainfall"] = 80.0
         app.session_state["wf_rainfall_period"] = "Last 24 hours"
@@ -145,7 +152,7 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
         )
 
     def test_map_hides_flood_scenario_for_unrelated_selected_hazard(self):
-        app = AppTest.from_file("app.py", default_timeout=90).run()
+        app = _workflow_app(90)
         app.session_state["wf_hazard"] = "Heatwave"
         app.session_state["wf_temperature"] = 35.0
         app.session_state["wf_relative_humidity"] = 60.0

@@ -1,6 +1,6 @@
 # Scientific model documentation
 
-**Review date:** 2026-11-02  
+**Review date:** 2026-11-02
 This document records what the current application calculates and what it
 does not infer. “Scenario indicator” means arithmetic under user-supplied
 assumptions, not a forecast or verified local consequence.
