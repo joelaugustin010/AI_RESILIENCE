@@ -59,8 +59,10 @@ with st.form("compound_scenario_form"):
     c1, c2 = st.columns(2)
     with c1:
         rainfall_mm = st.text_input("Rainfall (mm)", placeholder="Observed accumulation")
-        rainfall_period = st.text_input("Rainfall accumulation period and station ID", placeholder="Example: 24 h, station ID")
-        rainfall_reference_mm = st.text_input("Documented rainfall reference (mm)", placeholder="Optional; same period and station")
+        rainfall_period = st.text_input("Rainfall accumulation period", placeholder="Example: 24 h")
+        rainfall_station_id = st.text_input("Rainfall station ID")
+        rainfall_reference_mm = st.text_input("Documented rainfall reference (mm)", placeholder="Optional; same station and period")
+        rainfall_reference_period = st.text_input("Reference accumulation period", placeholder="Must match the observation period exactly")
     with c2:
         river_level_m = st.text_input("River level (m)", placeholder="Gauge observation")
         river_gauge_id = st.text_input("River gauge ID")
@@ -105,7 +107,9 @@ if submitted:
             "forecast_valid_time": forecast_valid_time,
             "rainfall_mm": rainfall_mm,
             "rainfall_period": rainfall_period,
+            "rainfall_station_id": rainfall_station_id,
             "rainfall_reference_mm": rainfall_reference_mm,
+            "rainfall_reference_period": rainfall_reference_period,
             "river_level_m": river_level_m,
             "river_gauge_id": river_gauge_id,
             "river_gauge_datum": river_gauge_datum,
