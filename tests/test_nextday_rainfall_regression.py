@@ -32,5 +32,6 @@ def test_missing_calendar_day_breaks_lag_chain_instead_of_becoming_a_false_lag()
 
     # A row immediately after the missing day has no valid seven-day history.
     assert pd.Timestamp("2020-01-06") not in set(supervised["target_date"])
-    # Jan 6–12 provide seven complete observations for the Jan 13 target.
-    assert pd.Timestamp("2020-01-13") in set(supervised["target_date"])
+    # Jan 14 is the first target whose seven-day window and lag-7 value are complete.
+    assert pd.Timestamp("2020-01-13") not in set(supervised["target_date"])
+    assert pd.Timestamp("2020-01-14") in set(supervised["target_date"])
