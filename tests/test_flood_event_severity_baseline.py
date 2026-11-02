@@ -43,18 +43,22 @@ class FloodSeverityBaselineTests(unittest.TestCase):
             pd.DataFrame([
                 {"EventID": "INDOFLOODS-gauge-1-1", "Peak Flood Level (m)": 2.0},
                 {"EventID": "INDOFLOODS-gauge-2-1", "Peak Flood Level (m)": 0.5},
+                {"EventID": "INDOFLOODS-gauge-3-1", "Peak Flood Level (m)": 0.5},
             ]).to_csv(root / "floodevents_indofloods.csv", index=False)
             pd.DataFrame([
                 {"GaugeID": "INDOFLOODS-gauge-1", "Privacy": "Open", "Warning Level": 1.0, "Danger Level": 1.5, "Station": "A", "State": "Kerala"},
                 {"GaugeID": "INDOFLOODS-gauge-2", "Privacy": "Restricted", "Warning Level": 1.0, "Danger Level": 1.5, "Station": "B", "State": "Kerala"},
+                {"GaugeID": "INDOFLOODS-gauge-3", "Privacy": "Open", "Warning Level": 1.0, "Danger Level": 1.5, "Station": "C", "State": "Kerala"},
             ]).to_csv(root / "metadata_indofloods.csv", index=False)
             pd.DataFrame([
                 {"GaugeID": "INDOFLOODS-gauge-1", "Drainage Area": 100},
                 {"GaugeID": "INDOFLOODS-gauge-2", "Drainage Area": 200},
+                {"GaugeID": "INDOFLOODS-gauge-3", "Drainage Area": 300},
             ]).to_csv(root / "catchment_characteristics_indofloods.csv", index=False)
             table = load_training_table(root)
-            self.assertEqual(table["GaugeID"].unique().tolist(), ["INDOFLOODS-gauge-1"])
-            self.assertEqual(len(table), 1)
+            self.assertEqual(set(table["GaugeID"].unique()), {"INDOFLOODS-gauge-1", "INDOFLOODS-gauge-3"})
+            self.assertEqual(len(table), 2)
+            self.assertEqual(set(table["target_danger_exceed"]), {0, 1})
 
 
 if __name__ == "__main__":
