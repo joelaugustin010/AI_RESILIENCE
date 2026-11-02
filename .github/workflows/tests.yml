@@ -110,3 +110,39 @@ jobs:
             data/external/cyclone_best_track/acquisition_manifest.json
           if-no-files-found: error
           retention-days: 14
+
+  flood-event-baseline:
+    if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'milestone/kochi-cyclone-flood-resilience-')
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-data.txt
+      - name: Install research dependencies
+        run: python -m pip install -r requirements.txt -r requirements-data.txt pytest
+      - name: Test flood privacy and feature-timing safeguards
+        run: python -m pytest -q tests/test_flood_event_severity_baseline.py tests/test_indofloods_audit.py
+      - name: Acquire and checksum-verify INDOFLOODS source tables
+        run: python scripts/acquire_indofloods.py
+      - name: Train exploratory gauge-transfer baseline
+        run: >-
+          python scripts/train_flood_event_severity_baseline.py
+          --raw-dir data/external/raw
+          --model-out models/flood_event_severity_baseline.joblib
+          --report-out reports/flood_event_severity_baseline.json
+      - name: Upload evaluation report only
+        uses: actions/upload-artifact@v4
+        with:
+          name: kochi-flood-research-evaluation-${{ github.sha }}
+          path: reports/flood_event_severity_baseline.json
+          if-no-files-found: error
+          retention-days: 14
