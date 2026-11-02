@@ -44,16 +44,22 @@ class CompoundHazardAssessmentTests(unittest.TestCase):
         mismatch = assess_compound_scenario(self.base(
             rainfall_mm=80, rainfall_reference_mm=60,
             rainfall_station_id="RG-1", rainfall_period="24 h",
-            rainfall_reference_period="1 h",
+            rainfall_reference_station_id="RG-1", rainfall_reference_period="1 h",
         ))
         self.assertEqual(mismatch["reference_comparisons"], [])
         self.assertTrue(any("Rainfall reference not compared" in gap for gap in mismatch["data_gaps"]))
         matched = assess_compound_scenario(self.base(
             rainfall_mm=80, rainfall_reference_mm=60,
             rainfall_station_id="RG-1", rainfall_period="24 h",
-            rainfall_reference_period="24 h",
+            rainfall_reference_station_id="RG-1", rainfall_reference_period="24 h",
         ))
         self.assertEqual(matched["reference_comparisons"][0]["measure"], "Rainfall")
+        wrong_station = assess_compound_scenario(self.base(
+            rainfall_mm=80, rainfall_reference_mm=60,
+            rainfall_station_id="RG-1", rainfall_period="24 h",
+            rainfall_reference_station_id="RG-2", rainfall_reference_period="24 h",
+        ))
+        self.assertEqual(wrong_station["reference_comparisons"], [])
 
     def test_service_review_contains_hazard_and_compound_pathways(self):
         result = assess_compound_scenario(self.base())
