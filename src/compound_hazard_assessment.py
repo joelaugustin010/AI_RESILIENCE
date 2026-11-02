@@ -119,12 +119,14 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
     rainfall_station = str(inputs.get("rainfall_station_id") or "").strip()
     rainfall_period = str(inputs.get("rainfall_period") or "").strip()
     rainfall_reference_period = str(inputs.get("rainfall_reference_period") or "").strip()
+    rainfall_reference_station = str(inputs.get("rainfall_reference_station_id") or "").strip()
     river_gauge_id = str(inputs.get("river_gauge_id") or "").strip()
     river_gauge_datum = str(inputs.get("river_gauge_datum") or "").strip()
 
     if rainfall is not None and rain_ref is not None:
         compatible = (
             bool(rainfall_station)
+            and rainfall_station.casefold() == rainfall_reference_station.casefold()
             and bool(rainfall_period)
             and rainfall_period.casefold() == rainfall_reference_period.casefold()
         )
@@ -135,7 +137,7 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
                 "warning": "Comparison uses the supplied station and matching accumulation period; independently verify source, units and timestamp.",
             })
         else:
-            gaps.append("Rainfall reference not compared: provide the same station ID and an exactly matching observation/reference accumulation period")
+            gaps.append("Rainfall reference not compared: provide matching observation/reference station IDs and accumulation periods")
 
     if river is not None and river_ref is not None:
         if river_gauge_id and river_gauge_datum:
@@ -175,19 +177,24 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
     if not inputs.get("observation_time"): gaps.append("Observation timestamp and timezone")
     if not inputs.get("evidence_type"): gaps.append("Whether this is hypothetical, historical or a current sourced observation")
     if "Flood" in hazards:
-        if rainfall is not None and not inputs.get("rainfall_period"):
-            gaps.append("Rainfall accumulation period and station ID")
-        if river is not None and not inputs.get("river_gauge_id"):
+        if rainfall is not None and not rainfall_period:
+            gaps.append("Rainfall accumulation period")
+        if rainfall is not None and not rainfall_station:
+            gaps.append("Rainfall station ID")
+        if river is not None and not river_gauge_id:
             gaps.append("River gauge ID and station location")
-        if river is not None and not inputs.get("river_gauge_datum"):
+        if river is not None and not river_gauge_datum:
             gaps.append("River gauge datum/reference")
     if "Cyclone" in hazards:
         if cyclone_distance is not None and not inputs.get("cyclone_fix_time"):
             gaps.append("Cyclone track-fix timestamp")
-        if not inputs.get("forecast_issue_time"):
-            gaps.append("Cyclone forecast bulletin issue time (if forecast evidence is used)")
-        if not inputs.get("forecast_valid_time"):
-            gaps.append("Cyclone forecast valid time (if forecast evidence is used)")
+        if (inputs.get("evidence_type") == "Official forecast product"):
+            if not inputs.get("forecast_issue_time"):
+                gaps.append("Cyclone forecast bulletin issue time")
+            if not inputs.get("forecast_valid_time"):
+                gaps.append("Cyclone forecast valid time")
+        if (cyclone_distance is not None or cyclone_wind is not None) and not inputs.get("cyclone_storm_id"):
+            gaps.append("Cyclone storm ID or official storm name")
 
     return {
         "status": "SCENARIO_REVIEW_ONLY_NOT_A_VALIDATED_FORECAST",
@@ -200,6 +207,7 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
             "rainfall_period": rainfall_period or None,
             "rainfall_reference_period": rainfall_reference_period or None,
             "rainfall_station_id": rainfall_station or None,
+            "rainfall_reference_station_id": rainfall_reference_station or None,
             "river_gauge_id": river_gauge_id or None,
             "river_gauge_datum": river_gauge_datum or None,
             "cyclone_storm_id": str(inputs.get("cyclone_storm_id") or "").strip() or None,
