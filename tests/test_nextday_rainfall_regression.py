@@ -3,6 +3,7 @@ import pandas as pd
 from scripts.train_nextday_rainfall_regression import (
     WEATHER_COLUMNS,
     build_supervised_frame,
+    select_feature_columns,
 )
 
 
@@ -35,3 +36,15 @@ def test_missing_calendar_day_breaks_lag_chain_instead_of_becoming_a_false_lag()
     # Jan 14 is the first target whose seven-day window and lag-7 value are complete.
     assert pd.Timestamp("2020-01-13") not in set(supervised["target_date"])
     assert pd.Timestamp("2020-01-14") in set(supervised["target_date"])
+
+
+
+def test_model_feature_selector_includes_completed_feature_day_observations():
+    daily = make_daily()
+    supervised = build_supervised_frame(daily)
+    features = select_feature_columns(supervised)
+
+    assert "precipitation_sum_feature_day" in features
+    assert "temperature_2m_max_feature_day" in features
+    assert "precipitation_sum_lag1" in features
+    assert "target_rain_mm" not in features
