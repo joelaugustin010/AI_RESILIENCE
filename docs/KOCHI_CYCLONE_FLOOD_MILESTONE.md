@@ -82,10 +82,10 @@ Passing unit tests proves software behavior, not scientific validity.
 - [x] Automated unit tests for the scenario engine.
 - [x] Leakage-aware rainfall research baseline and baseline-promotion gate included in this milestone.
 - [x] Privacy- and feature-timing-safe INDOFLOODS exploratory baseline included with explicit weak-skill decision.
-- [ ] Clean-checkout CI passes on the milestone pull request.
+- [x] Clean-checkout CI passes on the milestone pull request (run 41430136503).
 - [ ] Rainfall model-training report and baseline comparison reviewed.
-- [ ] Flood baseline re-run and report reviewed; weak results remain research-only.
-- [ ] Cyclone best-track audit artifact generated in CI.
+- [x] Flood baseline re-run and report reviewed; weak results remain research-only (artifact generated in run 41430136503).
+- [x] Cyclone best-track audit artifact generated in CI (run 41430136503).
 - [ ] Source and spatial review for Kochi/Ernakulam gauges and cyclone evidence documented.
 - [ ] Rainfall research model evaluated against simple baselines and reviewed for local relevance.
 - [ ] Flood prediction gate remains blocked until valid event/non-event data are available.
