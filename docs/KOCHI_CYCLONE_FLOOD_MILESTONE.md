@@ -16,6 +16,7 @@ Deliver one coherent Kochi-focused workspace that connects flood and cyclone evi
    - Do not join gauges or facilities by name alone.
 
 2. **Rainfall and flood**
+   - Include the leakage-aware next-day rainfall research baseline and explicit promotion gate: the model must beat both persistence and training-monthly-median baselines on untouched chronological test MAE.
    - Rainfall prediction is a supporting weather component, not a flood prediction.
    - River-level values require station identity, timestamp, units, gauge datum and source-defined warning/danger references.
    - Flood outcomes require independently verified event/location/time labels and monitored non-event periods.
@@ -42,6 +43,7 @@ Deliver one coherent Kochi-focused workspace that connects flood and cyclone evi
 ## Implemented in this milestone branch
 
 - A reusable evidence-aware scenario assessment engine in `src/compound_hazard_assessment.py`.
+- The baseline-gated next-day rainfall research model and feature-day selector, carried into this milestone so rainfall research is evaluated in the same CI run.
 - A redesigned Cyclone + Flood workspace in `app_pages/compound_scenario.py` with:
   - hypothetical, historical, current-observation and official-forecast evidence types;
   - explicit observation time and source reference;
@@ -78,7 +80,9 @@ Passing unit tests proves software behavior, not scientific validity.
 - [x] Critical-service consequence pathways and preparedness actions.
 - [x] No fabricated probability, damage or casualty output.
 - [x] Automated unit tests for the scenario engine.
+- [x] Leakage-aware rainfall research baseline and baseline-promotion gate included in this milestone.
 - [ ] Clean-checkout CI passes on the milestone pull request.
+- [ ] Rainfall model-training report and baseline comparison reviewed.
 - [ ] Cyclone best-track audit artifact generated in CI.
 - [ ] Source and spatial review for Kochi/Ernakulam gauges and cyclone evidence documented.
 - [ ] Rainfall research model evaluated against simple baselines and reviewed for local relevance.
