@@ -73,10 +73,10 @@ def build_design_state(
     """Create the common, serializable design record used by both planning pages."""
     rainfall = float(rainfall_mm_per_hour)
     budget = float(available_budget_inr)
-    if rainfall < 0 or rainfall > 150:
-        raise ValueError("Rainfall input must be between 0 and 150 mm/hour.")
-    if budget < 0:
-        raise ValueError("Available budget cannot be negative.")
+    if not math.isfinite(rainfall) or rainfall < 0 or rainfall > 150:
+        raise ValueError("Rainfall input must be a finite value between 0 and 150 mm/hour.")
+    if not math.isfinite(budget) or budget < 0:
+        raise ValueError("Available budget must be a finite, non-negative value.")
 
     selected = {
         key: bool(selected_components.get(key, False))
