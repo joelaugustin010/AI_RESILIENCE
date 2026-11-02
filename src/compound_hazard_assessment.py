@@ -1,6 +1,7 @@
 """Evidence-aware compound cyclone/flood scenario assessment; not a forecasting model."""
 from __future__ import annotations
 from datetime import date
+from math import isfinite
 from typing import Any
 
 SERVICE_PATHWAYS = {
@@ -79,6 +80,8 @@ def _number(value: Any, label: str) -> float | None:
         result = float(value)
     except (TypeError, ValueError) as exc:
         raise ValueError(f"{label} must be a number.") from exc
+    if not isfinite(result):
+        raise ValueError(f"{label} must be a finite number.")
     if result < 0:
         raise ValueError(f"{label} cannot be negative.")
     return result
@@ -150,6 +153,20 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
     if not inputs.get("evidence_source"): gaps.append("Source URL or document reference for supplied observations")
     if not inputs.get("observation_time"): gaps.append("Observation timestamp and timezone")
     if not inputs.get("evidence_type"): gaps.append("Whether this is hypothetical, historical or a current sourced observation")
+    if "Flood" in hazards:
+        if rainfall is not None and not inputs.get("rainfall_period"):
+            gaps.append("Rainfall accumulation period and station ID")
+        if river is not None and not inputs.get("river_gauge_id"):
+            gaps.append("River gauge ID and station location")
+        if river is not None and not inputs.get("river_gauge_datum"):
+            gaps.append("River gauge datum/reference")
+    if "Cyclone" in hazards:
+        if cyclone_distance is not None and not inputs.get("cyclone_fix_time"):
+            gaps.append("Cyclone track-fix timestamp")
+        if not inputs.get("forecast_issue_time"):
+            gaps.append("Cyclone forecast bulletin issue time (if forecast evidence is used)")
+        if not inputs.get("forecast_valid_time"):
+            gaps.append("Cyclone forecast valid time (if forecast evidence is used)")
 
     return {
         "status": "SCENARIO_REVIEW_ONLY_NOT_A_VALIDATED_FORECAST",
@@ -158,6 +175,16 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
         "evidence_type": str(inputs.get("evidence_type") or "Not specified"),
         "evidence_source": str(inputs.get("evidence_source") or "").strip() or None,
         "observation_time": str(inputs.get("observation_time") or "").strip() or None,
+        "evidence_metadata": {
+            "rainfall_period": str(inputs.get("rainfall_period") or "").strip() or None,
+            "rainfall_station_id": str(inputs.get("rainfall_station_id") or "").strip() or None,
+            "river_gauge_id": str(inputs.get("river_gauge_id") or "").strip() or None,
+            "river_gauge_datum": str(inputs.get("river_gauge_datum") or "").strip() or None,
+            "cyclone_storm_id": str(inputs.get("cyclone_storm_id") or "").strip() or None,
+            "cyclone_fix_time": str(inputs.get("cyclone_fix_time") or "").strip() or None,
+            "forecast_issue_time": str(inputs.get("forecast_issue_time") or "").strip() or None,
+            "forecast_valid_time": str(inputs.get("forecast_valid_time") or "").strip() or None,
+        },
         "reported_inputs": {
             "rainfall_mm": rainfall, "river_level_m": river,
             "river_reference_level_m": river_ref, "rainfall_reference_mm": rain_ref,
