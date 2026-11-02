@@ -114,6 +114,7 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
     if compound:
         pathways.append({"hazard": "Compound interaction", "pathway": "Cyclone rainfall and coastal-water conditions may coincide with river flooding or drainage limitations. Verify sequence, overlap, tide/outfall conditions and local elevations."})
 
+    gaps = []
     comparisons = []
     rainfall_station = str(inputs.get("rainfall_station_id") or "").strip()
     rainfall_period = str(inputs.get("rainfall_period") or "").strip()
@@ -159,7 +160,6 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
             points.append(info["compound"])
         reviews.append({"service": service, "review_points": points})
 
-    gaps = []
     if "Flood" in hazards:
         if rainfall is None: gaps.append("Time-stamped rainfall observation and measurement interval")
         if river is None: gaps.append("Time-stamped river-level observation, gauge ID and datum")
