@@ -1,4 +1,5 @@
 import streamlit as st
+from src.dataframe_display import display_dataframe
 import plotly.graph_objects as go
 st.set_page_config(
     page_title="Smart Mitigation Design Studio",
@@ -605,9 +606,9 @@ if summary_items:
 
     summary_df = pd.DataFrame(summary_items)
 
-    st.dataframe(
+    display_dataframe(
         summary_df,
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
         column_config={
             "Estimated Cost (₹)": st.column_config.NumberColumn(
