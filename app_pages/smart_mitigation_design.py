@@ -1705,19 +1705,7 @@ st.caption(
     "water depth or a validated flood prediction."
 )
 
-# ==============================
-# RAINFALL SCENARIO INPUT
-# ==============================
-
-st.markdown("### 🌧️ Rainfall Scenario")
-
-rainfall_scenario = st.slider(
-    "Select illustrative rainfall intensity (mm/hour)",
-    min_value=0,
-    max_value=150,
-    value=50,
-    step=5
-)
+# The primary rainfall slider above drives all scenario displays and reports.
 # ==============================
 # RAINFALL IMPACT INDICATOR
 # ==============================
