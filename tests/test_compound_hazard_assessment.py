@@ -86,7 +86,12 @@ class CompoundHazardAssessmentTests(unittest.TestCase):
         result = assess_compound_scenario(self.base(rainfall_mm=25, river_level_m=2.1, cyclone_distance_km=180))
         self.assertIn("River gauge ID and station location", result["data_gaps"])
         self.assertIn("Cyclone track-fix timestamp", result["data_gaps"])
-        self.assertIn("Cyclone forecast valid time (if forecast evidence is used)", result["data_gaps"])
+        self.assertIn("Official forecast issue time, valid time, wind/rainfall fields and coastal-water evidence", result["data_gaps"])
+        forecast = assess_compound_scenario(self.base(
+            evidence_type="Official forecast product",
+            cyclone_distance_km=180,
+        ))
+        self.assertIn("Cyclone forecast valid time", forecast["data_gaps"])
 
 if __name__ == "__main__":
     unittest.main()
