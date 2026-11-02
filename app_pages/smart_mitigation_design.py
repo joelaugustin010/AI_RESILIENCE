@@ -1,6 +1,11 @@
 import streamlit as st
 from src.dataframe_display import display_dataframe
 import plotly.graph_objects as go
+from src.mitigation_intelligence import (
+    COMPONENT_CATALOG,
+    build_design_state,
+    design_recommendations,
+)
 st.set_page_config(
     page_title="Smart Mitigation Design Studio",
     page_icon="🏗️",
@@ -287,14 +292,10 @@ component_names = {
     "maintenance": "Maintenance access"
 }
 
-# Illustrative planning estimates — not verified quotations
+# Shared illustrative planning values — not verified quotations.
 costs = {
-    "drains": 150000,
-    "inlets": 50000,
-    "storage": 120000,
-    "garden": 60000,
-    "sensors": 40000,
-    "maintenance": 30000
+    key: int(details["indicative_cost_inr"])
+    for key, details in COMPONENT_CATALOG.items()
 }
 
 selected = {}
@@ -360,6 +361,25 @@ elif rainfall_scenario < 110:
     rainfall_label = "High"
 else:
     rainfall_label = "Very high"
+
+# ==========================================
+# SHARED MITIGATION INTELLIGENCE
+# ==========================================
+
+design_state = build_design_state(
+    project_name=project_name,
+    area_type=area_type,
+    rainfall_mm_per_hour=rainfall_scenario,
+    available_budget_inr=available_budget,
+    selected_components=selected,
+)
+
+# Keep the latest concept available to the connected planning page
+# during this Streamlit session. The project register remains user-controlled.
+st.session_state["mitigation_design_state"] = design_state
+
+# Keep the visual rainfall label aligned with the shared rule set.
+rainfall_label = design_state["rainfall_category"]
 
 # ==============================
 # BUDGET UTILISATION DASHBOARD
@@ -1508,7 +1528,29 @@ st.caption(
     "They are not independently verified engineering measurements."
 )
 
+# ==========================================
+# EXPLAINABLE AI-STYLE PLANNING ADVISER
+# ==========================================
 
+st.markdown("---")
+st.markdown("## 🧠 Explainable Mitigation Planning Adviser")
+st.caption(
+    "Rule-based prompts generated from the selected area, rainfall input, "
+    "components and entered budget. Each suggestion shows why it appeared "
+    "and what evidence should be checked."
+)
+
+recommendation_rows = design_recommendations(design_state)
+for item in recommendation_rows:
+    with st.container(border=True):
+        st.markdown(f"**{item['Priority']} priority · {item['Planning recommendation']}**")
+        st.write(item["Why this was suggested"])
+        st.caption(f"Verification step: {item['Suggested verification']}")
+
+st.info(
+    "These are transparent planning prompts, not machine-learning predictions, "
+    "official warnings, engineering instructions or quantified risk-reduction claims."
+)
 
 # ==========================================
 # RAINFALL SCENARIO COMPARISON
