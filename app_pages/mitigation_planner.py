@@ -26,6 +26,10 @@ def format_inr(amount):
     return f"₹{sign}{number}"
 
 from src.decision_workflow import budget_summary
+from src.mitigation_intelligence import (
+    design_recommendations,
+    review_project_register,
+)
 
 
 
@@ -231,9 +235,91 @@ plan = st.data_editor(
     },
 )
 
+# ==========================================
+# SHARED DESIGN + PROJECT REGISTER INTELLIGENCE
+# ==========================================
 
+st.markdown("---")
+st.markdown("## 🧠 Mitigation Planning Intelligence")
+st.caption(
+    "A transparent review of the project register, with the latest concept "
+    "configuration shared from the Smart Mitigation Design Studio when available."
+)
 
+design_state = st.session_state.get("mitigation_design_state")
 
+if design_state:
+    st.markdown("### Connected Design Studio Configuration")
+    design_cols = st.columns(4)
+    design_cols[0].metric("Design area", design_state["area_type"])
+    design_cols[1].metric(
+        "Illustrative rainfall",
+        f"{design_state['rainfall_input_mm_per_hour']:g} mm/h"
+    )
+    design_cols[2].metric(
+        "Selected component cost",
+        format_inr(design_state["illustrative_component_cost_inr"])
+    )
+    design_cols[3].metric("Design budget status", design_state["budget_status"])
+
+    st.caption(
+        f"Shared project: {design_state['project_name']} · "
+        f"Model version {design_state['model_version']}"
+    )
+
+    st.markdown("### Explainable planning prompts")
+    for item in design_recommendations(design_state):
+        with st.container(border=True):
+            st.markdown(
+                f"**{item['Priority']} priority · {item['Planning recommendation']}**"
+            )
+            st.write(item["Why this was suggested"])
+            st.caption(f"Verification step: {item['Suggested verification']}")
+else:
+    st.info(
+        "Open the Smart Mitigation Design Studio and configure a concept to "
+        "share its current settings with this planning page. Your project "
+        "register remains available independently."
+    )
+
+register_review = review_project_register(
+    plan.to_dict(orient="records"),
+    budget,
+)
+
+review_cols = st.columns(3)
+review_cols[0].metric("Projects reviewed", register_review["project_count"])
+review_cols[1].metric(
+    "Known entered costs",
+    format_inr(register_review["known_cost_total_inr"])
+)
+review_cols[2].metric(
+    "Rows with unknown/invalid cost",
+    register_review["unknown_cost_count"]
+)
+
+if register_review["review_rows"]:
+    review_df = pd.DataFrame(register_review["review_rows"])
+    st.markdown("### Project Register Review")
+    st.dataframe(review_df, hide_index=True, use_container_width=True)
+
+st.caption(register_review["interpretation"])
+
+if register_review["within_budget"] is True:
+    st.success("Entered project costs fit within the entered budget (arithmetic check only).")
+elif register_review["within_budget"] is False:
+    st.warning("Entered project costs exceed the entered budget (arithmetic check only).")
+else:
+    st.info(
+        "A complete budget-fit check is not available until a budget is entered "
+        "and every project row has a valid cost."
+    )
+
+st.info(
+    "The adviser uses transparent rules and field-completeness checks. "
+    "It does not rank project effectiveness, estimate avoided flood damage, "
+    "or replace engineering and financial review."
+)
 
 st.markdown("## 📊 Mitigation Expenditure Report")
 st.caption(
