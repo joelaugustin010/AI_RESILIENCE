@@ -49,6 +49,9 @@ with st.form("compound_scenario_form"):
         "Source URL or document reference",
         placeholder="Official IMD / CWC / KSDMA source or project dataset record",
     )
+    forecast_issue_time = st.text_input("Forecast bulletin issue time (if applicable)", placeholder="Preserve exact source timezone")
+    forecast_valid_time = st.text_input("Forecast valid time (if applicable)", placeholder="When the forecast conditions apply")
+
 
     st.divider()
     st.subheader("2. Flood and rainfall evidence")
@@ -56,9 +59,12 @@ with st.form("compound_scenario_form"):
     c1, c2 = st.columns(2)
     with c1:
         rainfall_mm = st.text_input("Rainfall (mm)", placeholder="Observed accumulation")
+        rainfall_period = st.text_input("Rainfall accumulation period and station ID", placeholder="Example: 24 h, station ID")
         rainfall_reference_mm = st.text_input("Documented rainfall reference (mm)", placeholder="Optional; same period and station")
     with c2:
         river_level_m = st.text_input("River level (m)", placeholder="Gauge observation")
+        river_gauge_id = st.text_input("River gauge ID")
+        river_gauge_datum = st.text_input("River gauge datum / reference")
         river_reference_level_m = st.text_input("Official gauge reference / danger level (m)", placeholder="Optional; same gauge and datum")
 
     st.divider()
@@ -66,6 +72,8 @@ with st.form("compound_scenario_form"):
     c1, c2 = st.columns(2)
     with c1:
         cyclone_distance_km = st.text_input("Cyclone track distance from study area (km)", placeholder="Source-derived; specify track time")
+        cyclone_fix_time = st.text_input("Cyclone track-fix timestamp")
+        cyclone_storm_id = st.text_input("Cyclone storm ID / name")
         cyclone_wind_knots = st.text_input("Recorded / forecast wind speed (knots)", placeholder="Preserve source definition and time")
     with c2:
         coastal_water_notes = st.text_area(
@@ -93,11 +101,18 @@ if submitted:
             "period_end": period_end,
             "observation_time": observation_time,
             "evidence_source": evidence_source,
+            "forecast_issue_time": forecast_issue_time,
+            "forecast_valid_time": forecast_valid_time,
             "rainfall_mm": rainfall_mm,
+            "rainfall_period": rainfall_period,
             "rainfall_reference_mm": rainfall_reference_mm,
             "river_level_m": river_level_m,
+            "river_gauge_id": river_gauge_id,
+            "river_gauge_datum": river_gauge_datum,
             "river_reference_level_m": river_reference_level_m,
             "cyclone_distance_km": cyclone_distance_km,
+            "cyclone_fix_time": cyclone_fix_time,
+            "cyclone_storm_id": cyclone_storm_id,
             "cyclone_wind_knots": cyclone_wind_knots,
             "coastal_water_notes": coastal_water_notes,
             "services": services,
