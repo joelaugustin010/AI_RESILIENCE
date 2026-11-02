@@ -86,9 +86,11 @@ def build_supervised_frame(daily: pd.DataFrame) -> pd.DataFrame:
         out = pd.DataFrame(index=calendar)
         out["location"] = location
         for column in WEATHER_COLUMNS:
+            # The completed feature_date is available when predicting the next day.
+            out[f"{column}_feature_day"] = indexed[column]
             for lag in (1, 2, 3, 7):
                 out[f"{column}_lag{lag}"] = indexed[column].shift(lag)
-            out[f"{column}_prior7_mean"] = indexed[column].shift(1).rolling(7, min_periods=7).mean()
+            out[f"{column}_prior7_mean"] = indexed[column].rolling(7, min_periods=7).mean()
         out["target_date"] = out.index + pd.Timedelta(days=1)
         day = out["target_date"].dt.dayofyear
         out["target_doy_sin"] = np.sin(2 * np.pi * day / 365.25)
@@ -100,7 +102,7 @@ def build_supervised_frame(daily: pd.DataFrame) -> pd.DataFrame:
     result = pd.concat(frames, ignore_index=True)
     feature_columns = [
         column for column in result.columns
-        if column.endswith(("_lag1", "_lag2", "_lag3", "_lag7", "_prior7_mean"))
+        if column.endswith(("_feature_day", "_lag1", "_lag2", "_lag3", "_lag7", "_prior7_mean"))
     ] + ["target_doy_sin", "target_doy_cos", "target_year", "target_month"]
     result = result.dropna(subset=[*feature_columns, "target_rain_mm"]).copy()
     result = result[np.isfinite(result["target_rain_mm"]) & (result["target_rain_mm"] >= 0)]
@@ -166,7 +168,7 @@ def evaluate(input_dir: Path = DEFAULT_INPUT, output_dir: Path = DEFAULT_OUTPUT)
     prediction = np.maximum(0, model.predict(test[feature_columns]))
 
     # Both baselines use no information from the test outcomes.
-    last_observed_day = test["precipitation_sum_lag1"].to_numpy(dtype=float)
+    last_observed_day = test["precipitation_sum_feature_day"].to_numpy(dtype=float)
     monthly = final_train.groupby("target_month")["target_rain_mm"].median()
     climatology = test["target_month"].map(monthly).to_numpy(dtype=float)
     metrics = {
@@ -192,7 +194,7 @@ def evaluate(input_dir: Path = DEFAULT_INPUT, output_dir: Path = DEFAULT_OUTPUT)
     report = {
         "status": "RESEARCH_BASELINE_TRAINED_NOT_VALIDATED",
         "target": "Next calendar day's gridded/reanalysis precipitation total (mm)",
-        "forecast_information_cutoff": "End of the feature_date; only observations through feature_date minus one day are used",
+        "forecast_information_cutoff": "End of the feature_date; completed observations through the day before target_date are used",
         "training_target_dates_before": str(TRAIN_END.date()),
         "validation_target_dates": f"{TRAIN_END.date()} through {(TEST_START - pd.Timedelta(days=1)).date()}",
         "test_target_dates_from": str(TEST_START.date()),
