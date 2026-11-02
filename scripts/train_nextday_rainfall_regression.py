@@ -166,16 +166,16 @@ def evaluate(input_dir: Path = DEFAULT_INPUT, output_dir: Path = DEFAULT_OUTPUT)
     prediction = np.maximum(0, model.predict(test[feature_columns]))
 
     # Both baselines use no information from the test outcomes.
-    persistence = test["precipitation_sum_lag1"].to_numpy(dtype=float)
+    last_observed_day = test["precipitation_sum_lag1"].to_numpy(dtype=float)
     monthly = final_train.groupby("target_month")["target_rain_mm"].median()
     climatology = test["target_month"].map(monthly).to_numpy(dtype=float)
     metrics = {
         "selected_model": regression_metrics(test["target_rain_mm"], prediction),
-        "persistence_baseline": regression_metrics(test["target_rain_mm"], persistence),
+        "last_observed_day_baseline": regression_metrics(test["target_rain_mm"], last_observed_day),
         "training_monthly_median_baseline": regression_metrics(test["target_rain_mm"], climatology),
     }
     model_mae = metrics["selected_model"]["mae_mm"]
-    for baseline_name in ("persistence_baseline", "training_monthly_median_baseline"):
+    for baseline_name in ("last_observed_day_baseline", "training_monthly_median_baseline"):
         baseline_mae = metrics[baseline_name]["mae_mm"]
         metrics[baseline_name]["mae_skill_vs_baseline"] = (
             float(1 - model_mae / baseline_mae) if baseline_mae > 0 else None
