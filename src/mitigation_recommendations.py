@@ -78,6 +78,22 @@ def _normalize_district(value: Any) -> str | None:
     return text
 
 
+def _safe_source_reference(value: Any) -> str:
+    if value is None:
+        return "Not provided"
+    text = str(value).strip()
+    if not text:
+        return "Not provided"
+    lowered = text.casefold()
+    if lowered in {"n/a", "na", "none", "not provided", "unknown", "unavailable"}:
+        return "Not provided"
+    return text
+
+
+def _source_is_actionable(value: Any) -> bool:
+    return _safe_source_reference(value) != "Not provided"
+
+
 def _read_json(path: Path) -> dict[str, Any]:
     try:
         return json.loads(path.read_text(encoding="utf-8"))
@@ -280,7 +296,10 @@ def match_evidence_to_district(hazard: str, district: str | None) -> list[dict[s
 
     evidence = get_hazard_evidence(normalized_hazard, district_name)
     if normalized_hazard == "Flood" and district_name == "Ernakulam":
-        return [item for item in evidence if item.get("matches_district") or item.get("evidence_type") in {"district-level official hazard statistics", "historical event evidence"}]
+        return [
+            item for item in evidence
+            if item.get("matches_district") or item.get("evidence_type") in {"district-level official hazard statistics", "historical event evidence"}
+        ]
     return []
 
 
@@ -336,7 +355,8 @@ def generate_recommendations(
 
     recommendations: list[dict[str, Any]] = []
     for item in filtered:
-        if local_evidence:
+        source_ok = _source_is_actionable(item.get("source"))
+        if local_evidence and source_ok:
             classification = "EVIDENCE-LINKED"
             supporting_evidence = [
                 f"{entry.get('title', 'Evidence item')} ({entry.get('source', 'Unknown source')})"
@@ -349,7 +369,7 @@ def generate_recommendations(
             if not limitations:
                 limitations.append("Local evidence exists, but district-level spatial detail may still be incomplete before local project design.")
             next_step = "Confirm the local hazard map, district coverage, and data source terms before approving a detailed mitigation project."
-        elif general_guidance:
+        elif general_guidance and source_ok:
             classification = "GUIDANCE-ONLY"
             supporting_evidence = [
                 f"{entry.get('title', 'Guidance source')} ({entry.get('source', 'Official source')})"
@@ -359,6 +379,16 @@ def generate_recommendations(
                 "No validated district-specific local hazard evidence was identified for this district and hazard combination."
             ]
             next_step = "Collect district-specific hazard maps, official guidance, and local observations before converting this into a site-level intervention decision."
+        elif general_guidance and not source_ok:
+            classification = "GUIDANCE-ONLY"
+            supporting_evidence = [
+                f"{entry.get('title', 'Guidance source')} ({entry.get('source', 'Official source')})"
+                for entry in general_guidance
+            ]
+            limitations = [
+                "The intervention record is missing a usable source reference, so it cannot be promoted to an evidence-linked recommendation."
+            ]
+            next_step = "Restore a traceable source reference and collect district-specific hazard evidence before converting this into a site-level intervention decision."
         else:
             classification = "INSUFFICIENT EVIDENCE"
             supporting_evidence = ["No validated source or local hazard evidence identified in the repository."]
@@ -367,7 +397,7 @@ def generate_recommendations(
             ]
             next_step = "Identify a verified local hazard source, official map, or authoritative dataset before preparing a site-specific mitigation proposal."
 
-        source_reference = str(item.get("source") or "Not provided").strip() or "Not provided"
+        source_reference = _safe_source_reference(item.get("source"))
         recommendation = {
             "District": district_name,
             "Hazard": normalized_hazard,
