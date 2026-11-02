@@ -115,15 +115,36 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
         pathways.append({"hazard": "Compound interaction", "pathway": "Cyclone rainfall and coastal-water conditions may coincide with river flooding or drainage limitations. Verify sequence, overlap, tide/outfall conditions and local elevations."})
 
     comparisons = []
-    for label, observed, reference in (
-        ("Rainfall", rainfall, rain_ref), ("River level", river, river_ref)
-    ):
-        if observed is not None and reference is not None:
+    rainfall_station = str(inputs.get("rainfall_station_id") or "").strip()
+    rainfall_period = str(inputs.get("rainfall_period") or "").strip()
+    rainfall_reference_period = str(inputs.get("rainfall_reference_period") or "").strip()
+    river_gauge_id = str(inputs.get("river_gauge_id") or "").strip()
+    river_gauge_datum = str(inputs.get("river_gauge_datum") or "").strip()
+
+    if rainfall is not None and rain_ref is not None:
+        compatible = (
+            bool(rainfall_station)
+            and bool(rainfall_period)
+            and rainfall_period.casefold() == rainfall_reference_period.casefold()
+        )
+        if compatible:
             comparisons.append({
-                "measure": label, "observed": observed, "reference": reference,
-                "result": "At or above supplied reference" if observed >= reference else "Below supplied reference",
-                "warning": "Comparison only; verify station/gauge, measurement period, units, datum, timestamp and issuing authority.",
+                "measure": "Rainfall", "observed": rainfall, "reference": rain_ref,
+                "result": "At or above supplied reference" if rainfall >= rain_ref else "Below supplied reference",
+                "warning": "Comparison uses the supplied station and matching accumulation period; independently verify source, units and timestamp.",
             })
+        else:
+            gaps.append("Rainfall reference not compared: provide the same station ID and an exactly matching observation/reference accumulation period")
+
+    if river is not None and river_ref is not None:
+        if river_gauge_id and river_gauge_datum:
+            comparisons.append({
+                "measure": "River level", "observed": river, "reference": river_ref,
+                "result": "At or above supplied reference" if river >= river_ref else "Below supplied reference",
+                "warning": "Comparison uses the supplied gauge ID and datum; independently verify the official threshold source and timestamp.",
+            })
+        else:
+            gaps.append("River reference not compared: provide the gauge ID and documented gauge datum")
 
     services = [str(s) for s in (inputs.get("services") or []) if str(s) in SERVICE_PATHWAYS]
     reviews = []
@@ -176,10 +197,11 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
         "evidence_source": str(inputs.get("evidence_source") or "").strip() or None,
         "observation_time": str(inputs.get("observation_time") or "").strip() or None,
         "evidence_metadata": {
-            "rainfall_period": str(inputs.get("rainfall_period") or "").strip() or None,
-            "rainfall_station_id": str(inputs.get("rainfall_station_id") or "").strip() or None,
-            "river_gauge_id": str(inputs.get("river_gauge_id") or "").strip() or None,
-            "river_gauge_datum": str(inputs.get("river_gauge_datum") or "").strip() or None,
+            "rainfall_period": rainfall_period or None,
+            "rainfall_reference_period": rainfall_reference_period or None,
+            "rainfall_station_id": rainfall_station or None,
+            "river_gauge_id": river_gauge_id or None,
+            "river_gauge_datum": river_gauge_datum or None,
             "cyclone_storm_id": str(inputs.get("cyclone_storm_id") or "").strip() or None,
             "cyclone_fix_time": str(inputs.get("cyclone_fix_time") or "").strip() or None,
             "forecast_issue_time": str(inputs.get("forecast_issue_time") or "").strip() or None,
