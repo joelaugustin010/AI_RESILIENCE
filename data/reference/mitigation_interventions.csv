@@ -1,0 +1,14 @@
+intervention_id,hazard,intervention,objective,applicability,evidence_status,cost_status,technical_review_required,source
+MI001,Flood,Drainage capacity assessment and improvement,Reduce urban water accumulation,Urban flood-prone locations,Guideline candidate,Cost unknown,Yes,KSDMA SDMP
+MI002,Flood,Rainwater retention and storage,Manage surface runoff,Locations identified through hydrological assessment,Guideline candidate,Cost unknown,Yes,KSDMA SDMP
+MI003,Flood,Community evacuation routes and shelters,Improve evacuation access,Identified flood-risk communities,Guideline supported,Cost unknown,Yes,KSDMA SDMP Annexure
+MI004,Landslide,Slope stability assessment,Identify unstable slopes,Geologically susceptible areas,Candidate,Cost unknown,Yes,NDMA Landslide Strategy
+MI005,Landslide,Slope drainage and stabilization,Reduce slope failure risk,Locations approved by geotechnical assessment,Candidate,Cost unknown,Yes,NDMA Landslide Strategy
+MI006,Cyclone,Community shelters and evacuation planning,Improve public safety,Coastal and wind-exposed communities,Candidate,Cost unknown,Yes,NDMA Cyclone Guidelines
+MI007,Drought,Water conservation and rainwater harvesting,Improve water availability,Water-stressed locations,Candidate,Cost unknown,Yes,NDMA Drought Guidelines
+MI008,Heatwave,Heat action plans and cooling facilities,Reduce heat exposure,High-temperature vulnerable communities,Candidate,Cost unknown,Yes,NDMA Heat Wave Guidelines
+MI009,Earthquake,Structural safety assessment and retrofitting,Improve building resilience,Vulnerable public buildings,Candidate,Cost unknown,Yes,NDMA Earthquake Guidelines
+MI010,Coastal erosion,Coastal vulnerability assessment,Support appropriate shoreline protection,Identified erosion-prone coastlines,Candidate,Cost unknown,Yes,KSDMA SDMP
+MI011,Lightning,Lightning warning and public safety systems,Improve early warning and preparedness,Lightning-prone communities,Candidate,Cost unknown,Yes,KSDMA SDMP
+MI012,Industrial chemical accident,Industrial safety audits and emergency preparedness,Reduce accident consequences,Identified industrial facilities,Candidate,Cost unknown,Yes,NDMA Chemical Disaster Guidelines
+MI013,Forest fire,Forest fire monitoring and preparedness,Improve early detection and response,Fire-prone forest regions,Candidate,Cost unknown,Yes,KSDMA SDMP
