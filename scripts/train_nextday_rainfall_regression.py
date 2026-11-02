@@ -109,6 +109,14 @@ def build_supervised_frame(daily: pd.DataFrame) -> pd.DataFrame:
     return result.sort_values(["target_date", "location"]).reset_index(drop=True)
 
 
+def select_feature_columns(data: pd.DataFrame) -> list[str]:
+    """Return only weather observed by the end of the completed feature day."""
+    return [
+        column for column in data.columns
+        if column.endswith(("_feature_day", "_lag1", "_lag2", "_lag3", "_lag7", "_prior7_mean"))
+    ] + ["target_doy_sin", "target_doy_cos", "target_year", "target_month"]
+
+
 def make_model(kind: str) -> Pipeline:
     if kind == "random_forest":
         estimator = RandomForestRegressor(
@@ -137,10 +145,7 @@ def regression_metrics(actual: pd.Series, predicted: np.ndarray) -> dict[str, fl
 def evaluate(input_dir: Path = DEFAULT_INPUT, output_dir: Path = DEFAULT_OUTPUT) -> dict:
     raw = load_daily_weather(input_dir)
     data = build_supervised_frame(raw)
-    feature_columns = [
-        column for column in data.columns
-        if column.endswith(("_feature_day", "_lag1", "_lag2", "_lag3", "_lag7", "_prior7_mean"))
-    ] + ["target_doy_sin", "target_doy_cos", "target_year", "target_month"]
+    feature_columns = select_feature_columns(data)
     train = data[data["target_date"] < TRAIN_END]
     validation = data[(data["target_date"] >= TRAIN_END) & (data["target_date"] < TEST_START)]
     final_train = data[data["target_date"] < TEST_START]
