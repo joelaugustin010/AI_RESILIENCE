@@ -80,3 +80,33 @@ jobs:
           path: models/hazards/rainfall_regression/
           if-no-files-found: error
           retention-days: 14
+
+  cyclone-best-track-audit:
+    if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'milestone/kochi-cyclone-flood-resilience-')
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-data.txt
+      - name: Install declared dependencies
+        run: python -m pip install -r requirements.txt -r requirements-data.txt
+      - name: Acquire and audit IMD/RSMC cyclone best-track source
+        run: python scripts/acquire_cyclone_best_track.py --output-dir data/external/cyclone_best_track
+      - name: Upload audit report and acquisition manifest only
+        uses: actions/upload-artifact@v4
+        with:
+          name: kochi-cyclone-best-track-audit-${{ github.sha }}
+          path: |
+            data/external/cyclone_best_track/cyclone_best_track_audit.json
+            data/external/cyclone_best_track/acquisition_manifest.json
+          if-no-files-found: error
+          retention-days: 14
