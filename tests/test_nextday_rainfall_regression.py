@@ -20,9 +20,9 @@ def test_target_is_next_calendar_day_and_features_are_prior_days_only():
 
     row = supervised.loc[supervised["feature_date"] == pd.Timestamp("2020-01-08")].iloc[0]
     assert row["target_date"] == pd.Timestamp("2020-01-09")
-    # Jan 8 is the feature date; lag1 is Jan 7, not Jan 8.
-    assert row["precipitation_sum_lag1"] == 6.0
-    assert row["target_rain_mm"] == 8.0
+    # The completed Jan 8 observation is available for the Jan 9 prediction.
+    assert row["precipitation_sum_feature_day"] == 9.0
+    assert row["target_rain_mm"] == 10.0
 
 
 def test_missing_calendar_day_breaks_lag_chain_instead_of_becoming_a_false_lag():
@@ -31,6 +31,6 @@ def test_missing_calendar_day_breaks_lag_chain_instead_of_becoming_a_false_lag()
     supervised = build_supervised_frame(daily)
 
     # A row immediately after the missing day has no valid seven-day history.
-    assert pd.Timestamp("2020-01-06") not in set(supervised["feature_date"])
-    # After seven complete days have elapsed, valid rows can resume.
-    assert pd.Timestamp("2020-01-13") in set(supervised["feature_date"])
+    assert pd.Timestamp("2020-01-06") not in set(supervised["target_date"])
+    # Jan 6–12 provide seven complete observations for the Jan 13 target.
+    assert pd.Timestamp("2020-01-13") in set(supervised["target_date"])
