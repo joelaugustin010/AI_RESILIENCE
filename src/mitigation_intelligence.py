@@ -6,6 +6,7 @@ flood probability, hydraulic performance, avoided damage, or risk reduction.
 
 from __future__ import annotations
 
+import math
 from typing import Any, Iterable, Mapping
 
 
@@ -195,8 +196,6 @@ def review_project_register(
     review_rows: list[dict[str, str]] = []
     known_total = 0.0
     unknown_costs = 0
-    cost_values: list[float] = []
-
     for index, row in enumerate(rows, start=1):
         intervention = str(row.get("Intervention", "") or "").strip() or f"Project row {index}"
         issues: list[str] = []
@@ -204,10 +203,9 @@ def review_project_register(
         raw_cost = row.get("Cost INR")
         try:
             cost = float(raw_cost)
-            if cost < 0:
+            if not math.isfinite(cost) or cost < 0:
                 raise ValueError
             known_total += cost
-            cost_values.append(cost)
         except (TypeError, ValueError):
             unknown_costs += 1
             issues.append("Cost missing or invalid")
@@ -218,7 +216,8 @@ def review_project_register(
             ("Scope and unit", "Scope/unit missing"),
             ("Evidence for risk reduction", "Supporting evidence not recorded"),
         ):
-            if not str(row.get(field, "") or "").strip():
+            value = row.get(field, "")
+            if value is None or str(value).strip() in {"", "<NA>", "nan", "NaT"}:
                 issues.append(label)
 
         review_rows.append({
@@ -229,7 +228,7 @@ def review_project_register(
 
     try:
         budget = float(available_budget_inr)
-        if budget < 0:
+        if not math.isfinite(budget) or budget < 0:
             budget = None
     except (TypeError, ValueError):
         budget = None
