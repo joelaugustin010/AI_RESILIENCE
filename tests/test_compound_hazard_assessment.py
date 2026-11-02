@@ -1,0 +1,56 @@
+"""Tests for the evidence-aware cyclone/flood scenario engine."""
+import unittest
+from datetime import date
+from src.compound_hazard_assessment import assess_compound_scenario
+
+class CompoundHazardAssessmentTests(unittest.TestCase):
+    def base(self, **overrides):
+        values = {
+            "area": "Kochi", "hazards": ["Flood", "Cyclone"],
+            "services": ["Hospitals", "Roads and bridges", "Drainage"],
+            "evidence_type": "Hypothetical scenario",
+            "evidence_source": "User-defined exercise",
+            "observation_time": "2026-11-02T10:00:00+05:30",
+            "period_start": date(2026, 11, 2), "period_end": date(2026, 11, 3),
+        }
+        values.update(overrides)
+        return values
+
+    def test_compound_interaction_pathway_is_included(self):
+        result = assess_compound_scenario(self.base())
+        self.assertTrue(result["compound"])
+        self.assertEqual(result["status"], "SCENARIO_REVIEW_ONLY_NOT_A_VALIDATED_FORECAST")
+        self.assertTrue(any(p["hazard"] == "Compound interaction" for p in result["pathways"]))
+
+    def test_no_probability_or_damage_estimate_is_generated(self):
+        result = assess_compound_scenario(self.base(rainfall_mm=120, river_level_m=4.2))
+        self.assertFalse(result["numerical_probability_provided"])
+        self.assertFalse(result["damage_or_casualty_estimate_provided"])
+        self.assertIsNone(result["reported_inputs"]["river_reference_level_m"])
+
+    def test_threshold_comparison_requires_both_values(self):
+        result = assess_compound_scenario(self.base(river_level_m=4.2, river_reference_level_m=4.0))
+        self.assertEqual(len(result["reference_comparisons"]), 1)
+        self.assertEqual(result["reference_comparisons"][0]["result"], "At or above supplied reference")
+
+    def test_missing_threshold_does_not_invent_danger_level(self):
+        result = assess_compound_scenario(self.base(river_level_m=4.2))
+        self.assertEqual(result["reference_comparisons"], [])
+
+    def test_service_review_contains_hazard_and_compound_pathways(self):
+        result = assess_compound_scenario(self.base())
+        hospital = next(x for x in result["service_reviews"] if x["service"] == "Hospitals")
+        self.assertEqual(len(hospital["review_points"]), 3)
+
+    def test_invalid_hazard_and_negative_measurement_are_rejected(self):
+        with self.assertRaises(ValueError):
+            assess_compound_scenario(self.base(hazards=["Earthquake"]))
+        with self.assertRaises(ValueError):
+            assess_compound_scenario(self.base(rainfall_mm=-1))
+
+    def test_end_date_cannot_precede_start_date(self):
+        with self.assertRaisesRegex(ValueError, "end date"):
+            assess_compound_scenario(self.base(period_start=date(2026, 11, 3), period_end=date(2026, 11, 2)))
+
+if __name__ == "__main__":
+    unittest.main()
