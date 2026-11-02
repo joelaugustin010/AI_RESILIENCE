@@ -52,5 +52,17 @@ class CompoundHazardAssessmentTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "end date"):
             assess_compound_scenario(self.base(period_start=date(2026, 11, 3), period_end=date(2026, 11, 2)))
 
+    def test_non_finite_measurements_are_rejected(self):
+        with self.assertRaisesRegex(ValueError, "finite"):
+            assess_compound_scenario(self.base(rainfall_mm="nan"))
+        with self.assertRaisesRegex(ValueError, "finite"):
+            assess_compound_scenario(self.base(river_level_m="inf"))
+
+    def test_station_and_forecast_time_metadata_gaps_are_reported(self):
+        result = assess_compound_scenario(self.base(rainfall_mm=25, river_level_m=2.1, cyclone_distance_km=180))
+        self.assertIn("River gauge ID and station location", result["data_gaps"])
+        self.assertIn("Cyclone track-fix timestamp", result["data_gaps"])
+        self.assertIn("Cyclone forecast valid time (if forecast evidence is used)", result["data_gaps"])
+
 if __name__ == "__main__":
     unittest.main()
