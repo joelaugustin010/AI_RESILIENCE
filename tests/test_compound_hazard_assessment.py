@@ -29,13 +29,31 @@ class CompoundHazardAssessmentTests(unittest.TestCase):
         self.assertIsNone(result["reported_inputs"]["river_reference_level_m"])
 
     def test_threshold_comparison_requires_both_values(self):
-        result = assess_compound_scenario(self.base(river_level_m=4.2, river_reference_level_m=4.0))
+        result = assess_compound_scenario(self.base(
+            river_level_m=4.2, river_reference_level_m=4.0,
+            river_gauge_id="CWC-001", river_gauge_datum="m above gauge zero",
+        ))
         self.assertEqual(len(result["reference_comparisons"]), 1)
         self.assertEqual(result["reference_comparisons"][0]["result"], "At or above supplied reference")
 
     def test_missing_threshold_does_not_invent_danger_level(self):
         result = assess_compound_scenario(self.base(river_level_m=4.2))
         self.assertEqual(result["reference_comparisons"], [])
+
+    def test_rainfall_reference_requires_matching_station_and_period(self):
+        mismatch = assess_compound_scenario(self.base(
+            rainfall_mm=80, rainfall_reference_mm=60,
+            rainfall_station_id="RG-1", rainfall_period="24 h",
+            rainfall_reference_period="1 h",
+        ))
+        self.assertEqual(mismatch["reference_comparisons"], [])
+        self.assertTrue(any("Rainfall reference not compared" in gap for gap in mismatch["data_gaps"]))
+        matched = assess_compound_scenario(self.base(
+            rainfall_mm=80, rainfall_reference_mm=60,
+            rainfall_station_id="RG-1", rainfall_period="24 h",
+            rainfall_reference_period="24 h",
+        ))
+        self.assertEqual(matched["reference_comparisons"][0]["measure"], "Rainfall")
 
     def test_service_review_contains_hazard_and_compound_pathways(self):
         result = assess_compound_scenario(self.base())
