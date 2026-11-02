@@ -139,7 +139,7 @@ def evaluate(input_dir: Path = DEFAULT_INPUT, output_dir: Path = DEFAULT_OUTPUT)
     data = build_supervised_frame(raw)
     feature_columns = [
         column for column in data.columns
-        if column.endswith(("_lag1", "_lag2", "_lag3", "_lag7", "_prior7_mean"))
+        if column.endswith(("_feature_day", "_lag1", "_lag2", "_lag3", "_lag7", "_prior7_mean"))
     ] + ["target_doy_sin", "target_doy_cos", "target_year", "target_month"]
     train = data[data["target_date"] < TRAIN_END]
     validation = data[(data["target_date"] >= TRAIN_END) & (data["target_date"] < TEST_START)]
@@ -191,8 +191,26 @@ def evaluate(input_dir: Path = DEFAULT_INPUT, output_dir: Path = DEFAULT_OUTPUT)
 
     output_dir.mkdir(parents=True, exist_ok=True)
     joblib.dump(model, output_dir / "nextday_rainfall_research.joblib")
+    beats_last_day_mae = (
+        metrics["selected_model"]["mae_mm"]
+        < metrics["last_observed_day_baseline"]["mae_mm"]
+    )
+    beats_monthly_median_mae = (
+        metrics["selected_model"]["mae_mm"]
+        < metrics["training_monthly_median_baseline"]["mae_mm"]
+    )
     report = {
         "status": "RESEARCH_BASELINE_TRAINED_NOT_VALIDATED",
+        "promotion_gate": (
+            "NOT_ELIGIBLE_FOR_INTEGRATION"
+            if not (beats_last_day_mae and beats_monthly_median_mae)
+            else "REVIEW_REQUIRED_BEFORE_INTEGRATION"
+        ),
+        "baseline_comparison": {
+            "beats_last_observed_day_on_mae": beats_last_day_mae,
+            "beats_training_monthly_median_on_mae": beats_monthly_median_mae,
+            "integration_rule": "Do not integrate unless the model beats both simple baselines on the untouched chronological test MAE and passes location/event-level review.",
+        },
         "target": "Next calendar day's gridded/reanalysis precipitation total (mm)",
         "forecast_information_cutoff": "End of the feature_date; completed observations through the day before target_date are used",
         "training_target_dates_before": str(TRAIN_END.date()),
