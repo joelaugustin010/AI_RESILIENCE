@@ -193,6 +193,39 @@ hr {
     border-color: #dcebf3;
 }
 
+
+/* SDG climate-intelligence dark workspace overrides */
+.stApp { background: transparent !important; color: #e7f5f5 !important; }
+.design-header {
+  background: radial-gradient(ellipse at 90% 10%, rgba(76,226,197,.2), transparent 22rem),
+              linear-gradient(118deg,#071a2a 0%,#0b4054 58%,#087e78 100%) !important;
+  border: 1px solid rgba(112,226,207,.28) !important;
+  box-shadow: 0 22px 54px rgba(0,0,0,.28) !important;
+}
+.design-header h1 { color: #f1ffff !important; }
+.design-header p { color: #c3e0e2 !important; }
+.concept-note {
+  background: rgba(64,54,28,.55) !important; border-color: rgba(235,190,91,.4) !important;
+  border-left-color: #e9bd5a !important; color: #f6e6b8 !important;
+}
+h1,h2,h3,h4 { color: #effafa !important; }
+h2 { border-bottom-color: rgba(130,190,199,.24) !important; }
+h3 { color: #65e4ce !important; }
+div[data-baseweb="select"] > div, div[data-baseweb="input"] > div {
+  background: #102b3c !important; border-color: rgba(130,190,199,.34) !important;
+}
+div[data-testid="stSlider"], div[data-testid="stMetric"], div[data-testid="stExpander"] {
+  background: linear-gradient(145deg, rgba(17,48,66,.96), rgba(10,34,49,.96)) !important;
+  border-color: rgba(130,190,199,.24) !important; color: #e7f5f5 !important;
+}
+div[data-testid="stMetricLabel"], .stCaption { color: #a7c1c8 !important; }
+div[data-testid="stMetricValue"] { color: #f0ffff !important; }
+.stDownloadButton button {
+  background: linear-gradient(105deg,#126a70,#147c83) !important;
+  color: #f4ffff !important; border-color: rgba(91,223,200,.42) !important;
+}
+hr { border-color: rgba(130,190,199,.22) !important; }
+
 </style>
 """, unsafe_allow_html=True)
 
