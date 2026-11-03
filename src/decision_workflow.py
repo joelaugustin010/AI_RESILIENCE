@@ -144,6 +144,15 @@ def describe_entered_conditions(inputs: dict[str, Any]) -> str:
         entries.append(f"Infrastructure condition: {inputs['infrastructure_status']} (user-described).")
     if str(inputs.get("source_and_time", "")).strip():
         entries.append(f"Source/time notes: {inputs['source_and_time'].strip()}")
+    if inputs.get("source_checked_by_user"):
+        entries.append(
+            "User attests that they reviewed the supplied source/time/location/units where available; "
+            "this self-attestation is not independently verified by the app."
+        )
+    else:
+        entries.append(
+            "Source review not confirmed by user; all entered values remain unverified by the app."
+        )
     if str(inputs.get("condition_notes", "")).strip():
         entries.append(f"Additional notes: {inputs['condition_notes'].strip()}")
     if len(entries) == 1:

@@ -21,6 +21,7 @@ from src.decision_workflow import (
     report_html,
     report_rows,
     validate_workflow_inputs,
+    describe_entered_conditions,
 )
 
 
@@ -75,6 +76,14 @@ class DecisionWorkflowValidationTests(unittest.TestCase):
             validate_workflow_inputs(valid_inputs(rainfall_mm=None, rainfall_period="Not supplied")),
             [],
         )
+
+    def test_source_review_attestation_is_recorded_but_not_called_verified(self):
+        reviewed = describe_entered_conditions(valid_inputs(source_checked_by_user=True))
+        unreviewed = describe_entered_conditions(valid_inputs(source_checked_by_user=False))
+        self.assertIn("User attests", reviewed)
+        self.assertIn("not independently verified by the app", reviewed)
+        self.assertIn("Source review not confirmed", unreviewed)
+        self.assertIn("remain unverified by the app", unreviewed)
 
 
 class ScenarioAndAssessmentTests(unittest.TestCase):

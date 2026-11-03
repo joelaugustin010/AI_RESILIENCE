@@ -336,6 +336,18 @@ with st.form("decision_workflow_intake"):
         placeholder="Example: IMD bulletin; issued 31 Oct 2026, 10:00 IST; valid until 31 Oct 2026, 20:30 IST; wind in km/h; station/area: Kochi.",
         help="Enter the provider/source, observation time or forecast issue and valid times, timezone, station/area, units, and averaging period where known. Leave unknown details blank. This app does not independently verify the entry.",
     )
+    source_checked_by_user = st.checkbox(
+        "I reviewed the source, time, location and units where available",
+        value=False,
+        key="wf_source_checked",
+        help=(
+            "This records your own review only. It does not authenticate the source or make the data "
+            "independently verified; the workflow will still treat the values as unverified."
+        ),
+    )
+    st.caption(
+        "Source-review status is a user attestation for the report, not an app verification or scientific approval."
+    )
 
     # Show only fields relevant to the selected hazard. Keep hidden fields explicitly
     # unset so stale values from a previous selection cannot influence this assessment.
@@ -454,6 +466,7 @@ if submitted:
         "location": location,
         "input_classification": input_classification,
         "source_and_time": source_and_time,
+        "source_checked_by_user": source_checked_by_user,
         "rainfall_mm": rainfall_mm,
         "rainfall_period": rainfall_period if rainfall_mm is not None else "Not supplied",
         "river_level_m": river_level_m,
