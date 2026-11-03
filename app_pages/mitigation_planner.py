@@ -3,6 +3,7 @@
 import pandas as pd
 import streamlit as st
 import plotly.express as px
+from src.dataframe_display import display_dataframe
 
 def format_inr(amount):
     amount = int(round(amount))
@@ -301,7 +302,7 @@ review_cols[2].metric(
 if register_review["review_rows"]:
     review_df = pd.DataFrame(register_review["review_rows"])
     st.markdown("### Project Register Review")
-    st.dataframe(review_df, hide_index=True, use_container_width=True)
+    display_dataframe(review_df, hide_index=True, use_container_width=True)
 
 st.caption(register_review["interpretation"])
 
