@@ -54,6 +54,11 @@ pages = {
             icon=":material/local_hospital:",
         ),
         st.Page(
+            "app_pages/compound_scenario.py",
+            title="Cyclone + Flood",
+            icon=":material/thunderstorm:",
+        ),
+        st.Page(
             "app_pages/disaster_probability.py",
             title="Disaster Probability",
             icon=":material/analytics:",
