@@ -1,0 +1,631 @@
+{
+  "asset_count": 69,
+  "assets": [
+    {
+      "bytes": 1067,
+      "format": "csv",
+      "path": "data/raw/air_pollution_data.csv",
+      "provenance_sidecar": null,
+      "provenance_status": "unverified_example_input_not_for_assessment",
+      "role": "raw",
+      "sha256": "53f1edc7791db4c7f03af80eec4bd83c3be1fb30d250b0add8d18b1123801739"
+    },
+    {
+      "bytes": 233,
+      "format": "json",
+      "path": "data/raw/air_quality/kspcb_annual_aqi_2023_20261023T154709Z.json",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "raw",
+      "sha256": "e1ac179044cbeca12e8af2ebe90a0e9e5952a7e00008288d7f95680e5eb898aa"
+    },
+    {
+      "bytes": 4677,
+      "format": "json",
+      "path": "data/raw/air_quality/kspcb_annual_aqi_2024_20261023T154709Z.json",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "raw",
+      "sha256": "ab9546071dd7429b73f22a1c51f4d0c55de0e7e1baba039f161ecd717b3bfaab"
+    },
+    {
+      "bytes": 4199,
+      "format": "json",
+      "path": "data/raw/air_quality/kspcb_annual_aqi_2025_20261023T154709Z.json",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "raw",
+      "sha256": "f3b33a83fac58165c0813a74189d3a8557150d4d1b0c47a175b0022466fc6c20"
+    },
+    {
+      "bytes": 4108,
+      "format": "json",
+      "path": "data/raw/air_quality/kspcb_annual_aqi_2026_20261023T154709Z.json",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "raw",
+      "sha256": "a92f5fd2764625cb25fe0d7e1401cabb0973608eeb010726dfc92fc8c2892f82"
+    },
+    {
+      "bytes": 471812,
+      "format": "pdf",
+      "path": "data/raw/air_quality_reports/KSPCB_AQI_daily_average_2026-10-16.pdf",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "raw",
+      "sha256": "5c86fea66c55643307eb8ede78e2b9b175f835c46efd2d1407239f2e766986fd"
+    },
+    {
+      "bytes": 923058,
+      "format": "pdf",
+      "path": "data/raw/air_quality_reports/KSPCB_CAAQMS_monthly_report_2026-08.pdf",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "raw",
+      "sha256": "1cbdc3805b4406eb05af1abc67a7c5f22466944efc10333b1f116867576b4002"
+    },
+    {
+      "bytes": 919254,
+      "format": "pdf",
+      "path": "data/raw/air_quality_reports/KSPCB_CAAQMS_monthly_report_2026-09.pdf",
+      "provenance_sidecar": "data/raw/air_quality_reports/KSPCB_CAAQMS_monthly_report_2026-09.pdf.metadata.json",
+      "provenance_status": "sidecar_available_requires_dataset_specific_suitability_review",
+      "role": "raw",
+      "sha256": "f3412dd5cd03d32104d30449d789b407ee153407533e7a23359e12cb3bd86d45"
+    },
+    {
+      "bytes": 3564414,
+      "format": "pdf",
+      "path": "data/raw/air_quality_reports/KSPCB_NAMP_report_2025-08.pdf",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "raw",
+      "sha256": "29f7e9c00da304357156c022bccbd7a9418e0b811003b75594ba88bf1ee13a1c"
+    },
+    {
+      "bytes": 1052,
+      "format": "csv",
+      "path": "data/raw/compound_disaster_data.csv",
+      "provenance_sidecar": null,
+      "provenance_status": "unverified_example_input_not_for_assessment",
+      "role": "raw",
+      "sha256": "b5f099b5f73f45cee51b9377b4f863b98d86a2416145cf59469a36b33a4a479e"
+    },
+    {
+      "bytes": 789,
+      "format": "csv",
+      "path": "data/raw/disaster_probability_data.csv",
+      "provenance_sidecar": null,
+      "provenance_status": "unverified_example_input_not_for_assessment",
+      "role": "raw",
+      "sha256": "687b059f610a99495fe3a522c1cb88a7f2fc185ce37f290551f886951aa8bea2"
+    },
+    {
+      "bytes": 18685,
+      "format": "zip",
+      "path": "data/raw/Ernakulam_map_dataset_draft.zip",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "raw",
+      "sha256": "7c263bedb70754fc1273f0a7b362ec64098869616386307fbf6ee6f2f157c680"
+    },
+    {
+      "bytes": 25431832,
+      "format": "nc",
+      "path": "data/raw/experimental/imd_daily_gridded_rainfall_2018_025deg.nc",
+      "provenance_sidecar": "data/raw/experimental/imd_daily_gridded_rainfall_2018_025deg.nc.metadata.json",
+      "provenance_status": "experimental_or_research_snapshot",
+      "role": "raw",
+      "sha256": "26bd53aeb2d6f3f7d39516c41606db005dede474906b33462d1a0caef69cd6ec"
+    },
+    {
+      "bytes": 25431832,
+      "format": "nc",
+      "path": "data/raw/experimental/imd_daily_gridded_rainfall_2021_025deg.nc",
+      "provenance_sidecar": "data/raw/experimental/imd_daily_gridded_rainfall_2021_025deg.nc.metadata.json",
+      "provenance_status": "experimental_or_research_snapshot",
+      "role": "raw",
+      "sha256": "fb0f291fa7e214a7811023a9309cead67233b6b4e0bfcc5b277643f976f68374"
+    },
+    {
+      "bytes": 25501532,
+      "format": "nc",
+      "path": "data/raw/experimental/imd_daily_gridded_rainfall_2024_025deg.nc",
+      "provenance_sidecar": "data/raw/experimental/imd_daily_gridded_rainfall_2024_025deg.nc.metadata.json",
+      "provenance_status": "experimental_or_research_snapshot",
+      "role": "raw",
+      "sha256": "1ef02aeba5694dbb57a6cca23a3c2cc11740affb185137c1eacbeab59893228a"
+    },
+    {
+      "bytes": 151918,
+      "format": "json",
+      "path": "data/raw/experimental/nasa_power_kochi_center_daily_20200101_20250101.json",
+      "provenance_sidecar": "data/raw/experimental/nasa_power_kochi_center_daily_20200101_20250101.json.metadata.json",
+      "provenance_status": "experimental_or_research_snapshot",
+      "role": "raw",
+      "sha256": "5d683368b44b2c314f4296137683ba1997a51d98c15e5856d9c39d853b32e2f1"
+    },
+    {
+      "bytes": 1318119,
+      "format": "csv",
+      "path": "data/raw/experimental/nwdp_cwc_rainfall_2021_2025.csv",
+      "provenance_sidecar": "data/raw/experimental/nwdp_cwc_rainfall_2021_2025.csv.metadata.json",
+      "provenance_status": "experimental_or_research_snapshot",
+      "role": "raw",
+      "sha256": "c0426bf4a7daba52658952bd7f24f77d0664137845542a6afe59f981d5ae72b5"
+    },
+    {
+      "bytes": 16842662,
+      "format": "csv",
+      "path": "data/raw/experimental/nwdp_manual_rainfall_1991_2020.csv",
+      "provenance_sidecar": "data/raw/experimental/nwdp_manual_rainfall_1991_2020.csv.metadata.json",
+      "provenance_status": "experimental_or_research_snapshot",
+      "role": "raw",
+      "sha256": "71a9b4f7aa19f521ffd950dc7aac9bfa3198d909506d7ed1c595b85c5d4c4cc7"
+    },
+    {
+      "bytes": 3058411,
+      "format": "csv",
+      "path": "data/raw/experimental/nwdp_manual_river_level_2021_2025.csv",
+      "provenance_sidecar": "data/raw/experimental/nwdp_manual_river_level_2021_2025.csv.metadata.json",
+      "provenance_status": "experimental_or_research_snapshot",
+      "role": "raw",
+      "sha256": "8b71aae37c539b6124f45b4120e730e03a19ad8d51c0ceb1164abcff6dc9d783"
+    },
+    {
+      "bytes": 21890691,
+      "format": "csv",
+      "path": "data/raw/experimental/nwdp_telemetry_river_level_2021_2025.csv",
+      "provenance_sidecar": "data/raw/experimental/nwdp_telemetry_river_level_2021_2025.csv.metadata.json",
+      "provenance_status": "experimental_or_research_snapshot",
+      "role": "raw",
+      "sha256": "1acd381b066b6f2e6d078168db00c2d04effbb28f9313de7b7ab3d0a88f7f51e"
+    },
+    {
+      "bytes": 11067472,
+      "format": "json",
+      "path": "data/raw/experimental/openstreetmap_roads_provisional_kochi_bounds.json",
+      "provenance_sidecar": "data/raw/experimental/openstreetmap_roads_provisional_kochi_bounds.json.metadata.json",
+      "provenance_status": "experimental_or_research_snapshot",
+      "role": "raw",
+      "sha256": "92631cf880203e0a40c59a13ee8f5bd5aca4efaf331846fd0ebbc0be3163728d"
+    },
+    {
+      "bytes": 350,
+      "format": "geojson",
+      "path": "data/raw/experimental/usgs_earthquakes_kerala_bbox_1900_present_m0.geojson",
+      "provenance_sidecar": "data/raw/experimental/usgs_earthquakes_kerala_bbox_1900_present_m0.geojson.metadata.json",
+      "provenance_status": "experimental_or_research_snapshot",
+      "role": "raw",
+      "sha256": "56bf9ebdc2f6f7b6603e8aa140d1c0f42dddb6e841d02c4dcd0e18ad8eb0837a"
+    },
+    {
+      "bytes": 1034,
+      "format": "csv",
+      "path": "data/raw/hospital_vulnerability_data.csv",
+      "provenance_sidecar": null,
+      "provenance_status": "unverified_example_input_not_for_assessment",
+      "role": "raw",
+      "sha256": "4e9da05faf3a461a516d105ae5e7eb09f6db7ed0636cfe1fdcdd304bf3872e21"
+    },
+    {
+      "bytes": 8148021,
+      "format": "dwg",
+      "path": "data/raw/industrial/DIC_DA_EDAYAR.dwg",
+      "provenance_sidecar": "data/raw/industrial/DIC_DA_EDAYAR.dwg.metadata.json",
+      "provenance_status": "sidecar_available_requires_dataset_specific_suitability_review",
+      "role": "raw",
+      "sha256": "6a366806a35eb55eb25da4b9093780e4c8f9249ab18b5efabedb3acf5bc42a0a"
+    },
+    {
+      "bytes": 223073,
+      "format": "pdf",
+      "path": "data/raw/industrial/DIC_DA_Edayar_allotment_details_2022.pdf",
+      "provenance_sidecar": "data/raw/industrial/DIC_DA_Edayar_allotment_details_2022.pdf.metadata.json",
+      "provenance_status": "sidecar_available_requires_dataset_specific_suitability_review",
+      "role": "raw",
+      "sha256": "65ab23453d4e4f3df679d95f5671e9447edd7ae9cf19c4b64847f8ea79b99648"
+    },
+    {
+      "bytes": 497,
+      "format": "pdf",
+      "path": "data/raw/industrial/KSPCB_OCMMS_Active_Char_CTO_2019.pdf",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "raw",
+      "sha256": "18678a141c79f50b21c21d645dec1490e188129896e1e34104750f13f755a76a"
+    },
+    {
+      "bytes": 497,
+      "format": "pdf",
+      "path": "data/raw/industrial/KSPCB_OCMMS_Arjuna_Natural_CTE_2021.pdf",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "raw",
+      "sha256": "18678a141c79f50b21c21d645dec1490e188129896e1e34104750f13f755a76a"
+    },
+    {
+      "bytes": 497,
+      "format": "pdf",
+      "path": "data/raw/industrial/KSPCB_OCMMS_Arjuna_Natural_CTO_2019.pdf",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "raw",
+      "sha256": "18678a141c79f50b21c21d645dec1490e188129896e1e34104750f13f755a76a"
+    },
+    {
+      "bytes": 497,
+      "format": "pdf",
+      "path": "data/raw/industrial/KSPCB_OCMMS_CMRL_CTO_2023.pdf",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "raw",
+      "sha256": "18678a141c79f50b21c21d645dec1490e188129896e1e34104750f13f755a76a"
+    },
+    {
+      "bytes": 497,
+      "format": "pdf",
+      "path": "data/raw/industrial/KSPCB_OCMMS_Indo_German_Carbon_CTO_2019.pdf",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "raw",
+      "sha256": "18678a141c79f50b21c21d645dec1490e188129896e1e34104750f13f755a76a"
+    },
+    {
+      "bytes": 497,
+      "format": "pdf",
+      "path": "data/raw/industrial/KSPCB_OCMMS_Malaya_Rub_Tech_CTO_2022.pdf",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "raw",
+      "sha256": "18678a141c79f50b21c21d645dec1490e188129896e1e34104750f13f755a76a"
+    },
+    {
+      "bytes": 497,
+      "format": "pdf",
+      "path": "data/raw/industrial/KSPCB_OCMMS_Rubber_O_Malabar_CTO_2020.pdf",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "raw",
+      "sha256": "18678a141c79f50b21c21d645dec1490e188129896e1e34104750f13f755a76a"
+    },
+    {
+      "bytes": 497,
+      "format": "pdf",
+      "path": "data/raw/industrial/KSPCB_OCMMS_Sud_Chemie_CTE_2020.pdf",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "raw",
+      "sha256": "18678a141c79f50b21c21d645dec1490e188129896e1e34104750f13f755a76a"
+    },
+    {
+      "bytes": 497,
+      "format": "pdf",
+      "path": "data/raw/industrial/KSPCB_OCMMS_Sud_Chemie_CTO_Variation_2021.pdf",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "raw",
+      "sha256": "18678a141c79f50b21c21d645dec1490e188129896e1e34104750f13f755a76a"
+    },
+    {
+      "bytes": 497,
+      "format": "pdf",
+      "path": "data/raw/industrial/KSPCB_OCMMS_TMS_Leathers_CTO_2023.pdf",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "raw",
+      "sha256": "18678a141c79f50b21c21d645dec1490e188129896e1e34104750f13f755a76a"
+    },
+    {
+      "bytes": 5893254,
+      "format": "pdf",
+      "path": "data/raw/industrial/KWA_Edayar_CETP_DER_2022.pdf",
+      "provenance_sidecar": "data/raw/industrial/KWA_Edayar_CETP_DER_2022.pdf.metadata.json",
+      "provenance_status": "sidecar_available_requires_dataset_specific_suitability_review",
+      "role": "raw",
+      "sha256": "649955b4008cdbf1e1f14133fa4cac6d33afdb046ca0dddfc57d6a053abe0d07"
+    },
+    {
+      "bytes": 14020365,
+      "format": "tif",
+      "path": "data/raw/jrc_glofas_rp100_ID185_N20_E70_depth.tif",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "raw",
+      "sha256": "93ba198ffeb0fb7436c6b97d66cf6b47b10cd59c4e6cf742a8aff59f46bdaf3b"
+    },
+    {
+      "bytes": 2207891,
+      "format": "tif",
+      "path": "data/raw/jrc_glofas_rp100_ID186_N10_E70_depth.tif",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "raw",
+      "sha256": "cd78d43b91c235e39aa443550319ab099b816ca679f76ab83c339b5e7a9f1a30"
+    },
+    {
+      "bytes": 90791,
+      "format": "geojson",
+      "path": "data/raw/jrc_glofas_v2_1_tile_extents.geojson",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "raw",
+      "sha256": "f02b744fcbbf0c0647001d100a9e18954d40541ab73282f0671278a62fb4112a"
+    },
+    {
+      "bytes": 1335415,
+      "format": "csv",
+      "path": "data/raw/kerala.csv",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "raw",
+      "sha256": "2d4588f23f5c49151b6ec7b220c5cc2485dfefbf50eadbb3d17c869db07f6ad8"
+    },
+    {
+      "bytes": 943022,
+      "format": "geojson",
+      "path": "data/raw/koch_wards_2022.geojson",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "raw",
+      "sha256": "d8de90012f5c785b9d63c4b6f0b8bee69c72125da828051934de159d8f80dc17"
+    },
+    {
+      "bytes": 4370593,
+      "format": "zip",
+      "path": "data/raw/ksdma_flood_return_probability_historical_10_25_50.zip",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "raw",
+      "sha256": "4057b36cdfc467ecaf618afb1e74b725187ef1d2a20326cdc1e4eb32df54605e"
+    },
+    {
+      "bytes": 10341256,
+      "format": "csv",
+      "path": "data/raw/nihfw_national_hospital_directory.csv",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "raw",
+      "sha256": "1ddcad9f9b922142a4374c7b89b70fb6cefd8a257448c70a61e1c07d98845134"
+    },
+    {
+      "bytes": 16952641,
+      "format": "csv",
+      "path": "data/raw/rainfall_manual_hr_kerala-sw_kl_1991_2020.csv",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "raw",
+      "sha256": "88c7dc7e8f3d32f532bf6889b511f5d88bfec26a3894872bc7d00a6c06d9ad6c"
+    },
+    {
+      "bytes": 3074417,
+      "format": "csv",
+      "path": "data/raw/rwl_manual_hr_kerala_sw_031_2021_2025.csv",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "raw",
+      "sha256": "1ccbd605f9b218986c40bc2d27d19566aa7ee8220c9c828ce0f3651e02a9da55"
+    },
+    {
+      "bytes": 21997756,
+      "format": "csv",
+      "path": "data/raw/rwl_tel_hr_kerala_sw_031_2021_2025.csv",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "raw",
+      "sha256": "e6e23d204d2d3c2afd1cc37850d59dcc496cc6a0b777b00b356f5bb32b23e2a8"
+    },
+    {
+      "bytes": 6725,
+      "format": "csv",
+      "path": "data/processed/air_quality/kspcb_annual_aqi.csv",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "processed",
+      "sha256": "7d2a0dad72a852dc0fb55b63fa47cac2c3cda4e115a629859ad88838cbeb1855"
+    },
+    {
+      "bytes": 6932,
+      "format": "csv",
+      "path": "data/processed/air_quality/kspcb_caaqms_eloor_aqi_2026-08.csv",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "processed",
+      "sha256": "fbe91c0608d8e2ea494b8fdd99f4b97b880441798e396c6db80ed8a690972a83"
+    },
+    {
+      "bytes": 6711,
+      "format": "csv",
+      "path": "data/processed/air_quality/kspcb_caaqms_eloor_aqi_2026-09.csv",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "processed",
+      "sha256": "f2fe3c007fddc6676fb66ca4be3a308fd309946f7301f4d17da3f90e8eaa2b36"
+    },
+    {
+      "bytes": 93533,
+      "format": "csv",
+      "path": "data/processed/air_quality/kspcb_caaqms_eloor_daily_2026-08.csv",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "processed",
+      "sha256": "14886c1cb86deca55d33dd495751b2aab7a3f3aae7eaaf561100b2feba8228e9"
+    },
+    {
+      "bytes": 90519,
+      "format": "csv",
+      "path": "data/processed/air_quality/kspcb_caaqms_eloor_daily_2026-09.csv",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "processed",
+      "sha256": "c0888fa4fc8e76bab0c49e133e4cbe261705032dad294a87744693be9ef3b217"
+    },
+    {
+      "bytes": 8792,
+      "format": "csv",
+      "path": "data/processed/air_quality/kspcb_caaqms_eloor_weather_2026-08.csv",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "processed",
+      "sha256": "c0aa04b9be20388d686441253d47e16304ac13c57bf8eed4d7d712b88e348b9b"
+    },
+    {
+      "bytes": 8493,
+      "format": "csv",
+      "path": "data/processed/air_quality/kspcb_caaqms_eloor_weather_2026-09.csv",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "processed",
+      "sha256": "fac8b82c163bc3b91e1b8047c96b0449f5c5f1cce5fe519ed9637a3ee64d60ce"
+    },
+    {
+      "bytes": 2080,
+      "format": "csv",
+      "path": "data/processed/air_quality/kspcb_daily_aqi_2026-10-16.csv",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "processed",
+      "sha256": "c30ef5a2ffac3a332c11a9f8e22a2f6c6728162811e0794d8547a773f922be82"
+    },
+    {
+      "bytes": 892,
+      "format": "csv",
+      "path": "data/processed/air_quality/kspcb_daily_aqi_status_2026-10-16.csv",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "processed",
+      "sha256": "1ff44a8a57e5dfa2fc353104827b67dfa8912c1f3d77313055f21c7514a5f632"
+    },
+    {
+      "bytes": 18214,
+      "format": "csv",
+      "path": "data/processed/air_quality/kspcb_namp_ernakulam_2025-06.csv",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "processed",
+      "sha256": "433f2663ea706c70db6d187a532429dc001782c90a0d9e3a222a0d29526ee392"
+    },
+    {
+      "bytes": 97231,
+      "format": "csv",
+      "path": "data/processed/cwc_rainfall_conflicts.csv",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "processed",
+      "sha256": "2d7aae484dc615b771fed512d955d41238e0abe175230b6bc20f02ec57f2ee69"
+    },
+    {
+      "bytes": 16952,
+      "format": "csv",
+      "path": "data/processed/industrial/edayar_candidate_facilities.csv",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "processed",
+      "sha256": "a7dd82da910c74c98b2903fcbeda5564979e981143346db950f4c5a5dea49f64"
+    },
+    {
+      "bytes": 8228,
+      "format": "csv",
+      "path": "data/processed/industrial/edayar_consent_records.csv",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "processed",
+      "sha256": "ece2da41a27b42277f1dcb9f3e12e71326c19781be5cfaccd7acf5d8b9732d1f"
+    },
+    {
+      "bytes": 818,
+      "format": "csv",
+      "path": "data/processed/industrial/edayar_dic_allotment_crosswalk_2022.csv",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "processed",
+      "sha256": "5ce78f11741d922deeb9b3940539626a643c0b0655bc2d649e4ee7c450a3cd91"
+    },
+    {
+      "bytes": 1830,
+      "format": "csv",
+      "path": "data/processed/industrial/edayar_estate_industry_type_counts.csv",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "processed",
+      "sha256": "b2f2243899e0787c46d5c03921d6dc4919c5970a8948f87ec589d7b92aab5dd1"
+    },
+    {
+      "bytes": 372,
+      "format": "csv",
+      "path": "data/processed/industrial/edayar_estate_reference.csv",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "processed",
+      "sha256": "bbbdf11a59456bc8b4b5a45fe320afa2cd844c2eb56189504bd1d12bc958a0be"
+    },
+    {
+      "bytes": 46211,
+      "format": "csv",
+      "path": "data/processed/nihfw_ernakulam_hospitals_coordinate_review.csv",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "processed",
+      "sha256": "6b1884390d05e9f035af573a73960c31f8a5b6f35b6e1b0834af6fb2bf1d3a05"
+    },
+    {
+      "bytes": 914472,
+      "format": "geojson",
+      "path": "data/processed/spatial_layers/kochi_wards_datameet_2022.geojson",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "processed",
+      "sha256": "d27ee64ade27b5d4145eb11e55524f34d20f759eb8bc42b344211854aac86d40"
+    },
+    {
+      "bytes": 18079,
+      "format": "json",
+      "path": "data/reference/air_quality_acquisition.json",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "reference",
+      "sha256": "39d0bcd16c3ad01d50d5cb851cf53428aa00b2294ac3cf7aff53a312241838f9"
+    },
+    {
+      "bytes": 1953,
+      "format": "json",
+      "path": "data/reference/historical_flood_events.json",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "reference",
+      "sha256": "6f76f076e7b35371531f828a1e26eb1d8105fa6eadb5ea2d09c217172f602665"
+    },
+    {
+      "bytes": 10569,
+      "format": "json",
+      "path": "data/reference/hydrology_data_sources.json",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "reference",
+      "sha256": "3f239ad05f51606c7813da18f1646ec9b66a4cbfe3551297b7760c0a56b4a2da"
+    },
+    {
+      "bytes": 72732,
+      "format": "geojson",
+      "path": "data/reference/kochi_corporation_boundary.geojson",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "reference",
+      "sha256": "02e3217959ed1edef2c91d852305e86d1d7ff55a90971a8f61fcd3a9ce0dcdbf"
+    },
+    {
+      "bytes": 26592,
+      "format": "json",
+      "path": "data/reference/spatial_sources.json",
+      "provenance_sidecar": null,
+      "provenance_status": "provenance_sidecar_not_found",
+      "role": "reference",
+      "sha256": "29c8d6f9cbc1b8688df474beabd515c1cd27a6366d667c2e2f9946d41fd32660"
+    }
+  ],
+  "assets_without_sidecars": 55,
+  "generated_at_utc": "2026-11-01T18:51:20.744458+00:00",
+  "policy": "Checksums establish byte identity only, not source identity, licence, accuracy, completeness, or suitability.",
+  "register_version": 1,
+  "repository": "joelaugustin010/AI_RESILIENCE"
+}

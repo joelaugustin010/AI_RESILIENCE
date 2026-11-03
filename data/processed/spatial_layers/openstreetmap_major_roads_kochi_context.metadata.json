@@ -1,0 +1,49 @@
+{
+  "analysis_status": "Integrated as OpenStreetMap community-mapped context only; not an authoritative inventory or exposure input.",
+  "attribution": "© OpenStreetMap contributors",
+  "crs": "EPSG:4326",
+  "dataset_id": "openstreetmap_major_roads_kochi_context",
+  "geographic_coverage": "Query rectangle only: 76.2373589–76.3400293 E, 9.8934161–10.0497693 N. This is not a validated or complete Kochi Corporation boundary.",
+  "layer_role": "context",
+  "license": "Open Database License (ODbL) 1.0; © OpenStreetMap contributors. Attribution required; database adaptations are subject to ODbL share-alike terms.",
+  "limitations": [
+    "Community mapping is not an authoritative inventory; completeness, positional accuracy, access, condition, and operational status are not independently validated.",
+    "The query rectangle was derived from the observed extent of a provisional ward snapshot and is not a legal or complete city boundary.",
+    "Only tagged OSM highway ways meeting the recorded filter are included; mapped bridges are road ways tagged with bridge=* and may not be a complete bridge register.",
+    "These layers provide map context only. They are not used to calculate route availability, hazard exposure, damage, service disruption, or consequences.",
+    "ODbL attribution and share-alike obligations apply to these derived databases."
+  ],
+  "processed_feature_count": 1564,
+  "processing_filter": "OSM highway ways with highway in: motorway, motorway_link, primary, primary_link, secondary, secondary_link, tertiary, tertiary_link, trunk, trunk_link",
+  "publication_date": "2026-11-01",
+  "publisher": "OpenStreetMap contributors",
+  "retrieved_on": "2026-11-01",
+  "source_coordinate_order": "Source OSM point geometry uses lat/lon; converted to GeoJSON [longitude, latitude] order.",
+  "source_feature_count": 16378,
+  "source_snapshot_base_timestamp": "2026-11-01T18:27:21Z",
+  "source_snapshot_bytes": 11067472,
+  "source_snapshot_file": "data/raw/experimental/openstreetmap_roads_provisional_kochi_bounds.json",
+  "source_snapshot_sha256": "92631cf880203e0a40c59a13ee8f5bd5aca4efaf331846fd0ebbc0be3163728d",
+  "source_url": "https://overpass-api.de/api/interpreter?data=%5Bout%3Ajson%5D%5Btimeout%3A60%5D%3Bway%5B%22highway%22%5D%289.8934161%2C76.2373589%2C10.0497693%2C76.3400293%29%3Bout+geom%3B",
+  "title": "OpenStreetMap major road ways in the Kochi review rectangle (context only)",
+  "units": "Line geometries and OpenStreetMap tags; tag values are not uniformly measured quantities",
+  "validation": {
+    "dataset_id": "openstreetmap_major_roads_kochi_context",
+    "duplicate_ids": 0,
+    "errors": [],
+    "exact_duplicate_features": 0,
+    "feature_count": 1564,
+    "features_intersecting_coverage": null,
+    "features_outside_coverage": null,
+    "geometry_types": {
+      "LineString": 1564
+    },
+    "intersection_method": "Planar topological overlay in longitude/latitude (EPSG:4326); boundary counts as intersection; no distance/area calculation.",
+    "invalid_features": [],
+    "missing_property_values": 0,
+    "provenance_valid": true,
+    "source_file": "data/processed/spatial_layers/openstreetmap_major_roads_kochi_context.geojson",
+    "source_sha256": "f7f11ce8e6fcb121faf643ef55715ee42d7a4b69d87ddd550d91144e47a047d7",
+    "warnings": []
+  }
+}

@@ -13,6 +13,7 @@ from src.hazard_manifest import build_hazard_manifest_frame
 
 ROOT = Path(__file__).resolve().parents[1]
 TRAINING_REPORT = ROOT / "reports" / "weather_hazard_training.json"
+FLOOD_REPORT = ROOT / "reports" / "flood_event_severity_baseline.json"
 ACQUISITION_REPORT = ROOT / "reports" / "hazard_data_acquisition_manifest.json"
 READINESS_REPORT = ROOT / "reports" / "hazard_dataset_readiness.json"
 
@@ -128,6 +129,38 @@ if blocked:
     st.subheader("Training blockers")
     for hazard, reason in blocked.items():
         st.error(f"{hazard}: {reason}")
+
+flood_report = read_json(FLOOD_REPORT)
+st.subheader("Flood research baseline")
+if not flood_report:
+    st.info("No flood research evaluation report is available in this deployment.")
+else:
+    st.warning(
+        "Exploratory event-severity research only. This is not a flood-occurrence model, "
+        "Kochi forecast, inundation model or public warning."
+    )
+    dataset = flood_report.get("dataset", {})
+    metrics = flood_report.get("test_metrics", {})
+    fc1, fc2, fc3 = st.columns(3)
+    fc1.metric("Recorded event rows", dataset.get("event_rows", "—"))
+    fc2.metric("Explicitly Open gauges", dataset.get("explicitly_open_gauges", "—"))
+    fc3.metric("Held-out gauges", dataset.get("held_out_gauges", "—"))
+    st.write("**Research target:**", flood_report.get("target", "Not documented"))
+    metric_rows = [
+        {"Metric": "Accuracy", "Value": metrics.get("accuracy")},
+        {"Metric": "Majority baseline accuracy", "Value": metrics.get("majority_baseline_accuracy")},
+        {"Metric": "Balanced accuracy", "Value": metrics.get("balanced_accuracy")},
+        {"Metric": "Precision", "Value": metrics.get("precision")},
+        {"Metric": "Recall", "Value": metrics.get("recall")},
+        {"Metric": "F1", "Value": metrics.get("f1")},
+        {"Metric": "ROC-AUC", "Value": metrics.get("roc_auc")},
+        {"Metric": "Grouped CV balanced accuracy (mean ± SD)", "Value": f"{metrics.get('grouped_cv_balanced_accuracy_mean', '—')} ± {metrics.get('grouped_cv_balanced_accuracy_std', '—')}"},
+    ]
+    display_dataframe(pd.DataFrame(metric_rows), hide_index=True, width="stretch")
+    st.error(f"**Decision:** {flood_report.get('decision', 'Integration decision not recorded')}")
+    for limitation in flood_report.get("limitations", []):
+        st.write(f"- {limitation}")
+    st.caption("The source and full evaluation are documented in the milestone report.")
 
 st.subheader("Scientific data readiness by hazard")
 readiness = read_json(READINESS_REPORT)
