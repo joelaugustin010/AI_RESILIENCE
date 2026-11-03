@@ -54,6 +54,18 @@ jobs:
       - name: Run clean-checkout test suite
         run: python -m pytest -q -ra --strict-markers
 
+  provenance-hash-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify provenance hashes after Linux checkout
+        run: python test_provenance_line_endings.py
+
   rainfall-regression-research:
     if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && (startsWith(github.head_ref, 'research/nextday-rainfall-regression-') || startsWith(github.head_ref, 'research/rainfall-') || startsWith(github.head_ref, 'milestone/kochi-cyclone-flood-resilience-') || startsWith(github.head_ref, 'integration/cyclone-flood-')))
     needs: test

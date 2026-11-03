@@ -2,12 +2,13 @@ name: Acquire and store multi-hazard source data
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
     paths:
       - "scripts/acquire_hazard_data.py"
       - "scripts/audit_hazard_datasets.py"
       - "scripts/train_hazard_baseline.py"
       - "data/external/hazard_dataset_registry.json"
-      - ".github/workflows/audit-hazard-readiness.yml"
 permissions:
   contents: write
 jobs:
