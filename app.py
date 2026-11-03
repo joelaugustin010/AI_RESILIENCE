@@ -10,13 +10,6 @@ st.set_page_config(
 )
 
 pages = {
-    "Home": [
-        st.Page(
-            "app_pages/home.py",
-            title="Command Centre",
-            icon=":material/dashboard:",
-        ),
-    ],
     "Explore": [
         st.Page(
             "app_pages/decision_workflow.py",
@@ -54,14 +47,16 @@ pages = {
             icon=":material/local_hospital:",
         ),
         st.Page(
-            "app_pages/compound_scenario.py",
-            title="Cyclone + Flood",
-            icon=":material/thunderstorm:",
-        ),
-        st.Page(
             "app_pages/disaster_probability.py",
             title="Disaster Probability",
             icon=":material/analytics:",
+        ),
+    ],
+    "Home": [
+        st.Page(
+            "app_pages/home.py",
+            title="Command Centre",
+            icon=":material/dashboard:",
         ),
     ],
     "Plan": [

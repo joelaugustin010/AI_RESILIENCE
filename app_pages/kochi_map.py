@@ -1,5 +1,6 @@
 """Kochi map showing licensed reference geometry and user-reviewed points."""
 
+import base64
 import json
 from pathlib import Path
 
@@ -9,12 +10,18 @@ import streamlit as st
 
 from src.dataframe_display import display_dataframe
 from src.spatial_data import classify_exposure, processed_layer_issues, read_processed_layers, validate_geojson
+from src.landcover_context import validate_worldcover_preview
+from src.map_integration import MAP_CONTEXT_KEY, selected_feature_properties
 
 ROOT = Path(__file__).resolve().parents[1]
 BOUNDARY_PATH = ROOT / "data" / "reference" / "kochi_corporation_boundary.geojson"
 SOURCE_CATALOG_PATH = ROOT / "data" / "reference" / "spatial_sources.json"
 FLOOD_ACQUISITION_METADATA = ROOT / "data" / "raw" / "ksdma_flood_return_probability_historical_10_25_50.metadata.json"
 HOSPITAL_REVIEW_METADATA = ROOT / "data" / "processed" / "nihfw_ernakulam_hospitals_coordinate_review.metadata.json"
+WORLDCOVER_PREVIEW_PATH = ROOT / "data" / "processed" / "spatial_layers" / "worldcover_2021_kochi_context.png"
+WORLDCOVER_PREVIEW_METADATA = WORLDCOVER_PREVIEW_PATH.with_name(
+    "worldcover_2021_kochi_context.metadata.json"
+)
 HOSPITAL_REVIEW_CSV = ROOT / "data" / "processed" / "nihfw_ernakulam_hospitals_coordinate_review.csv"
 WARD_RECONCILIATION_REPORT = ROOT / "reports" / "kochi_ward_label_reconciliation.json"
 PORTAL_WARD_AUDIT_REPORT = ROOT / "reports" / "kochi_portal_candidate_vs_sec_register.json"
@@ -230,6 +237,91 @@ def load_processed_layer_issues(boundary_geometry: dict | None) -> list[str]:
 
 st.header("Kochi GIS and infrastructure map")
 st.caption("Layer status and source records are explicit. The corporation boundary is an administrative outline, not a hazard or vulnerability layer.")
+st.page_link(
+    ROOT / "app_pages" / "decision_workflow.py",
+    label="Return to the Decision Workflow",
+    icon=":material/assignment_turned_in:",
+)
+
+map_context = st.session_state.get(MAP_CONTEXT_KEY)
+active_hazard = None
+if isinstance(map_context, dict):
+    active_hazard = map_context.get("hazard")
+    st.subheader("Scenario carried over from the Decision Workflow")
+    st.write("**Selected disaster:**", active_hazard)
+    st.write("**Geographical scope:**", map_context.get("location", "Not supplied"))
+    st.caption(
+        "Scenario values are user-entered and have not been independently verified. "
+        "The map shows only available source-reviewed layers; it does not infer a local hazard footprint or exposure."
+    )
+    conditions = map_context.get("conditions", {})
+    if conditions:
+        display_dataframe(
+            pd.DataFrame(
+                [
+                    {"Condition": name.replace("_", " ").capitalize(), "User-supplied value": value}
+                    for name, value in conditions.items()
+                ]
+            ),
+            hide_index=True,
+            width="stretch",
+            alt="Submitted user-supplied scenario conditions",
+        )
+    assessment_context = map_context.get("assessment", {})
+    if assessment_context:
+        st.write(
+            "**Assessment status:**",
+            assessment_context.get("assessment_type", "Evidence review"),
+            "|",
+            assessment_context.get("result_status", "No classified result"),
+        )
+        hazard_result = assessment_context.get("hazard_assessment", {})
+        if hazard_result:
+            st.write("**Assessment interpretation:**", hazard_result.get("severity", "Not classified"))
+            indicators = hazard_result.get("indicators")
+            if indicators:
+                display_dataframe(
+                    pd.DataFrame(
+                        [
+                            {
+                                "Indicator": name.replace("_", " ").capitalize(),
+                                "Result": json.dumps(value, ensure_ascii=False, default=str),
+                            }
+                            for name, value in indicators.items()
+                        ]
+                    ),
+                    hide_index=True,
+                    width="stretch",
+                    alt="Scenario assessment indicators transferred from the workflow",
+                )
+        recommendation_groups = assessment_context.get("recommendations", {})
+        if recommendation_groups:
+            with st.expander("Scenario recommendation candidates"):
+                st.caption(
+                    "These are hazard/scenario-specific general recommendations from the workflow, "
+                    "not location-specific instructions. Follow competent-authority guidance."
+                )
+                phase_labels = {
+                    "before": "Before: prevention and preparedness",
+                    "during": "During: response",
+                    "after": "After: recovery",
+                    "long_term": "Long-term resilience",
+                }
+                for phase, label in phase_labels.items():
+                    items = recommendation_groups.get(phase, [])
+                    if not items:
+                        continue
+                    st.markdown(f"**{label}**")
+                    for item in items:
+                        st.markdown(f"- {item.get('action', 'Recommendation details unavailable.')}")
+                        st.caption(
+                            f"Why relevant: {item.get('relevance', 'Not stated.')} "
+                            f"Evidence/authority: {item.get('evidence_or_authority', 'Not stated.')} "
+                            f"Scope: {item.get('scope', 'Not stated.')} "
+                            f"Limitations: {item.get('limitations', 'Not stated.')}"
+                        )
+else:
+    st.info("No submitted scenario is attached. Select a disaster in the Decision Workflow and use “View prone areas on the Kochi map” to carry its context here.")
 
 catalog = load_source_catalog()
 catalog_rows = [{
@@ -581,12 +673,99 @@ show_boundary = st.checkbox("Kochi Corporation administrative boundary", value=T
 st.caption("Blue outline = administrative boundary only. It must not be interpreted as a hazard zone or as the full Greater Kochi urban area.")
 deck_layers = []
 legend_rows = []
-st.warning(
-    "The JRC RP100 raster preview is withheld. Its dataset README lists ODbL 1.0, while the linked JRC copyright "
-    "notice lists CC BY 4.0; no clarification has been obtained. Do not redistribute or publicly deploy the local "
-    "raster or preview until the applicable terms are confirmed.",
-    title="JRC flood preview withheld pending licence clarification",
-)
+flood_context_hazards = {"Flood", "Compound: cyclone + flood"}
+if active_hazard is None or active_hazard in flood_context_hazards:
+    st.warning(
+        "The JRC RP100 raster preview is withheld. Its dataset README lists ODbL 1.0, while the linked JRC copyright "
+        "notice lists CC BY 4.0; no clarification has been obtained. Do not redistribute or publicly deploy the local "
+        "raster or preview until the applicable terms are confirmed.",
+        title="JRC flood preview withheld pending licence clarification",
+    )
+else:
+    st.info(
+        f"No compatible {active_hazard} hazard layer is currently available. "
+        "Flood-scenario data remain hidden instead of being displayed as this disaster."
+    )
+
+landcover_hazards = {
+    "Flood",
+    "Cyclone",
+    "Landslide",
+    "Heatwave",
+    "Drought",
+    "Compound: cyclone + flood",
+    "Compound: heavy rainfall + drainage failure",
+}
+if active_hazard is None or active_hazard in landcover_hazards:
+    try:
+        landcover_metadata = load_acquisition_metadata(WORLDCOVER_PREVIEW_METADATA)
+        if landcover_metadata and WORLDCOVER_PREVIEW_PATH.is_file():
+            landcover_processing = landcover_metadata["processing"]
+            show_landcover = st.checkbox(
+                "ESA WorldCover 2021 land-cover context (not a hazard or exposure layer)",
+                value=True,
+                key=f"kochimap_worldcover_{active_hazard}",
+            )
+            st.caption(
+                "Classified land cover can provide broad environmental context for reviewing this scenario. "
+                "It does not represent present-day land cover, building footprints, impervious fraction, "
+                "hazard susceptibility, population, or consequences."
+            )
+            st.markdown(
+                "[ESA WorldCover source](https://esa-worldcover.org/en/data-access) | "
+                "[CC BY 4.0 attribution and license](https://creativecommons.org/licenses/by/4.0/)"
+            )
+            st.caption(
+                f"Publisher: {landcover_metadata['publisher']} | "
+                f"Observation year: {landcover_metadata['publication_date']} | "
+                f"Source CRS: {landcover_metadata['source_crs']} | "
+                f"Review rectangle: {landcover_processing['review_rectangle_wgs84']} | "
+                f"Rendered source classes: {', '.join(str(code) for code in landcover_processing['rendered_class_codes'])}."
+            )
+            if show_landcover:
+                landcover_bytes = WORLDCOVER_PREVIEW_PATH.read_bytes()
+                validate_worldcover_preview(landcover_bytes, landcover_metadata)
+                landcover_image = base64.b64encode(landcover_bytes).decode("ascii")
+                landcover_bounds = landcover_processing["bounds_epsg4326"]
+                deck_layers.append(
+                    pdk.Layer(
+                        "BitmapLayer",
+                        id="worldcover-2021-context",
+                        image=f"data:image/png;base64,{landcover_image}",
+                        bounds=[
+                            landcover_bounds[0],
+                            landcover_bounds[1],
+                            landcover_bounds[2],
+                            landcover_bounds[3],
+                        ],
+                        opacity=0.58,
+                    )
+                )
+                legend_rows.append(
+                    (
+                        "ESA WorldCover 2021 categorical context",
+                        "ESA WorldCover class colors",
+                        "Land-cover classes only; not hazard severity or exposure",
+                    )
+                )
+            class_rows = [
+                {
+                    "Class code": code,
+                    "Land-cover class": definition["label"],
+                    "Map color": "#{:02X}{:02X}{:02X}".format(*definition["rgb"]),
+                }
+                for code, definition in landcover_processing["classes"].items()
+            ]
+            display_dataframe(
+                pd.DataFrame(class_rows),
+                hide_index=True,
+                width="stretch",
+                alt="ESA WorldCover categorical class legend for the displayed context layer",
+            )
+        else:
+            st.warning("The processed ESA WorldCover context image or provenance sidecar is missing; the layer is unavailable.")
+    except (OSError, KeyError, TypeError, ValueError) as error:
+        st.warning(f"The ESA WorldCover context layer could not be loaded: {error}")
 
 template = pd.DataFrame(columns=["name", "layer", "latitude", "longitude", "source", "source_date"])
 st.download_button("Download point CSV template", template.to_csv(index=False).encode("utf-8"), file_name="kochi_reviewed_points_template.csv", mime="text/csv")
@@ -607,13 +786,15 @@ if processed_layers:
         f"{layer['metadata']['title']} [{layer['metadata']['dataset_id']}]": layer
         for layer in processed_layers
     }
+    contextual_default = [
+        title
+        for title, layer in processed_titles.items()
+        if active_hazard is None or layer["metadata"].get("layer_role") == "context"
+    ]
     selected_titles = st.multiselect(
         "Layers to show",
         list(processed_titles),
-        default=[
-            title for title, layer in processed_titles.items()
-            if not str(layer["metadata"].get("logical_layer_id", "")).startswith("osm_kochi_")
-        ],
+        default=contextual_default,
         key="kochisp_validated_layers",
     )
     st.caption("Select each OSM context layer independently. Large community-mapped layers start hidden for map responsiveness.")
@@ -800,7 +981,26 @@ if deck_layers:
         initial_view_state=pdk.ViewState(longitude=map_center[0], latitude=map_center[1], zoom=10),
         tooltip={"text": "Bound Name: {display_bound}\nWard Name: {display_ward}\nFeature ID: {display_feature_id}\nFeature: {display_name}\nType: {display_type}\nSource: {display_source}\nOSM updated: {display_timestamp}\nSource URL: {display_url}"},
     )
-    st.pydeck_chart(deck, width="stretch", alt="Kochi administrative outline and selected source-documented spatial layers")
+    map_selection = st.pydeck_chart(
+        deck,
+        width="stretch",
+        alt="Kochi administrative outline and selected source-documented spatial layers",
+        on_select="rerun",
+        key="kochi_interactive_map",
+    )
+    picked_properties = selected_feature_properties(map_selection)
+    if picked_properties:
+        st.subheader("Selected map feature")
+        st.caption(
+            "These are source feature attributes only. They are not ward-level hazard, "
+            "population, infrastructure-exposure, or consequence estimates."
+        )
+        display_dataframe(
+            pd.DataFrame(picked_properties),
+            hide_index=True,
+            width="stretch",
+            alt="Attributes of the selected mapped feature",
+        )
 else:
     st.info("Turn on at least one layer to display the map.")
 if legend_rows:

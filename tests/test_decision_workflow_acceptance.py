@@ -14,6 +14,7 @@ from src.decision_workflow import (
     budget_summary,
     compare_action_combinations,
     decision_readiness_summary,
+    evidence_provenance_summary,
     expand_hazards,
     hazard_evidence_checklist,
     mitigation_actions_for,
@@ -121,3 +122,16 @@ def test_hypothetical_inputs_never_open_prediction_gate_even_if_form_is_complete
     assert quality["numerical_prediction_enabled"] is False
     assert readiness["numerical_prediction_gate"].startswith("CLOSED")
     assert "WHAT-IF PLANNING ONLY" in readiness["decision_status"]
+
+
+def test_historical_event_classification_is_shared_and_remains_unverified():
+    from src.decision_workflow import INPUT_CLASSIFICATIONS
+    from src.disaster_models.common import INPUT_CLASSIFICATIONS as MODEL_CLASSIFICATIONS
+
+    classification = "Historical event (source not independently verified)"
+    assert classification in INPUT_CLASSIFICATIONS
+    assert classification in MODEL_CLASSIFICATIONS
+    provenance = evidence_provenance_summary({"input_classification": classification})
+    assert "historical event" in provenance["Provenance status"].lower()
+    assert "not independently verified" in provenance["Provenance status"].lower()
+    assert "current conditions" in provenance["Permitted interpretation"]
