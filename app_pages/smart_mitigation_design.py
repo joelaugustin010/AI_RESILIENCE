@@ -8,193 +8,33 @@ st.set_page_config(
 )
 
 
-# Page styling — Light professional theme
+# Shared dark SDG climate-intelligence workspace styling.
 st.markdown("""
 <style>
-
-/* Main background */
-.stApp {
-    background: linear-gradient(
-        135deg,
-        #f2f9ff 0%,
-        #f8fcff 50%,
-        #effaf5 100%
-    );
-    color: #29445b;
-}
-
-/* Main content */
-.block-container {
-    padding-top: 1.8rem;
-    padding-bottom: 3rem;
-    max-width: 1500px;
-}
-
-/* Headings */
-h1, h2, h3 {
-    color: #285675;
-    font-weight: 700;
-    letter-spacing: -0.3px;
-}
-
-h2 {
-    padding-bottom: 8px;
-    border-bottom: 1px solid #dcebf3;
-}
-
-h3 {
-    color: #398477;
-}
-
-/* Main header */
-.design-header {
-    background: linear-gradient(
-        110deg,
-        #d9efff 0%,
-        #e4f5ff 55%,
-        #ddf5ed 100%
-    );
-    padding: 34px;
-    border-radius: 20px;
-    color: #285675;
-    margin-bottom: 24px;
-    border: 1px solid #c9e3ef;
-    box-shadow: 0 7px 24px rgba(75, 135, 165, 0.09);
-}
-
-.design-header h1 {
-    color: #245675;
-    font-size: 34px;
-    font-weight: 750;
-    margin-bottom: 10px;
-}
-
-.design-header p {
-    color: #52768b;
-    font-size: 16px;
-    line-height: 1.7;
-    margin-bottom: 0;
-}
-
-/* Concept warning */
-.concept-note {
-    background: #fff9e8;
-    border: 1px solid #f0dda8;
-    border-left: 5px solid #e5b84e;
-    border-radius: 12px;
-    padding: 17px;
-    color: #755b20;
-    line-height: 1.6;
-}
-/* Project configuration controls */
-div[data-baseweb="select"] > div,
-div[data-baseweb="input"] > div {
-    background-color: #ffffff;
-    border: 1px solid #cddfe9;
-    border-radius: 10px;
-}
-
-div[data-testid="stSlider"] {
-    padding: 10px 14px;
-    background: #ffffff;
-    border: 1px solid #deebf1;
-    border-radius: 12px;
-}
-
-div[data-testid="stCheckbox"] {
-    padding: 5px 0;
-}
-
-div[data-testid="stSelectbox"],
-div[data-testid="stNumberInput"] {
-    margin-bottom: 12px;
-}
-/* Professional budget metric cards */
-div[data-testid="stMetric"] {
-    background: linear-gradient(145deg, #ffffff, #f1f8fc);
-    border: 1px solid #d5e7ef;
-    padding: 22px;
-    border-radius: 16px;
-    box-shadow: 0 4px 14px rgba(70, 120, 145, 0.08);
-    transition: transform 0.2s ease;
-}
-
-div[data-testid="stMetricLabel"] {
-    color: #52768b;
-    font-weight: 650;
-}
-
-div[data-testid="stMetricValue"] {
-    color: #285675;
-    font-weight: 750;
-}
-/* Budget progress bar */
-div[data-testid="stProgress"] {
-    background: #e6f0f5;
-    border-radius: 20px;
-    padding: 5px;
-}
-
-div[data-testid="stProgress"] > div > div {
-    background: linear-gradient(90deg, #75bce8, #72c9a8);
-    border-radius: 20px;
-}
-
-
-
-
-/* Intelligence dashboard spacing */
-div[data-testid="stHorizontalBlock"] {
-    gap: 16px;
-}
-
-div[data-testid="stMetric"] {
-    min-height: 112px;
-    justify-content: center;
-}
-
-div[data-testid="stMetricValue"] {
-    font-size: 25px;
-}
-
-/* Expanders */
-div[data-testid="stExpander"] {
-    background: #ffffff;
-    border: 1px solid #deebf1;
-    border-radius: 13px;
-}
-
-/* Professional report download button */
-   .stDownloadButton button {
-    background: linear-gradient(100deg, #b9e1fa, #bcebd8);
-    color: #245675;
-    border: 1px solid #b4d9df;
-    border-radius: 12px;
-    font-weight: 750;
-    padding: 15px 22px;
-    min-height: 52px;
-    box-shadow: 0 4px 12px rgba(70, 120, 145, 0.10);
-    transition: all 0.2s ease;
-}
-
-.stDownloadButton button:hover {
-    background: linear-gradient(100deg, #a5d7f5, #a8e3ca);
-    border-color: #8fc9c9;
-    color: #1c4b63;
-}
-
-/* Captions */
-.stCaption {
-    color: #718797;
-}
-
-/* Dividers */
-hr {
-    border-color: #dcebf3;
-}
-
+.stApp{background:transparent!important;color:#e7f5f5!important}
+.block-container{padding-top:1.5rem;padding-bottom:3rem;max-width:1500px}
+h1,h2,h3,h4{color:#effafa!important;letter-spacing:-.02em}
+h2{border-bottom:1px solid rgba(130,190,199,.24);padding-bottom:.5rem}
+h3{color:#65e4ce!important}
+p,li,label,.stMarkdown,.stCaption{color:#c5dadd}
+.design-header{position:relative;overflow:hidden;padding:clamp(1.5rem,3vw,2.4rem);border-radius:23px;margin-bottom:1.25rem;background:radial-gradient(ellipse at 88% 12%,rgba(76,226,197,.2),transparent 22rem),linear-gradient(118deg,#071a2a 0%,#0b4054 58%,#087e78 100%);border:1px solid rgba(112,226,207,.28);box-shadow:0 22px 54px rgba(0,0,0,.28);color:#e7f5f5}
+.design-header h1{color:#f1ffff!important;font-size:clamp(2rem,3.5vw,2.8rem)}
+.design-header p{color:#c3e0e2!important;line-height:1.7}
+.concept-note{background:rgba(64,54,28,.55)!important;border:1px solid rgba(235,190,91,.4);border-left:5px solid #e9bd5a;border-radius:12px;padding:17px;color:#f6e6b8!important;line-height:1.6}
+div[data-baseweb="select"]>div,div[data-baseweb="input"]>div,div[data-baseweb="textarea"]>div,div[data-testid="stDateInput"] input,div[data-testid="stNumberInput"] input,div[data-testid="stTextInput"] input,div[data-testid="stTextArea"] textarea{background:#102b3c!important;color:#eaf7f7!important;border:1px solid rgba(130,190,199,.34)!important;border-radius:10px!important}
+div[data-testid="stSlider"],div[data-testid="stMetric"],div[data-testid="stExpander"],div[data-testid="stVerticalBlockBorderWrapper"]>div{background:linear-gradient(145deg,rgba(17,48,66,.96),rgba(10,34,49,.96))!important;border:1px solid rgba(130,190,199,.24)!important;border-radius:14px;color:#e7f5f5!important}
+div[data-testid="stMetric"]{padding:1rem;min-height:108px}
+div[data-testid="stMetricLabel"],.stCaption{color:#a7c1c8!important}
+div[data-testid="stMetricValue"]{color:#f0ffff!important}
+div[data-testid="stProgress"]{background:#16384a;border-radius:20px}
+div[data-testid="stProgress"]>div>div{background:linear-gradient(90deg,#42e0c1,#56c8e8);border-radius:20px}
+div[data-testid="stExpander"] summary,div[data-testid="stExpander"] summary p{color:#e5f4f4!important}
+.stDownloadButton button,div.stButton>button{background:linear-gradient(105deg,#126a70,#147c83)!important;color:#f4ffff!important;border:1px solid rgba(91,223,200,.42)!important;border-radius:11px;font-weight:750;min-height:2.7rem}
+.stDownloadButton button:hover,div.stButton>button:hover{background:linear-gradient(105deg,#16817e,#168b91)!important;border-color:#7bf0d7!important}
+hr{border-color:rgba(130,190,199,.22)!important}
+[data-testid="stDataFrame"],[data-testid="stTable"]{border:1px solid rgba(130,190,199,.22);border-radius:12px}
 </style>
-""", unsafe_allow_html=True)
+""",unsafe_allow_html=True)
 
 # Page header
 
@@ -207,7 +47,7 @@ st.markdown(
     "<div style='font-size:12px; letter-spacing:2px; font-weight:700; color:#398477;'>AI RESILIENCE · ENGINEERING & PLANNING</div>"
     "<h1>🏗️ Smart Mitigation Design Studio</h1>"
     "<p>Kochi, Kerala, India<br>Urban Flood Resilience · Concept Design and Budget Planning</p>"
-    "<div style='margin-top:18px; display:inline-block; padding:7px 13px; background:#ffffff; border:1px solid #c5e4dc; border-radius:20px; color:#398477; font-size:12px; font-weight:650;'>CONCEPT STAGE · ENGINEERING REVIEW REQUIRED</div>",
+    "<div style='margin-top:18px; display:inline-block; padding:7px 13px; background:#102b3c; border:1px solid #c5e4dc; border-radius:20px; color:#398477; font-size:12px; font-weight:650;'>CONCEPT STAGE · ENGINEERING REVIEW REQUIRED</div>",
     unsafe_allow_html=True
 )
 
@@ -232,14 +72,14 @@ st.markdown("""
     margin-top: 12px;
     margin-bottom: 18px;
     padding: 15px 20px;
-    background: linear-gradient(100deg, #e5f3ff, #e8f8f1);
-    border: 1px solid #d2e8ed;
+    background: linear-gradient(120deg, rgba(13,43,60,.98), rgba(10,61,67,.96));
+    border: 1px solid rgba(130,190,199,.28);
     border-radius: 13px;
 ">
-    <h3 style="margin: 0; color: #285675;">
+    <h3 style="margin: 0; color: #e7f5f5;">
         ⚙️ Project Configuration
     </h3>
-    <p style="margin: 5px 0 0 0; color: #648093; font-size: 13px;">
+    <p style="margin: 5px 0 0 0; color: #a8c2ca; font-size: 13px;">
         Define the planning area, rainfall conditions and mitigation components.
     </p>
 </div>
@@ -370,14 +210,14 @@ st.markdown("""
     margin-top: 28px;
     margin-bottom: 18px;
     padding: 16px 20px;
-    background: linear-gradient(100deg, #e3f2ff, #e6f7ef);
-    border: 1px solid #cfe5e9;
+    background: linear-gradient(120deg, rgba(13,43,60,.98), rgba(10,61,67,.96));
+    border: 1px solid rgba(130,190,199,.28);
     border-radius: 14px;
 ">
-    <h3 style="margin: 0; color: #285675;">
+    <h3 style="margin: 0; color: #e7f5f5;">
         📊 Budget Utilisation Dashboard
     </h3>
-    <p style="margin: 5px 0 0 0; color: #648093; font-size: 13px;">
+    <p style="margin: 5px 0 0 0; color: #a8c2ca; font-size: 13px;">
         Monitor estimated project costs against the available planning budget.
     </p>
 </div>
@@ -463,14 +303,14 @@ st.markdown("""
     margin-top: 28px;
     margin-bottom: 18px;
     padding: 16px 20px;
-    background: linear-gradient(100deg, #e6f2ff, #e8f7ef);
-    border: 1px solid #d2e6e9;
+    background: linear-gradient(120deg, rgba(13,43,60,.98), rgba(10,61,67,.96));
+    border: 1px solid rgba(130,190,199,.28);
     border-radius: 14px;
 ">
-    <h3 style="margin: 0; color: #285675;">
+    <h3 style="margin: 0; color: #e7f5f5;">
         📐 Engineering Concept Brief
     </h3>
-    <p style="margin: 5px 0 0 0; color: #648093; font-size: 13px;">
+    <p style="margin: 5px 0 0 0; color: #a8c2ca; font-size: 13px;">
         Project scope, selected systems and engineering review status.
     </p>
 </div>
@@ -1303,27 +1143,27 @@ fig3d.update_layout(
         font=dict(
             family="Arial",
             size=22,
-            color="#285675"
+            color="#e7f5f5"
         )
     ),
     height=760,
     margin=dict(l=15, r=15, t=100, b=75),
 
-    paper_bgcolor="#f2f8fc",
-    plot_bgcolor="#f2f8fc",
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(0,0,0,0)",
 
     scene=dict(
-    bgcolor="#eaf4fa",
+    bgcolor="#0b2435",
 
         xaxis=dict(
             title="",
             range=[0, 100],
             showbackground=True,
-            backgroundcolor="#f5faff",
-            gridcolor="#d5e4ed",
-            zerolinecolor="#9bb8c8",
+            backgroundcolor="#102b3c",
+            gridcolor="rgba(130,190,199,.25)",
+            zerolinecolor="rgba(130,190,199,.45)",
             showspikes=False,
-            color="#52768b",
+            color="#b8d1d5",
             tickfont=dict(size=10),
             nticks=6
         ),
@@ -1332,11 +1172,11 @@ fig3d.update_layout(
             title="",
             range=[0, 70],
             showbackground=True,
-            backgroundcolor="#f5faff",
-            gridcolor="#d5e4ed",
-            zerolinecolor="#9bb8c8",
+            backgroundcolor="#102b3c",
+            gridcolor="rgba(130,190,199,.25)",
+            zerolinecolor="rgba(130,190,199,.45)",
             showspikes=False,
-            color="#52768b",
+            color="#b8d1d5",
             tickfont=dict(size=10),
             nticks=5
         ),
@@ -1345,11 +1185,11 @@ fig3d.update_layout(
             title="",
             range=[0, 10],
             showbackground=True,
-            backgroundcolor="#f5faff",
-            gridcolor="#d5e4ed",
-            zerolinecolor="#9bb8c8",
+            backgroundcolor="#102b3c",
+            gridcolor="rgba(130,190,199,.25)",
+            zerolinecolor="rgba(130,190,199,.45)",
             showspikes=False,
-            color="#52768b",
+            color="#b8d1d5",
             tickfont=dict(size=10),
             nticks=5
         ),
@@ -1389,7 +1229,7 @@ fig3d.update_layout(
         title=dict(
             text="DESIGN COMPONENTS",
             font=dict(
-                color="#285675",
+                color="#e7f5f5",
                 size=11
             )
         ),
@@ -1399,23 +1239,23 @@ fig3d.update_layout(
         xanchor="center",
         x=0.5,
         font=dict(
-            color="#285675",
+            color="#e7f5f5",
             size=10
         ),
-        bgcolor="rgba(255,255,255,0.95)",
-        bordercolor="#cbdfe9",
+        bgcolor="rgba(12,35,51,0.98)",
+        bordercolor="rgba(130,190,199,0.35)",
         borderwidth=1,
         itemsizing="constant"
     ),
 
     font=dict(
         family="Arial",
-        color="#285675"
+        color="#e7f5f5"
     ),
 
     hoverlabel=dict(
-        bgcolor="#ffffff",
-        bordercolor="#9bcbdc",
+        bgcolor="#102b3c",
+        bordercolor="rgba(130,190,199,.4)",
         font=dict(
             color="#ffffff",
             size=12
@@ -1454,14 +1294,14 @@ st.markdown("""
     margin-top: 30px;
     margin-bottom: 18px;
     padding: 17px 21px;
-    background: linear-gradient(105deg, #e4f1ff, #e5f7ef);
-    border: 1px solid #d0e5e9;
+    background: linear-gradient(120deg, rgba(13,43,60,.98), rgba(10,61,67,.96));
+    border: 1px solid rgba(130,190,199,.28);
     border-radius: 14px;
 ">
-    <h3 style="margin: 0; color: #285675;">
+    <h3 style="margin: 0; color: #e7f5f5;">
         🧠 Live Design Intelligence
     </h3>
-    <p style="margin: 5px 0 0 0; color: #648093; font-size: 13px;">
+    <p style="margin: 5px 0 0 0; color: #a8c2ca; font-size: 13px;">
         Real-time overview of your selected design configuration.
     </p>
 </div>
@@ -1711,14 +1551,14 @@ st.markdown("""
     margin-top: 30px;
     margin-bottom: 18px;
     padding: 17px 21px;
-    background: linear-gradient(105deg, #e5f2ff, #e8f8ef);
-    border: 1px solid #d1e6e9;
+    background: linear-gradient(120deg, rgba(13,43,60,.98), rgba(10,61,67,.96));
+    border: 1px solid rgba(130,190,199,.28);
     border-radius: 14px;
 ">
-    <h3 style="margin: 0; color: #285675;">
+    <h3 style="margin: 0; color: #e7f5f5;">
         🏗️ Flood-Management Design Overview
     </h3>
-    <p style="margin: 5px 0 0 0; color: #648093; font-size: 13px;">
+    <p style="margin: 5px 0 0 0; color: #a8c2ca; font-size: 13px;">
         Summary of the mitigation systems included in this concept design.
     </p>
 </div>
@@ -1818,14 +1658,14 @@ st.markdown("""
     margin-top: 32px;
     margin-bottom: 20px;
     padding: 20px 23px;
-    background: linear-gradient(105deg, #dfefff, #e3f6ed);
-    border: 1px solid #cbdfe9;
+    background: linear-gradient(120deg, rgba(13,43,60,.98), rgba(10,61,67,.96));
+    border: 1px solid rgba(130,190,199,.28);
     border-radius: 16px;
 ">
-    <h2 style="margin: 0; color: #285675;">
+    <h2 style="margin: 0; color: #e7f5f5;">
         📄 Project Design Report
     </h2>
-    <p style="margin: 6px 0 0 0; color: #648093; font-size: 13px;">
+    <p style="margin: 6px 0 0 0; color: #a8c2ca; font-size: 13px;">
         Downloadable project configuration, component estimates and engineering limitations.
     </p>
 </div>
