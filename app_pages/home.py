@@ -105,6 +105,26 @@ st.markdown(
       .ar-work-card { transition: none; }
       .ar-work-card:hover { transform: none; }
     }
+    
+    .stApp { background: transparent !important; }
+    .ar-home-hero {
+      background:
+        radial-gradient(ellipse at 82% 30%, rgba(72, 228, 199, .18), transparent 23rem),
+        linear-gradient(122deg, #061a2a 0%, #0b4054 56%, #087e78 100%) !important;
+      border: 1px solid rgba(112, 226, 207, .28);
+      box-shadow: 0 24px 65px rgba(0,0,0,.32);
+    }
+    .ar-home-kicker, .ar-section-kicker { color: #68e8d1 !important; }
+    .ar-work-card {
+      background: linear-gradient(150deg, rgba(17,49,66,.96), rgba(9,31,46,.96)) !important;
+      border: 1px solid rgba(130,190,199,.24) !important;
+      box-shadow: 0 14px 34px rgba(0,0,0,.20) !important;
+    }
+    .ar-work-card:hover { border-color: rgba(87,229,203,.65) !important; box-shadow: 0 18px 40px rgba(0,0,0,.30) !important; }
+    .ar-work-title { color: #effafa !important; }
+    .ar-work-copy { color: #b6d0d4 !important; }
+    [data-testid="stMetric"] { background: linear-gradient(145deg, #12364a, #0a2638) !important; }
+
     </style>
     """,
     unsafe_allow_html=True,
