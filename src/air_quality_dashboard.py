@@ -27,12 +27,17 @@ POLLUTANTS: dict[str, dict[str, Any]] = {
         "precautions": "When ozone is elevated, reduce strenuous outdoor activity and consider exercising at a time when levels are lower. Follow official air-quality advisories."},
 }
 
+def _safe_text(value: Any) -> str:
+    if value is None or pd.isna(value):
+        return ""
+    return str(value).strip()
+
 def _normalise_unit(value: Any) -> str:
-    return str(value or "").strip().casefold().replace("μ", "u").replace("µ", "u").replace("³", "3").replace(" ", "")
+    return _safe_text(value).casefold().replace("μ", "u").replace("µ", "u").replace("³", "3").replace(" ", "")
 
 def period_matches(actual: Any, expected: str) -> bool:
     """Match only explicit 8-hour or 24-hour averaging-period labels."""
-    text = str(actual or "").strip().casefold().replace("_", "-")
+    text = _safe_text(actual).casefold().replace("_", "-")
     if expected == "24-hour":
         return bool(re.search(r"(?:24\s*[- ]?hour|24\s*h(?:r|rs)?)", text))
     if expected == "8-hour":
@@ -50,7 +55,7 @@ def classify_reference(value: Any, averaging_period: Any, quality_flag: Any, pol
         return "unavailable", "No numeric observation"
     if not pd.notna(numeric) or numeric < 0:
         return "unavailable", "No valid numeric observation"
-    if str(quality_flag or "").strip().casefold() != "valid":
+    if _safe_text(quality_flag).casefold() != "valid":
         return "unavailable", "Measurement quality is not marked valid"
     if not period_matches(averaging_period, spec["period"]):
         return "unavailable", f"Needs a {spec['period']} observation"
@@ -80,7 +85,7 @@ def _render_pollutant_card(name: str, spec: dict[str, Any], row: dict[str, Any] 
         st.caption("No dated observation in the currently loaded extracts.")
         return
     value = pd.to_numeric(pd.Series([row.get("value")]), errors="coerce").iloc[0]
-    unit = str(row.get("unit") or spec["unit"])
+    unit = _safe_text(row.get("unit")) or spec["unit"]
     status, label = classify_reference(value, row.get("averaging_period"), row.get("quality_flag"), name, unit)
     st.metric(name, f"{value:g} {unit}" if pd.notna(value) else "No numeric value")
     if status == "within":
@@ -144,11 +149,11 @@ def render_air_pollution_intelligence(observations: pd.DataFrame, industrial_csv
     else:
         st.info(f"No facility-specific measured stack-emission results are verified for {choice}. The facilities below are Edayar candidates for further investigation, not confirmed sources.")
         for _, facility in facilities.iterrows():
-            name = str(facility.get("official_name") or facility.get("facility_name_as_published") or "Unnamed candidate")
-            industry = str(facility.get("industry_type_as_individually_documented") or "Industry process not individually documented")
-            address = str(facility.get("address_as_published") or "Facility address not recorded")
-            evidence = str(facility.get("measured_emissions_status") or "unavailable")
-            url = str(facility.get("source_url") or "").strip()
+            name = _safe_text(facility.get("official_name")) or _safe_text(facility.get("facility_name_as_published")) or "Unnamed candidate"
+            industry = _safe_text(facility.get("industry_type_as_individually_documented")) or "Industry process not individually documented"
+            address = _safe_text(facility.get("address_as_published")) or "Facility address not recorded"
+            evidence = _safe_text(facility.get("measured_emissions_status")) or "unavailable"
+            url = _safe_text(facility.get("source_url"))
             with st.expander(name):
                 st.write(industry)
                 st.caption(address)
