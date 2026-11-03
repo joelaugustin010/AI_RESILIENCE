@@ -1,166 +1,223 @@
-"""Evidence-aware pollutant, CO2 and industrial-source dashboard components."""
-from __future__ import annotations
-import re
-from pathlib import Path
-from typing import Any
-import pandas as pd
-import streamlit as st
+"""Pure helpers for the compact air-quality dashboard."""
 
-POLLUTANTS: dict[str, dict[str, Any]] = {
-    "PM2.5": {"aliases": {"PM2.5", "PM2_5"}, "unit": "µg/m³", "limit": 60.0, "period": "24-hour",
-        "health": "Fine particles can travel deep into the lungs. Exposure is associated with worsened asthma and other respiratory symptoms, and increased cardiovascular risk, especially with repeated exposure.",
-        "precautions": "When levels are elevated, reduce prolonged strenuous outdoor activity, avoid smoky or dusty areas, and follow local health advisories. People with heart or lung conditions should follow their clinician's advice."},
-    "PM10": {"aliases": {"PM10"}, "unit": "µg/m³", "limit": 100.0, "period": "24-hour",
-        "health": "Inhalable particles can irritate the nose, throat and airways and may worsen asthma or other breathing problems.",
-        "precautions": "Limit time near road dust, construction and dusty industrial areas. Reduce strenuous outdoor activity during elevated episodes."},
-    "NO₂": {"aliases": {"NO2"}, "unit": "µg/m³", "limit": 80.0, "period": "24-hour",
-        "health": "Nitrogen dioxide irritates airways and can worsen asthma and other respiratory conditions. It is commonly associated with fuel combustion.",
-        "precautions": "Avoid prolonged strenuous activity beside busy roads or visible combustion plumes when levels are elevated. Follow official local advisories."},
-    "SO₂": {"aliases": {"SO2"}, "unit": "µg/m³", "limit": 80.0, "period": "24-hour",
-        "health": "Sulphur dioxide can irritate the respiratory system and trigger breathing symptoms. People with asthma may be particularly sensitive.",
-        "precautions": "Move away from suspected smoke or industrial plumes, reduce strenuous outdoor activity during elevated episodes, and follow prescribed asthma action plans."},
-    "CO": {"aliases": {"CO"}, "unit": "mg/m³", "limit": 2.0, "period": "8-hour",
-        "health": "Carbon monoxide reduces the blood's ability to carry oxygen. High exposure can be dangerous. It is colourless and odourless.",
-        "precautions": "Never rely on smell to detect carbon monoxide. If a CO alarm sounds or exposure is suspected, move to fresh air and contact emergency services."},
-    "O₃": {"aliases": {"O3"}, "unit": "µg/m³", "limit": 100.0, "period": "8-hour",
-        "health": "Ground-level ozone can irritate the lungs, cause coughing or discomfort, and worsen respiratory conditions. It is different from the protective ozone layer high in the atmosphere.",
-        "precautions": "When ozone is elevated, reduce strenuous outdoor activity and consider exercising at a time when levels are lower. Follow official air-quality advisories."},
+from __future__ import annotations
+
+import math
+import re
+
+import pandas as pd
+
+
+POLLUTANT_GUIDELINES = {
+    "PM2.5": {"limit": 15.0, "unit": "µg/m³", "averaging": "24-hour", "source": "WHO 2021 air-quality guideline"},
+    "PM10": {"limit": 45.0, "unit": "µg/m³", "averaging": "24-hour", "source": "WHO 2021 air-quality guideline"},
+    "NO2": {"limit": 25.0, "unit": "µg/m³", "averaging": "24-hour", "source": "WHO 2021 air-quality guideline"},
+    "SO2": {"limit": 40.0, "unit": "µg/m³", "averaging": "24-hour", "source": "WHO 2021 air-quality guideline"},
+    "O3": {"limit": 100.0, "unit": "µg/m³", "averaging": "8-hour", "source": "WHO 2021 air-quality guideline"},
+    "CO": {"limit": 4000.0, "unit": "µg/m³", "averaging": "24-hour", "source": "WHO 2021 air-quality guideline (4 mg/m³)"},
 }
 
-def _safe_text(value: Any) -> str:
-    if value is None or pd.isna(value):
-        return ""
-    return str(value).strip()
+_LEGACY_REFERENCE_LIMITS = {
+    "PM2.5": (60.0, "µg/m³", "24-hour"),
+    "PM10": (100.0, "µg/m³", "24-hour"),
+    "NO2": (80.0, "µg/m³", "24-hour"),
+    "SO2": (80.0, "µg/m³", "24-hour"),
+    "CO": (2.0, "mg/m³", "8-hour"),
+    "O3": (100.0, "µg/m³", "8-hour"),
+}
 
-def _normalise_unit(value: Any) -> str:
-    return _safe_text(value).casefold().replace("μ", "u").replace("µ", "u").replace("³", "3").replace(" ", "")
 
-def period_matches(actual: Any, expected: str) -> bool:
-    """Match only explicit 8-hour or 24-hour averaging-period labels."""
-    text = _safe_text(actual).casefold().replace("_", "-")
+def period_matches(actual: object, expected: str) -> bool:
+    """Keep the original explicit averaging-period helper for existing callers."""
+    text = str(actual or "").casefold().replace("_", "-")
     if expected == "24-hour":
         return bool(re.search(r"(?:24\s*[- ]?hour|24\s*h(?:r|rs)?)", text))
     if expected == "8-hour":
         return bool(re.search(r"(?:8\s*[- ]?hour|8\s*h(?:r|rs)?)", text))
     return False
 
-def classify_reference(value: Any, averaging_period: Any, quality_flag: Any, pollutant: str, unit: Any) -> tuple[str, str]:
-    """Compare only numeric, QA-valid observations with matching period and unit."""
-    spec = POLLUTANTS.get(pollutant)
-    if spec is None:
+
+def classify_reference(
+    value: object,
+    averaging_period: object,
+    quality_flag: object,
+    pollutant: str,
+    unit: object,
+) -> tuple[str, str]:
+    """Compatibility wrapper for the pre-live-feed dashboard test/API."""
+    key = str(pollutant).replace("₂", "2").replace("₃", "3")
+    reference = _LEGACY_REFERENCE_LIMITS.get(key)
+    if reference is None:
         return "unavailable", "No reference configured"
+    limit, expected_unit, expected_period = reference
     try:
         numeric = float(value)
     except (TypeError, ValueError):
         return "unavailable", "No numeric observation"
-    if not pd.notna(numeric) or numeric < 0:
+    if not math.isfinite(numeric) or numeric < 0:
         return "unavailable", "No valid numeric observation"
-    if _safe_text(quality_flag).casefold() != "valid":
+    if str(quality_flag or "").casefold() != "valid":
         return "unavailable", "Measurement quality is not marked valid"
-    if not period_matches(averaging_period, spec["period"]):
-        return "unavailable", f"Needs a {spec['period']} observation"
-    if _normalise_unit(unit) != _normalise_unit(spec["unit"]):
-        return "unavailable", f"Unit must be {spec['unit']}"
-    if numeric <= spec["limit"]:
-        return "within", f"Within CPCB {spec['period']} standard"
-    return "above", f"Above CPCB {spec['period']} standard"
+    normalized_unit = (
+        str(unit or "")
+        .casefold()
+        .replace("μ", "u")
+        .replace("µ", "u")
+        .replace("³", "3")
+        .replace(" ", "")
+    )
+    expected_normalized_unit = (
+        expected_unit.casefold()
+        .replace("μ", "u")
+        .replace("µ", "u")
+        .replace("³", "3")
+        .replace(" ", "")
+    )
+    if normalized_unit != expected_normalized_unit:
+        return "unavailable", f"Unit must be {expected_unit}"
+    if not period_matches(averaging_period, expected_period):
+        return "unavailable", f"Needs a {expected_period} observation"
+    if numeric <= limit:
+        return "within", f"Within CPCB {expected_period} standard"
+    return "above", f"Above CPCB {expected_period} standard"
 
-def _latest_rows(observations: pd.DataFrame) -> dict[str, dict[str, Any]]:
-    required = {"pollutant", "observed_at", "value"}
-    if observations.empty or not required.issubset(observations.columns):
-        return {}
-    data = observations.copy()
-    data["_date"] = pd.to_datetime(data["observed_at"], errors="coerce")
-    data = data.loc[data["_date"].notna()].sort_values("_date")
-    result: dict[str, dict[str, Any]] = {}
-    for label, spec in POLLUTANTS.items():
-        rows = data.loc[data["pollutant"].astype(str).str.upper().isin({str(x).upper() for x in spec["aliases"]})]
-        if not rows.empty:
-            result[label] = rows.iloc[-1].to_dict()
-    return result
+HEALTH_INFORMATION = {
+    "PM2.5": {
+        "summary": "Fine particles can reach deep into the lungs and may enter the bloodstream.",
+        "effects": "Higher or prolonged exposure can aggravate asthma and is associated with respiratory and cardiovascular effects. Effects depend on concentration, duration and individual sensitivity.",
+        "sensitive": "Children, older adults, pregnant people, and people with heart or lung disease may be more sensitive.",
+        "precautions": "Reduce strenuous outdoor activity when levels are elevated, keep windows closed during peaks, and use a well-fitted respirator if exposure cannot be avoided.",
+        "sources": "Traffic, combustion, industry, generators and fuel burning.",
+    },
+    "PM10": {
+        "summary": "Coarser particles can irritate the nose, throat and airways and reduce visibility.",
+        "effects": "Elevated exposure may worsen coughing, wheezing and other breathing symptoms, especially for sensitive people.",
+        "sensitive": "People with asthma or other respiratory disease, children and older adults.",
+        "precautions": "Limit dusty outdoor activity, avoid road/construction dust, and keep indoor spaces clean and ventilated away from peak dust.",
+        "sources": "Road dust, construction, resuspended soil and industrial handling.",
+    },
+    "NO2": {
+        "summary": "Nitrogen dioxide irritates airways and participates in the formation of secondary particles and ozone.",
+        "effects": "Short-term peaks can worsen respiratory symptoms and reduce lung function in susceptible people.",
+        "sensitive": "People with asthma, children and people with chronic lung disease.",
+        "precautions": "Avoid heavy traffic corridors during peaks and reduce indoor combustion from unvented stoves or generators.",
+        "sources": "Vehicle exhaust, generators, boilers and industrial combustion.",
+    },
+    "SO2": {
+        "summary": "Sulphur dioxide can constrict and irritate the airways.",
+        "effects": "Elevated exposure may trigger coughing, wheezing and asthma symptoms; effects vary with concentration and duration.",
+        "sensitive": "People with asthma and other breathing conditions, children and older adults.",
+        "precautions": "Move indoors away from the plume, avoid strenuous activity during peaks, and follow an existing asthma action plan.",
+        "sources": "Sulphur-containing fuels, boilers, generators and industrial processes.",
+    },
+    "CO": {
+        "summary": "Carbon monoxide reduces the blood's ability to carry oxygen.",
+        "effects": "High exposure can cause headache, dizziness, confusion or loss of consciousness and can be life-threatening.",
+        "sensitive": "Fetuses, infants, older adults, and people with heart or blood disorders.",
+        "precautions": "Never use generators, charcoal appliances or vehicle engines in enclosed spaces. Leave suspected exposure immediately and contact emergency services.",
+        "sources": "Incomplete combustion from engines, generators, biomass, charcoal and fuel-burning equipment.",
+    },
+    "O3": {
+        "summary": "Ground-level ozone is a reactive pollutant formed when NOx and volatile organic compounds react in sunlight; it is different from the protective ozone layer.",
+        "effects": "It can irritate the lungs and cause coughing, chest discomfort or breathing difficulty, especially during prolonged outdoor activity.",
+        "sensitive": "Children, outdoor workers, people with asthma and people with chronic lung disease.",
+        "precautions": "Plan strenuous outdoor activity away from afternoon peaks and reduce exposure on sunny, stagnant days.",
+        "sources": "Usually a secondary pollutant formed downwind from traffic, industry and solvent emissions; a factory should not be treated as a direct ozone source without evidence.",
+    },
+}
 
-def _render_pollutant_card(name: str, spec: dict[str, Any], row: dict[str, Any] | None) -> None:
-    if row is None:
-        st.markdown(f"**{name}**")
-        st.caption("No dated observation in the currently loaded extracts.")
-        return
-    value = pd.to_numeric(pd.Series([row.get("value")]), errors="coerce").iloc[0]
-    unit = _safe_text(row.get("unit")) or spec["unit"]
-    status, label = classify_reference(value, row.get("averaging_period"), row.get("quality_flag"), name, unit)
-    st.metric(name, f"{value:g} {unit}" if pd.notna(value) else "No numeric value")
-    if status == "within":
-        st.success(label)
-    elif status == "above":
-        st.warning(label)
-    else:
-        st.info("Reference comparison not available")
-        st.caption(label)
-    st.caption(f"Observation date: {row.get('observed_at', 'Not recorded')}")
-    with st.expander(f"Why {name} matters · Precautions"):
-        st.write(spec["health"])
-        st.markdown("**What people can do**")
-        st.write(spec["precautions"])
-        st.caption(f"CPCB reference: {spec['period']} value {spec['limit']:g} {spec['unit']}. Comparison requires matching source period, unit and QA.")
 
-def render_air_pollution_intelligence(observations: pd.DataFrame, industrial_csv: Path) -> None:
-    """Render the compact pollutant, CO2 and industrial-source intelligence area."""
-    st.markdown("## Air Quality & CO₂ Intelligence")
-    st.caption("Interpretation of acquired observations. Historical day-level reports are not presented as live or hourly measurements.")
-    st.markdown("### CO₂ Intelligence")
-    left, right = st.columns([1, 2])
-    with left:
-        st.metric("Outdoor CO₂", "Unavailable", help="No verified ambient CO₂ observation is currently connected.")
-        st.caption("Unit: ppm · No measurement source loaded")
-    with right:
-        st.info("CO₂ monitoring is not yet connected to a verified local observation source. No demonstration value is substituted.")
-        st.markdown("**Why CO₂ matters:** Outdoor carbon dioxide is important mainly because it accumulates in the atmosphere and strengthens the greenhouse effect. An ordinary outdoor concentration reading is not an AQI value or an immediate-poisoning warning.")
-    with st.expander("CO₂ details, sources and actions"):
-        st.markdown("- **Ambient concentration:** parts per million (ppm).\n- **Emissions:** a separate quantity, usually mass such as tonnes of CO₂.\n- **Common sources:** fossil-fuel combustion for electricity, industry and transport, plus land-use and natural processes.\n- **Climate significance:** sustained increases in atmospheric CO₂ contribute to long-term global warming.\n- **Actions:** improve energy efficiency, use lower-carbon electricity and fuels, reduce avoidable fuel use, and monitor industrial greenhouse-gas emissions.")
-        st.caption("Ambient ppm cannot be converted directly into a factory's tonnes of emissions or a person's carbon footprint. Indoor ventilation guidance is not applied to outdoor air.")
-    st.markdown("### Pollutant levels")
-    st.caption("Green means the observation meets the stated CPCB reference; yellow means it is above that reference. If period, units or source QA are insufficient, no traffic-light judgement is shown.")
-    latest = _latest_rows(observations)
-    cols = st.columns(3)
-    for index, (name, spec) in enumerate(POLLUTANTS.items()):
-        with cols[index % 3]:
-            _render_pollutant_card(name, spec, latest.get(name))
-    if not observations.empty:
-        chart = observations.copy()
-        chart["value"] = pd.to_numeric(chart["value"], errors="coerce")
-        chart["observed_at"] = pd.to_datetime(chart["observed_at"], errors="coerce")
-        chart = chart.loc[chart["value"].notna() & chart["observed_at"].notna()]
-        if not chart.empty:
-            st.markdown("### Historical pollutant trends")
-            st.caption("The loaded Eloor extracts have day-level dates, not verified hourly timestamps.")
-            options = sorted(chart["pollutant"].dropna().astype(str).unique().tolist())
-            selected = st.selectbox("Choose a pollutant trend", options, key="air_intelligence_trend")
-            selected_rows = chart.loc[chart["pollutant"].astype(str).eq(selected)]
-            if not selected_rows.empty:
-                st.line_chart(selected_rows.set_index("observed_at")["value"].sort_index(), y_label=str(selected_rows.iloc[-1].get("unit") or "Source unit"))
-    st.markdown("### Industrial pollution sources")
-    st.caption("Facility cards are research leads, not proof that a facility caused a monitoring-station reading.")
-    choice = st.selectbox("Investigate a pollutant", ["PM2.5", "PM10", "NO₂", "SO₂", "CO", "O₃", "CO₂"], key="air_intelligence_source_pollutant")
+def compare_pollutant(pollutant: str, value: object, unit: str, *, averaging_period: str) -> dict[str, object]:
+    """Compare only like units and averaging periods; otherwise refuse assessment."""
+    guideline = POLLUTANT_GUIDELINES.get(pollutant)
+    if guideline is None:
+        return {"status": "Cannot assess", "reason": "No selected reference limit is available."}
     try:
-        facilities = pd.read_csv(industrial_csv)
-    except (OSError, pd.errors.ParserError, UnicodeDecodeError):
-        facilities = pd.DataFrame()
-    if facilities.empty:
-        st.info("The reviewed industrial-facility inventory is unavailable.")
+        parsed = float(value)
+    except (TypeError, ValueError):
+        parsed = math.nan
+    if not math.isfinite(parsed):
+        return {"status": "Cannot assess", "reason": "The measurement is missing or invalid."}
+    if unit.replace("μ", "µ") != guideline["unit"]:
+        return {"status": "Cannot assess", "reason": "The measurement unit does not match the reference unit."}
+    if averaging_period != guideline["averaging"]:
+        return {"status": "Cannot assess", "reason": f"The reading is {averaging_period}; the reference is {guideline['averaging']}."}
+    ratio = parsed / guideline["limit"]
+    status = "Within reference" if ratio <= 1 else "Approaching or exceeding" if ratio <= 1.5 else "Substantially exceeds"
+    return {"status": status, "difference": parsed - guideline["limit"], "ratio": ratio, "reason": guideline["source"]}
+
+
+def assess_pollutant(pollutant: str, current_value: object, unit: str, hourly: pd.DataFrame) -> dict[str, object]:
+    """Assess an hourly model feed using a compatible trailing mean window."""
+    guideline = POLLUTANT_GUIDELINES.get(pollutant)
+    if guideline is None:
+        return {"status": "Reference unavailable", "color": "#64748b", "reason": "No compatible health reference is configured."}
+    window_hours = 8 if guideline["averaging"] == "8-hour" else 24
+    series = hourly.loc[hourly.get("pollutant", pd.Series(dtype=str)).eq(pollutant), ["observed_at", "value"]].copy()
+    if series.empty:
+        return {"status": "Reading available", "color": "#64748b", "reason": f"The selected reference uses a {guideline['averaging']} average; this window is unavailable."}
+    series["observed_at"] = pd.to_datetime(series["observed_at"], utc=True, errors="coerce")
+    series["value"] = pd.to_numeric(series["value"], errors="coerce")
+    series = series.dropna().sort_values("observed_at").tail(window_hours)
+    if len(series) < window_hours * 0.75:
+        return {"status": "Reading available", "color": "#64748b", "reason": f"A complete {guideline['averaging']} average is not available."}
+    assessed = float(series["value"].mean())
+    ratio = assessed / guideline["limit"]
+    if ratio <= 1:
+        status, color = "Within WHO health guideline", "#198754"
+    elif ratio <= 1.25:
+        status, color = "Elevated", "#d6a700"
+    elif ratio <= 2:
+        status, color = "High — take extra care", "#e67e22"
     else:
-        st.info(f"No facility-specific measured stack-emission results are verified for {choice}. The facilities below are Edayar candidates for further investigation, not confirmed sources.")
-        for _, facility in facilities.iterrows():
-            name = _safe_text(facility.get("official_name")) or _safe_text(facility.get("facility_name_as_published")) or "Unnamed candidate"
-            industry = _safe_text(facility.get("industry_type_as_individually_documented")) or "Industry process not individually documented"
-            address = _safe_text(facility.get("address_as_published")) or "Facility address not recorded"
-            evidence = _safe_text(facility.get("measured_emissions_status")) or "unavailable"
-            url = _safe_text(facility.get("source_url"))
-            with st.expander(name):
-                st.write(industry)
-                st.caption(address)
-                st.caption(f"Measured stack-emission evidence: {evidence}")
-                st.warning("Candidate facility only — no causal link to the selected ambient pollutant is established.")
-                if url.startswith("https://"):
-                    st.markdown(f"[Open facility inventory source]({url})")
-    with st.expander("Data sources and limitations"):
-        st.markdown("- **KSPCB Eloor monthly reports:** historical day-level observations; exact averaging intervals and row-level QA are not established for every record.\n- **KSPCB daily AQI extracts:** dated historical reports, not a live feed.\n- **Industrial inventory:** facility identity/process leads and consent context; measured stack emissions and source attribution are not established.\n- **CO₂:** no verified local ambient CO₂ series is connected.")
-        st.caption("Original source files and timestamps are retained. Missing data are not filled, historical values are not labelled live, and no factory is blamed without evidence.")
+        status, color = "Very high — reduce exposure", "#dc3545"
+    return {"status": status, "color": color, "assessed_value": assessed, "ratio": ratio,
+            "difference": assessed - guideline["limit"], "window": f"trailing {window_hours}-hour mean",
+            "reason": guideline["source"]}
+
+
+def co2_context(value: object, *, verified: bool = False) -> dict[str, str]:
+    """Provide context, never an indoor safety classification, for outdoor CO2."""
+    try:
+        parsed = float(value)
+    except (TypeError, ValueError):
+        return {"status": "Unavailable", "color": "#64748b", "note": "No valid CO₂ measurement is available."}
+    if not math.isfinite(parsed):
+        return {"status": "Unavailable", "color": "#64748b", "note": "No valid CO₂ measurement is available."}
+    return {"status": "Outdoor context only", "color": "#198754" if parsed <= 500 else "#d6a700",
+            "note": "Not an indoor ventilation limit or AQI input; the value is modelled and not a verified station observation." if not verified else "Outdoor ambient context; not an indoor ventilation limit or AQI input."}
+
+
+def aggregate_co2_trend(observations: pd.DataFrame, period: str) -> pd.DataFrame:
+    """Aggregate only returned CO₂ observations; missing periods stay missing."""
+    if period not in {"hourly", "daily", "weekly", "monthly"}:
+        raise ValueError(f"Unsupported CO₂ trend period: {period}")
+    if observations.empty or not {"observed_at", "value"}.issubset(observations.columns):
+        return pd.DataFrame(columns=["observed_at", "value", "minimum", "maximum", "observations"])
+    frame = observations.copy()
+    if "pollutant" in frame.columns:
+        frame = frame.loc[frame["pollutant"].eq("CO2")]
+    frame["observed_at"] = pd.to_datetime(frame["observed_at"], utc=True, errors="coerce")
+    frame["value"] = pd.to_numeric(frame["value"], errors="coerce")
+    frame = frame.dropna(subset=["observed_at", "value"]).sort_values("observed_at")
+    if frame.empty:
+        return pd.DataFrame(columns=["observed_at", "value", "minimum", "maximum", "average", "observations"])
+    if period == "hourly":
+        frame["period"] = frame["observed_at"].dt.floor("h")
+    elif period == "daily":
+        frame["period"] = frame["observed_at"].dt.floor("D")
+    elif period == "weekly":
+        frame["period"] = frame["observed_at"].dt.to_period("W").dt.start_time.dt.tz_localize("UTC")
+    elif period == "monthly":
+        frame["period"] = frame["observed_at"].dt.to_period("M").dt.start_time.dt.tz_localize("UTC")
+    grouped = frame.groupby("period")["value"]
+    result = grouped.agg(["mean", "min", "max", "count"]).reset_index()
+    return result.rename(columns={"period": "observed_at", "mean": "value", "min": "minimum", "max": "maximum", "count": "observations"})
+
+
+def evidence_category(*, measured_facility_emissions: bool = False, documented_facility_presence: bool = False) -> str:
+    if measured_facility_emissions:
+        return "Confirmed emissions evidence"
+    if documented_facility_presence:
+        return "Documented potential contributor"
+    return "Insufficient evidence"
