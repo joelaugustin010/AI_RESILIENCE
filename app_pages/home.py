@@ -146,7 +146,7 @@ for col, (icon, title, description, path, page_icon) in zip(cols, primary):
             f'<div class="ar-work-title">{title}</div><div class="ar-work-copy">{description}</div></div>',
             unsafe_allow_html=True,
         )
-        st.page_link(path, label=f"Open {title}", icon=page_icon, use_container_width=True)
+        st.page_link(path, label=f"Open {title}", icon=page_icon, width="stretch")
 
 st.markdown('<div class="ar-section-kicker" style="margin-top:1.4rem">Research and planning tools</div>', unsafe_allow_html=True)
 st.subheader("Explore the workspaces")
@@ -167,7 +167,7 @@ for i in range(0, len(tools), 4):
             with st.container(border=True):
                 st.markdown(f"#### {title}")
                 st.caption(description)
-                st.page_link(path, label="Open workspace", icon=icon, use_container_width=True)
+                st.page_link(path, label="Open workspace", icon=icon, width="stretch")
 
 st.divider()
 st.markdown('<div class="ar-section-kicker">Trust and readiness</div>', unsafe_allow_html=True)

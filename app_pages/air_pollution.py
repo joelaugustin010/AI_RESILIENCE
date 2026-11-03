@@ -499,7 +499,7 @@ def render_live_air_quality() -> None:
         points = alt.Chart(chart_data.loc[chart_data["is_unusual"]]).mark_point(size=90, filled=True, color="#b91c1c").encode(
             x="observed_at:T", y="value:Q", tooltip=[alt.Tooltip("observed_at:T", title="Observed (UTC)"), alt.Tooltip("pollutant:N", title="Pollutant"), alt.Tooltip("value:Q", title="Value", format=".2f")]
         )
-        st.altair_chart(lines + points, use_container_width=True)
+        st.altair_chart(lines + points, width="stretch")
     elif not chart_data.empty:
         st.line_chart(chart_data.pivot_table(index="observed_at", columns="pollutant", values="value", aggfunc="last").tail(24))
     else:
@@ -651,7 +651,7 @@ def _render_co2_intelligence(live: dict) -> None:
                     y=alt.Y("value:Q", title="CO₂ concentration (ppm)"),
                     tooltip=[alt.Tooltip("observed_at:T", title="Period (UTC)"), alt.Tooltip("value:Q", title="Average ppm", format=".1f"), alt.Tooltip("minimum:Q", title="Minimum", format=".1f"), alt.Tooltip("maximum:Q", title="Maximum", format=".1f"), alt.Tooltip("observations:Q", title="Returned observations")],
                 ).properties(height=260)
-                st.altair_chart(co2_chart, use_container_width=True)
+                st.altair_chart(co2_chart, width="stretch")
             else:
                 st.line_chart(trend.set_index("observed_at")[["value"]])
             st.caption("Only returned timestamps up to the latest current timestamp are included; forecast values, empty periods and missing observations are not shown as measured data.")
@@ -730,7 +730,7 @@ def _render_compact_dashboard() -> None:
                 "Reference": f'{guide["limit"]:g} {guide["unit"]} ({guide["averaging"]})' if guide else "Unavailable",
                 "Status": assessment["status"] if item else "Unavailable",
             })
-        display_dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True, alt="Live pollutant readings and reference status")
+        display_dataframe(pd.DataFrame(rows), hide_index=True, width="stretch", alt="Live pollutant readings and reference status")
     else:
         item = current.get(selected)
         guide = POLLUTANT_GUIDELINES.get(selected)
@@ -824,7 +824,7 @@ def _render_compact_dashboard() -> None:
         if not daily_aqi.empty:
             st.caption("Historical KSPCB station extract — not live and not a model estimate.")
             columns = [c for c in ("station", "observed_at", "source_aqi", "PM2.5_value", "PM10_value", "NO2_value", "SO2_value", "CO_value", "O3_value") if c in daily_aqi.columns]
-            display_dataframe(daily_aqi[columns].head(20), hide_index=True, use_container_width=True, alt="Historical KSPCB station AQI and pollutant values")
+            display_dataframe(daily_aqi[columns].head(20), hide_index=True, width="stretch", alt="Historical KSPCB station AQI and pollutant values")
         else:
             st.info("Historical KSPCB station data is unavailable.")
 
@@ -852,7 +852,7 @@ def _render_compact_dashboard() -> None:
             with st.expander("Reviewed source register", expanded=False):
                 source_rows = [{key: source.get(key) for key in ("id", "publisher", "status", "reviewed_on")} for source in sources if isinstance(source, dict)]
                 if source_rows:
-                    display_dataframe(pd.DataFrame(source_rows), hide_index=True, use_container_width=True, alt="Reviewed air-quality source register")
+                    display_dataframe(pd.DataFrame(source_rows), hide_index=True, width="stretch", alt="Reviewed air-quality source register")
 
 
 try:
@@ -1058,7 +1058,7 @@ else:
         display_dataframe(
             pollutant_audit,
             hide_index=True,
-            use_container_width=True,
+            width="stretch",
             alt="Missing, non-numeric, negative and unit-mismatch counts in the daily pollutant extract",
         )
     st.caption(
@@ -1703,7 +1703,7 @@ else:
     display_dataframe(
         pd.DataFrame(eligibility_rows),
         hide_index=True,
-        use_container_width=True,
+        width="stretch",
     )
     st.caption(
         "No application-calculated AQI is produced for the current extract: its averaging "
@@ -1824,7 +1824,7 @@ if timeline_events:
         display_dataframe(
             visible_timeline,
             hide_index=True,
-            use_container_width=True,
+            width="stretch",
             column_config={
                 "Source / record": st.column_config.LinkColumn(
                     "Source / record",
@@ -1948,7 +1948,7 @@ else:
     display_dataframe(
         evidence_table,
         hide_index=True,
-        use_container_width=True,
+        width="stretch",
         alt="Facility-level evidence status for eight Edayar candidate facilities",
     )
     st.caption(
@@ -2026,7 +2026,7 @@ else:
     display_dataframe(
         pollutant_comparison,
         hide_index=True,
-        use_container_width=True,
+        width="stretch",
         alt="Pollutant-level comparison of Eloor ambient report coverage and Edayar facility stack evidence",
     )
     st.caption(
@@ -2133,7 +2133,7 @@ if source_assessment["candidates"]:
             display_dataframe(
                 missing_actions,
                 hide_index=True,
-                use_container_width=True,
+                width="stretch",
                 alt="Actionable missing evidence requests for each industrial candidate",
             )
             st.warning(
@@ -2145,7 +2145,7 @@ if source_assessment["candidates"]:
             display_dataframe(
                 action_plan,
                 hide_index=True,
-                use_container_width=True,
+                width="stretch",
                 alt="Complete industrial source evidence checklist",
             )
 
@@ -2205,7 +2205,7 @@ if not source_review_table.empty:
     display_dataframe(
         source_review_table,
         hide_index=True,
-        use_container_width=True,
+        width="stretch",
         alt="Source register review dates and evidence status",
     )
     invalid_review_dates = int(

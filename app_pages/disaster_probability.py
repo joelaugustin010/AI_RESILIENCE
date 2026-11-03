@@ -84,7 +84,7 @@ with st.form("hazard_screening_form"):
                             key=f"{hazard}_{key}_unit",
                             placeholder="Unit · source · observation time",
                         )
-    submitted = st.form_submit_button("Assess all four hazards", type="primary", use_container_width=True)
+    submitted = st.form_submit_button("Assess all four hazards", type="primary", width="stretch")
 
 if submitted:
     try:

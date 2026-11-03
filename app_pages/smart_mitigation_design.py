@@ -1291,7 +1291,7 @@ fig3d.update_layout(
 
 st.plotly_chart(
     fig3d,
-    use_container_width=True,
+    width="stretch",
     config={
         "displaylogo": False,
         "scrollZoom": True,
@@ -1798,7 +1798,7 @@ st.download_button(
     data=report_text,
     file_name="AI_RESILIENCE_Design_Report.txt",
     mime="text/plain",
-    use_container_width=True,
+    width="stretch",
 )
 
 
