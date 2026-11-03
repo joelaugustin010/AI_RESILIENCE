@@ -47,7 +47,7 @@ st.markdown(
     "<div style='font-size:12px; letter-spacing:2px; font-weight:700; color:#398477;'>AI RESILIENCE · ENGINEERING & PLANNING</div>"
     "<h1>🏗️ Smart Mitigation Design Studio</h1>"
     "<p>Kochi, Kerala, India<br>Urban Flood Resilience · Concept Design and Budget Planning</p>"
-    "<div style='margin-top:18px; display:inline-block; padding:7px 13px; background:#ffffff; border:1px solid #c5e4dc; border-radius:20px; color:#398477; font-size:12px; font-weight:650;'>CONCEPT STAGE · ENGINEERING REVIEW REQUIRED</div>",
+    "<div style='margin-top:18px; display:inline-block; padding:7px 13px; background:#102b3c; border:1px solid #c5e4dc; border-radius:20px; color:#398477; font-size:12px; font-weight:650;'>CONCEPT STAGE · ENGINEERING REVIEW REQUIRED</div>",
     unsafe_allow_html=True
 )
 
@@ -72,14 +72,14 @@ st.markdown("""
     margin-top: 12px;
     margin-bottom: 18px;
     padding: 15px 20px;
-    background: linear-gradient(100deg, #e5f3ff, #e8f8f1);
-    border: 1px solid #d2e8ed;
+    background: linear-gradient(120deg, rgba(13,43,60,.98), rgba(10,61,67,.96));
+    border: 1px solid rgba(130,190,199,.28);
     border-radius: 13px;
 ">
-    <h3 style="margin: 0; color: #285675;">
+    <h3 style="margin: 0; color: #e7f5f5;">
         ⚙️ Project Configuration
     </h3>
-    <p style="margin: 5px 0 0 0; color: #648093; font-size: 13px;">
+    <p style="margin: 5px 0 0 0; color: #a8c2ca; font-size: 13px;">
         Define the planning area, rainfall conditions and mitigation components.
     </p>
 </div>
@@ -210,14 +210,14 @@ st.markdown("""
     margin-top: 28px;
     margin-bottom: 18px;
     padding: 16px 20px;
-    background: linear-gradient(100deg, #e3f2ff, #e6f7ef);
-    border: 1px solid #cfe5e9;
+    background: linear-gradient(120deg, rgba(13,43,60,.98), rgba(10,61,67,.96));
+    border: 1px solid rgba(130,190,199,.28);
     border-radius: 14px;
 ">
-    <h3 style="margin: 0; color: #285675;">
+    <h3 style="margin: 0; color: #e7f5f5;">
         📊 Budget Utilisation Dashboard
     </h3>
-    <p style="margin: 5px 0 0 0; color: #648093; font-size: 13px;">
+    <p style="margin: 5px 0 0 0; color: #a8c2ca; font-size: 13px;">
         Monitor estimated project costs against the available planning budget.
     </p>
 </div>
@@ -303,14 +303,14 @@ st.markdown("""
     margin-top: 28px;
     margin-bottom: 18px;
     padding: 16px 20px;
-    background: linear-gradient(100deg, #e6f2ff, #e8f7ef);
-    border: 1px solid #d2e6e9;
+    background: linear-gradient(120deg, rgba(13,43,60,.98), rgba(10,61,67,.96));
+    border: 1px solid rgba(130,190,199,.28);
     border-radius: 14px;
 ">
-    <h3 style="margin: 0; color: #285675;">
+    <h3 style="margin: 0; color: #e7f5f5;">
         📐 Engineering Concept Brief
     </h3>
-    <p style="margin: 5px 0 0 0; color: #648093; font-size: 13px;">
+    <p style="margin: 5px 0 0 0; color: #a8c2ca; font-size: 13px;">
         Project scope, selected systems and engineering review status.
     </p>
 </div>
@@ -1242,8 +1242,8 @@ fig3d.update_layout(
             color="#285675",
             size=10
         ),
-        bgcolor="rgba(255,255,255,0.95)",
-        bordercolor="#cbdfe9",
+        bgcolor="rgba(12,35,51,0.98)",
+        bordercolor="rgba(130,190,199,0.35)",
         borderwidth=1,
         itemsizing="constant"
     ),
@@ -1254,7 +1254,7 @@ fig3d.update_layout(
     ),
 
     hoverlabel=dict(
-        bgcolor="#ffffff",
+        bgcolor="#102b3c",
         bordercolor="#9bcbdc",
         font=dict(
             color="#ffffff",
@@ -1294,14 +1294,14 @@ st.markdown("""
     margin-top: 30px;
     margin-bottom: 18px;
     padding: 17px 21px;
-    background: linear-gradient(105deg, #e4f1ff, #e5f7ef);
-    border: 1px solid #d0e5e9;
+    background: linear-gradient(120deg, rgba(13,43,60,.98), rgba(10,61,67,.96));
+    border: 1px solid rgba(130,190,199,.28);
     border-radius: 14px;
 ">
-    <h3 style="margin: 0; color: #285675;">
+    <h3 style="margin: 0; color: #e7f5f5;">
         🧠 Live Design Intelligence
     </h3>
-    <p style="margin: 5px 0 0 0; color: #648093; font-size: 13px;">
+    <p style="margin: 5px 0 0 0; color: #a8c2ca; font-size: 13px;">
         Real-time overview of your selected design configuration.
     </p>
 </div>
@@ -1551,14 +1551,14 @@ st.markdown("""
     margin-top: 30px;
     margin-bottom: 18px;
     padding: 17px 21px;
-    background: linear-gradient(105deg, #e5f2ff, #e8f8ef);
-    border: 1px solid #d1e6e9;
+    background: linear-gradient(120deg, rgba(13,43,60,.98), rgba(10,61,67,.96));
+    border: 1px solid rgba(130,190,199,.28);
     border-radius: 14px;
 ">
-    <h3 style="margin: 0; color: #285675;">
+    <h3 style="margin: 0; color: #e7f5f5;">
         🏗️ Flood-Management Design Overview
     </h3>
-    <p style="margin: 5px 0 0 0; color: #648093; font-size: 13px;">
+    <p style="margin: 5px 0 0 0; color: #a8c2ca; font-size: 13px;">
         Summary of the mitigation systems included in this concept design.
     </p>
 </div>
@@ -1658,14 +1658,14 @@ st.markdown("""
     margin-top: 32px;
     margin-bottom: 20px;
     padding: 20px 23px;
-    background: linear-gradient(105deg, #dfefff, #e3f6ed);
-    border: 1px solid #cbdfe9;
+    background: linear-gradient(120deg, rgba(13,43,60,.98), rgba(10,61,67,.96));
+    border: 1px solid rgba(130,190,199,.28);
     border-radius: 16px;
 ">
-    <h2 style="margin: 0; color: #285675;">
+    <h2 style="margin: 0; color: #e7f5f5;">
         📄 Project Design Report
     </h2>
-    <p style="margin: 6px 0 0 0; color: #648093; font-size: 13px;">
+    <p style="margin: 6px 0 0 0; color: #a8c2ca; font-size: 13px;">
         Downloadable project configuration, component estimates and engineering limitations.
     </p>
 </div>
