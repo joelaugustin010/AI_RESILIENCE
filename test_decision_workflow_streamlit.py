@@ -6,6 +6,16 @@ from streamlit.testing.v1 import AppTest
 
 
 class DecisionWorkflowStreamlitTests(unittest.TestCase):
+    def test_decision_workflow_hero_renders_html(self):
+        app = AppTest.from_file("app.py", default_timeout=60).run()
+
+        self.assertEqual(len(app.exception), 0)
+        hero = next(
+            element for element in app.markdown if "<section class=\"wf-hero\">" in element.value
+        )
+        self.assertTrue(hero.proto.allow_html)
+        self.assertIn("Disaster decision workflow", hero.value)
+
     def test_default_intake_renders_assessment_evidence_and_reports(self):
         app = AppTest.from_file("app.py", default_timeout=45).run()
         self.assertEqual(len(app.exception), 0)

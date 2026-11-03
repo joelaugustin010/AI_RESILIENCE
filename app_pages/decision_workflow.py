@@ -736,8 +736,8 @@ st.markdown("""
 .wf-title{font-size:clamp(2rem,3.5vw,3rem);font-weight:850;letter-spacing:-.04em;line-height:1.08;color:#fff;margin:0 0 .75rem}
 .wf-copy{max-width:850px;color:#dbeafe;font-size:1rem;line-height:1.65;margin:0}
 .wf-steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.65rem;margin:1rem 0 1.4rem}
-.wf-step{border:1px solid #dce7ee;background:rgba(255,255,255,.9);border-radius:14px;padding:.85rem .9rem;color:#526579;font-size:.8rem}
-.wf-step strong{display:block;color:#102a43;font-size:.9rem;margin-bottom:.2rem}
+.wf-step{border:1px solid rgba(130,190,199,.24);background:linear-gradient(145deg,rgba(17,49,66,.96),rgba(9,31,46,.96));border-radius:14px;padding:.85rem .9rem;color:#b8d1d5;font-size:.8rem;box-shadow:0 10px 25px rgba(0,0,0,.14)}
+.wf-step strong{display:block;color:#effafa;font-size:.9rem;margin-bottom:.2rem}
 @media(max-width:760px){.wf-steps{grid-template-columns:repeat(2,minmax(0,1fr))}.wf-hero{padding:1.4rem;border-radius:18px}}
 </style>
 <section class="wf-hero">
@@ -752,7 +752,7 @@ st.markdown("""
 <div class="wf-step"><strong>04 · Plan</strong>Compare actions and costs</div>
 <div class="wf-step"><strong>05 · Export</strong>Keep a report record</div>
 </div>
-""")
+""", unsafe_allow_html=True)
 st.caption("A historical rainfall measurement benchmark is available in the evidence explorer. It is separate from the assessment and is not a current rainfall or flood forecast.")
 st.info(
     "Kochi evidence update: JRC 100-year river-flood depth tiles are locally reviewed as modeled hazard data, but the map preview is withheld pending clarification of conflicting licence statements. "
