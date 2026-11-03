@@ -752,7 +752,7 @@ st.markdown("""
 <div class="wf-step"><strong>04 · Plan</strong>Compare actions and costs</div>
 <div class="wf-step"><strong>05 · Export</strong>Keep a report record</div>
 </div>
-""")
+""", unsafe_allow_html=True)
 st.caption("A historical rainfall measurement benchmark is available in the evidence explorer. It is separate from the assessment and is not a current rainfall or flood forecast.")
 st.info(
     "Kochi evidence update: JRC 100-year river-flood depth tiles are locally reviewed as modeled hazard data, but the map preview is withheld pending clarification of conflicting licence statements. "
