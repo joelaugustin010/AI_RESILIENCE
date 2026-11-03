@@ -54,14 +54,30 @@ IMD_YEARS = (2018, 2021, 2024)
 OSM_BOUNDS = (9.8934161, 76.2373589, 10.0497693, 76.3400293)
 INVENTORY_EXTENSIONS = {
     ".csv",
+    ".dly",
     ".dwg",
     ".geojson",
     ".json",
     ".nc",
     ".pdf",
+    ".png",
     ".tif",
+    ".txt",
+    ".xlsx",
     ".zip",
 }
+BROWSER_PROFILE_DIRECTORY_NAMES = {
+    "browser_profile",
+    "browser_cache",
+    "chrome_profile",
+    "chromium_profile",
+    "edge_pdf_profile",
+    "firefox_profile",
+}
+LOCAL_MACHINE_SUFFIX_PATTERN = re.compile(
+    r"-(?:LAPTOP|DESKTOP|WORKSTATION)-[A-Z0-9]{6,}(?=\.|$)",
+    re.IGNORECASE,
+)
 EXAMPLE_INPUT_NAMES = {
     "air_pollution_data.csv",
     "compound_disaster_data.csv",
@@ -80,6 +96,15 @@ def _utc_now() -> datetime:
 
 def _sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def _sha256_file(path: Path) -> str:
+    """Hash a file incrementally so large local rasters do not load into memory."""
+    digest = hashlib.sha256()
+    with path.open("rb") as source:
+        for chunk in iter(lambda: source.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def _request_bytes(url: str, *, data: bytes | None = None, timeout: int = 120) -> tuple[bytes, dict[str, str]]:
@@ -580,13 +605,84 @@ def acquire_all() -> list[dict[str, Any]]:
     return results
 
 
-def _asset_status(path: Path, sidecar: Path | None) -> str:
+def _is_browser_profile_path(path: Path) -> bool:
+    parts = {part.casefold() for part in path.parts}
+    return bool(parts.intersection(BROWSER_PROFILE_DIRECTORY_NAMES))
+
+
+def _is_local_machine_artifact(path: Path) -> bool:
+    return bool(LOCAL_MACHINE_SUFFIX_PATTERN.search(path.name))
+
+
+def _asset_status(
+    path: Path,
+    sidecar: Path | None,
+    metadata: dict[str, Any] | None = None,
+    observed_sha256: str | None = None,
+) -> str:
     if path.name in EXAMPLE_INPUT_NAMES:
         return "unverified_example_input_not_for_assessment"
-    if "experimental" in path.parts:
+
+    parts = {part.casefold() for part in path.parts}
+    metadata_unreadable = sidecar is not None and metadata is None
+    metadata = metadata or {}
+    dataset_id = str(metadata.get("dataset_id", "")).casefold()
+    reuse_status = str(metadata.get("reuse_status", "")).upper()
+    metadata_hash_matches = bool(
+        observed_sha256
+        and str(metadata.get("sha256", "")).casefold() == observed_sha256.casefold()
+    )
+    acquired_record = metadata_hash_matches and reuse_status.startswith("ACQUIRED")
+    structurally_validated = (
+        acquired_record
+        and "STRUCTURALLY_VALIDATED" in reuse_status
+        and isinstance(metadata.get("validation"), dict)
+        and bool(metadata["validation"])
+    )
+
+    is_ibtracs = "ibtracs" in parts or "ibtracs" in path.name.casefold() or "ibtracs" in dataset_id
+    if is_ibtracs:
+        rights_text = " ".join(
+            str(metadata.get(field, ""))
+            for field in ("license", "licence", "rights", "license_status", "rights_status", "reuse_status")
+        ).casefold()
+        unresolved_terms = ("unresolved", "unknown", "no dataset-level", "not found", "not stated", "unclear")
+        rights_unresolved = not rights_text.strip() or any(term in rights_text for term in unresolved_terms)
+        if rights_unresolved:
+            if structurally_validated:
+                return "acquired_validated_not_integrated_rights_unresolved"
+            if acquired_record:
+                return "acquired_not_integrated_rights_unresolved"
+            return "present_not_integrated_rights_unresolved"
+
+    is_ghcn = (
+        "ghcn" in parts
+        or path.name.casefold() == "ghcnd-stations.txt"
+        or (path.suffix.casefold() == ".dly" and path.parent.name.casefold() in {"ghcn", "ghcnd"})
+    )
+    if is_ghcn:
+        rights_text = " ".join(
+            str(metadata.get(field, ""))
+            for field in ("license", "licence", "rights", "license_status", "rights_status", "reuse_status")
+        ).casefold()
+        rights_review_required = any(
+            term in rights_text
+            for term in ("review", "no explicit", "not found", "unknown", "unresolved")
+        )
+        if structurally_validated and rights_review_required:
+            return "acquired_structurally_validated_rights_review_required_not_integrated"
+        if acquired_record and rights_review_required:
+            return "acquired_rights_review_required_not_integrated"
+        if acquired_record:
+            return "acquired_not_integrated"
+        return "present_inventory_only_not_integrated_provenance_unverified"
+
+    if "experimental" in parts:
         return "experimental_or_research_snapshot"
     if sidecar is None:
         return "provenance_sidecar_not_found"
+    if metadata_unreadable:
+        return "provenance_sidecar_unreadable"
     return "sidecar_available_requires_dataset_specific_suitability_review"
 
 
@@ -597,7 +693,15 @@ def build_register(root: Path = ROOT) -> dict[str, Any]:
         if not base.exists():
             continue
         for path in sorted(base.rglob("*")):
-            if not path.is_file() or "edge_pdf_profile" in path.parts:
+            if (
+                not path.is_file()
+                or _is_browser_profile_path(path)
+                or _is_local_machine_artifact(path)
+            ):
+                continue
+            if path.suffix.casefold() == ".png" and "spatial_layers" not in {
+                part.casefold() for part in path.parts
+            }:
                 continue
             if path.name.endswith(".metadata.json") or path.suffix.lower() not in INVENTORY_EXTENSIONS:
                 continue
@@ -607,17 +711,29 @@ def build_register(root: Path = ROOT) -> dict[str, Any]:
                 continue
             relative = path.relative_to(root).as_posix()
             sidecar = path.with_name(path.name + ".metadata.json")
-            sidecar_relative = sidecar.relative_to(root).as_posix() if sidecar.is_file() else None
-            data = path.read_bytes()
+            if not sidecar.is_file() and path.suffix.casefold() in {".png", ".jpg", ".jpeg", ".webp"}:
+                stem_sidecar = path.with_suffix(".metadata.json")
+                if stem_sidecar.is_file():
+                    sidecar = stem_sidecar
+            if not sidecar.is_file():
+                sidecar = None
+                metadata = None
+            else:
+                try:
+                    metadata = json.loads(sidecar.read_text(encoding="utf-8"))
+                except (OSError, json.JSONDecodeError):
+                    metadata = None
+            sidecar_relative = sidecar.relative_to(root).as_posix() if sidecar is not None else None
+            observed_sha256 = _sha256_file(path)
             assets.append(
                 {
                     "path": relative,
-                    "bytes": len(data),
-                    "sha256": _sha256(data),
+                    "bytes": path.stat().st_size,
+                    "sha256": observed_sha256,
                     "format": path.suffix.lower().lstrip("."),
                     "role": "raw" if "raw" in path.parts else "processed" if "processed" in path.parts else "reference",
                     "provenance_sidecar": sidecar_relative,
-                    "provenance_status": _asset_status(path, sidecar if sidecar.is_file() else None),
+                    "provenance_status": _asset_status(path, sidecar, metadata, observed_sha256),
                 }
             )
     return {

@@ -256,7 +256,7 @@ if isinstance(map_context, dict):
     )
     conditions = map_context.get("conditions", {})
     if conditions:
-        st.dataframe(
+        display_dataframe(
             pd.DataFrame(
                 [
                     {"Condition": name.replace("_", " ").capitalize(), "User-supplied value": value}
@@ -280,7 +280,7 @@ if isinstance(map_context, dict):
             st.write("**Assessment interpretation:**", hazard_result.get("severity", "Not classified"))
             indicators = hazard_result.get("indicators")
             if indicators:
-                st.dataframe(
+                display_dataframe(
                     pd.DataFrame(
                         [
                             {
@@ -756,7 +756,7 @@ if active_hazard is None or active_hazard in landcover_hazards:
                 }
                 for code, definition in landcover_processing["classes"].items()
             ]
-            st.dataframe(
+            display_dataframe(
                 pd.DataFrame(class_rows),
                 hide_index=True,
                 width="stretch",
@@ -995,7 +995,7 @@ if deck_layers:
             "These are source feature attributes only. They are not ward-level hazard, "
             "population, infrastructure-exposure, or consequence estimates."
         )
-        st.dataframe(
+        display_dataframe(
             pd.DataFrame(picked_properties),
             hide_index=True,
             width="stretch",

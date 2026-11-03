@@ -246,5 +246,136 @@ class Phase2ExternalDataTests(unittest.TestCase):
         self.assertEqual(register["assets"][0]["sha256"], hashlib.sha256(b"a\n1\n").hexdigest())
 
 
+    def test_register_inventories_ghcn_files_without_claiming_validation(self):
+        raw = self.root / "data" / "raw" / "ghcn"
+        raw.mkdir(parents=True)
+        (raw / "ghcnd-stations.txt").write_text("station inventory", encoding="utf-8")
+        (raw / "IN010032300.dly").write_text("daily station data", encoding="utf-8")
+
+        register = build_register(self.root)
+        assets = {asset["path"]: asset for asset in register["assets"]}
+        expected = {
+            "data/raw/ghcn/ghcnd-stations.txt",
+            "data/raw/ghcn/IN010032300.dly",
+        }
+        self.assertTrue(expected.issubset(assets))
+        for relative in expected:
+            status = assets[relative]["provenance_status"]
+            self.assertEqual(status, "present_inventory_only_not_integrated_provenance_unverified")
+            self.assertNotIn("validated", status)
+            self.assertNotIn("integrated", status.replace("not_integrated", ""))
+
+    def test_ibtracs_rights_are_explicitly_unresolved_and_not_integrated(self):
+        raw = self.root / "data" / "raw" / "ibtracs"
+        raw.mkdir(parents=True)
+        snapshot = raw / "ibtracs.NI.list.v04r01.csv"
+        snapshot.write_text("SID,ISO_TIME\nexample,2020-01-01 00:00:00\n", encoding="utf-8")
+        snapshot.with_name(snapshot.name + ".metadata.json").write_text(
+            json.dumps({"dataset_id": "noaa_ibtracs_north_indian_v04r01"}),
+            encoding="utf-8",
+        )
+
+        register = build_register(self.root)
+        asset = next(item for item in register["assets"] if item["path"].endswith(snapshot.name))
+        status = asset["provenance_status"]
+        self.assertEqual(status, "present_not_integrated_rights_unresolved")
+        self.assertNotIn("validated", status)
+        self.assertNotIn("integrated", status.replace("not_integrated", ""))
+
+    def test_register_discovers_stem_sidecar_for_processed_png(self):
+        layer_dir = self.root / "data" / "processed" / "spatial_layers"
+        layer_dir.mkdir(parents=True)
+        image = layer_dir / "context.png"
+        image.write_bytes(b"processed preview")
+        sidecar = layer_dir / "context.metadata.json"
+        sidecar.write_text(json.dumps({"dataset_id": "context"}), encoding="utf-8")
+
+        register = build_register(self.root)
+        asset = next(item for item in register["assets"] if item["path"].endswith("context.png"))
+        self.assertEqual(asset["provenance_sidecar"], "data/processed/spatial_layers/context.metadata.json")
+        self.assertEqual(
+            asset["provenance_status"],
+            "sidecar_available_requires_dataset_specific_suitability_review",
+        )
+
+    def test_register_excludes_browser_and_machine_artifacts_and_inventories_xlsx(self):
+        raw = self.root / "data" / "raw"
+        (raw / "example.csv").write_bytes(b"a\n1\n")
+        (raw / "official_tables.xlsx").write_bytes(b"workbook snapshot")
+        profile = self.root / "data" / "processed" / "edge_pdf_profile"
+        profile.mkdir(parents=True)
+        (profile / "History.csv").write_text("browser history", encoding="utf-8")
+        (self.root / "data" / "processed" / "aqi_daily_preview.png").write_bytes(b"non-spatial preview")
+        reference = self.root / "data" / "reference"
+        reference.mkdir(parents=True)
+        (reference / "DATA_PROVENANCE_REGISTER-LAPTOP-TBN5N220.json").write_text(
+            "{}", encoding="utf-8"
+        )
+        (reference / "spatial_sources-LAPTOP-TBN5N220.json").write_text(
+            "{}", encoding="utf-8"
+        )
+
+        register = build_register(self.root)
+        assets = {asset["path"]: asset for asset in register["assets"]}
+        self.assertEqual(set(assets), {"data/raw/example.csv", "data/raw/official_tables.xlsx"})
+        self.assertEqual(assets["data/raw/example.csv"]["provenance_status"], "provenance_sidecar_not_found")
+        self.assertEqual(
+            assets["data/raw/official_tables.xlsx"]["sha256"],
+            hashlib.sha256(b"workbook snapshot").hexdigest(),
+        )
+
+
+    def test_ibtracs_validation_claim_requires_matching_sidecar_checksum(self):
+        raw = self.root / "data" / "raw" / "ibtracs"
+        raw.mkdir(parents=True)
+        snapshot = raw / "ibtracs.NI.list.v04r01.csv"
+        payload = b"SID,ISO_TIME\\nexample,2020-01-01 00:00:00\\n"
+        snapshot.write_bytes(payload)
+        metadata = {
+            "dataset_id": "noaa_ibtracs_north_indian_v04r01",
+            "license": "No dataset-level licence or rights statement was found.",
+            "reuse_status": "ACQUIRED_AND_STRUCTURALLY_VALIDATED_NOT_INTEGRATED_RIGHTS_UNRESOLVED",
+            "validation": {"row_count": 1},
+            "sha256": hashlib.sha256(payload).hexdigest(),
+        }
+        sidecar = snapshot.with_name(snapshot.name + ".metadata.json")
+        sidecar.write_text(json.dumps(metadata), encoding="utf-8")
+
+        register = build_register(self.root)
+        asset = next(item for item in register["assets"] if item["path"].endswith(snapshot.name))
+        self.assertEqual(asset["provenance_status"], "acquired_validated_not_integrated_rights_unresolved")
+
+        metadata["sha256"] = "incorrect"
+        sidecar.write_text(json.dumps(metadata), encoding="utf-8")
+        register = build_register(self.root)
+        asset = next(item for item in register["assets"] if item["path"].endswith(snapshot.name))
+        self.assertEqual(asset["provenance_status"], "present_not_integrated_rights_unresolved")
+        self.assertNotIn("validated", asset["provenance_status"])
+
+    def test_ghcn_status_uses_hash_verified_sidecar_without_claiming_integration(self):
+        raw = self.root / "data" / "raw" / "ghcn"
+        raw.mkdir(parents=True)
+        snapshot = raw / "IN010032300.dly"
+        payload = b"daily station snapshot"
+        snapshot.write_bytes(payload)
+        metadata = {
+            "dataset_id": "noaa_ghcnd_in010032300_prcp",
+            "license": "No explicit dataset-level downstream licence statement; rights review required.",
+            "reuse_status": "ACQUIRED_STRUCTURALLY_VALIDATED_RIGHTS_REVIEW_REQUIRED_NOT_INTEGRATED",
+            "validation": {"record_count": 1, "station_id": "IN010032300"},
+            "sha256": hashlib.sha256(payload).hexdigest(),
+        }
+        snapshot.with_name(snapshot.name + ".metadata.json").write_text(
+            json.dumps(metadata), encoding="utf-8"
+        )
+
+        register = build_register(self.root)
+        asset = next(item for item in register["assets"] if item["path"].endswith(snapshot.name))
+        self.assertEqual(
+            asset["provenance_status"],
+            "acquired_structurally_validated_rights_review_required_not_integrated",
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -160,7 +160,7 @@ tools = [
     ("Data Readiness", "Inspect provenance, completeness, and validation blockers.", "app_pages/data_readiness.py", ":material/fact_check:"),
     ("Hazard Model Lab", "Review model readiness before interpreting outputs.", "app_pages/hazard_model_lab.py", ":material/model_training:"),
     ("Hospital Vulnerability", "Review evidence needed for critical-facility exposure.", "app_pages/hospital_vulnerability.py", ":material/local_hospital:"),
-    ("Cyclone + Flood", "Explore compound-hazard assumptions and evidence needs.", "app_pages/compound_scenario.py", ":material/thunderstorm:"),
+    ("Cyclone + Flood", "Open the unified workflow and select the cyclone + flood scenario.", "app_pages/decision_workflow.py", ":material/thunderstorm:"),
     ("Disaster Probability", "Inspect probability-model readiness and limitations.", "app_pages/disaster_probability.py", ":material/analytics:"),
     ("Mitigation Budget", "Compare supplied costs and check budget arithmetic.", "app_pages/mitigation_planner.py", ":material/account_balance_wallet:"),
     ("Smart Mitigation Design", "Structure a mitigation concept for a selected scenario.", "app_pages/smart_mitigation_design.py", ":material/engineering:"),
@@ -178,7 +178,7 @@ st.divider()
 st.markdown('<div class="ar-section-kicker">Trust and readiness</div>', unsafe_allow_html=True)
 s1, s2, s3 = st.columns(3)
 with s1:
-    st.metric("Research workspaces", "12", help="One command centre, nine Explore tools, and two Plan tools.")
+    st.metric("Research workspaces", "11", help="One command centre, eight Explore tools, and two Plan tools.")
 with s2:
     st.metric("Official emergency alerts", "Not enabled", help="This student prototype does not issue official warnings.")
 with s3:

@@ -6,6 +6,8 @@ from pathlib import Path
 import pandas as pd
 
 from src.scenario_screening import build_scenario_screening
+from src.consequence_assessment import build_consequence_assessment
+from src.disaster_models import assess_disaster
 
 from src.decision_workflow import (
     HAZARD_OPTIONS,
@@ -17,6 +19,7 @@ from src.decision_workflow import (
     decision_readiness_summary,
     evidence_inventory,
     evidence_provenance_summary,
+    expand_hazards,
     hazard_evidence_checklist,
     mitigation_actions_for,
     recommendation_candidates,
@@ -177,12 +180,53 @@ class ScenarioAndAssessmentTests(unittest.TestCase):
         self.assertTrue(actions["Cost INR"].isna().all())
         self.assertTrue(actions["User priority (1=highest)"].isna().all())
 
-    def test_compound_rainfall_and_drainage_remain_distinct_drivers(self):
-        scenarios = build_scenario_comparison(
-            valid_inputs(hazard="Compound: heavy rainfall + drainage failure")
+    def test_compound_rainfall_and_drainage_flow_through_the_complete_pipeline(self):
+        inputs = valid_inputs(hazard="Compound: heavy rainfall + drainage failure")
+        root = Path(__file__).resolve().parent
+        components = ["Flood", "Infrastructure failure"]
+
+        self.assertEqual(expand_hazards(inputs["hazard"]), components)
+        scenarios = build_scenario_comparison(inputs)
+        self.assertIn("Hazard(s): Flood, Infrastructure failure", scenarios.iloc[0]["Assumptions"])
+
+        model = assess_disaster(inputs)
+        self.assertEqual(model["model_id"], "compound_rainfall_drainage_rational_method_screening")
+        self.assertFalse(model["validated_prediction_available"])
+
+        evidence_requirements = hazard_evidence_checklist(inputs, root)
+        self.assertEqual(set(evidence_requirements["Hazard component"]), set(components))
+
+        actions = mitigation_actions_for(inputs["hazard"])
+        self.assertEqual(set(actions["Hazard"]), set(components))
+
+        consequences = build_consequence_assessment(
+            inputs["hazard"], inputs["location"], inputs["input_classification"], inputs
         )
-        self.assertIn("Heavy rainfall, Drainage failure", scenarios.iloc[0]["Assumptions"])
-        self.assertNotIn("Flood, Infrastructure failure", scenarios.iloc[0]["Assumptions"])
+        self.assertTrue(
+            any("Drainage-related waterlogging" in item for item in consequences["consequence_categories"])
+        )
+        self.assertTrue(
+            any("Service outage and recovery" in item for item in consequences["consequence_categories"])
+        )
+
+        report = report_rows(
+            inputs,
+            evidence_inventory(root),
+            scenarios,
+            actions,
+            None,
+            compare_action_combinations(actions, None, {}),
+            root,
+            disaster_assessment=model,
+            consequence_assessment=consequences,
+        )
+        assessed_hazards = report.loc[
+            report["Section"].eq("Assessment") & report["Field"].eq("hazards"), "Value"
+        ].iloc[0]
+        self.assertEqual(assessed_hazards, "Flood, Infrastructure failure")
+        report_actions = report.loc[report["Section"].eq("Mitigation action"), "Value"]
+        self.assertTrue(any("Flood" in value for value in report_actions))
+        self.assertTrue(any("Infrastructure failure" in value for value in report_actions))
 
     def test_evidence_matrix_separates_risk_dimensions_without_inventing_scores(self):
         inputs = valid_inputs(rainfall_mm=100, affected_population=150, assets=["Hospitals"])

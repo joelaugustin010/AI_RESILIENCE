@@ -138,7 +138,7 @@ def expand_hazards(selection: str) -> list[str]:
     if selection == "Compound: cyclone + flood":
         return ["Cyclone", "Flood"]
     if selection == "Compound: heavy rainfall + drainage failure":
-        return ["Heavy rainfall", "Drainage failure"]
+        return ["Flood", "Infrastructure failure"]
     return [selection] if selection in HAZARD_NOTES else []
 
 
@@ -881,10 +881,14 @@ def assessment_summary(inputs: dict[str, Any]) -> dict[str, str]:
     hazards = expand_hazards(str(inputs.get("hazard", "")))
     joined = ", ".join(hazards) if hazards else str(inputs.get("hazard", "Not selected"))
     return {
-        "status": "Insufficient evidence for a validated numerical prediction; qualitative scenario review only",
+        "status": "Insufficient evidence for a validated numerical prediction; numerical prediction not validated; qualitative scenario review only",
         "method": "Qualitative evidence and preparedness review. Hazard, exposure, vulnerability and response capacity, and consequences remain distinct. No locally validated model or compatible spatial and temporal evidence join is available; no probability, flood depth, affected-area, casualty, damage, or risk-reduction estimate is produced.",
         "hazards": joined,
-        "interpretation": "Submitted values remain observations, forecasts, or hypothetical assumptions as labelled by the user. The workflow organizes evidence, identifies gaps, and supports preparedness review; it does not establish that an event will occur or estimate its probability or impacts.",
+        "interpretation": (
+            "Hypothetical values are valid inputs for a conditional what-if review only; they are not observations or evidence that an event exists. The workflow organizes evidence, identifies gaps, and does not estimate event probability or impacts."
+            if inputs.get("input_classification") == "Hypothetical scenario assumption"
+            else "Submitted values remain observations or forecasts as labelled by the user. The workflow organizes evidence, identifies gaps, and supports preparedness review; it does not establish that an event will occur or estimate its probability or impacts."
+        ),
         "additional_caution": "Numerical prediction not validated. No numerical risk score or risk class is assigned. Compound hazards are not treated as additive scores. The legacy demonstration thresholds in assessment.py are not used here and are not official warning thresholds. The separate historical rainfall model predicts recorded rainfall only; it is not a flood model. Unresolved river-level references and rainfall conflicts prevent threshold comparisons."
     }
 

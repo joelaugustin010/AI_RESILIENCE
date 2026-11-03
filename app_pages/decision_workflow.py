@@ -434,14 +434,14 @@ def _render_disaster_assessment(result: dict) -> None:
             {"Component": name, "Status": component["status"], "Indicators": json.dumps(component["indicators"], ensure_ascii=False, default=str)}
             for name, component in components.items()
         ]
-        st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch", alt="Separate cyclone and flood component indicators")
+        display_dataframe(pd.DataFrame(rows), hide_index=True, width="stretch", alt="Separate cyclone and flood component indicators")
         st.info("Compound interaction remains unresolved. Component indicators are separate and are not added.")
     elif indicators:
         rows = [
             {"Indicator": key.replace("_", " ").capitalize(), "Result": json.dumps(value, ensure_ascii=False, default=str)}
             for key, value in indicators.items()
         ]
-        st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch", alt="Hazard-specific physical indicators and their user-supplied values")
+        display_dataframe(pd.DataFrame(rows), hide_index=True, width="stretch", alt="Hazard-specific physical indicators and their user-supplied values")
 
     consequences = result["potential_consequences"]
     st.write("**Potential consequences:**", consequences["status"])
@@ -471,7 +471,7 @@ def _render_disaster_assessment(result: dict) -> None:
                 "Evidence required": "; ".join(category["data_requirements"]),
             }
         )
-    st.dataframe(
+    display_dataframe(
         pd.DataFrame(category_rows),
         hide_index=True,
         width="stretch",
@@ -571,13 +571,13 @@ def _render_compound_assessment(result: dict) -> None:
     st.write("**Source reference:**", result["evidence_source"] or "Not supplied")
     st.write("**Observation time:**", result["observation_time"] or "Not supplied")
     st.write("**Scenario dates:**", f"{result['period_start'] or 'Not supplied'} to {result['period_end'] or 'Not supplied'}")
-    st.dataframe(
+    display_dataframe(
         pd.DataFrame(result["pathways"]), hide_index=True, width="stretch",
         alt="Separate flood, cyclone, and compound interaction pathways",
     )
     if result["reference_comparisons"]:
         st.markdown("**User-supplied reference comparisons**")
-        st.dataframe(
+        display_dataframe(
             pd.DataFrame(result["reference_comparisons"]), hide_index=True, width="stretch",
             alt="Rainfall and river readings compared only with user-supplied matched references",
         )
@@ -594,12 +594,12 @@ def _render_compound_assessment(result: dict) -> None:
         for phase, actions in result["actions"].items()
         for action in actions
     ]
-    st.dataframe(
+    display_dataframe(
         pd.DataFrame(action_rows), hide_index=True, width="stretch",
         alt="General before, during, and after preparedness actions for cyclone and flood planning",
     )
     st.markdown("**Evidence still required**")
-    st.dataframe(
+    display_dataframe(
         pd.DataFrame({"Missing or unverified evidence": result["data_gaps"]}),
         hide_index=True, width="stretch",
         alt="Evidence gaps that prevent a validated cyclone and flood assessment",
@@ -770,6 +770,7 @@ with st.expander("Longer-term AI RESILIENCE roadmap"):
 _render_phase2_data_context()
 _render_hydrology_explorer()
 
+st.title("Unified disaster decision workflow")
 st.header("1. Select a hazard and describe conditions")
 # Keep the hazard selector outside the form so Streamlit reruns immediately when
 # the user changes hazards; the visible inputs then update before submission.
@@ -1333,11 +1334,11 @@ st.caption("No user-entered value is treated as verified. River-level values are
 st.subheader("Evidence by decision dimension")
 st.caption("Statuses below describe evidence readiness, not hazard severity or risk class.")
 dimension_matrix = assessment_evidence_matrix(inputs, evidence)
-st.dataframe(dimension_matrix, hide_index=True, width="stretch")
+display_dataframe(dimension_matrix, hide_index=True, width="stretch", alt="Evidence readiness by hazard decision dimension")
 st.subheader("Uncertainty register")
 uncertainty_register = build_uncertainty_register(inputs, evidence)
 st.caption("Measurement, data quality, spatial, temporal, model, and scenario uncertainty are reported separately. Unknown values are not interpreted as zero risk.")
-st.dataframe(uncertainty_register, hide_index=True, width="stretch")
+display_dataframe(uncertainty_register, hide_index=True, width="stretch", alt="Measurement, data quality, spatial, temporal, model, and scenario uncertainties")
 st.subheader("Conceptual infrastructure dependencies")
 st.caption("These are generic pathways to investigate, not verified Kochi networks or claims of actual vulnerability. Simultaneous occurrence and causal/service dependencies are distinct; every listed local link remains unverified.")
 infrastructure_dependency_review = dependency_review_table()
@@ -1451,7 +1452,7 @@ display_dataframe(scenarios, hide_index=True, width="stretch")
 st.header("6. Evidence-linked recommendation candidates")
 recommendations = recommendation_candidates(inputs)
 st.caption("Candidates are linked to the selected scenario, entered conditions, or evidence gaps. They are unranked planning prompts; no benefit or risk reduction is quantified.")
-st.dataframe(recommendations, hide_index=True, width="stretch")
+display_dataframe(recommendations, hide_index=True, width="stretch", alt="Evidence-linked preparedness and mitigation recommendation candidates")
 priority_gate = recommendation_priority_readiness({})
 st.info(
     f"Recommendation priority: {priority_gate['status']}. "
