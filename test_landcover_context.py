@@ -2,11 +2,14 @@
 
 import unittest
 from pathlib import Path
+from tempfile import TemporaryDirectory
+from unittest.mock import patch
 
 import numpy as np
 from PIL import Image
 
-from scripts.build_worldcover_kochi_context import OUTPUT, verify_preview
+from scripts import build_worldcover_kochi_context
+from scripts.build_worldcover_kochi_context import OUTPUT, SOURCE, SOURCE_METADATA, verify_preview
 from src.landcover_context import colorize_worldcover, validate_worldcover_preview
 
 
@@ -23,6 +26,24 @@ class LandCoverContextTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Unknown WorldCover class"):
             colorize_worldcover(np.array([[101]], dtype=np.uint8))
 
+    def test_preview_verification_reports_a_missing_optional_source(self):
+        with TemporaryDirectory() as temporary_directory:
+            source = Path(temporary_directory) / "missing_worldcover.tif"
+            metadata = source.with_name(source.name + ".metadata.json")
+            with (
+                patch.object(build_worldcover_kochi_context, "SOURCE", source),
+                patch.object(build_worldcover_kochi_context, "SOURCE_METADATA", metadata),
+                self.assertRaisesRegex(
+                    FileNotFoundError,
+                    "Required WorldCover source or metadata is missing",
+                ),
+            ):
+                build_worldcover_kochi_context.verify_preview()
+
+    @unittest.skipUnless(
+        SOURCE.is_file() and SOURCE_METADATA.is_file(),
+        "requires the optional local WorldCover source raster and provenance sidecar",
+    )
     def test_real_preview_hash_and_geographic_coverage_match_provenance(self):
         metadata = verify_preview()
 

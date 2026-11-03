@@ -98,11 +98,22 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
         )
         load_button.click().run()
         self.assertEqual(len(app.exception), 0)
-        rendered_text = "\n".join(str(element.value) for element in app.markdown)
-        self.assertIn("IMD 0.25-degree daily rainfall", rendered_text)
-        self.assertIn("NASA POWER daily gridded/model-derived data", rendered_text)
-        self.assertIn("OpenStreetMap road context", rendered_text)
-        self.assertIn("USGS catalog query", rendered_text)
+        rendered_text = "\n".join(
+            str(element.value)
+            for elements in (app.markdown, app.info, app.error)
+            for element in elements
+        )
+        context_states = {
+            "IMD 0.25-degree daily rainfall": "IMD rainfall grid unavailable in this checkout",
+            "NASA POWER daily gridded/model-derived data": "NASA POWER snapshot unavailable in this checkout",
+            "OpenStreetMap road context": "OpenStreetMap road snapshot unavailable",
+            "USGS catalog query": "USGS earthquake query unavailable",
+        }
+        for available_label, unavailable_label in context_states.items():
+            self.assertTrue(
+                available_label in rendered_text or unavailable_label in rendered_text,
+                f"Expected the optional context to be rendered or clearly marked unavailable: {available_label}",
+            )
         self.assertIn("Unified disaster decision workflow", [e.value for e in app.title])
 
     def test_map_navigation_preserves_submitted_hazard_and_assessment_context(self):
