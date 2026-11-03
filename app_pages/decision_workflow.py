@@ -8,32 +8,26 @@ import pandas as pd
 import streamlit as st
 
 from src.dataframe_display import display_dataframe
-
-from src.scientific_scenario_engine import build_scientific_scenario_frame
-from src.source_registry import build_source_registry, source_fitness_summary
-from src.disaster_data_catalog import get_catalog, validate_catalog_record
-from src.consequence_data_requirements import HAZARD_REQUIREMENTS, requirements_for_hazard, requirements_table
-from src.consequence_assessment import build_consequence_assessment
-from src.scenario_input_quality import evaluate_scenario_readiness
-from src.scenario_screening import build_scenario_screening
-from src.scenario_output_model import HAZARDS as PREDICTABLE_HAZARDS, predict_scenario_outcome
-
 from src.decision_workflow import (
+    ASSET_OPTIONS,
+    DRAINAGE_STATUS_OPTIONS,
     HAZARD_OPTIONS,
+    INFRASTRUCTURE_STATUS_OPTIONS,
+    assessment_evidence_matrix,
     assessment_summary,
     build_scenario_comparison,
     budget_summary,
     compare_action_combinations,
-    decision_readiness_summary,
     evidence_inventory,
-    evidence_provenance_summary,
-    expand_hazards,
-    hazard_evidence_checklist,
     mitigation_actions_for,
+    recommendation_candidates,
+    recommendation_priority_readiness,
     report_html,
     report_rows,
     validate_workflow_inputs,
 )
+from src.disaster_models import assess_disaster
+from src.disaster_models.drought import parse_monthly_precipitation_csv
 from src.hydrology_analytics import (
     DATASETS,
     HydrologyDataError,
@@ -42,7 +36,18 @@ from src.hydrology_analytics import (
     rainfall_station_comparison,
     station_gap_summary,
 )
+from src.infrastructure_dependencies import dependency_review_table
+from src.map_integration import MAP_CONTEXT_KEY, build_map_context
+from src.phase2_data import (
+    Phase2DataError,
+    Phase2DataUnavailable,
+    load_imd_rainfall_cell,
+    load_nasa_power,
+    load_osm_road_snapshot,
+    load_usgs_earthquake_query,
+)
 from src.rainfall_forecast import RainfallForecastError, run_manual_rainfall_backtest
+from src.uncertainty import build_uncertainty_register
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -66,6 +71,80 @@ def _get_rainfall_backtest():
     except OSError as exc:
         raise RainfallForecastError(f"Could not inspect source file {path}: {exc}") from exc
     return _cached_rainfall_backtest(str(ROOT), stat.st_size, stat.st_mtime_ns)
+
+
+def _snapshot_signature(filename: str) -> tuple[tuple[int, int] | None, ...]:
+    path = ROOT / "data" / "raw" / "experimental" / filename
+    signature = []
+    for candidate in (path, path.with_name(path.name + ".metadata.json")):
+        try:
+            stat = candidate.stat()
+        except FileNotFoundError:
+            signature.append(None)
+        except OSError as exc:
+            raise Phase2DataError(
+                f"Could not inspect optional snapshot {candidate}: {exc}"
+            ) from exc
+        else:
+            signature.append((stat.st_size, stat.st_mtime_ns))
+    return tuple(signature)
+
+
+def _assert_snapshot_unchanged(
+    filename: str,
+    signature: tuple[tuple[int, int] | None, ...],
+) -> None:
+    if signature != _snapshot_signature(filename):
+        raise Phase2DataError(f"Dataset snapshot changed while preparing to load: {filename}")
+
+
+@st.cache_data(show_spinner=False)
+def _cached_phase2_imd(
+    root: str,
+    year: int,
+    _signature: tuple[tuple[int, int] | None, ...],
+):
+    _assert_snapshot_unchanged(
+        f"imd_daily_gridded_rainfall_{year}_025deg.nc",
+        _signature,
+    )
+    return load_imd_rainfall_cell(root, year)
+
+
+@st.cache_data(show_spinner=False)
+def _cached_phase2_nasa(
+    root: str,
+    _signature: tuple[tuple[int, int] | None, ...],
+):
+    _assert_snapshot_unchanged(
+        "nasa_power_kochi_center_daily_20200101_20250101.json",
+        _signature,
+    )
+    return load_nasa_power(root)
+
+
+@st.cache_data(show_spinner=False)
+def _cached_phase2_osm(
+    root: str,
+    _signature: tuple[tuple[int, int] | None, ...],
+):
+    _assert_snapshot_unchanged(
+        "openstreetmap_roads_provisional_kochi_bounds.json",
+        _signature,
+    )
+    return load_osm_road_snapshot(root)
+
+
+@st.cache_data(show_spinner=False)
+def _cached_phase2_usgs(
+    root: str,
+    _signature: tuple[tuple[int, int] | None, ...],
+):
+    _assert_snapshot_unchanged(
+        "usgs_earthquakes_kerala_bbox_1900_present_m0.geojson",
+        _signature,
+    )
+    return load_usgs_earthquake_query(root)
 
 
 def _render_rainfall_backtest(station: str) -> None:
@@ -147,6 +226,276 @@ def _render_rainfall_backtest(station: str) -> None:
         st.markdown(
             f"[Manual rainfall source metadata]({DATASETS['rainfall_manual'].source_url})"
         )
+
+
+def _render_phase2_imd_context(year: int) -> None:
+    try:
+        rainfall, metadata, summary = _cached_phase2_imd(
+            str(ROOT),
+            year,
+            _snapshot_signature(f"imd_daily_gridded_rainfall_{year}_025deg.nc"),
+        )
+    except Phase2DataUnavailable as exc:
+        st.info(f"IMD rainfall grid unavailable in this checkout: {exc}")
+        return
+    except Phase2DataError as exc:
+        st.error(f"IMD rainfall grid could not be validated: {exc}")
+        return
+
+    st.markdown(
+        f"**IMD 0.25-degree daily rainfall - {year}.** "
+        f"Grid cell center: {summary['grid_cell_center']['latitude']:.2f} N, "
+        f"{summary['grid_cell_center']['longitude']:.2f} E; "
+        f"{summary['valid_days']} valid days and {summary['missing_days']} missing days. "
+        "This is a coarse gridded rainfall series, not a local gauge or flood observation."
+    )
+    if not rainfall["rainfall_mm"].notna().any():
+        st.warning("No valid daily rainfall values are available for this grid cell/year.")
+        return
+
+    st.line_chart(
+        rainfall.set_index("date")[["rainfall_mm"]].rename(
+            columns={"rainfall_mm": "IMD gridded rainfall (mm/day)"}
+        ),
+        height=260,
+        width="stretch",
+    )
+    peak = rainfall.loc[rainfall["rainfall_mm"].idxmax()]
+    st.caption(
+        f"Maximum at this selected grid cell: {peak['rainfall_mm']:.2f} mm/day "
+        f"on {peak['date'].date().isoformat()}. The selected point is fixed and is not geocoded "
+        "from the user-entered assessment area. "
+        f"[IMD product information]({metadata['source_url']}). "
+        "The source page does not state a data reuse licence; terms require confirmation."
+    )
+
+
+def _render_phase2_nasa_context() -> None:
+    try:
+        data, metadata, summary = _cached_phase2_nasa(
+            str(ROOT),
+            _snapshot_signature("nasa_power_kochi_center_daily_20200101_20250101.json"),
+        )
+    except Phase2DataUnavailable as exc:
+        st.info(f"NASA POWER snapshot unavailable in this checkout: {exc}")
+        return
+    except Phase2DataError as exc:
+        st.error(f"NASA POWER snapshot could not be validated: {exc}")
+        return
+
+    parameter = st.selectbox(
+        "NASA POWER daily variable",
+        ["PRECTOTCORR", "T2M", "T2M_MAX", "T2M_MIN", "WS10M"],
+        format_func=lambda name: f"{name} ({summary['parameter_metadata'][name]['units']})",
+        key="phase2_nasa_parameter",
+    )
+    unit = summary["parameter_metadata"][parameter]["units"]
+    st.markdown(
+        f"**NASA POWER daily gridded/model-derived data, {summary['start']} to "
+        f"{summary['end']}.** Fixed request coordinate: 9.93 N, 76.27 E; "
+        f"{summary['row_count']:,} daily records; "
+        f"{summary['missing_values_by_parameter'][parameter]} fill/missing values. "
+        "Not a station observation or forecast."
+    )
+    st.line_chart(
+        data.set_index("date")[[parameter]].rename(
+            columns={parameter: f"{parameter} ({unit})"}
+        ),
+        height=260,
+        width="stretch",
+    )
+    st.caption(
+        f"[NASA POWER API source]({metadata['source_url']}). "
+        "No local flood threshold, event impact, or verified station comparison is available."
+    )
+
+
+def _render_phase2_other_context() -> None:
+    columns = st.columns(2)
+    with columns[0]:
+        try:
+            metadata, summary = _cached_phase2_osm(
+                str(ROOT),
+                _snapshot_signature("openstreetmap_roads_provisional_kochi_bounds.json"),
+            )
+        except Phase2DataUnavailable as exc:
+            st.info(f"OpenStreetMap road snapshot unavailable: {exc}")
+        except Phase2DataError as exc:
+            st.error(f"OpenStreetMap road snapshot could not be validated: {exc}")
+        else:
+            st.markdown(
+                f"**OpenStreetMap road context:** {summary['road_way_count']:,} mapped road ways "
+                f"within a provisional bounding box; map snapshot {summary['snapshot_timestamp']}. "
+                "This does not establish road condition, passability, hospital access, or flood exposure."
+            )
+            st.caption(
+                f"[OpenStreetMap source query]({metadata['source_url']}). "
+                "ODbL attribution and share-alike terms may apply."
+            )
+
+    with columns[1]:
+        try:
+            metadata, summary = _cached_phase2_usgs(
+                str(ROOT),
+                _snapshot_signature("usgs_earthquakes_kerala_bbox_1900_present_m0.geojson"),
+            )
+        except Phase2DataUnavailable as exc:
+            st.info(f"USGS earthquake query unavailable: {exc}")
+        except Phase2DataError as exc:
+            st.error(f"USGS earthquake query could not be validated: {exc}")
+        else:
+            st.markdown(
+                f"**USGS catalog query:** {summary['catalogue_event_count']} events returned "
+                f"for {summary['time_range']['start']} to {summary['time_range']['end']} "
+                f"at magnitude >= {summary['minimum_magnitude']}. "
+                "An empty result is not evidence of zero hazard."
+            )
+            st.caption(f"[USGS query source]({metadata['source_url']}).")
+
+
+def _render_phase2_data_context() -> None:
+    with st.expander("Additional gridded climate and context snapshots", expanded=False):
+        st.caption(
+            "These optional, research-only snapshots are not automatically joined to the assessment location, "
+            "hospital records, flood maps, or one another. A valid checksum establishes byte integrity only."
+        )
+        year = st.selectbox(
+            "IMD daily rainfall grid year",
+            [2018, 2021, 2024],
+            key="phase2_imd_year",
+        )
+        if not st.button("Load research-only context snapshots", key="load_phase2_context"):
+            st.info("Load the optional data to view their coverage and limitations.")
+            return
+        _render_phase2_imd_context(year)
+        _render_phase2_nasa_context()
+        _render_phase2_other_context()
+
+
+def _render_disaster_assessment(result: dict) -> None:
+    st.header("4. Hazard-specific scientific assessment")
+    st.caption(
+        "This is an observation review or scenario calculation, never a validated prediction. "
+        "Only supplied inputs are used; missing exposure and impact evidence stays unavailable. "
+        "NOT YET VALIDATED for local predictive use."
+    )
+    input_classification = result["input_conditions"].get(
+        "input_classification", "Unknown / unverified"
+    )
+    if input_classification == "Hypothetical scenario assumption":
+        evidence_label = "SIMULATED SCENARIO"
+    elif input_classification == "User-reported observation (source not independently verified)":
+        evidence_label = "OBSERVED — USER-REPORTED, NOT INDEPENDENTLY VERIFIED"
+    elif input_classification == "Forecast supplied by user (not checked by app)":
+        evidence_label = "FORECAST — USER-SUPPLIED, NOT VERIFIED BY THE APP"
+    else:
+        evidence_label = "INSUFFICIENT EVIDENCE"
+    st.write("**Evidence label:**", evidence_label)
+    st.write("**Predictive validation:**", "NOT YET VALIDATED")
+    st.write("**Assessment type:**", result["assessment_type"])
+    st.write("**Model status:**", result["result_status"])
+    st.write("**Method:**", result["methodology"]["name"])
+    st.write("**Scientific basis:**", result["methodology"]["scientific_basis"])
+    st.write("**Hazard assessment:**", result["hazard_assessment"]["severity"])
+
+    indicators = result["hazard_assessment"].get("indicators", {})
+    components = result["hazard_assessment"].get("components")
+    if components:
+        rows = [
+            {"Component": name, "Status": component["status"], "Indicators": json.dumps(component["indicators"], ensure_ascii=False, default=str)}
+            for name, component in components.items()
+        ]
+        display_dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
+        st.info("Compound interaction remains unresolved. Component indicators are separate and are not added.")
+    elif indicators:
+        rows = [
+            {"Indicator": key.replace("_", " ").capitalize(), "Result": json.dumps(value, ensure_ascii=False, default=str)}
+            for key, value in indicators.items()
+        ]
+        display_dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
+
+    consequences = result["potential_consequences"]
+    st.write("**Potential consequences:**", consequences["status"])
+    st.caption(consequences["human_population"]["interpretation"])
+    st.caption(consequences["infrastructure"]["interpretation"])
+    category_rows = []
+    for name, category in consequences["categories"].items():
+        category_rows.append(
+            {
+                "Consequence category": name.capitalize(),
+                "Evidence status": category["status"],
+                "Observed impacts": category["observed_impacts"]["status"],
+                "Model estimate": category["modelled_estimate"]["status"],
+                "Model output": json.dumps(
+                    category["modelled_estimate"]["value"],
+                    ensure_ascii=False,
+                    default=str,
+                ),
+                "Interpretation": category["modelled_estimate"].get(
+                    "interpretation", "No consequence estimate is available."
+                ),
+                "User-supplied context": json.dumps(
+                    category["user_supplied_context"],
+                    ensure_ascii=False,
+                    default=str,
+                ),
+                "Evidence required": "; ".join(category["data_requirements"]),
+            }
+        )
+    display_dataframe(
+        pd.DataFrame(category_rows),
+        hide_index=True,
+        width="stretch",
+        alt="Evidence-gated human, infrastructure, environmental, and economic consequences",
+    )
+    st.caption(
+        "No observed impacts or modelled consequence values are available here. "
+        "User-entered population or asset names are context only, not exposure estimates."
+    )
+    st.write("**Pathways requiring review:**")
+    for pathway in consequences["cascading_or_compound_pathways"]:
+        st.markdown(f"- {pathway}")
+
+    columns = st.columns(3)
+    phase_labels = {
+        "before": "Before: prevention and preparedness",
+        "during": "During: response",
+        "after": "After: recovery",
+    }
+    for column, phase in zip(columns, ("before", "during", "after")):
+        with column:
+            st.markdown(f"**{phase_labels[phase]}**")
+            for item in result["recommendations"][phase]:
+                st.markdown(f"- **{item['category'].capitalize()}:** {item['action']}")
+                st.caption(
+                    f"Why relevant: {item['relevance']} Evidence/authority: "
+                    f"{item['evidence_or_authority']} Scope: {item['scope']} "
+                    f"Limitations: {item['limitations']}"
+                )
+    with st.expander("Long-term risk reduction and resilience planning"):
+        for item in result["recommendations"]["long_term"]:
+            st.markdown(f"- {item['action']}")
+            st.caption(
+                f"Why relevant: {item['relevance']} Evidence/authority: "
+                f"{item['evidence_or_authority']} Scope: {item['scope']} "
+                f"Limitations: {item['limitations']}"
+            )
+
+    with st.expander("Scientific assumptions, uncertainty, data gaps and validation"):
+        st.write("**Calculation:**", result["methodology"]["calculation"])
+        st.write("**Assumptions:**", result["assumptions"])
+        st.write("**Uncertainty:**", result["uncertainty"])
+        st.write("**Data gaps:**", result["data_gaps"])
+        st.write("**Validation:**", result["validation"])
+        st.write("**Evidence-source role:**", result["evidence"]["dataset_use"])
+        st.write("**Repository dataset relevance:**")
+        for dataset in result["evidence"]["dataset_relevance"]:
+            st.markdown(
+                f"- **{dataset['dataset']}** (`{dataset['file_or_source']}`): "
+                f"{dataset['use_status']}"
+            )
+        for source in result["evidence"]["sources"]:
+            st.markdown(f"- [{source['title']}]({source['url']}) — {source['role']}")
 
 
 def _render_hydrology_explorer() -> None:
@@ -272,52 +621,29 @@ def _render_hydrology_explorer() -> None:
         st.caption("Data-source and limitation register: `data/reference/hydrology_data_sources.json`.")
 
 
-st.markdown("""
-<style>
-.wf-hero{padding:2rem 2.2rem;border-radius:24px;color:#f8fafc;background:linear-gradient(120deg,#071a2b,#104766 58%,#087e8b);box-shadow:0 18px 45px rgba(7,40,61,.16);margin:.2rem 0 1.1rem}
-.wf-kicker{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:#a5f3fc;margin-bottom:.65rem}
-.wf-title{font-size:clamp(2rem,3.5vw,3rem);font-weight:850;letter-spacing:-.04em;line-height:1.08;color:#fff;margin:0 0 .75rem}
-.wf-copy{max-width:850px;color:#dbeafe;font-size:1rem;line-height:1.65;margin:0}
-.wf-steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.65rem;margin:1rem 0 1.4rem}
-.wf-step{border:1px solid #dce7ee;background:rgba(255,255,255,.9);border-radius:14px;padding:.85rem .9rem;color:#526579;font-size:.8rem}
-.wf-step strong{display:block;color:#102a43;font-size:.9rem;margin-bottom:.2rem}
-@media(max-width:760px){.wf-steps{grid-template-columns:repeat(2,minmax(0,1fr))}.wf-hero{padding:1.4rem;border-radius:18px}}
-</style>
-<section class="wf-hero">
-<div class="wf-kicker">AI RESILIENCE · KOCHI · PLANNING WORKSPACE</div>
-<div class="wf-title">Disaster decision workflow</div>
-<p class="wf-copy">Turn a clearly described scenario into an evidence checklist, compare possible preparedness actions, review budget arithmetic, and export a traceable report. The workflow supports planning—not official warnings or validated predictions.</p>
-</section>
-<div class="wf-steps">
-<div class="wf-step"><strong>01 · Describe</strong>Choose hazard and area</div>
-<div class="wf-step"><strong>02 · Review</strong>Check inputs and evidence</div>
-<div class="wf-step"><strong>03 · Assess</strong>Understand missing proof</div>
-<div class="wf-step"><strong>04 · Plan</strong>Compare actions and costs</div>
-<div class="wf-step"><strong>05 · Export</strong>Keep a report record</div>
-</div>
-""")
+st.title("Unified disaster decision workflow")
+st.caption("Select a hazard → describe the area and conditions → review evidence → compare scenarios and actions → check budget fit → export a report.")
+st.warning("This prototype does not issue official warnings or validated predictions. Inputs are user-described and are not verified observations unless the user supplies and checks their source.")
 st.caption("A historical rainfall measurement benchmark is available in the evidence explorer. It is separate from the assessment and is not a current rainfall or flood forecast.")
-st.page_link("app_pages/kochi_map.py", label="Open the Kochi map", icon=":material/map:")
 st.info(
-    "Kochi evidence update: JRC 100-year river-flood depth tiles are locally reviewed as modeled hazard data, but the map preview is withheld pending clarification of conflicting licence statements. "
+    "Kochi evidence update: an official JRC 100-year river-flood depth scenario is available as map context. "
     "Asset-level flood exposure remains unknown because there is no independently validated hospital or critical-facility location layer. "
     "See the map for source details and the broader data gaps."
 )
 with st.expander("Longer-term AI RESILIENCE roadmap"):
     st.markdown(
         "- **Pollution sources:** combine pollutant-specific station observations, weather, and verified facility/emissions records; AQI alone cannot identify a factory.\n"
-        "- **Multi-hazard and compound scenarios:** add verified flood, cyclone, earthquake, landslide, heat, drought, industrial-incident, and infrastructure-failure evidence.\n"
+        "- **Local hazard validation:** connect the screening models below to verified location/time-specific observations, exposure layers, local thresholds, and independently reviewed impacts.\n"
         "- **Historical-event-informed preparedness:** use sourced event records and documented impacts before estimating likelihoods or consequences.\n"
         "- **Budget prioritisation:** compare documented intervention costs and defensible outcome evidence; leave benefits unquantified when evidence is missing."
     )
 
+_render_phase2_data_context()
 _render_hydrology_explorer()
 
 st.header("1. Select a hazard and describe conditions")
-# Keep the hazard selector outside the form so Streamlit reruns immediately when
-# the user changes hazards; the visible inputs then update before submission.
-hazard = st.selectbox("Hazard or compound scenario", HAZARD_OPTIONS, key="wf_hazard")
 with st.form("decision_workflow_intake"):
+    hazard = st.selectbox("Hazard or compound scenario", HAZARD_OPTIONS, key="wf_hazard")
     location = st.text_input(
         "Location or area name",
         value="Kochi Municipal Corporation — area not specified",
@@ -329,119 +655,125 @@ with st.form("decision_workflow_intake"):
         ["Hypothetical scenario assumption", "User-reported observation (source not independently verified)", "Forecast supplied by user (not checked by app)", "Unknown / unverified"],
         key="wf_classification",
     )
-    source_and_time = st.text_area(
+    source_and_time = st.text_input(
         "Source, observation/forecast time, and units (if known)",
         key="wf_source_time",
-        height=90,
-        placeholder="Example: IMD bulletin; issued 31 Oct 2026, 10:00 IST; valid until 31 Oct 2026, 20:30 IST; wind in km/h; station/area: Kochi.",
-        help="Enter the provider/source, observation time or forecast issue and valid times, timezone, station/area, units, and averaging period where known. Leave unknown details blank. This app does not independently verify the entry.",
+        help="Example: source name, timestamp, timezone, station, and averaging period. This app does not verify them.",
     )
 
-    # Show only fields relevant to the selected hazard. Keep hidden fields explicitly
-    # unset so stale values from a previous selection cannot influence this assessment.
-    show_rainfall = hazard in {
-        "Flood", "Cyclone", "Landslide", "Drought",
-        "Compound: cyclone + flood",
-        "Compound: heavy rainfall + drainage failure",
-    }
-    show_river = hazard in {"Flood", "Compound: cyclone + flood"}
-    show_wind = hazard in {"Cyclone", "Compound: cyclone + flood"}
-    show_temperature = hazard == "Heatwave"
-    show_drainage = hazard in {
-        "Flood", "Compound: cyclone + flood",
-        "Compound: heavy rainfall + drainage failure",
-    }
-    show_earthquake = hazard == "Earthquake"
-    show_landslide = hazard == "Landslide"
-    show_drought = hazard == "Drought"
-    show_industrial = hazard == "Industrial incident"
-    show_infrastructure = hazard == "Infrastructure failure"
-    show_population = hazard in {
-        "Flood", "Cyclone", "Earthquake", "Landslide", "Heatwave",
-        "Drought", "Industrial incident", "Infrastructure failure",
-        "Compound: cyclone + flood",
-        "Compound: heavy rainfall + drainage failure",
-    }
-
-    # Hazard-specific inputs are optional context, not validated model inputs.
-    earthquake_magnitude = None
-    earthquake_depth_km = None
-    slope_condition = "Not supplied"
-    soil_condition = "Not supplied"
-    drought_indicator = "Not supplied"
-    water_supply_status = "Not supplied"
-    industrial_substance = ""
-    industrial_release_status = "Not supplied"
-    industrial_wind_direction = ""
-    failed_asset_type = "Not supplied"
-    failure_status = "Not supplied"
-
-    rainfall_mm = None
-    rainfall_period = "Not supplied"
-    river_level_m = None
-    river_station = ""
-    river_reference = ""
-    wind_speed_kmh = None
-    temperature_c = None
-    normal_max_temperature_c = None
-    heatwave_consecutive_days = None
-    heatwave_station_count = None
-    affected_population = None
-    drainage_status = "Not supplied"
-    infrastructure_status = "Not supplied"
-
-    st.caption("Only fields relevant to the selected hazard are shown. Empty means not supplied; the app does not fill in values.")
+    st.caption("All numeric fields are optional. Empty means not supplied; the app does not fill in values.")
     col1, col2 = st.columns(2)
     with col1:
-        if show_rainfall:
-            st.markdown("**Rainfall evidence**")
-            rainfall_mm = st.number_input("Rainfall (mm)", min_value=0.0, value=None, step=1.0, key="wf_rainfall")
-            rainfall_period = st.selectbox("Rainfall period", ["Not supplied", "Last 1 hour", "Last 24 hours", "Last 3 days", "Other / state in notes"], key="wf_rainfall_period")
-        if show_river:
-            st.markdown("**River evidence**")
-            river_level_m = st.number_input("River-level reading (m)", value=None, step=0.1, key="wf_river", help="Gauge readings can be below zero depending on the reference datum. The app does not compare this with a threshold.")
-            river_station = st.text_input("River station (if applicable)", key="wf_river_station")
-            river_reference = st.text_input("Gauge zero / datum reference (if known)", key="wf_river_reference")
-        if show_wind:
-            wind_speed_kmh = st.number_input("Wind speed (km/h)", min_value=0.0, value=None, step=1.0, key="wf_wind")
-        if show_drainage:
-            drainage_status = st.selectbox("Drainage condition", ["Not supplied", "Reported functioning", "Reported partially impaired", "Reported failed", "Hypothetical partial failure", "Not applicable"], key="wf_drainage")
-        if show_landslide:
-            st.markdown("**Slope and ground evidence**")
-            slope_condition = st.selectbox("Slope condition", ["Not supplied", "Stable / no movement reported", "Cracks or movement reported", "Recent slope failure reported", "Unknown"], key="wf_slope")
-            soil_condition = st.selectbox("Ground / soil condition", ["Not supplied", "Dry", "Saturated / waterlogged", "Loose / disturbed", "Unknown"], key="wf_soil")
-        if show_drought:
-            st.markdown("**Drought and water-supply evidence**")
-            drought_indicator = st.selectbox("Drought indicator", ["Not supplied", "SPI", "SPEI", "Standardised soil-moisture index", "Official drought category", "Other / specify in notes"], key="wf_drought_indicator")
-            water_supply_status = st.selectbox("Water supply status", ["Not supplied", "Normal", "Restricted", "Severely disrupted", "Unknown"], key="wf_water_supply")
-        if show_earthquake:
-            st.markdown("**Earthquake evidence**")
-            earthquake_magnitude = st.number_input("Reported magnitude (Mw; if sourced)", min_value=0.0, max_value=10.0, value=None, step=0.1, key="wf_eq_magnitude")
-            earthquake_depth_km = st.number_input("Reported focal depth (km; if sourced)", min_value=0.0, max_value=800.0, value=None, step=1.0, key="wf_eq_depth")
-        if show_industrial:
-            st.markdown("**Industrial incident evidence**")
-            industrial_substance = st.text_input("Substance or material involved (if known)", key="wf_industrial_substance")
-            industrial_release_status = st.selectbox("Release / incident status", ["Not supplied", "Suspected", "Reported by user", "Confirmed by cited authority", "No release reported", "Unknown"], key="wf_industrial_status")
-            industrial_wind_direction = st.text_input("Wind direction / weather context (if known)", key="wf_industrial_wind")
-        if show_infrastructure:
-            st.markdown("**Infrastructure failure evidence**")
-            failed_asset_type = st.selectbox("Asset type", ["Not supplied", "Road / bridge", "Electricity", "Drinking water", "Communications", "Drainage", "Building", "Other"], key="wf_failed_asset")
-            failure_status = st.selectbox("Failure status", ["Not supplied", "Suspected", "Reported by user", "Confirmed by cited authority", "Hypothetical", "Unknown"], key="wf_failure_status")
-        if hazard in {"Flood", "Cyclone", "Earthquake", "Infrastructure failure", "Compound: cyclone + flood", "Compound: heavy rainfall + drainage failure"}:
-            infrastructure_status = st.selectbox("Other infrastructure condition", ["Not supplied", "No disruption reported", "Possible / hypothetical disruption", "Disruption reported by user", "Not applicable"], key="wf_infrastructure")
+        rainfall_mm = st.number_input("Rainfall (mm)", min_value=0.0, value=None, step=1.0, key="wf_rainfall")
+        rainfall_period = st.selectbox("Rainfall period", ["Not supplied", "Last 1 hour", "Last 24 hours", "Last 3 days", "Other / state in notes"], key="wf_rainfall_period")
+        river_level_m = st.number_input("River-level reading (m)", value=None, step=0.1, key="wf_river", help="Gauge readings can be below zero depending on the reference datum. The app does not compare this with a threshold.")
+        river_station = st.text_input("River station (if applicable)", key="wf_river_station")
+        river_reference = st.text_input("Gauge zero / datum reference (if known)", key="wf_river_reference")
     with col2:
-        if show_temperature:
-            st.markdown("**Heatwave evidence**")
-            temperature_c = st.number_input("Maximum temperature (°C)", value=None, step=0.5, key="wf_temperature")
-            normal_max_temperature_c = st.number_input("Normal daily maximum for this station (°C; heatwave screening)", value=None, step=0.5, key="wf_normal_temperature", help="Use an official station normal for the relevant date/period; leave blank if unknown.")
-            heatwave_consecutive_days = st.number_input("Consecutive days meeting the heatwave criteria (if verified)", min_value=0, value=None, step=1, key="wf_heatwave_days")
-            heatwave_station_count = st.number_input("Stations in the meteorological subdivision meeting criteria (if verified)", min_value=0, value=None, step=1, key="wf_heatwave_stations")
-        if show_population:
-            affected_population = st.number_input("Affected population context (people; optional)", min_value=0, value=None, step=1, key="wf_population")
+        wind_speed_kmh = st.number_input("Wind speed (km/h)", min_value=0.0, value=None, step=1.0, key="wf_wind")
+        temperature_c = st.number_input("Temperature (°C)", value=None, step=0.5, key="wf_temperature")
+        affected_population = st.number_input("Affected population context (people; optional)", min_value=0, value=None, step=1, key="wf_population")
+        drainage_status = st.selectbox("Drainage condition", DRAINAGE_STATUS_OPTIONS, key="wf_drainage")
+        infrastructure_status = st.selectbox("Other infrastructure condition", INFRASTRUCTURE_STATUS_OPTIONS, key="wf_infrastructure")
+
+    model_inputs = {}
+    if hazard == "Heatwave":
+        model_inputs["relative_humidity_percent"] = st.number_input(
+            "Relative humidity (%)",
+            min_value=0.0,
+            max_value=100.0,
+            value=None,
+            key="wf_relative_humidity",
+        )
+    if hazard == "Earthquake":
+        model_inputs["earthquake_mmi"] = st.selectbox(
+            "Reported Modified Mercalli Intensity (MMI)",
+            ["Not supplied", *range(1, 13)],
+            key="wf_earthquake_mmi",
+            help="Enter an official or field-reported intensity only; the app does not estimate shaking.",
+        )
+    if hazard == "Landslide":
+        model_inputs["antecedent_rainfall_mm"] = st.number_input(
+            "Antecedent rainfall total (mm; optional)",
+            min_value=0.0,
+            value=None,
+            key="wf_antecedent_rainfall",
+        )
+    if hazard == "Drought":
+        model_inputs["monthly_precipitation_csv"] = st.text_area(
+            "Optional monthly precipitation history CSV",
+            placeholder="month,precipitation_mm\n1991-01,123.4\n1991-02,45.6",
+            height=110,
+            key="wf_drought_monthly_csv",
+            help="One location, consecutive monthly totals in mm, and at least 30 complete years are required for SPI-1. Values are not authenticated.",
+        )
+    if hazard == "Industrial incident":
+        with st.expander("Optional pollutant measurement comparison"):
+            model_inputs["pollutant_name"] = st.text_input("Pollutant name", key="wf_pollutant_name")
+            model_inputs["pollutant_concentration"] = st.number_input(
+                "Measured concentration",
+                min_value=0.0,
+                value=None,
+                key="wf_pollutant_concentration",
+            )
+            model_inputs["pollutant_unit"] = st.selectbox(
+                "Measurement unit",
+                ["Not supplied", "µg/m³", "mg/m³", "ppm", "ppb"],
+                key="wf_pollutant_unit",
+            )
+            model_inputs["pollutant_averaging_period"] = st.selectbox(
+                "Observation averaging period",
+                ["Not supplied", "1-hour", "8-hour", "24-hour", "annual"],
+                key="wf_pollutant_period",
+            )
+            model_inputs["pollutant_reference_value"] = st.number_input(
+                "Applicable reference value (optional)",
+                min_value=0.0,
+                value=None,
+                key="wf_pollutant_reference",
+                help="Supply a documented pollutant-, unit- and averaging-period-matched reference; no benchmark is assumed.",
+            )
+            model_inputs["pollutant_reference_unit"] = st.selectbox(
+                "Reference unit",
+                ["Not supplied", "µg/m³", "mg/m³", "ppm", "ppb"],
+                key="wf_pollutant_reference_unit",
+            )
+            model_inputs["pollutant_reference_averaging_period"] = st.selectbox(
+                "Reference averaging period",
+                ["Not supplied", "1-hour", "8-hour", "24-hour", "annual"],
+                key="wf_pollutant_reference_period",
+            )
+    if hazard in {"Flood", "Compound: heavy rainfall + drainage failure"}:
+        with st.expander("Optional catchment inputs for Rational Method screening"):
+            model_inputs["catchment_area_ha"] = st.number_input(
+                "Catchment area (hectares)",
+                min_value=0.0,
+                value=None,
+                key="wf_catchment_area",
+            )
+            model_inputs["runoff_coefficient"] = st.number_input(
+                "Runoff coefficient C (0-1)",
+                min_value=0.0,
+                max_value=1.0,
+                value=None,
+                key="wf_runoff_coefficient",
+            )
+            if hazard == "Compound: heavy rainfall + drainage failure":
+                model_inputs["drainage_capacity_m3_s"] = st.number_input(
+                    "Drainage design capacity (m³/s)",
+                    min_value=0.0,
+                    value=None,
+                    key="wf_drainage_capacity",
+                )
+    if hazard == "Infrastructure failure":
+        model_inputs["failed_service"] = st.text_input(
+            "Service or infrastructure failure mode",
+            key="wf_failed_service",
+        )
 
     assets = st.multiselect(
         "Services or assets to review (user-nominated; location/exposure not verified)",
-        ["Hospitals", "Roads and bridges", "Electricity", "Drinking water", "Communications", "Shelters", "Schools", "Drainage", "Industrial facilities", "Residential buildings"],
+        ASSET_OPTIONS,
         default=["Hospitals", "Roads and bridges"],
         key="wf_assets",
     )
@@ -461,27 +793,29 @@ if submitted:
         "river_reference": river_reference,
         "wind_speed_kmh": wind_speed_kmh,
         "temperature_c": temperature_c,
-        "normal_max_temperature_c": normal_max_temperature_c,
-        "heatwave_consecutive_days": heatwave_consecutive_days,
-        "heatwave_station_count": heatwave_station_count,
-        "earthquake_magnitude": earthquake_magnitude,
-        "earthquake_depth_km": earthquake_depth_km,
-        "slope_condition": slope_condition,
-        "soil_condition": soil_condition,
-        "drought_indicator": drought_indicator,
-        "water_supply_status": water_supply_status,
-        "industrial_substance": industrial_substance,
-        "industrial_release_status": industrial_release_status,
-        "industrial_wind_direction": industrial_wind_direction,
-        "failed_asset_type": failed_asset_type,
-        "failure_status": failure_status,
         "affected_population": affected_population,
         "drainage_status": drainage_status,
         "infrastructure_status": infrastructure_status,
         "assets": assets,
         "condition_notes": condition_notes,
+        **model_inputs,
     }
+    if submitted_inputs["hazard"] == "Earthquake" and submitted_inputs.get("earthquake_mmi") == "Not supplied":
+        submitted_inputs["earthquake_mmi"] = None
+    for field in ("pollutant_unit", "pollutant_reference_unit"):
+        if submitted_inputs.get(field) == "Not supplied":
+            submitted_inputs[field] = ""
+    for field in ("pollutant_averaging_period", "pollutant_reference_averaging_period"):
+        if submitted_inputs.get(field) == "Not supplied":
+            submitted_inputs[field] = ""
     problems = validate_workflow_inputs(submitted_inputs)
+    if submitted_inputs["hazard"] == "Drought" and submitted_inputs.get("monthly_precipitation_csv", "").strip():
+        try:
+            submitted_inputs["monthly_precipitation_records"] = parse_monthly_precipitation_csv(
+                submitted_inputs["monthly_precipitation_csv"]
+            )
+        except ValueError as exc:
+            problems.append(str(exc))
     if problems:
         st.session_state["decision_workflow_inputs"] = None
         for problem in problems:
@@ -491,278 +825,77 @@ if submitted:
 
 inputs = st.session_state.get("decision_workflow_inputs")
 if inputs is None:
-    # Keep the page focused on the scenario form until the user submits it.
-    # The evidence inventory is shown in the results section after submission.
+    st.header("2. Evidence available to review")
+    display_dataframe(
+        evidence_inventory(ROOT, st.session_state.get("rainfall_backtest_result")),
+        hide_index=True,
+        width="stretch",
+    )
+    st.info("Submit the form to continue. Missing GIS layers do not block a qualitative assessment; missing evidence does block a reliable numerical prediction.")
     st.stop()
 
-st.header("2. Immediate scenario result")
-st.caption(
-    "Your submitted hypothetical values are assessed here first. This output explains conditional consequences and, " 
-    "where an official threshold applies, the corresponding screening category. It is not a calibrated flood probability, " 
-    "flood-depth estimate, affected-area map, or official warning."
-)
-prediction = predict_scenario_outcome(inputs)
-st.subheader("Conditional scenario output")
-st.metric("Scenario concern", prediction["concern_level"])
-st.markdown("**Potential outcome**")
-st.write(prediction["conditional_outcome"])
-st.caption(f"Output engine: {prediction['model_type']}. Numerical probability: not available. This is not a trained ML forecast or official warning.")
-with st.expander("Why the model produced this output", expanded=True):
-    st.markdown("**Evidence used**")
-    for item in prediction["evidence_used"]:
-        st.markdown(f"- {item}")
-    st.markdown("**Recommended verification / next checks**")
-    for item in prediction["recommended_checks"]:
-        st.markdown(f"- {item}")
-    st.markdown("**Basis and limitations**")
-    st.write(prediction["basis"])
-    for item in prediction["limitations"]:
-        st.caption(f"• {item}")
-
-scenario_screen = build_scenario_screening(inputs)
-display_dataframe(scenario_screen, hide_index=True, width="stretch")
-
-st.header("3. Review evidence")
+st.header("2. Review evidence")
 evidence = evidence_inventory(ROOT, st.session_state.get("rainfall_backtest_result"))
 st.caption("The separate historical benchmark uses only the manual rainfall observations. Its results do not enter this qualitative assessment; conflicted CWC rainfall, unverified sample rows, and unresolved river levels remain excluded from model calculations.")
 display_dataframe(evidence, hide_index=True, width="stretch")
 
-with st.expander("Dataset provenance and scientific fitness register", expanded=True):
-    st.caption(
-        "A listed source is not automatically suitable for every claim. Unknown licence, time-zone, "
-        "datum, checksum, or spatial metadata stays unresolved; this register does not certify data."
-    )
-    registry = build_source_registry()
-    registry_view = []
-    for record in registry:
-        fitness = source_fitness_summary(record)
-        registry_view.append({
-            "Dataset": record["name"],
-            "Publisher / source attribution": record["publisher"],
-            "Observation type": record["data_type"],
-            "Unit": record["unit"],
-            "Retrieval date": record["retrieval_date"],
-            "Licence status": record["license_status"],
-            "Checksum match": record["checksum_match"],
-            "Time zone": record["time_zone"],
-            "Spatial reference / datum": record["spatial_reference"],
-            "Validation status": record["validation_status"],
-            "Scientific fitness": fitness["scientific_fitness"],
-            "Permitted use": record["permitted_use"],
-            "Known limitation": record["known_limitation"],
-            "Source URL": record["source_url"],
-        })
-    display_dataframe(pd.DataFrame(registry_view), hide_index=True, width="stretch")
-    st.warning(
-        "No dataset in this registry is approved by this app for numerical disaster prediction or official warnings. "
-        "Source metadata completeness and scientific validation are different checks."
-    )
-
-with st.expander("Kochi multi-hazard data acquisition board", expanded=True):
-    st.caption(
-        "This is the parallel acquisition queue. 'Discovered' means a credible source page was identified, "
-        "not that its files have been downloaded or validated. Restricted or unclear sources are not scraped."
-    )
-    catalog_records = get_catalog()
-    catalog_issues = {
-        row["id"]: validate_catalog_record(row)
-        for row in catalog_records
-        if validate_catalog_record(row)
-    }
-    if catalog_issues:
-        st.error(f"Data catalog metadata structure needs review for {len(catalog_issues)} record(s).")
-        st.json(catalog_issues)
-    selected_hazards = set(expand_hazards(inputs["hazard"])) | {inputs["hazard"]}
-    # Show highest-priority data relevant to the selected hazard while keeping
-    # all other disaster sources available for project planning.
-    relevant_records = [
-        row for row in catalog_records
-        if selected_hazards.intersection(row["hazards"])
-    ]
-    all_records = relevant_records + [
-        row for row in catalog_records if row not in relevant_records
-    ]
-    st.markdown("**Priority order:** P0 = core baseline evidence; P1 = important supporting evidence; P2 = later extension.")
-    display_dataframe(pd.DataFrame([{
-        "Priority": row["priority"],
-        "Hazard(s)": ", ".join(row["hazards"]),
-        "Theme": row["theme"],
-        "Dataset": row["dataset"],
-        "Publisher": row["publisher"],
-        "Acquisition status": row["status"],
-        "Access conditions": row["access"],
-        "Required QA before use": row["required_checks"],
-        "Known limitations": row["limitations"],
-        "Official source": row["url"],
-        "Direct resource URLs": "; ".join(row.get("resource_urls", [])) or "No direct file link confirmed",
-    } for row in all_records]), hide_index=True, width="stretch")
-    for row in relevant_records:
-        with st.expander(f"{row['priority']} · {row['dataset']}"):
-            st.markdown(f"**Publisher:** {row['publisher']}")
-            st.markdown(f"**Source:** [{row['url']}]({row['url']})")
-            if row.get("resource_urls"):
-                st.markdown("**Direct source files:**")
-                for resource_url in row["resource_urls"]:
-                    st.markdown(f"- [{resource_url.rsplit('/', 1)[-1]}]({resource_url})")
-            st.markdown(f"**Current status:** {row['status']}")
-            st.markdown(f"**Access:** {row['access']}")
-            st.markdown(f"**Required checks:** {row['required_checks']}")
-            st.markdown(f"**Limitations:** {row['limitations']}")
-    st.info(
-        "The catalog is a verified-source discovery queue, not a downloaded-data inventory. "
-        "A dataset moves to 'acquired' only after its file, publisher metadata, retrieval date, "
-        "licence/access terms, checksum, schema, spatial coverage and QA results are recorded."
-    )
-
-with st.expander("Consequence-model data requirements by disaster", expanded=True):
-    st.caption(
-        "This matrix defines the evidence needed to estimate local consequences—not just whether a hazard exists. "
-        "It separates hazard intensity, physical processes, exposure, vulnerability and observed outcomes. "
-        "It is a requirements plan, not a working consequence predictor."
-    )
-    requirement_hazard = st.selectbox(
-        "Inspect data requirements for",
-        list(HAZARD_REQUIREMENTS),
-        index=list(HAZARD_REQUIREMENTS).index(inputs["hazard"]) if inputs["hazard"] in HAZARD_REQUIREMENTS else 0,
-        key="consequence_requirements_hazard",
-    )
-    req = requirements_for_hazard(requirement_hazard)
-    st.markdown(f"**Candidate model family:** {req['model_family']}")
-    display_dataframe(pd.DataFrame(requirements_table(requirement_hazard)), hide_index=True, width="stretch")
-    st.markdown("**Specific blockers before consequence estimates:**")
-    st.warning(req["current_blockers"])
-    st.markdown("**Potential authoritative starting sources:**")
-    st.write(req["starter_sources"])
-    st.markdown("**Validation rule:** every hazard needs independent event/outcome evidence, a baseline comparison, event- or time-separated evaluation, uncertainty reporting, and a documented intended-use boundary.")
-    with st.expander("Shared minimum requirements across every hazard"):
-        display_dataframe(pd.DataFrame(req["common_requirements"]), hide_index=True, width="stretch")
-
-st.subheader("Evidence readiness checklist for this hazard")
-st.caption(
-    "This checklist identifies evidence needed before stronger conclusions are justified. "
-    "A file/path being present does not prove its contents are suitable, current, licensed for reuse, or independently verified."
-)
-evidence_checklist = hazard_evidence_checklist(inputs, ROOT)
-display_dataframe(evidence_checklist, hide_index=True, width="stretch")
-st.info(
-    "Readiness status is descriptive, not a numerical risk score. Items marked not connected or unverified "
-    "must not be treated as evidence that the hazard or exposure is absent."
-)
-
-st.subheader("Evidence provenance gate")
-provenance = evidence_provenance_summary(inputs)
-st.warning(f"**{provenance['Provenance status']}**")
-st.write("**Source/time notes:**", provenance["Source/time notes"])
-st.write("**Permitted interpretation:**", provenance["Permitted interpretation"])
-st.write("**Required verification:**", provenance["Verification gate"])
-st.caption("Typing a source name or selecting a classification does not independently verify the source, its freshness, or its fitness for this hazard.")
-
-st.header("4. Assessment status")
+st.header("3. Assessment status")
 assessment = assessment_summary(inputs)
-st.success(assessment["status"], icon=":material/assignment_turned_in:")
+try:
+    disaster_assessment = assess_disaster(inputs)
+except ValueError as exc:
+    disaster_assessment = None
+    st.error(f"Hazard-specific assessment input error: {exc}")
+else:
+    _render_disaster_assessment(disaster_assessment)
+if st.button(
+    "View prone areas on the Kochi map",
+    icon=":material/map:",
+    key="wf_open_kochi_map",
+    help="Opens the existing map with this submitted scenario. Available map evidence may not support the selected hazard.",
+):
+    st.session_state[MAP_CONTEXT_KEY] = build_map_context(inputs, disaster_assessment)
+    st.switch_page(ROOT / "app_pages" / "kochi_map.py")
+st.warning(assessment["status"], icon=":material/priority_high:")
 st.write("**Method:**", assessment["method"])
 st.write("**Selected hazard(s):**", assessment["hazards"])
 st.write("**Interpretation:**", assessment["interpretation"])
 st.warning(assessment["additional_caution"])
-st.caption("No user-entered value is treated as verified. River-level values are recorded in the report but never compared with a threshold in this workflow.")
-
-st.subheader("Scientific scenario frame and evidence gates")
-scientific_frame = build_scientific_scenario_frame(inputs)
-st.info(scientific_frame["evidence_gate"])
-st.caption(
-    "This frame structures the reasoning into hazard, exposure, vulnerability, and consequences to investigate. "
-    "It does not calculate a probability, impact estimate, or warning."
-)
-if scientific_frame["pathways"]:
-    display_dataframe(pd.DataFrame(scientific_frame["pathways"]), hide_index=True, width="stretch")
-else:
-    st.warning("No pathway template exists for this selection. The app will not guess one.")
-st.markdown("**Evidence required before stronger conclusions:**")
-for item in scientific_frame["required_evidence"]:
-    st.markdown(f"- {item}")
-st.markdown("**Interpretation safeguards:**")
-for item in scientific_frame["limitations"]:
-    st.markdown(f"- {item}")
-
-st.subheader("Input quality and hazard-specific evidence gate")
-input_quality = evaluate_scenario_readiness(inputs["hazard"], inputs)
-if input_quality["input_status"] == "Review required":
-    st.warning("Input review required before interpreting this scenario.")
-else:
-    st.success(input_quality["input_status"])
-for item in input_quality["errors"]:
-    st.error(item)
-for item in input_quality["warnings"]:
-    st.warning(item)
-st.markdown("**Hazard-specific evidence checklist**")
-for item in input_quality["evidence_factors_present"]:
-    st.markdown(f"- ✓ Supplied in the form: {item}")
-for item in input_quality["evidence_factors_missing_or_unverified"]:
-    st.markdown(f"- ☐ Missing or not independently verified: {item}")
-
-readiness_plan = decision_readiness_summary(inputs, input_quality)
-st.subheader("Decision readiness and next actions")
-st.warning(f"**{readiness_plan['decision_status']}**")
-st.write("**Numerical prediction gate:**", readiness_plan["numerical_prediction_gate"])
-if readiness_plan["critical_input_errors"]:
-    st.error("Resolve these input errors before interpreting the scenario:")
-    for item in readiness_plan["critical_input_errors"]:
-        st.markdown(f"- {item}")
-if readiness_plan["hazard_specific_gaps"]:
-    st.warning("Hazard-specific evidence gaps:")
-    for item in readiness_plan["hazard_specific_gaps"]:
-        st.markdown(f"- {item}")
-display_dataframe(pd.DataFrame(readiness_plan["next_steps"]), hide_index=True, width="stretch")
-st.caption(readiness_plan["interpretation"])
-st.info(
-    "Numerical prediction is not enabled because the required calibrated model and verified local evidence are not available. "
-    "Your hypothetical scenario has still been assessed qualitatively in the section above."
-)
-
-st.subheader("Consequence assessment: probability, affected areas and impacts")
-consequence_assessment = build_consequence_assessment(
-    inputs["hazard"],
-    inputs["location"],
-    inputs["input_classification"],
-    inputs,
-)
-st.caption(
-    "This is the required output structure for every selected disaster. Numerical probability and affected-area results "
-    "will appear only after the corresponding validated model and spatial evidence are connected."
-)
-st.write("**Scenario type:**", consequence_assessment["scenario_type"])
-st.write("**Current model status:**", consequence_assessment["model_status"])
-if consequence_assessment["heatwave_screening"] is not None:
-    heat = consequence_assessment["heatwave_screening"]
-    st.markdown("**Heatwave criteria screen (not a forecast or official warning)**")
-    st.write("**Station-level screening:**", heat["station_status"])
-    if heat["departure_from_normal_c"] is not None:
-        st.metric("Supplied maximum-temperature departure from normal", f"{heat['departure_from_normal_c']:.1f} °C")
-    st.write("**Duration and multi-station check:**", heat["declaration_status"])
-    st.caption(heat["source"])
-col_prob, col_area = st.columns(2)
-with col_prob:
-    st.markdown("**Probability of occurrence**")
-    st.info(consequence_assessment["occurrence_probability"])
-with col_area:
-    st.markdown("**Affected-area estimate**")
-    st.info(consequence_assessment["affected_area"])
-st.markdown("**Consequences this assessment must examine**")
-for item in consequence_assessment["consequence_categories"]:
-    st.markdown(f"- {item}")
-st.markdown("**Required evidence for this scenario**")
-for item in consequence_assessment["required_evidence"]:
-    st.markdown(f"- {item}")
-st.warning(consequence_assessment["scientific_guardrail"])
-st.caption(consequence_assessment["probability_semantics"])
+st.caption("No user-entered value is treated as verified. River-level values are recorded but never compared with a threshold in this workflow.")
+st.subheader("Evidence by decision dimension")
+st.caption("Statuses below describe evidence readiness, not hazard severity or risk class.")
+dimension_matrix = assessment_evidence_matrix(inputs, evidence)
+display_dataframe(dimension_matrix, hide_index=True, width="stretch")
+st.subheader("Uncertainty register")
+uncertainty_register = build_uncertainty_register(inputs, evidence)
+st.caption("Measurement, data quality, spatial, temporal, model, and scenario uncertainty are reported separately. Unknown values are not interpreted as zero risk.")
+display_dataframe(uncertainty_register, hide_index=True, width="stretch")
+st.subheader("Conceptual infrastructure dependencies")
+st.caption("These are generic pathways to investigate, not verified Kochi networks or claims of actual vulnerability. Simultaneous occurrence and causal/service dependencies are distinct; every listed local link remains unverified.")
+display_dataframe(dependency_review_table(), hide_index=True, width="stretch")
 
 st.header("4. Compare hypothetical scenarios")
 st.caption("The following cases differ only by their stated assumptions. Possible pathways are planning prompts, not calculated impacts.")
 scenarios = build_scenario_comparison(inputs)
 display_dataframe(scenarios, hide_index=True, width="stretch")
 
-st.header("5. Compare mitigation actions")
-st.write("Candidate actions below are qualitative planning prompts. Costs and impact estimates start blank and must be supported by your own documented evidence.")
+st.header("5. Evidence-linked recommendation candidates")
+recommendations = recommendation_candidates(inputs)
+st.caption("Candidates are linked to the selected scenario, entered conditions, or evidence gaps. They are unranked planning prompts; no benefit or risk reduction is quantified.")
+display_dataframe(recommendations, hide_index=True, width="stretch")
+priority_gate = recommendation_priority_readiness({})
+st.info(
+    f"Recommendation priority: {priority_gate['status']}. "
+    "Expected risk reduction, affected population, infrastructure importance, feasibility, cost, time, and uncertainty "
+    "lack complete verified evidence. No score or ranking is produced."
+)
+
+st.header("6. Plan prevention and preparedness actions")
+st.write(
+    "Hazard-specific risk-reduction and preparedness options are planning candidates, "
+    "not site-specific prescriptions. Costs and impact estimates start blank and must "
+    "be supported by documented evidence."
+)
 slug = re.sub(r"[^a-z0-9]+", "_", inputs["hazard"].lower()).strip("_")
 starter_actions = mitigation_actions_for(inputs["hazard"])
 starter_actions["Cost INR"] = pd.Series([None] * len(starter_actions), dtype="object")
@@ -780,7 +913,7 @@ actions = st.data_editor(
 )
 st.caption("No risk-reduction percentages or guaranteed benefits are estimated. Entered cost and priority values remain user-supplied.")
 
-st.header("6. Compare action combinations within a budget")
+st.header("7. Compare action combinations within a budget")
 budget = st.number_input("Available budget (INR)", min_value=0, value=None, step=100000, key=f"workflow_budget_{slug}", help="Leave blank if a budget has not yet been set.")
 action_names = actions["Action"].fillna("").astype(str).str.strip().tolist()
 action_names = [name for name in action_names if name]
@@ -807,24 +940,17 @@ combinations = compare_action_combinations(actions, budget, {"A": combination_a,
 display_dataframe(combinations, hide_index=True, width="stretch")
 st.caption("A combination is shown because you selected its actions. Affordability is cost arithmetic only; priority numbers are supplied by you.")
 
-st.header("7. Generate a report")
-report = report_rows(inputs, evidence, scenarios, actions, budget, combinations, ROOT, evidence_checklist=evidence_checklist, readiness_summary=readiness_plan)
-# Include the same evidence-gated scientific frame in exports so caveats survive outside the app.
-frame_rows = [
-    {"Section": "Scientific scenario frame", "Item": row["Reasoning stage"],
-     "Detail": f'{row["Hazard component"]}: {row["Question to investigate"]} — {row["Status"]}'}
-    for row in scientific_frame["pathways"]
-]
-frame_rows.extend(
-    {"Section": "Scientific evidence gate", "Item": "Required evidence", "Detail": item}
-    for item in scientific_frame["required_evidence"]
+st.header("8. Generate a report")
+report = report_rows(
+    inputs,
+    evidence,
+    scenarios,
+    actions,
+    budget,
+    combinations,
+    ROOT,
+    disaster_assessment=disaster_assessment,
 )
-frame_rows.extend(
-    {"Section": "Scientific limitation", "Item": "Safeguard", "Detail": item}
-    for item in scientific_frame["limitations"]
-)
-frame_rows.append({"Section": "Scientific evidence gate", "Item": "Status", "Detail": scientific_frame["evidence_gate"]})
-report = pd.concat([report, pd.DataFrame(frame_rows)], ignore_index=True, sort=False)
 report_slug = slug or "scenario"
 csv_bytes = report.to_csv(index=False).encode("utf-8-sig")
 html_bytes = report_html(report).encode("utf-8")
