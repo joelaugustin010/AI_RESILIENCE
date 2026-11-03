@@ -34,17 +34,17 @@ from src.decision_workflow import budget_summary
 st.markdown("""
 <style>
 .project-header {
-    background: #ffffff;
+    background: radial-gradient(ellipse at 90% 8%, rgba(76,226,197,.18), transparent 22rem), linear-gradient(118deg, #071a2a 0%, #0b4054 58%, #087e78 100%);
     padding: 28px 32px;
-    border: 1px solid #d9e2ec;
-    border-top: 4px solid #17365d;
+    border: 1px solid rgba(112,226,207,.28);
+    border-top: 4px solid #42e0c1;
     border-radius: 8px;
     margin: 8px 0 26px 0;
-    box-shadow: 0 2px 8px rgba(15, 35, 60, 0.05);
+    box-shadow: 0 22px 54px rgba(0,0,0,.24);
 }
 
 .project-eyebrow {
-    color: #52677f !important;
+    color: #70ead4 !important;
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 1.8px;
@@ -52,7 +52,7 @@ st.markdown("""
 }
 
 .project-title {
-    color: #17365d !important;
+    color: #f1ffff !important;
     font-size: clamp(26px, 3vw, 36px);
     font-weight: 750;
     line-height: 1.25;
@@ -60,7 +60,7 @@ st.markdown("""
 }
 
 .project-description {
-    color: #526174 !important;
+    color: #c3e0e2 !important;
     font-size: 15px;
     line-height: 1.7;
     max-width: 850px;
@@ -297,7 +297,7 @@ if not chart_data.empty:
         text="Cost INR",
         color="Cost INR",
         color_continuous_scale=["#b9e4e8", "#117477", "#103653"],
-        template="plotly_white",
+        template="plotly_dark",
     )
 
     fig.update_traces(
@@ -314,7 +314,7 @@ if not chart_data.empty:
             tickprefix="₹",
             tickformat=",.0f",
             showgrid=True,
-            gridcolor="#e4edf2",
+            gridcolor="#254454",
             zeroline=False,
         ),
         yaxis=dict(
@@ -324,12 +324,12 @@ if not chart_data.empty:
         ),
         coloraxis_showscale=False,
         showlegend=False,
-        plot_bgcolor="white",
-        paper_bgcolor="white",
+        plot_bgcolor="#0b2232",
+        paper_bgcolor="#0b2232",
         font=dict(
             family="Arial, sans-serif",
             size=13,
-            color="#193247",
+            color="#e5f4f4",
         ),
     )
 
