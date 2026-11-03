@@ -186,20 +186,16 @@ st.markdown(
         max-width: 1480px;
     }
 
-    [data-testid="stAppViewContainer"] {
-        background:
-            radial-gradient(circle at 8% 2%, rgba(111, 190, 210, 0.10), transparent 27rem),
-            linear-gradient(180deg, rgba(244, 249, 250, 0.45), transparent 24rem);
-    }
+    [data-testid="stAppViewContainer"] { background: transparent !important; }
 
     .air-hero {
         position: relative;
         overflow: hidden;
         padding: 34px 36px 30px;
-        border: 1px solid rgba(91, 164, 190, 0.28);
+        border: 1px solid rgba(112, 226, 207, 0.28);
         border-radius: 22px;
-        background: linear-gradient(118deg, #e6f4f8 0%, #f1f8f6 54%, #f8fbfa 100%);
-        box-shadow: 0 12px 34px rgba(27, 73, 91, 0.07);
+        background: radial-gradient(ellipse at 90% 8%, rgba(76,226,197,.18), transparent 22rem), linear-gradient(118deg, #071a2a 0%, #0b4054 58%, #087e78 100%);
+        box-shadow: 0 22px 54px rgba(0,0,0,.28);
         margin: 4px 0 22px;
     }
 
@@ -217,7 +213,7 @@ st.markdown(
     }
 
     .air-eyebrow {
-        color: #28768b;
+        color: #70ead4;
         font-size: 0.72rem;
         font-weight: 800;
         letter-spacing: 2.2px;
@@ -225,7 +221,7 @@ st.markdown(
     }
 
     .air-heading {
-        color: #173d50;
+        color: #f1ffff;
         font-size: clamp(2rem, 4vw, 2.7rem);
         font-weight: 800;
         letter-spacing: -1.2px;
@@ -234,7 +230,7 @@ st.markdown(
     }
 
     .air-description {
-        color: #496675;
+        color: #c3e0e2;
         font-size: 1.02rem;
         line-height: 1.7;
         max-width: 850px;
@@ -253,14 +249,14 @@ st.markdown(
         padding: 6px 11px;
         border: 1px solid rgba(47, 119, 139, 0.18);
         border-radius: 999px;
-        color: #315e6d;
-        background: rgba(255,255,255,0.62);
+        color: #c5e5e3;
+        background: rgba(255,255,255,0.08);
         font-size: 0.76rem;
         font-weight: 650;
     }
 
     div[data-testid="stMetric"] {
-        background: rgba(255, 255, 255, 0.82);
+        background: linear-gradient(145deg, rgba(17,48,66,.96), rgba(10,34,49,.96));
         border: 1px solid rgba(87, 143, 160, 0.19);
         border-radius: 15px;
         padding: 15px 17px;
@@ -268,12 +264,12 @@ st.markdown(
     }
 
     div[data-testid="stMetricLabel"] {
-        color: #587481;
+        color: #a7c1c8;
         font-weight: 650;
     }
 
     div[data-testid="stMetricValue"] {
-        color: #183f51;
+        color: #f0ffff;
         font-weight: 780;
     }
 
@@ -291,15 +287,15 @@ st.markdown(
         padding: 7px 11px;
         border: 1px solid rgba(71, 132, 151, 0.20);
         border-radius: 999px;
-        color: #285b6c !important;
-        background: rgba(255,255,255,0.78);
+        color: #c5e5e3 !important;
+        background: rgba(12,35,51,.92);
         text-decoration: none !important;
         font-size: 0.78rem;
         font-weight: 650;
     }
 
     .air-nav a:hover {
-        background: #e5f3f6;
+        background: #164253;
         border-color: rgba(71, 132, 151, 0.42);
     }
 
@@ -307,17 +303,17 @@ st.markdown(
         border: 1px solid rgba(100, 160, 180, 0.22);
         border-radius: 13px;
         overflow: hidden;
-        background: rgba(255,255,255,0.86);
+        background: rgba(12,35,51,.82);
     }
 
     div[data-testid="stExpander"] {
         border: 1px solid rgba(100, 160, 180, 0.24);
         border-radius: 13px;
-        background: rgba(255,255,255,0.62);
+        background: rgba(12,35,51,.72);
     }
 
     h2, h3 {
-        color: #1d4c5e;
+        color: #e7f5f5;
         letter-spacing: -0.35px;
     }
 
