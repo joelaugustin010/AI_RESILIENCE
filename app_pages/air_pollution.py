@@ -729,7 +729,7 @@ def _render_compact_dashboard() -> None:
                 "Reference": f'{guide["limit"]:g} {guide["unit"]} ({guide["averaging"]})' if guide else "Unavailable",
                 "Status": assessment["status"] if item else "Unavailable",
             })
-        st.dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True)
+        display_dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True, alt="Live pollutant readings and reference status")
     else:
         item = current.get(selected)
         guide = POLLUTANT_GUIDELINES.get(selected)
@@ -823,7 +823,7 @@ def _render_compact_dashboard() -> None:
         if not daily_aqi.empty:
             st.caption("Historical KSPCB station extract — not live and not a model estimate.")
             columns = [c for c in ("station", "observed_at", "source_aqi", "PM2.5_value", "PM10_value", "NO2_value", "SO2_value", "CO_value", "O3_value") if c in daily_aqi.columns]
-            st.dataframe(daily_aqi[columns].head(20), hide_index=True, use_container_width=True)
+            display_dataframe(daily_aqi[columns].head(20), hide_index=True, use_container_width=True, alt="Historical KSPCB station AQI and pollutant values")
         else:
             st.info("Historical KSPCB station data is unavailable.")
 
@@ -851,7 +851,7 @@ def _render_compact_dashboard() -> None:
             with st.expander("Reviewed source register", expanded=False):
                 source_rows = [{key: source.get(key) for key in ("id", "publisher", "status", "reviewed_on")} for source in sources if isinstance(source, dict)]
                 if source_rows:
-                    st.dataframe(pd.DataFrame(source_rows), hide_index=True, use_container_width=True)
+                    display_dataframe(pd.DataFrame(source_rows), hide_index=True, use_container_width=True, alt="Reviewed air-quality source register")
 
 
 try:

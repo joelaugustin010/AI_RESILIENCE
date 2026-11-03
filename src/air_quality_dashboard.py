@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+import re
 
 import pandas as pd
 
@@ -15,6 +16,70 @@ POLLUTANT_GUIDELINES = {
     "O3": {"limit": 100.0, "unit": "µg/m³", "averaging": "8-hour", "source": "WHO 2021 air-quality guideline"},
     "CO": {"limit": 4000.0, "unit": "µg/m³", "averaging": "24-hour", "source": "WHO 2021 air-quality guideline (4 mg/m³)"},
 }
+
+_LEGACY_REFERENCE_LIMITS = {
+    "PM2.5": (60.0, "µg/m³", "24-hour"),
+    "PM10": (100.0, "µg/m³", "24-hour"),
+    "NO2": (80.0, "µg/m³", "24-hour"),
+    "SO2": (80.0, "µg/m³", "24-hour"),
+    "CO": (2.0, "mg/m³", "8-hour"),
+    "O3": (100.0, "µg/m³", "8-hour"),
+}
+
+
+def period_matches(actual: object, expected: str) -> bool:
+    """Keep the original explicit averaging-period helper for existing callers."""
+    text = str(actual or "").casefold().replace("_", "-")
+    if expected == "24-hour":
+        return bool(re.search(r"(?:24\s*[- ]?hour|24\s*h(?:r|rs)?)", text))
+    if expected == "8-hour":
+        return bool(re.search(r"(?:8\s*[- ]?hour|8\s*h(?:r|rs)?)", text))
+    return False
+
+
+def classify_reference(
+    value: object,
+    averaging_period: object,
+    quality_flag: object,
+    pollutant: str,
+    unit: object,
+) -> tuple[str, str]:
+    """Compatibility wrapper for the pre-live-feed dashboard test/API."""
+    key = str(pollutant).replace("₂", "2").replace("₃", "3")
+    reference = _LEGACY_REFERENCE_LIMITS.get(key)
+    if reference is None:
+        return "unavailable", "No reference configured"
+    limit, expected_unit, expected_period = reference
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return "unavailable", "No numeric observation"
+    if not math.isfinite(numeric) or numeric < 0:
+        return "unavailable", "No valid numeric observation"
+    if str(quality_flag or "").casefold() != "valid":
+        return "unavailable", "Measurement quality is not marked valid"
+    normalized_unit = (
+        str(unit or "")
+        .casefold()
+        .replace("μ", "u")
+        .replace("µ", "u")
+        .replace("³", "3")
+        .replace(" ", "")
+    )
+    expected_normalized_unit = (
+        expected_unit.casefold()
+        .replace("μ", "u")
+        .replace("µ", "u")
+        .replace("³", "3")
+        .replace(" ", "")
+    )
+    if normalized_unit != expected_normalized_unit:
+        return "unavailable", f"Unit must be {expected_unit}"
+    if not period_matches(averaging_period, expected_period):
+        return "unavailable", f"Needs a {expected_period} observation"
+    if numeric <= limit:
+        return "within", f"Within CPCB {expected_period} standard"
+    return "above", f"Above CPCB {expected_period} standard"
 
 HEALTH_INFORMATION = {
     "PM2.5": {
