@@ -1,468 +1,160 @@
-
-"""Kochi Multi-Hazard Intelligence Dashboard."""
+"""Four-hazard, input-based screening workspace for Ernakulam."""
+from __future__ import annotations
 
 import streamlit as st
-import pandas as pd
 
-from src.evidence_fusion import (
-    SOURCE_REGISTRY,
-    audit_multisource_evidence,
-)
+from src.hazard_screening import HAZARD_CONFIG, LEVELS, assess_all_hazards
 
-from src.flood_model import (
-    FEATURE_COLUMNS,
-    audit_flood_dataset,
-    load_flood_data,
-)
-
-
-# --------------------------------------------------
-# PAGE HEADER
-# --------------------------------------------------
-
-st.title("🌍 KOCHI MULTI-HAZARD INTELLIGENCE")
-
-st.caption(
-    "AI RESILIENCE | Kochi, Kerala, India | "
-    "Multi-Hazard Risk Assessment"
-)
+st.title("Disaster Risk Assessment")
+st.caption("AI RESILIENCE · Ernakulam district, Kerala")
 
 st.info(
-    "Research prototype only. This application does not issue "
-    "emergency warnings or replace official KSDMA, IMD or CWC guidance."
+    "Research prototype only. This page summarizes the conditions you enter; "
+    "it does not issue official warnings or calculate validated hazard probabilities. "
+    "Always follow current KSDMA, IMD and other competent-authority guidance."
 )
 
+mode = st.radio(
+    "Choose assessment mode",
+    ["Simple Mode", "Advanced Mode"],
+    horizontal=True,
+    help="Both modes use the same screening engine. Advanced Mode records scientific measurements as context; it does not silently convert unverified measurements into risk probabilities.",
+)
 
-# --------------------------------------------------
-# HAZARD CONFIGURATION
-# --------------------------------------------------
-
-HAZARDS = {
-    "Flood & Urban Waterlogging": {
-        "icon": "🌊",
-        "status": "Evidence review in progress",
-        "description": (
-            "River flooding, intense rainfall, drainage capacity, "
-            "tidal influence and urban waterlogging."
-        ),
-        "inputs": [
-            "Rainfall observations and forecasts",
-            "Verified river and tide levels",
-            "Terrain and drainage information",
-            "Historical flood-event records",
-        ],
-    },
-
-    "Cyclone & Severe Storm": {
-        "icon": "🌀",
-        "status": "Data integration pending",
-        "description": (
-            "Cyclone tracks, wind conditions, storm surge "
-            "and extreme rainfall affecting coastal Kochi."
-        ),
-        "inputs": [
-            "Official IMD cyclone forecasts",
-            "Wind speed and direction",
-            "Storm-surge information",
-            "Historical cyclone impact records",
-        ],
-    },
-
-    "Landslide": {
-        "icon": "⛰️",
-        "status": "Data integration pending",
-        "description": (
-            "Slope instability and rainfall-related landslide "
-            "susceptibility in relevant mapped areas."
-        ),
-        "inputs": [
-            "Slope and elevation data",
-            "Geological information",
-            "Rainfall history",
-            "Verified landslide inventories",
-        ],
-    },
-
-    "Drought & Water Scarcity": {
-        "icon": "☀️",
-        "status": "Data integration pending",
-        "description": (
-            "Seasonal rainfall deficit, groundwater conditions "
-            "and drinking-water supply stress."
-        ),
-        "inputs": [
-            "Historical rainfall records",
-            "Groundwater monitoring",
-            "Reservoir levels",
-            "Water demand and supply records",
-        ],
-    },
-}
-
-
-# --------------------------------------------------
-# KOCHI LOCATION SELECTOR
-# --------------------------------------------------
-
-st.subheader("📍 Geographic Assessment")
-
+st.subheader("Assessment location")
 area = st.selectbox(
-    "Select assessment area",
+    "Select area",
     [
-        "Kochi City",
-        "Fort Kochi",
-        "Ernakulam",
-        "Vyttila",
-        "Edappally",
-        "Kakkanad",
-        "Kalamassery",
-        "Eloor–Edayar",
+        "Ernakulam district (district-wide)",
+        "Kochi",
         "Aluva",
+        "Kalamassery",
+        "Kakkanad",
+        "Fort Kochi",
+        "North Paravur",
+        "Perumbavoor",
+        "Muvattupuzha",
+        "Kothamangalam",
+        "Angamaly",
         "Tripunithura",
+        "Other / not specified",
     ],
 )
-
 st.caption(
-    f"Selected area: {area}. This selection does not imply "
-    "that validated local hazard data is available."
+    "The location is recorded for context only. The assessment does not have verified "
+    "neighbourhood-level coverage or automatically fetch local observations."
 )
 
-
-# --------------------------------------------------
-# HAZARD OVERVIEW
-# --------------------------------------------------
-
-st.divider()
-st.subheader("⚠️ Hazard Monitoring Overview")
-
-columns = st.columns(4)
-
-for column, (name, details) in zip(
-    columns,
-    HAZARDS.items(),
-):
-    with column:
-        st.markdown(f"### {details['icon']}")
-        st.markdown(f"**{name}**")
-        st.caption(details["status"])
-
-
-# --------------------------------------------------
-# HAZARD TABS
-# --------------------------------------------------
-
-tabs = st.tabs(
-    [
-        "🌊 Flood",
-        "🌀 Cyclone",
-        "⛰️ Landslide",
-        "☀️ Drought",
-        "📚 Evidence Register",
-    ]
+st.subheader("Enter current conditions")
+st.write(
+    "Complete the indicators you can assess. Leave anything unknown as "
+    "'Not known / not checked'; missing information is never treated as zero."
 )
 
+all_inputs: dict[str, dict[str, str]] = {}
+advanced_context: dict[str, dict[str, str]] = {}
 
-# ==================================================
-# 1. FLOOD ASSESSMENT
-# ==================================================
+with st.form("hazard_screening_form"):
+    for hazard, config in HAZARD_CONFIG.items():
+        with st.expander(f"{config['icon']} {hazard}", expanded=True):
+            st.write(config["description"])
+            all_inputs[hazard] = {}
+            advanced_context[hazard] = {}
+            for key, label, question in config["indicators"]:
+                st.markdown(f"**{label}**")
+                st.caption(question)
+                selected = st.selectbox(
+                    label,
+                    list(LEVELS.keys()),
+                    key=f"{hazard}_{key}_level",
+                    label_visibility="collapsed",
+                )
+                all_inputs[hazard][key] = selected
+                if mode == "Advanced Mode":
+                    c1, c2 = st.columns(2)
+                    with c1:
+                        advanced_context[hazard][f"{key}_value"] = st.text_input(
+                            f"{label}: measured value (optional)",
+                            key=f"{hazard}_{key}_value",
+                            placeholder="Enter source-reported value",
+                        )
+                    with c2:
+                        advanced_context[hazard][f"{key}_unit"] = st.text_input(
+                            f"{label}: unit / source (optional)",
+                            key=f"{hazard}_{key}_unit",
+                            placeholder="Unit · source · observation time",
+                        )
+    submitted = st.form_submit_button("Assess all four hazards", type="primary", use_container_width=True)
 
-with tabs[0]:
-
-    st.header("🌊 Flood & Urban Waterlogging")
-
-    st.write(
-        HAZARDS["Flood & Urban Waterlogging"]["description"]
-    )
-
+if submitted:
     try:
-
-        data, metadata = load_flood_data()
-
-        readiness = audit_flood_dataset(
-            data,
-            metadata,
+        results = assess_all_hazards(all_inputs)
+    except ValueError as exc:
+        st.error(f"Assessment could not be completed: {exc}")
+    else:
+        st.divider()
+        st.header("Assessment results")
+        st.caption(f"Selected area: {area} · Mode: {mode}")
+        st.warning(
+            "These are user-input screening summaries, not official alerts, "
+            "validated risk scores or probabilities. No live data was fetched."
         )
-
-        fusion = audit_multisource_evidence([])
-
-        st.subheader("Flood Dataset Readiness")
-
-        if readiness["ready"]:
-
-            st.success(
-                "Dataset passed the current prototype "
-                "screening gates. This does not prove "
-                "predictive accuracy."
-            )
-
-        else:
-
-            st.error(
-                "MODEL STATUS: BLOCKED. "
-                "No flood probability has been calculated."
-            )
-
-        col1, col2, col3, col4 = st.columns(4)
-
-        col1.metric(
-            "Candidate records",
-            readiness["rows"],
+        cols = st.columns(2)
+        for index, (hazard, result) in enumerate(results.items()):
+            with cols[index % 2]:
+                with st.container(border=True):
+                    st.markdown(f"### {HAZARD_CONFIG[hazard]['icon']} {hazard}")
+                    st.subheader(result["category"])
+                    st.write(result["explanation"])
+                    m1, m2 = st.columns(2)
+                    m1.metric("Indicators assessed", f"{result['assessed_count']}/{result['indicator_count']}")
+                    m2.metric("Not checked", result["unknown_count"])
+                    st.caption(f"Method: {result['method']}")
+                    st.caption(f"Assessment period: {HAZARD_CONFIG[hazard]['period']}")
+                    st.markdown("**Conditions entered**")
+                    for key, label, _ in HAZARD_CONFIG[hazard]["indicators"]:
+                        st.write(f"- {label}: {all_inputs[hazard][key]}")
+                    if mode == "Advanced Mode":
+                        supplied = [
+                            (key, value) for key, value in advanced_context[hazard].items()
+                            if value.strip()
+                        ]
+                        if supplied:
+                            with st.expander("Advanced measurements entered"):
+                                for key, value in supplied:
+                                    st.write(f"- {key.replace('_', ' ').title()}: {value}")
+        st.divider()
+        st.subheader("What to do next")
+        st.markdown(
+            """
+            - **Flood / waterlogging:** Check official rainfall and river bulletins; avoid flooded roads and follow local instructions.
+            - **Cyclone / coastal storm:** Follow IMD and KSDMA bulletins; secure loose outdoor items and follow evacuation instructions if issued.
+            - **Landslide:** If new ground movement or slope changes are noticed, move away from the slope and contact local authorities.
+            - **Drought / water scarcity:** Follow local water-supply advisories and use water carefully; verify shortages with the responsible utility.
+            """
         )
-
-        col2.metric(
-            "Available features",
-            f"{readiness['feature_count']}/{len(FEATURE_COLUMNS)}",
+        st.caption(
+            "A low-concern or incomplete result must never be used to delay emergency action. "
+            "For emergencies, contact the appropriate local emergency services."
         )
-
-        col3.metric(
-            "Distinct dates",
-            readiness["distinct_dates"],
-        )
-
-        col4.metric(
-            "Duplicate records",
-            readiness["exact_duplicates"],
-        )
-
-        st.info(
-            "Dataset classification: "
-            + str(metadata.get("data_kind", "Unknown"))
-        )
-
-        if readiness["blockers"]:
-
-            with st.expander(
-                "View dataset blockers",
-                expanded=True,
-            ):
-
-                for item in readiness["blockers"]:
-                    st.markdown(f"- {item}")
-
-        if readiness["warnings"]:
-
-            with st.expander("View warnings"):
-
-                for item in readiness["warnings"]:
-                    st.markdown(f"- {item}")
-
-        st.subheader("Multi-Source Evidence Fusion")
-
-        st.error(
-            f"Fusion status: {fusion['status']}. "
-            "Numerical flood predictions remain disabled."
-        )
-
-        st.caption(fusion["interpretation"])
-
-        for item in fusion["blockers"]:
-            st.markdown(f"- {item}")
-
-        with st.expander("Dataset technical details"):
-
-            st.write(
-                "Date range:",
-                readiness["date_min"],
-                "to",
-                readiness["date_max"],
-            )
-
-            st.write(
-                "Invalid timestamps:",
-                readiness["invalid_timestamps"],
-            )
-
-            st.json(readiness["screening_floors"])
-
-            st.write("Dataset metadata")
-
-            st.json(metadata)
-
-    except (FileNotFoundError, ValueError, OSError, KeyError) as error:
-
-        st.error(
-            f"Flood readiness assessment unavailable: {error}"
-        )
-
-
-# ==================================================
-# 2. CYCLONE ASSESSMENT
-# ==================================================
-
-with tabs[1]:
-
-    st.header("🌀 Cyclone & Severe Storm Assessment")
-
-    details = HAZARDS["Cyclone & Severe Storm"]
-
-    st.write(details["description"])
-
-    st.warning(
-        "MODEL STATUS: NOT YET AVAILABLE"
-    )
-
-    st.write("Required datasets:")
-
-    for item in details["inputs"]:
-        st.markdown(f"- {item}")
-
-    st.info(
-        "Cyclone probability and local impact estimates "
-        "will remain unavailable until official forecast "
-        "products and independently verified historical "
-        "impact records are integrated."
-    )
-
-
-# ==================================================
-# 3. LANDSLIDE ASSESSMENT
-# ==================================================
-
-with tabs[2]:
-
-    st.header("⛰️ Landslide Assessment")
-
-    details = HAZARDS["Landslide"]
-
-    st.write(details["description"])
-
-    st.warning(
-        "MODEL STATUS: NOT YET AVAILABLE"
-    )
-
-    st.write("Required datasets:")
-
-    for item in details["inputs"]:
-        st.markdown(f"- {item}")
-
-    st.info(
-        "A landslide model requires appropriate terrain, "
-        "geology, rainfall and verified event data. "
-        "It must not assume that every part of Kochi "
-        "has the same landslide exposure."
-    )
-
-
-# ==================================================
-# 4. DROUGHT ASSESSMENT
-# ==================================================
-
-with tabs[3]:
-
-    st.header("☀️ Drought & Water Scarcity Assessment")
-
-    details = HAZARDS["Drought & Water Scarcity"]
-
-    st.write(details["description"])
-
-    st.warning(
-        "MODEL STATUS: NOT YET AVAILABLE"
-    )
-
-    st.write("Required datasets:")
-
-    for item in details["inputs"]:
-        st.markdown(f"- {item}")
-
-    st.info(
-        "Drought assessment requires long-term historical "
-        "observations and a clearly defined drought "
-        "measurement methodology."
-    )
-
-
-# ==================================================
-# 5. EVIDENCE REGISTER
-# ==================================================
-
-with tabs[4]:
-
-    st.header("📚 Evidence Source Register")
-
-    st.write(
-        "Reviewed candidate sources for the existing "
-        "flood evidence assessment."
-    )
-
-    rows = []
-
-    for source_id, source in SOURCE_REGISTRY.items():
-
-        rows.append(
-            {
-                "Evidence family": source.get(
-                    "family",
-                    "Unknown",
-                ),
-
-                "Source": source.get(
-                    "title",
-                    source_id,
-                ),
-
-                "Status": source.get(
-                    "status",
-                    "Not documented",
-                ),
-
-                "Unit": source.get(
-                    "unit",
-                    "Not established",
-                ),
-
-                "Limitations": source.get(
-                    "use",
-                    "",
-                ),
-
-                "Reference": source.get(
-                    "url",
-                    "",
-                ),
-            }
-        )
-
-    st.dataframe(
-        pd.DataFrame(rows),
-        hide_index=True,
-        width="stretch",
-        column_config={
-            "Reference": st.column_config.LinkColumn(
-                "Reference"
-            )
-        },
-    )
-
-
-# --------------------------------------------------
-# SCIENTIFIC VALIDATION RULES
-# --------------------------------------------------
 
 st.divider()
+with st.expander("Data sources and scientific limitations"):
+    st.markdown(
+        """
+        **Live data status:** No IMD, CWC, NWIC or KSDMA live feed is connected by this page.
 
-st.header("🔬 Scientific Model Validation")
+        **Model status:** No trained model is used here. The existing flood-model evaluation gate
+        remains separate and unchanged; the current small, unverified example dataset is not
+        promoted into a predictive model.
 
-st.markdown(
-    """
-    Every hazard model must satisfy the following requirements:
+        **How to interpret results:** The screening labels summarize only the condition levels
+        selected by the user. They are not calibrated risk classes, probabilities, return periods,
+        or official warnings. Advanced measurements are displayed as user-entered context and
+        are not automatically interpreted without verified units, timestamps, location matching
+        and defensible hazard-specific thresholds.
 
-    1. Verified and traceable source datasets.
-    2. Correct geographic coverage for Kochi.
-    3. Documented observation timestamps and units.
-    4. Clearly defined hazard-event labels.
-    5. Independent training and evaluation events.
-    6. Comparison against simple baseline models.
-    7. Probability calibration and uncertainty assessment.
-    8. No leakage from information unavailable at prediction time.
-    """
-)
-
-st.success(
-    "Evidence-first architecture enabled. "
-    "Unsupported probability estimates are blocked."
-)
-
-st.caption(
-    "AI RESILIENCE | Kochi, Kerala, India | "
-    "Educational research prototype"
-)
+        **Geographic scope:** Ernakulam district is the intended project scope. Selecting a
+        sub-area does not imply validated local coverage.
+        """
+    )

@@ -33,8 +33,11 @@ jobs:
           else
             git commit -m "Store weather hazard research baselines and evaluation"
             for attempt in 1 2 3 4 5; do
-            git fetch origin main
-            git rebase origin/main
+            # Rebase the generated-artifact commit onto the latest checked-out branch,
+            # not just main; this workflow also runs on feature branches and PRs.
+            branch="${GITHUB_REF_NAME}"
+            git fetch origin "${branch}"
+            git rebase "origin/${branch}"
             if git push; then
               exit 0
             fi

@@ -1,153 +1,38 @@
 {
-  "status": "RESEARCH_BASELINE_TRAINED",
-  "target": "Peak Flood Level (m) >= gauge-specific Danger Level",
-  "interpretation": "Danger-level exceedance among already-recorded flood events only; not flood occurrence probability.",
+  "status": "EXPLORATORY_GAUGE_TRANSFER_BASELINE_NOT_ELIGIBLE_FOR_INTEGRATION",
+  "target": "Danger-level exceedance among already-recorded flood events only; not flood occurrence or flood timing.",
   "dataset": {
-    "name": "INDOFLOODS event, precipitation, metadata and catchment tables",
-    "doi": "10.5281/zenodo.14584654",
+    "source": "INDOFLOODS",
     "url": "https://zenodo.org/records/14584655",
-    "rows_after_required_label_join": 4451,
-    "unique_gauges": 153,
-    "positive_events": 1629,
-    "positive_rate": 0.36598517187148955
-  },
-  "validation": {
-    "method": "One deterministic 75/25 GroupShuffleSplit by gauge; test gauges are unseen in training.",
-    "random_state": 42,
-    "train_rows": 3098,
-    "test_rows": 1353,
-    "train_gauges": 114,
-    "test_gauges": 39,
-    "test_positive_rate": 0.3887657058388766
-  },
-  "model": {
-    "type": "scikit-learn RandomForestClassifier",
-    "n_estimators": 400,
-    "min_samples_leaf": 5,
-    "class_weight": "balanced_subsample",
-    "random_state": 42
+    "doi": "10.5281/zenodo.14584654",
+    "event_rows": 4451,
+    "explicitly_open_gauges": 153,
+    "held_out_gauges": 39,
+    "held_out_events": 1353,
+    "privacy_rule": "Only gauges explicitly marked Open were included.",
+    "event_rainfall_features_excluded": true
   },
   "test_metrics": {
-    "accuracy": 0.614929785661493,
-    "balanced_accuracy": 0.5784456163419938,
-    "precision": 0.505800464037123,
-    "recall": 0.4144486692015209,
-    "f1": 0.4555903866248694,
-    "roc_auc": 0.6456154224578278,
-    "confusion_matrix_tn_fp_fn_tp": [
-      614,
-      213,
-      308,
-      218
-    ]
+    "accuracy": 0.54,
+    "majority_baseline_accuracy": 0.611,
+    "balanced_accuracy": 0.531,
+    "precision": 0.421,
+    "recall": 0.492,
+    "f1": 0.454,
+    "roc_auc": 0.585,
+    "grouped_cv_balanced_accuracy_mean": 0.555,
+    "grouped_cv_balanced_accuracy_std": 0.135,
+    "grouped_cv_roc_auc_mean": 0.598,
+    "grouped_cv_roc_auc_std": 0.124
   },
-  "majority_baseline": {
-    "accuracy": 0.6112342941611234,
-    "balanced_accuracy": 0.5
-  },
-  "features": [
-    "T1d through T10d cumulative event precipitation",
-    "catchment terrain/hydrology/climate/population features",
-    "catchment land-cover, soil and lithology categories"
-  ],
+  "decision": "Do not integrate into the live assessment. Accuracy is below the majority baseline and held-out-gauge skill is weak and variable.",
   "limitations": [
-    "The data contains flood events but not matched non-flood periods; the model cannot learn whether/when a flood will occur.",
-    "The dataset covers Indian gauges, not a Kochi-only sample; this does not establish Kochi/Ernakulam validity.",
-    "Only one grouped holdout split was evaluated; repeated grouped validation, uncertainty intervals, calibration and external validation remain outstanding.",
-    "Not approved for operational warning or public safety decisions."
+    "Contains recorded flood events only and has no representative matched non-event periods.",
+    "Does not predict flood occurrence, timing, water depth, inundation extent, or ward-level impacts.",
+    "Not validated for Kochi or Ernakulam.",
+    "Event-scale rainfall windows are excluded until their timing relative to a prediction issue time is proven.",
+    "Static catchment attributes do not provide event-specific rainfall-driven timing.",
+    "Not an operational early-warning model; follow IMD, CWC, KSDMA and local-authority guidance."
   ],
-  "data_quality_note": "Of 4548 event rows, 4451 could be joined to gauge danger-level metadata; 97 lacked a danger level and were excluded from this training target.",
-  "run_command": "python scripts/train_flood_event_severity_baseline.py --raw-dir data/external/raw",
-  "grouped_cross_validation": {
-    "method": "5-fold GroupKFold by gauge; 300-tree Random Forest per fold",
-    "folds": [
-      {
-        "fold": 1,
-        "train_rows": 3560,
-        "test_rows": 891,
-        "test_gauges": 30,
-        "accuracy": 0.5084175084175084,
-        "balanced_accuracy": 0.46533357291372535,
-        "precision": 0.23607427055702918,
-        "recall": 0.3723849372384937,
-        "f1": 0.288961038961039,
-        "roc_auc": 0.4328426213517468
-      },
-      {
-        "fold": 2,
-        "train_rows": 3561,
-        "test_rows": 890,
-        "test_gauges": 30,
-        "accuracy": 0.7067415730337079,
-        "balanced_accuracy": 0.6830724504377248,
-        "precision": 0.5925925925925926,
-        "recall": 0.5981308411214953,
-        "f1": 0.5953488372093023,
-        "roc_auc": 0.739601640304628
-      },
-      {
-        "fold": 3,
-        "train_rows": 3561,
-        "test_rows": 890,
-        "test_gauges": 31,
-        "accuracy": 0.5853932584269663,
-        "balanced_accuracy": 0.565020488477767,
-        "precision": 0.6441717791411042,
-        "recall": 0.25240384615384615,
-        "f1": 0.3626943005181347,
-        "roc_auc": 0.6424760629665693
-      },
-      {
-        "fold": 4,
-        "train_rows": 3561,
-        "test_rows": 890,
-        "test_gauges": 31,
-        "accuracy": 0.6247191011235955,
-        "balanced_accuracy": 0.6355086919350241,
-        "precision": 0.5661764705882353,
-        "recall": 0.7586206896551724,
-        "f1": 0.6484210526315789,
-        "roc_auc": 0.6391778284411513
-      },
-      {
-        "fold": 5,
-        "train_rows": 3561,
-        "test_rows": 890,
-        "test_gauges": 31,
-        "accuracy": 0.7303370786516854,
-        "balanced_accuracy": 0.6587856769570775,
-        "precision": 0.5146443514644351,
-        "recall": 0.4979757085020243,
-        "f1": 0.5061728395061729,
-        "roc_auc": 0.7102083477625756
-      }
-    ],
-    "mean_std": {
-      "accuracy": {
-        "mean": 0.6311217039306927,
-        "std": 0.09048543920379486
-      },
-      "balanced_accuracy": {
-        "mean": 0.6015441761442637,
-        "std": 0.08798344368496404
-      },
-      "precision": {
-        "mean": 0.5107318928686793,
-        "std": 0.16049423309915128
-      },
-      "recall": {
-        "mean": 0.49590320453420633,
-        "std": 0.19622943320930902
-      },
-      "f1": {
-        "mean": 0.48031961376524557,
-        "std": 0.1521611183448845
-      },
-      "roc_auc": {
-        "mean": 0.6328613001653343,
-        "std": 0.11991234303917417
-      }
-    }
-  },
-  "final_model_fit_rows": 4451
+  "report_url": "https://github.com/joelaugustin010/AI_RESILIENCE/blob/milestone/kochi-cyclone-flood-resilience-20261102/docs/INDOFLOODS_BASELINE_RESULTS_2026-11-02.md"
 }

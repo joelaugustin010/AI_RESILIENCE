@@ -9,9 +9,9 @@ import json
 from pathlib import Path
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import ExtraTreesClassifier, RandomForestClassifier
 from sklearn.impute import SimpleImputer
-from sklearn.metrics import accuracy_score, balanced_accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+from sklearn.metrics import (accuracy_score, balanced_accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, average_precision_score, brier_score_loss, confusion_matrix)
 from sklearn.pipeline import Pipeline
 
 ROOT = Path("data/external/hazards/raw/weather")
@@ -58,18 +58,37 @@ def make_features(df: pd.DataFrame) -> pd.DataFrame:
     out["target_date"] = out["date"] + pd.Timedelta(days=1)
     return out
 
-def fit_target(df: pd.DataFrame, target_col: str, source_target: str, hazard: str) -> dict:
-    train_period = df["date"] < pd.Timestamp(TRAIN_END)
-    train_values = df.loc[train_period, source_target].dropna()
+def feature_columns(df: pd.DataFrame) -> list[str]:
+    """Return predictors available at the end of the current day for a next-day forecast."""
+    current_observations = [
+        "temperature_2m_max", "temperature_2m_min", "precipitation_sum",
+        "wind_speed_10m_max", "wind_gusts_10m_max",
+    ]
+    lagged_observations = [
+        c for c in df.columns
+        if c.endswith(("_lag1", "_lag2", "_lag3", "_lag7", "_prior7_mean"))
+    ]
+    return current_observations + lagged_observations + ["doy_sin", "doy_cos", "year"]
+
+
+def training_event_threshold(
+    df: pd.DataFrame, target_col: str, validation_start: str = "2015-01-01"
+) -> float:
+    """Estimate the 95th-percentile event threshold from training-era target dates only."""
+    train_values = df.loc[df["target_date"] < pd.Timestamp(validation_start), target_col].dropna()
     if len(train_values) < 100:
-        raise RuntimeError(f"Insufficient pre-2020 observations for {hazard}")
-    threshold = float(train_values.quantile(0.95))
+        raise RuntimeError("Insufficient pre-validation training outcomes to estimate event threshold.")
+    return float(train_values.quantile(0.95))
+
+
+def fit_target(df: pd.DataFrame, target_col: str, source_target: str, hazard: str) -> dict:
+    validation_start = pd.Timestamp("2015-01-01")
+    # Using all pre-2020 observations here would leak validation-era outcomes into target definition.
+    threshold = training_event_threshold(df, target_col, str(validation_start.date()))
     data = df.dropna(subset=[target_col, "target_date"]).copy()
     data["target"] = (data[target_col] >= threshold).astype(int)
     cutoff = pd.Timestamp(TRAIN_END)
-    validation_start = pd.Timestamp("2015-01-01")
-    feature_cols = [c for c in df.columns if c.endswith(("_lag1", "_lag2", "_lag3", "_lag7", "_prior7_mean"))]
-    feature_cols += ["doy_sin", "doy_cos", "year"]
+    feature_cols = feature_columns(df)
     data = df.dropna(subset=[target_col, "target_date"]).copy()
     data["target"] = (data[target_col] >= threshold).astype(int)
     data = data.dropna(subset=feature_cols).copy()
@@ -87,37 +106,71 @@ def fit_target(df: pd.DataFrame, target_col: str, source_target: str, hazard: st
             f"train={len(train)}, validation={len(validation)}, final_train={len(final_train)}, test={len(test)}"
         )
 
-    def new_model():
+    def new_model(model_type: str):
+        if model_type == "random_forest":
+            classifier = RandomForestClassifier(
+                n_estimators=300, min_samples_leaf=10,
+                class_weight="balanced_subsample", random_state=42, n_jobs=-1,
+            )
+        elif model_type == "extra_trees":
+            classifier = ExtraTreesClassifier(
+                n_estimators=400, min_samples_leaf=5,
+                class_weight="balanced", random_state=42, n_jobs=-1,
+            )
+        else:
+            raise ValueError(f"Unsupported model type: {model_type}")
         return Pipeline([
             ("imputer", SimpleImputer(strategy="median")),
-            ("rf", RandomForestClassifier(n_estimators=300, min_samples_leaf=10,
-                                          class_weight="balanced_subsample", random_state=42, n_jobs=-1)),
+            ("classifier", classifier),
         ])
 
-    # Choose a probability threshold using 2015-2019 validation only; never tune on 2020+ test data.
-    selection_model = new_model()
-    selection_model.fit(train[feature_cols], train["target"])
-    val_prob = selection_model.predict_proba(validation[feature_cols])[:, list(selection_model.named_steps["rf"].classes_).index(1)]
+    # Compare two tree ensembles and tune their decision thresholds on 2015-2019 only.
+    # The 2020+ test period is not used to select the model or threshold.
     candidates = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7, 0.8]
-    threshold_scores = []
-    for probability_threshold in candidates:
-        val_pred = (val_prob >= probability_threshold).astype(int)
-        threshold_scores.append({
-            "threshold": probability_threshold,
-            "f1": float(f1_score(validation["target"], val_pred, zero_division=0)),
-            "recall": float(recall_score(validation["target"], val_pred, zero_division=0)),
-            "precision": float(precision_score(validation["target"], val_pred, zero_division=0)),
-            "balanced_accuracy": float(balanced_accuracy_score(validation["target"], val_pred)),
+    candidate_results = []
+    for model_type in ("random_forest", "extra_trees"):
+        selection_model = new_model(model_type)
+        selection_model.fit(train[feature_cols], train["target"])
+        class_values = list(selection_model.named_steps["classifier"].classes_)
+        val_prob = selection_model.predict_proba(validation[feature_cols])[:, class_values.index(1)]
+        threshold_scores = []
+        for probability_threshold in candidates:
+            val_pred = (val_prob >= probability_threshold).astype(int)
+            threshold_scores.append({
+                "threshold": probability_threshold,
+                "f1": float(f1_score(validation["target"], val_pred, zero_division=0)),
+                "recall": float(recall_score(validation["target"], val_pred, zero_division=0)),
+                "precision": float(precision_score(validation["target"], val_pred, zero_division=0)),
+                "balanced_accuracy": float(balanced_accuracy_score(validation["target"], val_pred)),
+            })
+        chosen = max(threshold_scores, key=lambda item: (item["f1"], item["recall"], item["precision"]))
+        candidate_results.append({
+            "model_type": model_type,
+            "best_validation_threshold": float(chosen["threshold"]),
+            "best_validation_f1": chosen["f1"],
+            "best_validation_recall": chosen["recall"],
+            "best_validation_precision": chosen["precision"],
+            "best_validation_balanced_accuracy": chosen["balanced_accuracy"],
+            "threshold_scores": threshold_scores,
         })
-    chosen = max(threshold_scores, key=lambda item: (item["f1"], item["recall"], item["precision"]))
-    probability_threshold = float(chosen["threshold"])
 
-    model = new_model()
+    selected = max(candidate_results, key=lambda item: (
+        item["best_validation_f1"], item["best_validation_recall"], item["best_validation_precision"]
+    ))
+    selected_model_type = selected["model_type"]
+    probability_threshold = selected["best_validation_threshold"]
+    threshold_scores = selected["threshold_scores"]
+
+    model = new_model(selected_model_type)
     model.fit(final_train[feature_cols], final_train["target"])
-    prob = model.predict_proba(test[feature_cols])[:, list(model.named_steps["rf"].classes_).index(1)]
+    class_values = list(model.named_steps["classifier"].classes_)
+    prob = model.predict_proba(test[feature_cols])[:, class_values.index(1)]
     pred = (prob >= probability_threshold).astype(int)
     prevalence = float(final_train["target"].mean())
     baseline = np.full(len(test), int(prevalence >= 0.5), dtype=int)
+    persistence_mask = test[source_target].notna()
+    persistence_actual = test.loc[persistence_mask, "target"]
+    persistence_pred = (test.loc[persistence_mask, source_target] >= threshold).astype(int)
     metrics = {
         "accuracy": float(accuracy_score(test["target"], pred)),
         "balanced_accuracy": float(balanced_accuracy_score(test["target"], pred)),
@@ -125,7 +178,15 @@ def fit_target(df: pd.DataFrame, target_col: str, source_target: str, hazard: st
         "recall": float(recall_score(test["target"], pred, zero_division=0)),
         "f1": float(f1_score(test["target"], pred, zero_division=0)),
         "roc_auc": float(roc_auc_score(test["target"], prob)) if test["target"].nunique() == 2 else None,
+        "average_precision": float(average_precision_score(test["target"], prob)) if test["target"].nunique() == 2 else None,
+        "brier_score": float(brier_score_loss(test["target"], prob)),
+        "confusion_matrix_tn_fp_fn_tp": [int(v) for v in confusion_matrix(test["target"], pred, labels=[0, 1]).ravel()],
         "majority_baseline_accuracy": float(accuracy_score(test["target"], baseline)),
+        "majority_baseline_balanced_accuracy": float(balanced_accuracy_score(test["target"], baseline)),
+        "majority_baseline_f1": float(f1_score(test["target"], baseline, zero_division=0)),
+        "persistence_baseline_rows": int(persistence_mask.sum()),
+        "persistence_baseline_balanced_accuracy": float(balanced_accuracy_score(persistence_actual, persistence_pred)) if len(persistence_actual) else None,
+        "persistence_baseline_f1": float(f1_score(persistence_actual, persistence_pred, zero_division=0)) if len(persistence_actual) else None,
     }
     OUT.mkdir(parents=True, exist_ok=True)
     import joblib
@@ -134,10 +195,13 @@ def fit_target(df: pd.DataFrame, target_col: str, source_target: str, hazard: st
         "status": "RESEARCH_BASELINE_TRAINED_NOT_VALIDATED",
         "hazard": hazard, "target_definition": f"next-day {source_target} >= training-period 95th percentile",
         "threshold": threshold, "threshold_units": "°C" if "temperature" in source_target else "mm/day",
-        "threshold_training_period": f"2000-01-01 through 2019-12-31",
+        "threshold_training_period": "2000-01-01 through 2014-12-31 (training target dates only)",
         "model_selection_train_target_dates_before": "2015-01-01",
         "threshold_validation_target_dates": "2015-01-01 through 2019-12-31",
-        "threshold_selection_metric": "F1, tie-break by recall then precision",
+        "model_selection_metric": "Validation F1, tie-break by recall then precision; 2015-2019 only",
+        "model_selection_results": [{k: v for k, v in result.items() if k != "threshold_scores"} for result in candidate_results],
+        "selected_model_type": selected_model_type,
+        "threshold_selection_metric": "F1, tie-break by recall then precision; validation period only",
         "selected_probability_threshold": probability_threshold,
         "validation_threshold_scores": threshold_scores,
         "validation_rows": int(len(validation)),
@@ -151,7 +215,9 @@ def fit_target(df: pd.DataFrame, target_col: str, source_target: str, hazard: st
             "Historical reanalysis/grid-point data are not station observations.",
             "Only four Kerala locations; performance may not generalize outside these grid points.",
             "The 95th-percentile threshold is a research event definition, not an IMD heatwave or official extreme-rainfall warning definition.",
-            "Probability threshold is tuned on 2015-2019 validation predictions; the 2020+ test set is not used for tuning.",
+            "The event-definition percentile is estimated from pre-2015 training target dates only; Random Forest and Extra Trees are compared on 2015-2019 validation data, and the decision threshold is selected there.",
+            "The next-day forecast now includes current-day observations, which are assumed available when the forecast is issued; real forecast availability must be checked before operational use.",
+            "Metrics include a majority baseline, a simple persistence baseline, average precision, Brier score and a confusion matrix; these remain retrospective research metrics.",
             "A single future-period holdout is preliminary; assess calibration, drift and independent station data before any real-world use.",
             "Not an emergency-warning or scientifically approved operational model."
         ]

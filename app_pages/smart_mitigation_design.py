@@ -1,64 +1,60 @@
 import streamlit as st
+from src.dataframe_display import display_dataframe
 import plotly.graph_objects as go
-import numpy as np
 st.set_page_config(
     page_title="Smart Mitigation Design Studio",
     page_icon="🏗️",
     layout="wide"
 )
 
-# Page styling
+
+# Shared dark SDG climate-intelligence workspace styling.
 st.markdown("""
 <style>
-.stApp {
-    background: linear-gradient(135deg, #eaf7ff 0%, #e9fff5 100%);
-}
-
-.block-container {
-    padding-top: 1.5rem;
-    padding-bottom: 2rem;
-}
-
-.design-header {
-    background: linear-gradient(110deg, #073763, #087eaa);
-    padding: 28px;
-    border-radius: 18px;
-    color: white;
-    margin-bottom: 18px;
-    box-shadow: 0 8px 25px rgba(0, 60, 100, 0.15);
-}
-
-.design-header h1 {
-    color: white;
-    margin-bottom: 8px;
-}
-
-.design-header p {
-    color: #e2f5ff;
-    font-size: 16px;
-    margin-bottom: 0;
-}
-
-.concept-note {
-    background: #fff8df;
-    border: 1px solid #f2d27b;
-    border-radius: 12px;
-    padding: 15px;
-    color: #654b00;
-}
+.stApp{background:transparent!important;color:#e7f5f5!important}
+.block-container{padding-top:1.5rem;padding-bottom:3rem;max-width:1500px}
+h1,h2,h3,h4{color:#effafa!important;letter-spacing:-.02em}
+h2{border-bottom:1px solid rgba(130,190,199,.24);padding-bottom:.5rem}
+h3{color:#65e4ce!important}
+p,li,label,.stMarkdown,.stCaption{color:#c5dadd}
+.design-header{position:relative;overflow:hidden;padding:clamp(1.5rem,3vw,2.4rem);border-radius:23px;margin-bottom:1.25rem;background:radial-gradient(ellipse at 88% 12%,rgba(76,226,197,.2),transparent 22rem),linear-gradient(118deg,#071a2a 0%,#0b4054 58%,#087e78 100%);border:1px solid rgba(112,226,207,.28);box-shadow:0 22px 54px rgba(0,0,0,.28);color:#e7f5f5}
+.design-header h1{color:#f1ffff!important;font-size:clamp(2rem,3.5vw,2.8rem)}
+.design-header p{color:#c3e0e2!important;line-height:1.7}
+.concept-note{background:rgba(64,54,28,.55)!important;border:1px solid rgba(235,190,91,.4);border-left:5px solid #e9bd5a;border-radius:12px;padding:17px;color:#f6e6b8!important;line-height:1.6}
+div[data-baseweb="select"]>div,div[data-baseweb="input"]>div,div[data-baseweb="textarea"]>div,div[data-testid="stDateInput"] input,div[data-testid="stNumberInput"] input,div[data-testid="stTextInput"] input,div[data-testid="stTextArea"] textarea{background:#102b3c!important;color:#eaf7f7!important;border:1px solid rgba(130,190,199,.34)!important;border-radius:10px!important}
+div[data-testid="stSlider"],div[data-testid="stMetric"],div[data-testid="stExpander"],div[data-testid="stVerticalBlockBorderWrapper"]>div{background:linear-gradient(145deg,rgba(17,48,66,.96),rgba(10,34,49,.96))!important;border:1px solid rgba(130,190,199,.24)!important;border-radius:14px;color:#e7f5f5!important}
+div[data-testid="stMetric"]{padding:1rem;min-height:108px}
+div[data-testid="stMetricLabel"],.stCaption{color:#a7c1c8!important}
+div[data-testid="stMetricValue"]{color:#f0ffff!important}
+div[data-testid="stProgress"]{background:#16384a;border-radius:20px}
+div[data-testid="stProgress"]>div>div{background:linear-gradient(90deg,#42e0c1,#56c8e8);border-radius:20px}
+div[data-testid="stExpander"] summary,div[data-testid="stExpander"] summary p{color:#e5f4f4!important}
+.stDownloadButton button,div.stButton>button{background:linear-gradient(105deg,#126a70,#147c83)!important;color:#f4ffff!important;border:1px solid rgba(91,223,200,.42)!important;border-radius:11px;font-weight:750;min-height:2.7rem}
+.stDownloadButton button:hover,div.stButton>button:hover{background:linear-gradient(105deg,#16817e,#168b91)!important;border-color:#7bf0d7!important}
+hr{border-color:rgba(130,190,199,.22)!important}
+[data-testid="stDataFrame"],[data-testid="stTable"]{border:1px solid rgba(130,190,199,.22);border-radius:12px}
 </style>
-""", unsafe_allow_html=True)
+""",unsafe_allow_html=True)
 
 # Page header
-st.markdown("""
-<div class="design-header">
-    <h1>🏗️ Smart Mitigation Design Studio</h1>
-    <p>
-        AI RESILIENCE · Kochi, Kerala, India<br>
-        Conceptual urban drainage and flood management design
-    </p>
-</div>
-""", unsafe_allow_html=True)
+
+st.markdown(
+    "<div class='design-header'>",
+    unsafe_allow_html=True
+)
+
+st.markdown(
+    "<div style='font-size:12px; letter-spacing:2px; font-weight:700; color:#398477;'>AI RESILIENCE · ENGINEERING & PLANNING</div>"
+    "<h1>🏗️ Smart Mitigation Design Studio</h1>"
+    "<p>Kochi, Kerala, India<br>Urban Flood Resilience · Concept Design and Budget Planning</p>"
+    "<div style='margin-top:18px; display:inline-block; padding:7px 13px; background:#102b3c; border:1px solid #c5e4dc; border-radius:20px; color:#398477; font-size:12px; font-weight:650;'>CONCEPT STAGE · ENGINEERING REVIEW REQUIRED</div>",
+    unsafe_allow_html=True
+)
+
+st.markdown(
+    "</div>",
+    unsafe_allow_html=True
+)
 
 st.markdown("""
 <div class="concept-note">
@@ -69,10 +65,25 @@ hydraulic calculations, dimensions, costs, and local requirements.
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("")
 
 
-st.markdown("## 🏙️ Project Configuration")
+st.markdown("""
+<div style="
+    margin-top: 12px;
+    margin-bottom: 18px;
+    padding: 15px 20px;
+    background: linear-gradient(120deg, rgba(13,43,60,.98), rgba(10,61,67,.96));
+    border: 1px solid rgba(130,190,199,.28);
+    border-radius: 13px;
+">
+    <h3 style="margin: 0; color: #e7f5f5;">
+        ⚙️ Project Configuration
+    </h3>
+    <p style="margin: 5px 0 0 0; color: #a8c2ca; font-size: 13px;">
+        Define the planning area, rainfall conditions and mitigation components.
+    </p>
+</div>
+""", unsafe_allow_html=True)
 
 left, right = st.columns(2)
 
@@ -102,122 +113,62 @@ with right:
     )
 
 # ==============================
-# RAINFALL SCENARIO CONTROL
+# MITIGATION COMPONENT SELECTION
 # ==============================
 
-st.markdown("### 🌧️ Rainfall Scenario")
-
-rainfall_scenario = st.slider(
-    "Illustrative rainfall intensity (mm/hour)",
-    min_value=0,
-    max_value=150,
-    value=50,
-    step=10,
-    help=(
-        "This is a user-selected scenario for visualization only. "
-        "It is not a live rainfall measurement or flood prediction."
-    )
-)
-
-if rainfall_scenario < 30:
-    rainfall_label = "Low scenario"
-elif rainfall_scenario < 70:
-    rainfall_label = "Moderate scenario"
-elif rainfall_scenario < 110:
-    rainfall_label = "High scenario"
-else:
-    rainfall_label = "Very high scenario"
-
-st.info(
-    f"Selected scenario: {rainfall_label} — "
-    f"{rainfall_scenario} mm/hour"
-)
-
-st.markdown("### 🧩 Select Design Components")
-
-c1, c2, c3 = st.columns(3)
-
-with c1:
-    use_drains = st.checkbox(
-        "Underground drainage channels", value=True
-    )
-    use_inlets = st.checkbox(
-        "Roadside stormwater inlets", value=True
-    )
-
-with c2:
-    use_garden = st.checkbox(
-        "Rain garden / permeable surfaces", value=True
-    )
-    use_storage = st.checkbox(
-        "Detention / storage pond", value=True
-    )
-
-with c3:
-    use_sensors = st.checkbox(
-        "Water-level sensors", value=True
-    )
-    use_maintenance = st.checkbox(
-        "Maintenance access", value=True
-    )
-
-st.markdown("### 💰 Component Cost Estimates")
-
-st.caption(
-    "Enter sourced estimates when available. These inputs do not "
-    "represent verified construction prices."
-)
-
-costs = {}
-
-with st.expander("Configure component costs", expanded=True):
-    cost_col1, cost_col2 = st.columns(2)
-
-    with cost_col1:
-        costs["drains"] = st.number_input(
-            "Underground drainage channels (₹)",
-            min_value=0, value=200000, step=10000
-        )
-        costs["inlets"] = st.number_input(
-            "Stormwater inlets (₹)",
-            min_value=0, value=75000, step=5000
-        )
-        costs["garden"] = st.number_input(
-            "Rain garden / permeable surfaces (₹)",
-            min_value=0, value=100000, step=5000
-        )
-
-    with cost_col2:
-        costs["storage"] = st.number_input(
-            "Detention / storage pond (₹)",
-            min_value=0, value=150000, step=10000
-        )
-        costs["sensors"] = st.number_input(
-            "Water-level sensors (₹)",
-            min_value=0, value=25000, step=1000
-        )
-        costs["maintenance"] = st.number_input(
-            "Maintenance access (₹)",
-            min_value=0, value=25000, step=1000
-        )
-
-selected = {
-    "drains": use_drains,
-    "inlets": use_inlets,
-    "garden": use_garden,
-    "storage": use_storage,
-    "sensors": use_sensors,
-    "maintenance": use_maintenance
-}
+st.markdown("### 🏗️ Select Mitigation Components")
 
 component_names = {
-    "drains": "Underground drainage channels",
+    "drains": "Underground drainage",
     "inlets": "Roadside stormwater inlets",
-    "garden": "Rain garden / permeable surfaces",
-    "storage": "Detention / storage pond",
+    "storage": "Stormwater storage pond",
+    "garden": "Rain garden",
     "sensors": "Water-level sensors",
     "maintenance": "Maintenance access"
 }
+
+# Illustrative planning estimates — not verified quotations
+costs = {
+    "drains": 150000,
+    "inlets": 50000,
+    "storage": 120000,
+    "garden": 60000,
+    "sensors": 40000,
+    "maintenance": 30000
+}
+
+selected = {}
+
+component_col1, component_col2 = st.columns(2)
+
+with component_col1:
+    selected["drains"] = st.checkbox(
+        "Underground drainage", value=True
+    )
+    selected["inlets"] = st.checkbox(
+        "Roadside stormwater inlets", value=True
+    )
+    selected["storage"] = st.checkbox(
+        "Stormwater storage pond", value=True
+    )
+
+with component_col2:
+    selected["garden"] = st.checkbox(
+        "Rain garden", value=True
+    )
+    selected["sensors"] = st.checkbox(
+        "Water-level sensors", value=True
+    )
+    selected["maintenance"] = st.checkbox(
+        "Maintenance access", value=True
+    )
+
+use_drains = selected["drains"]
+use_inlets = selected["inlets"]
+use_storage = selected["storage"]
+use_garden = selected["garden"]
+use_sensors = selected["sensors"]
+use_maintenance = selected["maintenance"]
 
 design_total = sum(
     costs[key] for key in costs if selected[key]
@@ -227,10 +178,50 @@ remaining_budget = available_budget - design_total
 
 
 # ==============================
+# RAINFALL SCENARIO INPUT
+# ==============================
+
+st.markdown("### 🌧️ Rainfall Scenario")
+
+rainfall_scenario = st.slider(
+    "Select illustrative rainfall intensity (mm/hour)",
+    min_value=0,
+    max_value=150,
+    value=50,
+    step=5,
+    key="rainfall_scenario_slider"
+)
+
+if rainfall_scenario < 30:
+    rainfall_label = "Low"
+elif rainfall_scenario < 70:
+    rainfall_label = "Moderate"
+elif rainfall_scenario < 110:
+    rainfall_label = "High"
+else:
+    rainfall_label = "Very high"
+
+# ==============================
 # BUDGET UTILISATION DASHBOARD
 # ==============================
 
-st.markdown("### 💰 Budget Utilisation Dashboard")
+st.markdown("""
+<div style="
+    margin-top: 28px;
+    margin-bottom: 18px;
+    padding: 16px 20px;
+    background: linear-gradient(120deg, rgba(13,43,60,.98), rgba(10,61,67,.96));
+    border: 1px solid rgba(130,190,199,.28);
+    border-radius: 14px;
+">
+    <h3 style="margin: 0; color: #e7f5f5;">
+        📊 Budget Utilisation Dashboard
+    </h3>
+    <p style="margin: 5px 0 0 0; color: #a8c2ca; font-size: 13px;">
+        Monitor estimated project costs against the available planning budget.
+    </p>
+</div>
+""", unsafe_allow_html=True)
 
 budget_col1, budget_col2, budget_col3 = st.columns(3)
 
@@ -263,13 +254,13 @@ else:
     st.info("Enter an available budget greater than ₹0 to view utilisation.")
 
 if design_total > available_budget:
-    st.error(
-        f"Over budget by ₹{design_total - available_budget:,.0f}. "
+    st.warning(
+        f"⚠️ Over budget by ₹{design_total - available_budget:,.0f}. "
         "Review component estimates or the available budget."
     )
 else:
-    st.success(
-        f"₹{remaining_budget:,.0f} remains within the available budget."
+    st.info(
+        f"✓ ₹{remaining_budget:,.0f} remains within the available budget."
     )
 
 
@@ -298,25 +289,7 @@ st.caption(
     "Conceptual flood mitigation planning"
 )
 
-st.markdown("---")
 
-st.markdown("### 📊 Budget Overview")
-
-m1, m2, m3 = st.columns(3)
-
-m1.metric("Available Budget", f"₹{available_budget:,.0f}")
-m2.metric("Estimated Total Cost", f"₹{design_total:,.0f}")
-m3.metric("Budget Remaining", f"₹{remaining_budget:,.0f}")
-
-if design_total > available_budget:
-    st.error(
-        f"Over budget by ₹{design_total - available_budget:,.0f}. "
-        "Adjust the scope or budget estimates."
-    )
-else:
-    st.success(
-        f"Within budget — ₹{remaining_budget:,.0f} remaining."
-    )
 
 
 
@@ -325,10 +298,25 @@ else:
 # ENGINEERING PROJECT BRIEF
 # ==============================
 
-st.markdown("---")
-st.markdown("### 📐 Engineering Concept Brief")
+st.markdown("""
+<div style="
+    margin-top: 28px;
+    margin-bottom: 18px;
+    padding: 16px 20px;
+    background: linear-gradient(120deg, rgba(13,43,60,.98), rgba(10,61,67,.96));
+    border: 1px solid rgba(130,190,199,.28);
+    border-radius: 14px;
+">
+    <h3 style="margin: 0; color: #e7f5f5;">
+        📐 Engineering Concept Brief
+    </h3>
+    <p style="margin: 5px 0 0 0; color: #a8c2ca; font-size: 13px;">
+        Project scope, selected systems and engineering review status.
+    </p>
+</div>
+""", unsafe_allow_html=True)
 
-brief1, brief2, brief3 = st.columns(3)
+brief1, brief2, brief3 = st.columns(3, gap="large")
 
 with brief1:
     st.markdown("**PROJECT**")
@@ -458,9 +446,9 @@ if summary_items:
 
     summary_df = pd.DataFrame(summary_items)
 
-    st.dataframe(
+    display_dataframe(
         summary_df,
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
         column_config={
             "Estimated Cost (₹)": st.column_config.NumberColumn(
@@ -490,8 +478,22 @@ st.caption(
     "Conceptual site visualization for engineering review. "
     "Drag to rotate, scroll to zoom, and hover over components."
 )
-# Illustrative water-level response to selected rainfall
-display_water_z = 0.55 + (rainfall_scenario / 150) * 1.8
+# Illustrative visual parameter only — not a predicted flood depth.
+# Rainfall-responsive visual parameters.
+# These are display effects, NOT hydraulic predictions.
+
+rainfall_fraction = max(
+    0.0,
+    min(float(rainfall_scenario) / 150.0, 1.0)
+)
+
+illustrative_water_level = (
+    0.42 + rainfall_fraction * 0.40
+)
+
+illustrative_pond_level = (
+    0.42 + rainfall_fraction * 0.30
+)
 fig3d = go.Figure()
 
 # 1. Site ground
@@ -563,18 +565,95 @@ def add_plotly_building(x0, y0, length, width, height, label):
         hovertemplate=f"{label}<br>Concept height: {height}<extra></extra>"
     ))
 
-building_layout_3d = [
-    (12, 5, 12, 10, 4, "Residential Block A"),
-    (31, 5, 14, 10, 6, "Residential Block B"),
-    (55, 5, 13, 10, 5, "Residential Block C"),
-    (76, 5, 12, 10, 7, "Residential Block D"),
-    (12, 51, 13, 10, 5, "Residential Block E"),
-    (34, 53, 14, 9, 7, "Residential Block F"),
-    (76, 53, 13, 10, 6, "Residential Block G")
-]
+
+# Area-specific conceptual 3D building layouts
+
+building_layouts = {
+    "Low-lying flood-prone area": [
+        (12, 5, 12, 10, 3, "Low-rise Block A"),
+        (31, 5, 14, 10, 3, "Low-rise Block B"),
+        (55, 5, 13, 10, 4, "Low-rise Block C"),
+        (76, 5, 12, 10, 3, "Low-rise Block D"),
+        (12, 51, 13, 10, 3, "Low-rise Block E"),
+        (34, 53, 14, 9, 4, "Low-rise Block F"),
+        (76, 53, 13, 10, 3, "Low-rise Block G")
+    ],
+
+    "Urban road": [
+        (12, 5, 12, 10, 5, "Roadside Building A"),
+        (31, 5, 14, 10, 7, "Roadside Building B"),
+        (55, 5, 13, 10, 6, "Roadside Building C"),
+        (76, 5, 12, 10, 8, "Roadside Building D"),
+        (12, 51, 13, 10, 5, "Roadside Building E"),
+        (34, 53, 14, 9, 7, "Roadside Building F"),
+        (76, 53, 13, 10, 6, "Roadside Building G")
+    ],
+
+    "Residential neighbourhood": [
+        (12, 5, 12, 10, 4, "Residential Block A"),
+        (31, 5, 14, 10, 6, "Residential Block B"),
+        (55, 5, 13, 10, 5, "Residential Block C"),
+        (76, 5, 12, 10, 7, "Residential Block D"),
+        (12, 51, 13, 10, 5, "Residential Block E"),
+        (34, 53, 14, 9, 7, "Residential Block F"),
+        (76, 53, 13, 10, 6, "Residential Block G")
+    ],
+
+    "Commercial area": [
+        (12, 5, 12, 10, 8, "Commercial Building A"),
+        (31, 5, 14, 10, 9, "Commercial Building B"),
+        (55, 5, 13, 10, 8, "Commercial Building C"),
+        (76, 5, 12, 10, 9, "Commercial Building D"),
+        (12, 51, 13, 10, 7, "Commercial Building E"),
+        (34, 53, 14, 9, 9, "Commercial Building F"),
+        (76, 53, 13, 10, 8, "Commercial Building G")
+    ]
+}
+
+building_layout_3d = building_layouts.get(
+    area_type,
+    building_layouts["Residential neighbourhood"]
+)
+
 
 for building in building_layout_3d:
     add_plotly_building(*building)
+
+    # ==========================================
+# AREA-RESPONSIVE COMPONENT POSITIONING
+# ==========================================
+
+component_layouts = {
+    "Low-lying flood-prone area": {
+        "garden": (50, 61, 48, 56),
+        "pond": (63, 74, 48, 64)
+    },
+
+    "Urban road": {
+        "garden": (50, 61, 49, 57),
+        "pond": (63, 74, 49, 65)
+    },
+
+    "Residential neighbourhood": {
+        "garden": (50, 61, 50, 58),
+        "pond": (63, 74, 48, 64)
+    },
+
+    "Commercial area": {
+        "garden": (50, 61, 48, 56),
+        "pond": (63, 74, 50, 66)
+    }
+}
+
+active_layout = component_layouts[area_type]
+
+garden_x0, garden_x1, garden_y0, garden_y1 = (
+    active_layout["garden"]
+)
+
+pond_x0, pond_x1, pond_y0, pond_y1 = (
+    active_layout["pond"]
+)
 
 
 # Drainage corridor — 3D channel with banks and flowing water
@@ -597,7 +676,7 @@ if use_drains:
     fig3d.add_trace(go.Mesh3d(
         x=[8, 92, 92, 8],
         y=[25, 25, 29, 29],
-        z=[display_water_z] * 4,
+        z=[illustrative_pond_level] * 4,
         i=[0, 0],
         j=[1, 2],
         k=[2, 3],
@@ -607,43 +686,115 @@ if use_drains:
         hovertemplate="Conceptual stormwater surface<extra></extra>"
     ))
 
-    # Raised channel banks
+        # Subtle water-surface highlights
+    for highlight_y in [26.0, 28.0]:
+        fig3d.add_trace(go.Scatter3d(
+            x=[12, 88],
+            y=[highlight_y, highlight_y],
+            z=[
+                illustrative_water_level + 0.015,
+                illustrative_water_level + 0.015
+            ],
+            mode="lines",
+            line=dict(color="#bae6fd", width=2),
+            showlegend=False,
+            hoverinfo="skip"
+        ))
+
+    # Water-surface edge indicator
+    fig3d.add_trace(go.Scatter3d(
+        x=[8, 92],
+        y=[25, 25],
+        z=[
+            illustrative_water_level + 0.01,
+            illustrative_water_level + 0.01
+        ],
+        mode="lines",
+        line=dict(color="#7dd3fc", width=2),
+        showlegend=False,
+        hoverinfo="skip"
+    ))
+    # Proper 3D concrete drainage channel walls
     for bank_y in [24, 30]:
+
+        fig3d.add_trace(go.Mesh3d(
+            x=[8, 92, 92, 8],
+            y=[bank_y, bank_y, bank_y, bank_y],
+            z=[0.35, 0.35, 0.90, 0.90],
+            i=[0, 0],
+            j=[1, 2],
+            k=[2, 3],
+            color="#94a3b8",
+            opacity=1,
+            flatshading=True,
+            name="Concrete channel wall",
+            showlegend=(bank_y == 24),
+            hovertemplate=(
+                "Concrete drainage channel wall"
+                "<br>Conceptual height: 0.55 units"
+                "<extra></extra>"
+            )
+        ))
+
+        # Upper wall edge
         fig3d.add_trace(go.Scatter3d(
             x=[8, 92],
             y=[bank_y, bank_y],
-            z=[0.9, 0.9],
+            z=[0.90, 0.90],
             mode="lines",
-            line=dict(color="#64748b", width=10),
-            name="Channel bank",
-            showlegend=(bank_y == 24),
-            hovertemplate="Conceptual channel bank<extra></extra>"
+            line=dict(
+                color="#cbd5e1",
+                width=5
+            ),
+            showlegend=False,
+            hoverinfo="skip"
         ))
 
-    # Flow direction arrows
-    # Small flow-direction arrows
-    fig3d.add_trace(go.Cone(
-        x=[25, 48, 71],
-        y=[27, 27, 27],
-        z=[0.8, 0.8, 0.8],
-        u=[1, 1, 1],
-        v=[0, 0, 0],
-        w=[0, 0, 0],
-        sizemode="absolute",
-        sizeref=0.7,
-        anchor="tail",
-        colorscale=[[0, "#e0f2fe"], [1, "#0284c7"]],
-        showscale=False,
-        name="Illustrative flow direction",
-        hovertemplate="Illustrative flow direction<extra></extra>"
+
+    
+    # Compact drainage flow-direction indicators
+    flow_z = illustrative_water_level + 0.10
+
+    fig3d.add_trace(go.Scatter3d(
+        x=[
+            25, 27, None,
+            48, 50, None,
+            71, 73
+        ],
+        y=[
+            27, 27, None,
+            27, 27, None,
+            27, 27
+        ],
+        z=[
+            flow_z, flow_z, None,
+            flow_z, flow_z, None,
+            flow_z, flow_z
+        ],
+        mode="lines+markers",
+        line=dict(
+            color="#e0f7ff",
+            width=5
+        ),
+        marker=dict(
+            size=3,
+            color="#e0f7ff",
+            symbol="circle"
+        ),
+        name="Illustrative water-flow direction",
+        hovertemplate=(
+            "Conceptual flow direction"
+            "<extra></extra>"
+        )
     ))
+
 
 
 # 5. Rain garden
 if use_garden:
     fig3d.add_trace(go.Mesh3d(
-        x=[15, 38, 38, 15],
-        y=[48, 48, 62, 62],
+        x=[garden_x0, garden_x1, garden_x1, garden_x0],
+        y=[garden_y0, garden_y0, garden_y1, garden_y1],
         z=[0.35, 0.35, 0.35, 0.35],
         i=[0, 0], j=[1, 2], k=[2, 3],
         color="#239b68",
@@ -654,19 +805,72 @@ if use_garden:
     
     # Rain garden — conceptual raised edging
     fig3d.add_trace(go.Scatter3d(
-        x=[15, 38, 38, 15, 15],
-        y=[48, 48, 62, 62, 48],
-        z=[0.65, 0.65, 0.65, 0.65, 0.65],
+        x=[
+            garden_x0, garden_x1, garden_x1,
+            garden_x0, garden_x0
+        ],
+        y=[
+            garden_y0, garden_y0, garden_y1,
+            garden_y1, garden_y0
+        ],
+        z=[[0.80] * 5, 0.65, 0.65, 0.65, 0.65],
         mode="lines",
         line=dict(color="#475569", width=6),
         name="Rain-garden edging",
         hovertemplate="Conceptual garden edging<extra></extra>"
     ))
-
+        # Rain garden — 3D vegetation clusters
+    fig3d.add_trace(go.Scatter3d(
+                x=[
+            garden_x0 + 1, garden_x0 + 2,
+            garden_x0 + 3, garden_x0 + 5,
+            garden_x0 + 7, garden_x0 + 9,
+            garden_x0 + 2, garden_x0 + 4,
+            garden_x0 + 6, garden_x0 + 8
+        ],
+        y=[
+            garden_y0 + 1, garden_y0 + 4,
+            garden_y0 + 2, garden_y0 + 6,
+            garden_y0 + 1, garden_y0 + 4,
+            garden_y0 + 7, garden_y0 + 6,
+            garden_y0 + 1, garden_y0 + 3
+        ],
+        z=[
+            0.65, 0.72, 0.68, 0.75, 0.66, 0.72,
+            0.68, 0.74, 0.70, 0.67
+        ],
+        mode="markers",
+        marker=dict(
+            size=11,
+            color=[
+                "#166534", "#15803d", "#22c55e",
+                "#166534", "#15803d", "#22c55e",
+                "#166534", "#15803d", "#22c55e",
+                "#166534"
+            ],
+            symbol="circle",
+            line=dict(
+                color="#bbf7d0",
+                width=1
+            )
+        ),
+        name="Rain-garden vegetation",
+        hovertemplate="Conceptual vegetation<extra></extra>"
+    ))
     # Shallow infiltration zone
     fig3d.add_trace(go.Mesh3d(
-        x=[19, 34, 34, 19],
-        y=[51, 51, 59, 59],
+                x=[
+            garden_x0 + 2,
+            garden_x1 - 2,
+            garden_x1 - 2,
+            garden_x0 + 2
+        ],
+        y=[
+            garden_y0 + 2,
+            garden_y0 + 2,
+            garden_y1 - 2,
+            garden_y1 - 2
+        ],
         z=[0.42, 0.42, 0.42, 0.42],
         i=[0, 0],
         j=[1, 2],
@@ -680,15 +884,54 @@ if use_garden:
 
 
 
+    # Conceptual vegetation clusters
+    vegetation_positions = [
+        (garden_x0 + 2, garden_y0 + 3),
+        (garden_x0 + 4, garden_y0 + 6),
+        (garden_x0 + 6, garden_y0 + 3),
+        (garden_x0 + 8, garden_y0 + 6),
+        (garden_x0 + 9, garden_y0 + 2),
+        (garden_x0 + 5, garden_y0 + 8)
+    ]
+
+    for plant_index, (px, py) in enumerate(vegetation_positions):
+        fig3d.add_trace(go.Scatter3d(
+            x=[px, px],
+            y=[py, py],
+            z=[0.45, 1.15],
+            mode="lines",
+            line=dict(
+                color="#166534",
+                width=5
+            ),
+            showlegend=(plant_index == 0),
+            name="Conceptual vegetation"
+        ))
+
+        fig3d.add_trace(go.Scatter3d(
+            x=[px],
+            y=[py],
+            z=[1.15],
+            mode="markers",
+            marker=dict(
+                size=8,
+                color="#4ade80",
+                symbol="circle",
+                line=dict(color="#14532d", width=1)
+            ),
+            showlegend=False,
+            hovertemplate="Illustrative vegetation cluster<extra></extra>"
+        ))
+
 # 6. Stormwater storage pond
 if use_storage:
-    pond_x = [62, 88, 88, 62]
-    pond_y = [48, 48, 62, 62]
+    pond_x = [pond_x0, pond_x1, pond_x1, pond_x0]
+    pond_y = [pond_y0, pond_y0, pond_y1, pond_y1]
 
     fig3d.add_trace(go.Mesh3d(
         x=pond_x,
         y=pond_y,
-        z=[display_water_z] * 4,
+        z=[illustrative_water_level] * 4,
         i=[0, 0],
         j=[1, 2],
         k=[2, 3],
@@ -697,6 +940,48 @@ if use_storage:
         name="Concept detention pond",
         hovertemplate="Stormwater storage concept<extra></extra>"
     ))
+    
+    # Conceptual pond perimeter
+    fig3d.add_trace(go.Scatter3d(
+        x=[pond_x0, pond_x1, pond_x1, pond_x0, pond_x0],
+        y=[pond_y0, pond_y0, pond_y1, pond_y1, pond_y0], 
+        z=[0.65, 0.65, 0.65, 0.65, 0.65],
+        mode="lines",
+        line=dict(
+            color="#a16207",
+            width=9
+        ),
+        name="Pond perimeter",
+        hovertemplate="Conceptual pond boundary<extra></extra>"
+    ))
+
+    # Landscape buffer around pond
+    fig3d.add_trace(go.Scatter3d(
+        x=[
+    pond_x0 + 2,
+    pond_x1 - 2,
+    pond_x1 - 2,
+    pond_x0 + 2,
+    pond_x0 + 2
+],
+        y=[
+    pond_y0 - 2,
+    pond_y0 - 2,
+    pond_y1 + 2,
+    pond_y1 + 2,
+    pond_y0 - 2
+],
+        z=[0.40, 0.40, 0.40, 0.40, 0.40],
+        mode="lines",
+        line=dict(
+            color="#4ade80",
+            width=5,
+            dash="dot"
+        ),
+        name="Pond landscape buffer",
+        hovertemplate="Illustrative landscape buffer<extra></extra>"
+    ))
+
 
 # 7. Roadside inlets — conceptual 3D grates
 if use_inlets:
@@ -826,8 +1111,8 @@ if use_sensors:
 
 # 9. Project labels
 fig3d.add_trace(go.Scatter3d(
-    x=[20, 72, 28],
-    y=[27, 57, 58],
+    x=[20, pond_x0 + 3, garden_x0 + 2],
+    y=[27, pond_y0 + 3, garden_y0 + 1],
     z=[3, 3, 4],
     mode="text",
     text=[
@@ -840,60 +1125,353 @@ fig3d.add_trace(go.Scatter3d(
     hoverinfo="skip"
 ))
 
-# 10. Professional scene layout
+
+
+# ==========================================
+# PROFESSIONAL 3D PRESENTATION LAYOUT
+# ==========================================
+
 fig3d.update_layout(
     title=dict(
-        text="KOCHI | URBAN FLOOD RESILIENCE — CONCEPT MODEL",
+        text=(
+            "KOCHI | URBAN FLOOD RESILIENCE"
+            "<br><sup>INTERACTIVE 3D SITE MODEL · CONCEPT DESIGN</sup>"
+        ),
         x=0.5,
-        xanchor="center"
+        xanchor="center",
+        y=0.97,
+        font=dict(
+            family="Arial",
+            size=22,
+            color="#e7f5f5"
+        )
     ),
-    height=720,
-    margin=dict(l=0, r=0, t=65, b=0),
-    paper_bgcolor="#eef6f8",
+    height=760,
+    margin=dict(l=15, r=15, t=100, b=75),
+
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(0,0,0,0)",
+
     scene=dict(
-        bgcolor="#eaf2f5",
+    bgcolor="#0b2435",
+
         xaxis=dict(
-            title="Site length (concept units)",
+            title="",
             range=[0, 100],
             showbackground=True,
-            backgroundcolor="#e5edf0",
-            gridcolor="#cbd5e1"
+            backgroundcolor="#102b3c",
+            gridcolor="rgba(130,190,199,.25)",
+            zerolinecolor="rgba(130,190,199,.45)",
+            showspikes=False,
+            color="#b8d1d5",
+            tickfont=dict(size=10),
+            nticks=6
         ),
+
         yaxis=dict(
-            title="Site width (concept units)",
+            title="",
             range=[0, 70],
             showbackground=True,
-            backgroundcolor="#e5edf0",
-            gridcolor="#cbd5e1"
+            backgroundcolor="#102b3c",
+            gridcolor="rgba(130,190,199,.25)",
+            zerolinecolor="rgba(130,190,199,.45)",
+            showspikes=False,
+            color="#b8d1d5",
+            tickfont=dict(size=10),
+            nticks=5
         ),
+
         zaxis=dict(
-            title="Concept elevation",
+            title="",
             range=[0, 10],
             showbackground=True,
-            backgroundcolor="#e5edf0",
-            gridcolor="#cbd5e1"
+            backgroundcolor="#102b3c",
+            gridcolor="rgba(130,190,199,.25)",
+            zerolinecolor="rgba(130,190,199,.45)",
+            showspikes=False,
+            color="#b8d1d5",
+            tickfont=dict(size=10),
+            nticks=5
         ),
-        
-        aspectmode="manual",
-        aspectratio=dict(x=1.6, y=1.15, z=0.85),
-        camera=dict(
-            eye=dict(x=1.8, y=-2.1, z=1.45),
-            center=dict(x=0, y=0, z=-0.08),
-            up=dict(x=0, y=0, z=1),
-            projection=dict(type="perspective")
-        )
 
+        # Reduce vertical exaggeration
+        aspectmode="manual",
+        aspectratio=dict(
+            x=1.8,
+            y=1.25,
+            z=0.55
+        ),
+
+        # More balanced engineering perspective
+        camera=dict(
+            eye=dict(
+                x=1.65,
+                y=-1.85,
+                z=1.25
+            ),
+            center=dict(
+                x=0,
+                y=0,
+                z=0
+            ),
+            up=dict(
+                x=0,
+                y=0,
+                z=1
+            ),
+            projection=dict(type="orthographic")
+        ),
+
+        dragmode="turntable"
     ),
+
     legend=dict(
+        title=dict(
+            text="DESIGN COMPONENTS",
+            font=dict(
+                color="#e7f5f5",
+                size=11
+            )
+        ),
         orientation="h",
         yanchor="bottom",
-        y=-0.12,
+        y=-0.16,
         xanchor="center",
-        x=0.5
-    )
+        x=0.5,
+        font=dict(
+            color="#e7f5f5",
+            size=10
+        ),
+        bgcolor="rgba(12,35,51,0.98)",
+        bordercolor="rgba(130,190,199,0.35)",
+        borderwidth=1,
+        itemsizing="constant"
+    ),
+
+    font=dict(
+        family="Arial",
+        color="#e7f5f5"
+    ),
+
+    hoverlabel=dict(
+        bgcolor="#102b3c",
+        bordercolor="rgba(130,190,199,.4)",
+        font=dict(
+            color="#ffffff",
+            size=12
+        )
+    ),
+
+    uirevision="kochi-engineering-model"
 )
 
-st.plotly_chart(fig3d, use_container_width=True)
+# ==========================================
+# RENDER PRESENTATION MODEL
+# ==========================================
+
+st.plotly_chart(
+    fig3d,
+    use_container_width=True,
+    config={
+        "displaylogo": False,
+        "scrollZoom": True,
+        "responsive": True,
+        "displayModeBar": True,
+        "modeBarButtonsToRemove": [
+            "lasso3d",
+            "select3d"
+        ]
+    },
+    key="kochi_flood_resilience_3d"
+)
+
+# ==========================================
+# LIVE 3D DESIGN INTELLIGENCE PANEL
+# ==========================================
+
+st.markdown("""
+<div style="
+    margin-top: 30px;
+    margin-bottom: 18px;
+    padding: 17px 21px;
+    background: linear-gradient(120deg, rgba(13,43,60,.98), rgba(10,61,67,.96));
+    border: 1px solid rgba(130,190,199,.28);
+    border-radius: 14px;
+">
+    <h3 style="margin: 0; color: #e7f5f5;">
+        🧠 Live Design Intelligence
+    </h3>
+    <p style="margin: 5px 0 0 0; color: #a8c2ca; font-size: 13px;">
+        Real-time overview of your selected design configuration.
+    </p>
+</div>
+""", unsafe_allow_html=True)
+
+live_col1, live_col2, live_col3, live_col4 = st.columns(4)
+
+selected_component_count = sum([
+    use_drains,
+    use_inlets,
+    use_garden,
+    use_storage,
+    use_sensors,
+    use_maintenance
+])
+
+with live_col1:
+    st.metric(
+        "Active Components",
+        f"{selected_component_count}/6"
+    )
+
+with live_col2:
+    st.metric(
+        "Rainfall Scenario",
+        f"{rainfall_scenario} mm/h"
+    )
+
+with live_col3:
+    st.metric(
+        "Area Configuration",
+        area_type
+    )
+
+with live_col4:
+    st.metric(
+        "Budget Status",
+        "Over budget" if design_total > available_budget
+        else "Within budget"
+    )
+
+st.caption(
+    "Live values reflect user-selected design settings. "
+    "They are not independently verified engineering measurements."
+)
+
+
+
+# ==========================================
+# RAINFALL SCENARIO COMPARISON
+# ==========================================
+
+st.markdown("---")
+st.markdown("### 🌧️ Rainfall Scenario Comparison")
+
+st.caption(
+    "Illustrative display comparison using three rainfall inputs. "
+    "This is not a hydraulic flood simulation."
+)
+
+scenario_col1, scenario_col2, scenario_col3 = st.columns(3)
+
+scenario_values = [
+    ("Lower scenario", 30),
+    ("Moderate scenario", 75),
+    ("Higher scenario", 120)
+]
+
+for column, (scenario_name, scenario_rainfall) in zip(
+    [scenario_col1, scenario_col2, scenario_col3],
+    scenario_values
+):
+    with column:
+        display_level = (
+            0.42 + (scenario_rainfall / 150) * 0.40
+        )
+
+        pond_display_level = (
+            0.42 + (scenario_rainfall / 150) * 0.30
+        )
+
+        st.markdown(f"**{scenario_name}**")
+        st.metric(
+            "Rainfall input",
+            f"{scenario_rainfall} mm/hour"
+        )
+        st.metric(
+            "Illustrative channel level",
+            f"{display_level:.2f}"
+        )
+        st.metric(
+            "Illustrative pond level",
+            f"{pond_display_level:.2f}"
+        )
+# ==========================================
+# MITIGATION CONFIGURATION COMPARISON
+# ==========================================
+
+st.markdown("---")
+st.markdown("### 🏗️ Mitigation Configuration Comparison")
+
+st.caption(
+    "Compare your selected design with a fully integrated "
+    "component package. Costs are estimates, not engineering quotations."
+)
+
+# Current configuration
+current_components = [
+    key for key in costs
+    if selected.get(key, False)
+]
+
+# Fully integrated configuration
+all_components = list(costs.keys())
+
+full_package_cost = sum(costs.values())
+
+current_component_count = len(current_components)
+full_component_count = len(all_components)
+
+compare_col1, compare_col2 = st.columns(2)
+
+with compare_col1:
+    st.markdown("#### Current Design")
+    st.metric(
+        "Active components",
+        current_component_count
+    )
+    st.metric(
+        "Estimated project cost",
+        f"₹{design_total:,.0f}"
+    )
+    st.metric(
+        "Remaining budget",
+        f"₹{remaining_budget:,.0f}"
+    )
+
+    st.write("**Included components**")
+    if current_components:
+        for key in current_components:
+            st.write(f"✅ {component_names.get(key, key.title())}")
+    else:
+        st.info("No components selected.")
+
+with compare_col2:
+    st.markdown("#### Fully Integrated Package")
+    st.metric(
+        "Active components",
+        full_component_count
+    )
+    st.metric(
+        "Estimated project cost",
+        f"₹{full_package_cost:,.0f}"
+    )
+
+    full_package_balance = available_budget - full_package_cost
+
+    st.metric(
+        "Budget balance",
+        f"₹{full_package_balance:,.0f}"
+    )
+
+    st.write("**Included components**")
+    for key in all_components:
+        st.write(f"📦 {component_names.get(key, key.title())}")
+
+st.info(
+    "This comparison evaluates component selection and estimated cost only. "
+    "It does not predict flood-depth reduction or hydraulic performance."
+)
 # ==============================
 # LIVE RAINFALL STATUS
 # ==============================
@@ -917,12 +1495,26 @@ with status_col2:
 with status_col3:
     st.metric(
         "Illustrative Display Level",
-        f"{display_water_z:.2f} units"
+        f"{illustrative_water_level:.2f} units"
     )
 
 st.caption(
     "Display level is a visualization parameter, not a measured "
     "water depth or a validated flood prediction."
+)
+
+# ==============================
+# RAINFALL SCENARIO INPUT
+# ==============================
+
+st.markdown("### 🌧️ Rainfall Scenario")
+
+rainfall_scenario = st.slider(
+    "Select illustrative rainfall intensity (mm/hour)",
+    min_value=0,
+    max_value=150,
+    value=50,
+    step=5
 )
 # ==============================
 # RAINFALL IMPACT INDICATOR
@@ -948,63 +1540,59 @@ st.caption(
     "It does not calculate actual flood probability or safety."
 )
 
-use_rain_garden = st.checkbox(
-    "Include Rain Garden",
-    value=True
-)
-# ==============================
-# DESIGN SUMMARY
-# ==============================
 
-st.markdown("### 🏗️ Flood Management Design Summary")
 
-summary_col1, summary_col2 = st.columns(2)
+# ==========================================
+# ENGINEERING CONCEPT SUMMARY
+# ==========================================
 
-with summary_col1:
-    st.markdown("#### ✅ Selected Components")
+st.markdown("""
+<div style="
+    margin-top: 30px;
+    margin-bottom: 18px;
+    padding: 17px 21px;
+    background: linear-gradient(120deg, rgba(13,43,60,.98), rgba(10,61,67,.96));
+    border: 1px solid rgba(130,190,199,.28);
+    border-radius: 14px;
+">
+    <h3 style="margin: 0; color: #e7f5f5;">
+        🏗️ Flood-Management Design Overview
+    </h3>
+    <p style="margin: 5px 0 0 0; color: #a8c2ca; font-size: 13px;">
+        Summary of the mitigation systems included in this concept design.
+    </p>
+</div>
+""", unsafe_allow_html=True)
 
-    if use_drains:
-        st.write("• Stormwater drainage channel")
-
-    if use_storage:
-        st.write("• Stormwater storage pond")
-
-    if use_rain_garden:
-        st.write("• Rain garden / infiltration zone")
-
-    if not any([use_drains, use_storage, use_rain_garden]):
-        st.info("No mitigation components selected.")
-
-with summary_col2:
-    st.markdown("#### 🌧️ Scenario Details")
-    st.write(f"**Project:** {project_name}")
-    st.write(f"**Area type:** {area_type}")
-    st.write(f"**Selected rainfall:** {rainfall_scenario} mm/hour")
-    st.write(f"**Scenario category:** {rainfall_label}")
-    st.write(f"**Available budget:** ₹{available_budget:,.0f}")
-
-st.warning(
-    "Conceptual design only. Component selection and budget do not "
-    "establish flood protection performance. Professional site surveys, "
-    "hydraulic calculations, and engineering review are required."
-)
-# 10. Engineering concept summary
-st.markdown("### 🏗️ Flood-Management Design Summary")
-
-summary_col1, summary_col2, summary_col3 = st.columns(3)
+summary_col1, summary_col2, summary_col3, summary_col4 = st.columns(4)
 
 with summary_col1:
-    st.metric("Drainage", "Included" if use_drains else "Disabled")
-    st.caption("Conceptual stormwater channel")
+    st.metric(
+        "Drainage",
+        "Included" if use_drains else "Not selected"
+    )
+    st.caption("Stormwater channel")
 
 with summary_col2:
-    st.metric("Green Infrastructure", "Included" if use_garden else "Disabled")
-    st.caption("Rain garden and infiltration zone")
+    st.metric(
+        "Storage",
+        "Included" if use_storage else "Not selected"
+    )
+    st.caption("Retention pond")
 
 with summary_col3:
-    st.metric("Monitoring", "Included" if use_sensors else "Disabled")
-    st.caption("Conceptual water-level sensors")
+    st.metric(
+        "Green Infrastructure",
+        "Included" if use_garden else "Not selected"
+    )
+    st.caption("Rain garden")
 
+with summary_col4:
+    st.metric(
+        "Monitoring",
+        "Included" if use_sensors else "Not selected"
+    )
+    st.caption("Water-level sensors")
 st.info(
     "Engineering status: CONCEPT ONLY. "
     "No validated flood prediction, hydraulic capacity, "
@@ -1065,8 +1653,23 @@ st.caption(
 # GENERATE DESIGN REPORT
 # ==============================
 
-st.markdown("---")
-st.markdown("## 📄 Project Design Report")
+st.markdown("""
+<div style="
+    margin-top: 32px;
+    margin-bottom: 20px;
+    padding: 20px 23px;
+    background: linear-gradient(120deg, rgba(13,43,60,.98), rgba(10,61,67,.96));
+    border: 1px solid rgba(130,190,199,.28);
+    border-radius: 16px;
+">
+    <h2 style="margin: 0; color: #e7f5f5;">
+        📄 Project Design Report
+    </h2>
+    <p style="margin: 6px 0 0 0; color: #a8c2ca; font-size: 13px;">
+        Downloadable project configuration, component estimates and engineering limitations.
+    </p>
+</div>
+""", unsafe_allow_html=True)
 
 report_lines = [
     "AI RESILIENCE — SMART MITIGATION DESIGN STUDIO",
@@ -1097,7 +1700,67 @@ report_lines.extend([
     "A qualified civil/drainage engineer must validate site",
     "conditions, hydraulic calculations, dimensions, and costs.",
 ])
+# ----------------------------------------------
+# PROFESSIONAL PROJECT DESIGN REPORT
+# ----------------------------------------------
 
+report_lines.extend([
+    "",
+    "=" * 55,
+    "PROJECT DESIGN AND BUDGET SUMMARY",
+    "=" * 55,
+    "",
+    "PROJECT DETAILS",
+    f"Project Name: {project_name}",
+    "Location: Kochi, Kerala, India",
+    f"Area Type: {area_type}",
+    f"Illustrative Rainfall Scenario: {rainfall_scenario} mm/hour",
+    "",
+    "SELECTED MITIGATION COMPONENTS",
+])
+
+selected_count = 0
+
+for key, is_selected in selected.items():
+    if is_selected:
+        selected_count += 1
+        report_lines.append(
+            f"- {component_names[key]}: ₹{costs[key]:,.0f}"
+        )
+
+if selected_count == 0:
+    report_lines.append("No mitigation components selected.")
+
+report_lines.extend([
+    "",
+    "BUDGET SUMMARY",
+    f"Available Budget: ₹{available_budget:,.0f}",
+    f"Estimated Project Cost: ₹{design_total:,.0f}",
+    f"Remaining Budget: ₹{remaining_budget:,.0f}",
+    f"Selected Components: {selected_count}",
+])
+
+if design_total > available_budget:
+    report_lines.append(
+        f"Budget Status: OVER BUDGET by ₹{design_total - available_budget:,.0f}"
+    )
+else:
+    report_lines.append("Budget Status: WITHIN AVAILABLE BUDGET")
+
+report_lines.extend([
+    "",
+    "ENGINEERING REVIEW AND LIMITATIONS",
+    "- This report represents a conceptual mitigation design.",
+    "- Cost figures are preliminary estimates, not verified quotations.",
+    "- The 3D water level is an illustrative visual parameter.",
+    "- No validated hydraulic or structural simulation is performed.",
+    "- Site surveys, drainage calculations and engineering review are required.",
+    "- This report must not be used as construction approval.",
+    "",
+    "Prepared by: AI RESILIENCE",
+    "Location: Kochi, Kerala, India",
+    "=" * 55,
+])
 report_text = "\n".join(report_lines)
 
 st.download_button(

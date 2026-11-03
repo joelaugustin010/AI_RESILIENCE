@@ -1,63 +1,6 @@
-""""AI RESILIENCE prototype entry point and shared navigation."""
+"""AI RESILIENCE prototype entry point and shared navigation."""
 
-from pathlib import Path
-
-import pandas as pd
 import streamlit as st
-
-ROOT = Path(__file__).resolve().parent
-
-
-@st.cache_data(ttl=3600)
-def load_quality_summary() -> tuple[str, str]:
-    """Read the two known hydrology issues for concise app-wide warnings."""
-    conflict_path = ROOT / "data" / "processed" / "cwc_rainfall_conflicts.csv"
-    if conflict_path.is_file():
-        conflicts = pd.read_csv(conflict_path, usecols=["Station", "Data Acquisition Time"])
-        conflict_groups = conflicts.drop_duplicates().shape[0]
-        rainfall_warning = (
-            f"Rainfall QA: the reviewed conflict export contains {conflict_groups:,} "
-            "station-time groups with conflicting readings. Raw values are preserved."
-        )
-    else:
-        rainfall_warning = (
-            "Rainfall QA: the project audit previously found conflicting duplicate "
-            "station-time readings. Review them before using rainfall for thresholds."
-        )
-
-    telemetry_path = ROOT / "data" / "raw" / "rwl_tel_hr_kerala_sw_031_2021_2025.csv"
-    try:
-        telemetry = pd.read_csv(
-            telemetry_path,
-            usecols=["Station", "Data Acquisition Time", "River Water Level Telemetry Hourly (meter)"],
-        )
-        station = telemetry["Station"].astype("string").str.strip().str.casefold()
-        station_rows = telemetry.loc[station.eq("f.c.s. mananthavadi")].copy()
-        station_rows["_time"] = pd.to_datetime(
-            station_rows["Data Acquisition Time"], dayfirst=True, errors="coerce"
-        )
-        station_rows["_value"] = pd.to_numeric(
-            station_rows["River Water Level Telemetry Hourly (meter)"], errors="coerce"
-        )
-        station_rows = station_rows.dropna(subset=["_time", "_value"]).sort_values("_time")
-        delta = station_rows["_value"].diff().abs()
-        index = delta.idxmax()
-        position = station_rows.index.get_loc(index)
-        before = station_rows.iloc[position - 1]
-        after = station_rows.iloc[position]
-        jump = float(delta.loc[index])
-        gap = after["_time"] - before["_time"]
-        river_warning = (
-            "River-level QA: F.C.S. Mananthavadi telemetry has a large change "
-            f"({jump:.3f} m) across a {gap.days}-day data gap. The reporting reference "
-            "is unconfirmed; do not apply an automatic correction."
-        )
-    except (OSError, ValueError, KeyError, IndexError, pd.errors.ParserError):
-        river_warning = (
-            "River-level QA: F.C.S. Mananthavadi telemetry has a previously reviewed "
-            "large change across a data gap. The reporting reference is unconfirmed."
-        )
-    return rainfall_warning, river_warning
 
 
 st.set_page_config(
@@ -114,6 +57,13 @@ pages = {
             icon=":material/analytics:",
         ),
     ],
+    "Home": [
+        st.Page(
+            "app_pages/home.py",
+            title="Command Centre",
+            icon=":material/dashboard:",
+        ),
+    ],
     "Plan": [
         st.Page(
             "app_pages/mitigation_planner.py",
@@ -130,17 +80,65 @@ pages = {
 
 page = st.navigation(pages, position="top")
 
-st.title("AI RESILIENCE")
-st.caption("Disaster-risk assessment prototype | Exploratory use only")
-
-rainfall_warning, river_warning = load_quality_summary()
-st.warning(rainfall_warning, icon=":material/water_drop:")
-st.warning(river_warning, icon=":material/water:")
-st.info(
-    "Prototype data and methods are not independently validated. This app does not "
-    "issue warnings or replace official emergency guidance.",
-    icon=":material/info:",
+# A lightweight visual system shared by every page. Keep this CSS local to the
+# Streamlit app so the deployment needs no external assets or build step.
+st.markdown(
+    """
+    <style>
+:root {
+ --ar-bg:#061522; --ar-panel:#102b3c; --ar-ink:#e7f5f5; --ar-muted:#a7c1c8;
+ --ar-teal:#42e0c1; --ar-cyan:#56c8e8; --ar-border:rgba(130,190,199,.24);
+}
+html,body,[data-testid="stAppViewContainer"] {background:#061522 !important;}
+.stApp {color:var(--ar-ink)!important;background:
+ radial-gradient(ellipse at 8% 4%,rgba(28,190,169,.19),transparent 31rem),
+ radial-gradient(ellipse at 92% 12%,rgba(47,137,190,.17),transparent 34rem),
+ radial-gradient(ellipse at 52% 100%,rgba(34,116,115,.11),transparent 38rem),
+ repeating-radial-gradient(ellipse at 85% 18%,transparent 0 34px,rgba(126,208,202,.035) 35px 36px,transparent 37px 72px),
+ linear-gradient(145deg,#061522 0%,#0a2030 48%,#071925 100%)!important;background-attachment:fixed!important;}
+.block-container{padding-top:1.45rem;padding-bottom:3.5rem;max-width:1500px;}
+[data-testid="stHeader"],[data-testid="stToolbar"]{background:rgba(6,21,34,.76)!important;}
+[data-testid="stSidebar"]{background:rgba(7,25,39,.96)!important;border-right:1px solid var(--ar-border);}
+[data-testid="stSidebar"] *{color:var(--ar-ink);}
+[data-testid="stAppViewContainer"]>.main,[data-testid="stMain"]{background:transparent!important;}
+h1,h2,h3,h4,h5,h6{color:#effafa!important;letter-spacing:-.025em;}
+p,li,label,.stMarkdown,.stCaption,[data-testid="stWidgetLabel"]{color:#c5dadd;}
+[data-testid="stMetric"]{background:linear-gradient(145deg,rgba(17,48,66,.96),rgba(10,34,49,.96))!important;border:1px solid var(--ar-border)!important;padding:1rem 1.05rem;border-radius:17px;box-shadow:0 18px 48px rgba(0,0,0,.22);}
+[data-testid="stMetricLabel"]{color:#9fc0c8!important;}[data-testid="stMetricValue"]{color:#f0ffff!important;font-weight:780;}
+[data-testid="stMetricDelta"]{color:var(--ar-teal)!important;}
+[data-testid="stExpander"]{background:rgba(12,35,51,.72)!important;border:1px solid var(--ar-border)!important;border-radius:15px;}
+[data-testid="stExpander"] summary,[data-testid="stExpander"] summary p{color:#e5f4f4!important;}
+[data-baseweb="select"]>div,[data-baseweb="input"]>div,[data-baseweb="textarea"]>div,[data-testid="stDateInput"] input,[data-testid="stNumberInput"] input,[data-testid="stTextInput"] input,[data-testid="stTextArea"] textarea{background:#102b3c!important;color:#eaf7f7!important;border-color:rgba(130,190,199,.34)!important;border-radius:11px!important;}
+[data-baseweb="popover"],[data-baseweb="menu"],[role="listbox"]{background:#102b3c!important;color:#eaf7f7!important;}
+[data-baseweb="menu"] *,[role="option"]{color:#eaf7f7!important;}
+[data-testid="stRadio"] label,[data-testid="stCheckbox"] label{color:#d5e7e8!important;}
+[data-testid="stDataFrame"],[data-testid="stTable"]{border:1px solid var(--ar-border);border-radius:13px;overflow:hidden;background:rgba(12,35,51,.8);}
+[data-testid="stTabs"] button{color:#a9c9ce!important;}
+[data-testid="stTabs"] button[aria-selected="true"]{color:#58e1c5!important;border-bottom-color:#42e0c1!important;}
+div.stButton>button,div.stDownloadButton>button{border-radius:11px;font-weight:700;min-height:2.7rem;border:1px solid rgba(91,223,200,.42);background:linear-gradient(110deg,#126a70,#147c83);color:#f4ffff!important;}
+div.stButton>button:hover,div.stDownloadButton>button:hover{border-color:#7bf0d7;background:linear-gradient(110deg,#16817e,#168b91);color:#fff!important;}
+hr{border-color:rgba(130,190,199,.22)!important;}a{color:#62dfd0!important;}
+.ar-hero{position:relative;overflow:hidden;border-radius:25px;padding:clamp(1.5rem,3vw,2.6rem);margin:.25rem 0 1.25rem;color:#fff;background:linear-gradient(118deg,#092032 0%,#07516a 55%,#087e78 100%);border:1px solid rgba(120,220,208,.25);box-shadow:0 22px 54px rgba(0,0,0,.26);}
+.ar-hero:after{content:"";position:absolute;width:310px;height:310px;right:-95px;top:-155px;border-radius:50%;border:1px solid rgba(255,255,255,.22);box-shadow:0 0 0 34px rgba(255,255,255,.045),0 0 0 70px rgba(255,255,255,.035);}
+.ar-eyebrow{color:#8cf3df;text-transform:uppercase;letter-spacing:.15em;font-size:.76rem;font-weight:800;margin-bottom:.8rem;}
+.ar-hero h1{color:white;font-size:clamp(2.1rem,4vw,3.35rem);line-height:1.05;margin:0 0 .8rem;}
+.ar-hero p{color:#d9f3f1;font-size:1.04rem;max-width:760px;line-height:1.65;margin:0;}
+.ar-chip{display:inline-block;margin-top:1.25rem;margin-right:.4rem;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.10);color:#fff;padding:.35rem .7rem;border-radius:999px;font-size:.78rem;}
+.ar-section-label{color:#55e1ca;font-size:.76rem;text-transform:uppercase;letter-spacing:.12em;font-weight:800;margin-bottom:.25rem;}
+@media(max-width:640px){.block-container{padding-left:1rem;padding-right:1rem;}.ar-hero{border-radius:18px;}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition-duration:.01ms!important;}}
+</style>
+    """,
+    unsafe_allow_html=True,
+)
+st.markdown(
+    """
+    <div style="display:flex;align-items:center;gap:.55rem;margin:.1rem 0 1rem;color:#a7c1c8;font-size:.82rem">
+      <span style="display:inline-block;width:.55rem;height:.55rem;border-radius:50%;background:#42e0c1"></span>
+      <span><strong style="color:#e7f5f5">AI RESILIENCE</strong> · KOCHI CLIMATE INTELLIGENCE · INTELLIGENT CITIES, RESILIENT FUTURES</span>
+    </div>
+    """,
+    unsafe_allow_html=True,
 )
 
 page.run()
-"

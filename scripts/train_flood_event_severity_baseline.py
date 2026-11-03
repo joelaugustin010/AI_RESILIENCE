@@ -2,7 +2,6 @@
 
 Required local files (from the project's public hydrology acquisition bundle):
   data/external/raw/floodevents_indofloods.csv
-  data/external/raw/precipitation_variables_indofloods.csv
   data/external/raw/metadata_indofloods.csv
   data/external/raw/catchment_characteristics_indofloods.csv
 
@@ -30,7 +29,6 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 
 
-PRECIPITATION_FEATURES = [f"T{i}d" for i in range(1, 11)]
 NUMERIC_CATCHMENT_FEATURES = [
     "Drainage Area", "Catchment Relief", "Catchment Length",
     "Catchment Perimeter", "Sinuosity Index", "Form Factor", "Relief Ratio",
@@ -43,11 +41,28 @@ CATEGORICAL_CATCHMENT_FEATURES = [
 ]
 
 
+def filter_open_gauges(metadata: pd.DataFrame) -> pd.DataFrame:
+    """Fail closed: only gauges explicitly marked Open may enter model training."""
+    if "Privacy" not in metadata.columns:
+        raise ValueError("Metadata has no Privacy field; cannot verify reuse eligibility.")
+    privacy = metadata["Privacy"].astype("string").str.strip().str.casefold()
+    return metadata.loc[privacy.eq("open")].copy()
+
+
+def select_catchment_features(table: pd.DataFrame) -> tuple[list[str], list[str]]:
+    """Select static catchment features only; event rainfall windows are excluded."""
+    categorical = [c for c in CATEGORICAL_CATCHMENT_FEATURES if c in table.columns]
+    numeric = [c for c in NUMERIC_CATCHMENT_FEATURES if c in table.columns]
+    return numeric, categorical
+
+
 def load_training_table(raw_dir: Path) -> pd.DataFrame:
     events = pd.read_csv(raw_dir / "floodevents_indofloods.csv")
-    precipitation = pd.read_csv(raw_dir / "precipitation_variables_indofloods.csv")
-    metadata = pd.read_csv(raw_dir / "metadata_indofloods.csv")
+    metadata_all = pd.read_csv(raw_dir / "metadata_indofloods.csv")
+    metadata = filter_open_gauges(metadata_all)
     catchment = pd.read_csv(raw_dir / "catchment_characteristics_indofloods.csv")
+    if metadata.empty:
+        raise ValueError("No gauges are explicitly marked Open; refusing to train.")
 
     # Event IDs encode the same gauge identifier used in the other tables.
     events["GaugeID"] = events["EventID"].astype(str).str.extract(
@@ -57,10 +72,8 @@ def load_training_table(raw_dir: Path) -> pd.DataFrame:
         raise ValueError("Some flood event IDs do not contain a recognized gauge ID.")
 
     table = events.merge(
-        precipitation, on="EventID", how="left", validate="one_to_one"
-    ).merge(
-        metadata[["GaugeID", "Warning Level", "Danger Level", "Station", "State"]],
-        on="GaugeID", how="left", validate="many_to_one",
+        metadata[["GaugeID", "Warning Level", "Danger Level", "Station", "State", "Privacy"]],
+        on="GaugeID", how="inner", validate="many_to_one",
     ).merge(
         catchment, on="GaugeID", how="left", validate="many_to_one",
         suffixes=("", "_catchment"),
@@ -78,14 +91,13 @@ def load_training_table(raw_dir: Path) -> pd.DataFrame:
 
 def train(raw_dir: Path, model_path: Path, report_path: Path) -> dict:
     table = load_training_table(raw_dir)
-    categorical = [c for c in CATEGORICAL_CATCHMENT_FEATURES if c in table.columns]
-    numeric = [
-        c for c in PRECIPITATION_FEATURES + NUMERIC_CATCHMENT_FEATURES
-        if c in table.columns
-    ]
+    numeric, categorical = select_catchment_features(table)
     features = numeric + categorical
-    if len(features) < 10:
-        raise ValueError(f"Expected at least 10 usable features, found {len(features)}.")
+    if len(features) < 5:
+        raise ValueError(f"Expected at least 5 static catchment features, found {len(features)}.")
+    if groups_count := table["GaugeID"].nunique():
+        if groups_count < 5:
+            raise ValueError(f"At least 5 Open gauges are required for grouped evaluation; found {groups_count}.")
 
     X = table[features]
     y = table["target_danger_exceed"]
@@ -122,11 +134,17 @@ def train(raw_dir: Path, model_path: Path, report_path: Path) -> dict:
     tn, fp, fn, tp = confusion_matrix(y.iloc[test_idx], prediction, labels=[0, 1]).ravel()
 
     report = {
-        "status": "RESEARCH_BASELINE_TRAINED",
+        "status": "EXPLORATORY_GAUGE_TRANSFER_BASELINE",
         "target": "Peak Flood Level (m) >= gauge-specific Danger Level",
-        "interpretation": "Danger-level exceedance among already-recorded flood events only.",
+        "interpretation": "Exploratory classification of danger-level exceedance among already-recorded flood events, using static catchment attributes only; not an event forecast.",
+        "data_governance": {
+            "privacy_rule": "Only metadata rows explicitly marked Open are eligible; Restricted, missing, and unknown values are excluded.",
+            "open_gauges_used": int(table["GaugeID"].nunique()),
+            "event_rainfall_features_excluded": True,
+            "reason": "T1d-T10d event-scale rainfall windows are not used until their observation windows are proven to precede a defined prediction issue time.",
+        },
         "dataset": {
-            "name": "INDOFLOODS event, precipitation, metadata and catchment tables",
+            "name": "INDOFLOODS event, metadata and catchment tables",
             "doi": "10.5281/zenodo.14584654",
             "url": "https://zenodo.org/records/14584655",
             "rows_after_required_label_join": int(len(table)),
@@ -166,6 +184,9 @@ def train(raw_dir: Path, model_path: Path, report_path: Path) -> dict:
         },
         "limitations": [
             "This is not a flood occurrence probability model: the dataset contains recorded flood events, not matched non-flood periods.",
+            "Only gauges explicitly marked Open in the Privacy metadata field are included.",
+            "Event-scale T1d-T10d precipitation features are excluded because their timing relative to event onset and forecast issue time is not yet verified.",
+            "Static catchment attributes cannot provide event-specific rainfall-driven timing; this is a gauge-transfer research exercise, not an early-warning forecast.",
             "The records span multiple Indian gauges; this does not establish Kochi or Ernakulam validity.",
             "Gauge-group holdout is useful but only one split; uncertainty intervals, repeated grouped validation, calibration, and independent external validation remain undone.",
             "The model must not issue public warnings or replace IMD, CWC, KSDMA or local-authority guidance.",

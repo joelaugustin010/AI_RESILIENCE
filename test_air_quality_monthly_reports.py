@@ -1,6 +1,8 @@
 """Tests for provenance-checked Eloor monthly report loading and comparison."""
 
+import json
 import unittest
+from datetime import date, timedelta
 from pathlib import Path
 from unittest.mock import patch
 
@@ -96,6 +98,48 @@ class EloorMonthlyReportTests(unittest.TestCase):
             ]
         )
         self.assertTrue(compare_monthly_report_values([first, second]).empty)
+
+    def test_unexpected_weather_units_fail_report_validation(self):
+        original_read_csv = pd.read_csv
+        weather_path = REPORTS / "kspcb_caaqms_eloor_weather_2026-09.csv"
+
+        def altered_weather_units(path, *args, **kwargs):
+            frame = original_read_csv(path, *args, **kwargs)
+            if Path(path) == weather_path:
+                frame.loc[frame.index[0], "wind_speed_unit"] = "km/h"
+            return frame
+
+        with patch("src.air_quality_monthly_reports.pd.read_csv", side_effect=altered_weather_units):
+            with self.assertRaisesRegex(MonthlyReportError, "Unexpected source weather unit"):
+                load_eloor_monthly_report(REPORTS, "2026-09")
+
+    def test_out_of_range_humidity_is_preserved_for_explicit_review(self):
+        humidity = pd.to_numeric(self.september["weather"]["relative_humidity"], errors="coerce")
+        out_of_range = humidity.loc[~humidity.between(0, 100)]
+        self.assertGreater(len(out_of_range), 0)
+        self.assertTrue((out_of_range > 100).all())
+        # Ingestion preserves the source-reported values; the page flags and
+        # excludes them from the humidity chart instead of silently correcting them.
+
+    def test_invalid_or_future_retrieval_dates_fail_provenance_checks(self):
+        metadata_path = REPORTS / "kspcb_caaqms_eloor_2026-09.metadata.json"
+        original_read_text = Path.read_text
+
+        def load_with_retrieval_date(value):
+            def altered_read_text(path: Path, *args, **kwargs):
+                content = original_read_text(path, *args, **kwargs)
+                if path == metadata_path:
+                    metadata = json.loads(content)
+                    metadata["sources"]["kspcb_caaqms_eloor_2026_09"]["retrieved_on"] = value
+                    return json.dumps(metadata)
+                return content
+            return altered_read_text
+
+        for retrieval_date in ("not-a-date", (date.today() + timedelta(days=1)).isoformat()):
+            with self.subTest(retrieval_date=retrieval_date):
+                with patch.object(Path, "read_text", load_with_retrieval_date(retrieval_date)):
+                    with self.assertRaisesRegex(MonthlyReportError, "retrieval date"):
+                        load_eloor_monthly_report(REPORTS, "2026-09")
 
     def test_modified_csv_fails_its_provenance_hash_check(self):
         daily_path = REPORTS / "kspcb_caaqms_eloor_daily_2026-09.csv"

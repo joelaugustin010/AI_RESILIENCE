@@ -1,0 +1,133 @@
+{
+  "analysis_status": "Display-only categorical land-cover context; not used for hazard, population, exposure, or consequence calculations.",
+  "attribution": "© ESA WorldCover project 2021 / Contains modified Copernicus Sentinel data (2021) processed by ESA WorldCover consortium",
+  "dataset_id": "worldcover_2021_kochi_context",
+  "layer_role": "context",
+  "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+  "limitations": [
+    "2021 remotely sensed land-cover classification; not current building footprints, household data, vegetation condition, impervious fraction, drainage capacity, temperature, or hazard susceptibility.",
+    "The review rectangle is a visualization window, not a legal or validated Kochi Corporation boundary.",
+    "Image is downsampled for web display; classification accuracy has not been assessed locally.",
+    "Transparent pixels represent source NoData only in this crop and are not evidence of no hazard or exposure.",
+    "WorldCover class legend attribution is required under CC BY 4.0."
+  ],
+  "processing": {
+    "bounds_epsg4326": [
+      76.15,
+      9.780000000000001,
+      76.42,
+      10.120000000000001
+    ],
+    "classes": {
+      "10": {
+        "label": "Tree cover",
+        "rgb": [
+          0,
+          100,
+          0
+        ]
+      },
+      "20": {
+        "label": "Shrubland",
+        "rgb": [
+          255,
+          187,
+          34
+        ]
+      },
+      "30": {
+        "label": "Grassland",
+        "rgb": [
+          255,
+          255,
+          76
+        ]
+      },
+      "40": {
+        "label": "Cropland",
+        "rgb": [
+          240,
+          150,
+          255
+        ]
+      },
+      "50": {
+        "label": "Built-up",
+        "rgb": [
+          250,
+          0,
+          0
+        ]
+      },
+      "60": {
+        "label": "Bare / sparse vegetation",
+        "rgb": [
+          180,
+          180,
+          180
+        ]
+      },
+      "80": {
+        "label": "Permanent water bodies",
+        "rgb": [
+          0,
+          100,
+          200
+        ]
+      },
+      "90": {
+        "label": "Herbaceous wetland",
+        "rgb": [
+          0,
+          150,
+          160
+        ]
+      },
+      "95": {
+        "label": "Mangroves",
+        "rgb": [
+          0,
+          207,
+          117
+        ]
+      }
+    },
+    "image_height_pixels": 2400,
+    "image_width_pixels": 1906,
+    "method": "Read only the fixed review rectangle from the source GeoTIFF, downsampled using nearest-neighbour for display, then colorized with the ESA WorldCover v200 class legend.",
+    "preview_file": "worldcover_2021_kochi_context.png",
+    "preview_sha256": "4e1c1ee22da53f0dec86b9a63fbf9d840abb11d1d60ffdf930e34d8ef9d796dd",
+    "rendered_class_codes": [
+      10,
+      20,
+      30,
+      40,
+      50,
+      60,
+      80,
+      90,
+      95
+    ],
+    "resampling": "nearest",
+    "review_rectangle_wgs84": {
+      "east": 76.42,
+      "north": 10.12,
+      "south": 9.78,
+      "west": 76.15
+    },
+    "transparent_nodata_code": 0
+  },
+  "publication_date": "2021 map, v200 released October 2022",
+  "publisher": "European Space Agency (ESA) WorldCover consortium",
+  "retrieved_on": "2026-11-01",
+  "source_crs": "EPSG:4326",
+  "source_file": "data/raw/experimental/kochidata_2026-11-02/esa_worldcover_10m_2021_v200_N09E075_Map.tif",
+  "source_resolution_degrees": [
+    8.333333333333333e-05,
+    8.333333333333333e-05
+  ],
+  "source_sha256": "913f22dd9ba2b05f52eeb104ca88aa5162ec2d0a5dcef1124d4f19546ac49558",
+  "source_units": "Categorical UInt8 land-cover class; no-data code 0",
+  "source_url": "https://esa-worldcover.s3.eu-central-1.amazonaws.com/v200/2021/map/ESA_WorldCover_10m_2021_v200_N09E075_Map.tif",
+  "title": "ESA WorldCover 2021 v200 land-cover context crop for approximate Kochi review bounds"
+}

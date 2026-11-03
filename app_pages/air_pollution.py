@@ -1,24 +1,61 @@
 """AQI monitoring and evidence readiness for Kochi and Ernakulam."""
 
 import json
+import importlib
 from datetime import date
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import pandas as pd
 import streamlit as st
 
+try:
+    import altair as alt
+except ImportError:  # Streamlit normally installs Altair; retain a chart fallback.
+    alt = None
+
+from src.dataframe_display import display_dataframe
+
 from src.air_quality import (
+    AirQualityDataError,
     CPCB_AQI_CATEGORIES,
     cpcb_aqi_category,
+    safe_cpcb_aqi_category,
     time_series_summary,
 )
-from src.air_quality_attribution import assess_industrial_sources
+from src.air_quality_attribution import (
+    SOURCE_EVIDENCE_REQUIREMENTS,
+    assess_industrial_sources,
+    evidence_action_plan,
+)
 from src.cpcb_aqi import calculate_ind_aqi
 from src.air_quality_monthly_reports import (
     MonthlyReportError,
     compare_monthly_report_values,
     load_eloor_monthly_report,
     monthly_report_coverage,
+)
+from src import live_air_quality as live_air_quality_module
+from src import air_quality_dashboard as air_quality_dashboard_module
+
+live_air_quality_module = importlib.reload(live_air_quality_module)
+air_quality_dashboard_module = importlib.reload(air_quality_dashboard_module)
+
+from src.live_air_quality import (
+    CAMS_ATTRIBUTION_URL,
+    MODEL_SOURCE,
+    OPEN_METEO_DOCS_URL,
+    fetch_open_meteo,
+    aqi_category,
+)
+from src.air_quality_dashboard import (
+    HEALTH_INFORMATION,
+    POLLUTANT_GUIDELINES,
+    aggregate_co2_trend,
+    assess_pollutant,
+    compare_pollutant,
+    co2_context,
+    evidence_category,
 )
 
 
@@ -41,6 +78,133 @@ def read_csv(path: Path) -> pd.DataFrame:
         return pd.DataFrame()
 
 
+def audit_daily_extract(data: pd.DataFrame) -> tuple[dict, pd.DataFrame]:
+    """Describe completeness and basic validity without certifying source QA."""
+    if data.empty:
+        return {}, pd.DataFrame()
+
+    parsed_dates = (
+        pd.to_datetime(data["observed_at"], errors="coerce")
+        if "observed_at" in data.columns
+        else pd.Series(pd.NaT, index=data.index)
+    )
+    station_values = (
+        data["station"].astype("string").str.strip().str.casefold()
+        if "station" in data.columns
+        else pd.Series(pd.NA, index=data.index, dtype="string")
+    )
+    duplicate_keys = pd.DataFrame(
+        {"station": station_values, "date": parsed_dates}, index=data.index
+    )
+    duplicate_mask = (
+        duplicate_keys["station"].notna()
+        & duplicate_keys["station"].ne("")
+        & duplicate_keys["date"].notna()
+        & duplicate_keys.duplicated(keep="first")
+    )
+    raw_dates = data["observed_at"] if "observed_at" in data.columns else pd.Series(pd.NA, index=data.index)
+    missing_date_count = int(raw_dates.isna().sum() + raw_dates.astype("string").str.strip().eq("").sum())
+    invalid_date_count = int((raw_dates.notna() & raw_dates.astype("string").str.strip().ne("") & parsed_dates.isna()).sum())
+    missing_station_count = int(station_values.isna().sum() + station_values.eq("").sum())
+
+    aqi_values = (
+        pd.to_numeric(data["source_aqi"], errors="coerce")
+        if "source_aqi" in data.columns
+        else pd.Series(float("nan"), index=data.index)
+    )
+    aqi_raw = data["source_aqi"] if "source_aqi" in data.columns else pd.Series(pd.NA, index=data.index)
+    missing_aqi_count = int(aqi_raw.isna().sum() + aqi_raw.astype("string").str.strip().eq("").sum())
+    aqi_present = aqi_raw.notna() & aqi_raw.astype("string").str.strip().ne("")
+    invalid_aqi_mask = (
+        aqi_values.isna()
+        | ~aqi_values.between(0, 500)
+        | aqi_values.mod(1).ne(0)
+    )
+    invalid_aqi_count = int((aqi_present & invalid_aqi_mask).sum())
+
+    pollutant_specs = (
+        ("PM2.5", "PM2.5_value", "unit_PM2.5", "ug/m3"),
+        ("PM10", "PM10_value", "unit_PM10", "ug/m3"),
+        ("SO₂", "SO2_value", "unit_SO2", "ug/m3"),
+        ("NO₂", "NO2_value", "unit_NO2", "ug/m3"),
+        ("NO", "NO_value", "unit_NO", "ug/m3"),
+        ("NOx", "NOx_value", "unit_NOx", "ug/m3"),
+        ("O₃", "O3_value", "unit_O3", "ug/m3"),
+        ("NH₃", "NH3_value", "unit_NH3", "ug/m3"),
+        ("CO", "CO_value", "unit_CO", "mg/m3"),
+    )
+    pollutant_rows = []
+    for label, value_column, unit_column, expected_unit in pollutant_specs:
+        if value_column not in data.columns:
+            pollutant_rows.append({
+                "Pollutant": label,
+                "Numeric values": 0,
+                "Missing values": len(data),
+                "Non-numeric values": 0,
+                "Negative values": 0,
+                "Unit mismatches": len(data),
+            })
+            continue
+
+        raw_values = data[value_column]
+        present = raw_values.notna() & raw_values.astype("string").str.strip().ne("")
+        numeric_values = pd.to_numeric(raw_values, errors="coerce")
+        missing_count = int((~present).sum())
+        nonnumeric_count = int((present & numeric_values.isna()).sum())
+        negative_count = int((numeric_values.notna() & numeric_values.lt(0)).sum())
+
+        if unit_column in data.columns:
+            units = (
+                data[unit_column].astype("string").str.strip().str.casefold()
+                .str.replace("μ", "u", regex=False)
+                .str.replace("µ", "u", regex=False)
+                .str.replace("³", "3", regex=False)
+            )
+            unit_mismatch_count = int(
+                (present & units.ne(expected_unit)).sum()
+            )
+        else:
+            unit_mismatch_count = int(present.sum())
+
+        pollutant_rows.append({
+            "Pollutant": label,
+            "Numeric values": int(numeric_values.notna().sum()),
+            "Missing values": missing_count,
+            "Non-numeric values": nonnumeric_count,
+            "Negative values": negative_count,
+            "Unit mismatches": unit_mismatch_count,
+        })
+
+    quality_flags = (
+        data["quality_flag"].astype("string").str.strip().str.casefold()
+        if "quality_flag" in data.columns
+        else pd.Series(pd.NA, index=data.index, dtype="string")
+    )
+    known_quality_flags = {"valid", "suspect", "invalid", "unassessed"}
+    present_quality_flags = quality_flags.notna() & quality_flags.ne("")
+    pollutant_audit = pd.DataFrame(pollutant_rows)
+    summary = {
+        "rows": len(data),
+        "stations": int(station_values.dropna().loc[lambda values: values.ne("")].nunique()),
+        "duplicate_rows": int(duplicate_mask.sum()),
+        "missing_dates": missing_date_count,
+        "invalid_dates": invalid_date_count,
+        "missing_stations": missing_station_count,
+        "missing_aqi": missing_aqi_count,
+        "invalid_aqi": invalid_aqi_count,
+        "valid_qa_rows": int(quality_flags.eq("valid").sum()),
+        "suspect_qa_rows": int(quality_flags.eq("suspect").sum()),
+        "invalid_qa_rows": int(quality_flags.eq("invalid").sum()),
+        "unassessed_rows": int(quality_flags.eq("unassessed").sum()),
+        "missing_qa_rows": int((~present_quality_flags).sum()),
+        "unknown_qa_rows": int((present_quality_flags & ~quality_flags.isin(known_quality_flags)).sum()),
+        "pollutant_nonnumeric": int(pollutant_audit["Non-numeric values"].sum()),
+        "pollutant_negative": int(pollutant_audit["Negative values"].sum()),
+        "pollutant_unit_mismatches": int(pollutant_audit["Unit mismatches"].sum()),
+    }
+    return summary, pollutant_audit
+
+
 st.markdown(
     """
     <style>
@@ -52,8 +216,9 @@ st.markdown(
 
     [data-testid="stAppViewContainer"] {
         background:
-            radial-gradient(circle at 8% 2%, rgba(111, 190, 210, 0.10), transparent 27rem),
-            linear-gradient(180deg, rgba(244, 249, 250, 0.45), transparent 24rem);
+            radial-gradient(circle at 8% 2%, rgba(38, 190, 170, 0.12), transparent 27rem),
+            radial-gradient(circle at 92% 4%, rgba(47, 137, 190, 0.10), transparent 30rem),
+            transparent !important;
     }
 
     .air-hero {
@@ -62,7 +227,7 @@ st.markdown(
         padding: 34px 36px 30px;
         border: 1px solid rgba(91, 164, 190, 0.28);
         border-radius: 22px;
-        background: linear-gradient(118deg, #e6f4f8 0%, #f1f8f6 54%, #f8fbfa 100%);
+        background: radial-gradient(ellipse at 90% 8%,rgba(76,226,197,.18),transparent 22rem),linear-gradient(118deg,#071a2a 0%,#0b4054 58%,#087e78 100%);
         box-shadow: 0 12px 34px rgba(27, 73, 91, 0.07);
         margin: 4px 0 22px;
     }
@@ -81,7 +246,7 @@ st.markdown(
     }
 
     .air-eyebrow {
-        color: #28768b;
+        color: #72d8cf;
         font-size: 0.72rem;
         font-weight: 800;
         letter-spacing: 2.2px;
@@ -118,13 +283,13 @@ st.markdown(
         border: 1px solid rgba(47, 119, 139, 0.18);
         border-radius: 999px;
         color: #315e6d;
-        background: rgba(255,255,255,0.62);
+        background: rgba(12,35,51,.82);
         font-size: 0.76rem;
         font-weight: 650;
     }
 
     div[data-testid="stMetric"] {
-        background: rgba(255, 255, 255, 0.82);
+        background: rgba(12,35,51,.92);
         border: 1px solid rgba(87, 143, 160, 0.19);
         border-radius: 15px;
         padding: 15px 17px;
@@ -156,14 +321,14 @@ st.markdown(
         border: 1px solid rgba(71, 132, 151, 0.20);
         border-radius: 999px;
         color: #285b6c !important;
-        background: rgba(255,255,255,0.78);
+        background: rgba(12,35,51,.82);
         text-decoration: none !important;
         font-size: 0.78rem;
         font-weight: 650;
     }
 
     .air-nav a:hover {
-        background: #e5f3f6;
+        background: #164253;
         border-color: rgba(71, 132, 151, 0.42);
     }
 
@@ -171,7 +336,7 @@ st.markdown(
         border: 1px solid rgba(100, 160, 180, 0.22);
         border-radius: 13px;
         overflow: hidden;
-        background: rgba(255,255,255,0.86);
+        background: rgba(12,35,51,.92);
     }
 
     div[data-testid="stExpander"] {
@@ -227,28 +392,168 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+
+@st.cache_data(ttl=900, show_spinner=False)
+def load_live_air_quality() -> dict:
+    """Cache the model response for 15 minutes; timestamps remain untouched."""
+    return fetch_open_meteo()
+
+
+@st.fragment(run_every="15m")
+def render_live_air_quality() -> None:
+    st.markdown('<div id="live-feed"></div>', unsafe_allow_html=True)
+    st.subheader("Kochi air-quality estimate")
+    st.caption(
+        "Near-real-time CAMS model estimate for Kochi (9.9312°N, 76.2673°E). "
+        "This is not a CPCB/KSPCB monitoring-station measurement."
+    )
+    refresh = st.button("↻ Refresh live feed", key="air-live-refresh")
+    if refresh:
+        load_live_air_quality.clear()
+    try:
+        result = load_live_air_quality()
+    except Exception as error:
+        st.info(
+            f"The Open-Meteo/CAMS model feed is temporarily unavailable: {error} "
+            "Historical KSPCB observations remain available below."
+        )
+        return
+
+    current = result["current"]
+    observations = result["hourly"].copy()
+    latest_observed = result["observed_at"]
+    updated_label = latest_observed.strftime("%d %b %Y, %H:%M UTC") if latest_observed is not None else "Not reported"
+    standard = st.radio("AQI standard", ("US AQI", "EAQI"), horizontal=True, key="air-aqi-standard")
+    selected_label = "US AQI" if standard == "US AQI" else "European AQI"
+    selected = current.get(selected_label)
+    category = aqi_category(standard, selected.get("value") if selected else None)
+    if selected and category:
+        st.markdown(
+            f'<div style="border:3px solid {category["color"]};border-radius:16px;padding:14px 18px;'
+            f'background:linear-gradient(90deg,{category["color"]}18,transparent);">'
+            f'<div style="font-size:.82rem;color:#52707a;">{standard} · CAMS/Open-Meteo model estimate</div>'
+            f'<div style="font-size:2.7rem;font-weight:750;line-height:1.1;">{selected["value"]:g}</div>'
+            f'<div style="font-weight:700;color:{category["color"]};">{category["label"]}</div>'
+            f'<div style="font-size:.82rem;color:#52707a;">Kochi model grid · observed {updated_label}</div></div>',
+            unsafe_allow_html=True,
+        )
+    top = st.columns(3)
+    top[0].metric("Other AQI scale", _model_metric(current, "European AQI" if selected_label == "US AQI" else "US AQI"))
+    top[1].metric("Last observed", updated_label)
+    top[2].metric("Retrieved", result["retrieved_at"].strftime("%d %b %Y, %H:%M UTC"))
+    st.caption(
+        f"Source: {MODEL_SOURCE} · model grid response at {result['latitude']}, {result['longitude']} · "
+        "hourly model estimate, not a station observation"
+    )
+
+    pollutant_order = ("PM2.5", "PM10", "NO2", "SO2", "CO", "O3")
+    cards = st.columns(3)
+    elevated_pollutants = []
+    for index, pollutant in enumerate(pollutant_order):
+        with cards[index % 3]:
+            item = current.get(pollutant)
+            value_label = _model_metric(current, pollutant)
+            assessment = assess_pollutant(pollutant, item["value"] if item else None, item["unit"] if item else "", observations)
+            status = assessment["status"] if item else "Unavailable"
+            color = assessment["color"]
+            st.markdown(
+                f'<div style="border:2px solid {color};border-radius:12px;padding:10px 12px;margin:4px 0;">'
+                f'<div style="font-weight:700;">{pollutant}</div><div style="font-size:1.15rem;">{value_label}</div>'
+                f'<span style="font-size:.72rem;color:{color};font-weight:650;">{status}</span></div>',
+                unsafe_allow_html=True,
+            )
+            if st.button("Extra Details", key=f"air-extra-{pollutant}"):
+                st.session_state["air-extra-pollutant"] = pollutant
+            if item and assessment["status"] not in ("Within WHO health guideline", "Reading available", "Reference unavailable"):
+                elevated_pollutants.append((pollutant, assessment))
+
+    if elevated_pollutants:
+        with st.expander("Precautions for elevated pollutants", expanded=True):
+            for pollutant, assessment in elevated_pollutants:
+                st.warning(f"{pollutant}: {HEALTH_INFORMATION[pollutant]['precautions']}")
+
+    extra_pollutant = st.session_state.get("air-extra-pollutant")
+    if extra_pollutant in HEALTH_INFORMATION:
+        health = HEALTH_INFORMATION[extra_pollutant]
+        with st.expander(f"Extra Details · {extra_pollutant}", expanded=True):
+            st.write(health["summary"])
+            st.write(f"**Main sources:** {health['sources']}")
+            st.write(f"**Health context:** {health['effects']}")
+            st.write(f"**More sensitive:** {health['sensitive']}")
+            st.write(f"**Practical precautions:** {health['precautions']}")
+            st.caption("Health effects are associated with concentration and exposure duration; a measured value does not by itself establish that illness will occur.")
+    st.markdown("**Recent hourly CAMS model trend · concentration (µg/m³)**")
+    chart_data = observations.loc[~observations["pollutant"].isin(("European AQI", "US AQI", "CO2"))].copy()
+    chart_data = chart_data.sort_values("observed_at").groupby("pollutant", group_keys=False).tail(24)
+    chart_data["is_unusual"] = chart_data.groupby("pollutant")["value"].transform(
+        lambda values: values > values.mean() + (2 * values.std(ddof=0) if len(values) > 1 else 0)
+    )
+    if alt is not None and not chart_data.empty:
+        palette = {"PM2.5": "#d97706", "PM10": "#ca8a04", "NO2": "#2563eb", "SO2": "#16a34a", "CO": "#dc2626", "O3": "#7c3aed"}
+        lines = alt.Chart(chart_data).mark_line(point=True).encode(
+            x=alt.X("observed_at:T", title="Observation time (UTC)"),
+            y=alt.Y("value:Q", title="Concentration (µg/m³)"),
+            color=alt.Color("pollutant:N", title="Pollutant", scale=alt.Scale(domain=list(palette), range=list(palette.values()))),
+            tooltip=[alt.Tooltip("observed_at:T", title="Observed (UTC)"), alt.Tooltip("pollutant:N", title="Pollutant"), alt.Tooltip("value:Q", title="Value", format=".2f"), alt.Tooltip("is_unusual:N", title="Unusually high vs recent series")],
+        ).properties(height=280)
+        points = alt.Chart(chart_data.loc[chart_data["is_unusual"]]).mark_point(size=90, filled=True, color="#b91c1c").encode(
+            x="observed_at:T", y="value:Q", tooltip=[alt.Tooltip("observed_at:T", title="Observed (UTC)"), alt.Tooltip("pollutant:N", title="Pollutant"), alt.Tooltip("value:Q", title="Value", format=".2f")]
+        )
+        st.altair_chart(lines + points, use_container_width=True)
+    elif not chart_data.empty:
+        st.line_chart(chart_data.pivot_table(index="observed_at", columns="pollutant", values="value", aggfunc="last").tail(24))
+    else:
+        st.info("No hourly pollutant observations are available for the trend chart.")
+    st.caption("Points marked as unusually high are statistical flags relative to this recent model series, not proof of a health-limit exceedance. Missing observations are not interpolated.")
+    st.caption(
+        f"Modelled estimate from [Open-Meteo]({OPEN_METEO_DOCS_URL}) using CAMS data. "
+        f"Attribution: [Copernicus Atmosphere Monitoring Service]({CAMS_ATTRIBUTION_URL}) and Open-Meteo."
+    )
+
+
+def _model_metric(current: dict, label: str) -> str:
+    item = current.get(label)
+    if not item:
+        return "Unavailable"
+    return f"{item['value']:g} {item['unit']}"
+
+
+render_live_air_quality()
+
 try:
     register = load_source_register()
 except (OSError, json.JSONDecodeError) as error:
     st.error(f"Air-pollution acquisition status could not be loaded: {error}")
     st.stop()
 
-st.caption(f"Source review: {register['reviewed_on']}")
-st.warning(
-    "No live AQI feed is connected to this dashboard. The latest acquired station report is dated "
-    "16 October 2026; the values below are historical source reports, not live readings."
-)
+register_review_value = register.get("reviewed_on")
+try:
+    register_review_date = date.fromisoformat(str(register_review_value))
+    register_review_age_days = (date.today() - register_review_date).days
+    if register_review_age_days < 0:
+        st.warning(
+            f"The source register review date ({register_review_date:%d %b %Y}) is in the future. "
+            "Verify the register metadata before relying on its review status."
+        )
+    else:
+        st.caption(
+            f"Source register reviewed: {register_review_date:%d %b %Y} "
+            f"({register_review_age_days} days ago)."
+        )
+except (TypeError, ValueError):
+    st.warning(
+        "The source register has a missing or invalid top-level reviewed_on date. "
+        "Verify the register metadata; individual source review dates are shown below."
+    )
 st.markdown(
     """
     <nav class="air-nav">
-        <a href="#latest-report">Latest report</a>
-        <a href="#eloor-trends">Eloor trends</a>
-        <a href="#evidence-timeline">Evidence timeline</a>
-        <a href="#namp-network">NAMP network</a>
-        <a href="#annual-aqi">Annual AQI</a>
-        <a href="#cpcb-method">CPCB method</a>
-        <a href="#industrial-evidence">Industrial evidence</a>
-        <a href="#sources">Sources</a>
+        <a href="#live-feed">Live feed</a>
+        <a href="#co2-intelligence">CO2 Intelligence</a>
+        <a href="#pollutant-levels">Pollutants</a>
+        <a href="#industrial-pollution-sources">Industrial sources</a>
+        <a href="#historical-trends-and-kspcb-data">Historical trends</a>
+        <a href="#data-sources-and-limitations">Sources</a>
     </nav>
     """,
     unsafe_allow_html=True,
@@ -282,6 +587,280 @@ verified_monthly = (
 )
 namp_records = read_csv(REPORTS / "kspcb_namp_ernakulam_2025-06.csv")
 
+
+def _render_co2_intelligence(live: dict) -> None:
+    """Render CO₂ monitoring, trends and action context without mixing it into AQI."""
+    st.markdown('<div id="co2-intelligence"></div>', unsafe_allow_html=True)
+    st.markdown("## 🌍 CO2 Intelligence")
+    co2_item = live.get("current", {}).get("CO2") if isinstance(live, dict) else None
+    hourly = live.get("hourly", pd.DataFrame()) if isinstance(live, dict) else pd.DataFrame()
+    with st.container(border=True):
+        if not co2_item:
+            st.info("Verified local ambient CO₂: Unavailable. No validated Kochi monitoring-station concentration is connected.")
+        else:
+            observed = live.get("observed_at")
+            observed_label = observed.strftime("%d %b %Y, %H:%M UTC") if observed is not None else "Timestamp unavailable"
+            context = co2_context(co2_item["value"])
+            st.markdown(
+                f'<div style="border:3px solid {context["color"]};border-radius:18px;padding:16px 20px;'
+                f'background:linear-gradient(100deg,{context["color"]}18,transparent);">'
+                f'<div style="font-size:.86rem;color:#52656d;">Modelled outdoor CO₂ estimate · {context["status"]}</div>'
+                f'<div style="font-size:3rem;font-weight:800;line-height:1.1;">{co2_item["value"]:g} <span style="font-size:1.1rem;font-weight:600;">{co2_item["unit"]}</span></div>'
+                f'<div style="font-weight:700;color:{context["color"]};">Kochi model grid · model timestamp {observed_label}</div>'
+                f'<div style="font-size:.82rem;color:#52656d;">Source: CAMS via Open-Meteo · near-real-time modelled · cached up to 15 minutes</div></div>',
+                unsafe_allow_html=True,
+            )
+            st.warning("Verified local ambient CO₂: Unavailable. The value above is a model estimate, not a validated station observation; it must not be treated as a measured Kochi concentration or an AQI input.")
+            st.write("Outdoor ambient CO₂ is not a factory emission total and is not an AQI pollutant. A model estimate at this level is not an immediate-danger breathing warning; indoor CO₂ can instead help indicate ventilation conditions, but indoor thresholds do not apply here.")
+
+    monitor_tab, trend_tab, action_tab = st.tabs(["Monitor", "CO2 Trends", "Sources, climate & action"])
+    with monitor_tab:
+        if co2_item:
+            observed = live.get("observed_at")
+            st.write(f"**Location:** Kochi model grid (9.9312°N, 76.2673°E)")
+            st.write(f"**Timestamp:** {observed.strftime('%d %b %Y, %H:%M UTC') if observed is not None else 'Unavailable'}")
+            st.write("**Data type:** Modelled estimate only; verified local ambient CO₂ observation unavailable. The app may serve a cached response for up to 15 minutes.")
+            st.write("CO₂ is a greenhouse gas that accumulates globally. A local model value varies with atmospheric transport and is not a direct measurement of local emissions.")
+        else:
+            st.info("No current CO₂ observation is available to describe.")
+    with trend_tab:
+        period = st.selectbox("CO₂ trend resolution", ["hourly", "daily", "weekly", "monthly"], key="co2-trend-period")
+        # Open-Meteo returns past observations and forecast values in the same
+        # hourly payload. Keep the CO₂ trend historical/observed-only; forecast
+        # values must not be presented as measured concentrations.
+        trend_observations = hourly.copy()
+        observed_cutoff = live.get("observed_at")
+        if observed_cutoff is not None and not trend_observations.empty:
+            trend_observations["observed_at"] = pd.to_datetime(
+                trend_observations["observed_at"], utc=True, errors="coerce"
+            )
+            trend_observations = trend_observations.loc[
+                trend_observations["observed_at"] <= pd.Timestamp(observed_cutoff)
+            ]
+        trend = aggregate_co2_trend(trend_observations, period)
+        if trend.empty:
+            st.info("No returned CO₂ observations are available for this trend.")
+        else:
+            summary = st.columns(3)
+            summary[0].metric("Maximum", f'{trend["maximum"].max():.1f} ppm')
+            summary[1].metric("Minimum", f'{trend["minimum"].min():.1f} ppm')
+            summary[2].metric("Average", f'{trend["value"].mean():.1f} ppm')
+            if alt is not None:
+                co2_chart = alt.Chart(trend).mark_line(point=True, color="#0f766e").encode(
+                    x=alt.X("observed_at:T", title="Observation period (UTC)"),
+                    y=alt.Y("value:Q", title="CO₂ concentration (ppm)"),
+                    tooltip=[alt.Tooltip("observed_at:T", title="Period (UTC)"), alt.Tooltip("value:Q", title="Average ppm", format=".1f"), alt.Tooltip("minimum:Q", title="Minimum", format=".1f"), alt.Tooltip("maximum:Q", title="Maximum", format=".1f"), alt.Tooltip("observations:Q", title="Returned observations")],
+                ).properties(height=260)
+                st.altair_chart(co2_chart, use_container_width=True)
+            else:
+                st.line_chart(trend.set_index("observed_at")[["value"]])
+            st.caption("Only returned timestamps up to the latest current timestamp are included; forecast values, empty periods and missing observations are not shown as measured data.")
+    with action_tab:
+        st.markdown("**Where Does CO2 Come From?**")
+        source_types = {
+            "Industrial fuel combustion": "Boilers, furnaces and process heat can emit CO₂ when coal, oil, gas, biomass or other carbon-containing fuels are combusted.",
+            "Power generation": "Electricity generation can produce CO₂ when fossil fuels are used; the local contribution depends on the power system and transport of air.",
+            "Road transport": "Petrol and diesel engines release CO₂ through fuel combustion; traffic is a general possible source, not attribution of this model value.",
+            "Commercial and residential energy": "Buildings can contribute through cooking, heating, backup generators and purchased electricity.",
+        }
+        source_columns = st.columns(2)
+        for index, (title, description) in enumerate(source_types.items()):
+            with source_columns[index % 2]:
+                st.markdown(f'<div style="border:1px solid #9bbbc5;border-radius:11px;padding:10px;margin:5px 0;"><b>{title}</b><br><span style="font-size:.83rem;color:#52656d;">{description}</span></div>', unsafe_allow_html=True)
+
+        st.markdown("**Documented Edayar fuel-use evidence**")
+        candidates = read_csv(INDUSTRIAL / "edayar_candidate_facilities.csv")
+        fuel_records = candidates.loc[candidates["documented_fuel_use"].fillna("").astype(str).str.strip().ne("")].head(6) if not candidates.empty and "documented_fuel_use" in candidates.columns else pd.DataFrame()
+        if fuel_records.empty:
+            st.info("No facility-specific fuel-use record is available in the reviewed Edayar inventory.")
+        else:
+            for _, record in fuel_records.iterrows():
+                facility = record.get("official_name") or record.get("facility_name_as_published")
+                with st.expander(f"{facility} · Documented potential contributor"):
+                    st.write(f'**Location:** {record.get("address_as_published") or record.get("industrial_area")}')
+                    st.write(f'**Industry:** {record.get("industry_type_as_individually_documented") or "Not specified"}')
+                    st.write(f'**Documented fuel-use information:** {record.get("documented_fuel_use")}')
+                    st.write(f'**Evidence date:** {record.get("retrieved_on")}')
+                    st.markdown(f'[Open reviewed source record]({record.get("source_url")})')
+                    st.caption("This is evidence of a historical or documented fuel-use record, not a measured ambient CO₂ contribution or proof of responsibility for the current reading.")
+
+        with st.expander("Climate impact and local-versus-global context"):
+            st.write("CO₂ absorbs outgoing infrared radiation and is a long-lived greenhouse gas. Human emissions contribute to warming and long-term changes in climate, oceans, ice and ecosystems.")
+            st.write("Local air pollution describes concentrations people may encounter near a place and time. Climate change is driven by the accumulated global balance of greenhouse-gas emissions and removals; a local ambient ppm reading cannot be converted into a local emissions total.")
+            st.markdown("For comparison with a reliable global background series, use [NOAA Global Monitoring Laboratory global monthly CO₂ means](https://www.gml.noaa.gov/ccgg/trends/global.html). NOAA's global product is a marine-surface network average and is not the same measurement as this Kochi model-grid estimate; no global value is substituted into the local chart.")
+
+        with st.expander("Carbon mitigation action tracker"):
+            st.caption("These are practical actions, not quantified claims of emissions reduction.")
+            for group, actions in {
+                "Residents": ["Reduce unnecessary fuel use and prefer efficient or shared transport.", "Use energy-efficient appliances and avoid unnecessary generator use."],
+                "Industries": ["Improve energy efficiency and assess cleaner fuels or electrification where technically appropriate.", "Maintain verified stack/fuel monitoring and publish time-stamped emissions records."],
+                "Local authorities": ["Support efficient public transport and electrification where appropriate.", "Request verified facility-level emissions monitoring and preserve accessible records."],
+            }.items():
+                st.markdown(f"**{group}**")
+                for index, action in enumerate(actions):
+                    st.checkbox(action, key=f"co2-action-{group}-{index}")
+
+        with st.expander("CO₂ versus carbon emissions and carbon footprint"):
+            st.write("Ambient CO₂ concentration is measured in ppm. Carbon emissions are a mass quantity such as tonnes of CO₂. A carbon footprint is the total emissions associated with an activity, product, household or organisation. An ambient ppm reading cannot be used to calculate a carbon footprint.")
+
+
+def _render_compact_dashboard() -> None:
+    """Render the short resident-facing view; legacy long sections are not reached."""
+    st.markdown("## Pollutant Levels")
+    st.caption("The cards above are hourly CAMS/Open-Meteo model estimates. Statuses below use compatible trailing averages and show a plain-language limitation when a complete reference window is unavailable.")
+    live = {}
+    try:
+        live = load_live_air_quality()
+        current = live.get("current", {})
+    except Exception:
+        current = {}
+    _render_co2_intelligence(live)
+    pollutant_names = ["PM2.5", "PM10", "NO2", "SO2", "CO", "O3"]
+    selected = st.selectbox("Pollutant details", ["All pollutants", *pollutant_names], key="air-pollutant-detail")
+    if selected == "All pollutants":
+        rows = []
+        for pollutant in pollutant_names:
+            item = current.get(pollutant)
+            guide = POLLUTANT_GUIDELINES.get(pollutant)
+            assessment = assess_pollutant(pollutant, item["value"] if item else None, item["unit"] if item else "", live.get("hourly", pd.DataFrame()))
+            rows.append({
+                "Pollutant": pollutant,
+                "Latest": item["value"] if item else "Unavailable",
+                "Unit": item["unit"] if item else "—",
+                "Reference": f'{guide["limit"]:g} {guide["unit"]} ({guide["averaging"]})' if guide else "Unavailable",
+                "Status": assessment["status"] if item else "Unavailable",
+            })
+        display_dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True, alt="Live pollutant readings and reference status")
+    else:
+        item = current.get(selected)
+        guide = POLLUTANT_GUIDELINES.get(selected)
+        explanation, sources = {
+            "PM2.5": ("Fine particles that can enter the lungs and bloodstream.", "Traffic, combustion, industry and fuel burning."),
+            "PM10": ("Coarser particles affecting breathing and visibility.", "Road dust, construction and industrial dust."),
+            "NO2": ("A combustion gas that irritates airways and helps form ozone.", "Traffic, generators and industrial combustion."),
+            "SO2": ("A sulphur combustion gas that can irritate lungs and form particles.", "Sulphur-containing fuels and industrial processes."),
+            "CO": ("A colourless gas that reduces oxygen transport in the body.", "Incomplete combustion, traffic and generators."),
+            "O3": ("A secondary pollutant formed by sunlight-driven chemistry.", "Atmospheric reactions involving traffic and industry."),
+        }[selected]
+        if not item:
+            st.info(f"{selected} is unavailable in the current response.")
+        else:
+            st.metric(selected, f'{item["value"]:g} {item["unit"]}')
+            assessment = assess_pollutant(selected, item["value"], item["unit"], live.get("hourly", pd.DataFrame()))
+            st.markdown(f'<span style="border:2px solid {assessment["color"]};border-radius:999px;padding:4px 10px;color:{assessment["color"]};font-weight:650;">{assessment["status"]}</span>', unsafe_allow_html=True)
+            if assessment.get("assessed_value") is not None:
+                st.caption(f'Assessment uses {assessment["window"]}: {assessment["assessed_value"]:.1f} {item["unit"]} compared with {guide["limit"]:g} {guide["unit"]}.')
+            else:
+                st.caption(assessment["reason"])
+            if guide:
+                st.caption(f'Reference: {guide["limit"]:g} {guide["unit"]}, {guide["averaging"]} · {guide["source"]}. This is a health guideline, not a CPCB legal limit.')
+            health = HEALTH_INFORMATION[selected]
+            with st.expander(f"Health and practical guidance for {selected}", expanded=True):
+                st.write(health["summary"])
+                st.write(health["effects"])
+                st.write(f'**More sensitive:** {health["sensitive"]}')
+                st.write(f'**Possible sources:** {health["sources"]}')
+                st.write(f'**What residents can do:** {health["precautions"]}')
+            if st.button("Investigate Reasons", key="air-investigate"):
+                st.session_state["air-investigate-pollutant"] = selected
+
+    with st.expander("🏭 Industrial Pollution Sources", expanded=bool(st.session_state.get("air-investigate-pollutant"))):
+        st.markdown('<div id="industrial-pollution-sources"></div>', unsafe_allow_html=True)
+        st.subheader("Industrial Pollution Sources")
+        pollutant = st.selectbox("Select a pollutant to investigate", ["PM2.5", "PM10", "NO2", "SO2", "CO", "O3"], key="air-source-pollutant")
+        st.caption("These are evidence leads for Kochi, Eloor and Edayar—not a ranking of responsibility for the current model estimate.")
+        st.warning("No facility-specific current source-attribution measurement is available. A documented potential contributor is not proof that a facility caused a particular reading.")
+        candidates = read_csv(INDUSTRIAL / "edayar_candidate_facilities.csv")
+        if candidates.empty:
+            st.info("No verified facility evidence record is available.")
+        else:
+            aliases = {"PM2.5": ("pm", "particulate", "dust"), "PM10": ("pm", "particulate", "dust"), "SO2": ("so2", "sulphur", "sulfur"), "CO": ("carbon monoxide", "co "), "NO2": ("no2", "nitrogen oxide", "combustion"), "O3": ("ozone", "voc", "nox")}
+            matches = []
+            for _, record in candidates.iterrows():
+                text = " ".join(str(record.get(column, "")) for column in ("air_emissions_data", "emissions_limits_value", "measured_emissions_value", "documented_fuel_use", "candidate_basis")).casefold()
+                measured = bool(str(record.get("measured_emissions_value", "")).strip()) and str(record.get("measured_emissions_status", "")).casefold() not in ("", "unavailable", "unverified")
+                relevant = any(alias in text for alias in aliases.get(pollutant, ()))
+                if measured or relevant:
+                    associated = [name for name, terms in aliases.items() if any(term in text for term in terms)] or [pollutant]
+                    row = {
+                        "Facility": record.get("official_name") or record.get("facility_name_as_published"),
+                        "Location": record.get("address_as_published") or record.get("industrial_area"),
+                        "Industry type": record.get("industry_type_as_individually_documented"),
+                        "Pollutant": pollutant,
+                        "Associated pollutants": ", ".join(associated),
+                        "Evidence category": evidence_category(measured_facility_emissions=measured, documented_facility_presence=relevant),
+                        "Reported evidence": record.get("emissions_limits_value") or record.get("documented_fuel_use") or record.get("candidate_basis"),
+                        "Evidence date": record.get("retrieved_on"),
+                        "Source": record.get("source_url"),
+                        "Current measured emissions verified": "Yes" if measured else "No",
+                    }
+                    matches.append(row)
+            if matches:
+                for match in matches:
+                    evidence_color = {"Confirmed emissions evidence": "#dc3545", "Documented potential contributor": "#e67e22", "General possible source": "#d6a700", "Insufficient evidence": "#64748b"}.get(match["Evidence category"], "#64748b")
+                    st.markdown(
+                        f'<div style="border:1px solid {evidence_color};border-left:5px solid {evidence_color};border-radius:12px;padding:11px 14px;margin:8px 0;">'
+                        f'<div style="font-weight:750;font-size:1.02rem;">{match["Facility"]}</div>'
+                        f'<div style="font-size:.84rem;color:#52656d;">{match["Location"]} · {match["Industry type"]}</div>'
+                        f'<div style="margin-top:5px;"><span style="color:{evidence_color};font-weight:700;">{match["Evidence category"]}</span> · {match["Pollutant"]} · associated: {match["Associated pollutants"]}</div></div>',
+                        unsafe_allow_html=True,
+                    )
+                    with st.expander(f"View Evidence · {match['Facility']}"):
+                        st.write(f"**Reported evidence:** {match['Reported evidence']}")
+                        st.write(f"**Evidence date:** {match['Evidence date']} · **Current measured emissions verified:** {match['Current measured emissions verified']}")
+                        st.markdown(f"[Open source record]({match['Source']})")
+            else:
+                st.info(f"No facility-specific {pollutant} emissions measurement or permit detail was found in the reviewed Edayar records.")
+            st.caption("A documented potential contributor is not proof of responsibility for the current model estimate. O₃ is generally formed in the atmosphere; no direct factory attribution is made.")
+
+    with st.expander("Historical trends and KSPCB data"):
+        if monthly_observations.empty:
+            st.info("Historical monthly observations are unavailable in this checkout.")
+        else:
+            history = monthly_observations.copy()
+            if {"observed_at", "pollutant", "value"}.issubset(history.columns):
+                chart = history.pivot_table(index="observed_at", columns="pollutant", values="value", aggfunc="mean")
+                st.line_chart(chart)
+        if not daily_aqi.empty:
+            st.caption("Historical KSPCB station extract — not live and not a model estimate.")
+            columns = [c for c in ("station", "observed_at", "source_aqi", "PM2.5_value", "PM10_value", "NO2_value", "SO2_value", "CO_value", "O3_value") if c in daily_aqi.columns]
+            display_dataframe(daily_aqi[columns].head(20), hide_index=True, use_container_width=True, alt="Historical KSPCB station AQI and pollutant values")
+        else:
+            st.info("Historical KSPCB station data is unavailable.")
+
+    with st.expander("📚 Data Sources and Limitations"):
+        st.markdown("**Sources**")
+        observed = live.get("observed_at") if isinstance(live, dict) else None
+        observed_label = observed.strftime("%d %b %Y, %H:%M UTC") if observed is not None else "Unavailable"
+        historical_latest = pd.to_datetime(daily_aqi.get("observed_at"), errors="coerce").max() if not daily_aqi.empty and "observed_at" in daily_aqi else pd.NaT
+        source_cards = [
+            {"name": "CAMS via Open-Meteo", "link": OPEN_METEO_DOCS_URL, "station": "Kochi model grid (9.9312°N, 76.2673°E)", "timestamp": observed_label, "type": "Near-real-time modelled · app cache up to 15 minutes", "limit": "Not a CPCB/KSPCB station measurement."},
+            {"name": "KSPCB historical extract", "link": "https://kspcb.kerala.gov.in/", "station": "Ernakulam/KSPCB records; Eloor history retained", "timestamp": historical_latest.strftime("%d %b %Y") if pd.notna(historical_latest) else "Unavailable", "type": "Historical observations", "limit": "Observation windows, completeness and some units are not fully specified in the published extracts."},
+        ]
+        for source in source_cards:
+            st.markdown(
+                f'<div style="border:1px solid #9bbbc5;border-radius:11px;padding:10px 13px;margin:7px 0;">'
+                f'<div style="font-weight:750;">{source["name"]}</div>'
+                f'<div style="font-size:.85rem;">[{source["station"]}]({source["link"]}) · {source["type"]}</div>'
+                f'<div style="font-size:.8rem;color:#52656d;">Last observed: {source["timestamp"]} · {source["limit"]}</div></div>',
+                unsafe_allow_html=True,
+            )
+        st.markdown("**Limitations**")
+        st.caption("The live feed is a CAMS/Open-Meteo model estimate and has no monitoring-station identity. CO₂ is modelled outdoor context, not a verified observation. PM1, NH₃ and facility-specific current emissions are unavailable in the live response. Missing values are left unavailable; no observations are invented or interpolated.")
+        sources = register.get("sources", []) if isinstance(register, dict) else []
+        if sources:
+            with st.expander("Reviewed source register", expanded=False):
+                source_rows = [{key: source.get(key) for key in ("id", "publisher", "status", "reviewed_on")} for source in sources if isinstance(source, dict)]
+                if source_rows:
+                    display_dataframe(pd.DataFrame(source_rows), hide_index=True, use_container_width=True, alt="Reviewed air-quality source register")
+
+
+try:
+    _render_compact_dashboard()
+except Exception as error:
+    st.warning(f"The compact historical dashboard could not render completely: {error}")
+st.stop()
+
 # Executive overview: show only facts that are directly available in the loaded extracts.
 latest_extract_date = (
     pd.to_datetime(daily_aqi["observed_at"], errors="coerce").max().date()
@@ -289,6 +868,21 @@ latest_extract_date = (
     and pd.to_datetime(daily_aqi["observed_at"], errors="coerce").notna().any()
     else None
 )
+
+# Report freshness is calculated from the source observation date, not retrieval time.
+report_age_days = (date.today() - latest_extract_date).days if latest_extract_date else None
+if report_age_days is None:
+    st.caption("No dated KSPCB station report is available in the historical extract.")
+elif report_age_days < 0:
+    st.warning(
+        f"The latest source report is dated {latest_extract_date:%d %b %Y}, which is in the future "
+        "relative to the application date. Check the source date before interpreting this extract."
+    )
+else:
+    st.caption(
+        f"Historical KSPCB station report: {latest_extract_date:%d %b %Y} "
+        f"({report_age_days} days old). It is separate from the CAMS model estimate above."
+    )
 station_count = int(daily_aqi["station"].nunique()) if not daily_aqi.empty and "station" in daily_aqi.columns else 0
 eloor_daily_rows = (
     daily_aqi.loc[daily_aqi["station"].astype(str).str.strip().str.casefold().eq("eloor")]
@@ -300,16 +894,21 @@ if not eloor_daily_rows.empty and "source_aqi" in eloor_daily_rows.columns:
     raw_eloor_aqi = pd.to_numeric(
         pd.Series([eloor_daily_rows.iloc[0]["source_aqi"]]), errors="coerce"
     ).iloc[0]
-    if pd.notna(raw_eloor_aqi) and 0 <= int(raw_eloor_aqi) <= 500:
+    if (
+        pd.notna(raw_eloor_aqi)
+        and float(raw_eloor_aqi).is_integer()
+        and 0 <= float(raw_eloor_aqi) <= 500
+    ):
         eloor_category = cpcb_aqi_category(int(raw_eloor_aqi))[0]
         eloor_source_aqi = f"{int(raw_eloor_aqi)} · {eloor_category}"
 st.markdown("### Air quality at a glance")
-overview = st.columns(5)
+overview = st.columns(6)
 overview[0].metric("Latest loaded report", latest_extract_date.strftime("%d %b %Y") if latest_extract_date else "Unavailable")
-overview[1].metric("Eloor source AQI", eloor_source_aqi, help="Source-reported value from the 16 October 2026 KSPCB daily extract; not a live reading.")
-overview[2].metric("Stations in daily extract", station_count)
-overview[3].metric("Eloor monthly reports", len(monthly_reports), help="August and September 2026 source reports when both pass ingestion checks.")
-overview[4].metric("AQI calculation", "Evidence-gated", help="The app calculates AQI only when averaging period, valid hours and QA flags meet CPCB requirements.")
+overview[1].metric("Report age", f"{report_age_days} days" if report_age_days is not None and report_age_days >= 0 else "Review date", help="Days since the source observation date; this is a freshness indicator, not a pollution measure.")
+overview[2].metric("Eloor source AQI", eloor_source_aqi, help="Source-reported value from the dated KSPCB daily extract; not a live reading.")
+overview[3].metric("Stations in daily extract", station_count)
+overview[4].metric("Eloor monthly reports", len(monthly_reports), help="August and September 2026 source reports when both pass ingestion checks.")
+overview[5].metric("AQI calculation", "Evidence-gated", help="The app calculates AQI only when averaging period, valid hours and QA flags meet CPCB requirements.")
 st.caption(
     "This is a historical research dashboard, not a live public warning service. "
     "Each chart and table retains its source date, unit and evidence limitations."
@@ -331,11 +930,21 @@ if daily_aqi.empty:
     st.info("The acquired daily AQI report extract is unavailable in this checkout.")
 else:
     display_aqi = daily_aqi.copy()
-    display_aqi["CPCB AQI category"] = display_aqi["source_aqi"].map(
-        lambda value: cpcb_aqi_category(value)[0]
+    if "source_aqi" in display_aqi.columns:
+        display_aqi["CPCB AQI category"] = display_aqi["source_aqi"].map(
+            safe_cpcb_aqi_category
+        )
+    else:
+        st.warning(
+            "The daily extract has no source_aqi column. AQI categories are unavailable "
+            "for this file; pollutant fields will be displayed only when present."
+        )
+    report_date_label = (
+        latest_extract_date.strftime("%d %B %Y")
+        if latest_extract_date else "date unavailable"
     )
     st.caption(
-        "KSPCB source report date: 16 October 2026. AQI values are source-reported; "
+        f"KSPCB source report date: {report_date_label}. AQI values are source-reported; "
         "the category label is mapped to CPCB's official band. These are historical readings."
     )
     columns = [
@@ -343,7 +952,21 @@ else:
         "SO2_value", "CO_value", "PM2.5_value", "O3_value", "PM10_value", "NH3_value",
         "NOx_value", "NO_value", "NO2_value",
     ]
-    display_aqi = display_aqi[columns].rename(
+    available_display_columns = [
+        column for column in columns if column in display_aqi.columns
+    ]
+    missing_display_columns = [
+        column for column in columns
+        if column not in display_aqi.columns and column != "CPCB AQI category"
+    ]
+    if missing_display_columns:
+        st.caption(
+            "Optional report fields absent from this extract: "
+            + ", ".join(missing_display_columns)
+        )
+    if not available_display_columns:
+        st.warning("No recognised station-report columns are available to display.")
+    display_aqi = display_aqi[available_display_columns].rename(
         columns={
             "station": "KSPCB station label",
             "observed_at": "Report date",
@@ -360,17 +983,23 @@ else:
             "NO2_value": "NO₂ (µg/m³)",
         }
     )
-    st.dataframe(display_aqi, hide_index=True, alt="Historical KSPCB station AQI and pollutant values")
+    display_dataframe(display_aqi, hide_index=True, alt="Historical KSPCB station AQI and pollutant values")
 
     # A focused Eloor snapshot makes the industrial-belt report easier to scan.
     # Values are copied from the dated KSPCB extract; no unit conversion or averaging is applied.
-    eloor_rows = daily_aqi.loc[
-        daily_aqi["station"].astype(str).str.strip().str.casefold().eq("eloor")
-    ]
+    eloor_rows = (
+        daily_aqi.loc[
+            daily_aqi["station"].astype(str).str.strip().str.casefold().eq("eloor")
+        ]
+        if "station" in daily_aqi.columns
+        else pd.DataFrame()
+    )
     if not eloor_rows.empty:
         eloor_row = eloor_rows.iloc[0]
         st.markdown("#### Eloor pollutant snapshot")
-        st.caption("KSPCB source-reported values · 16 October 2026 · historical, not live")
+        st.caption(
+            f"KSPCB source-reported values · {report_date_label} · historical, not live"
+        )
         snapshot_pollutants = (
             ("PM2.5", "PM2.5_value", "unit_PM2.5"),
             ("PM10", "PM10_value", "unit_PM10"),
@@ -402,19 +1031,150 @@ else:
         "station identifiers, or coordinates. Pollutant driver is not calculated. Source: "
         "[KSPCB Water and Air Quality Directory](https://kspcb.kerala.gov.in/water-and-air-quality-directory)."
     )
-    if not daily_status.empty:
-        st.write("Stations without a reported AQI in this report:")
-        st.dataframe(
-            daily_status.rename(
-                columns={
-                    "station": "KSPCB station label",
-                    "observed_at": "Report date",
-                    "source_status": "Reported status",
-                }
-            )[["KSPCB station label", "Report date", "Reported status"]],
+    st.markdown("**Daily extract data-quality audit**")
+    audit_summary, pollutant_audit = audit_daily_extract(daily_aqi)
+    audit_metrics = st.columns(4)
+    audit_metrics[0].metric("Extract rows", audit_summary.get("rows", 0))
+    audit_metrics[1].metric("Duplicate station-date rows", audit_summary.get("duplicate_rows", 0))
+    audit_metrics[2].metric(
+        "Missing / invalid dates",
+        audit_summary.get("missing_dates", 0) + audit_summary.get("invalid_dates", 0),
+    )
+    audit_metrics[3].metric(
+        "Missing / invalid AQI",
+        audit_summary.get("missing_aqi", 0) + audit_summary.get("invalid_aqi", 0),
+    )
+    detail_metrics = st.columns(4)
+    detail_metrics[0].metric("Non-numeric pollutants", audit_summary.get("pollutant_nonnumeric", 0))
+    detail_metrics[1].metric("Negative pollutant values", audit_summary.get("pollutant_negative", 0))
+    detail_metrics[2].metric("Unit mismatches", audit_summary.get("pollutant_unit_mismatches", 0))
+    detail_metrics[3].metric("Rows QA-unassessed", audit_summary.get("unassessed_rows", 0))
+    qa_metrics = st.columns(4)
+    qa_metrics[0].metric("QA valid", audit_summary.get("valid_qa_rows", 0))
+    qa_metrics[1].metric("QA suspect", audit_summary.get("suspect_qa_rows", 0))
+    qa_metrics[2].metric("QA invalid", audit_summary.get("invalid_qa_rows", 0))
+    qa_metrics[3].metric("Unknown QA flags", audit_summary.get("unknown_qa_rows", 0))
+    if not pollutant_audit.empty:
+        display_dataframe(
+            pollutant_audit,
             hide_index=True,
-            alt="Stations marked unavailable in the KSPCB daily AQI report",
+            use_container_width=True,
+            alt="Missing, non-numeric, negative and unit-mismatch counts in the daily pollutant extract",
         )
+    st.caption(
+        "This is a structural audit of the preserved CSV, not independent certification of "
+        "the KSPCB measurements. Missing means no value is present; non-numeric means a "
+        "non-empty value could not be parsed. Duplicate counts represent extra rows sharing "
+        "the same station and report date. QA flags are counted exactly as recorded; unknown "
+        "flags are not silently treated as valid, and suspect/invalid rows are not promoted."
+    )
+    if (
+        audit_summary.get("duplicate_rows", 0)
+        or audit_summary.get("missing_dates", 0)
+        or audit_summary.get("invalid_dates", 0)
+        or audit_summary.get("missing_aqi", 0)
+        or audit_summary.get("invalid_aqi", 0)
+        or audit_summary.get("missing_stations", 0)
+        or audit_summary.get("pollutant_nonnumeric", 0)
+        or audit_summary.get("pollutant_negative", 0)
+        or audit_summary.get("pollutant_unit_mismatches", 0)
+        or audit_summary.get("invalid_qa_rows", 0)
+        or audit_summary.get("unknown_qa_rows", 0)
+    ):
+        st.warning(
+            "The daily extract has structural issues that should be reviewed before "
+            "using it in comparisons or calculations."
+        )
+    elif (
+        audit_summary.get("unassessed_rows", 0)
+        or audit_summary.get("missing_qa_rows", 0)
+        or audit_summary.get("suspect_qa_rows", 0)
+    ):
+        st.info(
+            "Basic structural checks did not identify the listed issues, but source QA is "
+            "unassessed or incomplete. These records are not certified as validated measurements."
+        )
+    else:
+        st.success(
+            "No issues were detected by these basic structural checks. This does not replace "
+            "the monitoring agency's quality-assurance review."
+        )
+
+    if not daily_status.empty:
+        # Summarise only the station records present in these two dated extracts.
+        # A missing AQI is a reporting-availability issue, not evidence of clean air.
+        aqi_station_labels = (
+            daily_aqi["station"].dropna().astype(str).str.strip()
+            if "station" in daily_aqi.columns else pd.Series(dtype="string")
+        )
+        status_station_labels = (
+            daily_status["station"].dropna().astype(str).str.strip()
+            if "station" in daily_status.columns else pd.Series(dtype="string")
+        )
+        aqi_station_keys = set(aqi_station_labels.str.casefold())
+        status_station_keys = set(status_station_labels.str.casefold())
+        status_only_count = len(status_station_keys - aqi_station_keys)
+        station_record_count = len(aqi_station_keys | status_station_keys)
+
+        st.markdown("**Monitoring-network reporting coverage in this extract**")
+        coverage_columns = st.columns(3)
+        coverage_columns[0].metric("Stations with AQI rows", len(aqi_station_keys))
+        coverage_columns[1].metric("Status-only stations", status_only_count)
+        coverage_columns[2].metric("Distinct station records", station_record_count)
+        st.caption(
+            "Counts describe station labels in this dated report pair only; they are not a "
+            "complete inventory of all operating KSPCB monitors."
+        )
+
+        if "source_status" in daily_status.columns:
+            if "station" in daily_status.columns:
+                status_summary = (
+                    daily_status.assign(
+                        _station_key=daily_status["station"].astype("string").str.strip().str.casefold(),
+                        _status_label=daily_status["source_status"].astype("string").str.strip(),
+                    )
+                    .dropna(subset=["_status_label"])
+                    .drop_duplicates(subset=["_station_key", "_status_label"])
+                    .groupby("_status_label")["_station_key"]
+                    .nunique()
+                    .sort_values(ascending=False)
+                )
+            else:
+                status_summary = pd.Series(dtype="int64")
+                st.warning(
+                    "The station-status extract has no station column, so station-level "
+                    "status counts cannot be calculated."
+                )
+            if not status_summary.empty:
+                status_columns = st.columns(min(3, len(status_summary)))
+                for column, (status_label, count) in zip(status_columns, status_summary.items()):
+                    column.metric(str(status_label).title(), int(count))
+
+        st.write("Stations without a reported AQI in this report:")
+        status_display = daily_status.rename(
+            columns={
+                "station": "KSPCB station label",
+                "observed_at": "Report date",
+                "source_status": "Reported status",
+            }
+        )
+        status_display_columns = [
+            column for column in (
+                "KSPCB station label", "Report date", "Reported status"
+            )
+            if column in status_display.columns
+        ]
+        if status_display_columns:
+            display_dataframe(
+                status_display[status_display_columns],
+                hide_index=True,
+                alt="Stations marked unavailable in the KSPCB daily AQI report",
+            )
+        else:
+            st.warning(
+                "The station-status extract is present but contains none of the recognised "
+                "station, date or status columns."
+            )
 
 st.markdown('<div id="eloor-trends"></div>', unsafe_allow_html=True)
 st.subheader("Dated Eloor pollutant trends")
@@ -439,7 +1199,7 @@ else:
         ignore_index=True,
     )
     st.markdown("**Report coverage and missing observations**")
-    st.dataframe(
+    display_dataframe(
         coverage,
         hide_index=True,
         alt="Expected, reported, and missing dates for Eloor pollutant, AQI, and weather series",
@@ -453,6 +1213,22 @@ else:
         station_inventory = sorted(verified_monthly["station"].dropna().unique().tolist())
         station = st.selectbox("Monitoring station", station_inventory, key="report_station")
         station_data = verified_monthly.loc[verified_monthly["station"].eq(station)]
+        qa_counts = (
+            station_data["quality_flag"].astype("string").str.strip().str.casefold()
+            .value_counts()
+        )
+        st.markdown("**Source QA status for the selected station**")
+        qa_columns = st.columns(4)
+        for column, flag, label in zip(
+            qa_columns,
+            ("valid", "unassessed", "suspect", "invalid"),
+            ("QA-valid rows", "Unassessed rows", "Suspect rows", "Invalid rows"),
+        ):
+            column.metric(label, int(qa_counts.get(flag, 0)))
+        st.caption(
+            "Schema validation confirms that records can be parsed for descriptive review; "
+            "it does not turn source-unassessed records into QA-valid measurements."
+        )
         pollutants = sorted(station_data["pollutant"].unique().tolist())
         pollutant = st.selectbox("Pollutant", pollutants, key="report_pollutant")
         dates = pd.to_datetime(station_data["observed_at"])
@@ -469,20 +1245,54 @@ else:
         else:
             selected_start = selected_end = selected_range
 
-        series = time_series_summary(
-            station_data, pollutant, include_unassessed=True
+        trend_basis = st.radio(
+            "Trend inclusion",
+            (
+                "All eligible source rows (includes unassessed)",
+                "Only source QA-valid rows",
+            ),
+            horizontal=True,
+            key="air_trend_qa_basis",
         )
-        series_dates = pd.to_datetime(series["observed_at"]).dt.date
-        series = series.loc[(series_dates >= selected_start) & (series_dates <= selected_end)]
-        unit = station_data.loc[station_data["pollutant"].eq(pollutant), "unit"].iloc[0]
+        include_unassessed = trend_basis.startswith("All eligible")
+        series_error = None
+        try:
+            series = time_series_summary(
+                station_data, pollutant, include_unassessed=include_unassessed
+            )
+        except AirQualityDataError as error:
+            series = pd.DataFrame()
+            series_error = str(error)
+        if not series.empty:
+            series_dates = pd.to_datetime(series["observed_at"]).dt.date
+            series = series.loc[
+                (series_dates >= selected_start) & (series_dates <= selected_end)
+            ]
+        unit = station_data.loc[
+            station_data["pollutant"].eq(pollutant), "unit"
+        ].iloc[0]
         if series.empty:
-            st.info("No source-reported values are available for the selected pollutant and dates.")
+            st.info(
+                series_error
+                or "No source-reported values are available for the selected pollutant and dates."
+            )
         else:
             st.line_chart(
                 series.set_index("observed_at")["mean_value"],
                 y_label=f"{pollutant} ({unit})",
                 alt=f"Historical daily KSPCB-reported {pollutant} values at Eloor from August through September 2026",
             )
+            if include_unassessed:
+                st.caption(
+                    "Trend includes source rows marked valid or unassessed. Unassessed values "
+                    "remain visibly unassessed in the QA summary above and must not be treated "
+                    "as certified measurements."
+                )
+            else:
+                st.caption(
+                    "Trend includes only rows explicitly marked QA-valid by the source. "
+                    "This filter does not independently certify the monitoring programme."
+                )
 
         if not monthly_aqi.empty:
             st.markdown("**Historical source-reported Eloor AQI trend**")
@@ -528,7 +1338,7 @@ else:
                 )
                 direction_invalid = (
                     selected_weather["wind_direction"].notna()
-                    & ~selected_weather["wind_direction"].between(0, 360, inclusive="left")
+                    & ~selected_weather["wind_direction"].between(0, 360, inclusive="both")
                 )
                 negative_wind = (
                     selected_weather["wind_speed"].notna()
@@ -539,7 +1349,7 @@ else:
                     & selected_weather["wind_speed"].gt(20)
                 )
 
-                weather_metrics = st.columns(3)
+                weather_metrics = st.columns(5)
                 weather_metrics[0].metric(
                     "Dated weather records", len(selected_weather)
                 )
@@ -547,15 +1357,24 @@ else:
                     "Humidity outside 0–100%", int(humidity_invalid.sum())
                 )
                 weather_metrics[2].metric(
+                    "Invalid wind direction", int(direction_invalid.sum())
+                )
+                weather_metrics[3].metric(
+                    "Negative wind speed", int(negative_wind.sum())
+                )
+                weather_metrics[4].metric(
                     "Wind speed >20 m/s · review", int(high_wind_review.sum())
                 )
 
                 temperature_series = selected_weather.dropna(
                     subset=["temperature"]
                 ).set_index("observed_at")["temperature"]
-                wind_series = selected_weather.dropna(
-                    subset=["wind_speed"]
-                ).set_index("observed_at")["wind_speed"]
+                # Negative wind speed is physically invalid and is excluded from
+                # the chart; unusually high positive speeds remain visible for review.
+                wind_series = selected_weather.loc[
+                    selected_weather["wind_speed"].notna()
+                    & selected_weather["wind_speed"].ge(0)
+                ].set_index("observed_at")["wind_speed"]
                 humidity_series = selected_weather.loc[
                     ~humidity_invalid & selected_weather["relative_humidity"].notna()
                 ].set_index("observed_at")["relative_humidity"]
@@ -610,7 +1429,7 @@ else:
                         "Wind speed above 20 m/s review threshold; not automatically rejected; "
                     )
                     st.markdown("**Records requiring review**")
-                    st.dataframe(
+                    display_dataframe(
                         flagged_weather[
                             [
                                 "observed_at", "wind_speed", "wind_direction",
@@ -624,9 +1443,11 @@ else:
                     st.success("No values triggered the displayed weather review checks.")
 
                 st.caption(
-                    "Humidity outside 0–100% is excluded from its chart. Wind speeds above 20 m/s "
-                    "are flagged for source review only and remain visible in the wind chart; this "
-                    "app threshold is not a KSPCB quality flag. The source does not state exact "
+                    "Humidity outside 0–100% and negative wind speeds are excluded from their "
+                    "charts, but the original source-reported values remain unchanged in the "
+                    "review table. No values are silently corrected or replaced. Wind speeds above "
+                    "20 m/s are flagged for source review only and remain visible in the wind chart; "
+                    "this app threshold is not a KSPCB quality flag. The source does not state exact "
                     "averaging windows or station coordinates. Daily same-date summaries cannot "
                     "establish subdaily wind alignment, atmospheric dispersion, or an industrial "
                     "source relationship."
@@ -670,7 +1491,7 @@ else:
                     "Change in mean (%)",
                 ] = 0.0
 
-            st.dataframe(
+            display_dataframe(
                 comparison,
                 hide_index=True,
                 alt="Descriptive August and September means and percentage changes for matching Eloor pollutant report fields",
@@ -707,7 +1528,7 @@ else:
                 "Coordinate note": "report value; CRS not stated" if coordinates_consistent else "conflicting row-level coordinates",
             }
         )
-    st.dataframe(
+    display_dataframe(
         pd.DataFrame(station_rows),
         hide_index=True,
         alt="NAMP report station identifiers and source coordinates",
@@ -748,7 +1569,7 @@ else:
             "endpoint does not state the exact measurement cutoff or any observation timestamp. "
             "The 2026 summary may be year-to-date. The year label is not a current-reading timestamp."
         )
-        st.dataframe(
+        display_dataframe(
             latest[["reference_station", "source_station_code", "source_station", "monitoring_mode", "average_aqi"]]
             .rename(
                 columns={
@@ -783,7 +1604,7 @@ else:
         stations = sorted(matched["reference_station"].unique().tolist())
         selected_station = st.selectbox("Monitoring station", stations)
         selected = matched.loc[matched["reference_station"].eq(selected_station)].sort_values("year")
-        st.dataframe(
+        display_dataframe(
             selected[["year", "source_station", "source_station_code", "monitoring_mode", "average_aqi"]]
             .rename(
                 columns={
@@ -816,7 +1637,7 @@ category_table = pd.DataFrame(
         for low, high, category, meaning in CPCB_AQI_CATEGORIES
     ]
 )
-st.dataframe(category_table, hide_index=True, alt="CPCB AQI categories and health meanings")
+display_dataframe(category_table, hide_index=True, alt="CPCB AQI categories and health meanings")
 st.markdown(
     "CPCB uses 24-hour averages for PM2.5, PM10, SO2, NO2, NH3 and Pb, and 8-hour averages "
     "for CO and O3; the highest sub-index is the AQI. Overall AQI requires at least three "
@@ -879,7 +1700,7 @@ else:
                 ) or "Eligible for CPCB calculation",
             }
         )
-    st.dataframe(
+    display_dataframe(
         pd.DataFrame(eligibility_rows),
         hide_index=True,
         use_container_width=True,
@@ -973,38 +1794,57 @@ if not consent_records.empty:
 
 if timeline_events:
     timeline = pd.DataFrame(timeline_events)
-    timeline["_sort_date"] = pd.to_datetime(timeline["Date"], format="%Y-%m-%d", errors="coerce")
-    timeline = timeline.sort_values(["_sort_date", "Evidence stream", "Event"]).drop(
-        columns="_sort_date"
+    timeline["_sort_date"] = pd.to_datetime(
+        timeline["Date"], format="%Y-%m-%d", errors="coerce"
     )
-    stream_options = ["All evidence streams"] + sorted(timeline["Evidence stream"].unique().tolist())
-    selected_stream = st.selectbox(
-        "Filter timeline",
-        stream_options,
-        key="evidence_timeline_stream",
-    )
-    visible_timeline = (
-        timeline if selected_stream == "All evidence streams"
-        else timeline.loc[timeline["Evidence stream"].eq(selected_stream)]
-    )
-    st.dataframe(
-        visible_timeline,
-        hide_index=True,
-        use_container_width=True,
-        column_config={
-            "Source / record": st.column_config.LinkColumn(
-                "Source / record",
-                display_text="Open source record",
+    undated_event_count = int(timeline["_sort_date"].isna().sum())
+    timeline = timeline.loc[timeline["_sort_date"].notna()].copy()
+
+    if timeline.empty:
+        st.warning(
+            f"{undated_event_count} timeline record(s) were found, but none had a valid "
+            "YYYY-MM-DD date. They are excluded from the chronological display."
+        )
+    else:
+        timeline = timeline.sort_values(
+            ["_sort_date", "Evidence stream", "Event"]
+        ).drop(columns="_sort_date")
+        stream_options = ["All evidence streams"] + sorted(
+            timeline["Evidence stream"].unique().tolist()
+        )
+        selected_stream = st.selectbox(
+            "Filter timeline",
+            stream_options,
+            key="evidence_timeline_stream",
+        )
+        visible_timeline = (
+            timeline if selected_stream == "All evidence streams"
+            else timeline.loc[timeline["Evidence stream"].eq(selected_stream)]
+        )
+        display_dataframe(
+            visible_timeline,
+            hide_index=True,
+            use_container_width=True,
+            column_config={
+                "Source / record": st.column_config.LinkColumn(
+                    "Source / record",
+                    display_text="Open source record",
+                )
+            },
+            alt="Chronological timeline of Eloor ambient monitoring periods and Edayar consent records",
+        )
+        st.caption(
+            f"Showing {len(visible_timeline)} dated events from the records currently available "
+            "in this project. Dates describe the source record; they are not continuous monitoring "
+            "coverage. Consent-to-establish (CTE), consent-to-operate (CTO), rejected applications, "
+            "and stated expiry dates remain distinct."
+        )
+        if undated_event_count:
+            st.warning(
+                f"{undated_event_count} timeline record(s) had missing or invalid dates and "
+                "were excluded from the chronological display. Check the source register before "
+                "using those records in a date-based comparison."
             )
-        },
-        alt="Chronological timeline of Eloor ambient monitoring periods and Edayar consent records",
-    )
-    st.caption(
-        f"Showing {len(visible_timeline)} dated events from the records currently available "
-        "in this project. Dates describe the source record; they are not continuous monitoring "
-        "coverage. Consent-to-establish (CTE), consent-to-operate (CTO), rejected applications, "
-        "and stated expiry dates remain distinct."
-    )
 else:
     st.info(
         "No dated ambient-report or facility consent events are available to build the timeline."
@@ -1019,7 +1859,7 @@ st.info(
 
 st.subheader("Documented NAMP network reference")
 stations = pd.DataFrame(register["kspcb_namp_ernakulam_stations"])
-st.dataframe(stations, hide_index=True, alt="KSPCB Ernakulam NAMP monitoring-station inventory")
+display_dataframe(stations, hide_index=True, alt="KSPCB Ernakulam NAMP monitoring-station inventory")
 st.caption(
     "The KSPCB directory station inventory is a network reference. June 2025 report pages also "
     "contain station codes and row-level coordinates; the report does not specify their coordinate "
@@ -1058,7 +1898,7 @@ else:
             "ranking_status": "Assessment status",
         }
     )
-    st.dataframe(
+    display_dataframe(
         display_candidates,
         hide_index=True,
         alt="Edayar facilities listed as candidates with current evidence gaps",
@@ -1105,7 +1945,7 @@ else:
     evidence_table = facility_candidates[evidence_fields].rename(
         columns=evidence_labels
     )
-    st.dataframe(
+    display_dataframe(
         evidence_table,
         hide_index=True,
         use_container_width=True,
@@ -1183,7 +2023,7 @@ else:
             }
         )
     pollutant_comparison = pd.DataFrame(comparison_rows)
-    st.dataframe(
+    display_dataframe(
         pollutant_comparison,
         hide_index=True,
         use_container_width=True,
@@ -1198,7 +2038,7 @@ else:
 
 if not industry_type_counts.empty:
     st.markdown("**Estate-level trade-effluent industry categories reported by KWA**")
-    st.dataframe(
+    display_dataframe(
         industry_type_counts,
         hide_index=True,
         alt="Edayar estate industry-type counts from KWA",
@@ -1248,11 +2088,67 @@ if source_assessment["candidates"]:
             for candidate in source_assessment["candidates"]
         ]
     )
-    st.dataframe(
+    display_dataframe(
         readiness_table,
         hide_index=True,
         alt="Evidence readiness for each unranked Edayar candidate facility",
     )
+
+    st.markdown("**Actionable evidence-gap register**")
+    st.caption(
+        "This register translates each evidence gate into a specific data request. "
+        "It is a research checklist, not a facility score or source ranking."
+    )
+    action_rows = []
+    for candidate in source_assessment["candidates"]:
+        required_evidence = {
+            field: candidate["evidence"].get(field)
+            for field in SOURCE_EVIDENCE_REQUIREMENTS
+        }
+        for item in evidence_action_plan(required_evidence):
+            action_rows.append(
+                {
+                    "Candidate facility": candidate["facility_name"],
+                    "Evidence domain": item["evidence_domain"].replace("_", " ").title(),
+                    "Status": item["status"],
+                    "Evidence requirement": item["requirement"],
+                    "Recommended next action": item["next_action"],
+                }
+            )
+    action_plan = pd.DataFrame(action_rows)
+    if not action_plan.empty:
+        missing_actions = action_plan.loc[action_plan["Status"].eq("Missing")].copy()
+        total_gates = len(action_plan)
+        available_gates = total_gates - len(missing_actions)
+        action_metrics = st.columns(3)
+        action_metrics[0].metric("Evidence checks", total_gates)
+        action_metrics[1].metric("Available for review", available_gates)
+        action_metrics[2].metric("Open evidence gaps", len(missing_actions))
+        if missing_actions.empty:
+            st.success(
+                "All minimum evidence domains are marked available. Independent scientific "
+                "method review is still required; this is not permission to attribute pollution."
+            )
+        else:
+            display_dataframe(
+                missing_actions,
+                hide_index=True,
+                use_container_width=True,
+                alt="Actionable missing evidence requests for each industrial candidate",
+            )
+            st.warning(
+                f"{len(missing_actions)} evidence requirement(s) remain open across "
+                f"{len(source_assessment['candidates'])} candidate record(s). No source ranking "
+                "or causal attribution is produced."
+            )
+        with st.expander("View all evidence requirements"):
+            display_dataframe(
+                action_plan,
+                hide_index=True,
+                use_container_width=True,
+                alt="Complete industrial source evidence checklist",
+            )
+
 st.caption(
     "The August and September Eloor values are historical, day-level source-reported concentrations. Their exact "
     "averaging windows are unspecified and row-level QA is unassessed. Facility coordinates, "
@@ -1278,12 +2174,85 @@ st.markdown(
 
 st.markdown('<div id="sources"></div>', unsafe_allow_html=True)
 st.subheader("Sources, retrieval metadata and limitations")
+
+source_review_rows = []
 for source in register["sources"]:
-    st.markdown(f"- [{source['publisher']}]({source['url']}) — {source['status']}")
+    reviewed_value = source.get("reviewed_on")
+    try:
+        reviewed_date = date.fromisoformat(str(reviewed_value))
+        review_age_days = (date.today() - reviewed_date).days
+        review_date_check = (
+            "Future date — check register" if review_age_days < 0 else "Valid date"
+        )
+    except (TypeError, ValueError):
+        reviewed_date = None
+        review_age_days = None
+        review_date_check = "Missing or invalid date"
+
+    source_review_rows.append(
+        {
+            "Publisher": source.get("publisher", "Publisher not recorded"),
+            "Evidence status": source.get("evidence_status", "Not classified"),
+            "Source status": source.get("status", "Status not recorded"),
+            "Reviewed on": reviewed_value or "Not recorded",
+            "Days since review": review_age_days if review_age_days is not None else "—",
+            "Date check": review_date_check,
+        }
+    )
+
+source_review_table = pd.DataFrame(source_review_rows)
+if not source_review_table.empty:
+    display_dataframe(
+        source_review_table,
+        hide_index=True,
+        use_container_width=True,
+        alt="Source register review dates and evidence status",
+    )
+    invalid_review_dates = int(
+        source_review_table["Date check"].ne("Valid date").sum()
+    )
+    st.caption(
+        f"{len(source_review_table)} source records are listed in the register. "
+        "Review age is calculated from each record's reviewed_on date; it is not "
+        "the publication date or the age of the underlying observation."
+    )
+    if invalid_review_dates:
+        st.warning(
+            f"{invalid_review_dates} source record(s) have a missing, invalid or future "
+            "review date. Check the source register before relying on their review metadata."
+        )
+
+for source in register["sources"]:
+    publisher = source.get("publisher", "Publisher not recorded")
+    source_url = str(source.get("url") or "").strip()
+    try:
+        parsed_source_url = urlsplit(source_url)
+        valid_https_url = (
+            parsed_source_url.scheme == "https"
+            and bool(parsed_source_url.hostname)
+            and parsed_source_url.username is None
+            and parsed_source_url.password is None
+        )
+    except ValueError:
+        valid_https_url = False
+
+    if valid_https_url:
+        st.markdown(
+            f"- [{publisher}]({source_url}) — {source.get('status', 'Status not recorded')}"
+        )
+    else:
+        st.warning(
+            f"{publisher}: the source URL is missing or is not a valid HTTPS web address. "
+            "Verify the register entry before using the link."
+        )
+
 with st.expander("Evidence and reuse notes"):
     for source in register["sources"]:
-        st.markdown(f"**{source['publisher']}**")
-        st.write(source["evidence"])
-        st.caption(f"Coverage: {source['geographic_coverage']}")
-        st.caption(f"Limitations/blocker: {source['blocker']}")
-        st.caption(f"Reuse: {source['reuse_status']} | Reviewed: {source['reviewed_on']}")
+        st.markdown(f"**{source.get('publisher', 'Publisher not recorded')}**")
+        st.write(source.get("evidence", "No evidence description recorded."))
+        st.caption(f"Coverage: {source.get('geographic_coverage', 'Not recorded')}")
+        st.caption(f"Limitations/blocker: {source.get('blocker', 'Not recorded')}")
+        st.caption(
+            f"Reuse: {source.get('reuse_status', 'Not recorded')} | "
+            f"Reviewed: {source.get('reviewed_on', 'Not recorded')}"
+        )

@@ -1,13 +1,17 @@
 """Source provenance, validation status and analysis readiness."""
+import json
 from pathlib import Path
 
 import pandas as pd
 import streamlit as st
 
+from src.dataframe_display import display_dataframe
+
 from src.ingestion_audit import DATA_STATUS_DEFINITIONS, build_ingestion_report
 
 
 ROOT = Path(__file__).resolve().parents[1]
+FLOOD_REFERENCE_PATH = ROOT / "data" / "reference" / "ksdma_ernakulam_flood_return_period_statistics_2022.json"
 
 
 @st.cache_data(ttl=60)
@@ -47,7 +51,7 @@ source_rows = [
     for item in report["recovered_sources"]
 ]
 if source_rows:
-    st.dataframe(
+    display_dataframe(
         pd.DataFrame(source_rows).astype("string"),
         hide_index=True,
         width="stretch",
@@ -87,7 +91,7 @@ spatial_rows = [
     for item in report["spatial_catalog"]
 ]
 if spatial_rows:
-    st.dataframe(
+    display_dataframe(
         pd.DataFrame(spatial_rows).astype("string"),
         hide_index=True,
         width="stretch",
@@ -103,6 +107,45 @@ for blocker in flood["blockers"]:
 st.markdown("**Evidence needed to reopen the analysis**")
 for requirement in flood["next_evidence"]:
     st.write(f"- {requirement}")
+
+st.subheader("Official flood-risk context: Ernakulam district")
+st.caption(
+    "KSDMA's published district-level statistics are available as a source-traceable reference. "
+    "They do not identify affected Kochi wards or validate the separate GeoTIFF pixel values."
+)
+try:
+    flood_reference = json.loads(FLOOD_REFERENCE_PATH.read_text(encoding="utf-8"))
+    scenario_label = st.radio(
+        "Scenario",
+        ["Historical", "RCP 8.5 climate scenario"],
+        horizontal=True,
+        key="ksdma_flood_reference_scenario",
+    )
+    scenario_key = "historical_scenario" if scenario_label == "Historical" else "rcp_8_5_scenario"
+    flood_rows = flood_reference[scenario_key]
+    flood_frame = pd.DataFrame([
+        {
+            "Return period (years)": row["return_period_years"],
+            "Annual exceedance probability (%)": row["annual_exceedance_probability_percent"],
+            "Area affected (km²)": row["area_affected_sq_km"],
+            "Hospitals exposed (source count)": row["hospitals_exposed"],
+            "Schools exposed (source count)": row["schools_exposed"],
+        }
+        for row in flood_rows
+    ])
+    display_dataframe(flood_frame, hide_index=True, width="stretch")
+    st.caption(
+        f"Publisher: {flood_reference['publisher']} · Published: {flood_reference['publication_date']} · "
+        f"Coverage: {flood_reference['geographic_coverage']}."
+    )
+    st.markdown(f"**Method context:** {flood_reference['method_context']}")
+    st.markdown(f"**Source:** {flood_reference['source_url']}")
+    with st.expander("Interpretation and limitations"):
+        st.write(flood_reference["return_period_definition"])
+        for limitation in flood_reference["limitations"]:
+            st.write(f"- {limitation}")
+except (OSError, json.JSONDecodeError, KeyError, TypeError) as exc:
+    st.error(f"Could not load the official flood reference table: {exc}")
 
 st.subheader("Air quality and industrial attribution")
 air = report["air_attribution"]

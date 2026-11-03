@@ -72,6 +72,14 @@ def cpcb_aqi_category(value: object) -> tuple[str, str]:
     raise AirQualityDataError("AQI falls outside the CPCB category bands.")
 
 
+def safe_cpcb_aqi_category(value: object) -> str:
+    """Return a display label for any input without interrupting a dashboard."""
+    try:
+        return cpcb_aqi_category(value)[0]
+    except (TypeError, ValueError, OverflowError):
+        return "Unavailable / invalid"
+
+
 def _station_names(
     station_inventory: Iterable[str | Mapping[str, str]],
 ) -> dict[str, str]:

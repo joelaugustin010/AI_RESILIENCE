@@ -1,0 +1,62 @@
+{
+  "dataset_name": "Ernakulam Carbon Calculator Metadata",
+  "dataset_version": "1.0",
+  "generated_on": "2026-11-02",
+  "dataset_purpose": "Reference methodology documentation for household and industrial carbon calculations scoped to Ernakulam district, Kerala. This database is intended to support verified direct CO2 calculations only and is not a complete greenhouse-gas inventory.",
+  "geographic_scope": {
+    "district": "Ernakulam",
+    "state": "Kerala",
+    "country": "India",
+    "scope_note": "Industrial calculations are restricted to Ernakulam district. National default electricity and fuel factors are retained only as clearly labelled national or grid-level defaults and are not treated as Ernakulam-specific local factors."
+  },
+  "data_sources": [
+    {
+      "source_organisation": "Central Electricity Authority (CEA), Ministry of Power, Government of India",
+      "source_type": "electricity grid baseline",
+      "source_document": "CEA CO2 Baseline Database, Version 22.0",
+      "source_url": "https://cea.nic.in/cdm-co2-baseline-view?lang=en&mappingId=234",
+      "reporting_year": "FY 2025-26",
+      "value": "0.675 tCO2/MWh",
+      "methodology_note": "This is the weighted-average national grid factor, not an operating margin, build margin, or combined margin factor. It is a national default and is not Ernakulam-specific."
+    },
+    {
+      "source_organisation": "Intergovernmental Panel on Climate Change (IPCC)",
+      "source_type": "fuel combustion default factors",
+      "source_document": "IPCC 2006 Guidelines for National Greenhouse Gas Inventories, Volume 2: Energy",
+      "source_url": "https://www.ipcc-nggip.iges.or.jp/",
+      "reporting_year": "Methodology default (2006)",
+      "methodology_note": "Direct CO2 combustion factors are used for petrol, diesel and LPG. These are generic defaults and exclude CH4 and N2O."
+    }
+  ],
+  "calculation_boundaries": {
+    "scope": "This reference dataset supports direct CO2 emissions and purchased electricity emissions only.",
+    "household_boundary": "Household electricity and fuel use are treated as monthly consumption inputs. Annualised values are calculated as monthly values multiplied by 12 and must be labelled as estimates.",
+    "industrial_boundary": "Industrial Scope 1 includes direct combustion of supported fuels. Industrial Scope 2 includes purchased electricity. Process emissions, waste emissions and feedstock emissions are excluded.",
+    "waste_boundary": "Waste factors are intentionally excluded unless an appropriate methodology and activity data are available and explicitly added.",
+    "co2_vs_co2e": "All factors in this dataset are CO2-only factors. Results are not labelled as full CO2e because CH4 and N2O are not included."
+  },
+  "assumptions": [
+    "Petrol and diesel values are generic defaults converted from standard fuel properties and are not local fuel-specification measurements.",
+    "LPG is calculated using the IPCC default CO2 factor of 63,100 kg CO2/TJ and LPG net calorific value of 47.3 MJ/kg.",
+    "Electricity uses the official CEA national weighted-average location-based grid factor for FY 2025-26.",
+    "Annualised values are estimates derived from the reported month, not measured annual emissions."
+  ],
+  "known_limitations": [
+    "No district-specific electricity factor for Ernakulam has been identified in the reviewed official sources.",
+    "No district-specific industrial fuel mix or technology factor has been identified.",
+    "The database does not include complete greenhouse-gas accounting because CH4 and N2O are excluded.",
+    "This dataset is intended for transparent estimation and reporting, not for audited facility emissions claims."
+  ],
+  "verification_status": {
+    "overall_status": "partial",
+    "verified_sources": [
+      "CEA CO2 Baseline Database, Version 22.0",
+      "IPCC 2006 Guidelines for National Greenhouse Gas Inventories, Volume 2: Energy"
+    ],
+    "pending_verification": [
+      "District-specific Ernakulam electricity factors.",
+      "District-specific industrial fuel mix and process factors.",
+      "Waste emissions factors and any additional Scope 3 categories."
+    ]
+  }
+}

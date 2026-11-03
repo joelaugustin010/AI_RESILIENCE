@@ -101,6 +101,104 @@ def fetch_kochi_data(api_key):
     return data
 
 
+@st.cache_data(ttl=1800)
+def fetch_open_meteo_data():
+    """Fetch modelled CAMS air-quality estimates; no API key is required."""
+    response = requests.get(
+        "https://air-quality-api.open-meteo.com/v1/air-quality",
+        params={
+            "latitude": 9.9312,
+            "longitude": 76.2673,
+            "current": (
+                "european_aqi,us_aqi,pm2_5,pm10,carbon_monoxide,"
+                "nitrogen_dioxide,sulphur_dioxide,ozone"
+            ),
+            "hourly": (
+                "european_aqi,us_aqi,pm2_5,pm10,carbon_monoxide,"
+                "nitrogen_dioxide,sulphur_dioxide,ozone"
+            ),
+            "past_hours": 24,
+            "forecast_hours": 24,
+            "timezone": "Asia/Kolkata",
+        },
+        timeout=20,
+    )
+    response.raise_for_status()
+    payload = response.json()
+    if not isinstance(payload.get("current"), dict):
+        raise ValueError("Open-Meteo did not return current model estimates.")
+    return payload
+
+
+def show_open_meteo_fallback():
+    st.info(
+        "No CPCB, OpenAQ or IQAir station API key is configured. "
+        "Showing a no-key, model-based estimate for central Kochi instead. "
+        "This is NOT a CPCB/KSPCB monitoring-station measurement."
+    )
+    try:
+        with st.spinner("Loading the latest available model estimates..."):
+            payload = fetch_open_meteo_data()
+    except (requests.RequestException, ValueError, KeyError) as exc:
+        st.error(f"Model-based air-quality data is temporarily unavailable: {exc}")
+        st.caption("Historical KSPCB observations remain available below.")
+        return
+
+    current = payload["current"]
+    units = payload.get("current_units", {})
+    st.subheader("Kochi — model-based air-quality estimate")
+    st.caption(
+        "Source: Open-Meteo Air Quality API / Copernicus Atmosphere Monitoring "
+        "Service (CAMS). Approximate model grid, not a local sensor station."
+    )
+    st.write("Model timestamp:", current.get("time", "Not provided"))
+
+    aqi_cols = st.columns(2)
+    with aqi_cols[0]:
+        value = current.get("european_aqi")
+        st.metric("European AQI", value if value is not None else "Unavailable")
+    with aqi_cols[1]:
+        value = current.get("us_aqi")
+        st.metric("US AQI", value if value is not None else "Unavailable")
+
+    pollutant_fields = [
+        ("PM2.5", "pm2_5"), ("PM10", "pm10"),
+        ("Carbon monoxide", "carbon_monoxide"),
+        ("Nitrogen dioxide", "nitrogen_dioxide"),
+        ("Sulphur dioxide", "sulphur_dioxide"),
+        ("Ozone", "ozone"),
+    ]
+    st.subheader("Modelled pollutant concentrations")
+    cols = st.columns(3)
+    for index, (label, key) in enumerate(pollutant_fields):
+        value = current.get(key)
+        with cols[index % 3]:
+            if value is None:
+                st.metric(label, "Unavailable")
+            else:
+                st.metric(label, f"{value} {units.get(key, 'unit not reported')}")
+
+    hourly = payload.get("hourly", {})
+    times = hourly.get("time", [])
+    if times:
+        import pandas as pd
+        chart_key = "pm2_5"
+        values = hourly.get(chart_key, [])
+        if len(times) == len(values):
+            frame = pd.DataFrame({"Time": times, "PM2.5 (µg/m³)": values})
+            frame = frame.dropna().set_index("Time")
+            if not frame.empty:
+                st.subheader("PM2.5: recent and forecast model series")
+                st.line_chart(frame)
+
+    st.caption(
+        "Model estimates are spatially averaged and may differ from readings "
+        "at individual monitoring stations. The feed is not a substitute for "
+        "official CPCB/KSPCB observations. Open-Meteo/CAMS data attribution: "
+        "https://open-meteo.com/en/docs/air-quality-api"
+    )
+
+
 def show_air_quality():
     st.title("🌍 Kochi Live Air Quality")
     st.caption("AI_RESILIENCE | Data source: IQAir AirVisual API")
@@ -112,10 +210,7 @@ def show_air_quality():
     ) or os.getenv("IQAIR_API_KEY", "")
 
     if not api_key:
-        st.error(
-            "API key missing. Add IQAIR_API_KEY to your "
-            "environment variables or Streamlit secrets."
-        )
+        show_open_meteo_fallback()
         return
 
     if st.button("🔄 Refresh Kochi data"):

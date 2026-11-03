@@ -30,6 +30,12 @@ each candidate and shows only the newest snapshot for a logical layer; if that
 newest file fails its hash check, the map does not silently fall back to an older
 snapshot.
 
+Rows from user-uploaded point CSVs are displayed only when they pass the
+existing coordinate and metadata checks, and their source columns are retained.
+The table uses a display-only copy: empty cells in otherwise numeric columns
+are treated as missing, and genuinely mixed-type columns are rendered as text.
+This does not alter uploaded values used for mapping.
+
 ## Acquisition method
 
 Run `python scripts/acquire_kochi_osm_layers.py --retries 2` from the repository
@@ -86,6 +92,9 @@ no compatible validated asset and vector hazard layers. The JRC image preview
 is contextual raster display, not a vector overlay. Counts and geometry checks
 are QA summaries, not risk estimates. No distance, area, flood depth at an
 asset, probability, vulnerability, or safety conclusion is derived from OSM.
+Uploaded-point CSV tables pass through the shared display-only Arrow
+normalization boundary. Map layers and calculations use their separate point
+frame, so table rendering does not alter them.
 
 ## Existing layers and project behavior preserved
 

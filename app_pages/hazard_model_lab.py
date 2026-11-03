@@ -7,9 +7,15 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
+from src.dataframe_display import display_dataframe
+
+from src.hazard_manifest import build_hazard_manifest_frame
+
 ROOT = Path(__file__).resolve().parents[1]
 TRAINING_REPORT = ROOT / "reports" / "weather_hazard_training.json"
+FLOOD_REPORT = ROOT / "reports" / "flood_event_severity_baseline.json"
 ACQUISITION_REPORT = ROOT / "reports" / "hazard_data_acquisition_manifest.json"
+READINESS_REPORT = ROOT / "reports" / "hazard_dataset_readiness.json"
 
 
 def read_json(path: Path) -> dict:
@@ -54,6 +60,7 @@ else:
         with st.expander(label, expanded=True):
             st.caption(model.get("status", "Status not recorded"))
             st.write(f"**Research target:** {model.get('target_definition', 'Not documented')}")
+            st.write(f"**Selected estimator:** {model.get('selected_model_type', 'Not recorded')}")
             st.write(
                 f"**Threshold:** {model.get('threshold', 'N/A')} "
                 f"{model.get('threshold_units', '')}"
@@ -71,6 +78,10 @@ else:
                     f"(chosen using validation-period {model.get('threshold_selection_metric', 'metric not recorded')})."
                 )
             st.write("**Locations:** " + ", ".join(model.get("locations", [])))
+            selection_results = model.get("model_selection_results", [])
+            if selection_results:
+                st.write("**Validation-only estimator comparison**")
+                display_dataframe(pd.DataFrame(selection_results), hide_index=True, width="stretch")
             metrics = model.get("metrics", {})
             metric_rows = [
                 {"Metric": "Accuracy", "Value": metrics.get("accuracy")},
@@ -79,9 +90,21 @@ else:
                 {"Metric": "Recall", "Value": metrics.get("recall")},
                 {"Metric": "F1 score", "Value": metrics.get("f1")},
                 {"Metric": "ROC-AUC", "Value": metrics.get("roc_auc")},
+                {"Metric": "Average precision (rare-event ranking)", "Value": metrics.get("average_precision")},
+                {"Metric": "Brier score (probability error; lower is better)", "Value": metrics.get("brier_score")},
                 {"Metric": "Majority baseline accuracy", "Value": metrics.get("majority_baseline_accuracy")},
+                {"Metric": "Majority baseline balanced accuracy", "Value": metrics.get("majority_baseline_balanced_accuracy")},
+                {"Metric": "Majority baseline F1", "Value": metrics.get("majority_baseline_f1")},
+                {"Metric": "Persistence baseline balanced accuracy", "Value": metrics.get("persistence_baseline_balanced_accuracy")},
+                {"Metric": "Persistence baseline F1", "Value": metrics.get("persistence_baseline_f1")},
             ]
-            st.dataframe(pd.DataFrame(metric_rows), hide_index=True, width="stretch")
+            display_dataframe(pd.DataFrame(metric_rows), hide_index=True, width="stretch")
+            if metrics.get("confusion_matrix_tn_fp_fn_tp") is not None:
+                tn, fp, fn, tp = metrics["confusion_matrix_tn_fp_fn_tp"]
+                st.caption(
+                    f"Untouched test-set confusion matrix — true negatives: {tn}; false positives: {fp}; "
+                    f"false negatives: {fn}; true positives: {tp}."
+                )
             if model.get("hazard") == "extreme_rainfall":
                 if metrics.get("accuracy") is not None and metrics.get("majority_baseline_accuracy") is not None and metrics["accuracy"] < metrics["majority_baseline_accuracy"]:
                     st.error(
@@ -98,7 +121,7 @@ else:
                 validation_scores = model.get("validation_threshold_scores", [])
                 if validation_scores:
                     st.write("**Validation-only threshold comparison**")
-                    st.dataframe(pd.DataFrame(validation_scores), hide_index=True, width="stretch")
+                    display_dataframe(pd.DataFrame(validation_scores), hide_index=True, width="stretch")
             for limitation in model.get("limitations", []):
                 st.write(f"- {limitation}")
 
@@ -107,33 +130,103 @@ if blocked:
     for hazard, reason in blocked.items():
         st.error(f"{hazard}: {reason}")
 
-st.subheader("Other hazard tracks")
-remaining = [
-    ("Earthquake", "Event catalogue acquired; suitable impact labels and exposure/shaking predictors are still needed."),
-    ("Cyclone", "North Indian Ocean track data acquired; a storm-held-out forecast dataset is still needed."),
-    ("Landslide", "Global event catalogue acquired; defensible background samples and spatial-bias checks are still needed."),
-    ("Drought", "India drought-monitor files acquired; definitions, structure and aligned predictors need validation."),
-    ("Wildfire", "Satellite access and defensible non-fire/background examples are still needed."),
-    ("Tsunami", "Historical event records cannot alone support short-term occurrence prediction; coastal impact modelling needs suitable data."),
-    ("Air pollution", "Validated CPCB/OpenAQ station time series and time-aligned predictors are still needed."),
-]
-for hazard, status in remaining:
-    st.markdown(f"**{hazard}:** {status}")
+flood_report = read_json(FLOOD_REPORT)
+st.subheader("Flood research baseline")
+if not flood_report:
+    st.info("No flood research evaluation report is available in this deployment.")
+else:
+    st.warning(
+        "Exploratory event-severity research only. This is not a flood-occurrence model, "
+        "Kochi forecast, inundation model or public warning."
+    )
+    dataset = flood_report.get("dataset", {})
+    metrics = flood_report.get("test_metrics", {})
+    fc1, fc2, fc3 = st.columns(3)
+    fc1.metric("Recorded event rows", dataset.get("event_rows", "—"))
+    fc2.metric("Explicitly Open gauges", dataset.get("explicitly_open_gauges", "—"))
+    fc3.metric("Held-out gauges", dataset.get("held_out_gauges", "—"))
+    st.write("**Research target:**", flood_report.get("target", "Not documented"))
+    metric_rows = [
+        {"Metric": "Accuracy", "Value": metrics.get("accuracy")},
+        {"Metric": "Majority baseline accuracy", "Value": metrics.get("majority_baseline_accuracy")},
+        {"Metric": "Balanced accuracy", "Value": metrics.get("balanced_accuracy")},
+        {"Metric": "Precision", "Value": metrics.get("precision")},
+        {"Metric": "Recall", "Value": metrics.get("recall")},
+        {"Metric": "F1", "Value": metrics.get("f1")},
+        {"Metric": "ROC-AUC", "Value": metrics.get("roc_auc")},
+        {"Metric": "Grouped CV balanced accuracy (mean ± SD)", "Value": f"{metrics.get('grouped_cv_balanced_accuracy_mean', '—')} ± {metrics.get('grouped_cv_balanced_accuracy_std', '—')}"},
+    ]
+    display_dataframe(pd.DataFrame(metric_rows), hide_index=True, width="stretch")
+    st.error(f"**Decision:** {flood_report.get('decision', 'Integration decision not recorded')}")
+    for limitation in flood_report.get("limitations", []):
+        st.write(f"- {limitation}")
+    st.caption("The source and full evaluation are documented in the milestone report.")
+
+st.subheader("Scientific data readiness by hazard")
+readiness = read_json(READINESS_REPORT)
+readiness_hazards = readiness.get("hazards", [])
+if not readiness_hazards:
+    st.warning(
+        "The local source-readiness audit is missing or unreadable. Re-run "
+        "`python scripts/audit_hazard_datasets.py` to regenerate it."
+    )
+else:
+    readiness_rows = []
+    for item in readiness_hazards:
+        raw_sources = item.get("raw_sources", [])
+        present_sources = [
+            source for source in raw_sources
+            if source.get("exists") and source.get("status") != "PRESENT_BUT_UNREADABLE"
+        ]
+        curated = item.get("curated_training_table", {})
+        baseline = item.get("research_baseline") or {}
+        readiness_rows.append({
+            "Hazard": item.get("label", item.get("hazard_id", "Unknown")),
+            "Raw source files": f"{len(present_sources)} / {len(raw_sources)}",
+            "Curated training table": curated.get("status", "Not audited"),
+            "Research baseline": baseline.get("status", "None recorded"),
+            "Model readiness": item.get("model_status", "Not established"),
+        })
+    display_dataframe(pd.DataFrame(readiness_rows), hide_index=True, width="stretch")
+    for item in readiness_hazards:
+        with st.expander(f"{item.get('label', item.get('hazard_id', 'Hazard'))}: evidence and blockers"):
+            for source in item.get("raw_sources", []):
+                st.markdown(
+                    f"**{source.get('file', 'Source file')}** — "
+                    f"{source.get('status', 'Not audited')}"
+                )
+                if source.get("sha256"):
+                    st.caption(f"SHA-256: {source['sha256']}")
+                if source.get("error"):
+                    st.error(source["error"])
+            curated = item.get("curated_training_table", {})
+            st.markdown(f"**Training table:** {curated.get('status', 'Not audited')}")
+            for issue in curated.get("issues", []):
+                st.write(f"- {issue}")
+            baseline = item.get("research_baseline") or {}
+            if baseline:
+                st.info(f"Separate research baseline: {baseline.get('status', 'Status not recorded')}")
+                if baseline.get("test_target_dates_from"):
+                    st.caption(f"Historical test period begins: {baseline['test_target_dates_from']}")
+                if baseline.get("locations"):
+                    st.caption("Training/evaluation locations: " + ", ".join(baseline["locations"]))
+                if baseline.get("metrics"):
+                    display_dataframe(
+                        pd.DataFrame([baseline["metrics"]]),
+                        hide_index=True,
+                        width="stretch",
+                    )
+            st.write(f"**Scientific limitation:** {item.get('scientific_limitation', 'Not documented')}")
+    st.caption(readiness.get("warning", ""))
 
 with st.expander("Source acquisition manifest"):
     entries = acquisition.get("downloads", [])
     if entries:
-        rows = []
-        for item in entries:
-            rows.append({
-                "File": item.get("file", ""),
-                "Status": item.get("status", "Not recorded"),
-                "Rows": item.get("data_rows", ""),
-                "Bytes": item.get("bytes", ""),
-                "Retrieved": item.get("retrieved_at", ""),
-                "SHA-256": item.get("sha256", ""),
-            })
-        st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
+        display_dataframe(
+            build_hazard_manifest_frame(entries),
+            hide_index=True,
+            width="stretch",
+        )
     else:
         st.info("No acquisition manifest entries are available.")
 
