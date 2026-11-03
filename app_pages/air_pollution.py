@@ -9,6 +9,7 @@ import pandas as pd
 import streamlit as st
 
 from src.dataframe_display import display_dataframe
+from src.air_quality_dashboard import render_air_pollution_intelligence
 
 from src.air_quality import (
     AirQualityDataError,
@@ -432,6 +433,10 @@ verified_monthly = (
 )
 namp_records = read_csv(REPORTS / "kspcb_namp_ernakulam_2025-06.csv")
 
+render_air_pollution_intelligence(
+    monthly_observations, INDUSTRIAL / "edayar_candidate_facilities.csv"
+)
+
 # Executive overview: show only facts that are directly available in the loaded extracts.
 latest_extract_date = (
     pd.to_datetime(daily_aqi["observed_at"], errors="coerce").max().date()
@@ -475,29 +480,7 @@ if not eloor_daily_rows.empty and "source_aqi" in eloor_daily_rows.columns:
     ):
         eloor_category = cpcb_aqi_category(int(raw_eloor_aqi))[0]
         eloor_source_aqi = f"{int(raw_eloor_aqi)} · {eloor_category}"
-st.markdown("### Air quality at a glance")
-overview = st.columns(6)
-overview[0].metric("Latest loaded report", latest_extract_date.strftime("%d %b %Y") if latest_extract_date else "Unavailable")
-overview[1].metric("Report age", f"{report_age_days} days" if report_age_days is not None and report_age_days >= 0 else "Review date", help="Days since the source observation date; this is a freshness indicator, not a pollution measure.")
-overview[2].metric("Eloor source AQI", eloor_source_aqi, help="Source-reported value from the dated KSPCB daily extract; not a live reading.")
-overview[3].metric("Stations in daily extract", station_count)
-overview[4].metric("Eloor monthly reports", len(monthly_reports), help="August and September 2026 source reports when both pass ingestion checks.")
-overview[5].metric("AQI calculation", "Evidence-gated", help="The app calculates AQI only when averaging period, valid hours and QA flags meet CPCB requirements.")
-st.caption(
-    "This is a historical research dashboard, not a live public warning service. "
-    "Each chart and table retains its source date, unit and evidence limitations."
-)
-with st.expander("How to read this dashboard"):
-    st.markdown(
-        """
-        - **Source-reported AQI** is reproduced from the cited KSPCB report.
-        - **Calculated indicator** is shown only when CPCB input requirements are demonstrated.
-        - **Historical pollutant trends** describe reported observations; they do not identify an emitting facility.
-        - **Industrial candidates** are evidence leads, not accusations or ranked pollution sources.
-        """
-    )
-
-st.divider()
+# The duplicate legacy "Air quality at a glance" summary was removed.\nst.divider()
 st.markdown('<div id="latest-report"></div>', unsafe_allow_html=True)
 st.subheader("Latest available station AQI report")
 if daily_aqi.empty:
