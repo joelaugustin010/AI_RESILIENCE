@@ -190,9 +190,15 @@ st.markdown(
 
 st.markdown(
     """
-    <div style="display:flex;align-items:center;gap:.55rem;margin:.1rem 0 1rem;color:#a7c1c8;font-size:.82rem">
+    <div style="display:flex;align-items:center;flex-wrap:wrap;gap:.65rem;margin:.1rem 0 1.15rem;color:#a7c1c8;font-size:.82rem">
       <span style="display:inline-block;width:.55rem;height:.55rem;border-radius:50%;background:#42e0c1;box-shadow:0 0 12px #42e0c1"></span>
-      <span><strong style="color:#e7f5f5">AI RESILIENCE</strong> · Kochi multi-hazard planning workspace</span>
+      <span><strong style="color:#e7f5f5;letter-spacing:.08em">AI RESILIENCE</strong> · KOCHI CLIMATE INTELLIGENCE</span>
+      <span style="margin-left:auto;display:flex;flex-wrap:wrap;gap:.35rem">
+        <span style="padding:.22rem .52rem;border:1px solid rgba(91,223,200,.35);border-radius:999px;color:#8cf3df;background:rgba(66,224,193,.08)">SDG 11</span>
+        <span style="padding:.22rem .52rem;border:1px solid rgba(91,223,200,.35);border-radius:999px;color:#8cf3df;background:rgba(66,224,193,.08)">SDG 13</span>
+        <span style="padding:.22rem .52rem;border:1px solid rgba(91,223,200,.35);border-radius:999px;color:#8cf3df;background:rgba(66,224,193,.08)">SDG 6</span>
+        <span style="padding:.22rem .52rem;border:1px solid rgba(91,223,200,.35);border-radius:999px;color:#8cf3df;background:rgba(66,224,193,.08)">SDG 9</span>
+      </span>
     </div>
     """,
     unsafe_allow_html=True,
