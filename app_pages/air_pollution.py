@@ -189,8 +189,9 @@ st.markdown(
 
     [data-testid="stAppViewContainer"] {
         background:
-            radial-gradient(circle at 8% 2%, rgba(111, 190, 210, 0.10), transparent 27rem),
-            linear-gradient(180deg, rgba(244, 249, 250, 0.45), transparent 24rem);
+            radial-gradient(circle at 8% 2%, rgba(38, 190, 170, 0.12), transparent 27rem),
+            radial-gradient(circle at 92% 4%, rgba(47, 137, 190, 0.10), transparent 30rem),
+            transparent !important;
     }
 
     .air-hero {
@@ -218,7 +219,7 @@ st.markdown(
     }
 
     .air-eyebrow {
-        color: #28768b;
+        color: #72d8cf;
         font-size: 0.72rem;
         font-weight: 800;
         letter-spacing: 2.2px;
