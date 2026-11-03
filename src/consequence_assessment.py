@@ -136,7 +136,7 @@ def build_consequence_assessment(
         consequences.append("Slope/runout exposure (requires valid terrain, geology, event inventory and runout method)")
     if hazard == "Industrial incident":
         consequences.append("Facility-specific impact footprint (requires verified incident, substance and release conditions)")
-    if hazard == "Infrastructure failure":
+    if hazard in {"Infrastructure failure", "Compound: heavy rainfall + drainage failure"}:
         consequences.append("Service outage and recovery (requires verified network topology, asset condition and failure data)")
 
     if calibrated_probability_available:

@@ -30,6 +30,26 @@ third-party material; confirm that the specific documents are covered before
 redistributing them. See the [KSPCB policy](https://kspcb.kerala.gov.in/copyright-policy)
 and [DIC policy](https://industry.kerala.gov.in/index.php/copyright-policy).
 
+## Live model feed integration
+
+The active dashboard page uses the no-key Open-Meteo Air Quality API at
+`https://air-quality-api.open-meteo.com/v1/air-quality`, with Kochi coordinates
+9.9312, 76.2673. It requests the documented current and hourly variables
+`european_aqi`, `us_aqi`, `pm2_5`, `pm10`, `carbon_monoxide`,
+`nitrogen_dioxide`, `sulphur_dioxide`, and `ozone`.
+
+This is a CAMS modelled estimate on an approximately 11 km grid, not a CPCB or
+KSPCB monitoring-station measurement. The page labels it as such and keeps it
+separate from the historical KSPCB observations. Open-Meteo documents hourly
+CAMS updates and the page caches requests for 15 minutes, refreshes every 15
+minutes, and provides a manual refresh button. No API key is required for the
+normal non-commercial endpoint.
+
+The page includes attribution to [Open-Meteo](https://open-meteo.com/en/docs/air-quality-api)
+and the [Copernicus Atmosphere Monitoring Service](https://atmosphere.copernicus.eu/).
+If the API fails, the page shows a connection error and continues to display
+the historical section; it does not relabel cached data as current.
+
 The exact downloaded paths are listed in `.gitignore` so local test setup does
 not add source documents to a commit or make `git status` appear dirty. The
 test assertions still verify the recorded hashes and PDF signatures.

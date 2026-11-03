@@ -2,3 +2,18 @@
 /data/reference/kochi_corporation_boundary.geojson text eol=lf
 /data/raw/koch_wards_2022.geojson text eol=lf
 /data/raw/nihfw_national_hospital_directory.csv text eol=lf
+
+# These CSVs have SHA-256 values recorded in their provenance metadata from
+# Windows (CRLF) files. Pin CRLF so hash checks and tests pass on every OS.
+/data/processed/nihfw_ernakulam_hospitals_coordinate_review.csv text eol=crlf
+/data/processed/air_quality/kspcb_annual_aqi.csv text eol=crlf
+/data/processed/air_quality/kspcb_caaqms_eloor_aqi_2026-08.csv text eol=crlf
+/data/processed/air_quality/kspcb_caaqms_eloor_aqi_2026-09.csv text eol=crlf
+/data/processed/air_quality/kspcb_caaqms_eloor_daily_2026-08.csv text eol=crlf
+/data/processed/air_quality/kspcb_caaqms_eloor_daily_2026-09.csv text eol=crlf
+/data/processed/air_quality/kspcb_caaqms_eloor_weather_2026-08.csv text eol=crlf
+/data/processed/air_quality/kspcb_caaqms_eloor_weather_2026-09.csv text eol=crlf
+/data/processed/air_quality/kspcb_daily_aqi_2026-10-16.csv text eol=crlf
+/data/processed/air_quality/kspcb_daily_aqi_status_2026-10-16.csv text eol=crlf
+/data/processed/air_quality/kspcb_namp_ernakulam_2025-06.csv text eol=crlf
+/data/processed/industrial/edayar_dic_allotment_crosswalk_2022.csv text eol=crlf

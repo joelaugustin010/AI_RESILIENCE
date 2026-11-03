@@ -39,7 +39,7 @@ from src.mitigation_intelligence import (
 st.markdown("""
 <style>
 .project-header {
-    background: #ffffff;
+    background: rgba(12,35,51,.92);
     padding: 28px 32px;
     border: 1px solid #d9e2ec;
     border-top: 4px solid #17365d;
@@ -384,7 +384,7 @@ if not chart_data.empty:
         text="Cost INR",
         color="Cost INR",
         color_continuous_scale=["#b9e4e8", "#117477", "#103653"],
-        template="plotly_white",
+        template="plotly_dark",
     )
 
     fig.update_traces(
@@ -411,8 +411,8 @@ if not chart_data.empty:
         ),
         coloraxis_showscale=False,
         showlegend=False,
-        plot_bgcolor="white",
-        paper_bgcolor="white",
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
         font=dict(
             family="Arial, sans-serif",
             size=13,

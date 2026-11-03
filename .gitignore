@@ -37,3 +37,15 @@ data/raw/openstreetmap/
 
 # Downloaded raw source snapshots and acquisition manifests stay local by default.
 data/external/
+
+# Locally held research acquisitions and generated/private previews are not Git artifacts.
+# Keep these local; the experimental folder includes the 742 MB WorldPop raster.
+data/raw/experimental/
+data/raw/ghcn/
+data/raw/ibtracs/
+data/processed/aqi_daily_preview.png
+data/processed/public_consent_search.html
+*-LAPTOP-TBN5N220.*
+
+# Industrial source documents and acquisition snapshots stay local pending reuse review.
+data/raw/industrial/

@@ -94,13 +94,13 @@ class AirQualityAcquisitionTests(unittest.TestCase):
         self.assertIn("cannot establish a source", self.page)
 
     def test_page_exposes_readiness_and_station_reference(self):
-        self.assertIn("No live AQI feed is connected", self.page)
-        self.assertIn("historical source reports", self.page)
-        self.assertIn("NAMP report observations", self.page)
+        self.assertIn("Near-real-time CAMS model estimate", self.page)
+        self.assertIn("Historical KSPCB Eloor monthly reports", self.page)
+        self.assertIn("NAMP report observations and station references", self.page)
         self.assertIn('register["not_obtained"]', self.page)
         self.assertIn('register["sources"]', self.page)
         self.assertIn("Dated Eloor pollutant trends", self.page)
-        self.assertIn("observation date range", self.page.lower())
+        self.assertIn("date-only precision", self.page.lower())
         self.assertIn("aqi_values.mod(1).ne(0)", self.page)
         self.assertIn("float(raw_eloor_aqi).is_integer()", self.page)
 
