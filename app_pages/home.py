@@ -2,7 +2,7 @@
 
 import streamlit as st
 
-# Landing-page-only polish. Global navigation and the scientific pages are untouched.
+# Command-centre layout and page-specific visual components; shared theme lives in app.py.
 st.markdown(
     """
     <style>
@@ -143,7 +143,7 @@ st.markdown(
         </p>
         <span class="ar-home-pill">Evidence-first</span>
         <span class="ar-home-pill">Multi-hazard planning</span>
-        <span class="ar-home-pill">SDG 11 · SDG 13 aligned</span>
+        <span class="ar-home-pill">SDG 11 · SDG 13 · SDG 6 · SDG 9 aligned</span>
       </div>
       <div class="ar-radar" aria-hidden="true">
         <div class="ar-radar-ring"><span class="ar-radar-dot"></span></div>
