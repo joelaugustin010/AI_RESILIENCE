@@ -10,6 +10,14 @@ st.set_page_config(
 )
 
 pages = {
+    "Start Here": [
+        st.Page(
+            "app_pages/welcome.py",
+            title="Welcome",
+            icon=":material/public:",
+            default=True,
+        ),
+    ],
     "Explore": [
         st.Page(
             "app_pages/decision_workflow.py",
