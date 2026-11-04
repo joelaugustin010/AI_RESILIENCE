@@ -125,6 +125,49 @@ hr{border-color:rgba(130,190,199,.22)!important;}a{color:#62dfd0!important;}
 .ar-hero p{color:#d9f3f1;font-size:1.04rem;max-width:760px;line-height:1.65;margin:0;}
 .ar-chip{display:inline-block;margin-top:1.25rem;margin-right:.4rem;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.10);color:#fff;padding:.35rem .7rem;border-radius:999px;font-size:.78rem;}
 .ar-section-label{color:#55e1ca;font-size:.76rem;text-transform:uppercase;letter-spacing:.12em;font-weight:800;margin-bottom:.25rem;}
+
+/* Readability guard for native Streamlit text blocks.
+   Keep custom HTML hero/cards untouched; only style standard rendered statements. */
+[data-testid="stMarkdownContainer"] > p,
+[data-testid="stMarkdownContainer"] > ul,
+[data-testid="stMarkdownContainer"] > ol,
+[data-testid="stMarkdownContainer"] > blockquote,
+[data-testid="stMarkdownContainer"] > h1,
+[data-testid="stMarkdownContainer"] > h2,
+[data-testid="stMarkdownContainer"] > h3,
+[data-testid="stMarkdownContainer"] > h4,
+[data-testid="stMarkdownContainer"] > h5,
+[data-testid="stMarkdownContainer"] > h6 {
+  color: #dcebed !important;
+}
+[data-testid="stMarkdownContainer"] > ul li,
+[data-testid="stMarkdownContainer"] > ol li,
+[data-testid="stMarkdownContainer"] > blockquote p {
+  color: #dcebed !important;
+}
+[data-testid="stCaptionContainer"],
+[data-testid="stCaptionContainer"] p,
+.stCaption,
+.stCaption p {
+  color: #b9d0d5 !important;
+}
+[data-testid="stAlert"] [data-testid="stMarkdownContainer"] p,
+[data-testid="stAlert"] [data-testid="stMarkdownContainer"] li {
+  color: #e3f0f2 !important;
+}
+[data-testid="stMarkdownContainer"] > blockquote {
+  border-left-color: #42e0c1 !important;
+}
+[data-testid="stMarkdownContainer"] > pre,
+[data-testid="stMarkdownContainer"] > p code {
+  color: #eaf7f7 !important;
+  background: rgba(18, 48, 65, .92) !important;
+}
+[data-testid="stMarkdownContainer"] > table th,
+[data-testid="stMarkdownContainer"] > table td {
+  color: #dcebed !important;
+}
+
 @media(max-width:640px){.block-container{padding-left:1rem;padding-right:1rem;}.ar-hero{border-radius:18px;}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition-duration:.01ms!important;}}
 </style>
