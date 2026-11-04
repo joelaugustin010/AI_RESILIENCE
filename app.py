@@ -4,7 +4,7 @@ import streamlit as st
 
 
 st.set_page_config(
-    page_title="AI RESILIENCE | Disaster-risk prototype",
+    page_title="AI RESILIENCE | Kochi Climate Intelligence",
     page_icon=":material/shield:",
     layout="wide",
 )
@@ -174,6 +174,49 @@ hr{border-color:rgba(130,190,199,.22)!important;}a{color:#62dfd0!important;}
     """,
     unsafe_allow_html=True,
 )
+if not st.session_state.get("ar_entered_platform", False):
+    st.markdown(
+        """
+        <style>
+        [data-testid="stNavigation"] { display: none !important; }
+        .block-container { max-width: 1320px; padding-top: 2.4rem; }
+        .ar-cover { position:relative; overflow:hidden; min-height:590px; display:flex; flex-direction:column; justify-content:center; padding:clamp(2rem,6vw,5.4rem); border:1px solid rgba(125,224,215,.24); border-radius:30px; background:radial-gradient(circle at 82% 25%,rgba(57,209,195,.24),transparent 24rem),radial-gradient(circle at 12% 92%,rgba(40,133,180,.22),transparent 28rem),linear-gradient(125deg,#061522 0%,#0b3044 52%,#075b62 100%); box-shadow:0 30px 90px rgba(0,0,0,.32); }
+        .ar-cover:before { content:""; position:absolute; inset:0; opacity:.3; background:repeating-linear-gradient(0deg,transparent 0 39px,rgba(156,225,224,.10) 40px),repeating-linear-gradient(90deg,transparent 0 39px,rgba(156,225,224,.10) 40px); mask-image:linear-gradient(90deg,transparent,black); pointer-events:none; }
+        .ar-cover:after { content:""; position:absolute; width:420px;height:420px;right:-100px;top:8%;border:1px solid rgba(132,235,221,.35);border-radius:50%;box-shadow:0 0 0 38px rgba(132,235,221,.045),0 0 0 82px rgba(132,235,221,.035),0 0 0 130px rgba(132,235,221,.025); pointer-events:none; }
+        .ar-cover-content { position:relative;z-index:1;max-width:780px; }
+        .ar-cover-kicker { color:#8cf3df;font-size:.78rem;font-weight:800;letter-spacing:.19em;text-transform:uppercase;margin-bottom:1.3rem; }
+        .ar-cover h1 { color:#f4ffff!important;font-size:clamp(2.8rem,7vw,5.7rem);line-height:.98;letter-spacing:-.055em;margin:0 0 1.15rem; }
+        .ar-cover h1 span { color:#63e5d0; }
+        .ar-cover-lead { color:#d7eeee;font-size:clamp(1.05rem,2vw,1.3rem);line-height:1.65;max-width:700px; }
+        .ar-cover-meta { display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.7rem; }
+        .ar-cover-meta span { color:#e4f8f5;border:1px solid rgba(190,245,235,.25);background:rgba(255,255,255,.07);padding:.48rem .8rem;border-radius:999px;font-size:.78rem; }
+        .ar-cover-foot { position:relative;z-index:1;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:3.5rem;padding-top:1.2rem;border-top:1px solid rgba(210,245,240,.18);color:#a9c9ce;font-size:.78rem;letter-spacing:.04em; }
+        div.stButton > button { min-height:3.2rem;padding:0 1.6rem;font-size:1rem;border-radius:13px; }
+        @media(max-width:640px){.ar-cover{min-height:620px;border-radius:20px;padding:1.6rem}.ar-cover:after{right:-260px;top:10%}.ar-cover-foot{margin-top:2rem}}
+        </style>
+        <section class="ar-cover">
+          <div class="ar-cover-content">
+            <div class="ar-cover-kicker">KOCHI · CLIMATE INTELLIGENCE · SDG 11 + SDG 13</div>
+            <h1>AI <span>RESILIENCE</span></h1>
+            <p class="ar-cover-lead"><strong>Building safer, smarter, more resilient cities.</strong><br>
+            An AI-assisted urban disaster-risk assessment and climate resilience platform for Kochi — bringing hazard evidence, exposure insights and practical response priorities into one place.</p>
+            <div class="ar-cover-meta">
+              <span>Evidence-led risk assessment</span><span>Multi-hazard intelligence</span><span>Action-oriented planning</span>
+            </div>
+          </div>
+          <div class="ar-cover-foot">
+            <span>INTELLIGENT CITIES · RESILIENT FUTURES</span>
+            <span>SCENARIO ASSESSMENT · NOT AN EMERGENCY WARNING SYSTEM</span>
+          </div>
+        </section>
+        """,
+        unsafe_allow_html=True,
+    )
+    if st.button("Explore the Platform  →", type="primary", use_container_width=False):
+        st.session_state["ar_entered_platform"] = True
+        st.rerun()
+    st.stop()
+
 st.markdown(
     """
     <div style="display:flex;align-items:center;gap:.55rem;margin:.1rem 0 1rem;color:#a7c1c8;font-size:.82rem">
