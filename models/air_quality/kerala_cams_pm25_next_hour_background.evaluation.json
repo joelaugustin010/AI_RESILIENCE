@@ -1,0 +1,51 @@
+{
+  "model_id": "kerala_cams_pm25_next_hour_background",
+  "trained_at_utc": "2026-11-04T14:08:51.782491+00:00",
+  "source_dataset": "data/external/air_quality/open_meteo_cams_kerala_background_2024_2025_multisite.csv",
+  "source_rows": 52632,
+  "usable_rows": 52629,
+  "train_rows": 42102,
+  "test_rows": 10527,
+  "locations": [
+    "Eloor_I",
+    "Eloor_II",
+    "Kochi"
+  ],
+  "train_period": {
+    "from": "2024-01-01 00:00:00+00:00",
+    "to": "2025-08-07 17:00:00+00:00"
+  },
+  "test_period": {
+    "from": "2025-08-07 18:00:00+00:00",
+    "to": "2025-12-31 22:00:00+00:00"
+  },
+  "split": "timestamp-based chronological 80/20; no random shuffling; next-hour target grouped by location",
+  "features": [
+    "pm2_5_ug_m3",
+    "pm10_ug_m3",
+    "no2_ug_m3",
+    "so2_ug_m3",
+    "co_ug_m3",
+    "o3_ug_m3",
+    "temperature_c",
+    "relative_humidity_pct",
+    "wind_speed_kmh",
+    "wind_direction_sin",
+    "wind_direction_cos",
+    "hour_sin",
+    "hour_cos",
+    "location_Eloor_I",
+    "location_Eloor_II",
+    "location_Kochi"
+  ],
+  "target": "next-hour pm2_5_ug_m3",
+  "algorithm": "HistGradientBoostingRegressor",
+  "metrics": {
+    "model_mae_ug_m3": 1.6239531950926824,
+    "model_rmse_ug_m3": 2.6429491617769423,
+    "model_r2": 0.9750463860824979,
+    "naive_previous_hour_mae_ug_m3": 2.20213736107153,
+    "naive_previous_hour_rmse_ug_m3": 3.4195267646833623
+  },
+  "scientific_boundary": "Surrogate for CAMS/Open-Meteo atmospheric-background values. Not trained on station observations, verified releases, plume measurements, volcanic ash, wildfire smoke, or cyclone incidents; not a disaster-plume predictor."
+}

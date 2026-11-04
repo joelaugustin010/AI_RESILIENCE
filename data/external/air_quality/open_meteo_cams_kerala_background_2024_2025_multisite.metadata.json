@@ -1,0 +1,70 @@
+{
+  "dataset_id": "open_meteo_cams_kerala_background_2024_2025_multisite",
+  "generated_at_utc": "2026-11-04T14:08:06.629073+00:00",
+  "rows": 52632,
+  "missing_values_by_column": {
+    "observed_at": 0,
+    "temperature_c": 0,
+    "relative_humidity_pct": 0,
+    "wind_speed_kmh": 0,
+    "wind_direction_deg": 0,
+    "pm2_5_ug_m3": 0,
+    "pm10_ug_m3": 0,
+    "no2_ug_m3": 0,
+    "so2_ug_m3": 0,
+    "co_ug_m3": 0,
+    "o3_ug_m3": 0,
+    "location": 0,
+    "requested_latitude": 0,
+    "requested_longitude": 0,
+    "returned_latitude": 0,
+    "returned_longitude": 0,
+    "source_type": 0
+  },
+  "locations": {
+    "Kochi": [
+      9.9312,
+      76.2673
+    ],
+    "Eloor_I": [
+      10.079692,
+      76.296766
+    ],
+    "Eloor_II": [
+      10.07435,
+      76.303942
+    ]
+  },
+  "period": {
+    "start": "2024-01-01",
+    "end": "2025-12-31",
+    "frequency": "hourly",
+    "timezone": "UTC"
+  },
+  "columns": [
+    "observed_at",
+    "temperature_c",
+    "relative_humidity_pct",
+    "wind_speed_kmh",
+    "wind_direction_deg",
+    "pm2_5_ug_m3",
+    "pm10_ug_m3",
+    "no2_ug_m3",
+    "so2_ug_m3",
+    "co_ug_m3",
+    "o3_ug_m3",
+    "location",
+    "requested_latitude",
+    "requested_longitude",
+    "returned_latitude",
+    "returned_longitude",
+    "source_type"
+  ],
+  "sha256": "8af2fd56d9c5f4aed9caa4e393caa8399550a3954ea4435fa632d016e8e409b1",
+  "sources": [
+    "https://archive-api.open-meteo.com/v1/archive",
+    "https://air-quality-api.open-meteo.com/v1/air-quality"
+  ],
+  "use_boundary": "Modelled atmospheric background only; not measured station data, not release inventory, not incident labels, and not plume ground truth.",
+  "training_status": "Eligible only for background-pattern experiments with location/time-aware validation."
+}
