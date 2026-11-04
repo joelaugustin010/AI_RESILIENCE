@@ -18,6 +18,7 @@ import pandas as pd
 
 
 OPEN_METEO_AIR_QUALITY_URL = "https://air-quality-api.open-meteo.com/v1/air-quality"
+OPEN_METEO_WEATHER_URL = "https://api.open-meteo.com/v1/forecast"
 KOCHI_LATITUDE = 9.9312
 KOCHI_LONGITUDE = 76.2673
 MODEL_SOURCE = "CAMS via Open-Meteo"
@@ -189,6 +190,33 @@ def fetch_open_meteo(*, latitude: float = KOCHI_LATITUDE, longitude: float = KOC
         "request_url": query_url,
     })
     return parsed
+
+
+def fetch_open_meteo_weather(*, latitude: float, longitude: float, timeout: int = 20,
+                             opener=urlopen) -> dict[str, float]:
+    """Fetch the weather inputs required by the background PM2.5 surrogate."""
+    params = urlencode({
+        "latitude": latitude, "longitude": longitude, "current":
+        "temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m",
+        "wind_speed_unit": "kmh", "timezone": "UTC",
+    })
+    payload = _get_json(f"{OPEN_METEO_WEATHER_URL}?{params}", timeout=timeout, opener=opener)
+    current = payload.get("current")
+    if not isinstance(current, dict):
+        raise LiveAirQualityError("Open-Meteo weather response did not contain current values.")
+    values = {
+        "temperature_c": current.get("temperature_2m"),
+        "relative_humidity_pct": current.get("relative_humidity_2m"),
+        "wind_speed_kmh": current.get("wind_speed_10m"),
+        "wind_direction_deg": current.get("wind_direction_10m"),
+        "hour": pd.to_datetime(current.get("time"), utc=True, errors="coerce").hour,
+    }
+    if pd.isna(pd.to_datetime(current.get("time"), utc=True, errors="coerce")):
+        raise LiveAirQualityError("Open-Meteo weather response did not contain a valid timestamp.")
+    for name, value in values.items():
+        if name != "hour" and _finite_number(value) is None:
+            raise LiveAirQualityError(f"Open-Meteo weather response omitted {name}.")
+    return {name: float(value) for name, value in values.items()}
 
 
 def freshness_label(observations: pd.DataFrame, *, now: pd.Timestamp | None = None) -> str:

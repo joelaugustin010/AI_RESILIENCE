@@ -7,6 +7,8 @@ import re
 
 import pandas as pd
 
+from src.cpcb_aqi import CPCB_AQI_CATEGORIES, calculate_pollutant_subindex
+
 
 POLLUTANT_GUIDELINES = {
     "PM2.5": {"limit": 15.0, "unit": "µg/m³", "averaging": "24-hour", "source": "WHO 2021 air-quality guideline"},
@@ -28,7 +30,7 @@ _LEGACY_REFERENCE_LIMITS = {
 
 
 def period_matches(actual: object, expected: str) -> bool:
-    """Keep the original explicit averaging-period helper for existing callers."""
+    """Keep explicit averaging-period validation for existing callers."""
     text = str(actual or "").casefold().replace("_", "-")
     if expected == "24-hour":
         return bool(re.search(r"(?:24\s*[- ]?hour|24\s*h(?:r|rs)?)", text))
@@ -44,7 +46,7 @@ def classify_reference(
     pollutant: str,
     unit: object,
 ) -> tuple[str, str]:
-    """Compatibility wrapper for the pre-live-feed dashboard test/API."""
+    """Retain the validated legacy reference API alongside scenario helpers."""
     key = str(pollutant).replace("₂", "2").replace("₃", "3")
     reference = _LEGACY_REFERENCE_LIMITS.get(key)
     if reference is None:
@@ -59,19 +61,12 @@ def classify_reference(
     if str(quality_flag or "").casefold() != "valid":
         return "unavailable", "Measurement quality is not marked valid"
     normalized_unit = (
-        str(unit or "")
-        .casefold()
-        .replace("μ", "u")
-        .replace("µ", "u")
-        .replace("³", "3")
-        .replace(" ", "")
+        str(unit or "").casefold().replace("μ", "u").replace("µ", "u")
+        .replace("³", "3").replace(" ", "")
     )
     expected_normalized_unit = (
-        expected_unit.casefold()
-        .replace("μ", "u")
-        .replace("µ", "u")
-        .replace("³", "3")
-        .replace(" ", "")
+        expected_unit.casefold().replace("μ", "u").replace("µ", "u")
+        .replace("³", "3").replace(" ", "")
     )
     if normalized_unit != expected_normalized_unit:
         return "unavailable", f"Unit must be {expected_unit}"
@@ -80,6 +75,134 @@ def classify_reference(
     if numeric <= limit:
         return "within", f"Within CPCB {expected_period} standard"
     return "above", f"Above CPCB {expected_period} standard"
+
+SCENARIO_POLLUTANTS = {
+    "PM2.5": {"unit": "µg/m³", "cpcb": "PM2.5"},
+    "PM10": {"unit": "µg/m³", "cpcb": "PM10"},
+    "NO2": {"unit": "µg/m³", "cpcb": "NO2"},
+    "SO2": {"unit": "µg/m³", "cpcb": "SO2"},
+    "CO": {"unit": "mg/m³", "cpcb": "CO"},
+    "O3": {"unit": "µg/m³", "cpcb": "O3"},
+    "CO2": {"unit": "ppm", "cpcb": None},
+}
+
+DISASTER_AIR_INTELLIGENCE = {
+    "Flood / waterlogging": {
+        "pollutants": ("PM2.5", "PM10", "CO"),
+        "context": "Flooding can move dust, fuel residues, mould and combustion products; the available air feed does not measure these impacts directly.",
+        "action": "Avoid flooded roads and enclosed generator/vehicle exhaust. Reassess air quality after water recedes and cleanup begins.",
+    },
+    "Cyclone / coastal storm": {
+        "pollutants": ("PM2.5", "PM10", "NO2", "SO2", "CO"),
+        "context": "Storm winds can change pollutant transport and power-generation patterns, but this page does not provide a cyclone track or dispersion model.",
+        "action": "Follow IMD/KSDMA instructions first; keep combustion equipment outdoors and avoid exposure to dust or smoke during cleanup.",
+    },
+    "Landslide": {
+        "pollutants": ("PM10", "PM2.5"),
+        "context": "Slope failure and cleanup can raise dust. Air concentrations do not indicate landslide likelihood and cannot replace slope or rainfall evidence.",
+        "action": "Stay clear of unstable slopes and dust-generating cleanup areas; use respiratory protection when authorities permit re-entry.",
+    },
+    "Drought / water scarcity": {
+        "pollutants": ("PM10", "PM2.5", "O3", "NO2"),
+        "context": "Dry, stagnant conditions can support dust or ozone concerns, but no drought or dispersion prediction is generated here.",
+        "action": "Reduce dusty outdoor activity during elevated readings and follow verified water-supply and public-health advisories.",
+    },
+}
+
+
+def _scenario_number(value: object) -> float | None:
+    try:
+        parsed = float(value)
+    except (TypeError, ValueError, OverflowError):
+        return None
+    return parsed if math.isfinite(parsed) and parsed >= 0 else None
+
+
+def scenario_pollutant_values(
+    current: dict[str, dict[str, object]] | None,
+    hourly: pd.DataFrame | None,
+    *,
+    mode: str,
+    overrides: dict[str, object] | None = None,
+    observed_at: object = None,
+) -> dict[str, dict[str, object]]:
+    """Return sourced scenario values without filling missing pollutants."""
+    if mode not in {"forecast", "what-if"}:
+        raise ValueError("mode must be 'forecast' or 'what-if'")
+    overrides = overrides or {}
+    values: dict[str, dict[str, object]] = {}
+    source_frame = hourly.copy() if isinstance(hourly, pd.DataFrame) else pd.DataFrame()
+    if mode == "forecast" and not source_frame.empty and observed_at is not None:
+        cutoff = pd.to_datetime(observed_at, utc=True, errors="coerce")
+        source_frame["observed_at"] = pd.to_datetime(source_frame.get("observed_at"), utc=True, errors="coerce")
+        source_frame = source_frame.loc[source_frame["observed_at"] > cutoff]
+    for pollutant, specification in SCENARIO_POLLUTANTS.items():
+        override = _scenario_number(overrides.get(pollutant))
+        if override is not None:
+            values[pollutant] = {"value": override, "unit": specification["unit"], "source": "User-entered simulated value"}
+            continue
+        if mode == "forecast" and not source_frame.empty:
+            rows = source_frame.loc[source_frame.get("pollutant", pd.Series(dtype=str)).eq(pollutant)]
+            if not rows.empty:
+                row = rows.sort_values("observed_at").iloc[0]
+                values[pollutant] = {"value": float(row["value"]), "unit": str(row["unit"]), "source": "External CAMS/Open-Meteo forecast"}
+                continue
+        item = (current or {}).get(pollutant)
+        if isinstance(item, dict) and _scenario_number(item.get("value")) is not None:
+            values[pollutant] = {"value": float(item["value"]), "unit": str(item.get("unit", specification["unit"])), "source": "External CAMS/Open-Meteo model estimate"}
+    return values
+
+
+def scenario_aqi_summary(values: dict[str, dict[str, object]]) -> dict[str, object]:
+    """Calculate transparent pollutant sub-indices for a scenario, never an official AQI."""
+    subindices = []
+    exclusions = []
+    for pollutant, item in values.items():
+        cpcb_pollutant = SCENARIO_POLLUTANTS[pollutant]["cpcb"]
+        if cpcb_pollutant is None:
+            continue
+        unit = item.get("unit")
+        value = _scenario_number(item.get("value"))
+        expected = SCENARIO_POLLUTANTS[pollutant]["unit"]
+        if value is None or unit != expected:
+            exclusions.append(f"{pollutant}: missing or incompatible unit/value")
+            continue
+        try:
+            subindices.append(calculate_pollutant_subindex(cpcb_pollutant, value))
+        except ValueError as error:
+            exclusions.append(f"{pollutant}: {error}")
+    eligible_names = {item["pollutant"] for item in subindices}
+    can_display_index = len(subindices) >= 3 and bool(eligible_names & {"PM2.5", "PM10"})
+    summary: dict[str, object] = {
+        "subindices": subindices,
+        "exclusions": exclusions,
+        "status": "scenario_index_available" if can_display_index else "insufficient_data",
+        "scenario_index": max((item["sub_index"] for item in subindices), default=None) if can_display_index else None,
+        "method": "CPCB segmented-linear pollutant sub-indices applied to supplied scenario values; not an official station AQI.",
+    }
+    if summary["scenario_index"] is not None:
+        index = int(summary["scenario_index"])
+        summary["category"] = next((label for low, high, label, _ in CPCB_AQI_CATEGORIES if low <= index <= high), "Severe")
+    else:
+        summary["category"] = None
+    return summary
+
+
+def disaster_air_intelligence(values: dict[str, dict[str, object]], hazard: str) -> dict[str, object]:
+    """Relate available air indicators to disaster preparedness without causal claims."""
+    if hazard not in DISASTER_AIR_INTELLIGENCE:
+        raise ValueError(f"Unsupported disaster context: {hazard}")
+    config = DISASTER_AIR_INTELLIGENCE[hazard]
+    signals = []
+    for pollutant in config["pollutants"]:
+        item = values.get(pollutant)
+        guide = POLLUTANT_GUIDELINES.get(pollutant)
+        if not item or not guide or item.get("unit") != guide["unit"]:
+            continue
+        value = _scenario_number(item.get("value"))
+        if value is not None and value > guide["limit"]:
+            signals.append({"pollutant": pollutant, "value": value, "unit": item["unit"], "source": item.get("source", "Unknown"), "reference": guide["limit"]})
+    return {"hazard": hazard, "signals": signals, "context": config["context"], "action": config["action"], "status": "Air-quality precaution signal" if signals else "No compatible elevated air indicator"}
 
 HEALTH_INFORMATION = {
     "PM2.5": {

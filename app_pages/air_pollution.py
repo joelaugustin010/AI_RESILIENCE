@@ -46,18 +46,34 @@ from src.live_air_quality import (
     MODEL_SOURCE,
     OPEN_METEO_DOCS_URL,
     fetch_open_meteo,
+    fetch_open_meteo_weather,
     aqi_category,
 )
+from src.air_background_model import (
+    EVALUATION_PATH,
+    BackgroundModelError,
+    predict_next_hour,
+)
 from src.air_quality_dashboard import (
+    DISASTER_AIR_INTELLIGENCE,
     HEALTH_INFORMATION,
     POLLUTANT_GUIDELINES,
     aggregate_co2_trend,
     assess_pollutant,
     compare_pollutant,
     co2_context,
+    disaster_air_intelligence,
     evidence_category,
+    scenario_aqi_summary,
+    scenario_pollutant_values,
 )
-from src.air_background_model import AirBackgroundModelError, load_model, predict_next_hour
+from src.disaster_air_dispersion import (
+    INCIDENT_TYPES,
+    LOCATION_PRESETS,
+    STABILITY_CLASSES,
+    SUPPORTED_POLLUTANTS,
+    run_gaussian_plume,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -66,7 +82,6 @@ SUMMARY = ROOT / "data" / "processed" / "air_quality" / "kspcb_annual_aqi.csv"
 SUMMARY_METADATA = ROOT / "data" / "processed" / "air_quality" / "kspcb_annual_aqi.metadata.json"
 REPORTS = ROOT / "data" / "processed" / "air_quality"
 INDUSTRIAL = ROOT / "data" / "processed" / "industrial"
-BACKGROUND_MODEL = ROOT / "models" / "air_quality" / "kerala_cams_pm25_next_hour_background.pkl"
 def load_source_register() -> dict:
     """Load the reviewed source-status record; no sample measurement is used."""
     with REGISTER.open(encoding="utf-8") as source_file:
@@ -218,9 +233,8 @@ st.markdown(
 
     [data-testid="stAppViewContainer"] {
         background:
-            radial-gradient(circle at 8% 2%, rgba(38, 190, 170, 0.12), transparent 27rem),
-            radial-gradient(circle at 92% 4%, rgba(47, 137, 190, 0.10), transparent 30rem),
-            transparent !important;
+            radial-gradient(circle at 8% 2%, rgba(111, 190, 210, 0.10), transparent 27rem),
+            linear-gradient(180deg, rgba(244, 249, 250, 0.45), transparent 24rem);
     }
 
     .air-hero {
@@ -229,7 +243,7 @@ st.markdown(
         padding: 34px 36px 30px;
         border: 1px solid rgba(91, 164, 190, 0.28);
         border-radius: 22px;
-        background: radial-gradient(ellipse at 90% 8%,rgba(76,226,197,.18),transparent 22rem),linear-gradient(118deg,#071a2a 0%,#0b4054 58%,#087e78 100%);
+        background: linear-gradient(118deg, #e6f4f8 0%, #f1f8f6 54%, #f8fbfa 100%);
         box-shadow: 0 12px 34px rgba(27, 73, 91, 0.07);
         margin: 4px 0 22px;
     }
@@ -248,7 +262,7 @@ st.markdown(
     }
 
     .air-eyebrow {
-        color: #72d8cf;
+        color: #28768b;
         font-size: 0.72rem;
         font-weight: 800;
         letter-spacing: 2.2px;
@@ -285,13 +299,13 @@ st.markdown(
         border: 1px solid rgba(47, 119, 139, 0.18);
         border-radius: 999px;
         color: #315e6d;
-        background: rgba(12,35,51,.82);
+        background: rgba(255,255,255,0.62);
         font-size: 0.76rem;
         font-weight: 650;
     }
 
     div[data-testid="stMetric"] {
-        background: rgba(12,35,51,.92);
+        background: rgba(255, 255, 255, 0.82);
         border: 1px solid rgba(87, 143, 160, 0.19);
         border-radius: 15px;
         padding: 15px 17px;
@@ -323,14 +337,14 @@ st.markdown(
         border: 1px solid rgba(71, 132, 151, 0.20);
         border-radius: 999px;
         color: #285b6c !important;
-        background: rgba(12,35,51,.82);
+        background: rgba(255,255,255,0.78);
         text-decoration: none !important;
         font-size: 0.78rem;
         font-weight: 650;
     }
 
     .air-nav a:hover {
-        background: #164253;
+        background: #e5f3f6;
         border-color: rgba(71, 132, 151, 0.42);
     }
 
@@ -338,13 +352,156 @@ st.markdown(
         border: 1px solid rgba(100, 160, 180, 0.22);
         border-radius: 13px;
         overflow: hidden;
-        background: rgba(12,35,51,.92);
+        background: rgba(255,255,255,0.86);
     }
 
     div[data-testid="stExpander"] {
         border: 1px solid rgba(100, 160, 180, 0.24);
         border-radius: 13px;
         background: rgba(255,255,255,0.62);
+    }
+
+    .disaster-hero {
+        position: relative;
+        overflow: hidden;
+        padding: 30px 32px 26px;
+        border-radius: 24px;
+        background: linear-gradient(125deg, #0e4d59 0%, #126b73 48%, #1e8b80 100%);
+        box-shadow: 0 18px 42px rgba(11, 78, 87, 0.20);
+        color: white;
+        margin: 10px 0 18px;
+    }
+
+    .disaster-hero:after {
+        content: "";
+        position: absolute;
+        width: 310px;
+        height: 310px;
+        right: -70px;
+        top: -170px;
+        border: 1px solid rgba(255,255,255,0.22);
+        border-radius: 50%;
+        box-shadow: 0 0 0 28px rgba(255,255,255,0.06), 0 0 0 64px rgba(255,255,255,0.035);
+        pointer-events: none;
+    }
+
+    .disaster-kicker {
+        color: #b7f1df;
+        font-size: .72rem;
+        font-weight: 800;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    .disaster-title {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 800;
+        letter-spacing: -1.4px;
+        line-height: 1.08;
+        margin: 9px 0 11px;
+    }
+
+    .disaster-subtitle {
+        color: rgba(255,255,255,.84);
+        font-size: 1rem;
+        line-height: 1.65;
+        max-width: 760px;
+        margin: 0;
+    }
+
+    .disaster-step {
+        color: #277b76;
+        font-size: .72rem;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        margin: 22px 0 8px;
+    }
+
+    .disaster-card {
+        min-height: 104px;
+        padding: 15px 16px;
+        border: 1px solid rgba(71, 157, 145, .20);
+        border-radius: 17px;
+        background: linear-gradient(145deg, rgba(255,255,255,.95), rgba(237,249,246,.80));
+        box-shadow: 0 8px 22px rgba(38, 101, 103, .055);
+    }
+
+    .disaster-card-title {
+        color: #164f59;
+        font-weight: 800;
+        font-size: .94rem;
+        margin-bottom: 5px;
+    }
+
+    .disaster-card-copy {
+        color: #5c7279;
+        font-size: .78rem;
+        line-height: 1.45;
+    }
+
+    .disaster-result {
+        padding: 22px 24px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #e8f7f2, #edf8fb);
+        border: 1px solid rgba(53, 148, 139, .20);
+        box-shadow: 0 12px 30px rgba(43, 112, 113, .08);
+        margin: 16px 0 12px;
+    }
+
+    .disaster-result-label {
+        color: #347c78;
+        font-size: .70rem;
+        font-weight: 800;
+        letter-spacing: 1.4px;
+        text-transform: uppercase;
+    }
+
+    .disaster-result-value {
+        color: #104c59;
+        font-size: clamp(2rem, 5vw, 3.3rem);
+        font-weight: 850;
+        letter-spacing: -1.5px;
+        line-height: 1.05;
+        margin: 5px 0 4px;
+    }
+
+    .disaster-result-copy {
+        color: #5b7379;
+        font-size: .84rem;
+        line-height: 1.55;
+    }
+
+    .disaster-pill {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 999px;
+        background: rgba(24, 122, 111, .10);
+        color: #197367;
+        font-size: .73rem;
+        font-weight: 750;
+    }
+
+    .disaster-empty {
+        padding: 20px 22px;
+        border: 1px dashed rgba(64, 138, 144, .35);
+        border-radius: 18px;
+        background: rgba(243, 250, 249, .72);
+        color: #557178;
+    }
+
+    div[data-testid="stRadio"] label {
+        border: 1px solid rgba(71, 157, 145, .22);
+        border-radius: 15px;
+        padding: 12px 14px;
+        background: rgba(255,255,255,.74);
+        transition: border-color .2s ease, background .2s ease, transform .2s ease;
+    }
+
+    div[data-testid="stRadio"] label:hover {
+        border-color: rgba(35, 137, 126, .56);
+        background: #effaf6;
+        transform: translateY(-1px);
     }
 
     h2, h3 {
@@ -511,6 +668,7 @@ def render_live_air_quality() -> None:
         f"Modelled estimate from [Open-Meteo]({OPEN_METEO_DOCS_URL}) using CAMS data. "
         f"Attribution: [Copernicus Atmosphere Monitoring Service]({CAMS_ATTRIBUTION_URL}) and Open-Meteo."
     )
+    _render_background_pm25_forecast()
 
 
 def _model_metric(current: dict, label: str) -> str:
@@ -520,78 +678,446 @@ def _model_metric(current: dict, label: str) -> str:
     return f"{item['value']:g} {item['unit']}"
 
 
-@st.cache_resource(show_spinner=False)
-def load_air_background_model() -> dict:
-    return load_model(BACKGROUND_MODEL)
+@st.cache_data(ttl=900, show_spinner=False)
+def load_background_inputs(latitude: float, longitude: float) -> tuple[dict, dict]:
+    """Load matching CAMS pollutants and weather for the surrogate model."""
+    air = fetch_open_meteo(latitude=latitude, longitude=longitude)
+    weather = fetch_open_meteo_weather(latitude=latitude, longitude=longitude)
+    return air["current"], weather
 
 
-def _render_background_forecast(live: dict) -> None:
-    """Render guarded next-hour PM2.5 background inference, not incident plume output."""
-    st.markdown('<div id="background-forecast"></div>', unsafe_allow_html=True)
-    st.subheader("Validated background PM2.5 forecast")
+def _render_background_pm25_forecast() -> None:
+    st.markdown("### Kerala background PM2.5 model")
     st.caption(
-        "A location-aware CAMS/Open-Meteo background model trained for Kochi, Eloor-I and "
-        "Eloor-II. This is not a disaster-release or plume prediction."
+        "Evaluated next-hour surrogate for CAMS/Open-Meteo atmospheric background at three Kerala grid locations. "
+        "It is not a station forecast, incident-plume model, health-limit prediction or facility attribution."
     )
+    locations = {
+        "Kochi": (9.9312, 76.2673),
+        "Eloor I": (10.079692, 76.296766),
+        "Eloor II": (10.074350, 76.303942),
+    }
+    selected = st.selectbox("Background-model location", tuple(locations), key="air-background-location")
     try:
-        bundle = load_air_background_model()
-    except AirBackgroundModelError as error:
-        st.info(str(error))
+        current, weather = load_background_inputs(*locations[selected])
+        values = {
+            "pm2_5_ug_m3": current["PM2.5"]["value"], "pm10_ug_m3": current["PM10"]["value"],
+            "no2_ug_m3": current["NO2"]["value"], "so2_ug_m3": current["SO2"]["value"],
+            "co_ug_m3": current["CO"]["value"], "o3_ug_m3": current["O3"]["value"],
+            **weather,
+        }
+        prediction = predict_next_hour(values, selected.replace(" ", "_"))
+    except Exception as error:
+        st.info(f"The background model is temporarily unavailable: {error}")
         return
+    report = json.loads(EVALUATION_PATH.read_text(encoding="utf-8"))
+    metrics = report.get("metrics", {})
+    cards = st.columns(3)
+    cards[0].metric("Predicted next-hour PM2.5", f"{prediction:.1f} µg/m³")
+    cards[1].metric("Held-out MAE", f"{metrics.get('model_mae_ug_m3', float('nan')):.2f} µg/m³")
+    cards[2].metric("Compared with", "Previous hour baseline")
+    st.caption(
+        f"Model inputs are current CAMS/Open-Meteo values plus weather at {selected}; "
+        f"evaluation R²={metrics.get('model_r2', float('nan')):.3f}. "
+        "The prediction describes atmospheric background only and must not be interpreted as a disaster signal."
+    )
 
+
+def _scenario_external_aqi(hourly: pd.DataFrame, current: dict, label: str, *, mode: str, observed_at) -> dict | None:
+    """Return an AQI supplied by the external feed; never derive US/EAQI from CPCB."""
+    if mode == "Forecast mode" and isinstance(hourly, pd.DataFrame) and not hourly.empty and observed_at is not None:
+        cutoff = pd.to_datetime(observed_at, utc=True, errors="coerce")
+        rows = hourly.loc[
+            hourly.get("pollutant", pd.Series(dtype=str)).eq(label)
+            & (pd.to_datetime(hourly.get("observed_at"), utc=True, errors="coerce") > cutoff)
+        ].sort_values("observed_at")
+        if not rows.empty:
+            return {"value": float(rows.iloc[0]["value"]), "source": "External CAMS/Open-Meteo forecast"}
+    item = current.get(label)
+    if isinstance(item, dict) and item.get("value") is not None:
+        return {"value": float(item["value"]), "source": "External CAMS/Open-Meteo model estimate"}
+    return None
+
+
+def _render_scenario_visual_report(values: dict, baseline: dict, hourly: pd.DataFrame, *, mode: str, observed_at, location: str) -> None:
+    """Render the scenario outcome as an environmental intelligence report."""
+    aqi = scenario_aqi_summary(values)
+    subindices = {item["pollutant"]: item for item in aqi["subindices"]}
+    concern = max(aqi["subindices"], key=lambda item: item["sub_index"])["pollutant"] if aqi["subindices"] else None
+    if concern is None:
+        candidates = [(p, float(item["value"]) / POLLUTANT_GUIDELINES[p]["limit"])
+                      for p, item in values.items() if p in POLLUTANT_GUIDELINES and item["unit"] == POLLUTANT_GUIDELINES[p]["unit"]]
+        concern = max(candidates, key=lambda item: item[1])[0] if candidates else "No compatible pollutant"
+    status = "Predicted feed value" if mode == "Forecast mode" else "Hypothetical simulated scenario"
+    overall = f"{aqi['scenario_index']} · {aqi['category']}" if aqi["scenario_index"] is not None else "AQI unavailable — insufficient compatible inputs"
+    interpretation = HEALTH_INFORMATION.get(concern, {}).get("summary", "No pollutant-specific interpretation is available.")
+    precaution = HEALTH_INFORMATION.get(concern, {}).get("precautions", "Use official local guidance and avoid treating this scenario as an alert.")
+    st.markdown(
+        f'<div style="border:1px solid #b8ded6;border-radius:18px;padding:22px;margin:12px 0;'
+        f'background:linear-gradient(135deg,#f0fbf7,#eef8fc);">'
+        f'<div style="color:#087e8b;font-size:.78rem;font-weight:750;letter-spacing:.08em;text-transform:uppercase;">{status}</div>'
+        f'<div style="font-size:1.7rem;font-weight:800;color:#123b45;margin:.25rem 0;">Air-quality scenario report</div>'
+        f'<div style="color:#526b73;"><b>Scenario name:</b> {mode} · <b>Location:</b> {location}</div>'
+        f'<div style="display:flex;gap:24px;flex-wrap:wrap;margin-top:14px;">'
+        f'<div><div style="color:#55727b;font-size:.78rem;">OVERALL ASSESSMENT</div><div style="font-size:1.25rem;font-weight:750;">{overall}</div></div>'
+        f'<div><div style="color:#55727b;font-size:.78rem;">MAIN POLLUTANT OF CONCERN</div><div style="font-size:1.25rem;font-weight:750;">{concern}</div></div>'
+        f'<div><div style="color:#55727b;font-size:.78rem;">RESULT STATUS</div><div style="font-size:1.25rem;font-weight:750;color:#087e8b;">{status}</div></div>'
+        f'</div></div>', unsafe_allow_html=True,
+    )
+
+    st.markdown("**Pollutant indicators**")
+    pollutant_order = ("PM2.5", "PM10", "NO2", "SO2", "CO", "O3", "CO2")
+    cards = st.columns(3)
+    for index, pollutant in enumerate(pollutant_order):
+        item = values.get(pollutant)
+        with cards[index % 3]:
+            if not item:
+                st.markdown(f"<div style='border:1px solid #dbe7ea;border-radius:14px;padding:13px;margin:5px 0;color:#71858b;'><b>{pollutant}</b><br>Unavailable</div>", unsafe_allow_html=True)
+                continue
+            base = baseline.get(pollutant)
+            comparison = "No compatible baseline"
+            if base and base.get("unit") == item.get("unit"):
+                delta = float(item["value"]) - float(base["value"])
+                comparison = f"{delta:+.1f} vs baseline"
+            meaning = "CO₂ is context only; it is not an AQI pollutant." if pollutant == "CO2" else (subindices.get(pollutant, {}).get("category") or "Concentration available")
+            st.markdown(
+                f"<div style='border:1px solid #b8ded6;border-radius:14px;padding:13px;margin:5px 0;background:#fbfffe;'>"
+                f"<div style='font-weight:750;color:#164e59;'>{pollutant}</div>"
+                f"<div style='font-size:1.45rem;font-weight:800;'>{float(item['value']):.1f} <span style='font-size:.82rem;font-weight:500;'>{item['unit']}</span></div>"
+                f"<div style='font-size:.78rem;color:#087e8b;'>{item['source']}</div>"
+                f"<div style='font-size:.78rem;color:#526b73;'>{comparison} · {meaning}</div></div>", unsafe_allow_html=True,
+            )
+
+    st.markdown("**AQI indicators supplied by the external feed**")
+    aqi_cols = st.columns(2)
+    for column, label, title in zip(aqi_cols, ("European AQI", "US AQI"), ("EAQI", "US AQI")):
+        supplied = _scenario_external_aqi(hourly, baseline, label, mode=mode, observed_at=observed_at)
+        with column:
+            if supplied and mode == "Forecast mode":
+                category = aqi_category("EAQI" if label == "European AQI" else "US AQI", supplied["value"])
+                colour = category["color"] if category else "#087e8b"
+                category_label = category["label"] if category else "Category unavailable"
+                st.markdown(f"<div style='border:3px solid {colour};border-radius:16px;padding:17px;background:linear-gradient(135deg,{colour}16,transparent);'><div style='color:#55727b;font-size:.78rem;font-weight:700;'>{title} · external forecast</div><div style='font-size:2.4rem;font-weight:850;'>{supplied['value']:.0f}</div><div style='font-weight:750;color:{colour};'>{category_label}</div></div>", unsafe_allow_html=True)
+            else:
+                st.info(f"{title} unavailable for this scenario. No unsupported AQI is calculated.")
+
+    comparison_rows = []
+    for pollutant, item in values.items():
+        base = baseline.get(pollutant)
+        if base and base.get("unit") == item.get("unit"):
+            comparison_rows.append({"Pollutant": pollutant, "Baseline": float(base["value"]), "Scenario": float(item["value"]), "Unit": item["unit"]})
+    if comparison_rows:
+        st.markdown("**Current versus scenario**")
+        comparison = pd.DataFrame(comparison_rows)
+        if alt is not None:
+            chart = alt.Chart(comparison.melt(id_vars=["Pollutant", "Unit"], value_vars=["Baseline", "Scenario"], var_name="Series", value_name="Value")).mark_bar().encode(
+                x=alt.X("Pollutant:N", title=None), y=alt.Y("Value:Q", title="Concentration"), color=alt.Color("Series:N", scale=alt.Scale(range=["#7aa6b2", "#0e8175"])), tooltip=["Pollutant", "Series", "Value", "Unit"]
+            ).properties(height=260)
+            st.altair_chart(chart, use_container_width=True)
+        else:
+            st.bar_chart(comparison.set_index("Pollutant")[["Baseline", "Scenario"]])
+    if mode == "Forecast mode" and isinstance(hourly, pd.DataFrame) and not hourly.empty and observed_at is not None:
+        future = hourly.loc[pd.to_datetime(hourly.get("observed_at"), utc=True, errors="coerce") > pd.to_datetime(observed_at, utc=True, errors="coerce")]
+        future = future.loc[future["pollutant"].isin(pollutant_order[:-1])].head(48)
+        if not future.empty:
+            st.markdown("**Forecast trend from returned time-series values**")
+            if alt is not None:
+                st.altair_chart(alt.Chart(future).mark_line(point=True).encode(x="observed_at:T", y="value:Q", color="pollutant:N", tooltip=["observed_at:T", "pollutant:N", "value:Q"]).properties(height=260), use_container_width=True)
+            else:
+                st.line_chart(future.pivot_table(index="observed_at", columns="pollutant", values="value", aggfunc="last"))
+    st.markdown("**What changed and what does it mean?**")
+    st.write(f"The scenario uses the selected external or user-simulated values. The main concern is {concern}. {interpretation}")
+    st.write(f"Practical precaution: {precaution}")
+    st.caption("Reliability: this is a transparent scenario display. External values are model estimates; simulated values are assumptions. It is not an official warning, diagnosis, causal attribution, or validated disaster forecast.")
+    with st.expander("Detailed pollutant data and AQI calculation"):
+        display_dataframe(pd.DataFrame([{"Pollutant": p, "Value": item["value"], "Unit": item["unit"], "Provenance": item["source"]} for p, item in values.items()]), hide_index=True, use_container_width=True, alt="Detailed scenario pollutant values")
+        if aqi["subindices"]:
+            display_dataframe(pd.DataFrame(aqi["subindices"]), hide_index=True, use_container_width=True, alt="Scenario CPCB pollutant subindices")
+        st.caption(aqi["method"])
+        if aqi["exclusions"]:
+            st.caption("Excluded from CPCB scenario index: " + "; ".join(aqi["exclusions"]))
+
+
+def _render_air_intelligence_tools() -> None:
+    st.markdown('<div id="scenario-simulator"></div>', unsafe_allow_html=True)
+    st.header("Predictive Air Pollution — Scenario Simulator")
+    st.caption(
+        "Forecast mode uses returned future CAMS/Open-Meteo values when available. What-if mode lets you override selected values. "
+        "Neither mode is a validated local pollution forecast or an official AQI."
+    )
+    mode = st.radio(
+        "Scenario mode",
+        ["Forecast mode", "What-if scenario mode"],
+        horizontal=True,
+        key="air-scenario-mode",
+    )
+    location = st.selectbox(
+        "Scenario location",
+        ["Kochi model grid", "Eloor", "Edayar", "Other / not specified"],
+        key="air-scenario-location",
+    )
+    live = {}
+    try:
+        live = load_live_air_quality()
+    except Exception as error:
+        st.info(f"The external CAMS/Open-Meteo feed is unavailable: {error}")
     current = live.get("current", {}) if isinstance(live, dict) else {}
-    selected_location = st.selectbox(
-        "Forecast location",
-        bundle.get("locations", []),
-        key="air-background-location",
-        help="Only locations represented in the training dataset are available.",
-    )
-    pollutant_defaults = {
-        "pm2_5_ug_m3": "PM2.5", "pm10_ug_m3": "PM10", "no2_ug_m3": "NO2",
-        "so2_ug_m3": "SO2", "co_ug_m3": "CO", "o3_ug_m3": "O3",
-    }
-    defaults = {
-        field: (float(current[label]["value"]) if selected_location == "Kochi" and label in current else None)
-        for field, label in pollutant_defaults.items()
-    }
-    with st.form("air-background-forecast-form"):
-        pollutant_columns = st.columns(3)
-        values = {}
-        for index, (field, label) in enumerate(pollutant_defaults.items()):
-            with pollutant_columns[index % 3]:
-                values[field] = st.number_input(
-                    f"{label} (µg/m³)", min_value=0.0, value=defaults[field],
-                    placeholder="Required", key=f"air-background-{field}",
-                )
-        weather_columns = st.columns(4)
-        with weather_columns[0]:
-            values["temperature_c"] = st.number_input("Temperature (°C)", value=None, placeholder="Required", key="air-background-temperature")
-        with weather_columns[1]:
-            values["relative_humidity_pct"] = st.number_input("Relative humidity (%)", min_value=0.0, max_value=100.0, value=None, placeholder="Required", key="air-background-humidity")
-        with weather_columns[2]:
-            values["wind_speed_kmh"] = st.number_input("Wind speed (km/h)", min_value=0.0, value=None, placeholder="Required", key="air-background-wind-speed")
-        with weather_columns[3]:
-            values["wind_direction_deg"] = st.number_input("Wind direction (°)", min_value=0.0, max_value=360.0, value=None, placeholder="Required", key="air-background-wind-direction")
-        values["location"] = selected_location
-        submitted = st.form_submit_button("Forecast next hour")
+    hourly = live.get("hourly", pd.DataFrame()) if isinstance(live, dict) else pd.DataFrame()
+    observed_at = live.get("observed_at") if isinstance(live, dict) else None
+    if mode == "Forecast mode":
+        st.info(
+            "Forecast mode uses only future timestamps returned by the external model. "
+            "The current feed supplies air-quality variables, not a validated local dispersion forecast."
+        )
 
-    if not submitted:
-        st.info("Enter the atmospheric inputs and run the forecast. Empty fields remain unavailable; no values are invented.")
-        return
-    try:
-        prediction = predict_next_hour(bundle, values)
-    except AirBackgroundModelError as error:
-        st.warning(f"Forecast unavailable: {error}")
-        return
-    st.metric("Modelled next-hour PM2.5", f"{prediction:.1f} µg/m³")
-    st.caption(
-        "Output type: modelled atmospheric background. It is not a station observation, "
-        "incident concentration, AQI, or validated disaster-plume probability."
+    st.markdown("**Optional pollutant and environment overrides**")
+    st.caption("Leave a field blank to retain the selected external value, if one exists. CO is entered in mg/m³; CO₂ is ppm.")
+    pollutant_specs = (
+        ("PM2.5", "PM2.5 (µg/m³)", 0.0, 1000.0, 0.1),
+        ("PM10", "PM10 (µg/m³)", 0.0, 2000.0, 0.1),
+        ("NO2", "NO₂ (µg/m³)", 0.0, 1000.0, 0.1),
+        ("SO2", "SO₂ (µg/m³)", 0.0, 1000.0, 0.1),
+        ("CO", "CO (mg/m³)", 0.0, 100.0, 0.01),
+        ("O3", "O₃ (µg/m³)", 0.0, 1000.0, 0.1),
+        ("CO2", "CO₂ (ppm)", 0.0, 10000.0, 1.0),
     )
-    st.info("Evaluation on a chronological held-out period: MAE 1.62 µg/m³ and RMSE 2.64 µg/m³. Actual local error may differ.")
+    overrides = {}
+    pollutant_columns = st.columns(2)
+    for index, (key, label, minimum, maximum, step) in enumerate(pollutant_specs):
+        with pollutant_columns[index % 2]:
+            overrides[key] = st.number_input(
+                label,
+                min_value=minimum,
+                max_value=maximum,
+                value=None,
+                step=step,
+                key=f"air-scenario-{key}",
+            )
+    context_columns = st.columns(2)
+    with context_columns[0]:
+        temperature = st.number_input("Temperature (°C, optional)", min_value=-50.0, max_value=60.0, value=None, step=0.1, key="air-scenario-temperature")
+        humidity = st.number_input("Relative humidity (% , optional)", min_value=0.0, max_value=100.0, value=None, step=1.0, key="air-scenario-humidity")
+        wind_speed = st.number_input("Wind speed (km/h, optional)", min_value=0.0, max_value=250.0, value=None, step=0.1, key="air-scenario-wind-speed")
+    with context_columns[1]:
+        wind_direction = st.selectbox("Wind direction (optional)", ["Not provided", "N", "NE", "E", "SE", "S", "SW", "W", "NW"], key="air-scenario-wind-direction")
+        traffic = st.selectbox("Traffic intensity (optional)", ["Not provided", "Low", "Moderate", "High"], key="air-scenario-traffic")
+        industry = st.selectbox("Industrial activity level (optional)", ["Not provided", "Low", "Moderate", "High"], key="air-scenario-industry")
+    values = scenario_pollutant_values(
+        current,
+        hourly,
+        mode="forecast" if mode == "Forecast mode" else "what-if",
+        overrides=overrides,
+        observed_at=observed_at,
+    )
+    if not values:
+        st.warning("No pollutant values are available for this scenario. Enter at least one supported pollutant or restore the external feed.")
+    else:
+        _render_scenario_visual_report(values, current, hourly, mode=mode, observed_at=observed_at, location=location)
+        st.caption(
+            f"Context supplied: temperature={temperature if temperature is not None else 'not provided'}, humidity={humidity if humidity is not None else 'not provided'}, "
+            f"wind={wind_speed if wind_speed is not None else 'not provided'} km/h from {wind_direction}, traffic={traffic}, industrial activity={industry}. "
+            "These context fields are recorded for scenario description only; no unsupported dispersion prediction is calculated."
+        )
+    return values
+
+def _render_disaster_dispersion_engine(values: dict) -> None:
+    st.markdown('<div id="disaster-air-intelligence"></div>', unsafe_allow_html=True)
+    st.markdown(
+        '<section class="disaster-hero"><div class="disaster-kicker">AI RESILIENCE · INCIDENT MODELLING</div>'
+        '<div class="disaster-title">Disaster Air Pollution Intelligence</div>'
+        '<p class="disaster-subtitle">Understand and model how hazardous emissions may spread during environmental and industrial disasters.</p></section>',
+        unsafe_allow_html=True,
+    )
+    st.subheader("Air-quality precaution signal")
+    hazard = st.selectbox("Disaster context", list(DISASTER_AIR_INTELLIGENCE), key="air-disaster-context")
+    intelligence = disaster_air_intelligence(values, hazard)
+    st.caption("This preparedness view does not estimate disaster probability, identify a responsible facility, or replace IMD/KSDMA alerts.")
+    st.write(intelligence["context"])
+    if intelligence["signals"]:
+        for signal in intelligence["signals"]:
+            st.warning(
+                f"{signal['pollutant']}: {signal['value']:g} {signal['unit']} · {signal['source']} · "
+                f"above the configured {signal['reference']:g} {POLLUTANT_GUIDELINES[signal['pollutant']]['unit']} health reference."
+            )
+    else:
+        st.info("No compatible elevated pollutant indicator is available for this context. Missing values are not treated as safe or zero.")
+    st.markdown(f"**Relevant precaution:** {intelligence['action']}")
+    st.caption("Pollutant indicators and disaster conditions are not a validated causal linkage. Source attribution remains evidence-gated below.")
+    st.markdown('<div id="disaster-dispersion"></div>', unsafe_allow_html=True)
+    incident_options = {
+        "🏭 Industrial accident": "Industrial chemical accident",
+        "☣️ Toxic gas release": "Toxic gas release",
+        "🌋 Volcanic eruption": "Volcanic eruption",
+        "🔥 Wildfire": "Wildfire",
+        "🌀 Cyclone-related industrial accident": "Cyclone-related industrial accident",
+    }
+    prior_incident = st.session_state.get("dispersion-incident-selection")
+    selection = st.radio(
+        "Step 1 · Select incident type",
+        list(incident_options),
+        horizontal=True,
+        key="dispersion-incident-card",
+        label_visibility="collapsed",
+    )
+    incident_type = incident_options[selection]
+    if prior_incident != incident_type:
+        st.session_state["dispersion-incident-selection"] = incident_type
+        st.session_state.pop("disaster_dispersion_result", None)
+    st.caption({
+        "Industrial chemical accident": "A point-source release from an industrial facility or process.",
+        "Toxic gas release": "A hazardous gas release where the source term is known or estimated by authorities.",
+        "Volcanic eruption": "Ash and SO₂ require a specialized volcanic plume product; unavailable here.",
+        "Wildfire": "Smoke prediction requires a validated fire-emissions or smoke-forecast feed.",
+        "Cyclone-related industrial accident": "A steady snapshot only; changing cyclone winds are not modelled.",
+    }[incident_type])
+
+    supported = incident_type not in {"Volcanic eruption", "Wildfire"}
+    st.markdown('<div class="disaster-step">Step 2 · Locate the incident</div>', unsafe_allow_html=True)
+    with st.container(border=True):
+        location_name = st.selectbox("Incident location", [*LOCATION_PRESETS, "Custom coordinates"], key="dispersion-location")
+        preset = LOCATION_PRESETS.get(location_name)
+        location_cols = st.columns(2)
+        with location_cols[0]:
+            source_lat = st.number_input("Latitude", value=(preset[0] if preset else None), format="%.6f", key="dispersion-latitude", help="WGS84 incident latitude.")
+        with location_cols[1]:
+            source_lon = st.number_input("Longitude", value=(preset[1] if preset else None), format="%.6f", key="dispersion-longitude", help="WGS84 incident longitude.")
+        if preset:
+            st.caption(f"Reference: {preset[2]}. Choosing a location does not imply that an incident occurred there.")
+
+    st.markdown('<div class="disaster-step">Step 3 · Describe the incident</div>', unsafe_allow_html=True)
+    with st.form("disaster-dispersion-form", clear_on_submit=False):
+        if supported:
+            incident_cols = st.columns(3)
+            with incident_cols[0]:
+                pollutant = st.selectbox("Pollutant / chemical", SUPPORTED_POLLUTANTS, key="dispersion-pollutant", help="Use the released pollutant only; unknown chemistry should remain unknown.")
+            with incident_cols[1]:
+                release_rate = st.number_input("Release rate · g/s", min_value=0.0, value=None, step=0.1, key="dispersion-release-rate", help="Continuous mass release rate. Leave blank if not verified.")
+            with incident_cols[2]:
+                duration = st.number_input("Duration · minutes", min_value=0.01, value=None, step=1.0, key="dispersion-duration", help="Duration of the continuous release assumption.")
+            source_cols = st.columns(2)
+            with source_cols[0]:
+                release_height = st.number_input("Release height · m", min_value=0.0, value=None, step=1.0, key="dispersion-release-height", help="Height of the source above ground.")
+            with source_cols[1]:
+                st.caption("Source values are user-entered assumptions unless an official incident record is separately attached.")
+        else:
+            pollutant = None
+            release_rate = duration = release_height = None
+            st.info("This incident type is visible for planning, but no validated specialized plume model is connected. No industrial plume calculation will run.")
+
+        st.markdown('<div class="disaster-step">Step 4 · Add meteorology</div>', unsafe_allow_html=True)
+        if supported:
+            weather_cols = st.columns(3)
+            with weather_cols[0]:
+                wind_speed = st.number_input("Wind speed · m/s", min_value=0.01, value=None, step=0.1, key="dispersion-wind-speed", help="Sustained wind speed at release height, if known.")
+            with weather_cols[1]:
+                wind_from = st.number_input("Wind from · degrees", min_value=0.0, max_value=360.0, value=None, step=1.0, key="dispersion-wind-direction", help="Meteorological direction: where the wind comes from.")
+            with weather_cols[2]:
+                stability = st.selectbox("Stability class", ["Not provided", *STABILITY_CLASSES], key="dispersion-stability", help="Pasquill–Gifford atmospheric stability class.")
+        else:
+            wind_speed = wind_from = None
+            stability = "Not provided"
+
+        inputs = {
+            "incident_type": incident_type, "source_latitude": source_lat, "source_longitude": source_lon,
+            "pollutant": pollutant, "release_rate_g_s": release_rate, "duration_min": duration,
+            "release_height_m": release_height, "wind_speed_m_s": wind_speed, "wind_from_deg": wind_from,
+            "stability_class": None if stability == "Not provided" else stability,
+        }
+        valid_count = sum(value not in (None, "", "Not provided") for value in (source_lat, source_lon, pollutant, release_rate, duration, release_height, wind_speed, wind_from, stability))
+        st.progress(min(1.0, valid_count / (9 if supported else 2)), text=f"Input readiness · {valid_count} fields supplied")
+        st.caption("Review the location, source term and weather above. Missing critical inputs stay unavailable; they are never inferred.")
+        submitted = st.form_submit_button("Run dispersion assessment", type="primary", use_container_width=True)
+    if st.button("Reset assessment", key="dispersion-reset"):
+        st.session_state.pop("disaster_dispersion_result", None)
+        st.rerun()
+    if submitted:
+        with st.spinner("Calculating traceable plume receptors…"):
+            st.session_state["disaster_dispersion_result"] = run_gaussian_plume(inputs)
+    result = st.session_state.get("disaster_dispersion_result")
+    if not result:
+        st.markdown('<div class="disaster-empty"><b>Ready when you are.</b><br>Complete the relevant incident and meteorology fields, then run the assessment to see modelled concentrations, transport timing and the plume map.</div>', unsafe_allow_html=True)
+        return
+    if result["status"] != "modelled":
+        if result["status"] == "specialized_model_unavailable":
+            st.warning("No result generated: a verified volcanic-ash/SO₂ or wildfire-smoke model/feed is required for this incident type.")
+        else:
+            missing = ", ".join(result["validation"]["missing"])
+            st.warning(f"Assessment needs more information: {missing}.")
+        st.caption("Measured observations, official incident information and user assumptions remain separate from this unavailable model result.")
+        return
+
+    rows = pd.DataFrame(result["rows"])
+    nearest = rows.iloc[0]
+    st.markdown('<div class="disaster-step">Assessment result · modelled only</div>', unsafe_allow_html=True)
+    st.markdown(
+        f'<div class="disaster-result"><div class="disaster-result-label">Main pollutant of concern · {result["pollutant"]}</div>'
+        f'<div class="disaster-result-value">{nearest["concentration_mg_m3"]:.4g} <span style="font-size:1.1rem;font-weight:700;">mg/m³</span></div>'
+        f'<div class="disaster-result-copy">Nearest displayed downwind receptor at {nearest["distance_m"]:.0f} m · centerline arrival estimate {nearest["arrival_min"]:.1f} minutes · <span class="disaster-pill">Gaussian plume model</span></div></div>',
+        unsafe_allow_html=True,
+    )
+    result_cards = st.columns(3)
+    result_cards[0].metric("Peak in displayed transect", f"{rows['concentration_mg_m3'].max():.4g} mg/m³")
+    result_cards[1].metric("Plume direction", f"{result['wind_to_deg']:.0f}°")
+    result_cards[2].metric("Release window", f"{result['release_duration_min']:.0f} min")
+    st.caption("The concentration is a modelled incident increment, not a measured observation or a validated AQI value.")
+
+    st.markdown('<div class="disaster-step">Atmospheric dispersion map</div>', unsafe_allow_html=True)
+    map_rows = rows[["latitude", "longitude"]].copy()
+    map_rows["size"] = 1
+    map_rows["role"] = "Modelled downwind receptor"
+    source_row = pd.DataFrame([{"latitude": source_lat, "longitude": source_lon, "size": 12, "role": "Incident location"}])
+    st.map(pd.concat([source_row, map_rows], ignore_index=True), latitude="latitude", longitude="longitude", size="size", height=500, zoom=10)
+    st.caption("Legend: large marker = incident coordinate · small markers = modelled centerline receptors. This is not an affected-settlement boundary or a measured station map.")
+
+    st.markdown('<div class="disaster-step">Concentration profile</div>', unsafe_allow_html=True)
+    if alt is not None:
+        chart = alt.Chart(rows).mark_line(point=True, color="#178a7b").encode(
+            x=alt.X("distance_m:Q", title="Downwind distance (m)"),
+            y=alt.Y("concentration_mg_m3:Q", title="Modelled concentration (mg/m³)"),
+            tooltip=[alt.Tooltip("distance_m:Q", title="Distance (m)"), alt.Tooltip("concentration_mg_m3:Q", title="Concentration (mg/m³)", format=".4g"), alt.Tooltip("arrival_min:Q", title="Arrival (min)")],
+        ).properties(height=300)
+        st.altair_chart(chart, use_container_width=True)
+    else:
+        st.line_chart(rows.set_index("distance_m")["concentration_mg_m3"])
+
+    timeline = pd.DataFrame(result["timeline"])
+    st.markdown("**Projected change at the nearest receptor**")
+    if alt is not None:
+        timeline_chart = alt.Chart(timeline).mark_line(point=True, color="#2878a0").encode(
+            x=alt.X("time_min:Q", title="Minutes after incident start"),
+            y=alt.Y("concentration_mg_m3:Q", title="Modelled concentration (mg/m³)"),
+            tooltip=[alt.Tooltip("time_min:Q", title="Time (min)"), alt.Tooltip("concentration_mg_m3:Q", title="Concentration (mg/m³)", format=".4g")],
+        ).properties(height=260)
+        st.altair_chart(timeline_chart, use_container_width=True)
+    else:
+        st.line_chart(timeline.set_index("time_min")["concentration_mg_m3"])
+
+    live_baseline = load_live_air_quality()
+    baseline = (live_baseline.get("current", {}) if isinstance(live_baseline, dict) else {}).get(result["pollutant"])
+    st.markdown('<div class="disaster-step">Baseline and public impact</div>', unsafe_allow_html=True)
+    baseline_cols = st.columns(2)
+    with baseline_cols[0]:
+        if baseline:
+            st.markdown(f'<div class="disaster-card"><div class="disaster-card-title">Ambient baseline</div><div class="disaster-result-value" style="font-size:1.75rem;">{baseline["value"]:g} {baseline["unit"]}</div><div class="disaster-card-copy">External CAMS/Open-Meteo model estimate at the Kochi grid; not a station observation.</div></div>', unsafe_allow_html=True)
+        else:
+            st.markdown('<div class="disaster-card"><div class="disaster-card-title">Ambient baseline</div><div class="disaster-card-copy">No compatible baseline is available for this pollutant. The incident result is shown separately.</div></div>', unsafe_allow_html=True)
+    with baseline_cols[1]:
+        st.markdown('<div class="disaster-card"><div class="disaster-card-title">Potentially affected locations</div><div class="disaster-card-copy">The model identifies a downwind centerline only. Settlement and station impact cannot be determined from the available geographic data.</div></div>', unsafe_allow_html=True)
+    st.caption("No unsupported AQI is calculated. Toxic gases outside CPCB pollutants remain concentration-only results.")
+    with st.expander("Monitoring references, assumptions and limitations"):
+        st.write("Project-known reference locations are geographic references only; this model assigns no concentration to them.")
+        reference_cols = st.columns(3)
+        for column, (name, coords) in zip(reference_cols, LOCATION_PRESETS.items()):
+            with column:
+                st.markdown(f'<div class="disaster-card"><div class="disaster-card-title">{name}</div><div class="disaster-card-copy">{coords[0]:.6f}, {coords[1]:.6f}<br>{coords[2]}</div></div>', unsafe_allow_html=True)
+        st.write("Model assumptions: steady continuous point source, flat terrain, centerline receptor, Pasquill–Gifford rural coefficients, no deposition, chemistry, building downwash, terrain, plume rise or exposure-dose calculation.")
+        st.warning("Uncertainty is material and not statistically calibrated. Do not use this screening result for evacuation or health decisions without official incident and dispersion guidance.")
+        st.caption(f"Model trace: {result['model']} · source: user-supplied incident and meteorology inputs · wind travels toward {result['wind_to_deg']:.0f}°.")
 
 
 render_live_air_quality()
+scenario_values = _render_air_intelligence_tools()
+_render_disaster_dispersion_engine(scenario_values or {})
 
 try:
     register = load_source_register()
@@ -622,7 +1148,6 @@ st.markdown(
     """
     <nav class="air-nav">
         <a href="#live-feed">Live feed</a>
-        <a href="#background-forecast">Background forecast</a>
         <a href="#co2-intelligence">CO2 Intelligence</a>
         <a href="#pollutant-levels">Pollutants</a>
         <a href="#industrial-pollution-sources">Industrial sources</a>
@@ -789,7 +1314,6 @@ def _render_compact_dashboard() -> None:
     except Exception:
         current = {}
     _render_co2_intelligence(live)
-    _render_background_forecast(live)
     pollutant_names = ["PM2.5", "PM10", "NO2", "SO2", "CO", "O3"]
     selected = st.selectbox("Pollutant details", ["All pollutants", *pollutant_names], key="air-pollutant-detail")
     if selected == "All pollutants":
@@ -805,7 +1329,7 @@ def _render_compact_dashboard() -> None:
                 "Reference": f'{guide["limit"]:g} {guide["unit"]} ({guide["averaging"]})' if guide else "Unavailable",
                 "Status": assessment["status"] if item else "Unavailable",
             })
-        display_dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True, alt="Live pollutant readings and reference status")
+        display_dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True, alt="Current pollutant summary")
     else:
         item = current.get(selected)
         guide = POLLUTANT_GUIDELINES.get(selected)
@@ -899,7 +1423,7 @@ def _render_compact_dashboard() -> None:
         if not daily_aqi.empty:
             st.caption("Historical KSPCB station extract — not live and not a model estimate.")
             columns = [c for c in ("station", "observed_at", "source_aqi", "PM2.5_value", "PM10_value", "NO2_value", "SO2_value", "CO_value", "O3_value") if c in daily_aqi.columns]
-            display_dataframe(daily_aqi[columns].head(20), hide_index=True, use_container_width=True, alt="Historical KSPCB station AQI and pollutant values")
+            display_dataframe(daily_aqi[columns].head(20), hide_index=True, use_container_width=True, alt="Historical KSPCB station extract")
         else:
             st.info("Historical KSPCB station data is unavailable.")
 
@@ -927,7 +1451,7 @@ def _render_compact_dashboard() -> None:
             with st.expander("Reviewed source register", expanded=False):
                 source_rows = [{key: source.get(key) for key in ("id", "publisher", "status", "reviewed_on")} for source in sources if isinstance(source, dict)]
                 if source_rows:
-                    display_dataframe(pd.DataFrame(source_rows), hide_index=True, use_container_width=True, alt="Reviewed air-quality source register")
+                    display_dataframe(pd.DataFrame(source_rows), hide_index=True, use_container_width=True, alt="Reviewed source register")
 
 
 try:

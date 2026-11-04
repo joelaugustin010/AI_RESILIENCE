@@ -1,76 +1,84 @@
-"""Guarded inference for the trained CAMS/Open-Meteo background model."""
+"""Inference helpers for the evaluated Kerala CAMS background PM2.5 model.
+
+The model predicts the next hourly CAMS/Open-Meteo background value.  It is
+not an incident, plume, station-observation, or facility-attribution model.
+"""
 
 from __future__ import annotations
 
-import math
 import pickle
+from functools import lru_cache
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
 
-REQUIRED_BASE_FIELDS = (
-    "pm2_5_ug_m3", "pm10_ug_m3", "no2_ug_m3", "so2_ug_m3", "co_ug_m3", "o3_ug_m3",
-    "temperature_c", "relative_humidity_pct", "wind_speed_kmh", "wind_direction_deg",
-    "location",
-)
+ROOT = Path(__file__).resolve().parents[1]
+MODEL_PATH = ROOT / "models" / "air_quality" / "kerala_cams_pm25_next_hour_background.pkl"
+EVALUATION_PATH = ROOT / "models" / "air_quality" / "kerala_cams_pm25_next_hour_background.evaluation.json"
 
 
-class AirBackgroundModelError(ValueError):
-    """Raised when the background model cannot safely produce a prediction."""
+class BackgroundModelError(RuntimeError):
+    """Raised when the background model cannot produce a safe prediction."""
 
 
-def load_model(path: Path) -> dict:
-    if not path.is_file():
-        raise AirBackgroundModelError("The trained background model artifact is unavailable.")
+@lru_cache(maxsize=1)
+def load_background_model() -> dict:
+    if not MODEL_PATH.is_file():
+        raise BackgroundModelError(f"Background model is unavailable: {MODEL_PATH.name}")
     try:
-        with path.open("rb") as stream:
-            bundle = pickle.load(stream)
-    except (OSError, pickle.UnpicklingError, EOFError) as error:
-        raise AirBackgroundModelError("The trained background model artifact could not be loaded.") from error
-    if not isinstance(bundle, dict) or not hasattr(bundle.get("model"), "predict"):
-        raise AirBackgroundModelError("The trained background model artifact is invalid.")
-    return bundle
+        with MODEL_PATH.open("rb") as stream:
+            artifact = pickle.load(stream)
+    except (OSError, pickle.PickleError, EOFError, AttributeError, ImportError) as error:
+        raise BackgroundModelError("Background model could not be loaded safely.") from error
+    if not isinstance(artifact, dict) or not artifact.get("model") or not artifact.get("features"):
+        raise BackgroundModelError("Background model artifact is incomplete.")
+    return artifact
 
 
-def make_features(bundle: dict, values: dict[str, object]) -> pd.DataFrame:
-    missing = [field for field in REQUIRED_BASE_FIELDS if field not in values or values[field] in (None, "")]
+def _number(value: object, name: str) -> float:
+    try:
+        parsed = float(value)
+    except (TypeError, ValueError) as error:
+        raise BackgroundModelError(f"Missing numeric input: {name}") from error
+    if not np.isfinite(parsed):
+        raise BackgroundModelError(f"Non-finite numeric input: {name}")
+    return parsed
+
+
+def make_features(values: dict[str, object], location: str, *, features: list[str]) -> pd.DataFrame:
+    """Build the exact feature row used by the multisite training script."""
+    row = {key: _number(values.get(key), key) for key in (
+        "pm2_5_ug_m3", "pm10_ug_m3", "no2_ug_m3", "so2_ug_m3", "co_ug_m3",
+        "o3_ug_m3", "temperature_c", "relative_humidity_pct", "wind_speed_kmh",
+        "wind_direction_deg", "hour",
+    )}
+    row["wind_direction_sin"] = np.sin(np.deg2rad(row.pop("wind_direction_deg")))
+    row["wind_direction_cos"] = np.cos(np.deg2rad(values["wind_direction_deg"]))
+    row["hour_sin"] = np.sin(2 * np.pi * row.pop("hour") / 24)
+    row["hour_cos"] = np.cos(2 * np.pi * values["hour"] / 24)
+    for feature in features:
+        if feature.startswith("location_"):
+            row[feature] = float(feature == f"location_{location}")
+    missing = [feature for feature in features if feature not in row]
     if missing:
-        raise AirBackgroundModelError(f"Missing model inputs: {', '.join(missing)}")
-    numeric = {}
-    for field in REQUIRED_BASE_FIELDS:
-        if field == "location":
-            continue
-        try:
-            parsed = float(values[field])
-        except (TypeError, ValueError) as error:
-            raise AirBackgroundModelError(f"Invalid numeric input: {field}") from error
-        if not math.isfinite(parsed):
-            raise AirBackgroundModelError(f"Invalid numeric input: {field}")
-        numeric[field] = parsed
-    if numeric["pm2_5_ug_m3"] < 0 or numeric["pm10_ug_m3"] < 0 or numeric["wind_speed_kmh"] < 0:
-        raise AirBackgroundModelError("Concentrations and wind speed cannot be negative.")
-    direction = numeric.pop("wind_direction_deg")
-    numeric["wind_direction_sin"] = math.sin(math.radians(direction))
-    numeric["wind_direction_cos"] = math.cos(math.radians(direction))
-    numeric["hour_sin"] = 0.0
-    numeric["hour_cos"] = 1.0
-    location = str(values["location"])
-    locations = bundle.get("locations", [])
+        raise BackgroundModelError(f"Model features are unsupported: {', '.join(missing)}")
+    return pd.DataFrame([{feature: row[feature] for feature in features}])
+
+
+def predict_next_hour(values: dict[str, object], location: str) -> float:
+    """Predict one next-hour background PM2.5 value in µg/m³."""
+    artifact = load_background_model()
+    locations = artifact.get("locations", [])
     if location not in locations:
-        raise AirBackgroundModelError("Location is not covered by the trained model.")
-    for known_location in locations:
-        numeric[f"location_{known_location}"] = 1.0 if known_location == location else 0.0
-    features = bundle.get("features", [])
-    if not features or any(feature not in numeric for feature in features):
-        raise AirBackgroundModelError("The model feature schema is incomplete.")
-    return pd.DataFrame([[numeric[feature] for feature in features]], columns=features)
-
-
-def predict_next_hour(bundle: dict, values: dict[str, object]) -> float:
-    features = make_features(bundle, values)
-    prediction = float(np.asarray(bundle["model"].predict(features)).reshape(-1)[0])
-    if not math.isfinite(prediction) or prediction < 0:
-        raise AirBackgroundModelError("The model returned an invalid PM2.5 value.")
-    return prediction
+        raise BackgroundModelError(f"Location is not covered by the model: {location}")
+    features = list(artifact["features"])
+    frame = make_features(values, location, features=features)
+    try:
+        prediction = float(artifact["model"].predict(frame)[0])
+    except (TypeError, ValueError, KeyError) as error:
+        raise BackgroundModelError("Background model prediction failed.") from error
+    if not np.isfinite(prediction):
+        raise BackgroundModelError("Background model returned a non-finite prediction.")
+    return max(0.0, prediction)
