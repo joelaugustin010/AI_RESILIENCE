@@ -57,6 +57,7 @@ from src.air_quality_dashboard import (
     co2_context,
     evidence_category,
 )
+from src.air_background_model import AirBackgroundModelError, load_model, predict_next_hour
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -65,6 +66,7 @@ SUMMARY = ROOT / "data" / "processed" / "air_quality" / "kspcb_annual_aqi.csv"
 SUMMARY_METADATA = ROOT / "data" / "processed" / "air_quality" / "kspcb_annual_aqi.metadata.json"
 REPORTS = ROOT / "data" / "processed" / "air_quality"
 INDUSTRIAL = ROOT / "data" / "processed" / "industrial"
+BACKGROUND_MODEL = ROOT / "models" / "air_quality" / "kerala_cams_pm25_next_hour_background.pkl"
 def load_source_register() -> dict:
     """Load the reviewed source-status record; no sample measurement is used."""
     with REGISTER.open(encoding="utf-8") as source_file:
@@ -518,6 +520,77 @@ def _model_metric(current: dict, label: str) -> str:
     return f"{item['value']:g} {item['unit']}"
 
 
+@st.cache_resource(show_spinner=False)
+def load_air_background_model() -> dict:
+    return load_model(BACKGROUND_MODEL)
+
+
+def _render_background_forecast(live: dict) -> None:
+    """Render guarded next-hour PM2.5 background inference, not incident plume output."""
+    st.markdown('<div id="background-forecast"></div>', unsafe_allow_html=True)
+    st.subheader("Validated background PM2.5 forecast")
+    st.caption(
+        "A location-aware CAMS/Open-Meteo background model trained for Kochi, Eloor-I and "
+        "Eloor-II. This is not a disaster-release or plume prediction."
+    )
+    try:
+        bundle = load_air_background_model()
+    except AirBackgroundModelError as error:
+        st.info(str(error))
+        return
+
+    current = live.get("current", {}) if isinstance(live, dict) else {}
+    selected_location = st.selectbox(
+        "Forecast location",
+        bundle.get("locations", []),
+        key="air-background-location",
+        help="Only locations represented in the training dataset are available.",
+    )
+    pollutant_defaults = {
+        "pm2_5_ug_m3": "PM2.5", "pm10_ug_m3": "PM10", "no2_ug_m3": "NO2",
+        "so2_ug_m3": "SO2", "co_ug_m3": "CO", "o3_ug_m3": "O3",
+    }
+    defaults = {
+        field: (float(current[label]["value"]) if selected_location == "Kochi" and label in current else None)
+        for field, label in pollutant_defaults.items()
+    }
+    with st.form("air-background-forecast-form"):
+        pollutant_columns = st.columns(3)
+        values = {}
+        for index, (field, label) in enumerate(pollutant_defaults.items()):
+            with pollutant_columns[index % 3]:
+                values[field] = st.number_input(
+                    f"{label} (µg/m³)", min_value=0.0, value=defaults[field],
+                    placeholder="Required", key=f"air-background-{field}",
+                )
+        weather_columns = st.columns(4)
+        with weather_columns[0]:
+            values["temperature_c"] = st.number_input("Temperature (°C)", value=None, placeholder="Required", key="air-background-temperature")
+        with weather_columns[1]:
+            values["relative_humidity_pct"] = st.number_input("Relative humidity (%)", min_value=0.0, max_value=100.0, value=None, placeholder="Required", key="air-background-humidity")
+        with weather_columns[2]:
+            values["wind_speed_kmh"] = st.number_input("Wind speed (km/h)", min_value=0.0, value=None, placeholder="Required", key="air-background-wind-speed")
+        with weather_columns[3]:
+            values["wind_direction_deg"] = st.number_input("Wind direction (°)", min_value=0.0, max_value=360.0, value=None, placeholder="Required", key="air-background-wind-direction")
+        values["location"] = selected_location
+        submitted = st.form_submit_button("Forecast next hour")
+
+    if not submitted:
+        st.info("Enter the atmospheric inputs and run the forecast. Empty fields remain unavailable; no values are invented.")
+        return
+    try:
+        prediction = predict_next_hour(bundle, values)
+    except AirBackgroundModelError as error:
+        st.warning(f"Forecast unavailable: {error}")
+        return
+    st.metric("Modelled next-hour PM2.5", f"{prediction:.1f} µg/m³")
+    st.caption(
+        "Output type: modelled atmospheric background. It is not a station observation, "
+        "incident concentration, AQI, or validated disaster-plume probability."
+    )
+    st.info("Evaluation on a chronological held-out period: MAE 1.62 µg/m³ and RMSE 2.64 µg/m³. Actual local error may differ.")
+
+
 render_live_air_quality()
 
 try:
@@ -549,6 +622,7 @@ st.markdown(
     """
     <nav class="air-nav">
         <a href="#live-feed">Live feed</a>
+        <a href="#background-forecast">Background forecast</a>
         <a href="#co2-intelligence">CO2 Intelligence</a>
         <a href="#pollutant-levels">Pollutants</a>
         <a href="#industrial-pollution-sources">Industrial sources</a>
@@ -715,6 +789,7 @@ def _render_compact_dashboard() -> None:
     except Exception:
         current = {}
     _render_co2_intelligence(live)
+    _render_background_forecast(live)
     pollutant_names = ["PM2.5", "PM10", "NO2", "SO2", "CO", "O3"]
     selected = st.selectbox("Pollutant details", ["All pollutants", *pollutant_names], key="air-pollutant-detail")
     if selected == "All pollutants":
