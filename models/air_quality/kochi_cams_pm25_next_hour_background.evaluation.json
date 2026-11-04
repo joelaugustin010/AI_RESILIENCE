@@ -1,0 +1,43 @@
+{
+  "model_id": "kochi_cams_pm25_next_hour_background",
+  "trained_at_utc": "2026-11-04T13:59:55.875529+00:00",
+  "source_dataset": "data/external/air_quality/open_meteo_cams_kochi_background_2024_2025.csv",
+  "source_rows": 17544,
+  "usable_rows": 17543,
+  "train_rows": 14034,
+  "test_rows": 3509,
+  "train_period": {
+    "from": "2024-01-01T00:00:00Z",
+    "to": "2025-08-07T17:00:00Z"
+  },
+  "test_period": {
+    "from": "2025-08-07T18:00:00Z",
+    "to": "2025-12-31T23:00:00Z"
+  },
+  "split": "chronological 80/20; no random shuffling",
+  "features": [
+    "pm2_5_ug_m3",
+    "pm10_ug_m3",
+    "no2_ug_m3",
+    "so2_ug_m3",
+    "co_ug_m3",
+    "o3_ug_m3",
+    "temperature_c",
+    "relative_humidity_pct",
+    "wind_speed_kmh",
+    "wind_direction_sin",
+    "wind_direction_cos",
+    "hour_sin",
+    "hour_cos"
+  ],
+  "target": "next-hour pm2_5_ug_m3",
+  "algorithm": "HistGradientBoostingRegressor",
+  "metrics": {
+    "model_mae_ug_m3": 1.666729756029076,
+    "model_rmse_ug_m3": 2.7452933324777824,
+    "model_r2": 0.973076386761354,
+    "naive_previous_hour_mae_ug_m3": 2.2021373610715305,
+    "naive_previous_hour_rmse_ug_m3": 3.4195267646833623
+  },
+  "scientific_boundary": "This is a surrogate for CAMS/Open-Meteo atmospheric-background values. It is not trained on station observations, verified releases, plume measurements, volcanic ash, wildfire smoke, or cyclone incidents; it must not be used as a disaster-plume predictor."
+}
