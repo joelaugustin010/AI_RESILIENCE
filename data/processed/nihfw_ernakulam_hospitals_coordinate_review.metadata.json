@@ -29,7 +29,7 @@
     "records_in_duplicate_coordinate_pair_groups": 63,
     "coordinate_order": "Not documented by source; comma-delimited pair preserved without interpretation.",
     "crs": "Not documented by source; no point geometries created.",
-    "processed_file": "C:\\Users\\LENOVO\\OneDrive\\Desktop\\AI_RESILIENCE\\data\\processed\\nihfw_ernakulam_hospitals_coordinate_review.csv"
+    "processed_file": "data/processed/nihfw_ernakulam_hospitals_coordinate_review.csv"
   },
   "processed_file": "nihfw_ernakulam_hospitals_coordinate_review.csv",
   "alternative_sources_reviewed": [

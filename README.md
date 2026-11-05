@@ -32,8 +32,10 @@ The application entry point is `app.py`; the Command Centre is the default landi
 3. **Kochi Map** — inspect available geographic layers and point out coverage or boundary limitations.
 4. **Air Pollution** — show historical monitoring summaries and explain why AQI alone cannot prove which factory caused pollution.
 5. **Hospital Vulnerability / Cyclone + Flood** — show what evidence is needed before making exposure claims.
-6. **Data Readiness** — review source provenance, integrity checks and unresolved blockers.
+6. **Data Readiness** — review source provenance, integrity checks, descriptive climate benchmarks and unresolved blockers.
 7. **Mitigation Budget / Smart Mitigation Design** — demonstrate practical planning based on clearly stated assumptions.
+
+The committed screening and climate reports are offline products; their builders and inputs are documented in `docs/REPRODUCING_REPORTS.md`.
 
 ## Important limitations
 
