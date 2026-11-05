@@ -9,7 +9,6 @@ import streamlit as st
 from src.compound_hazard_assessment import assess_compound_scenario
 
 
-st.set_page_config(page_title="Cyclone + Flood | AI RESILIENCE", page_icon="🌧️", layout="wide")
 st.title("Kochi Cyclone + Flood Resilience Workspace")
 st.caption("One integrated workspace for rainfall, river flooding, cyclone exposure, compound pathways and service continuity.")
 
