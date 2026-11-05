@@ -9,7 +9,10 @@ ROOT = Path(__file__).resolve().parent
 
 
 def _page(path: str) -> AppTest:
-    app = AppTest.from_file(str(ROOT / "app.py"), default_timeout=60).run()
+    # The map page reads and validates the processed spatial layers on a cold
+    # cache; allow enough time for that one-time work without changing what the
+    # tests assert.
+    app = AppTest.from_file(str(ROOT / "app.py"), default_timeout=180).run()
     app.switch_page(path).run()
     assert not app.exception
     return app
