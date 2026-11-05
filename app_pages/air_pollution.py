@@ -29,6 +29,7 @@ from src.air_quality_attribution import (
     evidence_action_plan,
 )
 from src.cpcb_aqi import calculate_ind_aqi
+from src.air_quality_readiness import audit_air_quality_datasets
 from src.air_quality_monthly_reports import (
     MonthlyReportError,
     compare_monthly_report_values,
@@ -1157,6 +1158,45 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+# Read-only evidence readiness: integrity is not a certification of measurement quality.
+air_readiness = audit_air_quality_datasets(ROOT)
+st.subheader("Air-quality dataset readiness")
+st.caption(
+    f"Read-only audit: {air_readiness['dataset_count']} datasets · "
+    f"{air_readiness['status_counts']['provisional']} provisional · "
+    f"{air_readiness['status_counts']['unavailable']} unavailable · "
+    f"{air_readiness['status_counts']['unsuitable']} unsuitable."
+)
+readiness_rows = [
+    {
+        "Dataset": item["name"],
+        "Status": item["status"],
+        "Rows": item["row_count"],
+        "Coverage": (
+            f"{item['date_start']} to {item['date_end']}"
+            if item["date_start"] and item["date_end"] else "Not established"
+        ),
+        "Permitted use": item["permitted_use"],
+    }
+    for item in air_readiness["datasets"]
+]
+st.dataframe(pd.DataFrame(readiness_rows), hide_index=True, width="stretch")
+st.info(air_readiness["conclusion"])
+with st.expander("Dataset audit details and blockers"):
+    for item in air_readiness["datasets"]:
+        st.markdown(f"**{item['name']} — {item['status']}**")
+        st.caption(
+            f"Integrity: {item['integrity_check']} · Schema: {item['schema_check']} · "
+            f"Forecast eligible: {item['forecast_training_eligible']}"
+        )
+        for limitation in item["limitations"]:
+            st.write(f"- {limitation}")
+        for error in item["errors"]:
+            st.warning(error)
+    for error in air_readiness["catalog_errors"]:
+        st.warning(error)
+
 
 daily_aqi = read_csv(REPORTS / "kspcb_daily_aqi_2026-10-16.csv")
 daily_status = read_csv(REPORTS / "kspcb_daily_aqi_status_2026-10-16.csv")
