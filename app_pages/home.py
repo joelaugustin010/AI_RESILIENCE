@@ -766,6 +766,43 @@ st.markdown(
     }
     .ar-footer .ar-foot-right { text-align: right; }
 
+    /* ---------- Subtle scroll-linked parallax ---------- */
+    /*
+       Progressive enhancement: browsers with CSS scroll-driven animations get
+       gentle depth while scrolling. Older browsers keep the existing layout.
+       No JavaScript listeners, fake map data or extra network requests.
+    */
+    @keyframes arHeroParallax {
+      from { transform: translate3d(0, 0, 0) scale(1); }
+      to   { transform: translate3d(0, 7%, 0) scale(1.08); }
+    }
+    @keyframes arThreatParallax {
+      from { transform: translate3d(0, -4%, 0) scale(1.08); }
+      to   { transform: translate3d(0, 4%, 0) scale(1.08); }
+    }
+    @supports (animation-timeline: view()) {
+      .ar-cine-hero {
+        view-timeline-name: --ar-hero-view;
+        view-timeline-axis: block;
+      }
+      .ar-cine-media {
+        animation: arHeroParallax 1s linear both;
+        animation-timeline: --ar-hero-view;
+        animation-range: exit 0% exit 100%;
+        will-change: transform;
+      }
+      .ar-threat {
+        view-timeline-name: --ar-threat-view;
+        view-timeline-axis: block;
+      }
+      .ar-threat .ar-threat-bg {
+        animation: arThreatParallax 1s linear both;
+        animation-timeline: --ar-threat-view;
+        animation-range: entry 0% exit 100%;
+        will-change: transform;
+      }
+    }
+
     /* ---------- Responsive ---------- */
     @media (max-width: 1050px) {
       .ar-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 200px; }
@@ -809,6 +846,7 @@ st.markdown(
     }
     @media (prefers-reduced-motion: reduce) {
       .ar-cine-slide { animation: none !important; opacity: 0; transform: none !important; }
+      .ar-cine-media, .ar-threat .ar-threat-bg { animation: none !important; transform: none !important; }
       .ar-slide-a { opacity: 1; }
       .ar-cine-video { display: none !important; }
       .ar-live-dot { animation: none !important; }
