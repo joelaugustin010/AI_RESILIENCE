@@ -1196,55 +1196,66 @@ def _render_co2_intelligence(live: dict) -> None:
 
 
     with calculator_tab:
-        st.markdown("### Household carbon-footprint estimate")
-        st.write(
-            "Enter a typical month's household energy use. The calculator estimates "
-            "direct fuel-combustion emissions and purchased-grid-electricity emissions "
-            "using published default factors."
+        st.markdown(
+            """
+            <div class="disaster-hero" style="margin-top:.25rem;">
+              <div class="disaster-kicker">Kochi · household energy estimate</div>
+              <div class="disaster-title">Your Carbon Footprint</div>
+              <p class="disaster-subtitle">Turn a typical month's electricity and fuel use into a transparent CO₂ estimate. Adjust the inputs and review the result instantly.</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
-        st.info(
-            "This is an indicative household estimate, not a verified personal footprint. "
-            "It excludes food, shopping, flights, public transport, construction, "
-            "upstream fuel supply and other indirect emissions."
-        )
+        st.caption("HOUSEHOLD CALCULATOR  /  MONTHLY ACTIVITY  /  INDICATIVE CO₂")
 
-        input_left, input_right = st.columns(2)
-        with input_left:
-            electricity_kwh = st.number_input(
-                "Monthly electricity use (kWh)",
-                min_value=0.0, max_value=100000.0, value=150.0, step=10.0,
-                help="Use the active energy (kWh) shown on your electricity bill.",
-                key="co2-calc-electricity",
+        with st.container(border=True):
+            st.markdown("#### 01 · Enter monthly household activity")
+            st.caption("Use your latest electricity bill and a typical month's fuel use. Enter zero for any source you do not use.")
+            input_left, input_right = st.columns(2, gap="large")
+            with input_left:
+                st.markdown("**⚡ Electricity**")
+                electricity_kwh = st.number_input(
+                    "Grid electricity (kWh/month)",
+                    min_value=0.0, max_value=100000.0, value=150.0, step=10.0,
+                    help="Use the active energy consumption in kWh from your KSEB bill.",
+                    key="co2-calc-electricity",
+                )
+                st.markdown("**🚗 Petrol**")
+                petrol_litres = st.number_input(
+                    "Petrol (litres/month)",
+                    min_value=0.0, max_value=10000.0, value=20.0, step=1.0,
+                    help="Estimate the petrol used by household vehicles in one month.",
+                    key="co2-calc-petrol",
+                )
+            with input_right:
+                st.markdown("**🚙 Diesel**")
+                diesel_litres = st.number_input(
+                    "Diesel (litres/month)",
+                    min_value=0.0, max_value=10000.0, value=0.0, step=1.0,
+                    help="Estimate the diesel used by household vehicles or generators.",
+                    key="co2-calc-diesel",
+                )
+                st.markdown("**🔥 LPG cooking gas**")
+                lpg_cylinders = st.number_input(
+                    "14.2 kg LPG cylinders/month",
+                    min_value=0.0, max_value=100.0, value=1.0, step=0.5,
+                    help="Enter the number of standard 14.2 kg domestic cylinders used per month.",
+                    key="co2-calc-lpg",
+                )
+            household_size = st.number_input(
+                "People in household",
+                min_value=1, max_value=30, value=4, step=1,
+                help="Used only to calculate an equal per-person allocation.",
+                key="co2-calc-household-size",
             )
-            petrol_litres = st.number_input(
-                "Monthly petrol use (litres)",
-                min_value=0.0, max_value=10000.0, value=20.0, step=1.0,
-                key="co2-calc-petrol",
-            )
-        with input_right:
-            diesel_litres = st.number_input(
-                "Monthly diesel use (litres)",
-                min_value=0.0, max_value=10000.0, value=0.0, step=1.0,
-                key="co2-calc-diesel",
-            )
-            lpg_cylinders = st.number_input(
-                "14.2 kg LPG cylinders used per month",
-                min_value=0.0, max_value=100.0, value=1.0, step=0.5,
-                key="co2-calc-lpg",
-            )
-        household_size = st.number_input(
-            "People in household",
-            min_value=1, max_value=30, value=4, step=1,
-            key="co2-calc-household-size",
-        )
 
         # Default factors: CEA FY 2025-26 grid average; fuel factors are
         # rounded indicative combustion factors. They are not lifecycle factors.
         emission_factors = {
-            "Grid electricity": 0.675,   # kg CO2/kWh, CEA v22.0 FY 2025-26
-            "Petrol": 2.31,              # kg CO2/litre, indicative direct combustion
-            "Diesel": 2.68,              # kg CO2/litre, indicative direct combustion
-            "LPG": 2.98,                 # kg CO2/kg LPG, indicative direct combustion
+            "Grid electricity": 0.675,
+            "Petrol": 2.31,
+            "Diesel": 2.68,
+            "LPG": 2.98,
         }
         monthly_emissions = {
             "Electricity": electricity_kwh * emission_factors["Grid electricity"],
@@ -1255,87 +1266,150 @@ def _render_co2_intelligence(live: dict) -> None:
         total_monthly = sum(monthly_emissions.values())
         total_annual = total_monthly * 12
         per_person_monthly = total_monthly / household_size
-
-        st.markdown("---")
-        result_columns = st.columns(3)
-        result_columns[0].metric("Estimated monthly footprint", f"{total_monthly:,.1f} kg CO₂")
-        result_columns[1].metric("Estimated annual footprint", f"{total_annual / 1000:,.2f} tonnes CO₂")
-        result_columns[2].metric("Per person / month", f"{per_person_monthly:,.1f} kg CO₂")
-
-        breakdown = pd.DataFrame(
-            {"Estimated emissions (kg CO₂/month)": monthly_emissions}
-        )
-        st.markdown("**Monthly emissions breakdown**")
-        st.bar_chart(breakdown)
         largest_source = max(monthly_emissions, key=monthly_emissions.get)
-        if total_monthly > 0:
-            largest_share = monthly_emissions[largest_source] / total_monthly * 100
-            st.write(
-                f"**Largest input category:** {largest_source} "
-                f"({largest_share:.1f}% of this estimate)."
-            )
-        else:
-            st.write("Enter at least one non-zero activity value to see the largest category.")
+        largest_amount = monthly_emissions[largest_source]
+        largest_share = largest_amount / total_monthly * 100 if total_monthly > 0 else 0.0
 
-        st.markdown("**Ways to reduce the estimate**")
-        suggestions = {
-            "Electricity": "Switch off unused equipment, use efficient appliances and fans, and consider rooftop solar where feasible.",
-            "Petrol": "Combine errands, avoid unnecessary trips, use walking or cycling for suitable short journeys, and consider shared public transport.",
-            "Diesel": "Reduce avoidable vehicle use, keep vehicles maintained, and consider shared or public transport where practical.",
-            "LPG": "Avoid unnecessary fuel use while cooking and keep burners and appliances maintained.",
-        }
-        for category, amount in monthly_emissions.items():
-            if amount > 0:
-                st.markdown(f"- **{category}:** {suggestions[category]}")
+        st.markdown("#### 02 · Your estimated emissions")
+        result_columns = st.columns([1.25, 1, 1], gap="medium")
+        with result_columns[0]:
+            st.markdown(
+                f'<div class="disaster-result"><div class="disaster-result-label">Monthly household CO₂</div>'
+                f'<div class="disaster-result-value">{total_monthly:,.1f}</div>'
+                f'<div class="disaster-result-copy">kg CO₂ / month · indicative estimate</div></div>',
+                unsafe_allow_html=True,
+            )
+        result_columns[1].metric("Annualised estimate", f"{total_annual / 1000:,.2f} t CO₂")
+        result_columns[2].metric("Per person / month", f"{per_person_monthly:,.1f} kg CO₂")
+        st.caption("Annualised estimate = monthly activity × 12. Per-person result divides the household total equally; it is not an individual measurement.")
+
+        with st.container(border=True):
+            st.markdown("#### 03 · Emissions breakdown")
+            breakdown_left, breakdown_right = st.columns([1.5, 1], gap="large")
+            breakdown = pd.DataFrame(
+                {
+                    "Source": list(monthly_emissions.keys()),
+                    "Estimated CO₂ (kg/month)": list(monthly_emissions.values()),
+                }
+            )
+            with breakdown_left:
+                if alt is not None and total_monthly > 0:
+                    breakdown_chart = alt.Chart(breakdown).mark_bar(
+                        cornerRadiusEnd=6
+                    ).encode(
+                        x=alt.X("Estimated CO₂ (kg/month):Q", title="kg CO₂ / month"),
+                        y=alt.Y("Source:N", sort="-x", title=None),
+                        color=alt.Color(
+                            "Source:N",
+                            scale=alt.Scale(
+                                domain=["Electricity", "Petrol", "Diesel", "LPG"],
+                                range=["#38bdf8", "#34d399", "#f59e0b", "#a78bfa"],
+                            ),
+                            legend=None,
+                        ),
+                        tooltip=[
+                            alt.Tooltip("Source:N"),
+                            alt.Tooltip("Estimated CO₂ (kg/month):Q", format=",.1f"),
+                        ],
+                    ).properties(height=190)
+                    st.altair_chart(breakdown_chart, width="stretch")
+                elif total_monthly > 0:
+                    st.bar_chart(breakdown.set_index("Source"))
+                else:
+                    st.info("Enter a non-zero activity value to display the emissions breakdown.")
+            with breakdown_right:
+                st.markdown("**Largest category**")
+                if total_monthly > 0:
+                    st.metric(largest_source, f"{largest_amount:,.1f} kg CO₂", f"{largest_share:.1f}% of total")
+                    st.progress(min(max(largest_share / 100, 0.0), 1.0))
+                else:
+                    st.metric("No activity entered", "0.0 kg CO₂")
+                st.caption("The largest category is based only on the four inputs included in this calculator.")
+
+            share_rows = []
+            for name, amount in monthly_emissions.items():
+                share_rows.append({
+                    "Source": name,
+                    "Monthly CO₂ (kg)": round(amount, 2),
+                    "Share of included total (%)": round(amount / total_monthly * 100, 1) if total_monthly else 0.0,
+                })
+            st.dataframe(pd.DataFrame(share_rows), hide_index=True, use_container_width=True)
+
+        with st.container(border=True):
+            st.markdown("#### 04 · Practical reduction ideas")
+            suggestions = {
+                "Electricity": "Review high-use appliances, choose efficient equipment, and switch off devices that do not need to run.",
+                "Petrol": "Combine errands, avoid unnecessary trips, and consider walking, cycling or shared transport for suitable journeys.",
+                "Diesel": "Reduce avoidable generator or vehicle use where practical and keep engines maintained.",
+                "LPG": "Use appropriately sized cookware, keep burners maintained and avoid unnecessary fuel use while cooking.",
+            }
+            active_suggestions = [
+                (name, suggestions[name])
+                for name, amount in monthly_emissions.items()
+                if amount > 0
+            ]
+            if active_suggestions:
+                suggestion_columns = st.columns(2)
+                for index, (name, suggestion) in enumerate(active_suggestions):
+                    with suggestion_columns[index % 2]:
+                        st.markdown(
+                            f'<div class="disaster-card"><div class="disaster-card-title">{name}</div>'
+                            f'<div class="disaster-card-copy">{suggestion}</div></div>',
+                            unsafe_allow_html=True,
+                        )
+            else:
+                st.info("Add a monthly activity value to see relevant reduction ideas.")
 
         report_rows = [
-            {"Item": name, "Monthly activity / basis": value, "Emission factor": factor,
-             "Estimated emissions (kg CO2)": monthly_emissions[label]}
+            {
+                "Item": name,
+                "Monthly activity / basis": value,
+                "Emission factor": factor,
+                "Estimated emissions (kg CO2)": monthly_emissions[label],
+            }
             for name, value, factor, label in [
                 ("Grid electricity", electricity_kwh, "0.675 kg CO2/kWh (CEA FY 2025-26)", "Electricity"),
-                ("Petrol", petrol_litres, "2.31 kg CO2/litre (indicative)", "Petrol"),
-                ("Diesel", diesel_litres, "2.68 kg CO2/litre (indicative)", "Diesel"),
+                ("Petrol", petrol_litres, "2.31 kg CO2/litre (indicative direct combustion)", "Petrol"),
+                ("Diesel", diesel_litres, "2.68 kg CO2/litre (indicative direct combustion)", "Diesel"),
                 ("LPG", lpg_cylinders, "2.98 kg CO2/kg × 14.2 kg per cylinder (indicative)", "LPG"),
             ]
         ]
         report_rows.extend([
             {"Item": "Household total", "Monthly activity / basis": "Monthly estimate",
-             "Emission factor": "Sum of categories",
-             "Estimated emissions (kg CO2)": total_monthly},
+             "Emission factor": "Sum of categories", "Estimated emissions (kg CO2)": total_monthly},
             {"Item": "Annual household total", "Monthly activity / basis": "Monthly estimate × 12",
-             "Emission factor": "Annualised estimate",
-             "Estimated emissions (kg CO2)": total_annual},
+             "Emission factor": "Annualised estimate", "Estimated emissions (kg CO2)": total_annual},
             {"Item": "Household size", "Monthly activity / basis": household_size,
              "Emission factor": "People", "Estimated emissions (kg CO2)": ""},
             {"Item": "Per-person monthly estimate", "Monthly activity / basis": "Household total ÷ household size",
-             "Emission factor": "Allocation only; not a separate measurement",
+             "Emission factor": "Equal allocation; not a separate measurement",
              "Estimated emissions (kg CO2)": per_person_monthly},
         ])
         report = pd.DataFrame(report_rows)
-        st.download_button(
-            "Download carbon-footprint report (CSV)",
-            data=report.to_csv(index=False).encode("utf-8-sig"),
-            file_name="AI_RESILIENCE_Kochi_Household_Carbon_Footprint.csv",
-            mime="text/csv",
-            key="co2-footprint-download",
-        )
+        download_left, download_right = st.columns([1, 2], gap="medium")
+        with download_left:
+            st.download_button(
+                "↓ Download household report (CSV)",
+                data=report.to_csv(index=False).encode("utf-8-sig"),
+                file_name="AI_RESILIENCE_Kochi_Household_Carbon_Footprint.csv",
+                mime="text/csv",
+                key="co2-footprint-download",
+                use_container_width=True,
+            )
+        with download_right:
+            st.caption("The report includes your entered activity, emission factors, category totals, annualised total and equal per-person allocation.")
 
-        with st.expander("Calculation method, factors and limitations"):
+        with st.expander("Calculation method, emission factors and limitations"):
             st.markdown(
-                "- **Electricity:** kWh × 0.675 kg CO₂/kWh. This is the CEA "
-                "all-India weighted-average grid factor for FY 2025–26 (database v22.0), "
-                "the latest factor currently embedded in this calculator. It should be "
-                "updated when a newer CEA factor is published.\n"
+                "- **Electricity:** kWh × 0.675 kg CO₂/kWh. CEA all-India weighted-average grid factor for FY 2025–26 (database v22.0); update when a newer factor is published.\n"
                 "- **Petrol:** litres × 2.31 kg CO₂/litre (rounded indicative direct-combustion factor).\n"
                 "- **Diesel:** litres × 2.68 kg CO₂/litre (rounded indicative direct-combustion factor).\n"
                 "- **LPG:** cylinders × 14.2 kg × 2.98 kg CO₂/kg (rounded indicative direct-combustion factor)."
             )
             st.caption(
-                "Fuel factors are rounded defaults for educational estimation, not "
-                "product-specific or lifecycle emission factors. Results are sensitive "
-                "to actual fuel composition, vehicle efficiency, electricity year and "
-                "the completeness of the inputs. This calculator reports CO₂ only; it is "
-                "not a complete CO₂e or lifecycle greenhouse-gas inventory."
+                "Fuel factors are rounded educational defaults, not product-specific or lifecycle factors. "
+                "The estimate excludes food, shopping, flights, public transport, construction, upstream fuel supply "
+                "and other indirect emissions. This calculator reports CO₂ only; it is not a complete CO₂e or lifecycle inventory."
             )
             st.markdown(
                 "References: [Central Electricity Authority — CO₂ Baseline Database]("
