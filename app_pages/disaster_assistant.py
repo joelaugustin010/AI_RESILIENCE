@@ -12,7 +12,6 @@ page_header(
     meta=("Phase 2", "Reviewed knowledge base", "Not a live warning"),
     accent="teal",
     key="disaster-assistant",
-    image="app/static/images/hero-kerala-ghats.jpg",
 )
 
 st.info(
