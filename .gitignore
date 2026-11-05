@@ -50,3 +50,7 @@ data/processed/public_consent_search.html
 
 # Industrial source documents and acquisition snapshots stay local pending reuse review.
 data/raw/industrial/
+
+# Generated copy of the optional homepage hero film. The source of truth is
+# assets/videos/kerala_hero.mp4; do not commit both copies.
+static/videos/kerala_hero.mp4

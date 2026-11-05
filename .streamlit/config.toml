@@ -8,3 +8,6 @@ font = "sans serif"
 
 [server]
 headless = true
+# Required for the homepage hero video and local photography.
+# Files placed in ./static are served at app/static/<path>.
+enableStaticServing = true

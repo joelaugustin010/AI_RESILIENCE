@@ -8,6 +8,7 @@ import streamlit as st
 from src.dataframe_display import display_dataframe
 
 from src.ingestion_audit import DATA_STATUS_DEFINITIONS, build_ingestion_report
+from src.ui_theme import page_header
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -21,10 +22,14 @@ def load_report() -> dict:
 
 
 report = load_report()
-st.title("Data readiness")
-st.caption(
-    "This page checks local source integrity and reads the project catalogs. "
-    "It does not download data or rewrite raw files."
+page_header(
+    "AI RESILIENCE · EVIDENCE & PROVENANCE",
+    "Data readiness",
+    "Check local source integrity, provenance and analysis readiness before relying on "
+    "a model output. Nothing is downloaded and no raw file is rewritten.",
+    meta=("Local source audit", "Provenance", "No downloads"),
+    accent="cyan",
+    key="data-readiness",
 )
 st.caption(f"Last local validation: {report['validated_at_utc']}")
 

@@ -1,0 +1,106 @@
+"""Shared visual components for the AI RESILIENCE workspace.
+
+The design language lives in ``app.py`` so every page inherits the same tokens.
+This module provides the small, accessible HTML helpers pages use for their
+headers and section intros. It deliberately contains no data or model logic.
+"""
+
+from __future__ import annotations
+
+import html
+import re
+from typing import Iterable
+
+import streamlit as st
+
+
+# One accent per module family. The values are also exposed as CSS variables so
+# page headers keep their own character while sharing typography and spacing.
+ACCENTS: dict[str, str] = {
+    "teal": "#42e0c1",
+    "cyan": "#5cc8e8",
+    "blue": "#7fb8ff",
+    "emerald": "#4ade80",
+    "amber": "#f0c56a",
+    "orange": "#fb923c",
+    "violet": "#b39bff",
+    "rose": "#fb8098",
+}
+
+
+def _slug(value: str) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
+    return slug or "page"
+
+
+def _escape(value: object) -> str:
+    return html.escape(str(value), quote=True)
+
+
+def _meta_html(meta: Iterable[str]) -> str:
+    chips = "".join(f"<span>{_escape(item)}</span>" for item in meta if str(item).strip())
+    return f'<div class="ar-page-meta">{chips}</div>' if chips else ""
+
+
+def page_header(
+    kicker: str,
+    title: str,
+    description: str,
+    *,
+    meta: Iterable[str] = (),
+    accent: str = "teal",
+    key: str | None = None,
+    as_title: bool = True,
+) -> None:
+    """Render the standard module header.
+
+    ``st.title`` is kept for screen-reader structure and for the existing
+    Streamlit tests that inspect page titles. The surrounding container is
+    decorated by the shared stylesheet.
+    """
+
+    accent_hex = ACCENTS.get(accent, ACCENTS["teal"])
+    container_key = f"ar-head-{_slug(key or title)}"
+    st.markdown(
+        f"<style>.st-key-{container_key}{{--ar-accent:{accent_hex};}}</style>",
+        unsafe_allow_html=True,
+    )
+    with st.container(key=container_key):
+        st.markdown(
+            f'<div class="ar-page-kicker"><span class="ar-page-dot"></span>{_escape(kicker)}</div>',
+            unsafe_allow_html=True,
+        )
+        if as_title:
+            st.title(title)
+        else:
+            st.markdown(f'<div class="ar-page-title">{_escape(title)}</div>', unsafe_allow_html=True)
+        if description:
+            st.markdown(
+                f'<p class="ar-page-copy">{_escape(description)}</p>',
+                unsafe_allow_html=True,
+            )
+        if meta:
+            st.markdown(_meta_html(meta), unsafe_allow_html=True)
+
+
+def section_intro(overline: str, title: str, description: str = "") -> None:
+    """Compact section intro used between major blocks on analytical pages."""
+
+    copy = f"<p>{_escape(description)}</p>" if description else ""
+    st.markdown(
+        f'<div class="ar-sec-intro"><span class="ar-sec-overline">{_escape(overline)}</span>'
+        f"<h2>{_escape(title)}</h2>{copy}</div>",
+        unsafe_allow_html=True,
+    )
+
+
+def risk_badge(label: str, level: str = "moderate") -> str:
+    """Return an accessible risk pill in the shared colour language.
+
+    ``level`` is one of ``safe``, ``moderate``, ``high`` or ``critical``.
+    Intended for use inside an ``unsafe_allow_html`` markdown block.
+    """
+
+    allowed = {"safe", "moderate", "high", "critical"}
+    tone = level if level in allowed else "moderate"
+    return f'<span class="ar-risk ar-risk-{tone}">{_escape(label)}</span>'

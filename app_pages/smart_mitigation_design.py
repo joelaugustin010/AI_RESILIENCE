@@ -6,83 +6,72 @@ from src.mitigation_intelligence import (
     build_design_state,
     design_recommendations,
 )
+from src.ui_theme import page_header, section_intro
 
-# Shared dark SDG climate-intelligence workspace styling.
-st.markdown("""
-<style>
-.stApp{background:transparent!important;color:#e7f5f5!important}
-.block-container{padding-top:1.5rem;padding-bottom:3rem;max-width:1500px}
-h1,h2,h3,h4{color:#effafa!important;letter-spacing:-.02em}
-h2{border-bottom:1px solid rgba(130,190,199,.24);padding-bottom:.5rem}
-h3{color:#65e4ce!important}
-p,li,label,.stMarkdown,.stCaption{color:#c5dadd}
-.design-header{position:relative;overflow:hidden;padding:clamp(1.5rem,3vw,2.4rem);border-radius:23px;margin-bottom:1.25rem;background:radial-gradient(ellipse at 88% 12%,rgba(76,226,197,.2),transparent 22rem),linear-gradient(118deg,#071a2a 0%,#0b4054 58%,#087e78 100%);border:1px solid rgba(112,226,207,.28);box-shadow:0 22px 54px rgba(0,0,0,.28);color:#e7f5f5}
-.design-header h1{color:#f1ffff!important;font-size:clamp(2rem,3.5vw,2.8rem)}
-.design-header p{color:#c3e0e2!important;line-height:1.7}
-.concept-note{background:rgba(64,54,28,.55)!important;border:1px solid rgba(235,190,91,.4);border-left:5px solid #e9bd5a;border-radius:12px;padding:17px;color:#f6e6b8!important;line-height:1.6}
-div[data-baseweb="select"]>div,div[data-baseweb="input"]>div,div[data-baseweb="textarea"]>div,div[data-testid="stDateInput"] input,div[data-testid="stNumberInput"] input,div[data-testid="stTextInput"] input,div[data-testid="stTextArea"] textarea{background:#102b3c!important;color:#eaf7f7!important;border:1px solid rgba(130,190,199,.34)!important;border-radius:10px!important}
-div[data-testid="stSlider"],div[data-testid="stMetric"],div[data-testid="stExpander"],div[data-testid="stVerticalBlockBorderWrapper"]>div{background:linear-gradient(145deg,rgba(17,48,66,.96),rgba(10,34,49,.96))!important;border:1px solid rgba(130,190,199,.24)!important;border-radius:14px;color:#e7f5f5!important}
-div[data-testid="stMetric"]{padding:1rem;min-height:108px}
-div[data-testid="stMetricLabel"],.stCaption{color:#a7c1c8!important}
-div[data-testid="stMetricValue"]{color:#f0ffff!important}
-div[data-testid="stProgress"]{background:#16384a;border-radius:20px}
-div[data-testid="stProgress"]>div>div{background:linear-gradient(90deg,#42e0c1,#56c8e8);border-radius:20px}
-div[data-testid="stExpander"] summary,div[data-testid="stExpander"] summary p{color:#e5f4f4!important}
-.stDownloadButton button,div.stButton>button{background:linear-gradient(105deg,#126a70,#147c83)!important;color:#f4ffff!important;border:1px solid rgba(91,223,200,.42)!important;border-radius:11px;font-weight:750;min-height:2.7rem}
-.stDownloadButton button:hover,div.stButton>button:hover{background:linear-gradient(105deg,#16817e,#168b91)!important;border-color:#7bf0d7!important}
-hr{border-color:rgba(130,190,199,.22)!important}
-[data-testid="stDataFrame"],[data-testid="stTable"]{border:1px solid rgba(130,190,199,.22);border-radius:12px}
-</style>
-""",unsafe_allow_html=True)
+# Page-scoped styling only. Global tokens, typography, inputs and charts come
+# from the shared design system in app.py.
+st.markdown(
+    """
+    <style>
+    .concept-note {
+      background:
+        radial-gradient(ellipse at 100% 0%, rgba(240, 197, 106, .12), transparent 18rem),
+        linear-gradient(145deg, rgba(58, 47, 22, .62), rgba(36, 31, 18, .62));
+      border: 1px solid rgba(235, 190, 91, .34);
+      border-left: 4px solid #e9bd5a;
+      border-radius: 15px;
+      padding: 1rem 1.15rem;
+      color: #f6e6b8;
+      line-height: 1.62;
+      margin: .4rem 0 1.1rem;
+      box-shadow: var(--ar-shadow-soft);
+    }
+    .concept-note strong { color: #ffe9b0; letter-spacing: .04em; }
+    .concept-note p { color: #eddaa8; margin: .3rem 0 0; }
+    .smart-panel {
+      margin: 1.4rem 0 .9rem;
+      padding: 1.05rem 1.25rem;
+      background: linear-gradient(120deg, rgba(13,43,60,.98), rgba(10,61,67,.96));
+      border: 1px solid rgba(130,190,199,.28);
+      border-radius: 18px;
+      box-shadow: var(--ar-shadow-soft);
+    }
+    .smart-panel h3 { margin: 0; color: #e7f5f5; }
+    .smart-panel p { margin: .35rem 0 0; color: #a8c2ca; font-size: .86rem; }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 # Page header
-
-st.markdown(
-    "<div class='design-header'>",
-    unsafe_allow_html=True
+page_header(
+    "AI RESILIENCE · ENGINEERING & PLANNING",
+    "Smart Mitigation Design Studio",
+    "Kochi, Kerala · urban flood resilience concept design and budget planning. "
+    "Configure an illustrative scheme and compare component costs without treating "
+    "the result as construction-ready engineering.",
+    meta=("Kochi · Kerala · India", "Concept stage", "Engineering review required"),
+    accent="emerald",
+    key="smart-mitigation",
 )
 
 st.markdown(
-    "<div style='font-size:12px; letter-spacing:2px; font-weight:700; color:#398477;'>AI RESILIENCE · ENGINEERING & PLANNING</div>"
-    "<h1>🏗️ Smart Mitigation Design Studio</h1>"
-    "<p>Kochi, Kerala, India<br>Urban Flood Resilience · Concept Design and Budget Planning</p>"
-    "<div style='margin-top:18px; display:inline-block; padding:7px 13px; background:#102b3c; border:1px solid #c5e4dc; border-radius:20px; color:#398477; font-size:12px; font-weight:650;'>CONCEPT STAGE · ENGINEERING REVIEW REQUIRED</div>",
-    unsafe_allow_html=True
+    """
+    <div class="concept-note">
+      <strong>CONCEPT ONLY</strong>
+      <p>
+        This visualisation is not a construction-ready engineering design. A qualified
+        civil or drainage engineer must verify site conditions, hydraulic calculations,
+        dimensions, costs and local requirements.
+      </p>
+    </div>
+    """,
+    unsafe_allow_html=True,
 )
 
-st.markdown(
-    "</div>",
-    unsafe_allow_html=True
-)
-
-st.markdown("""
-<div class="concept-note">
-<strong>⚠️ CONCEPT ONLY</strong><br>
-This visualization is not a construction-ready engineering design.
-A qualified civil/drainage engineer must verify site conditions,
-hydraulic calculations, dimensions, costs, and local requirements.
-</div>
-""", unsafe_allow_html=True)
 
 
-
-st.markdown("""
-<div style="
-    margin-top: 12px;
-    margin-bottom: 18px;
-    padding: 15px 20px;
-    background: linear-gradient(120deg, rgba(13,43,60,.98), rgba(10,61,67,.96));
-    border: 1px solid rgba(130,190,199,.28);
-    border-radius: 13px;
-">
-    <h3 style="margin: 0; color: #e7f5f5;">
-        ⚙️ Project Configuration
-    </h3>
-    <p style="margin: 5px 0 0 0; color: #a8c2ca; font-size: 13px;">
-        Define the planning area, rainfall conditions and mitigation components.
-    </p>
-</div>
-""", unsafe_allow_html=True)
+section_intro("Configuration", "Project configuration", "Define the planning area, rainfall conditions and mitigation components.")
 
 left, right = st.columns(2)
 
@@ -115,7 +104,7 @@ with right:
 # MITIGATION COMPONENT SELECTION
 # ==============================
 
-st.markdown("### 🏗️ Select Mitigation Components")
+section_intro("Components", "Select mitigation components")
 
 component_names = {
     "drains": "Underground drainage",
@@ -176,7 +165,7 @@ remaining_budget = available_budget - design_total
 # RAINFALL SCENARIO INPUT
 # ==============================
 
-st.markdown("### 🌧️ Rainfall Scenario")
+section_intro("Scenario", "Rainfall scenario")
 
 rainfall_scenario = st.slider(
     "Select illustrative rainfall intensity (mm/hour)",
@@ -219,23 +208,7 @@ rainfall_label = design_state["rainfall_category"]
 # BUDGET UTILISATION DASHBOARD
 # ==============================
 
-st.markdown("""
-<div style="
-    margin-top: 28px;
-    margin-bottom: 18px;
-    padding: 16px 20px;
-    background: linear-gradient(120deg, rgba(13,43,60,.98), rgba(10,61,67,.96));
-    border: 1px solid rgba(130,190,199,.28);
-    border-radius: 14px;
-">
-    <h3 style="margin: 0; color: #e7f5f5;">
-        📊 Budget Utilisation Dashboard
-    </h3>
-    <p style="margin: 5px 0 0 0; color: #a8c2ca; font-size: 13px;">
-        Monitor estimated project costs against the available planning budget.
-    </p>
-</div>
-""", unsafe_allow_html=True)
+section_intro("Budget", "Budget utilisation dashboard", "Monitor estimated project costs against the available planning budget.")
 
 budget_col1, budget_col2, budget_col3 = st.columns(3)
 
@@ -289,7 +262,7 @@ if design_total > available_budget:
 else:
     budget_status = "Within budget"
 
-st.markdown("## 📊 Project Status Dashboard")
+section_intro("Status", "Project status dashboard")
 
 status1, status2, status3, status4 = st.columns(4)
 
@@ -363,12 +336,12 @@ st.caption(
 # DESIGN FEATURES PANEL
 # ==============================
 
-st.markdown("### 🏙️ Proposed Flood-Resilience Features")
+section_intro("Features", "Proposed flood-resilience features")
 
 feature_col1, feature_col2, feature_col3 = st.columns(3)
 
 with feature_col1:
-    st.markdown("#### 💧 Water Management")
+    st.markdown("#### Water management")
     if use_drains:
         st.write("✓ Underground drainage concept")
     if use_inlets:
@@ -377,14 +350,14 @@ with feature_col1:
         st.write("✓ Detention pond concept")
 
 with feature_col2:
-    st.markdown("#### 🌿 Green Infrastructure")
+    st.markdown("#### Green infrastructure")
     if use_garden:
         st.write("✓ Rain garden / permeable surfaces")
     st.write("✓ Conceptual landscape planting")
     st.write("✓ Urban green-space integration")
 
 with feature_col3:
-    st.markdown("#### 📡 Monitoring & Access")
+    st.markdown("#### Monitoring & access")
     if use_sensors:
         st.write("✓ Water-level monitoring concept")
     if use_maintenance:
@@ -401,7 +374,7 @@ st.caption(
 # 3D DESIGN LEGEND
 # ==============================
 
-st.markdown("### 🗺️ Design Legend")
+st.markdown("#### Design legend")
 
 legend_items = []
 
@@ -443,7 +416,7 @@ st.info(
 # ==============================
 
 st.markdown("---")
-st.markdown("## 📋 Design Component Summary")
+section_intro("Summary", "Design component summary")
 
 summary_items = []
 
@@ -487,7 +460,7 @@ st.caption(
 # ==================================================
 
 st.markdown("---")
-st.markdown("## 🏗️ Interactive 3D Flood-Resilience Site")
+section_intro("Visualisation", "Interactive 3D flood-resilience site")
 st.caption(
     "Conceptual site visualization for engineering review. "
     "Drag to rotate, scroll to zoom, and hover over components."
@@ -1285,7 +1258,7 @@ fig3d.update_layout(
 
 st.plotly_chart(
     fig3d,
-    width="stretch",
+    use_container_width=True,
     config={
         "displaylogo": False,
         "scrollZoom": True,
@@ -1304,18 +1277,11 @@ st.plotly_chart(
 # ==========================================
 
 st.markdown("""
-<div style="
-    margin-top: 30px;
-    margin-bottom: 18px;
-    padding: 17px 21px;
-    background: linear-gradient(120deg, rgba(13,43,60,.98), rgba(10,61,67,.96));
-    border: 1px solid rgba(130,190,199,.28);
-    border-radius: 14px;
-">
+<div class="smart-panel">
     <h3 style="margin: 0; color: #e7f5f5;">
         🧠 Live Design Intelligence
     </h3>
-    <p style="margin: 5px 0 0 0; color: #a8c2ca; font-size: 13px;">
+    <p>
         Real-time overview of your selected design configuration.
     </p>
 </div>
@@ -1367,7 +1333,7 @@ st.caption(
 # ==========================================
 
 st.markdown("---")
-st.markdown("## 🧠 Explainable Mitigation Planning Adviser")
+section_intro("Adviser", "Explainable mitigation planning adviser")
 st.caption(
     "Rule-based prompts generated from the selected area, rainfall input, "
     "components and entered budget. Each suggestion shows why it appeared "
@@ -1391,7 +1357,7 @@ st.info(
 # ==========================================
 
 st.markdown("---")
-st.markdown("### 🌧️ Rainfall Scenario Comparison")
+st.markdown("#### Rainfall scenario comparison")
 
 st.caption(
     "Illustrative display comparison using three rainfall inputs. "
@@ -1437,7 +1403,7 @@ for column, (scenario_name, scenario_rainfall) in zip(
 # ==========================================
 
 st.markdown("---")
-st.markdown("### 🏗️ Mitigation Configuration Comparison")
+st.markdown("#### Mitigation configuration comparison")
 
 st.caption(
     "Compare your selected design with a fully integrated "
@@ -1461,7 +1427,7 @@ full_component_count = len(all_components)
 compare_col1, compare_col2 = st.columns(2)
 
 with compare_col1:
-    st.markdown("#### Current Design")
+    st.markdown("#### Current design")
     st.metric(
         "Active components",
         current_component_count
@@ -1483,7 +1449,7 @@ with compare_col1:
         st.info("No components selected.")
 
 with compare_col2:
-    st.markdown("#### Fully Integrated Package")
+    st.markdown("#### Fully integrated package")
     st.metric(
         "Active components",
         full_component_count
@@ -1512,7 +1478,7 @@ st.info(
 # LIVE RAINFALL STATUS
 # ==============================
 
-st.markdown("### 🌧️ Live Design Scenario")
+st.markdown("#### Live design scenario")
 
 status_col1, status_col2, status_col3 = st.columns(3)
 
@@ -1544,7 +1510,7 @@ st.caption(
 # RAINFALL IMPACT INDICATOR
 # ==============================
 
-st.markdown("### 📊 Rainfall Scenario Indicator")
+st.markdown("#### Rainfall scenario indicator")
 
 rainfall_progress = rainfall_scenario / 150
 
@@ -1627,7 +1593,7 @@ st.info(
 # INTERACTIVE MODEL — ENGINEERING STATUS
 # ==========================================
 
-st.markdown("### 📋 Model Components & Review Status")
+st.markdown("#### Model components & review status")
 
 status_col1, status_col2, status_col3 = st.columns(3)
 
@@ -1792,7 +1758,7 @@ st.download_button(
     data=report_text,
     file_name="AI_RESILIENCE_Design_Report.txt",
     mime="text/plain",
-    width="stretch",
+    use_container_width=True,
 )
 
 

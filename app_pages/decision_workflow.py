@@ -56,6 +56,7 @@ from src.hydrology_analytics import (
 )
 from src.infrastructure_dependencies import dependency_review_table
 from src.map_integration import MAP_CONTEXT_KEY, build_map_context
+from src.ui_theme import section_intro
 from src.phase2_data import (
     Phase2DataError,
     Phase2DataUnavailable,
@@ -733,14 +734,20 @@ def _render_hydrology_explorer() -> None:
 
 st.markdown("""
 <style>
-.wf-hero{padding:2rem 2.2rem;border-radius:24px;color:#f8fafc;background:linear-gradient(120deg,#071a2b,#104766 58%,#087e8b);box-shadow:0 18px 45px rgba(7,40,61,.16);margin:.2rem 0 1.1rem}
-.wf-kicker{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:#a5f3fc;margin-bottom:.65rem}
-.wf-title{font-size:clamp(2rem,3.5vw,3rem);font-weight:850;letter-spacing:-.04em;line-height:1.08;color:#fff;margin:0 0 .75rem}
-.wf-copy{max-width:850px;color:#dbeafe;font-size:1rem;line-height:1.65;margin:0}
-.wf-steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.65rem;margin:1rem 0 1.4rem}
-.wf-step{border:1px solid rgba(130,190,199,.24);background:linear-gradient(145deg,rgba(17,49,66,.96),rgba(9,31,46,.96));border-radius:14px;padding:.85rem .9rem;color:#b8d1d5;font-size:.8rem;box-shadow:0 10px 25px rgba(0,0,0,.14)}
-.wf-step strong{display:block;color:#effafa;font-size:.9rem;margin-bottom:.2rem}
-@media(max-width:760px){.wf-steps{grid-template-columns:repeat(2,minmax(0,1fr))}.wf-hero{padding:1.4rem;border-radius:18px}}
+.wf-hero{position:relative;overflow:hidden;padding:clamp(1.6rem,3vw,2.4rem) clamp(1.4rem,3vw,2.6rem);border-radius:26px;color:#f8fafc;background:radial-gradient(ellipse at 92% -10%,rgba(66,224,193,.18),transparent 24rem),radial-gradient(ellipse at 6% 120%,rgba(30,120,160,.22),transparent 26rem),linear-gradient(118deg,#071a2b 0%,#0b3650 56%,#0a4f58 100%);border:1px solid rgba(120,220,208,.24);box-shadow:0 24px 60px rgba(2,12,20,.34);margin:.2rem 0 1.1rem;isolation:isolate}
+.wf-hero:before{content:"";position:absolute;z-index:-1;width:280px;height:280px;right:-100px;top:-160px;border-radius:50%;border:1px solid rgba(66,224,193,.30);box-shadow:0 0 0 28px rgba(66,224,193,.05),0 0 0 58px rgba(66,224,193,.03);pointer-events:none}
+.wf-hero:after{content:"";position:absolute;inset:0 auto auto 0;width:100%;height:3px;background:linear-gradient(90deg,#42e0c1,transparent 62%);opacity:.85}
+.wf-kicker{display:inline-flex;align-items:center;gap:.55rem;font-size:.71rem;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:#8cf3df;margin-bottom:.7rem}
+.wf-kicker:before{content:"";width:.5rem;height:.5rem;border-radius:50%;background:#42e0c1;box-shadow:0 0 0 4px rgba(66,224,193,.16);animation:arSoftPulse 2.8s ease-in-out infinite}
+.wf-title{font-size:clamp(2rem,3.5vw,3.15rem);font-weight:820;letter-spacing:-.045em;line-height:1.05;color:#f6ffff;margin:0 0 .75rem}
+.wf-copy{max-width:850px;color:#c8dfe2;font-size:clamp(.95rem,1.15vw,1.04rem);line-height:1.68;margin:0}
+.wf-steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.6rem;margin:1rem 0 1.4rem}
+.wf-step{border:1px solid rgba(130,190,199,.22);background:linear-gradient(150deg,rgba(17,49,66,.96),rgba(9,31,46,.96));border-radius:15px;padding:.9rem 1rem;color:#b8d1d5;font-size:.8rem;line-height:1.5;box-shadow:0 12px 30px rgba(0,0,0,.18);transition:transform .2s var(--ar-ease),border-color .2s var(--ar-ease),box-shadow .2s var(--ar-ease)}
+.wf-step:hover{transform:translateY(-2px);border-color:rgba(91,223,200,.36);box-shadow:0 18px 40px rgba(0,0,0,.26)}
+.wf-step strong{display:block;color:#effafa;font-size:.9rem;margin-bottom:.22rem;letter-spacing:-.01em}
+@media(max-width:900px){.wf-steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.wf-steps{grid-template-columns:1fr}.wf-hero{padding:1.3rem;border-radius:18px}}
+@media(prefers-reduced-motion:reduce){.wf-step:hover{transform:none}.wf-kicker:before{animation:none}}
 </style>
 <section class="wf-hero">
 <div class="wf-kicker">AI RESILIENCE · KOCHI · PLANNING WORKSPACE</div>
@@ -772,8 +779,20 @@ with st.expander("Longer-term AI RESILIENCE roadmap"):
 _render_phase2_data_context()
 _render_hydrology_explorer()
 
-st.title("Unified disaster decision workflow")
-st.header("1. Select a hazard and describe conditions")
+# Preserve the semantic page title for screen readers and existing Streamlit
+# integrations while the visible workflow uses the richer hero/section system.
+st.markdown(
+    "<style>.st-key-wf-semantic-title{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;}</style>",
+    unsafe_allow_html=True,
+)
+with st.container(key="wf-semantic-title"):
+    st.title("Unified disaster decision workflow")
+
+section_intro(
+    "Start here",
+    "1. Select a hazard and describe conditions",
+    "Capture the scenario context first. The workflow keeps user-supplied conditions separate from verified evidence and model outputs.",
+)
 # Keep the hazard selector outside the form so Streamlit reruns immediately when
 # the user changes hazards; the visible inputs then update before submission.
 hazard = st.selectbox("Hazard or compound scenario", HAZARD_OPTIONS, key="wf_hazard")

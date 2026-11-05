@@ -21,11 +21,9 @@ from src.jrc_flood_context import (
 from src.kochi_map_layers import build_jrc_preview_layer
 from src.spatial_data import classify_exposure, processed_layer_issues, read_processed_layers, validate_geojson
 from src.landcover_context import validate_worldcover_preview
-from src.map_integration import (
-    MAP_CONTEXT_KEY,
-    hazard_layer_availability,
-    selected_feature_properties,
-)
+from src.map_integration import MAP_CONTEXT_KEY, selected_feature_properties
+from src.ui_theme import page_header, section_intro
+from src.map_integration import hazard_layer_availability
 
 ROOT = Path(__file__).resolve().parents[1]
 BOUNDARY_PATH = ROOT / "data" / "reference" / "kochi_corporation_boundary.geojson"
@@ -324,8 +322,19 @@ def load_processed_layer_issues(boundary_geometry: dict | None) -> list[str]:
     return processed_layer_issues(ROOT / "data" / "processed", boundary_geometry)
 
 
-st.header("Kochi GIS and infrastructure map")
-st.caption("Layer status and source records are explicit. The corporation boundary is an administrative outline, not a hazard or vulnerability layer.")
+page_header(
+    "AI RESILIENCE · GEOSPATIAL EVIDENCE",
+    "Kochi GIS and infrastructure map",
+    "Inspect source-documented spatial layers for Kochi. The corporation boundary is an "
+    "administrative outline, not a hazard or vulnerability layer, and layer status is explicit.",
+    meta=("Kochi Municipal Corporation", "Source-reviewed layers", "No inferred exposure"),
+    accent="violet",
+    key="kochi-map",
+)
+st.markdown(
+    "<style>.st-key-kochi-semantic-scenario-heading{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;}</style>",
+    unsafe_allow_html=True,
+)
 st.page_link(
     ROOT / "app_pages" / "decision_workflow.py",
     label="Return to the Decision Workflow",
@@ -352,7 +361,14 @@ if map_context is not None:
             active_hazard = candidate_hazard
 
 if isinstance(map_context, dict):
-    st.subheader("Scenario carried over from the Decision Workflow")
+    active_hazard = map_context.get("hazard")
+    with st.container(key="kochi-semantic-scenario-heading"):
+        st.subheader("Scenario carried over from the Decision Workflow")
+    section_intro(
+        "Active context",
+        "Scenario carried over from the Decision Workflow",
+        "Review the submitted scenario alongside source-reviewed spatial context. Nothing on this page converts the scenario into a validated hazard footprint.",
+    )
     st.write("**Selected disaster:**", active_hazard)
     st.write("**Geographical scope:**", map_context.get("location", "Not supplied"))
     st.caption(
@@ -458,7 +474,11 @@ catalog_rows = [{
     "CRS": item["crs"],
     "Licence / reuse": item["license"],
 } for item in catalog["datasets"]]
-st.subheader("Source and layer catalog")
+section_intro(
+    "Evidence register",
+    "Source and layer catalog",
+    "Every layer keeps its publisher, coverage, validation state and reuse status visible before it can be used for orientation.",
+)
 display_dataframe(pd.DataFrame(catalog_rows), hide_index=True, width="stretch", alt="Reviewed Kochi spatial source inventory with availability, coverage, CRS, and reuse status")
 
 final_map_source_report = load_acquisition_metadata(FINAL_WARD_MAP_SOURCE_REPORT) or {}
@@ -786,7 +806,11 @@ for issue in load_processed_layer_issues(coverage_geometry):
     st.warning(issue, icon=":material/warning:")
 
 if processed_layers:
-    st.subheader("Current map-layer validation")
+    section_intro(
+        "Validation",
+        "Current map-layer validation",
+        "Structural validity and source coverage are reported separately from completeness or ground truth.",
+    )
     current_layer_rows = [{
         "Layer": item["metadata"]["title"],
         "Status": item["metadata"].get("validation_status", "PROVISIONAL"),
@@ -804,7 +828,11 @@ if processed_layers:
         "OSM layers remain provisional community-mapped context and are not used for exposure or causal analysis."
     )
 
-st.subheader("Map layers")
+section_intro(
+    "Map controls",
+    "Map layers",
+    "Toggle only the contextual layers you need. The administrative outline is not a hazard zone, and provisional sources remain labelled as such.",
+)
 show_boundary = st.checkbox("Kochi Corporation administrative boundary", value=True)
 st.caption("Blue outline = administrative boundary only. It must not be interpreted as a hazard zone or as the full Greater Kochi urban area.")
 deck_layers = []
@@ -1165,6 +1193,7 @@ if deck_layers:
     deck = pdk.Deck(
         layers=deck_layers,
         initial_view_state=pdk.ViewState(longitude=map_center[0], latitude=map_center[1], zoom=10),
+        map_style=pdk.map_styles.CARTO_DARK,
         tooltip={"text": "Bound Name: {display_bound}\nWard Name: {display_ward}\nFeature ID: {display_feature_id}\nFeature: {display_name}\nType: {display_type}\nSource: {display_source}\nOSM updated: {display_timestamp}\nSource URL: {display_url}"},
     )
     map_selection = st.pydeck_chart(
@@ -1176,7 +1205,11 @@ if deck_layers:
     )
     picked_properties = selected_feature_properties(map_selection)
     if picked_properties:
-        st.subheader("Selected map feature")
+        section_intro(
+            "Inspection",
+            "Selected map feature",
+            "Source attributes are shown exactly as available; they are not ward-level hazard or consequence estimates.",
+        )
         st.caption(
             "These are source feature attributes only. They are not ward-level hazard, "
             "population, infrastructure-exposure, or consequence estimates."
@@ -1190,7 +1223,7 @@ if deck_layers:
 else:
     st.info("Turn on at least one layer to display the map.")
 if legend_rows:
-    st.markdown("**Legend**")
+    section_intro("Map key", "Legend", "Symbols describe displayed source layers and their role in this review.")
     display_dataframe(pd.DataFrame(legend_rows, columns=["Layer", "Symbol", "Meaning"]), hide_index=True, width="stretch")
 
 st.subheader("Modelled flood-depth screening at mapped assets (provisional)")

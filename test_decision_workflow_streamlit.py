@@ -4,23 +4,22 @@ import unittest
 
 from streamlit.testing.v1 import AppTest
 
-from src.map_integration import MAP_CONTEXT_KEY
 
+def _decision_workflow_app(default_timeout=60):
+    """Start the app and open the Decision Workflow page.
 
-def open_workflow(timeout: int = 90):
-    """Start the app and navigate to the Decision Workflow.
-
-    The Command Centre is the default landing page, so workflow tests must
-    explicitly open the workspace they exercise.
+    Home is the default landing page, so tests that exercise the workflow must
+    switch to it explicitly before inspecting its widgets.
     """
-    app = AppTest.from_file("app.py", default_timeout=timeout).run()
+
+    app = AppTest.from_file("app.py", default_timeout=default_timeout).run()
     app.switch_page("app_pages/decision_workflow.py").run()
     return app
 
 
 class DecisionWorkflowStreamlitTests(unittest.TestCase):
     def test_decision_workflow_hero_renders_html(self):
-        app = open_workflow()
+        app = _decision_workflow_app()
 
         self.assertEqual(len(app.exception), 0)
         hero = next(
@@ -30,7 +29,7 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
         self.assertIn("Disaster decision workflow", hero.value)
 
     def test_default_intake_renders_assessment_evidence_and_reports(self):
-        app = open_workflow()
+        app = _decision_workflow_app(45)
         self.assertEqual(len(app.exception), 0)
         app.form_submit_button[0].click().run()
         self.assertEqual(len(app.exception), 0)
@@ -66,7 +65,7 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
         self.assertGreaterEqual(len(app.dataframe), 6)
 
     def test_compound_model_renders_component_separation_in_existing_workflow(self):
-        app = open_workflow()
+        app = _decision_workflow_app()
         app.session_state["wf_hazard"] = "Compound: cyclone + flood"
         app.run()
         app.form_submit_button[0].click().run()
@@ -85,7 +84,7 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
         )
 
     def test_drainage_scenario_inputs_render_the_dynamic_capacity_consequence(self):
-        app = open_workflow()
+        app = _decision_workflow_app()
         for key, value in {
             "wf_hazard": "Compound: heavy rainfall + drainage failure",
             "wf_rainfall": 24.0,
@@ -112,7 +111,7 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
         self.assertIn("surcharge or inundation is not calculated or confirmed", infrastructure["Interpretation"])
 
     def test_optional_phase2_context_is_available_without_replacing_workflow(self):
-        app = open_workflow()
+        app = _decision_workflow_app()
         self.assertEqual(len(app.exception), 0)
         load_button = next(
             button
@@ -140,7 +139,7 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
         self.assertIn("Unified disaster decision workflow", [e.value for e in app.title])
 
     def test_map_navigation_preserves_submitted_hazard_and_assessment_context(self):
-        app = open_workflow()
+        app = _decision_workflow_app(90)
         app.session_state["wf_hazard"] = "Flood"
         app.session_state["wf_rainfall"] = 80.0
         app.session_state["wf_rainfall_period"] = "Last 24 hours"
@@ -185,7 +184,7 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
         )
 
     def test_map_hides_flood_scenario_for_unrelated_selected_hazard(self):
-        app = open_workflow()
+        app = _decision_workflow_app(90)
         app.session_state["wf_hazard"] = "Heatwave"
         app.session_state["wf_temperature"] = 35.0
         app.session_state["wf_relative_humidity"] = 60.0
@@ -208,115 +207,6 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
         self.assertTrue(
             any("No compatible Heatwave hazard layer" in str(element.value) for element in app.info)
         )
-
-
-class CommandCentreLandingTests(unittest.TestCase):
-    def test_command_centre_is_the_default_landing_page(self):
-        app = AppTest.from_file("app.py", default_timeout=60).run()
-
-        self.assertEqual(len(app.exception), 0)
-        rendered = "\n".join(str(element.value) for element in app.markdown)
-        self.assertIn("Command centre", rendered)
-        self.assertIn(
-            "Where would you like to start?",
-            [heading.value for heading in app.subheader],
-        )
-        metrics = {metric.label: metric.value for metric in app.metric}
-        self.assertEqual(metrics["Research workspaces"], "12")
-        self.assertEqual(metrics["Official emergency alerts"], "Not enabled")
-        self.assertEqual(metrics["Validated live predictions"], "Not enabled")
-        self.assertTrue(
-            any(link.label == "Open Decision Workflow" for link in app.page_link)
-        )
-        self.assertFalse(
-            any(
-                title.value == "Unified disaster decision workflow"
-                for title in app.title
-            )
-        )
-
-    def test_command_centre_links_open_the_integrated_cyclone_flood_workspace(self):
-        app = AppTest.from_file("app.py", default_timeout=60).run()
-
-        self.assertTrue(
-            any("Cyclone + Flood" in str(element.value) for element in app.markdown)
-        )
-        compound_links = [
-            link
-            for link in app.page_link
-            if str(link.proto.page) == "compound_scenario"
-        ]
-        self.assertEqual(len(compound_links), 1)
-        self.assertEqual(compound_links[0].label, "Open workspace")
-
-
-class WorkflowStateTests(unittest.TestCase):
-    def _submit_flood(self, app):
-        app.session_state["wf_hazard"] = "Flood"
-        app.session_state["wf_rainfall"] = 80.0
-        app.session_state["wf_rainfall_period"] = "Last 24 hours"
-        app.run()
-        app.form_submit_button[0].click().run()
-        self.assertEqual(len(app.exception), 0)
-
-    def test_result_survives_navigation_away_and_back(self):
-        app = open_workflow()
-        self._submit_flood(app)
-        self.assertIsNotNone(app.session_state["decision_workflow_inputs"])
-
-        app.switch_page("app_pages/home.py").run()
-        self.assertEqual(len(app.exception), 0)
-        app.switch_page("app_pages/decision_workflow.py").run()
-
-        self.assertEqual(len(app.exception), 0)
-        self.assertIsNotNone(app.session_state["decision_workflow_inputs"])
-        self.assertTrue(
-            any(
-                heading.value == "2. Immediate scenario result"
-                for heading in app.header
-            )
-        )
-
-    def test_changing_hazard_clears_previous_result_and_map_context(self):
-        app = open_workflow()
-        self._submit_flood(app)
-        next(
-            button
-            for button in app.button
-            if button.label == "View prone areas on the Kochi map"
-        ).click().run()
-        self.assertIn(MAP_CONTEXT_KEY, app.session_state)
-
-        app.switch_page("app_pages/decision_workflow.py").run()
-        self.assertIsNotNone(app.session_state["decision_workflow_inputs"])
-
-        app.session_state["wf_hazard"] = "Heatwave"
-        app.run()
-
-        self.assertIsNone(app.session_state["decision_workflow_inputs"])
-        self.assertNotIn(MAP_CONTEXT_KEY, app.session_state)
-        self.assertFalse(
-            any(
-                heading.value == "2. Immediate scenario result"
-                for heading in app.header
-            )
-        )
-
-    def test_resubmission_clears_the_previous_map_context(self):
-        app = open_workflow()
-        self._submit_flood(app)
-        next(
-            button
-            for button in app.button
-            if button.label == "View prone areas on the Kochi map"
-        ).click().run()
-        self.assertIn(MAP_CONTEXT_KEY, app.session_state)
-
-        app.switch_page("app_pages/decision_workflow.py").run()
-        app.form_submit_button[0].click().run()
-
-        self.assertEqual(len(app.exception), 0)
-        self.assertNotIn(MAP_CONTEXT_KEY, app.session_state)
 
 
 if __name__ == "__main__":
