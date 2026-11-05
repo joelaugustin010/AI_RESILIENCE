@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 .test_tmp/
+.task-temp/
 .env
 .env.*
 !.env.example
