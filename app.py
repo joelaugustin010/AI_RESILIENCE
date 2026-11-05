@@ -1130,7 +1130,106 @@ st.markdown(
         transition-duration: .01ms !important;
       }
     }
-    </style>
+
+    /* ---------- Eco-glass completion: remaining interactive surfaces ---------- */
+    [data-baseweb="select"] > div,
+    [data-baseweb="input"] > div,
+    [data-baseweb="textarea"] > div,
+    [data-testid="stDateInput"] input,
+    [data-testid="stNumberInput"] input,
+    [data-testid="stTextInput"] input,
+    [data-testid="stTextArea"] textarea {
+      color: #294640 !important;
+      background: rgba(255,255,255,.94) !important;
+      border: 1px solid rgba(44,105,82,.24) !important;
+      border-radius: 11px !important;
+      box-shadow: inset 0 1px 2px rgba(26,65,49,.025);
+    }
+    [data-baseweb="select"] span,
+    [data-baseweb="select"] div,
+    [data-baseweb="input"] input,
+    [data-baseweb="textarea"] textarea { color: #294640 !important; }
+    [data-baseweb="select"] > div:hover,
+    [data-baseweb="input"] > div:hover,
+    [data-baseweb="textarea"] > div:hover {
+      border-color: rgba(36,122,101,.48) !important;
+      background: #ffffff !important;
+    }
+    [data-baseweb="select"] > div:focus-within,
+    [data-baseweb="input"] > div:focus-within,
+    [data-baseweb="textarea"] > div:focus-within {
+      border-color: #247A65 !important;
+      box-shadow: 0 0 0 3px rgba(36,122,101,.12) !important;
+    }
+    [data-baseweb="popover"], [data-baseweb="menu"],
+    [role="listbox"], [data-testid="stSelectboxVirtualDropdown"] {
+      color: #294640 !important;
+      background: rgba(255,255,255,.98) !important;
+      border: 1px solid rgba(44,105,82,.18) !important;
+      box-shadow: 0 14px 34px rgba(26,65,49,.12) !important;
+    }
+    [data-baseweb="menu"] *, [role="option"] { color: #294640 !important; }
+    [role="option"]:hover, [role="option"][aria-selected="true"] {
+      color: #1B604F !important;
+      background: #EAF3EE !important;
+    }
+    [data-testid="stMultiSelect"] [data-baseweb="tag"] {
+      color: #1B604F !important;
+      background: #EAF3EE !important;
+      border: 1px solid rgba(36,122,101,.22) !important;
+    }
+    [data-testid="stRadio"] label,
+    [data-testid="stCheckbox"] label {
+      color: #405D54 !important;
+    }
+    [data-testid="stRadio"] label {
+      border: 1px solid rgba(44,105,82,.20) !important;
+      border-radius: 999px;
+      background: rgba(255,255,255,.72) !important;
+    }
+    [data-testid="stRadio"] label:has(input:checked) {
+      color: #1B604F !important;
+      border-color: rgba(36,122,101,.52) !important;
+      background: #EAF3EE !important;
+    }
+    [data-testid="stSlider"] [data-baseweb="slider"] [role="slider"] {
+      background: #247A65 !important;
+      border-color: #ffffff !important;
+      box-shadow: 0 0 0 2px rgba(36,122,101,.14);
+    }
+    [data-testid="stSlider"] [data-baseweb="slider"] > div {
+      background: rgba(36,122,101,.18);
+    }
+    [data-testid="stPlotlyChart"], [data-testid="stAltairChart"],
+    [data-testid="stVegaLiteChart"] {
+      border: 1px solid rgba(44,105,82,.14) !important;
+      border-radius: 16px !important;
+      background: rgba(255,255,255,.62) !important;
+      box-shadow: 0 8px 24px rgba(26,65,49,.055) !important;
+    }
+    [data-testid="stDataFrame"], [data-testid="stTable"] {
+      background: rgba(255,255,255,.84) !important;
+      border-color: rgba(44,105,82,.16) !important;
+    }
+    [data-testid="stAlert"] [data-testid="stMarkdownContainer"] p {
+      color: #405D54 !important;
+    }
+    [data-testid="stProgress"] > div > div {
+      background: linear-gradient(90deg, #247A65, #83B9A5) !important;
+    }
+    [data-testid="stTopNavDropdownLink"]:focus-visible,
+    [data-testid="stSidebarNavLink"]:focus-visible,
+    [data-testid="stTabs"] button:focus-visible {
+      outline: 2px solid #247A65 !important;
+      outline-offset: 2px;
+    }
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] li {
+      color: #E1EEE7 !important;
+    }
+    .ar-global-foot, .ar-global-foot span { color: #71827F !important; }
+    .ar-global-foot strong { color: #315B4C !important; }
+        </style>
     """,
     unsafe_allow_html=True,
 )
@@ -1174,7 +1273,7 @@ try:  # pragma: no cover - presentation only
             ),
             hoverlabel=dict(
                 bgcolor="#ffffff",
-                bordercolor="rgba(130,190,199,.35)",
+                bordercolor="rgba(44,105,82,.22)",
                 font=dict(color="#1D3030"),
             ),
             margin=dict(l=55, r=28, t=64, b=48),
@@ -1227,9 +1326,9 @@ except Exception:  # pragma: no cover - optional dependency
 if page.title != "Home":
     st.markdown(
         """
-        <div style="display:flex;align-items:center;gap:.55rem;margin:.1rem 0 1rem;color:#a7c1c8;font-size:.82rem">
-          <span style="display:inline-block;width:.55rem;height:.55rem;border-radius:50%;background:#42e0c1"></span>
-          <span><strong style="color:#e7f5f5">AI RESILIENCE</strong> · KOCHI CLIMATE INTELLIGENCE · INTELLIGENT CITIES, RESILIENT FUTURES</span>
+        <div style="display:flex;align-items:center;gap:.55rem;margin:.1rem 0 1rem;color:#71827F;font-size:.82rem">
+          <span style="display:inline-block;width:.55rem;height:.55rem;border-radius:50%;background:#247A65"></span>
+          <span><strong style="color:#315B4C">AI RESILIENCE</strong> · KOCHI CLIMATE INTELLIGENCE · INTELLIGENT CITIES, RESILIENT FUTURES</span>
         </div>
         """,
         unsafe_allow_html=True,
