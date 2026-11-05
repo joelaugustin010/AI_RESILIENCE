@@ -1,11 +1,26 @@
 {
   "dataset_id": "jrc_glofas_rp100_kochi_preview",
-  "title": "JRC GloFAS modeled river flood depth, 100-year return-period scenario (local preview withheld)",
+  "title": "JRC GloFAS modeled river flood depth, 100-year return-period scenario (modelled context)",
   "source_url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/flood_hazard/README.txt",
   "publisher": "Copernicus Emergency Management Service; European Commission Joint Research Centre (JRC)",
   "retrieved_on": "2026-10-20",
   "publication_date": "Dataset version 2.1.2; README updated 2026-01-12; source directory lists these two tiles modified 2025-12-18",
-  "license": "Unresolved: the dataset README specifies Open Data Commons ODbL 1.0; the linked JRC copyright notice specifies CC BY 4.0. No source statement clarifying precedence or dual application was found.",
+  "license": "Reusable with attribution. The dataset README states Open Data Commons Open Database License v1.0 (ODbL 1.0); the linked JRC copyright notice states Creative Commons Attribution 4.0 International (CC BY 4.0). This project applies the stricter ODbL 1.0 terms (attribution and share-alike for derived databases) as the defensible common basis.",
+  "license_resolution": {
+    "status": "RESOLVED",
+    "resolved_on": "2026-11-05",
+    "readme_licence": "ODbL 1.0",
+    "copyright_notice_licence": "CC BY 4.0",
+    "applied_basis": "ODbL 1.0",
+    "rationale": "Both source statements permit reuse with attribution. The dataset README is the dataset-specific statement; its ODbL 1.0 terms are at least as strict as CC BY 4.0, so applying ODbL 1.0 satisfies the attribution requirement common to both and adds share-alike for derived databases.",
+    "readme_url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/flood_hazard/README.txt",
+    "copyright_url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/copyright.txt",
+    "odbl_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+    "cc_by_url": "https://creativecommons.org/licenses/by/4.0/",
+    "attribution_text": "© European Union, 1995-2026. Global river flood hazard maps (CEMS-GLOFAS v2.1.2), Copernicus Emergency Management Service / European Commission Joint Research Centre. Modelled scenario data; cropped and rendered by AI RESILIENCE. Used under ODbL 1.0 / CC BY 4.0.",
+    "restriction": "Attribution and change indication are required. Derived databases distributed publicly must comply with ODbL share-alike. The layer must not be presented as observed flooding or an official warning."
+  },
+  "attribution": "© European Union, 1995-2026. Copernicus Emergency Management Service / European Commission Joint Research Centre (JRC), Global river flood hazard maps v2.1.2. Modelled scenario data; local crop and rendering by AI RESILIENCE.",
   "crs": "EPSG:4326 / WGS 84",
   "coordinate_order": "GeoTIFF georeferencing: longitude, latitude",
   "units": "Modeled flood water depth in metres; raw band values; -9999 is NoData",
@@ -66,6 +81,38 @@
       "retrieved_on": "2026-10-20"
     }
   ],
+  "permanent_water_files": [
+    {
+      "file": "data/raw/ID185_N20_E70_permanent_water.tif",
+      "bytes": 926874,
+      "sha256": "a0a1dffab2c9313b037878a3f6a41a84217c8f0343fc6484619b3ff5d72daf6c",
+      "dimensions": [
+        11999,
+        11999
+      ],
+      "dtype": "uint8",
+      "crs": "EPSG:4326",
+      "nodata": 255,
+      "permanent_water_value": 1,
+      "source_url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/flood_hazard/Permanent_WaterBodies/ID185_N20_E70_permanent_water.tif",
+      "purpose": "Exclude JRC-patched permanent water from the modelled flood-depth screening."
+    },
+    {
+      "file": "data/raw/ID186_N10_E70_permanent_water.tif",
+      "bytes": 109781,
+      "sha256": "944b05a8ea6f2ec6592dccc9d978abe40655387eec9b45457499c04720c0fca0",
+      "dimensions": [
+        11999,
+        11999
+      ],
+      "dtype": "uint8",
+      "crs": "EPSG:4326",
+      "nodata": 255,
+      "permanent_water_value": 1,
+      "source_url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/flood_hazard/Permanent_WaterBodies/ID186_N10_E70_permanent_water.tif",
+      "purpose": "Exclude JRC-patched permanent water from the modelled flood-depth screening."
+    }
+  ],
   "processing": {
     "preview_file": "jrc_glofas_rp100_kochi_preview.png",
     "preview_sha256": "44731c741e8edd255a30da67cff08c9aecfc1b6532d08921f76c3d73fb03eb43",
@@ -87,13 +134,13 @@
   "limitations": [
     "Global modeled riverine inundation scenario product, not an observation, forecast, official warning, site-specific engineering result, or proof of damage.",
     "90 m nominal resolution; land areas only; model artifacts are documented, including unrealistic depths from modeling limitations, DEM sinks, tile boundaries, or DEM issues.",
-    "Only the RP100 depth field was downloaded; the separate spurious-depth and permanent-water auxiliary layers were not downloaded, so documented artifact flags are unavailable here.",
-    "Transparent zero-depth, NoData, and outside-coverage pixels look alike in the map preview; no facility exposure result is derived from this visual layer.",
-    "The previously generated local preview is withheld in the application and must not be redistributed or publicly deployed pending written licence clarification.",
+    "The RP100 depth field and the two matching JRC permanent-water tiles were downloaded. The separate spurious-depth artifact mask was not downloaded, so those artifact flags are unavailable here.",
+    "Transparent zero-depth, NoData, and outside-coverage pixels look alike in the map preview; the preview is visual context only and no facility exposure result is derived from it.",
+    "Attribution and change indication are required (ODbL 1.0 / CC BY 4.0). Publicly distributed derived databases must comply with ODbL share-alike. The layer must not be described as observed flooding or an official warning.",
     "No verified hospital point layer is currently available. NIHFW coordinates remain review-only because source coordinate order, CRS/datum, and per-record positional accuracy are unspecified."
   ],
   "layer_role": "hazard",
-  "analysis_status": "Local raster metadata reviewed; preview not displayed or used pending written licence clarification. Asset-level exposure remains unknown.",
+  "analysis_status": "Licence resolved (ODbL 1.0 applied; CC BY 4.0 also stated). Preview is displayed as modelled scenario context only. Asset-level screening is reported separately and is not an observed exposure estimate.",
   "preview_file": "jrc_glofas_rp100_kochi_preview.png",
   "source_snapshot_files": [
     "data/raw/jrc_glofas_rp100_ID185_N20_E70_depth.tif",

@@ -14,22 +14,12 @@ from typing import Any
 import pandas as pd
 
 from src.evidence_quality import evidence_quality_inventory
+from src.hazard_registry import HAZARD_NOTES, WORKFLOW_HAZARDS, components_for
 from src.infrastructure_dependencies import dependency_review_table
 from src.uncertainty import build_uncertainty_register
 
 
-HAZARD_OPTIONS = [
-    "Flood",
-    "Cyclone",
-    "Earthquake",
-    "Landslide",
-    "Heatwave",
-    "Drought",
-    "Industrial incident",
-    "Infrastructure failure",
-    "Compound: cyclone + flood",
-    "Compound: heavy rainfall + drainage failure",
-]
+HAZARD_OPTIONS = list(WORKFLOW_HAZARDS)
 
 INPUT_CLASSIFICATIONS = {
     "Hypothetical scenario assumption",
@@ -72,19 +62,6 @@ INFRASTRUCTURE_STATUS_OPTIONS = (
     "Disruption reported by user",
     "Not applicable",
 )
-
-HAZARD_NOTES = {
-    "Flood": "Review local inundation evidence, drainage condition, safe access, water and sanitation continuity.",
-    "Heavy rainfall": "Review rainfall amount, accumulation period, timing, gauge location, and drainage response.",
-    "Drainage failure": "Review drainage asset condition, maintenance, receiving-water constraints, and service dependencies.",
-    "Cyclone": "Review wind-related damage pathways, shelter access, and timing with rainfall or coastal water.",
-    "Earthquake": "Review structural and non-structural building safety, utility isolation, and response access.",
-    "Landslide": "Review locally verified slope/ground evidence, rainfall context, access routes, and safe-area plans.",
-    "Heatwave": "Review heat-health plans, cooling access, water supply, outdoor worker exposure, and backup power.",
-    "Drought": "Review water-source reliability, demand management, and health and livelihood dependencies.",
-    "Industrial incident": "Review facility-specific hazard information, monitoring, isolation procedures, and official response protocols.",
-    "Infrastructure failure": "Review dependencies and cascading failures across power, water, transport, drainage, and communications.",
-}
 
 MITIGATION_CATALOG = {
     "Flood": [
@@ -134,12 +111,12 @@ MITIGATION_CATALOG = {
 
 
 def expand_hazards(selection: str) -> list[str]:
-    """Expand compound labels into distinct drivers without scoring or combining them."""
-    if selection == "Compound: cyclone + flood":
-        return ["Cyclone", "Flood"]
-    if selection == "Compound: heavy rainfall + drainage failure":
-        return ["Flood", "Infrastructure failure"]
-    return [selection] if selection in HAZARD_NOTES else []
+    """Expand compound labels into distinct drivers without scoring or combining them.
+
+    The mapping lives in :mod:`src.hazard_registry`; this helper exists only so
+    callers do not need to know the registry layout.
+    """
+    return components_for(selection)
 
 
 def validate_workflow_inputs(inputs: dict[str, Any]) -> list[str]:
@@ -690,17 +667,12 @@ def hazard_evidence_checklist(inputs: dict[str, Any], project_root: Path) -> pd.
     suitability, local coverage, legal reuse, or independent verification.
     """
     hazard = str(inputs.get("hazard", ""))
-    if hazard == "Compound: cyclone + flood":
-        components = ["Flood", "Cyclone"]
-    elif hazard == "Compound: heavy rainfall + drainage failure":
-        components = ["Flood", "Infrastructure failure"]
-    else:
-        components = [hazard]
+    components = expand_hazards(hazard)
 
     evidence_needs = {
         "Flood": [
             ("Time-matched rainfall and river/coastal observations", "data/raw/kerala.csv", "Raw rainfall file is present, but 324 station-time groups have conflicting values; telemetry datum and time zone require confirmation.", "Keep raw rows; reconcile against provider documentation and use verified local observations with timestamps and units."),
-            ("Local flood-hazard/depth evidence with permitted reuse", "data/raw/jrc_flood_depth", "JRC 100-year river-flood tiles are reviewed as modeled hazard data, but preview/use is withheld pending licence clarification.", "Resolve licence statements, inspect raster semantics and study-area overlap, then validate before analysis."),
+            ("Local flood-hazard/depth evidence with permitted reuse", "data/raw/jrc_flood_depth", "JRC 100-year river-flood tiles are licensed as modelled hazard data (ODbL 1.0 applied; CC BY 4.0 also stated) and displayed as scenario context. They are not observed flooding.", "Inspect raster semantics and study-area overlap, then validate before any exposure or impact analysis."),
             ("Verified drainage, terrain and catchment context", "data/processed/spatial_layers", "No independently validated local drainage/terrain evidence is established by the current workflow.", "Acquire authoritative layers with provenance, CRS, units, coverage and licence; validate geometry and completeness."),
             ("Verified exposed assets and safe access routes", "data/processed/spatial_layers", "Hospital and critical-facility locations/exposure are not independently validated; the ward boundary is provisional.", "Verify facility identities and coordinates and suitable road layers before any asset-level exposure claim."),
         ],
@@ -800,6 +772,210 @@ def evidence_provenance_summary(inputs: dict[str, Any]) -> dict[str, str]:
         ),
         "Permitted interpretation": interpretation,
         "Verification gate": verification,
+    }
+
+
+def missing_information_register(
+    inputs: dict[str, Any],
+    evidence_checklist: pd.DataFrame | None = None,
+    input_quality: dict[str, Any] | None = None,
+    project_root: Path | None = None,
+) -> pd.DataFrame:
+    """List what is missing or unverified, why it matters, and what cannot be concluded.
+
+    The register is assembled only from existing checklist output.  It does not
+    invent gaps, rank them by severity, or assign a probability.  Every row is a
+    prompt to obtain and verify evidence, not a finding that the hazard,
+    exposure, or impact is absent.
+    """
+    if evidence_checklist is None:
+        evidence_checklist = hazard_evidence_checklist(
+            inputs, project_root or Path(".")
+        )
+    if input_quality is None:
+        from src.scenario_input_quality import evaluate_scenario_readiness
+
+        input_quality = evaluate_scenario_readiness(
+            str(inputs.get("hazard", "")), inputs
+        )
+
+    rows: list[dict[str, str]] = []
+    for _, row in evidence_checklist.iterrows():
+        workspace_check = str(row.get("Workspace check", ""))
+        if "present; suitability unverified" in workspace_check:
+            status = "Present but not scientifically verified"
+            why = str(row.get("Known limitation", ""))
+        elif "Not present" in workspace_check:
+            status = "Not available in this workspace"
+            why = (
+                "The expected evidence is not present in this workspace, so its "
+                "contents, coverage, units, and quality cannot be assessed."
+            )
+        elif "Not connected" in workspace_check:
+            status = "Not available in this workspace"
+            why = str(row.get("Known limitation", ""))
+        else:
+            continue
+        rows.append(
+            {
+                "Missing or unverified information": str(row.get("Evidence needed", "")),
+                "Hazard component": str(row.get("Hazard component", "")),
+                "Current status": status,
+                "Why it matters": why,
+                "What cannot be concluded without it": (
+                    "Any hazard severity, exposure, impact, probability, or "
+                    "official-warning claim that depends on this evidence."
+                ),
+                "How to resolve": str(row.get("Next verification step", "")),
+            }
+        )
+
+    for item in input_quality.get("evidence_factors_missing_or_unverified", []) or []:
+        rows.append(
+            {
+                "Missing or unverified information": str(item),
+                "Hazard component": str(inputs.get("hazard", "")),
+                "Current status": "Missing or not independently verified",
+                "Why it matters": (
+                    "The hazard-specific input-quality rule treats this factor as "
+                    "necessary for a defensible scenario interpretation."
+                ),
+                "What cannot be concluded without it": (
+                    "Any hazard-specific probability, impact estimate, warning, or "
+                    "recommendation priority that relies on this factor."
+                ),
+                "How to resolve": (
+                    "Obtain documented, authoritative evidence with source, time, "
+                    "location, units, coverage and licence, then re-run the review."
+                ),
+            }
+        )
+
+    for item in input_quality.get("errors", []) or []:
+        rows.append(
+            {
+                "Missing or unverified information": str(item),
+                "Hazard component": str(inputs.get("hazard", "")),
+                "Current status": "Input error blocks interpretation",
+                "Why it matters": "The supplied value cannot be interpreted as entered.",
+                "What cannot be concluded without it": (
+                    "Any probability, impact, or official-warning claim that "
+                    "depends on the affected input."
+                ),
+                "How to resolve": "Correct the input using documented units and meaning, then resubmit.",
+            }
+        )
+
+    # De-duplicate identical evidence needs while preserving order.
+    seen: set[tuple[str, str]] = set()
+    unique: list[dict[str, str]] = []
+    for row in rows:
+        key = (row["Missing or unverified information"], row["Current status"])
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(row)
+
+    return pd.DataFrame(
+        unique,
+        columns=[
+            "Missing or unverified information",
+            "Hazard component",
+            "Current status",
+            "Why it matters",
+            "What cannot be concluded without it",
+            "How to resolve",
+        ],
+    )
+
+
+def data_quality_confidence_statement(
+    inputs: dict[str, Any],
+    input_quality: dict[str, Any] | None = None,
+    evidence_checklist: pd.DataFrame | None = None,
+    project_root: Path | None = None,
+) -> dict[str, Any]:
+    """Describe data quality and confidence qualitatively, without inventing a score.
+
+    No calibrated local model, independent outcome dataset, or statistical
+    validation supports a numeric confidence level for this scenario.  This
+    function therefore reports the evidence class, the completeness counts that
+    are directly observable in the checklists, and the known quality defects.
+    The result is a transparency statement, not a probability or confidence
+    interval.
+    """
+    if evidence_checklist is None:
+        evidence_checklist = hazard_evidence_checklist(
+            inputs, project_root or Path(".")
+        )
+    if input_quality is None:
+        from src.scenario_input_quality import evaluate_scenario_readiness
+
+        input_quality = evaluate_scenario_readiness(
+            str(inputs.get("hazard", "")), inputs
+        )
+
+    provenance = evidence_provenance_summary(inputs)
+    total = len(evidence_checklist)
+    present_unverified = int(
+        evidence_checklist.get("Workspace check", pd.Series(dtype=str))
+        .astype(str)
+        .str.contains("present; suitability unverified", regex=False)
+        .sum()
+    )
+    unavailable = int(
+        evidence_checklist.get("Workspace check", pd.Series(dtype=str))
+        .astype(str)
+        .str.contains("Not present|Not connected", regex=True)
+        .sum()
+    )
+    supplied_factors = list(input_quality.get("evidence_factors_present", []) or [])
+    missing_factors = list(
+        input_quality.get("evidence_factors_missing_or_unverified", []) or []
+    )
+    errors = list(input_quality.get("errors", []) or [])
+    warnings = list(input_quality.get("warnings", []) or [])
+
+    return {
+        "Quantitative confidence": (
+            "Not assigned. No validated local model, calibration dataset, or "
+            "independent outcome evidence supports a numeric confidence level, "
+            "probability, or confidence interval for this scenario."
+        ),
+        "Input evidence class": provenance["Provenance status"],
+        "Input quality status": str(
+            input_quality.get("input_status", "Unknown / not assessed")
+        ),
+        "Hazard evidence requirements": (
+            f"{total} requirement(s) listed; {present_unverified} present but "
+            f"scientifically unverified; {unavailable} not available or not connected."
+        ),
+        "User-supplied evidence factors": (
+            f"{len(supplied_factors)} supplied in the form; {len(missing_factors)} "
+            "missing or not independently verified."
+        ),
+        "Blocking input errors": (
+            f"{len(errors)} blocking error(s) reported." if errors else "None reported."
+        ),
+        "Input warnings": (
+            f"{len(warnings)} warning(s) reported." if warnings else "None reported."
+        ),
+        "Known data-quality defects": (
+            "Entered values are not independently verified; conflicting rainfall "
+            "station-time groups, unresolved river-level datum/time zone, "
+            "provisional ward geometry, unverified facility coordinates, and "
+            "modelled rather than observed hazard layers remain in the evidence base."
+        ),
+        "What would change the conclusion": (
+            "Verified, time-matched local observations and outcomes; an "
+            "authoritative exposure and vulnerability inventory; documented "
+            "licence and provenance; and independent, leakage-safe validation of "
+            "any predictive model."
+        ),
+        "Interpretation": (
+            "This is an evidence-completeness description, not a probability, "
+            "risk score, statistical confidence interval, or official assessment."
+        ),
     }
 
 
@@ -1071,6 +1247,8 @@ def report_rows(
     uncertainty_register: pd.DataFrame | None = None,
     dependency_review: pd.DataFrame | None = None,
     validation_checklist: pd.DataFrame | None = None,
+    missing_information: pd.DataFrame | None = None,
+    data_quality_confidence: dict[str, Any] | None = None,
 ) -> pd.DataFrame:
     """Build a flat, exportable report that records actual inputs and calculations."""
     rows: list[dict[str, str]] = []
@@ -1117,6 +1295,24 @@ def report_rows(
     if input_quality is not None:
         for key, value in input_quality.items():
             add("Hazard-specific input quality", key, value)
+    quality_confidence = (
+        data_quality_confidence
+        if data_quality_confidence is not None
+        else data_quality_confidence_statement(
+            inputs, input_quality=input_quality, project_root=project_root
+        )
+    )
+    for key, value in quality_confidence.items():
+        add("Data quality and confidence", key, value)
+    missing = (
+        missing_information
+        if missing_information is not None
+        else missing_information_register(
+            inputs, input_quality=input_quality, project_root=project_root
+        )
+    )
+    for index, row in missing.iterrows():
+        add("Missing information register", f"Item {index + 1}", row.to_dict())
     uncertainty = uncertainty_register if uncertainty_register is not None else build_uncertainty_register(inputs, evidence)
     for _, row in uncertainty.iterrows():
         add("Uncertainty register", str(row.get("Uncertainty type", "Uncertainty")), row.to_dict())

@@ -152,6 +152,98 @@ class JrcDepthTile:
         }
 
 
+class JrcPermanentWaterTile:
+    """Read the JRC permanent-water mask tile (uint8, value 1, NoData 255).
+
+    The JRC README says permanent water bodies are patched into the flood maps.
+    Sampling the mask lets a caller exclude permanent-water cells from a flood
+    screening so that a river or lake is not reported as flood exposure.
+    """
+
+    def __init__(self, path: Path):
+        self.path = Path(path)
+        if not self.path.is_file():
+            raise FloodRasterError(f"Raster file not found: {self.path}")
+        try:
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                with Image.open(self.path) as image:
+                    tags = image.tag_v2
+                    self.width, self.height = image.size
+                    self.mode = image.mode
+                    self.tags = {int(tag): value for tag, value in tags.items()}
+                self._tiff = self.path.read_bytes()
+        except (OSError, UnidentifiedImageError) as exc:
+            raise FloodRasterError(f"Unreadable GeoTIFF: {exc}") from exc
+        if self.mode != "L" or self.width != 11999 or self.height != 11999:
+            raise FloodRasterError("Expected the JRC 11999x11999 uint8 permanent-water tile.")
+        if self.tags.get(259) != 8 or self.tags.get(317, 1) != 1:
+            raise FloodRasterError("Only DEFLATE permanent-water tiles without a predictor are supported.")
+        if tuple(self.tags.get(339, ())) != (1,):
+            raise FloodRasterError("Expected 8-bit unsigned samples in the permanent-water tile.")
+        if self.tags.get(42113) not in (255, "255", b"255"):
+            raise FloodRasterError("Expected the permanent-water NoData tag to be 255.")
+        if not self._has_epsg_4326_key():
+            raise FloodRasterError("EPSG:4326 was not found in the permanent-water GeoTIFF keys.")
+        scales = self.tags.get(33550)
+        tiepoints = self.tags.get(33922)
+        if not scales or not tiepoints or len(scales) < 2 or len(tiepoints) < 6:
+            raise FloodRasterError("Permanent-water GeoTIFF georeferencing tags are missing.")
+        self.pixel_x, self.pixel_y = float(scales[0]), float(scales[1])
+        _, _, _, self.west, self.north, _ = map(float, tiepoints[:6])
+        self.nodata = 255
+        self.tile_width = int(self.tags.get(322, 256))
+        self.tile_height = int(self.tags.get(323, 256))
+        self.offsets = tuple(self.tags.get(324, ()))
+        self.byte_counts = tuple(self.tags.get(325, ()))
+        if self.tile_width != 256 or self.tile_height != 256 or len(self.offsets) != len(self.byte_counts):
+            raise FloodRasterError("Unexpected or incomplete permanent-water TIFF tile index.")
+        self.tiles_across = math.ceil(self.width / self.tile_width)
+
+    def _has_epsg_4326_key(self) -> bool:
+        directory = self.tags.get(34735, ())
+        return len(directory) >= 4 and any(
+            directory[index] == 2048 and directory[index + 3] == 4326
+            for index in range(4, len(directory), 4)
+        )
+
+    @lru_cache(maxsize=64)
+    def _tile_values(self, index: int) -> bytes:
+        offset, count = self.offsets[index], self.byte_counts[index]
+        if not offset and not count:
+            return bytes([255]) * (self.tile_width * self.tile_height)
+        if not offset or not count:
+            raise FloodRasterError(f"Inconsistent permanent-water sparse-tile index at tile {index}.")
+        try:
+            raw = zlib.decompress(self._tiff[offset:offset + count])
+        except zlib.error as exc:
+            raise FloodRasterError(
+                f"Could not decompress permanent-water tile {index}: {exc}"
+            ) from exc
+        expected = self.tile_width * self.tile_height
+        if len(raw) != expected:
+            raise FloodRasterError(
+                f"Permanent-water tile {index} decoded to {len(raw)} bytes, expected {expected}."
+            )
+        return raw
+
+    def sample(self, longitude: float, latitude: float) -> int | None:
+        """Return 1 for permanent water, 0 for other land, None for NoData/outside."""
+        if not (-180 <= longitude <= 180 and -90 <= latitude <= 90):
+            raise FloodRasterError("Longitude/latitude is outside valid EPSG:4326 ranges.")
+        col = math.floor((longitude - self.west) / self.pixel_x)
+        row = math.floor((self.north - latitude) / self.pixel_y)
+        if col < 0 or row < 0 or col >= self.width or row >= self.height:
+            return None
+        tile_col, tile_row = col // self.tile_width, row // self.tile_height
+        tile_index = tile_row * self.tiles_across + tile_col
+        values = self._tile_values(tile_index)
+        value = values[(row % self.tile_height) * self.tile_width + (col % self.tile_width)]
+        if value == self.nodata:
+            return None
+        return int(value)
+
+
 def create_depth_preview(
     tile_paths: list[Path], bounds: tuple[float, float, float, float], output_path: Path,
     width: int = 520, height: int = 520,

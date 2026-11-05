@@ -151,7 +151,7 @@ for col, (icon, title, description, path, page_icon) in zip(cols, primary):
             f'<div class="ar-work-title">{title}</div><div class="ar-work-copy">{description}</div></div>',
             unsafe_allow_html=True,
         )
-        st.page_link(path, label=f"Open {title}", icon=page_icon, use_container_width=True)
+        st.page_link(path, label=f"Open {title}", icon=page_icon, width="stretch")
 
 st.markdown('<div class="ar-section-kicker" style="margin-top:1.4rem">Research and planning tools</div>', unsafe_allow_html=True)
 st.subheader("Explore the workspaces")
@@ -160,7 +160,7 @@ tools = [
     ("Data Readiness", "Inspect provenance, completeness, and validation blockers.", "app_pages/data_readiness.py", ":material/fact_check:"),
     ("Hazard Model Lab", "Review model readiness before interpreting outputs.", "app_pages/hazard_model_lab.py", ":material/model_training:"),
     ("Hospital Vulnerability", "Review evidence needed for critical-facility exposure.", "app_pages/hospital_vulnerability.py", ":material/local_hospital:"),
-    ("Cyclone + Flood", "Explore compound-hazard assumptions and evidence needs.", "app_pages/compound_scenario.py", ":material/thunderstorm:"),
+    ("Cyclone + Flood", "Open the integrated cyclone, flood and compound-impact workspace.", "app_pages/compound_scenario.py", ":material/thunderstorm:"),
     ("AI Disaster Risk Assessment", "Assess one selected Ernakulam hazard at a time with transparent evidence and uncertainty.", "app_pages/disaster_probability.py", ":material/analytics:"),
     ("Mitigation Budget", "Compare supplied costs and check budget arithmetic.", "app_pages/mitigation_planner.py", ":material/account_balance_wallet:"),
     ("Smart Mitigation Design", "Structure a mitigation concept for a selected scenario.", "app_pages/smart_mitigation_design.py", ":material/engineering:"),
@@ -172,7 +172,7 @@ for i in range(0, len(tools), 4):
             with st.container(border=True):
                 st.markdown(f"#### {title}")
                 st.caption(description)
-                st.page_link(path, label="Open workspace", icon=icon, use_container_width=True)
+                st.page_link(path, label="Open workspace", icon=icon, width="stretch")
 
 st.divider()
 st.markdown('<div class="ar-section-kicker">Trust and readiness</div>', unsafe_allow_html=True)

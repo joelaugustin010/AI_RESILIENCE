@@ -2,19 +2,11 @@
 from __future__ import annotations
 from typing import Any
 
-HAZARDS = {
- "Flood": ["Flood"],
- "Cyclone": ["Cyclone"],
- "Earthquake": ["Earthquake"],
- "Landslide": ["Landslide"],
- "Drought": ["Drought"],
- "Heatwave": ["Heatwave"],
- "Air pollution": ["Air pollution"],
- "Industrial incident": ["Industrial incident"],
- "Compound: cyclone + flood": ["Cyclone", "Flood"],
- "Compound: heavy rainfall + drainage failure": ["Heavy rainfall", "Drainage failure"],
- "Compound: earthquake + infrastructure disruption": ["Earthquake", "Infrastructure disruption"],
-}
+from src.hazard_registry import SCIENTIFIC_HAZARDS
+
+# Components come from the single hazard registry.  A compound label is never a
+# new physical hazard; it is an ordered set of components.
+HAZARDS = {name: list(components) for name, components in SCIENTIFIC_HAZARDS.items()}
 PATHWAYS = {
  "Flood": [
   ("Hazard", "Rainfall, river overflow, coastal water, or surface-water accumulation"),
@@ -66,6 +58,11 @@ PATHWAYS = {
   ("Exposure", "Connected drainage catchment and low-lying assets"),
   ("Vulnerability", "Redundancy, maintenance, outfall/tide conditions, and response time"),
   ("Consequence to examine", "Water accumulation and service interruption in the catchment")],
+ "Infrastructure failure": [
+  ("Hazard", "Specified infrastructure failure and dependency chain"),
+  ("Exposure", "Connected services, access routes, facilities, and dependent populations"),
+  ("Vulnerability", "Redundancy, structural condition, backup supply, and repair access"),
+  ("Consequence to examine", "Cascading service interruptions and restoration priorities")],
  "Infrastructure disruption": [
   ("Hazard", "Specified infrastructure failure and dependency chain"),
   ("Exposure", "Connected services, access routes, facilities, and dependent populations"),
@@ -83,6 +80,7 @@ REQUIRED = {
  "Industrial incident": ["verified incident/substance details", "authoritative safety guidance", "weather/dispersion inputs where relevant", "source records before attribution"],
  "Heavy rainfall": ["time-stamped rainfall with period", "catchment and drainage context", "validated local exposure layer", "observed waterlogging/flood records"],
  "Drainage failure": ["documented asset/failure report", "catchment connectivity", "rainfall/tide/outfall context", "maintenance and response records"],
+ "Infrastructure failure": ["verified asset/dependency inventory", "failure mode and service area", "redundancy and repair data", "observed outage/impact records"],
  "Infrastructure disruption": ["verified asset/dependency inventory", "failure mode and service area", "redundancy and repair data", "observed outage/impact records"],
 }
 

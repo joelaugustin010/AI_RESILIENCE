@@ -235,13 +235,13 @@ Kochi latitude band: `data/raw/jrc_glofas_rp100_ID185_N20_E70_depth.tif` and
 `data/raw/jrc_glofas_rp100_ID186_N10_E70_depth.tif`. The source README documents
 global land coverage, 3 arc-second (~90 m) resolution, water depth in metres,
 and WGS84. It specifies ODbL 1.0; the linked JRC copyright notice specifies
-CC BY 4.0 with attribution and indication of changes. No source statement
-clarifying precedence or dual application was found. The dataset is provisional
-and requires written licence clarification before redistribution or public
-display. The GeoTIFFs report EPSG:4326, 11999x11999 float32, DEFLATE, and
-`-9999` NoData. The RP100 tile index records both files as modified 2025-12-18.
-Hashes and technical metadata are in `data/reference/spatial_sources.json` and
-the preview sidecar.
+CC BY 4.0 with attribution and indication of changes. Both statements permit
+reuse with attribution. The project applies the stricter ODbL 1.0 basis
+(attribution, change indication, and share-alike for derived databases) as the
+defensible common basis; see `data/raw/JRC_GLOFAS_LICENCE.md`. The GeoTIFFs
+report EPSG:4326, 11999x11999 float32, DEFLATE, and `-9999` NoData. The RP100
+tile index records both files as modified 2025-12-18. Hashes and technical
+metadata are in `data/reference/spatial_sources.json` and the preview sidecar.
 
 `src/flood_raster.py` was used to create a separate transparent PNG preview
 under `data/processed/spatial_layers/`; the source tiles were not modified. The
@@ -250,33 +250,45 @@ only; the self-intersecting polygon was not used as a mask. Blue pixels show
 sampled positive modeled depth. Transparent pixels can mean zero, NoData, or
 outside source coverage and cannot establish safety. The JRC README warns about
 possible artifacts from model limitations, DEM sinks, tile boundaries, and DEM
-issues. The separate spurious-depth and permanent-water masks have not been
-downloaded or applied. Since the licensing conflict was reviewed on 2026-10-29,
-the application withholds this local preview pending written clarification.
+issues. The matching JRC permanent-water tiles
+(`data/raw/ID185_N20_E70_permanent_water.tif` and
+`data/raw/ID186_N10_E70_permanent_water.tif`) were downloaded and are applied
+only to exclude JRC-patched permanent water from the provisional screening; the
+separate spurious-depth artifact mask was not downloaded. The application
+displays the preview as attributed modelled scenario context.
 
-This is a modeled river-flood hazard scenario, but **a hazard–infrastructure
-exposure analysis has not been completed**. The JRC preview is withheld because
-of the unresolved licence conflict. NIHFW's licensed hospital CSV remains
-review-only:
-the official resource defines `Location_Coordinates` but does not specify
-coordinate order, CRS/datum, geocoding method, positional accuracy, or row-level
-location correctness. The Ernakulam subset has 31 missing/nonnumeric pairs and
-18 repeated-coordinate groups covering 63 rows. Numeric range plausibility is
-not sufficient to convert these to points. A focused Overpass query to an
-alternate endpoint did not complete; Healthsites requires an API key, while the
-available Geofabrik regional fallback was a 532 MB PBF (roughly 1.1 GB in the
-reviewed GIS bundle formats) and is community-mapped rather than authoritative.
-No alternate facility file was accepted.
+A provisional screening report
+(`reports/jrc_rp100_osm_exposure_screening.json`, built by
+`scripts/build_exposure_screening.py`) samples representative points of
+community-mapped OpenStreetMap assets against the RP100 depth field and excludes
+permanent-water cells. It is **not** an exposure estimate: OSM asset existence
+and positional accuracy are unverified, population is absent, and a positive
+modelled cell is not observed flooding. Zero and NoData cells do not establish
+safety.
 
-The map does not display the JRC RP100 preview and reports exposure as
-unknown/unassessable. A future provider request must confirm the JRC licence
-terms and NIHFW coordinate order, CRS/datum, geocoding method/accuracy, and
-corrections for missing/repeated/implausible locations; alternatively obtain a
-licensed, dated, independently checked facility GIS layer. Separately,
-polygon/vector intersection and raster cell sampling are different methods:
-the provided `classify_depth_sample` helper deliberately labels cell samples
-and never claims damage, failure, or safety. A functioning helper and passing
-synthetic tests do not constitute a real-data exposure analysis.
+A hazard–infrastructure exposure analysis therefore remains incomplete. The
+JRC preview is modelled scenario context, not a validated hazard footprint.
+NIHFW's licensed hospital CSV remains review-only: the official resource
+defines `Location_Coordinates` but does not specify coordinate order, CRS/datum,
+geocoding method, positional accuracy, or row-level location correctness. The
+Ernakulam subset has 31 missing/nonnumeric pairs and 18 repeated-coordinate
+groups covering 63 rows. Numeric range plausibility is not sufficient to
+convert these to points. A focused Overpass query to an alternate endpoint did
+not complete; Healthsites requires an API key, while the available Geofabrik
+regional fallback was a 532 MB PBF (roughly 1.1 GB in the reviewed GIS bundle
+formats) and is community-mapped rather than authoritative. No alternate
+facility file was accepted.
+
+The map displays the JRC RP100 preview as modelled scenario context and reports
+exposure as unknown/unassessable for operational purposes. A future provider
+request must confirm NIHFW coordinate order, CRS/datum, geocoding
+method/accuracy, and corrections for missing/repeated/implausible locations;
+alternatively obtain a licensed, dated, independently checked facility GIS
+layer. Separately, polygon/vector intersection and raster cell sampling are
+different methods: the provided `classify_depth_sample` helper deliberately
+labels cell samples and never claims damage, failure, or safety. A functioning
+helper and passing synthetic tests do not constitute a real-data exposure
+analysis.
 
 ## Hospital source follow-up (2026-10-20)
 

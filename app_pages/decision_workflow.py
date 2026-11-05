@@ -28,12 +28,14 @@ from src.decision_workflow import (
     build_scenario_comparison,
     budget_summary,
     compare_action_combinations,
+    data_quality_confidence_statement,
     decision_readiness_summary,
     evidence_inventory,
     evidence_provenance_summary,
     expand_hazards,
     hazard_evidence_checklist,
     mitigation_actions_for,
+    missing_information_register,
     recommendation_candidates,
     recommendation_priority_readiness,
     report_html,
@@ -755,8 +757,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 st.caption("A historical rainfall measurement benchmark is available in the evidence explorer. It is separate from the assessment and is not a current rainfall or flood forecast.")
 st.info(
-    "Kochi evidence update: JRC 100-year river-flood depth tiles are locally reviewed as modeled hazard data, but the map preview is withheld pending clarification of conflicting licence statements. "
-    "Asset-level flood exposure remains unknown because there is no independently validated hospital or critical-facility location layer. "
+    "Kochi evidence update: JRC 100-year river-flood depth tiles are licensed (ODbL 1.0 applied; CC BY 4.0 also stated) and displayed on the map as modelled scenario context with attribution. They are not observed flooding or an official warning. "
+    "Operational asset-level flood exposure remains unavailable because there is no independently validated hospital or critical-facility location layer. "
     "See the map for source details and the broader data gaps."
 )
 with st.expander("Longer-term AI RESILIENCE roadmap"):
@@ -775,6 +777,20 @@ st.header("1. Select a hazard and describe conditions")
 # Keep the hazard selector outside the form so Streamlit reruns immediately when
 # the user changes hazards; the visible inputs then update before submission.
 hazard = st.selectbox("Hazard or compound scenario", HAZARD_OPTIONS, key="wf_hazard")
+
+# A result belongs to the hazard it was submitted for.  When the selector
+# changes, discard the stored submission and the map context so an old
+# assessment can never appear beneath a newly selected hazard.
+_PREVIOUS_HAZARD_KEY = "wf_previous_hazard"
+if _PREVIOUS_HAZARD_KEY not in st.session_state:
+    # First visit in this session: remember the selection without discarding a
+    # result that is being restored after navigating away and back.
+    st.session_state[_PREVIOUS_HAZARD_KEY] = hazard
+elif st.session_state[_PREVIOUS_HAZARD_KEY] != hazard:
+    st.session_state[_PREVIOUS_HAZARD_KEY] = hazard
+    st.session_state["decision_workflow_inputs"] = None
+    st.session_state.pop(MAP_CONTEXT_KEY, None)
+
 with st.form("decision_workflow_intake"):
     location = st.text_input(
         "Location or area name",
@@ -1130,6 +1146,8 @@ if submitted:
             st.error(problem)
     else:
         st.session_state["decision_workflow_inputs"] = submitted_inputs
+        # Any previously generated map context belongs to the previous result.
+        st.session_state.pop(MAP_CONTEXT_KEY, None)
 
 inputs = st.session_state.get("decision_workflow_inputs")
 if inputs is None:
@@ -1388,6 +1406,51 @@ for item in input_quality["evidence_factors_present"]:
 for item in input_quality["evidence_factors_missing_or_unverified"]:
     st.markdown(f"- ☐ Missing or not independently verified: {item}")
 
+st.subheader("Data quality and confidence")
+data_quality_confidence = data_quality_confidence_statement(
+    inputs,
+    input_quality=input_quality,
+    evidence_checklist=evidence_checklist,
+    project_root=ROOT,
+)
+st.info(data_quality_confidence["Quantitative confidence"])
+for field in (
+    "Input evidence class",
+    "Input quality status",
+    "Hazard evidence requirements",
+    "User-supplied evidence factors",
+    "Blocking input errors",
+    "Input warnings",
+    "Known data-quality defects",
+    "What would change the conclusion",
+):
+    st.write(f"**{field}:**", data_quality_confidence[field])
+st.caption(data_quality_confidence["Interpretation"])
+
+st.subheader("Missing information register")
+missing_information = missing_information_register(
+    inputs,
+    evidence_checklist=evidence_checklist,
+    input_quality=input_quality,
+    project_root=ROOT,
+)
+if missing_information.empty:
+    st.success(
+        "No checklist items are currently missing or unverified. This means the "
+        "checklist is satisfied, not that the scenario is validated or safe."
+    )
+else:
+    st.caption(
+        "Each row records information the workflow cannot supply or verify. "
+        "Absence of evidence is not evidence that the hazard, exposure, or impact is absent."
+    )
+    display_dataframe(
+        missing_information,
+        hide_index=True,
+        width="stretch",
+        alt="Missing or unverified information, its consequences, and how to resolve it",
+    )
+
 readiness_plan = decision_readiness_summary(inputs, input_quality)
 st.subheader("Decision readiness and next actions")
 st.warning(f"**{readiness_plan['decision_status']}**")
@@ -1531,6 +1594,8 @@ report = report_rows(
     uncertainty_register=uncertainty_register,
     dependency_review=infrastructure_dependency_review,
     validation_checklist=validation_checklist,
+    missing_information=missing_information,
+    data_quality_confidence=data_quality_confidence,
 )
 report_slug = slug or "scenario"
 csv_bytes = report.to_csv(index=False).encode("utf-8-sig")

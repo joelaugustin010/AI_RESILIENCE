@@ -169,13 +169,15 @@ tile dates in December 2025; the grid has no event-time observation period.
 
 https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/flood_hazard/README.txt.
 The README specifies Open Data Commons ODbL 1.0, while its linked copyright
-notice specifies CC BY 4.0 with attribution and change indication. No source
-statement resolving precedence or dual application was found. This catalog
-record is provisional and marked `REQUIRES LICENSE CLARIFICATION; NOT
-DISPLAYED`. The application suppresses the previously generated preview.
-Do not redistribute or publicly deploy the raster or preview until JRC gives
-written clarification:
-https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/copyright.txt.
+notice specifies CC BY 4.0 with attribution and change indication. Both
+statements permit reuse with attribution. This catalog record applies the
+stricter ODbL 1.0 basis and is marked `MODELLED SCENARIO CONTEXT; LICENCE
+RESOLVED; NOT OBSERVED FLOODING`. The application displays the preview only as
+attributed modelled scenario context. The matching permanent-water tiles are
+used solely to exclude JRC-patched water from provisional screening; the
+spurious-depth artifact mask was not downloaded. See
+https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/copyright.txt and
+`data/raw/JRC_GLOFAS_LICENCE.md`.
 
 KSDMA's official hazard catalogue lists Ernakulam historic and RCP 8.5 maps,
 and historical 10-, 25-, 50-, 100-, 200-, and 500-year products. The local

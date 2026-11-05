@@ -18,6 +18,13 @@ streamlit run app.py
 
 If PowerShell blocks activation, use a permitted environment or run the virtual environment's Python directly; do not weaken device security settings without permission.
 
+Optional dependency sets:
+
+- `requirements-data.txt` — PDF extraction and coordinate/geometry support used by some data-validation paths (`pypdf`, `shapely`, `pyproj`).
+- `requirements-scripts.txt` — one-off acquisition/audit scripts only (`openpyxl`, `mapbox-vector-tile`, `rasterio`). The Streamlit app and the standard test suite do not need these.
+
+The application entry point is `app.py`; the Command Centre is the default landing page. All pages are registered in that file through `st.navigation`.
+
 ## Suggested demonstration (5–7 minutes)
 
 1. **Command Centre** — introduce the problem and the evidence-first approach.
@@ -25,8 +32,10 @@ If PowerShell blocks activation, use a permitted environment or run the virtual 
 3. **Kochi Map** — inspect available geographic layers and point out coverage or boundary limitations.
 4. **Air Pollution** — show historical monitoring summaries and explain why AQI alone cannot prove which factory caused pollution.
 5. **Hospital Vulnerability / Cyclone + Flood** — show what evidence is needed before making exposure claims.
-6. **Data Readiness** — review source provenance, integrity checks and unresolved blockers.
+6. **Data Readiness** — review source provenance, integrity checks, descriptive climate benchmarks and unresolved blockers.
 7. **Mitigation Budget / Smart Mitigation Design** — demonstrate practical planning based on clearly stated assumptions.
+
+The committed screening and climate reports are offline products; their builders and inputs are documented in `docs/REPRODUCING_REPORTS.md`.
 
 ## Important limitations
 
