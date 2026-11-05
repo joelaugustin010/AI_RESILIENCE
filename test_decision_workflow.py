@@ -16,12 +16,14 @@ from src.decision_workflow import (
     build_scenario_comparison,
     budget_summary,
     compare_action_combinations,
+    data_quality_confidence_statement,
     decision_readiness_summary,
     evidence_inventory,
     evidence_provenance_summary,
     expand_hazards,
     hazard_evidence_checklist,
     mitigation_actions_for,
+    missing_information_register,
     recommendation_candidates,
     report_html,
     report_rows,
@@ -391,7 +393,9 @@ class EvidenceAndReportTests(unittest.TestCase):
         checklist = hazard_evidence_checklist(valid_inputs(), Path(__file__).resolve().parent)
         self.assertGreaterEqual(len(checklist), 4)
         self.assertTrue(checklist["Evidence needed"].str.contains("exposed assets", case=False).any())
-        self.assertTrue(checklist["Known limitation"].str.contains("licence", case=False).any())
+        flood_limitations = " ".join(checklist["Known limitation"].tolist())
+        self.assertIn("licensed as modelled hazard data", flood_limitations)
+        self.assertIn("not observed flooding", flood_limitations)
 
     def test_compound_checklist_covers_both_hazards(self):
         checklist = hazard_evidence_checklist(
@@ -538,3 +542,98 @@ class EvidenceAndReportTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+class MissingInformationAndConfidenceTests(unittest.TestCase):
+    def _quality(self, **changes):
+        values = {
+            "input_status": "Review required",
+            "errors": [],
+            "warnings": ["River level is recorded but not interpreted."],
+            "evidence_factors_present": ["rainfall amount and period"],
+            "evidence_factors_missing_or_unverified": ["river level + station/datum"],
+        }
+        values.update(changes)
+        return values
+
+    def test_register_lists_missing_items_without_claiming_absence_of_hazard(self):
+        inputs = valid_inputs()
+        checklist = hazard_evidence_checklist(inputs, Path(__file__).resolve().parent)
+        register = missing_information_register(
+            inputs, evidence_checklist=checklist, input_quality=self._quality()
+        )
+        self.assertGreater(len(register), 0)
+        self.assertIn("Missing or unverified information", register.columns)
+        self.assertIn("What cannot be concluded without it", register.columns)
+        self.assertTrue(
+            register["What cannot be concluded without it"].str.contains(
+                "probability", case=False
+            ).all()
+        )
+        self.assertTrue(
+            register["Current status"].str.contains("verified|Not available", case=False).all()
+        )
+
+    def test_register_includes_input_quality_errors_and_warnings_are_not_missing_evidence(self):
+        register = missing_information_register(
+            valid_inputs(),
+            evidence_checklist=hazard_evidence_checklist(
+                valid_inputs(), Path(__file__).resolve().parent
+            ),
+            input_quality=self._quality(errors=["Rainfall must be numeric."]),
+        )
+        self.assertTrue(
+            register["Current status"].eq("Input error blocks interpretation").any()
+        )
+        self.assertFalse(
+            register["Missing or unverified information"].str.contains(
+                "River level is recorded", case=False, regex=False
+            ).any()
+        )
+
+    def test_register_deduplicates_identical_evidence_needs(self):
+        register = missing_information_register(
+            valid_inputs(hazard="Compound: cyclone + flood"),
+            evidence_checklist=hazard_evidence_checklist(
+                valid_inputs(hazard="Compound: cyclone + flood"),
+                Path(__file__).resolve().parent,
+            ),
+            input_quality=self._quality(),
+        )
+        keys = list(zip(
+            register["Missing or unverified information"],
+            register["Current status"],
+        ))
+        self.assertEqual(len(keys), len(set(keys)))
+
+    def test_confidence_is_never_quantified_or_called_a_probability(self):
+        statement = data_quality_confidence_statement(
+            valid_inputs(),
+            input_quality=self._quality(),
+            evidence_checklist=hazard_evidence_checklist(
+                valid_inputs(), Path(__file__).resolve().parent
+            ),
+        )
+        self.assertIn("Not assigned", statement["Quantitative confidence"])
+        self.assertIn("not a probability", statement["Interpretation"])
+        self.assertIn("missing or not independently verified", statement["User-supplied evidence factors"])
+        self.assertIn("present but scientifically unverified", statement["Hazard evidence requirements"])
+
+    def test_report_includes_missing_information_and_quality_sections(self):
+        inputs = valid_inputs()
+        evidence = evidence_inventory(Path(__file__).resolve().parent)
+        scenarios = build_scenario_comparison(inputs)
+        actions = mitigation_actions_for("Flood").head(1).copy()
+        combinations = compare_action_combinations(
+            actions, None, {"A": actions["Action"].tolist()}
+        )
+        checklist = hazard_evidence_checklist(inputs, Path(__file__).resolve().parent)
+        report = report_rows(
+            inputs, evidence, scenarios, actions, None, combinations,
+            Path(__file__).resolve().parent, evidence_checklist=checklist,
+        )
+        self.assertTrue(report["Section"].eq("Missing information register").any())
+        self.assertTrue(report["Section"].eq("Data quality and confidence").any())
+        quality = report.loc[report["Section"].eq("Data quality and confidence")]
+        self.assertTrue(
+            quality["Value"].str.contains("Not assigned", regex=False).any()
+        )

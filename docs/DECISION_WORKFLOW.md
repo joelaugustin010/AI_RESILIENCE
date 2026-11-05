@@ -66,20 +66,63 @@ evidence-readiness assessment, not “low”, “elevated”, or “high” risk
    supplied, what is user-described, what is not joined, and what remains
    unassessed. Uncertainty is described in text; no unsupported confidence
    percentage is created.
-5. **Review hazard interactions.** Compound selections retain separate
+5. **State data quality and confidence qualitatively.** The page reports the
+   evidence class, the number of hazard evidence requirements that are present
+   but unverified or unavailable, the number of user-supplied versus missing
+   evidence factors, blocking input errors, input warnings, known quality
+   defects, and what evidence would change the conclusion. It explicitly does
+   not assign a confidence percentage, probability, risk score, or statistical
+   confidence interval.
+6. **Publish a missing-information register.** Each row names the missing or
+   unverified information, its hazard component, current status, why it
+   matters, what cannot be concluded without it, and how to resolve it. The
+   register is derived only from the existing evidence checklist and
+   input-quality rules; it does not invent gaps or rank them by severity.
+7. **Review hazard interactions.** Compound selections retain separate
    components. The workflow does not sum component scores. It calls out the
    missing evidence needed to establish spatial/temporal overlap, dependence,
    and cascading service failure.
-6. **Compare scenarios.** Entered conditions and hypothetical service
+8. **Compare scenarios.** Entered conditions and hypothetical service
    degradation/compound cases are clearly labelled. Their consequences are
    review prompts, not modeled impacts.
-7. **Generate recommendation candidates.** Candidates link to the selected
+9. **Generate recommendation candidates.** Candidates link to the selected
    scenario, user-described service condition, nominated asset, or an explicit
    evidence gap. They are not ranked by risk reduction or cost-effectiveness.
-8. **Compare budgets and export.** Only user-entered costs are summed; incomplete
-   costs prevent a complete affordability conclusion. Reports preserve the
-   inputs, evidence limitations, dimensions, scenarios, candidates, and
-   arithmetic basis.
+10. **Compare budgets and export.** Only user-entered costs are summed;
+    incomplete costs prevent a complete affordability conclusion. Reports
+    preserve the inputs, evidence limitations, dimensions, scenarios,
+    candidates, and arithmetic basis.
+
+## Communication elements and coverage
+
+The page and the exported CSV/HTML report are checked against sixteen
+communication elements. Coverage means the element is visibly present and
+carries its limitation; it does not mean the underlying evidence is complete.
+
+| # | Communication element | Where it appears |
+|---|---|---|
+| 1 | Hazard and scenario identification | Section 1 selection and Section 2 conditional output |
+| 2 | Location and time context | Section 1 intake and Section 2 scenario description |
+| 3 | Inputs and stated assumptions | Section 1 and report `User inputs` |
+| 4 | Evidence class and provenance | Section 3 provenance gate and report `Evidence provenance gate` |
+| 5 | Data quality and known defects | Section 4 data-quality and confidence statement |
+| 6 | Confidence statement without a score | Section 4 data-quality and confidence statement |
+| 7 | Missing information register | Section 4 missing information register |
+| 8 | Uncertainty by type | Section 4 uncertainty register |
+| 9 | Probability semantics | Section 2 and Section 4 consequence assessment |
+| 10 | Affected-area and impact status | Section 4 consequence assessment |
+| 11 | Exposure and vulnerability status | Section 4 evidence matrix and scientific frame |
+| 12 | Infrastructure and service dependencies | Section 4 conceptual dependency review |
+| 13 | Historical validation status | Section 4 historical validation requirements |
+| 14 | Scientific model status and limitations | Section 4 hazard assessment, scientific frame, and model limitations |
+| 15 | Decision readiness and next actions | Section 4 readiness plan |
+| 16 | Official-authority referral and emergency guidance | Evidence checklist next steps, readiness plan, and Section 6 caveats |
+
+Items 5, 6, and 7 are implemented by
+`data_quality_confidence_statement()` and `missing_information_register()` in
+`src/decision_workflow.py`; their output is also written to the exported report
+under the `Data quality and confidence` and `Missing information register`
+sections. No element is satisfied by an unsupported number.
 
 ## Input fields and interpretation
 
@@ -125,7 +168,7 @@ assessment inputs:
 | `data/raw/rainfall_manual_hr_kerala-sw_kl_1991_2020.csv` | NWDP catalogue metadata is recorded; local observations cover 2000–2014, not the filename’s full declared period. Irregular intervals and no flood labels are documented. | Provider-confirmed coverage, station identity/location/CRS, timestamp/timezone, sampling schedule, quality flags, and a defensible link to the study area and target. |
 | `data/raw/kerala.csv` | CWC is the agency in the file; the matching NWDP resource is described as probable but not checksum-matched. Duplicate station-time groups include conflicts. | Confirmed source identity and station metadata; investigate conflicts without silently deduplicating; quality flags, exact coverage, and time/location-compatible outcomes. |
 | `data/raw/rwl_manual_hr_kerala_sw_031_2021_2025.csv` and `data/raw/rwl_tel_hr_kerala_sw_031_2021_2025.csv` | NWDP-related records with unresolved gauge reference/datum and some metadata inconsistencies documented in the source register. | Provider-confirmed station identity, gauge zero/datum, location/CRS, units, timestamp/timezone, and official stage/action thresholds. |
-| `data/raw/jrc_glofas_rp100_ID185_N20_E70_depth.tif` and `data/raw/jrc_glofas_rp100_ID186_N10_E70_depth.tif` | JRC/Copernicus GloFAS v2.1.2 RP100 modeled depth tiles, WGS84, approximately 90 m, metres; documented as CC BY 4.0 with attribution. These are modeled scenario layers, not observations or a current forecast. | Confirm study-area coverage and model caveats, NoData/water-mask treatment, scenario meaning, and a validated boundary/asset geometry before any exposure claim. |
+| `data/raw/jrc_glofas_rp100_ID185_N20_E70_depth.tif` and `data/raw/jrc_glofas_rp100_ID186_N10_E70_depth.tif` | JRC/Copernicus GloFAS v2.1.2 RP100 modeled depth tiles, WGS84, approximately 90 m, metres. The dataset README states ODbL 1.0; the linked JRC copyright notice states CC BY 4.0. The project applies the stricter ODbL 1.0 basis, with attribution and change indication, and treats the layers as modeled scenario context, not observations or a current forecast. | Study-area coverage, NoData/water-mask treatment, and scenario meaning are documented in the processed metadata. Any exposure statement still requires verified asset geometry and must retain the "modelled scenario / not observed" label. |
 | `data/raw/ksdma_flood_return_probability_historical_10_25_50.zip` | Acquisition is documented, but the spatial foundation records unresolved reuse terms and raster units/pixel/NoData interpretation. | KSDMA confirmation of permission, bands/units, NoData, method, return-period meaning, and CRS/coverage. |
 | `data/raw/nihfw_national_hospital_directory.csv` | NIHFW directory is available, but its coordinate order/CRS and record-level location quality are unresolved; the coordinate review is explicitly not accepted as a point layer. | NIHFW confirmation or a dated, licensed, independently checked hospital GIS source with coordinate order, CRS/datum, positional quality, stable facility identity, and current status. |
 | `data/reference/kochi_corporation_boundary.geojson` and `data/raw/koch_wards_2022.geojson` | Boundary is provisional and has a topology issue; ward data is a partial contextual snapshot. Both have documented validation/currency limitations. | A current authoritative boundary/ward source, geometry validation, CRS and positional metadata, publication date, and reuse terms. |
