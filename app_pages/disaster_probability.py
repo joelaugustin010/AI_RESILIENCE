@@ -57,6 +57,19 @@ st.markdown(
       font-weight: 750;
       margin: .18rem 0 .35rem;
     }
+
+    /* Eco-glass surfaces for the risk assessment page; assessment logic is unchanged. */
+    .probability-panel {
+      border-color: rgba(44,105,82,.18) !important;
+      background:
+        radial-gradient(ellipse at 100% 0%, rgba(131,185,165,.12), transparent 16rem),
+        linear-gradient(145deg, rgba(255,255,255,.94), rgba(234,243,238,.92)) !important;
+      box-shadow: 0 8px 24px rgba(26,65,49,.07) !important;
+      backdrop-filter: blur(12px);
+    }
+    .probability-label { color: #71827F !important; }
+    .probability-value { color: #1D3030 !important; }
+    .probability-unavailable { color: #94620E !important; }
     </style>
     """,
     unsafe_allow_html=True,
