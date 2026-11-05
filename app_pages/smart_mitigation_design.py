@@ -6,12 +6,6 @@ from src.mitigation_intelligence import (
     build_design_state,
     design_recommendations,
 )
-st.set_page_config(
-    page_title="Smart Mitigation Design Studio",
-    page_icon="🏗️",
-    layout="wide"
-)
-
 
 # Shared dark SDG climate-intelligence workspace styling.
 st.markdown("""
