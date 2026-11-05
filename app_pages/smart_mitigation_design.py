@@ -6,12 +6,6 @@ from src.mitigation_intelligence import (
     build_design_state,
     design_recommendations,
 )
-st.set_page_config(
-    page_title="Smart Mitigation Design Studio",
-    page_icon="🏗️",
-    layout="wide"
-)
-
 
 # Shared dark SDG climate-intelligence workspace styling.
 st.markdown("""
@@ -1291,7 +1285,7 @@ fig3d.update_layout(
 
 st.plotly_chart(
     fig3d,
-    use_container_width=True,
+    width="stretch",
     config={
         "displaylogo": False,
         "scrollZoom": True,
@@ -1798,7 +1792,7 @@ st.download_button(
     data=report_text,
     file_name="AI_RESILIENCE_Design_Report.txt",
     mime="text/plain",
-    use_container_width=True,
+    width="stretch",
 )
 
 
