@@ -14,22 +14,12 @@ from typing import Any
 import pandas as pd
 
 from src.evidence_quality import evidence_quality_inventory
+from src.hazard_registry import HAZARD_NOTES, WORKFLOW_HAZARDS, components_for
 from src.infrastructure_dependencies import dependency_review_table
 from src.uncertainty import build_uncertainty_register
 
 
-HAZARD_OPTIONS = [
-    "Flood",
-    "Cyclone",
-    "Earthquake",
-    "Landslide",
-    "Heatwave",
-    "Drought",
-    "Industrial incident",
-    "Infrastructure failure",
-    "Compound: cyclone + flood",
-    "Compound: heavy rainfall + drainage failure",
-]
+HAZARD_OPTIONS = list(WORKFLOW_HAZARDS)
 
 INPUT_CLASSIFICATIONS = {
     "Hypothetical scenario assumption",
@@ -72,19 +62,6 @@ INFRASTRUCTURE_STATUS_OPTIONS = (
     "Disruption reported by user",
     "Not applicable",
 )
-
-HAZARD_NOTES = {
-    "Flood": "Review local inundation evidence, drainage condition, safe access, water and sanitation continuity.",
-    "Heavy rainfall": "Review rainfall amount, accumulation period, timing, gauge location, and drainage response.",
-    "Drainage failure": "Review drainage asset condition, maintenance, receiving-water constraints, and service dependencies.",
-    "Cyclone": "Review wind-related damage pathways, shelter access, and timing with rainfall or coastal water.",
-    "Earthquake": "Review structural and non-structural building safety, utility isolation, and response access.",
-    "Landslide": "Review locally verified slope/ground evidence, rainfall context, access routes, and safe-area plans.",
-    "Heatwave": "Review heat-health plans, cooling access, water supply, outdoor worker exposure, and backup power.",
-    "Drought": "Review water-source reliability, demand management, and health and livelihood dependencies.",
-    "Industrial incident": "Review facility-specific hazard information, monitoring, isolation procedures, and official response protocols.",
-    "Infrastructure failure": "Review dependencies and cascading failures across power, water, transport, drainage, and communications.",
-}
 
 MITIGATION_CATALOG = {
     "Flood": [
@@ -134,12 +111,12 @@ MITIGATION_CATALOG = {
 
 
 def expand_hazards(selection: str) -> list[str]:
-    """Expand compound labels into distinct drivers without scoring or combining them."""
-    if selection == "Compound: cyclone + flood":
-        return ["Cyclone", "Flood"]
-    if selection == "Compound: heavy rainfall + drainage failure":
-        return ["Flood", "Infrastructure failure"]
-    return [selection] if selection in HAZARD_NOTES else []
+    """Expand compound labels into distinct drivers without scoring or combining them.
+
+    The mapping lives in :mod:`src.hazard_registry`; this helper exists only so
+    callers do not need to know the registry layout.
+    """
+    return components_for(selection)
 
 
 def validate_workflow_inputs(inputs: dict[str, Any]) -> list[str]:
@@ -690,12 +667,7 @@ def hazard_evidence_checklist(inputs: dict[str, Any], project_root: Path) -> pd.
     suitability, local coverage, legal reuse, or independent verification.
     """
     hazard = str(inputs.get("hazard", ""))
-    if hazard == "Compound: cyclone + flood":
-        components = ["Flood", "Cyclone"]
-    elif hazard == "Compound: heavy rainfall + drainage failure":
-        components = ["Flood", "Infrastructure failure"]
-    else:
-        components = [hazard]
+    components = expand_hazards(hazard)
 
     evidence_needs = {
         "Flood": [
