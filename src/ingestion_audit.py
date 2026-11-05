@@ -630,10 +630,10 @@ def build_ingestion_report(root: Path, *, validated_at_utc: str | None = None) -
         "flood_analysis": {
             "status": "unavailable", "operational": False,
             "conclusion": "No real asset-to-flood exposure count is currently supported.",
-            "available_hazard_context": "The local JRC GloFAS RP100 tiles are modeled river-flood scenario data at about 90 m. Their map preview is withheld because the dataset README specifies ODbL 1.0 while the linked copyright notice specifies CC BY 4.0; no clarification has been obtained. KSDMA historical return-period rasters remain review-only. CWC station metadata and NWIC telemetry listings are hydrology leads only; neither supplies a validated local asset layer or reviewed flood-event labels.",
+            "available_hazard_context": "The local JRC GloFAS RP100 tiles are modelled river-flood scenario data at about 90 m. Their licence is resolved: the dataset README states ODbL 1.0 and the linked copyright notice states CC BY 4.0; the stricter ODbL terms are applied, and the preview is displayed as modelled context with attribution. It is not observed flooding or an official warning. KSDMA historical return-period rasters remain review-only. CWC station metadata and NWIC telemetry listings are hydrology leads only; neither supplies a validated local asset layer or reviewed flood-event labels.",
             "blockers": [
                 "KSDMA's historical 10-, 25-, and 50-year archive passes ZIP and GeoTIFF structural checks and declares EPSG:4326 plus a NoData sentinel, but dataset reuse terms and valid pixel-value meaning/units remain undocumented; the rasters are not interpreted, rendered, or overlaid.",
-                "The JRC README lists ODbL 1.0 and its linked copyright notice lists CC BY 4.0. The applicable or dual-licence terms have not been clarified; the preview is suppressed and must not be redistributed or publicly deployed until clarified.",
+                "The JRC README lists ODbL 1.0 and its linked copyright notice lists CC BY 4.0. Both permit reuse with attribution; the stricter ODbL 1.0 terms are applied. The preview is displayed as modelled scenario context only and must not be presented as observed flooding or an official warning.",
                 "CWC's official meteorological-station register (as of 2012-06-01) lists Kalampur, Ramamangalam, and Neeleeswaram in Ernakulam, but does not document a CRS/datum or positional accuracy and is not a current station-status or water-level series.",
                 "NWIC's Kerala Surface Water Department portal lists an hourly telemetry CSV resource for 2026–2030, but the resource page could not be retrieved for file integrity, station semantics, CRS/datum, threshold, or reuse validation; it was not acquired or joined.",
                 "NIHFW hospital coordinate order, CRS/datum and positional accuracy are undocumented; no hospital points are eligible.",
@@ -647,7 +647,7 @@ def build_ingestion_report(root: Path, *, validated_at_utc: str | None = None) -
             ],
             "next_evidence": [
                 "Written KSDMA pixel definitions, units, intended NoData interpretation, and dataset-specific reuse terms for each historical and RCP 8.5 raster product.",
-                "Written JRC clarification explaining how the README's ODbL 1.0 statement and linked CC BY 4.0 copyright notice apply to the raster and derived products.",
+                "Optional: JRC confirmation of how the README's ODbL 1.0 statement and linked CC BY 4.0 notice are intended to interact. Current use applies the stricter ODbL terms and is not blocked on this.",
                 "A dated authoritative asset register with stable identifiers, coordinates, coordinate order, CRS/datum, positional accuracy, current status, and reuse terms for hospitals and schools.",
                 "A validated study boundary and coverage statement, plus a dated locally relevant hazard dataset covering river, pluvial, and coastal mechanisms as needed.",
                 "A directly downloadable municipal road/drainage inventory with schema, condition/capacity fields, CRS, positional accuracy, update date, and reuse terms.",

@@ -16,8 +16,8 @@ MAP_CONTEXT_KEY = "kochimap_assessment_context"
 # or a land-cover image is a hazard layer.
 _HAZARD_FOOTPRINT_STATUS: dict[str, tuple[str, str]] = {
     "Flood": (
-        "Not displayed",
-        "The JRC RP100 preview is withheld pending licence clarification, and the KSDMA raster's valid-pixel meaning and units are undocumented.",
+        "Modelled scenario context available",
+        "The JRC GloFAS RP100 preview is displayed as a modelled 100-year river-flood depth scenario under ODbL 1.0 / CC BY 4.0 attribution. It is not observed flooding, a forecast, or an official warning.",
     ),
     "Cyclone": (
         "Not available",
@@ -48,12 +48,12 @@ _HAZARD_FOOTPRINT_STATUS: dict[str, tuple[str, str]] = {
         "No validated network outage or service-area footprint has been acquired and QA-approved.",
     ),
     "Compound: cyclone + flood": (
-        "Not displayed",
-        "A compound view needs both a validated cyclone footprint and a validated flood footprint; neither is approved.",
+        "Modelled flood component only",
+        "Only the JRC RP100 modelled flood scenario is displayable. No validated cyclone track, wind-field, or storm-surge footprint is approved, so this is not a compound hazard footprint.",
     ),
     "Compound: heavy rainfall + drainage failure": (
-        "Not displayed",
-        "A compound view needs a validated flood footprint and a validated drainage-network layer; neither is approved.",
+        "Modelled flood component only",
+        "Only the JRC RP100 modelled flood scenario is displayable. No validated drainage-network layer or drainage-capacity footprint is approved, so this is not a compound hazard footprint.",
     ),
 }
 

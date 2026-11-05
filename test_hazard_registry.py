@@ -43,6 +43,17 @@ from src.scenario_output_model import predict_scenario_outcome
 from src.scientific_scenario_engine import build_scientific_scenario_frame
 
 
+# Only the JRC RP100 modelled flood scenario is displayable.  It is explicitly a
+# context layer, never a validated hazard footprint, so the map status must say
+# so instead of claiming a validated footprint exists.
+MODELLED_FOOTPRINT_STATUSES = {
+    "Flood": "Modelled scenario context available",
+    "Compound: cyclone + flood": "Modelled flood component only",
+    "Compound: heavy rainfall + drainage failure": "Modelled flood component only",
+}
+ALLOWED_FOOTPRINT_STATUSES = {"Not available", *MODELLED_FOOTPRINT_STATUSES.values()}
+
+
 def minimal_inputs(hazard: str) -> dict:
     """Return the smallest plausible scenario accepted for a workflow hazard."""
     return {
@@ -169,7 +180,11 @@ class ConsumerConsistencyTests(unittest.TestCase):
             with self.subTest(hazard=row["Hazard"]):
                 self.assertIn(
                     row["Validated hazard footprint"],
-                    {"Not available", "Not displayed"},
+                    ALLOWED_FOOTPRINT_STATUSES,
+                )
+                self.assertEqual(
+                    row["Validated hazard footprint"],
+                    MODELLED_FOOTPRINT_STATUSES.get(row["Hazard"], "Not available"),
                 )
                 self.assertTrue(row["Why no footprint is shown"])
                 self.assertEqual(
@@ -277,7 +292,11 @@ class UnifiedTenHazardPipelineTests(unittest.TestCase):
                 self.assertTrue(availability["Selected"])
                 self.assertIn(
                     availability["Validated hazard footprint"],
-                    {"Not available", "Not displayed"},
+                    ALLOWED_FOOTPRINT_STATUSES,
+                )
+                self.assertEqual(
+                    availability["Validated hazard footprint"],
+                    MODELLED_FOOTPRINT_STATUSES.get(hazard, "Not available"),
                 )
 
     def test_workflow_recommendation_and_mitigation_tables_exist_for_every_hazard(self):

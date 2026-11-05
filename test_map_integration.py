@@ -91,7 +91,11 @@ class HazardLayerAvailabilityTests(unittest.TestCase):
                 self.assertFalse(row["Selected"])
                 self.assertIn(
                     row["Validated hazard footprint"],
-                    {"Not available", "Not displayed"},
+                    {
+                        "Not available",
+                        "Modelled scenario context available",
+                        "Modelled flood component only",
+                    },
                 )
                 self.assertTrue(row["Why no footprint is shown"])
                 self.assertEqual(
@@ -107,20 +111,25 @@ class HazardLayerAvailabilityTests(unittest.TestCase):
             "Not available",
         )
 
-    def test_flood_components_are_not_displayed_as_other_hazards(self):
+    def test_flood_components_are_not_promoted_to_validated_hazard_footprints(self):
         by_hazard = {row["Hazard"]: row for row in hazard_layer_availability()}
         self.assertEqual(
-            by_hazard["Flood"]["Validated hazard footprint"], "Not displayed"
+            by_hazard["Flood"]["Validated hazard footprint"],
+            "Modelled scenario context available",
+        )
+        self.assertIn(
+            "not observed flooding",
+            by_hazard["Flood"]["Why no footprint is shown"],
         )
         self.assertEqual(
             by_hazard["Compound: cyclone + flood"]["Validated hazard footprint"],
-            "Not displayed",
+            "Modelled flood component only",
         )
         self.assertEqual(
             by_hazard["Compound: heavy rainfall + drainage failure"][
                 "Validated hazard footprint"
             ],
-            "Not displayed",
+            "Modelled flood component only",
         )
         for hazard in ("Earthquake", "Industrial incident", "Infrastructure failure"):
             with self.subTest(hazard=hazard):
@@ -134,7 +143,11 @@ class HazardLayerAvailabilityTests(unittest.TestCase):
         self.assertFalse(any(row["Selected"] for row in rows))
         self.assertEqual(
             {row["Validated hazard footprint"] for row in rows},
-            {"Not available", "Not displayed"},
+            {
+                "Not available",
+                "Modelled scenario context available",
+                "Modelled flood component only",
+            },
         )
 
 

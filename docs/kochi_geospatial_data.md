@@ -1,6 +1,6 @@
 # Kochi geospatial data status
 
-Reviewed 2026-10-28. This note records the source, license, geographic extent,
+Reviewed 2026-11-05. This note records the source, license, geographic extent,
 validation result, and intended use of the map layers. A structurally valid file
 is not proof that a community or government dataset is complete or ground-truth
 accurate.
@@ -18,7 +18,8 @@ accurate.
 | OSM emergency facilities | PROVISIONAL | 105 (44 points, 61 polygons) | OSM database 2026-10-28 19:27:36 UTC | Community-mapped fire/police/emergency features only; operating status and response capability are unknown. |
 | OSM industrial features | PROVISIONAL | 313 (76 points, 237 polygons) | OSM database 2026-10-28 19:27:36 UTC | Tagged works/industrial features, not a verified factory, consent, or emissions inventory. Proximity does not establish pollution causation. |
 | OSM air-quality monitors | UNAVAILABLE | 0 | OSM database 2026-10-28 19:27:36 UTC | No explicitly air-quality-tagged object was returned in the bounded snapshot. This does not show that monitoring stations do not exist. |
-| JRC/Copernicus GloFAS RP100 river flood preview | PROVISIONAL | Raster preview | Existing project copy | Modeled scenario context at about 90 m, not an observation, forecast, warning, or site-specific risk estimate. Transparent pixels do not establish safety. CC BY 4.0 attribution and change indication apply. |
+| JRC/Copernicus GloFAS RP100 river flood preview | PROVISIONAL | Raster preview | Existing project copy | Modeled scenario context at about 90 m, not an observation, forecast, warning, or site-specific risk estimate. Transparent pixels do not establish safety. The dataset README states ODbL 1.0; the linked JRC copyright notice states CC BY 4.0. The project applies the stricter ODbL 1.0 basis with attribution and change indication. |
+| JRC permanent-water mask tiles | CONTEXT / EXCLUSION ONLY | 2 source tiles | Existing project copy | Used only to exclude cells that JRC patches as permanent water from flood screening. A permanent-water classification is not a hazard or exposure layer. |
 
 The map displays the OSM groups independently. They start hidden to keep the
 initial map responsive. Each OSM GeoJSON sidecar records source query and hash,
@@ -85,13 +86,20 @@ spatial interpolation, AQI recalculation, or factory source attribution.
 
 ## Analysis supported by current data
 
-No asset-to-hazard exposure, road-access, hospital-proximity, pollution
-interpolation, or industrial source-attribution analysis is supported. The
-existing exposure interface reports unknown/unassessable exposure when it has
-no compatible validated asset and vector hazard layers. The JRC image preview
-is contextual raster display, not a vector overlay. Counts and geometry checks
-are QA summaries, not risk estimates. No distance, area, flood depth at an
-asset, probability, vulnerability, or safety conclusion is derived from OSM.
+No verified asset-to-hazard exposure, road-access, hospital-proximity,
+pollution interpolation, or industrial source-attribution analysis is
+supported. The existing exposure interface reports unknown/unassessable
+exposure when it has no compatible validated asset and vector hazard layers.
+The JRC image preview is contextual raster display, not a vector overlay.
+Counts and geometry checks are QA summaries, not risk estimates.
+
+A separate **provisional screening** report
+(`reports/jrc_rp100_osm_exposure_screening.json`) samples OSM asset points
+against the modelled JRC RP100 raster and excludes JRC-patched permanent water.
+It is not an exposure estimate: OSM asset existence is unverified, population is
+absent, and a positive modelled depth is not observed flooding. No distance,
+area, population, damage, probability, vulnerability, or safe/unsafe conclusion
+is derived from OSM or the JRC raster.
 Uploaded-point CSV tables pass through the shared display-only Arrow
 normalization boundary. Map layers and calculations use their separate point
 frame, so table rendering does not alter them.
