@@ -1,6 +1,6 @@
 {
   "status": "RAW_SOURCE_AUDIT_AND_TRAINING_READINESS",
-  "generated_at_utc": "2026-10-31T11:30:31.653795+00:00",
+  "generated_at_utc": "2026-11-05T12:41:04.476490+00:00",
   "raw_sources_available_for_hazards": 7,
   "hazard_tracks": 9,
   "research_baselines_found_in_separate_report": 2,
@@ -68,8 +68,8 @@
           "file": "data/external/hazards/raw/cyclone/ibtracs_north_indian_ocean_v04r01.csv",
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
-          "bytes": 25623827,
-          "sha256": "11e21e388602d8976f9be0042717813fc9b16decca2c17bd305532a0ae812661",
+          "bytes": 25634200,
+          "sha256": "a2e8b9c8050de1d159760c0b0cf8a4300d30e009441de8a752fc7bad214e8f2a",
           "format": "csv",
           "columns_sample": [
             "SID",
@@ -333,8 +333,8 @@
           "file": "data/external/hazards/raw/drought/india_current_cdi.txt",
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
-          "bytes": 101181,
-          "sha256": "f07694bd78935baecd49a822033c568d845bd014b7095bdd5220aeb1288ec30c",
+          "bytes": 100650,
+          "sha256": "46a1aa60add70c7c11445517db025485555f70e57bafb30434992339ff621aae",
           "format": "txt",
           "line_count": 4537
         },
@@ -342,13 +342,34 @@
           "file": "data/external/hazards/raw/drought/india_drought_area_timeseries.txt",
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
-          "bytes": 14597,
-          "sha256": "81b01a875da05789dcc8e4a246ff52baf0b00a493521eb218ed93b03ad10bcf2",
+          "bytes": 14649,
+          "sha256": "ef032e4265058a103cb44a2571a353436d44b8e6f37e38124aba6947080e026e",
           "format": "txt",
-          "line_count": 277
+          "line_count": 278
+        },
+        {
+          "file": "data/external/hazards/raw/weather/kochi_daily_weather_1991_2025.json",
+          "exists": true,
+          "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
+          "bytes": 484555,
+          "sha256": "e32a0595098834db8dd3f34eb5ac9af865a43d7d2c15e492b40e7a9bc979f0ab",
+          "format": "json",
+          "json_root_type": "dict",
+          "top_level_keys": [
+            "latitude",
+            "longitude",
+            "generationtime_ms",
+            "utc_offset_seconds",
+            "timezone",
+            "timezone_abbreviation",
+            "elevation",
+            "daily_units",
+            "daily"
+          ],
+          "daily_record_count": 12784
         }
       ],
-      "raw_source_count": 2,
+      "raw_source_count": 3,
       "curated_training_table": {
         "file": "data/external/hazards/drought.csv",
         "status": "MISSING_CURATED_TRAINING_TABLE",
@@ -367,11 +388,32 @@
       "source_url": "https://www.ncei.noaa.gov/; https://cds.climate.copernicus.eu/",
       "raw_sources": [
         {
+          "file": "data/external/hazards/raw/weather/kochi_daily_weather_1991_2025.json",
+          "exists": true,
+          "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
+          "bytes": 484555,
+          "sha256": "e32a0595098834db8dd3f34eb5ac9af865a43d7d2c15e492b40e7a9bc979f0ab",
+          "format": "json",
+          "json_root_type": "dict",
+          "top_level_keys": [
+            "latitude",
+            "longitude",
+            "generationtime_ms",
+            "utc_offset_seconds",
+            "timezone",
+            "timezone_abbreviation",
+            "elevation",
+            "daily_units",
+            "daily"
+          ],
+          "daily_record_count": 12784
+        },
+        {
           "file": "data/external/hazards/raw/weather/kochi_daily_weather_2000_2025.json",
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
           "bytes": 360514,
-          "sha256": "0774cb205643cc9ee71a6bc8ddf7aa8137970016db89303cd9c855c05838029d",
+          "sha256": "88449d0475c46e66cf714a097deb841cbc80bd03d6400d87c191d1c670edb2cc",
           "format": "json",
           "json_root_type": "dict",
           "top_level_keys": [
@@ -391,8 +433,8 @@
           "file": "data/external/hazards/raw/weather/kottayam_daily_weather_2000_2025.json",
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
-          "bytes": 361713,
-          "sha256": "37bfdb199b26ba2a90b9e17fe8b2f5be5377caa04129f14b884099e5dc0a9b9f",
+          "bytes": 361714,
+          "sha256": "eae9bf84bde463ec65a4c9190ab30b8ab1a463e2a6401cc85252371b8d44aa85",
           "format": "json",
           "json_root_type": "dict",
           "top_level_keys": [
@@ -413,7 +455,7 @@
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
           "bytes": 359692,
-          "sha256": "d62a0aa85849dd2efa4668f1bb65c56b7c4cef32dcd9b9bfe10db065b5b6539e",
+          "sha256": "25d27b3c8f91b00f9d1607ceb0cf60daf4aabf3d886ad3c73553a71d0d195eac",
           "format": "json",
           "json_root_type": "dict",
           "top_level_keys": [
@@ -433,8 +475,8 @@
           "file": "data/external/hazards/raw/weather/thiruvananthapuram_daily_weather_2000_2025.json",
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
-          "bytes": 361957,
-          "sha256": "95034172d5a19f754bf64c86d8b5d6920507a347a750e6e12cda66bf740c0887",
+          "bytes": 361956,
+          "sha256": "452512fcf47e5bbfd2cf6ffd91f6cead634ce4ebe1db9438dca4a72a6d6eb205",
           "format": "json",
           "json_root_type": "dict",
           "top_level_keys": [
@@ -451,7 +493,7 @@
           "daily_record_count": 9497
         }
       ],
-      "raw_source_count": 4,
+      "raw_source_count": 5,
       "curated_training_table": {
         "file": "data/external/hazards/heatwave.csv",
         "status": "MISSING_CURATED_TRAINING_TABLE",
@@ -538,11 +580,32 @@
       "source_url": "https://mausam.imd.gov.in/; https://cds.climate.copernicus.eu/",
       "raw_sources": [
         {
+          "file": "data/external/hazards/raw/weather/kochi_daily_weather_1991_2025.json",
+          "exists": true,
+          "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
+          "bytes": 484555,
+          "sha256": "e32a0595098834db8dd3f34eb5ac9af865a43d7d2c15e492b40e7a9bc979f0ab",
+          "format": "json",
+          "json_root_type": "dict",
+          "top_level_keys": [
+            "latitude",
+            "longitude",
+            "generationtime_ms",
+            "utc_offset_seconds",
+            "timezone",
+            "timezone_abbreviation",
+            "elevation",
+            "daily_units",
+            "daily"
+          ],
+          "daily_record_count": 12784
+        },
+        {
           "file": "data/external/hazards/raw/weather/kochi_daily_weather_2000_2025.json",
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
           "bytes": 360514,
-          "sha256": "0774cb205643cc9ee71a6bc8ddf7aa8137970016db89303cd9c855c05838029d",
+          "sha256": "88449d0475c46e66cf714a097deb841cbc80bd03d6400d87c191d1c670edb2cc",
           "format": "json",
           "json_root_type": "dict",
           "top_level_keys": [
@@ -562,8 +625,8 @@
           "file": "data/external/hazards/raw/weather/kottayam_daily_weather_2000_2025.json",
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
-          "bytes": 361713,
-          "sha256": "37bfdb199b26ba2a90b9e17fe8b2f5be5377caa04129f14b884099e5dc0a9b9f",
+          "bytes": 361714,
+          "sha256": "eae9bf84bde463ec65a4c9190ab30b8ab1a463e2a6401cc85252371b8d44aa85",
           "format": "json",
           "json_root_type": "dict",
           "top_level_keys": [
@@ -584,7 +647,7 @@
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
           "bytes": 359692,
-          "sha256": "d62a0aa85849dd2efa4668f1bb65c56b7c4cef32dcd9b9bfe10db065b5b6539e",
+          "sha256": "25d27b3c8f91b00f9d1607ceb0cf60daf4aabf3d886ad3c73553a71d0d195eac",
           "format": "json",
           "json_root_type": "dict",
           "top_level_keys": [
@@ -604,8 +667,8 @@
           "file": "data/external/hazards/raw/weather/thiruvananthapuram_daily_weather_2000_2025.json",
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
-          "bytes": 361957,
-          "sha256": "95034172d5a19f754bf64c86d8b5d6920507a347a750e6e12cda66bf740c0887",
+          "bytes": 361956,
+          "sha256": "452512fcf47e5bbfd2cf6ffd91f6cead634ce4ebe1db9438dca4a72a6d6eb205",
           "format": "json",
           "json_root_type": "dict",
           "top_level_keys": [
@@ -622,7 +685,7 @@
           "daily_record_count": 9497
         }
       ],
-      "raw_source_count": 4,
+      "raw_source_count": 5,
       "curated_training_table": {
         "file": "data/external/hazards/severe_storm.csv",
         "status": "MISSING_CURATED_TRAINING_TABLE",
@@ -676,8 +739,8 @@
           "file": "data/processed/air_quality/kspcb_caaqms_eloor_aqi_2026-08.csv",
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
-          "bytes": 6900,
-          "sha256": "1f02e9770233d6090778d01783df8d844d9ff3f80ff445dc7e7464c2b1b340cd",
+          "bytes": 6932,
+          "sha256": "fbe91c0608d8e2ea494b8fdd99f4b97b880441798e396c6db80ed8a690972a83",
           "format": "csv",
           "columns_sample": [
             "observed_at",
@@ -692,8 +755,8 @@
           "file": "data/processed/air_quality/kspcb_caaqms_eloor_aqi_2026-09.csv",
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
-          "bytes": 6680,
-          "sha256": "f03df29a4e771e75835d2b94fbebff6b0cc0feddce4c130442a920b3d239f927",
+          "bytes": 6711,
+          "sha256": "f2fe3c007fddc6676fb66ca4be3a308fd309946f7301f4d17da3f90e8eaa2b36",
           "format": "csv",
           "columns_sample": [
             "observed_at",
@@ -708,8 +771,8 @@
           "file": "data/processed/air_quality/kspcb_caaqms_eloor_daily_2026-08.csv",
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
-          "bytes": 93253,
-          "sha256": "56902f96ebf02afa65126f7fb6575c71a4c2b76f4927ee2ba5dd832c02c9ae55",
+          "bytes": 93533,
+          "sha256": "14886c1cb86deca55d33dd495751b2aab7a3f3aae7eaaf561100b2feba8228e9",
           "format": "csv",
           "columns_sample": [
             "observed_at",
@@ -729,8 +792,8 @@
           "file": "data/processed/air_quality/kspcb_caaqms_eloor_daily_2026-09.csv",
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
-          "bytes": 90248,
-          "sha256": "ffc8ebc564f69b57562e3d862db8c3a704b6c664ce98248cfa037027d6a635cc",
+          "bytes": 90519,
+          "sha256": "c0888fa4fc8e76bab0c49e133e4cbe261705032dad294a87744693be9ef3b217",
           "format": "csv",
           "columns_sample": [
             "observed_at",
@@ -750,8 +813,8 @@
           "file": "data/processed/air_quality/kspcb_daily_aqi_2026-10-16.csv",
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
-          "bytes": 2074,
-          "sha256": "c8d1af5bc458436d5078b1a3adfcf9d644a79da4e36b1b746b56dc4de45b0993",
+          "bytes": 2080,
+          "sha256": "c30ef5a2ffac3a332c11a9f8e22a2f6c6728162811e0794d8547a773f922be82",
           "format": "csv",
           "columns_sample": [
             "observed_at",
@@ -786,8 +849,8 @@
           "file": "data/processed/air_quality/kspcb_namp_ernakulam_2025-06.csv",
           "exists": true,
           "status": "PRESENT_RAW_SOURCE_NOT_VALIDATED_FOR_PREDICTION",
-          "bytes": 18151,
-          "sha256": "0524aac512a42aa5122fbbd6a11b2e3680e0376b02f8e879a76e31a31cb825b4",
+          "bytes": 18214,
+          "sha256": "433f2663ea706c70db6d187a532429dc001782c90a0d9e3a222a0d29526ee392",
           "format": "csv",
           "columns_sample": [
             "station_code",
