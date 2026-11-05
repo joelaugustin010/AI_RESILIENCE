@@ -17,14 +17,15 @@ import streamlit as st
 # One accent per module family. The values are also exposed as CSS variables so
 # page headers keep their own character while sharing typography and spacing.
 ACCENTS: dict[str, str] = {
-    "teal": "#42e0c1",
-    "cyan": "#5cc8e8",
-    "blue": "#7fb8ff",
-    "emerald": "#4ade80",
-    "amber": "#f0c56a",
-    "orange": "#fb923c",
-    "violet": "#b39bff",
-    "rose": "#fb8098",
+    # Shared eco palette; hazard-specific colours remain distinct from severity.
+    "teal": "#247A65",
+    "cyan": "#83B9A5",
+    "blue": "#328BCB",
+    "emerald": "#31866B",
+    "amber": "#C5A13A",
+    "orange": "#D58A36",
+    "violet": "#8064B5",
+    "rose": "#C85C5C",
 }
 
 
