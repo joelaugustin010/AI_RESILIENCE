@@ -41,16 +41,29 @@ class JrcRasterSourceTests(unittest.TestCase):
         self.assertEqual(hashlib.sha256(output.read_bytes()).hexdigest(), metadata["processing"]["preview_sha256"])
         self.assertIn("ODbL 1.0", metadata["license"])
         self.assertIn("CC BY 4.0", metadata["license"])
-        self.assertIn("must not be redistributed or publicly deployed", " ".join(metadata["limitations"]))
-        self.assertIn("not displayed", metadata["analysis_status"])
+        self.assertEqual(metadata["license_resolution"]["status"], "RESOLVED")
+        self.assertIn("attribution", metadata["license_resolution"]["restriction"].lower())
+        self.assertIn("modelled scenario context", metadata["analysis_status"].lower())
         self.assertEqual(len(metadata["source_files"]), 2)
+        self.assertEqual(len(metadata["permanent_water_files"]), 2)
+        for item in metadata["permanent_water_files"]:
+            self.assertEqual(
+                hashlib.sha256((ROOT / item["file"]).read_bytes()).hexdigest(),
+                item["sha256"],
+            )
         with Image.open(output) as preview:
             self.assertEqual(preview.mode, "RGBA")
             self.assertEqual(preview.size, (520, 520))
         catalog = json.loads((ROOT / "data" / "reference" / "spatial_sources.json").read_text(encoding="utf-8"))
         entry = next(item for item in catalog["datasets"] if item["layer_id"] == "flood_hazard_jrc_glofas_rp100")
-        self.assertIn("assets_unavailable", entry["status"])
-        self.assertEqual(entry["validation_status"], "REQUIRES LICENSE CLARIFICATION; NOT DISPLAYED")
+        self.assertIn("licence_resolved", entry["status"])
+        self.assertEqual(entry["validation_status"], "MODELLED SCENARIO CONTEXT; LICENCE RESOLVED; PERMANENT-WATER EXCLUSION APPLIED; NOT OBSERVED FLOODING")
+        self.assertEqual(len(entry["permanent_water_files"]), 2)
+        for item in entry["permanent_water_files"]:
+            self.assertEqual(
+                hashlib.sha256((ROOT / item["file"]).read_bytes()).hexdigest(),
+                item["sha256"],
+            )
         self.assertIn("ODbL 1.0", entry["license"])
         self.assertIn("CC BY 4.0", entry["license"])
 

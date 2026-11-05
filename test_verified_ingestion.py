@@ -190,8 +190,12 @@ class StatusAndCatalogTests(TemporaryAuditCase):
         self.assertEqual(spatial["flood_hazard_jrc_glofas_rp100"]["status"], "provisional")
         source_catalog = json.loads((self.root / "data/reference/spatial_sources.json").read_text(encoding="utf-8"))
         jrc = next(item for item in source_catalog["datasets"] if item["layer_id"] == "flood_hazard_jrc_glofas_rp100")
-        self.assertIn("preview_withheld", jrc["status"])
-        self.assertEqual(jrc["validation_status"], "REQUIRES LICENSE CLARIFICATION; NOT DISPLAYED")
+        self.assertIn("licence_resolved", jrc["status"])
+        self.assertEqual(
+            jrc["validation_status"],
+            "MODELLED SCENARIO CONTEXT; LICENCE RESOLVED; "
+            "PERMANENT-WATER EXCLUSION APPLIED; NOT OBSERVED FLOODING",
+        )
 
     def test_new_cwc_and_nwic_hydrology_leads_do_not_create_spatial_data(self):
         catalog = json.loads((ROOT / "data/reference/hydrology_data_sources.json").read_text(encoding="utf-8"))

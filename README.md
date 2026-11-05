@@ -23,6 +23,13 @@ The homepage has its own implementation and customisation guide in
 hero film, place it at `assets/videos/kerala_hero.mp4`; see
 [`assets/videos/README.md`](assets/videos/README.md) for export settings.
 
+Optional dependency sets:
+
+- `requirements-data.txt` — PDF extraction and coordinate/geometry support used by some data-validation paths.
+- `requirements-scripts.txt` — one-off acquisition and audit scripts only. The Streamlit app and standard test suite do not need these.
+
+The application entry point is `app.py`; all pages are registered there through `st.navigation`.
+
 ## Suggested demonstration (5–7 minutes)
 
 1. **Home** — open on the cinematic Kerala introduction: the landscape, the threats, why the evidence chain matters, and where each workspace fits.

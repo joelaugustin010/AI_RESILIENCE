@@ -1,0 +1,176 @@
+{
+  "aggregate": {
+    "features_total": 14663,
+    "features_sampled_in_coverage": 941,
+    "positive_modelled_depth": 724,
+    "zero_modelled_depth": 0,
+    "nodata_in_source": 13722,
+    "outside_source_coverage": 0,
+    "invalid_geometry": 0,
+    "permanent_water_cells": 217,
+    "status": "PROVISIONAL SCREENING ONLY — not verified exposure"
+  },
+  "layers": [
+    {
+      "features_total": 680,
+      "features_sampled_in_coverage": 34,
+      "positive_modelled_depth": 30,
+      "zero_modelled_depth": 0,
+      "nodata_in_source": 646,
+      "outside_source_coverage": 0,
+      "invalid_geometry": 0,
+      "permanent_water_cells": 4,
+      "positive_depth_min_m": 0.12800000607967377,
+      "positive_depth_median_m": 0.9249999821186066,
+      "positive_depth_max_m": 7.605999946594238,
+      "sampled_fraction": 0.05,
+      "status": "PROVISIONAL SCREENING ONLY — not verified exposure",
+      "layer_id": "osm_kochi_healthcare",
+      "layer_label": "Healthcare facilities",
+      "source_file": "osm_kochi_healthcare_20261028T192850Z.geojson"
+    },
+    {
+      "features_total": 105,
+      "features_sampled_in_coverage": 6,
+      "positive_modelled_depth": 4,
+      "zero_modelled_depth": 0,
+      "nodata_in_source": 99,
+      "outside_source_coverage": 0,
+      "invalid_geometry": 0,
+      "permanent_water_cells": 2,
+      "positive_depth_min_m": 0.6639999747276306,
+      "positive_depth_median_m": 1.6419999599456787,
+      "positive_depth_max_m": 2.052999973297119,
+      "sampled_fraction": 0.0571,
+      "status": "PROVISIONAL SCREENING ONLY — not verified exposure",
+      "layer_id": "osm_kochi_emergency",
+      "layer_label": "Emergency facilities",
+      "source_file": "osm_kochi_emergency_20261028T192850Z.geojson"
+    },
+    {
+      "features_total": 13123,
+      "features_sampled_in_coverage": 788,
+      "positive_modelled_depth": 580,
+      "zero_modelled_depth": 0,
+      "nodata_in_source": 12335,
+      "outside_source_coverage": 0,
+      "invalid_geometry": 0,
+      "permanent_water_cells": 208,
+      "positive_depth_min_m": 0.1080000028014183,
+      "positive_depth_median_m": 1.4240000247955322,
+      "positive_depth_max_m": 4.684999942779541,
+      "sampled_fraction": 0.06,
+      "status": "PROVISIONAL SCREENING ONLY — not verified exposure",
+      "layer_id": "osm_kochi_roads",
+      "layer_label": "Mapped roads",
+      "source_file": "osm_kochi_roads_20261028T192808Z.geojson"
+    },
+    {
+      "features_total": 442,
+      "features_sampled_in_coverage": 86,
+      "positive_modelled_depth": 84,
+      "zero_modelled_depth": 0,
+      "nodata_in_source": 356,
+      "outside_source_coverage": 0,
+      "invalid_geometry": 0,
+      "permanent_water_cells": 2,
+      "positive_depth_min_m": 0.1080000028014183,
+      "positive_depth_median_m": 3.3489999771118164,
+      "positive_depth_max_m": 8.107999801635742,
+      "sampled_fraction": 0.1946,
+      "status": "PROVISIONAL SCREENING ONLY — not verified exposure",
+      "layer_id": "osm_kochi_transit",
+      "layer_label": "Rail and transit ways",
+      "source_file": "osm_kochi_transit_20261028T192808Z.geojson"
+    },
+    {
+      "features_total": 313,
+      "features_sampled_in_coverage": 27,
+      "positive_modelled_depth": 26,
+      "zero_modelled_depth": 0,
+      "nodata_in_source": 286,
+      "outside_source_coverage": 0,
+      "invalid_geometry": 0,
+      "permanent_water_cells": 1,
+      "positive_depth_min_m": 0.1080000028014183,
+      "positive_depth_median_m": 1.4359999895095825,
+      "positive_depth_max_m": 7.992000102996826,
+      "sampled_fraction": 0.0863,
+      "status": "PROVISIONAL SCREENING ONLY — not verified exposure",
+      "layer_id": "osm_kochi_industry",
+      "layer_label": "Mapped industrial features",
+      "source_file": "osm_kochi_industry_20261028T192850Z.geojson"
+    }
+  ],
+  "method": "Nearest raster cell sampled at the bounding-box centre of a provisional OpenStreetMap geometry. This is not a facility entrance, an observed flood depth, or a validated exposure count. Permanent-water cells are excluded. NoData means no depth value is stored, not confirmed absence of flooding; a NoData cell does not establish safety.",
+  "extent": {
+    "bounds_epsg4326": [
+      76.23735890065669,
+      9.889718280722308,
+      76.34002933184016,
+      10.049769312385111
+    ],
+    "grid_cells_evaluated": 23932,
+    "valid_cells": 2678,
+    "positive_depth_cells": 1400,
+    "permanent_water_cells_excluded": 1278,
+    "valid_area_km2": 22.292,
+    "positive_depth_area_km2": 11.653,
+    "permanent_water_area_km2": 10.639,
+    "positive_fraction_of_valid": 0.5228,
+    "maximum_modelled_depth_m": 5.184999942779541,
+    "area_method": "Cell-centre sampling of the source raster at 3 arc-second spacing; per-row latitude scaling. Area is within the display rectangle, not a validated municipal boundary mask.",
+    "caveat": "Modelled RP100 scenario area, not observed inundation. Permanent-water cells are excluded. The auxiliary spurious-depth mask was not downloaded, so artifact cells cannot be excluded."
+  },
+  "source_tiles": [
+    {
+      "file": "jrc_glofas_rp100_ID185_N20_E70_depth.tif",
+      "sha256": "93ba198ffeb0fb7436c6b97d66cf6b47b10cd59c4e6cf742a8aff59f46bdaf3b",
+      "crs": "EPSG:4326",
+      "nodata": -9999.0,
+      "pixel_size_degrees": [
+        0.0008333333356347339,
+        0.0008333333333325754
+      ]
+    },
+    {
+      "file": "jrc_glofas_rp100_ID186_N10_E70_depth.tif",
+      "sha256": "cd78d43b91c235e39aa443550319ab099b816ca679f76ab83c339b5e7a9f1a30",
+      "crs": "EPSG:4326",
+      "nodata": -9999.0,
+      "pixel_size_degrees": [
+        0.0008333333356347339,
+        0.0008333333333325754
+      ]
+    }
+  ],
+  "permanent_water_tiles": [
+    {
+      "file": "ID185_N20_E70_permanent_water.tif",
+      "sha256": "a0a1dffab2c9313b037878a3f6a41a84217c8f0343fc6484619b3ff5d72daf6c",
+      "crs": "EPSG:4326",
+      "nodata": 255,
+      "permanent_water_value": 1
+    },
+    {
+      "file": "ID186_N10_E70_permanent_water.tif",
+      "sha256": "944b05a8ea6f2ec6592dccc9d978abe40655387eec9b45457499c04720c0fca0",
+      "crs": "EPSG:4326",
+      "nodata": 255,
+      "permanent_water_value": 1
+    }
+  ],
+  "licence": "JRC GloFAS v2.1.2 used under ODbL 1.0 (dataset README); CC BY 4.0 also stated by JRC. Attribution and change indication required; share-alike applies to publicly distributed derived databases. OSM asset context used under ODbL 1.0 with © OpenStreetMap contributors attribution.",
+  "limitations": [
+    "Modelled 100-year river-flood scenario, not observed flooding, a forecast, or an official warning.",
+    "Asset locations are provisional OpenStreetMap community-mapped geometry; completeness and positional accuracy are not verified.",
+    "Representative points are bounding-box centres, not surveyed facility entrances.",
+    "Only the RP100 depth field and the permanent-water mask were downloaded; the spurious-depth artifact mask is unavailable.",
+    "Permanent-water cells are excluded from the positive-depth screening because the JRC product patches permanent water into the flood map.",
+    "Cells outside the modelled inundation extent are stored as NoData (−9999), not as zero depth; NoData means no depth value is stored, not confirmed absence of flooding.",
+    "Zero and NoData cells do not establish safety. Population exposure and damage are not assessed.",
+    "No result here is an operational exposure count, risk class, or casualty estimate."
+  ],
+  "generated_at_utc": "2026-11-05T12:12:07.785813+00:00",
+  "metadata_file": "data/processed/spatial_layers/jrc_glofas_rp100_kochi_preview.metadata.json"
+}

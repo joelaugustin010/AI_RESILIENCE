@@ -9,7 +9,10 @@ ROOT = Path(__file__).resolve().parent
 
 
 def _page(path: str) -> AppTest:
-    app = AppTest.from_file(str(ROOT / "app.py"), default_timeout=60).run()
+    # The map page reads and validates the processed spatial layers on a cold
+    # cache; allow enough time for that one-time work without changing what the
+    # tests assert.
+    app = AppTest.from_file(str(ROOT / "app.py"), default_timeout=180).run()
     app.switch_page(path).run()
     assert not app.exception
     return app
@@ -49,14 +52,17 @@ def test_data_readiness_reports_flood_analysis_unavailable_and_license_conflict(
     assert "Sametham" in rendered
 
 
-def test_kochi_map_withholds_jrc_preview_and_has_no_jrc_display_toggle():
+def test_kochi_map_displays_licensed_jrc_preview_as_modelled_context():
     app = _page("app_pages/kochi_map.py")
     rendered = _text(app)
-    assert "JRC flood preview withheld pending licence clarification" in rendered
     assert "ODbL 1.0" in rendered
     assert "CC BY 4.0" in rendered
+    assert "not observed flooding" in rendered.lower()
     assert "unknown / unassessable exposure" in rendered.lower()
-    assert all("jrc" not in checkbox.label.lower() for checkbox in app.checkbox)
+    jrc_toggles = [box for box in app.checkbox if "jrc" in box.label.lower()]
+    assert len(jrc_toggles) == 1
+    assert "modelled" in jrc_toggles[0].label.lower()
+    assert jrc_toggles[0].value is False
 
 
 def test_hospital_page_does_not_rank_unsupported_scores():

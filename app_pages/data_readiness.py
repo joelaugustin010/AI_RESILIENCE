@@ -13,6 +13,7 @@ from src.ui_theme import page_header
 
 ROOT = Path(__file__).resolve().parents[1]
 FLOOD_REFERENCE_PATH = ROOT / "data" / "reference" / "ksdma_ernakulam_flood_return_period_statistics_2022.json"
+CLIMATE_BENCHMARK_REPORT = ROOT / "reports" / "kochi_climate_benchmarks.json"
 
 
 @st.cache_data(ttl=60)
@@ -161,3 +162,63 @@ st.caption(
     "The Air Pollution page remains the descriptive station-summary view. "
     "This readiness page does not create a second scoring or decision workflow."
 )
+
+st.subheader("Descriptive climate benchmarks: Kochi")
+st.caption(
+    "A separate, reproducible climatology for checking model context. It is not a "
+    "forecast, official warning, IMD declaration, or attribution statement."
+)
+try:
+    climate = json.loads(CLIMATE_BENCHMARK_REPORT.read_text(encoding="utf-8"))
+    record = climate["record"]
+    heat = climate["heat"]["thresholds"]
+    rainfall = climate["rainfall"]
+    spi = climate["spi_readiness"]
+    metric_cols = st.columns(4)
+    metric_cols[0].metric(
+        "Record",
+        f"{record['first_date']} to {record['last_date']}",
+        help="Daily consecutive record; no gaps.",
+    )
+    metric_cols[1].metric("Complete years", record["complete_year_count"])
+    metric_cols[2].metric(
+        "Baseline 95th-percentile Tmax", f"{heat['baseline_p95_c']:.1f} °C"
+    )
+    metric_cols[3].metric(
+        "Mean annual rainfall", f"{rainfall['annual_total_mm']['mean']:,.0f} mm"
+    )
+    st.caption(
+        f"Full-record maximum Tmax {heat['full_record_max_c']:.1f} °C · "
+        f"wettest day {rainfall['wettest_day']['precipitation_mm']:.1f} mm on "
+        f"{rainfall['wettest_day']['date']} · "
+        f"SPI-1 reference rule "
+        f"{'met' if spi['meets_30_year_spi_reference_rule'] else 'not met'} "
+        f"({spi['reference_years']} years). Baseline: "
+        f"{climate['baseline_period']['start']} to {climate['baseline_period']['end']}."
+    )
+    st.info(
+        "The input is Open-Meteo archived reanalysis at a model grid point, not a "
+        "rain-gauge or thermometer observation. Heat and heavy-rain thresholds are "
+        "transparent screening values, not official IMD criteria or local warnings.",
+        title="Descriptive climatology, not a hazard prediction",
+    )
+    with st.expander("Climate benchmark source, portability and limitations"):
+        st.markdown(
+            f"**Provider:** {climate['source']['provider']}  \n"
+            f"**Source:** {climate['source']['source_url']}  \n"
+            f"**File:** `{climate['source']['file']}`  \n"
+            f"**SHA-256:** `{climate['source']['sha256']}`  \n"
+            f"**Licence:** {climate['source']['licence']}"
+        )
+        for limitation in climate["limitations"]:
+            st.write(f"- {limitation}")
+        st.caption(
+            "Reproduce with `python scripts/build_climate_benchmarks.py` after "
+            "placing the documented local reanalysis snapshot in "
+            "`data/external/hazards/raw/weather/`."
+        )
+except (OSError, json.JSONDecodeError, KeyError, TypeError) as exc:
+    st.info(
+        "Insufficient evidence: the descriptive climate-benchmark report could not "
+        f"be loaded ({exc}). No climate value is shown."
+    )

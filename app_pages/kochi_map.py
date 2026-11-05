@@ -9,10 +9,21 @@ import pydeck as pdk
 import streamlit as st
 
 from src.dataframe_display import display_dataframe
+from src.hazard_registry import components_for, is_workflow_hazard
+from src.jrc_flood_context import (
+    DISPLAY_CAVEAT as JRC_DISPLAY_CAVEAT,
+    LICENCE_SOURCES as JRC_LICENCE_SOURCES,
+    JrcContextError,
+    licence_notice,
+    validate_licence_resolution,
+    validate_preview,
+)
+from src.kochi_map_layers import build_jrc_preview_layer
 from src.spatial_data import classify_exposure, processed_layer_issues, read_processed_layers, validate_geojson
 from src.landcover_context import validate_worldcover_preview
 from src.map_integration import MAP_CONTEXT_KEY, selected_feature_properties
 from src.ui_theme import page_header, section_intro
+from src.map_integration import hazard_layer_availability
 
 ROOT = Path(__file__).resolve().parents[1]
 BOUNDARY_PATH = ROOT / "data" / "reference" / "kochi_corporation_boundary.geojson"
@@ -23,10 +34,13 @@ WORLDCOVER_PREVIEW_PATH = ROOT / "data" / "processed" / "spatial_layers" / "worl
 WORLDCOVER_PREVIEW_METADATA = WORLDCOVER_PREVIEW_PATH.with_name(
     "worldcover_2021_kochi_context.metadata.json"
 )
+JRC_PREVIEW_PATH = ROOT / "data" / "processed" / "spatial_layers" / "jrc_glofas_rp100_kochi_preview.png"
+JRC_PREVIEW_METADATA = JRC_PREVIEW_PATH.with_name("jrc_glofas_rp100_kochi_preview.metadata.json")
 HOSPITAL_REVIEW_CSV = ROOT / "data" / "processed" / "nihfw_ernakulam_hospitals_coordinate_review.csv"
 WARD_RECONCILIATION_REPORT = ROOT / "reports" / "kochi_ward_label_reconciliation.json"
 PORTAL_WARD_AUDIT_REPORT = ROOT / "reports" / "kochi_portal_candidate_vs_sec_register.json"
 PORTAL_WARD_METADATA = ROOT / "data" / "external" / "map_reference" / "kochi_wards_ksmart_portal_candidate.metadata.json"
+EXPOSURE_SCREENING_REPORT = ROOT / "reports" / "jrc_rp100_osm_exposure_screening.json"
 FINAL_WARD_MAP_PDF = "https://wardmap.ksmart.live/FinalN/map/Map_FinalN_Ernakulam_Cochin.pdf"
 FINAL_WARD_MAP_SOURCE_REPORT = ROOT / "reports" / "kochi_final_map_source_discovery.json"
 ESRI_WARD_AUDIT_REPORT = ROOT / "reports" / "kochi_esri_ward_candidate_audit.json"
@@ -199,14 +213,81 @@ def load_ward_reconciliation_report() -> dict:
         return {}
 
 
+def _file_stamp(path: Path) -> tuple[int, int]:
+    """Return a (modified_ns, size) stamp so cached validation follows file edits."""
+    try:
+        stat = path.stat()
+    except OSError:
+        return (0, 0)
+    return (stat.st_mtime_ns, stat.st_size)
+
+
 @st.cache_data
-def load_acquisition_metadata(path: Path) -> dict | None:
-    """Read acquisition sidecars for datasets that are not eligible map layers."""
+def load_acquisition_metadata(
+    path: Path, stamp: tuple[int, int] | None = None
+) -> dict | None:
+    """Read acquisition sidecars for datasets that are not eligible map layers.
+
+    ``stamp`` participates in the cache key only.  Callers that must notice file
+    edits pass :func:`_file_stamp`; the sidecar is still re-read when it changes,
+    so caching never hides a newer provenance record.
+    """
+    del stamp
     try:
         with path.open(encoding="utf-8") as source:
             return json.load(source)
     except (OSError, json.JSONDecodeError):
         return None
+
+
+@st.cache_data(show_spinner=False)
+def load_jrc_context(
+    preview_path: Path,
+    metadata_path: Path,
+    preview_stamp: tuple[int, int],
+    metadata_stamp: tuple[int, int],
+) -> dict | None:
+    """Validate the JRC licence and preview once per file version.
+
+    Hash, pixel-size and bounds checks still run; only repeated validation of an
+    unchanged file is skipped.  Any edit to the image or sidecar changes the
+    stamps and forces a fresh check.
+    """
+    del preview_stamp, metadata_stamp
+    try:
+        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    if not isinstance(metadata, dict):
+        return None
+    return {
+        "metadata": metadata,
+        "licence": validate_licence_resolution(metadata),
+        "preview": validate_preview(preview_path, metadata),
+    }
+
+
+@st.cache_data(show_spinner=False)
+def load_worldcover_context(
+    image_path: Path,
+    metadata_path: Path,
+    image_stamp: tuple[int, int],
+    metadata_stamp: tuple[int, int],
+) -> dict | None:
+    """Validate and encode the land-cover preview once per file version."""
+    del image_stamp, metadata_stamp
+    try:
+        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    if not isinstance(metadata, dict):
+        return None
+    image_bytes = image_path.read_bytes()
+    validate_worldcover_preview(image_bytes, metadata)
+    return {
+        "metadata": metadata,
+        "image_base64": base64.b64encode(image_bytes).decode("ascii"),
+    }
 
 
 @st.cache_data
@@ -216,12 +297,17 @@ def load_hospital_review() -> pd.DataFrame:
 
 
 @st.cache_data
-def validate_boundary() -> dict:
-    """Check the bundled provisional polygon without repairing its source file."""
+def load_boundary_metadata() -> dict:
+    """Load the boundary provenance record used for CRS and licence checks."""
     metadata_path = ROOT / "data" / "reference" / "kochi_corporation_boundary.metadata.json"
     with metadata_path.open(encoding="utf-8") as source:
-        metadata = json.load(source)
-    return validate_geojson(BOUNDARY_PATH, metadata)
+        return json.load(source)
+
+
+@st.cache_data
+def validate_boundary() -> dict:
+    """Check the bundled provisional polygon without repairing its source file."""
+    return validate_geojson(BOUNDARY_PATH, load_boundary_metadata())
 
 
 @st.cache_data
@@ -257,6 +343,23 @@ st.page_link(
 
 map_context = st.session_state.get(MAP_CONTEXT_KEY)
 active_hazard = None
+if map_context is not None:
+    if not isinstance(map_context, dict):
+        st.session_state.pop(MAP_CONTEXT_KEY, None)
+        st.warning("The carried-over map context was malformed and has been cleared. Submit a new scenario in the Decision Workflow.")
+        map_context = None
+    else:
+        candidate_hazard = map_context.get("hazard")
+        if not isinstance(candidate_hazard, str) or not is_workflow_hazard(candidate_hazard):
+            st.session_state.pop(MAP_CONTEXT_KEY, None)
+            st.warning(
+                "The carried-over scenario named a hazard that is not in the authoritative registry "
+                "and has been cleared. Submit a new scenario in the Decision Workflow."
+            )
+            map_context = None
+        else:
+            active_hazard = candidate_hazard
+
 if isinstance(map_context, dict):
     active_hazard = map_context.get("hazard")
     with st.container(key="kochi-semantic-scenario-heading"):
@@ -273,7 +376,7 @@ if isinstance(map_context, dict):
         "The map shows only available source-reviewed layers; it does not infer a local hazard footprint or exposure."
     )
     conditions = map_context.get("conditions", {})
-    if conditions:
+    if isinstance(conditions, dict) and conditions:
         display_dataframe(
             pd.DataFrame(
                 [
@@ -286,7 +389,7 @@ if isinstance(map_context, dict):
             alt="Submitted user-supplied scenario conditions",
         )
     assessment_context = map_context.get("assessment", {})
-    if assessment_context:
+    if isinstance(assessment_context, dict) and assessment_context:
         st.write(
             "**Assessment status:**",
             assessment_context.get("assessment_type", "Evidence review"),
@@ -294,10 +397,10 @@ if isinstance(map_context, dict):
             assessment_context.get("result_status", "No classified result"),
         )
         hazard_result = assessment_context.get("hazard_assessment", {})
-        if hazard_result:
+        if isinstance(hazard_result, dict) and hazard_result:
             st.write("**Assessment interpretation:**", hazard_result.get("severity", "Not classified"))
             indicators = hazard_result.get("indicators")
-            if indicators:
+            if isinstance(indicators, dict) and indicators:
                 display_dataframe(
                     pd.DataFrame(
                         [
@@ -313,7 +416,7 @@ if isinstance(map_context, dict):
                     alt="Scenario assessment indicators transferred from the workflow",
                 )
         recommendation_groups = assessment_context.get("recommendations", {})
-        if recommendation_groups:
+        if isinstance(recommendation_groups, dict) and recommendation_groups:
             with st.expander("Scenario recommendation candidates"):
                 st.caption(
                     "These are hazard/scenario-specific general recommendations from the workflow, "
@@ -340,6 +443,25 @@ if isinstance(map_context, dict):
                         )
 else:
     st.info("No submitted scenario is attached. Select a disaster in the Decision Workflow and use “View prone areas on the Kochi map” to carry its context here.")
+
+st.subheader("Hazard layer availability")
+availability_rows = sorted(
+    hazard_layer_availability(active_hazard),
+    key=lambda row: (not row["Selected"], row["Hazard"]),
+)
+display_dataframe(
+    pd.DataFrame(availability_rows)[
+        ["Hazard", "Selected", "Validated hazard footprint", "Context layer", "Why no footprint is shown"]
+    ],
+    hide_index=True,
+    width="stretch",
+    alt="Availability of validated hazard footprints and context layers for all ten workflow hazards",
+)
+st.caption(
+    "No validated, licence-cleared hazard footprint is currently available for any of the ten workflow hazards. "
+    "The administrative outline and the land-cover image are context only. Without a validated footprint the map "
+    "cannot calculate population, infrastructure, or consequence exposure; unknown exposure is not a safe result."
+)
 
 catalog = load_source_catalog()
 catalog_rows = [{
@@ -660,6 +782,18 @@ if boundary_report["errors"]:
 else:
     st.caption(f"Boundary geometry QA: {boundary_report['feature_count']} feature; no structural geometry errors detected.")
 
+boundary_metadata = load_boundary_metadata()
+st.caption(
+    "**Boundary provenance:** "
+    f"{boundary_metadata.get('publisher', 'Publisher not recorded')} | "
+    f"CRS {boundary_metadata.get('crs', 'Not stated')} "
+    f"({boundary_metadata.get('crs_interpretation', 'interpretation not stated')}) | "
+    f"licence {boundary_metadata.get('license', 'Not stated')} | "
+    f"retrieved {boundary_metadata.get('retrieved_on', 'Not recorded')}. "
+    "This is a provisional administrative outline, not a ward layer, hazard footprint, or legal boundary record. "
+    "No current official ward polygon set is approved for production exposure analysis."
+)
+
 ring = boundary["geometry"]["coordinates"][0]
 longitudes = [coordinate[0] for coordinate in ring]
 latitudes = [coordinate[1] for coordinate in ring]
@@ -703,33 +837,85 @@ show_boundary = st.checkbox("Kochi Corporation administrative boundary", value=T
 st.caption("Blue outline = administrative boundary only. It must not be interpreted as a hazard zone or as the full Greater Kochi urban area.")
 deck_layers = []
 legend_rows = []
-flood_context_hazards = {"Flood", "Compound: cyclone + flood"}
-if active_hazard is None or active_hazard in flood_context_hazards:
-    st.warning(
-        "The JRC RP100 raster preview is withheld. Its dataset README lists ODbL 1.0, while the linked JRC copyright "
-        "notice lists CC BY 4.0; no clarification has been obtained. Do not redistribute or publicly deploy the local "
-        "raster or preview until the applicable terms are confirmed.",
-        title="JRC flood preview withheld pending licence clarification",
-    )
-else:
+active_components = components_for(active_hazard) if active_hazard else []
+if active_hazard is None or "Flood" in active_components:
+    try:
+        jrc_stamps = (
+            _file_stamp(JRC_PREVIEW_PATH),
+            _file_stamp(JRC_PREVIEW_METADATA),
+        )
+        jrc_context = (
+            load_jrc_context(
+                JRC_PREVIEW_PATH, JRC_PREVIEW_METADATA, *jrc_stamps
+            )
+            if jrc_stamps[0][1] and jrc_stamps[1][1]
+            else None
+        )
+        if jrc_context:
+            jrc_metadata = jrc_context["metadata"]
+            jrc_licence = jrc_context["licence"]
+            jrc_preview = jrc_context["preview"]
+            show_jrc = st.checkbox(
+                "JRC GloFAS RP100 modelled river-flood depth (scenario context, not observed flooding)",
+                value=False,
+                key=f"kochimap_jrc_{active_hazard}",
+            )
+            st.caption(JRC_DISPLAY_CAVEAT)
+            st.caption(
+                f"Licence: {jrc_licence['applied_basis']} applied (dataset README); "
+                f"{jrc_licence['copyright_notice_licence']} is also stated in the JRC copyright notice. "
+                "Attribution and change indication are required; ODbL share-alike applies to derived databases."
+            )
+            st.markdown(
+                f"[JRC dataset README]({JRC_LICENCE_SOURCES['readme']}) | "
+                f"[JRC copyright notice]({JRC_LICENCE_SOURCES['copyright']}) | "
+                f"[ODbL 1.0]({JRC_LICENCE_SOURCES['odbl']}) | "
+                f"[CC BY 4.0]({JRC_LICENCE_SOURCES['cc_by']})"
+            )
+            st.caption(f"Attribution: {licence_notice(jrc_metadata)}")
+            if show_jrc:
+                deck_layers.append(
+                    build_jrc_preview_layer(JRC_PREVIEW_PATH, jrc_preview["bounds"])
+                )
+                legend_rows.append((
+                    "JRC GloFAS RP100 modelled flood depth",
+                    "Blue overlay (alpha by modelled depth)",
+                    "Modelled 100-year scenario; not observed flooding; transparent does not mean safe",
+                ))
+        else:
+            st.info(
+                "The JRC modelled flood-context preview or provenance sidecar is missing; the layer is unavailable."
+            )
+    except (JrcContextError, OSError, KeyError, TypeError, ValueError) as error:
+        st.warning(f"The JRC modelled flood context could not be loaded: {error}")
+elif active_hazard is not None:
     st.info(
         f"No compatible {active_hazard} hazard layer is currently available. "
-        "Flood-scenario data remain hidden instead of being displayed as this disaster."
+        "No other hazard is substituted for the selected disaster."
     )
 
 landcover_hazards = {
-    "Flood",
-    "Cyclone",
-    "Landslide",
-    "Heatwave",
-    "Drought",
-    "Compound: cyclone + flood",
-    "Compound: heavy rainfall + drainage failure",
+    row["Hazard"]
+    for row in availability_rows
+    if str(row["Context layer"]).startswith("ESA WorldCover")
 }
 if active_hazard is None or active_hazard in landcover_hazards:
     try:
-        landcover_metadata = load_acquisition_metadata(WORLDCOVER_PREVIEW_METADATA)
-        if landcover_metadata and WORLDCOVER_PREVIEW_PATH.is_file():
+        landcover_stamps = (
+            _file_stamp(WORLDCOVER_PREVIEW_PATH),
+            _file_stamp(WORLDCOVER_PREVIEW_METADATA),
+        )
+        landcover_context = (
+            load_worldcover_context(
+                WORLDCOVER_PREVIEW_PATH,
+                WORLDCOVER_PREVIEW_METADATA,
+                *landcover_stamps,
+            )
+            if landcover_stamps[0][1] and landcover_stamps[1][1]
+            else None
+        )
+        if landcover_context:
+            landcover_metadata = landcover_context["metadata"]
             landcover_processing = landcover_metadata["processing"]
             show_landcover = st.checkbox(
                 "ESA WorldCover 2021 land-cover context (not a hazard or exposure layer)",
@@ -753,9 +939,7 @@ if active_hazard is None or active_hazard in landcover_hazards:
                 f"Rendered source classes: {', '.join(str(code) for code in landcover_processing['rendered_class_codes'])}."
             )
             if show_landcover:
-                landcover_bytes = WORLDCOVER_PREVIEW_PATH.read_bytes()
-                validate_worldcover_preview(landcover_bytes, landcover_metadata)
-                landcover_image = base64.b64encode(landcover_bytes).decode("ascii")
+                landcover_image = landcover_context["image_base64"]
                 landcover_bounds = landcover_processing["bounds_epsg4326"]
                 deck_layers.append(
                     pdk.Layer(
@@ -942,7 +1126,7 @@ if processed_layers:
     hazard_layers = [layer for layer in processed_layers if layer["metadata"].get("layer_role") == "hazard"]
     st.subheader("Spatial exposure overlay")
     if not asset_layers:
-        st.info("Unknown / unassessable exposure: no validated asset-location layer is available. The JRC preview is withheld pending licence clarification; KSDMA pixel values remain uninterpreted. NIHFW hospital coordinates are review-only because coordinate order, CRS/datum, and positional accuracy are undocumented. No facility is assumed safe or exposed.")
+        st.info("Unknown / unassessable exposure: no validated asset-location layer is available. OSM healthcare, emergency and road features are provisional community-mapped context, so they cannot support an operational exposure count. The JRC RP100 preview is modelled scenario context, not an observed footprint; KSDMA pixel values remain uninterpreted. NIHFW hospital coordinates are review-only because coordinate order, CRS/datum, and positional accuracy are undocumented. No facility is assumed safe or exposed.")
     elif not hazard_layers:
         st.info("Unknown exposure: no compatible processed hazard layer is available. No asset is assumed safe.")
     else:
@@ -1042,9 +1226,104 @@ if legend_rows:
     section_intro("Map key", "Legend", "Symbols describe displayed source layers and their role in this review.")
     display_dataframe(pd.DataFrame(legend_rows, columns=["Layer", "Symbol", "Meaning"]), hide_index=True, width="stretch")
 
+st.subheader("Modelled flood-depth screening at mapped assets (provisional)")
+screening_stamp = _file_stamp(EXPOSURE_SCREENING_REPORT)
+screening_report = (
+    load_acquisition_metadata(EXPOSURE_SCREENING_REPORT, screening_stamp)
+    if screening_stamp[1]
+    else None
+)
+if isinstance(screening_report, dict) and isinstance(
+    screening_report.get("aggregate"), dict
+):
+    aggregate = screening_report["aggregate"]
+    metric_cols = st.columns(4)
+    metric_cols[0].metric(
+        "Mapped assets screened", f"{aggregate.get('features_total', 0):,}"
+    )
+    metric_cols[1].metric(
+        "Inside modelled coverage",
+        f"{aggregate.get('features_sampled_in_coverage', 0):,}",
+    )
+    metric_cols[2].metric(
+        "Assets on positive depth cells",
+        f"{aggregate.get('positive_modelled_depth', 0):,}",
+    )
+    metric_cols[3].metric(
+        "Permanent-water exclusions",
+        f"{aggregate.get('permanent_water_cells', 0):,}",
+    )
+    st.caption(
+        screening_report.get("method")
+        or "Provisional raster-cell screening at representative asset points."
+    )
+    layer_rows = [
+        {
+            "Asset layer": layer.get("layer_label", layer.get("layer_id", "")),
+            "Assets": layer.get("features_total", 0),
+            "In coverage": layer.get("features_sampled_in_coverage", 0),
+            "Positive modelled depth": layer.get("positive_modelled_depth", 0),
+            "NoData": layer.get("nodata_in_source", 0),
+            "Permanent water excluded": layer.get("permanent_water_cells", 0),
+            "Median positive depth (m)": layer.get("positive_depth_median_m"),
+            "Maximum positive depth (m)": layer.get("positive_depth_max_m"),
+        }
+        for layer in screening_report.get("layers", [])
+        if isinstance(layer, dict)
+    ]
+    if layer_rows:
+        display_dataframe(
+            pd.DataFrame(layer_rows),
+            hide_index=True,
+            width="stretch",
+            alt="Provisional modelled flood-depth screening counts by mapped asset layer",
+        )
+    extent = screening_report.get("extent")
+    if isinstance(extent, dict):
+        st.caption(
+            "Display rectangle: "
+            f"{extent.get('positive_depth_cells', 0):,} positive-depth cells "
+            f"({extent.get('positive_depth_area_km2')} km²) and "
+            f"{extent.get('permanent_water_cells_excluded', 0):,} permanent-water "
+            f"cells excluded; maximum modelled depth "
+            f"{extent.get('maximum_modelled_depth_m')} m. "
+            f"{extent.get('area_method', '')}"
+        )
+    st.warning(
+        "Screening only — not an exposure estimate, observed flooding, forecast, "
+        "warning, damage estimate, casualty estimate, or safe/unsafe finding. "
+        "Asset locations are provisional community-mapped OpenStreetMap geometry, "
+        "positive cells are modelled 100-year return-period depths, and NoData "
+        "does not establish safety."
+    )
+    with st.expander("Screening input hashes, licence and limitations"):
+        st.caption(
+            screening_report.get("licence", "Licence information is unavailable.")
+        )
+        st.caption(
+            f"Report generated: {screening_report.get('generated_at_utc', 'not recorded')}"
+        )
+        for tile in screening_report.get("source_tiles", []):
+            st.code(
+                f"{tile.get('file')}  sha256={tile.get('sha256')}  "
+                f"nodata={tile.get('nodata')}"
+            )
+        for tile in screening_report.get("permanent_water_tiles", []):
+            st.code(
+                f"{tile.get('file')}  sha256={tile.get('sha256')}  "
+                f"nodata={tile.get('nodata')}"
+            )
+        for limitation in screening_report.get("limitations", []):
+            st.write(f"- {limitation}")
+else:
+    st.info(
+        "The provisional flood-screening report is unavailable in this checkout; "
+        "no asset-level screening result is shown."
+    )
+
 st.info(
     "OpenStreetMap roads, transit, mapped waterways, and any tagged facilities shown here are provisional community-mapped context. "
     "They do not establish complete municipal road or drainage assets, current facility operation, or emergency access. "
-    "KSPCB/CPCB observations are not spatially joined to verified station locations in this map. The JRC preview is withheld pending licence clarification. "
+    "KSPCB/CPCB observations are not spatially joined to verified station locations in this map. The JRC RP100 layer is modelled scenario context, not observed flooding or an official warning. "
     "No validated asset-to-hazard overlay or factory source-attribution analysis is supported by the available data."
 )

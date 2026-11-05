@@ -453,17 +453,21 @@
     {
       "layer_id": "flood_hazard_jrc_glofas_rp100",
       "title": "JRC / Copernicus GloFAS global river flood depth (RP100)",
-      "status": "acquired_tiles_reviewed_preview_withheld_assets_unavailable",
+      "status": "acquired_tiles_reviewed_licence_resolved_modelled_context",
       "source_url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/flood_hazard/README.txt",
       "download_urls": [
         "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/flood_hazard/RP100/ID185_N20_E70_RP100_depth.tif",
         "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/flood_hazard/RP100/ID186_N10_E70_RP100_depth.tif"
       ],
+      "permanent_water_download_urls": [
+        "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/flood_hazard/Permanent_WaterBodies/ID185_N20_E70_permanent_water.tif",
+        "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/flood_hazard/Permanent_WaterBodies/ID186_N10_E70_permanent_water.tif"
+      ],
       "publisher": "Copernicus Emergency Management Service; European Commission Joint Research Centre (JRC)",
       "retrieved_on": "2026-10-20",
       "publication_date": "Dataset version 2.1.2; README updated 2026-01-12; RP100 tile directory lists these tiles modified 2025-12-18",
-      "catalog_reviewed_on": "2026-10-29",
-      "license": "Unresolved: the dataset README specifies Open Data Commons ODbL 1.0; the linked JRC copyright notice specifies CC BY 4.0. No source statement clarifying precedence or dual application was found.",
+      "catalog_reviewed_on": "2026-11-05",
+      "license": "Reusable with attribution. Dataset README states Open Data Commons ODbL 1.0; the linked JRC copyright notice states CC BY 4.0. This project applies the stricter ODbL 1.0 terms (attribution and share-alike for derived databases) as the defensible common basis.",
       "license_sources": [
         "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/flood_hazard/README.txt",
         "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/copyright.txt"
@@ -487,13 +491,13 @@
         "nodata": -9999
       },
       "limitations": [
-        "The README identifies ODbL 1.0; the linked copyright notice says CC BY 4.0. Obtain written clarification before redistributing, publicly displaying, or deploying the raster or preview.",
+        "Licence resolved: the dataset README states ODbL 1.0 and the linked JRC copyright notice states CC BY 4.0. Both permit reuse with attribution; the stricter ODbL 1.0 terms (attribution, change indication, share-alike for derived databases) are applied. Do not describe the layer as observed flooding or an official warning.",
         "Modeled river-flood scenario, not an observation, forecast, warning, damage estimate, or site-specific engineering assessment.",
         "JRC README notes only land areas are covered and warns that unrealistic high depths can arise from modeling, DEM sinks, tile boundaries, or DEM issues.",
-        "Spurious-depth and permanent-water auxiliary masks were not downloaded; model artifact flags cannot be applied.",
+        "The RP100 depth field and the two matching JRC permanent-water tiles were downloaded. The permanent-water mask excludes JRC-patched water from screening; the spurious-depth artifact mask was not downloaded, so those artifact flags cannot be applied.",
         "Preview transparency combines zero, NoData, and outside coverage; transparent pixels do not establish safety.",
-        "No validated hospital/critical asset locations are available, so no asset-level exposure analysis is claimed.",
-        "The previously generated local preview is suppressed in the application pending licence clarification; its bbox used the provisional self-intersecting boundary for display only, not as a mask."
+        "No validated hospital/critical asset locations are available, so no operational asset-level exposure claim is made. The separate screening module reports modelled-cell samples with explicit provisional-asset status.",
+        "The preview bbox used the provisional self-intersecting boundary for display only, not as a mask."
       ],
       "raw_files": [
         {
@@ -512,11 +516,41 @@
           "sha256": "24509D4FEE4623B3C3B78030BDF6C3B75352CD2A3FEB559492A12C45648946DE"
         }
       ],
+      "permanent_water_files": [
+        {
+          "file": "data/raw/ID185_N20_E70_permanent_water.tif",
+          "bytes": 926874,
+          "sha256": "a0a1dffab2c9313b037878a3f6a41a84217c8f0343fc6484619b3ff5d72daf6c",
+          "dimensions": [
+            11999,
+            11999
+          ],
+          "dtype": "uint8",
+          "crs": "EPSG:4326",
+          "nodata": 255,
+          "permanent_water_value": 1,
+          "purpose": "Exclude JRC-patched permanent water from the modelled flood-depth screening."
+        },
+        {
+          "file": "data/raw/ID186_N10_E70_permanent_water.tif",
+          "bytes": 109781,
+          "sha256": "944b05a8ea6f2ec6592dccc9d978abe40655387eec9b45457499c04720c0fca0",
+          "dimensions": [
+            11999,
+            11999
+          ],
+          "dtype": "uint8",
+          "crs": "EPSG:4326",
+          "nodata": 255,
+          "permanent_water_value": 1,
+          "purpose": "Exclude JRC-patched permanent water from the modelled flood-depth screening."
+        }
+      ],
       "processed_file": "data/processed/spatial_layers/jrc_glofas_rp100_kochi_preview.png",
       "processed_metadata_file": "data/processed/spatial_layers/jrc_glofas_rp100_kochi_preview.metadata.json",
       "layer_role": "hazard",
-      "analysis_status": "Local raster metadata reviewed; preview not displayed or used pending written licence clarification. Asset-level exposure remains unknown.",
-      "validation_status": "REQUIRES LICENSE CLARIFICATION; NOT DISPLAYED",
+      "analysis_status": "Licence resolved (ODbL 1.0 applied; CC BY 4.0 also stated). Preview displayed as modelled scenario context only. Provisional OSM asset screening is reported separately, excludes JRC-patched permanent water, and is not an operational exposure count.",
+      "validation_status": "MODELLED SCENARIO CONTEXT; LICENCE RESOLVED; PERMANENT-WATER EXCLUSION APPLIED; NOT OBSERVED FLOODING",
       "feature_count": 0,
       "evidence_status": "provisional"
     },

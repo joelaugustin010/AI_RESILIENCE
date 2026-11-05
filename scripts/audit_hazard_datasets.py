@@ -26,14 +26,17 @@ SOURCE_FILES = {
     "drought": [
         "data/external/hazards/raw/drought/india_current_cdi.txt",
         "data/external/hazards/raw/drought/india_drought_area_timeseries.txt",
+        "data/external/hazards/raw/weather/kochi_daily_weather_1991_2025.json",
     ],
     "heatwave": [
+        "data/external/hazards/raw/weather/kochi_daily_weather_1991_2025.json",
         "data/external/hazards/raw/weather/kochi_daily_weather_2000_2025.json",
         "data/external/hazards/raw/weather/kottayam_daily_weather_2000_2025.json",
         "data/external/hazards/raw/weather/wayanad_daily_weather_2000_2025.json",
         "data/external/hazards/raw/weather/thiruvananthapuram_daily_weather_2000_2025.json",
     ],
     "severe_storm": [
+        "data/external/hazards/raw/weather/kochi_daily_weather_1991_2025.json",
         "data/external/hazards/raw/weather/kochi_daily_weather_2000_2025.json",
         "data/external/hazards/raw/weather/kottayam_daily_weather_2000_2025.json",
         "data/external/hazards/raw/weather/wayanad_daily_weather_2000_2025.json",

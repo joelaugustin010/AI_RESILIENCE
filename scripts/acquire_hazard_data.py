@@ -166,6 +166,17 @@ def main() -> int:
         import time as _time
         _time.sleep(3)
 
+    # Extended Kochi reference record (1991-2025) so the SPI-1 model can use a
+    # 30-year reference period. It is stored separately and never spliced with
+    # the 2000-2025 file; descriptive benchmarks use one consistent record.
+    extended_kochi_url = "https://archive-api.open-meteo.com/v1/archive?" + urlencode({
+        "latitude": 9.947276, "longitude": 76.29921,
+        "start_date": "1991-01-01", "end_date": "2025-12-31",
+        "daily": "temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max,wind_gusts_10m_max",
+        "timezone": "Asia/Kolkata",
+    })
+    entries.append(fetch("weather/kochi_daily_weather_1991_2025.json", extended_kochi_url))
+
     access_notes = [
         {"hazard_id": "wildfire", "status": "ACCESS_KEY_REQUIRED_FOR_ARCHIVE",
          "source": "NASA FIRMS", "url": "https://firms.modaps.eosdis.nasa.gov/download/",
