@@ -6,12 +6,19 @@ import streamlit as st
 
 
 st.set_page_config(
-    page_title="AI RESILIENCE | Disaster-risk prototype",
+    page_title="AI RESILIENCE | Kochi Climate Intelligence",
     page_icon=":material/shield:",
     layout="wide",
 )
 
 pages = {
+    "Start": [
+        st.Page(
+            "app_pages/welcome.py",
+            title="Welcome",
+            icon=":material/shield:",
+        ),
+    ],
     "Command Centre": [
         st.Page(
             "app_pages/home.py",
