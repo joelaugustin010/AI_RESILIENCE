@@ -53,6 +53,7 @@ page_header(
     meta=("Kochi · Kerala · India", "Concept stage", "Engineering review required"),
     accent="emerald",
     key="smart-mitigation",
+    image="app/static/images/hero-kerala-flood-road.jpg",
 )
 
 st.markdown(

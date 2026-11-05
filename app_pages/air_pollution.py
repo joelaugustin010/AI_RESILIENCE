@@ -397,6 +397,7 @@ page_header(
     meta=("Kochi · Kerala · India", "Eloor–Edayar industrial belt", "Historical evidence view"),
     accent="cyan",
     key="air-quality",
+    image="app/static/images/threats-monsoon.webp",
 )
 
 

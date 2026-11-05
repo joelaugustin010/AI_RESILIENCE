@@ -47,6 +47,7 @@ page_header(
     meta=("Kochi · Kerala · India", "User-supplied estimates", "Arithmetic comparison only"),
     accent="amber",
     key="mitigation-budget",
+    image="app/static/images/hero-kerala-flood-road.jpg",
 )
 
 

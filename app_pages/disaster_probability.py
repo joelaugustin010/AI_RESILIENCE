@@ -70,6 +70,7 @@ page_header(
     meta=("Ernakulam district", "Preliminary screening", "Not a forecast"),
     accent="blue",
     key="disaster-probability",
+    image="app/static/images/hero-kerala-fallback.jpg",
 )
 st.caption(
     "One independent hazard assessment at a time. Preliminary categories describe submitted "
