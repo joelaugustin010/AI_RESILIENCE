@@ -1334,8 +1334,8 @@ def _render_co2_intelligence(live: dict) -> None:
                 "Fuel factors are rounded defaults for educational estimation, not "
                 "product-specific or lifecycle emission factors. Results are sensitive "
                 "to actual fuel composition, vehicle efficiency, electricity year and "
-                "the completeness of the inputs. CO₂e is an estimate of greenhouse-gas "
-                "impact expressed as carbon-dioxide equivalent."
+                "the completeness of the inputs. This calculator reports CO₂ only; it is "
+                "not a complete CO₂e or lifecycle greenhouse-gas inventory."
             )
             st.markdown(
                 "References: [Central Electricity Authority — CO₂ Baseline Database]("
