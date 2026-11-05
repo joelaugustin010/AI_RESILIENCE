@@ -11,7 +11,7 @@ st.markdown(
       min-height:510px; display:grid; grid-template-columns:minmax(0,1.25fr) minmax(260px,.75fr);
       gap:2rem; align-items:center; padding:clamp(2rem,5vw,4.5rem);
       border:1px solid rgba(139,235,222,.28); border-radius:30px;
-      background:linear-gradient(120deg,#061827 0%,#0a3850 52%,#087b78 100%);
+      background:linear-gradient(90deg,rgba(4,18,28,.96) 0%,rgba(7,35,47,.78) 58%,rgba(7,34,43,.86) 100%),url('app/static/images/hero-kerala-ghats.jpg') center/cover no-repeat;
       box-shadow:0 28px 80px rgba(0,0,0,.32);
     }
     .ar-cover:before {

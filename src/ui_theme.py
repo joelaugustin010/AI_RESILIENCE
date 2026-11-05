@@ -51,6 +51,7 @@ def page_header(
     accent: str = "teal",
     key: str | None = None,
     as_title: bool = True,
+    image: str | None = None,
 ) -> None:
     """Render the standard module header.
 
@@ -61,8 +62,9 @@ def page_header(
 
     accent_hex = ACCENTS.get(accent, ACCENTS["teal"])
     container_key = f"ar-head-{_slug(key or title)}"
+    image_css = f"--ar-hero-image:url('{_escape(image)}');" if image else "--ar-hero-image:none;"
     st.markdown(
-        f"<style>.st-key-{container_key}{{--ar-accent:{accent_hex};}}</style>",
+        f"<style>.st-key-{container_key}{{--ar-accent:{accent_hex};{image_css}}}</style>",
         unsafe_allow_html=True,
     )
     with st.container(key=container_key):

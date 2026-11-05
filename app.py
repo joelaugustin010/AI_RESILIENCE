@@ -192,13 +192,17 @@ st.markdown(
     [data-testid="stTopNavLink"] {
       border-radius: 999px !important;
       padding: .34rem .78rem !important;
-      color: #c5dadd !important;
+      color: #f0ffff !important;
+      font-weight: 780 !important;
+      text-shadow: 0 1px 12px rgba(0, 0, 0, .38);
       background: transparent !important;
       transition: background .2s var(--ar-ease), color .2s var(--ar-ease),
                   transform .2s var(--ar-ease), box-shadow .2s var(--ar-ease);
     }
     [data-testid="stTopNavSection"] p,
-    [data-testid="stTopNavLink"] p { color: inherit !important; }
+    [data-testid="stTopNavLink"] p,
+    [data-testid="stTopNavSection"] span,
+    [data-testid="stTopNavLink"] span { color: inherit !important; }
     [data-testid="stTopNavSection"]:hover,
     [data-testid="stTopNavLink"]:hover {
       background: rgba(66, 224, 193, .10) !important;
@@ -209,7 +213,7 @@ st.markdown(
     [data-testid="stTopNavLink"][aria-current="page"],
     [data-testid="stTopNavLink"][data-active="true"] {
       background: rgba(66, 224, 193, .15) !important;
-      color: #9cf8e6 !important;
+      color: #b8fff1 !important;
       box-shadow: inset 0 0 0 1px rgba(66, 224, 193, .22);
     }
     [data-testid="stTopNavPopover"], [data-testid="stTopNavPopoverBody"] {
@@ -221,17 +225,19 @@ st.markdown(
     }
     [data-testid="stTopNavDropdownLink"] {
       border-radius: 10px;
-      color: #d8eef0 !important;
+      color: #efffff !important;
+      font-weight: 650 !important;
       transition: background .16s var(--ar-ease), color .16s var(--ar-ease), padding-left .16s var(--ar-ease);
     }
-    [data-testid="stTopNavDropdownLink"] p { color: inherit !important; }
+    [data-testid="stTopNavDropdownLink"] p,
+    [data-testid="stTopNavDropdownLink"] span { color: inherit !important; }
     [data-testid="stTopNavDropdownLink"] [data-testid="stIconMaterial"] {
-      color: #8fb3bb !important;
+      color: #b9e6e7 !important;
       transition: color .16s var(--ar-ease);
     }
     [data-testid="stTopNavDropdownLink"]:hover {
       background: rgba(66, 224, 193, .11) !important;
-      color: #9cf8e6 !important;
+      color: #b8fff1 !important;
       padding-left: .35rem !important;
     }
     [data-testid="stTopNavDropdownLink"]:hover [data-testid="stIconMaterial"] {
@@ -282,8 +288,10 @@ st.markdown(
       border: 1px solid var(--ar-border);
       border-radius: 26px;
       background:
+        linear-gradient(90deg, rgba(4, 18, 28, .95) 0%, rgba(7, 35, 47, .76) 58%, rgba(7, 34, 43, .86) 100%),
         radial-gradient(ellipse at 90% -10%, color-mix(in srgb, var(--ar-accent) 22%, transparent), transparent 24rem),
         radial-gradient(ellipse at 8% 120%, rgba(20, 90, 110, .28), transparent 26rem),
+        var(--ar-hero-image) center / cover no-repeat,
         linear-gradient(120deg, #071c2b 0%, #0a2c3e 56%, #0b3a45 100%);
       box-shadow: var(--ar-shadow);
       isolation: isolate;

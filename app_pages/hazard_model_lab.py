@@ -34,6 +34,7 @@ page_header(
     meta=("Research baselines", "Validation status", "Explicit blockers"),
     accent="violet",
     key="hazard-model-lab",
+    image="app/static/images/beauty-city.webp",
 )
 
 st.warning(

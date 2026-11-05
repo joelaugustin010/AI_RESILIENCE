@@ -30,6 +30,7 @@ page_header(
     meta=("Local source audit", "Provenance", "No downloads"),
     accent="cyan",
     key="data-readiness",
+    image="app/static/images/beauty-city.webp",
 )
 st.caption(f"Last local validation: {report['validated_at_utc']}")
 
