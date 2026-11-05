@@ -1258,12 +1258,12 @@ def _render_co2_intelligence(live: dict) -> None:
 
         st.markdown("---")
         result_columns = st.columns(3)
-        result_columns[0].metric("Estimated monthly footprint", f"{total_monthly:,.1f} kg CO₂e")
-        result_columns[1].metric("Estimated annual footprint", f"{total_annual / 1000:,.2f} tonnes CO₂e")
-        result_columns[2].metric("Per person / month", f"{per_person_monthly:,.1f} kg CO₂e")
+        result_columns[0].metric("Estimated monthly footprint", f"{total_monthly:,.1f} kg CO₂")
+        result_columns[1].metric("Estimated annual footprint", f"{total_annual / 1000:,.2f} tonnes CO₂")
+        result_columns[2].metric("Per person / month", f"{per_person_monthly:,.1f} kg CO₂")
 
         breakdown = pd.DataFrame(
-            {"Estimated emissions (kg CO₂e/month)": monthly_emissions}
+            {"Estimated emissions (kg CO₂/month)": monthly_emissions}
         )
         st.markdown("**Monthly emissions breakdown**")
         st.bar_chart(breakdown)
