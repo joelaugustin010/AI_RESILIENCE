@@ -9,9 +9,14 @@ import pydeck as pdk
 import streamlit as st
 
 from src.dataframe_display import display_dataframe
+from src.hazard_registry import components_for, is_workflow_hazard
 from src.spatial_data import classify_exposure, processed_layer_issues, read_processed_layers, validate_geojson
 from src.landcover_context import validate_worldcover_preview
-from src.map_integration import MAP_CONTEXT_KEY, selected_feature_properties
+from src.map_integration import (
+    MAP_CONTEXT_KEY,
+    hazard_layer_availability,
+    selected_feature_properties,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 BOUNDARY_PATH = ROOT / "data" / "reference" / "kochi_corporation_boundary.geojson"
@@ -215,12 +220,17 @@ def load_hospital_review() -> pd.DataFrame:
 
 
 @st.cache_data
-def validate_boundary() -> dict:
-    """Check the bundled provisional polygon without repairing its source file."""
+def load_boundary_metadata() -> dict:
+    """Load the boundary provenance record used for CRS and licence checks."""
     metadata_path = ROOT / "data" / "reference" / "kochi_corporation_boundary.metadata.json"
     with metadata_path.open(encoding="utf-8") as source:
-        metadata = json.load(source)
-    return validate_geojson(BOUNDARY_PATH, metadata)
+        return json.load(source)
+
+
+@st.cache_data
+def validate_boundary() -> dict:
+    """Check the bundled provisional polygon without repairing its source file."""
+    return validate_geojson(BOUNDARY_PATH, load_boundary_metadata())
 
 
 @st.cache_data
@@ -245,8 +255,24 @@ st.page_link(
 
 map_context = st.session_state.get(MAP_CONTEXT_KEY)
 active_hazard = None
+if map_context is not None:
+    if not isinstance(map_context, dict):
+        st.session_state.pop(MAP_CONTEXT_KEY, None)
+        st.warning("The carried-over map context was malformed and has been cleared. Submit a new scenario in the Decision Workflow.")
+        map_context = None
+    else:
+        candidate_hazard = map_context.get("hazard")
+        if not isinstance(candidate_hazard, str) or not is_workflow_hazard(candidate_hazard):
+            st.session_state.pop(MAP_CONTEXT_KEY, None)
+            st.warning(
+                "The carried-over scenario named a hazard that is not in the authoritative registry "
+                "and has been cleared. Submit a new scenario in the Decision Workflow."
+            )
+            map_context = None
+        else:
+            active_hazard = candidate_hazard
+
 if isinstance(map_context, dict):
-    active_hazard = map_context.get("hazard")
     st.subheader("Scenario carried over from the Decision Workflow")
     st.write("**Selected disaster:**", active_hazard)
     st.write("**Geographical scope:**", map_context.get("location", "Not supplied"))
@@ -255,7 +281,7 @@ if isinstance(map_context, dict):
         "The map shows only available source-reviewed layers; it does not infer a local hazard footprint or exposure."
     )
     conditions = map_context.get("conditions", {})
-    if conditions:
+    if isinstance(conditions, dict) and conditions:
         display_dataframe(
             pd.DataFrame(
                 [
@@ -268,7 +294,7 @@ if isinstance(map_context, dict):
             alt="Submitted user-supplied scenario conditions",
         )
     assessment_context = map_context.get("assessment", {})
-    if assessment_context:
+    if isinstance(assessment_context, dict) and assessment_context:
         st.write(
             "**Assessment status:**",
             assessment_context.get("assessment_type", "Evidence review"),
@@ -276,10 +302,10 @@ if isinstance(map_context, dict):
             assessment_context.get("result_status", "No classified result"),
         )
         hazard_result = assessment_context.get("hazard_assessment", {})
-        if hazard_result:
+        if isinstance(hazard_result, dict) and hazard_result:
             st.write("**Assessment interpretation:**", hazard_result.get("severity", "Not classified"))
             indicators = hazard_result.get("indicators")
-            if indicators:
+            if isinstance(indicators, dict) and indicators:
                 display_dataframe(
                     pd.DataFrame(
                         [
@@ -295,7 +321,7 @@ if isinstance(map_context, dict):
                     alt="Scenario assessment indicators transferred from the workflow",
                 )
         recommendation_groups = assessment_context.get("recommendations", {})
-        if recommendation_groups:
+        if isinstance(recommendation_groups, dict) and recommendation_groups:
             with st.expander("Scenario recommendation candidates"):
                 st.caption(
                     "These are hazard/scenario-specific general recommendations from the workflow, "
@@ -322,6 +348,25 @@ if isinstance(map_context, dict):
                         )
 else:
     st.info("No submitted scenario is attached. Select a disaster in the Decision Workflow and use “View prone areas on the Kochi map” to carry its context here.")
+
+st.subheader("Hazard layer availability")
+availability_rows = sorted(
+    hazard_layer_availability(active_hazard),
+    key=lambda row: (not row["Selected"], row["Hazard"]),
+)
+display_dataframe(
+    pd.DataFrame(availability_rows)[
+        ["Hazard", "Selected", "Validated hazard footprint", "Context layer", "Why no footprint is shown"]
+    ],
+    hide_index=True,
+    width="stretch",
+    alt="Availability of validated hazard footprints and context layers for all ten workflow hazards",
+)
+st.caption(
+    "No validated, licence-cleared hazard footprint is currently available for any of the ten workflow hazards. "
+    "The administrative outline and the land-cover image are context only. Without a validated footprint the map "
+    "cannot calculate population, infrastructure, or consequence exposure; unknown exposure is not a safe result."
+)
 
 catalog = load_source_catalog()
 catalog_rows = [{
@@ -638,6 +683,18 @@ if boundary_report["errors"]:
 else:
     st.caption(f"Boundary geometry QA: {boundary_report['feature_count']} feature; no structural geometry errors detected.")
 
+boundary_metadata = load_boundary_metadata()
+st.caption(
+    "**Boundary provenance:** "
+    f"{boundary_metadata.get('publisher', 'Publisher not recorded')} | "
+    f"CRS {boundary_metadata.get('crs', 'Not stated')} "
+    f"({boundary_metadata.get('crs_interpretation', 'interpretation not stated')}) | "
+    f"licence {boundary_metadata.get('license', 'Not stated')} | "
+    f"retrieved {boundary_metadata.get('retrieved_on', 'Not recorded')}. "
+    "This is a provisional administrative outline, not a ward layer, hazard footprint, or legal boundary record. "
+    "No current official ward polygon set is approved for production exposure analysis."
+)
+
 ring = boundary["geometry"]["coordinates"][0]
 longitudes = [coordinate[0] for coordinate in ring]
 latitudes = [coordinate[1] for coordinate in ring]
@@ -673,28 +730,24 @@ show_boundary = st.checkbox("Kochi Corporation administrative boundary", value=T
 st.caption("Blue outline = administrative boundary only. It must not be interpreted as a hazard zone or as the full Greater Kochi urban area.")
 deck_layers = []
 legend_rows = []
-flood_context_hazards = {"Flood", "Compound: cyclone + flood"}
-if active_hazard is None or active_hazard in flood_context_hazards:
+active_components = components_for(active_hazard) if active_hazard else []
+if active_hazard is None or "Flood" in active_components:
     st.warning(
         "The JRC RP100 raster preview is withheld. Its dataset README lists ODbL 1.0, while the linked JRC copyright "
         "notice lists CC BY 4.0; no clarification has been obtained. Do not redistribute or publicly deploy the local "
         "raster or preview until the applicable terms are confirmed.",
         title="JRC flood preview withheld pending licence clarification",
     )
-else:
+elif active_hazard is not None:
     st.info(
         f"No compatible {active_hazard} hazard layer is currently available. "
-        "Flood-scenario data remain hidden instead of being displayed as this disaster."
+        "No other hazard is substituted for the selected disaster."
     )
 
 landcover_hazards = {
-    "Flood",
-    "Cyclone",
-    "Landslide",
-    "Heatwave",
-    "Drought",
-    "Compound: cyclone + flood",
-    "Compound: heavy rainfall + drainage failure",
+    row["Hazard"]
+    for row in availability_rows
+    if str(row["Context layer"]).startswith("ESA WorldCover")
 }
 if active_hazard is None or active_hazard in landcover_hazards:
     try:

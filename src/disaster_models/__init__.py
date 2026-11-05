@@ -17,8 +17,9 @@ from src.disaster_models import (
     infrastructure_failure,
     landslide,
 )
+from src.hazard_registry import MODEL_DISPATCH_KEYS, WORKFLOW_HAZARDS
 
-MODEL_DISPATCH: dict[str, Callable[[dict[str, Any]], dict[str, Any]]] = {
+_MODEL_FUNCTIONS: dict[str, Callable[[dict[str, Any]], dict[str, Any]]] = {
     "Flood": flood.assess,
     "Cyclone": cyclone.assess,
     "Earthquake": earthquake.assess,
@@ -29,6 +30,14 @@ MODEL_DISPATCH: dict[str, Callable[[dict[str, Any]], dict[str, Any]]] = {
     "Infrastructure failure": infrastructure_failure.assess,
     "Compound: cyclone + flood": compound_cyclone_flood.assess,
     "Compound: heavy rainfall + drainage failure": compound_rainfall_drainage.assess,
+}
+
+# Build the dispatch table from the registry so a new workflow hazard cannot be
+# added without an explicit model, and a model cannot silently target a label
+# the workflow does not offer.
+MODEL_DISPATCH: dict[str, Callable[[dict[str, Any]], dict[str, Any]]] = {
+    hazard: _MODEL_FUNCTIONS[MODEL_DISPATCH_KEYS[hazard]]
+    for hazard in WORKFLOW_HAZARDS
 }
 
 

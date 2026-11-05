@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from src.hazard_registry import REQUIREMENT_HAZARDS, WORKFLOW_HAZARDS
+
 
 COMMON_REQUIREMENTS = [
     {
@@ -133,6 +135,21 @@ HAZARD_REQUIREMENTS: dict[str, dict[str, Any]] = {
 }
 
 
+def validate_requirements_matrix() -> list[str]:
+    """Return registry/matrix consistency problems (empty when sound)."""
+    missing = [hazard for hazard in REQUIREMENT_HAZARDS if hazard not in HAZARD_REQUIREMENTS]
+    extra = [hazard for hazard in HAZARD_REQUIREMENTS if hazard not in REQUIREMENT_HAZARDS]
+    problems = []
+    if missing:
+        problems.append(f"Requirements missing for registered hazards: {missing}.")
+    if extra:
+        problems.append(f"Requirements registered for unregistered hazards: {extra}.")
+    missing_workflow = [hazard for hazard in WORKFLOW_HAZARDS if hazard not in HAZARD_REQUIREMENTS]
+    if missing_workflow:
+        problems.append(f"Decision Workflow hazards missing requirements: {missing_workflow}.")
+    return problems
+
+
 def requirements_for_hazard(hazard: str) -> dict[str, Any]:
     """Return a defensive copy of requirements for one supported hazard label."""
     record = HAZARD_REQUIREMENTS.get(hazard)
@@ -140,6 +157,7 @@ def requirements_for_hazard(hazard: str) -> dict[str, Any]:
         return {
             "hazard": hazard,
             "supported": False,
+            "workflow_supported": False,
             "hazard_inputs": "No requirements template is registered.",
             "process_data": "Not established.",
             "impact_labels": "Not established.",
@@ -151,6 +169,7 @@ def requirements_for_hazard(hazard: str) -> dict[str, Any]:
     return {
         "hazard": hazard,
         "supported": True,
+        "workflow_supported": hazard in WORKFLOW_HAZARDS,
         **record,
         "common_requirements": [dict(item) for item in COMMON_REQUIREMENTS],
     }

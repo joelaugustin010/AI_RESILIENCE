@@ -775,6 +775,20 @@ st.header("1. Select a hazard and describe conditions")
 # Keep the hazard selector outside the form so Streamlit reruns immediately when
 # the user changes hazards; the visible inputs then update before submission.
 hazard = st.selectbox("Hazard or compound scenario", HAZARD_OPTIONS, key="wf_hazard")
+
+# A result belongs to the hazard it was submitted for.  When the selector
+# changes, discard the stored submission and the map context so an old
+# assessment can never appear beneath a newly selected hazard.
+_PREVIOUS_HAZARD_KEY = "wf_previous_hazard"
+if _PREVIOUS_HAZARD_KEY not in st.session_state:
+    # First visit in this session: remember the selection without discarding a
+    # result that is being restored after navigating away and back.
+    st.session_state[_PREVIOUS_HAZARD_KEY] = hazard
+elif st.session_state[_PREVIOUS_HAZARD_KEY] != hazard:
+    st.session_state[_PREVIOUS_HAZARD_KEY] = hazard
+    st.session_state["decision_workflow_inputs"] = None
+    st.session_state.pop(MAP_CONTEXT_KEY, None)
+
 with st.form("decision_workflow_intake"):
     location = st.text_input(
         "Location or area name",
@@ -1130,6 +1144,8 @@ if submitted:
             st.error(problem)
     else:
         st.session_state["decision_workflow_inputs"] = submitted_inputs
+        # Any previously generated map context belongs to the previous result.
+        st.session_state.pop(MAP_CONTEXT_KEY, None)
 
 inputs = st.session_state.get("decision_workflow_inputs")
 if inputs is None:

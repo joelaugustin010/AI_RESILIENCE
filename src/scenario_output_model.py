@@ -8,18 +8,9 @@ from __future__ import annotations
 
 from typing import Any
 
-HAZARDS = (
-    "Flood",
-    "Cyclone",
-    "Earthquake",
-    "Landslide",
-    "Heatwave",
-    "Drought",
-    "Industrial incident",
-    "Infrastructure failure",
-    "Compound: cyclone + flood",
-    "Compound: heavy rainfall + drainage failure",
-)
+from src.hazard_registry import WORKFLOW_HAZARDS
+
+HAZARDS = WORKFLOW_HAZARDS
 
 IMD_24H_HEAVY_RAIN_MM = 64.5
 IMD_24H_VERY_HEAVY_RAIN_MM = 115.6

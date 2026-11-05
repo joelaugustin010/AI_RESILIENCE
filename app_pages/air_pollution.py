@@ -521,6 +521,21 @@ st.markdown(
             font-size: 2rem;
         }
     }
+    
+    /* Dark-workspace contrast overrides; retain all main-branch air-quality tools. */
+    [data-testid="stAppViewContainer"] { background: transparent !important; }
+    .air-hero { background: radial-gradient(ellipse at 90% 8%,rgba(76,226,197,.18),transparent 22rem),linear-gradient(118deg,#071a2a 0%,#0b4054 58%,#087e78 100%); border-color:rgba(130,190,199,.28); }
+    .air-heading,.disaster-title,.disaster-result-value,h2,h3 { color:#effafa !important; }
+    .air-description,.disaster-subtitle,.disaster-card-copy,.disaster-result-copy { color:#c5dadd !important; }
+    .air-eyebrow,.disaster-kicker,.disaster-step,.disaster-result-label { color:#72d8cf !important; }
+    .air-meta span,.air-nav a { color:#d8eeee !important; background:rgba(12,35,51,.88) !important; border-color:rgba(130,190,199,.28) !important; }
+    .disaster-card,.disaster-result,.disaster-empty { color:#e7f5f5 !important; background:linear-gradient(145deg,rgba(17,48,66,.96),rgba(10,34,49,.96)) !important; border-color:rgba(130,190,199,.28) !important; }
+    div[data-testid="stMetric"],div[data-testid="stDataFrame"],div[data-testid="stTable"],div[data-testid="stExpander"] { background:rgba(12,35,51,.92) !important; color:#e7f5f5 !important; border-color:rgba(130,190,199,.25) !important; }
+    div[data-testid="stRadio"] label { background:rgba(12,35,51,.82) !important; color:#d5e7e8 !important; }
+    div[data-testid="stRadio"] label:hover { background:#164253 !important; }
+    [data-testid="stWidgetLabel"],[data-testid="stMarkdownContainer"],[data-testid="stCaptionContainer"],p,li,label { color:#c5dadd; }
+    hr { border-color:rgba(130,190,199,.22) !important; }
+
     </style>
     """,
     unsafe_allow_html=True,
@@ -658,7 +673,7 @@ def render_live_air_quality() -> None:
         points = alt.Chart(chart_data.loc[chart_data["is_unusual"]]).mark_point(size=90, filled=True, color="#b91c1c").encode(
             x="observed_at:T", y="value:Q", tooltip=[alt.Tooltip("observed_at:T", title="Observed (UTC)"), alt.Tooltip("pollutant:N", title="Pollutant"), alt.Tooltip("value:Q", title="Value", format=".2f")]
         )
-        st.altair_chart(lines + points, use_container_width=True)
+        st.altair_chart(lines + points, width="stretch")
     elif not chart_data.empty:
         st.line_chart(chart_data.pivot_table(index="observed_at", columns="pollutant", values="value", aggfunc="last").tail(24))
     else:
@@ -813,7 +828,7 @@ def _render_scenario_visual_report(values: dict, baseline: dict, hourly: pd.Data
             chart = alt.Chart(comparison.melt(id_vars=["Pollutant", "Unit"], value_vars=["Baseline", "Scenario"], var_name="Series", value_name="Value")).mark_bar().encode(
                 x=alt.X("Pollutant:N", title=None), y=alt.Y("Value:Q", title="Concentration"), color=alt.Color("Series:N", scale=alt.Scale(range=["#7aa6b2", "#0e8175"])), tooltip=["Pollutant", "Series", "Value", "Unit"]
             ).properties(height=260)
-            st.altair_chart(chart, use_container_width=True)
+            st.altair_chart(chart, width="stretch")
         else:
             st.bar_chart(comparison.set_index("Pollutant")[["Baseline", "Scenario"]])
     if mode == "Forecast mode" and isinstance(hourly, pd.DataFrame) and not hourly.empty and observed_at is not None:
@@ -822,7 +837,7 @@ def _render_scenario_visual_report(values: dict, baseline: dict, hourly: pd.Data
         if not future.empty:
             st.markdown("**Forecast trend from returned time-series values**")
             if alt is not None:
-                st.altair_chart(alt.Chart(future).mark_line(point=True).encode(x="observed_at:T", y="value:Q", color="pollutant:N", tooltip=["observed_at:T", "pollutant:N", "value:Q"]).properties(height=260), use_container_width=True)
+                st.altair_chart(alt.Chart(future).mark_line(point=True).encode(x="observed_at:T", y="value:Q", color="pollutant:N", tooltip=["observed_at:T", "pollutant:N", "value:Q"]).properties(height=260), width="stretch")
             else:
                 st.line_chart(future.pivot_table(index="observed_at", columns="pollutant", values="value", aggfunc="last"))
     st.markdown("**What changed and what does it mean?**")
@@ -830,9 +845,9 @@ def _render_scenario_visual_report(values: dict, baseline: dict, hourly: pd.Data
     st.write(f"Practical precaution: {precaution}")
     st.caption("Reliability: this is a transparent scenario display. External values are model estimates; simulated values are assumptions. It is not an official warning, diagnosis, causal attribution, or validated disaster forecast.")
     with st.expander("Detailed pollutant data and AQI calculation"):
-        display_dataframe(pd.DataFrame([{"Pollutant": p, "Value": item["value"], "Unit": item["unit"], "Provenance": item["source"]} for p, item in values.items()]), hide_index=True, use_container_width=True, alt="Detailed scenario pollutant values")
+        display_dataframe(pd.DataFrame([{"Pollutant": p, "Value": item["value"], "Unit": item["unit"], "Provenance": item["source"]} for p, item in values.items()]), hide_index=True, width="stretch", alt="Detailed scenario pollutant values")
         if aqi["subindices"]:
-            display_dataframe(pd.DataFrame(aqi["subindices"]), hide_index=True, use_container_width=True, alt="Scenario CPCB pollutant subindices")
+            display_dataframe(pd.DataFrame(aqi["subindices"]), hide_index=True, width="stretch", alt="Scenario CPCB pollutant subindices")
         st.caption(aqi["method"])
         if aqi["exclusions"]:
             st.caption("Excluded from CPCB scenario index: " + "; ".join(aqi["exclusions"]))
@@ -1026,7 +1041,7 @@ def _render_disaster_dispersion_engine(values: dict) -> None:
         valid_count = sum(value not in (None, "", "Not provided") for value in (source_lat, source_lon, pollutant, release_rate, duration, release_height, wind_speed, wind_from, stability))
         st.progress(min(1.0, valid_count / (9 if supported else 2)), text=f"Input readiness · {valid_count} fields supplied")
         st.caption("Review the location, source term and weather above. Missing critical inputs stay unavailable; they are never inferred.")
-        submitted = st.form_submit_button("Run dispersion assessment", type="primary", use_container_width=True)
+        submitted = st.form_submit_button("Run dispersion assessment", type="primary", width="stretch")
     if st.button("Reset assessment", key="dispersion-reset"):
         st.session_state.pop("disaster_dispersion_result", None)
         st.rerun()
@@ -1076,7 +1091,7 @@ def _render_disaster_dispersion_engine(values: dict) -> None:
             y=alt.Y("concentration_mg_m3:Q", title="Modelled concentration (mg/m³)"),
             tooltip=[alt.Tooltip("distance_m:Q", title="Distance (m)"), alt.Tooltip("concentration_mg_m3:Q", title="Concentration (mg/m³)", format=".4g"), alt.Tooltip("arrival_min:Q", title="Arrival (min)")],
         ).properties(height=300)
-        st.altair_chart(chart, use_container_width=True)
+        st.altair_chart(chart, width="stretch")
     else:
         st.line_chart(rows.set_index("distance_m")["concentration_mg_m3"])
 
@@ -1088,7 +1103,7 @@ def _render_disaster_dispersion_engine(values: dict) -> None:
             y=alt.Y("concentration_mg_m3:Q", title="Modelled concentration (mg/m³)"),
             tooltip=[alt.Tooltip("time_min:Q", title="Time (min)"), alt.Tooltip("concentration_mg_m3:Q", title="Concentration (mg/m³)", format=".4g")],
         ).properties(height=260)
-        st.altair_chart(timeline_chart, use_container_width=True)
+        st.altair_chart(timeline_chart, width="stretch")
     else:
         st.line_chart(timeline.set_index("time_min")["concentration_mg_m3"])
 
@@ -1250,7 +1265,7 @@ def _render_co2_intelligence(live: dict) -> None:
                     y=alt.Y("value:Q", title="CO₂ concentration (ppm)"),
                     tooltip=[alt.Tooltip("observed_at:T", title="Period (UTC)"), alt.Tooltip("value:Q", title="Average ppm", format=".1f"), alt.Tooltip("minimum:Q", title="Minimum", format=".1f"), alt.Tooltip("maximum:Q", title="Maximum", format=".1f"), alt.Tooltip("observations:Q", title="Returned observations")],
                 ).properties(height=260)
-                st.altair_chart(co2_chart, use_container_width=True)
+                st.altair_chart(co2_chart, width="stretch")
             else:
                 st.line_chart(trend.set_index("observed_at")[["value"]])
             st.caption("Only returned timestamps up to the latest current timestamp are included; forecast values, empty periods and missing observations are not shown as measured data.")
@@ -1329,7 +1344,7 @@ def _render_compact_dashboard() -> None:
                 "Reference": f'{guide["limit"]:g} {guide["unit"]} ({guide["averaging"]})' if guide else "Unavailable",
                 "Status": assessment["status"] if item else "Unavailable",
             })
-        display_dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True, alt="Current pollutant summary")
+        display_dataframe(pd.DataFrame(rows), hide_index=True, width="stretch", alt="Current pollutant summary")
     else:
         item = current.get(selected)
         guide = POLLUTANT_GUIDELINES.get(selected)
@@ -1423,7 +1438,7 @@ def _render_compact_dashboard() -> None:
         if not daily_aqi.empty:
             st.caption("Historical KSPCB station extract — not live and not a model estimate.")
             columns = [c for c in ("station", "observed_at", "source_aqi", "PM2.5_value", "PM10_value", "NO2_value", "SO2_value", "CO_value", "O3_value") if c in daily_aqi.columns]
-            display_dataframe(daily_aqi[columns].head(20), hide_index=True, use_container_width=True, alt="Historical KSPCB station extract")
+            display_dataframe(daily_aqi[columns].head(20), hide_index=True, width="stretch", alt="Historical KSPCB station extract")
         else:
             st.info("Historical KSPCB station data is unavailable.")
 
@@ -1451,7 +1466,7 @@ def _render_compact_dashboard() -> None:
             with st.expander("Reviewed source register", expanded=False):
                 source_rows = [{key: source.get(key) for key in ("id", "publisher", "status", "reviewed_on")} for source in sources if isinstance(source, dict)]
                 if source_rows:
-                    display_dataframe(pd.DataFrame(source_rows), hide_index=True, use_container_width=True, alt="Reviewed source register")
+                    display_dataframe(pd.DataFrame(source_rows), hide_index=True, width="stretch", alt="Reviewed source register")
 
 
 try:
@@ -1657,7 +1672,7 @@ else:
         display_dataframe(
             pollutant_audit,
             hide_index=True,
-            use_container_width=True,
+            width="stretch",
             alt="Missing, non-numeric, negative and unit-mismatch counts in the daily pollutant extract",
         )
     st.caption(
@@ -2302,7 +2317,7 @@ else:
     display_dataframe(
         pd.DataFrame(eligibility_rows),
         hide_index=True,
-        use_container_width=True,
+        width="stretch",
     )
     st.caption(
         "No application-calculated AQI is produced for the current extract: its averaging "
@@ -2423,7 +2438,7 @@ if timeline_events:
         display_dataframe(
             visible_timeline,
             hide_index=True,
-            use_container_width=True,
+            width="stretch",
             column_config={
                 "Source / record": st.column_config.LinkColumn(
                     "Source / record",
@@ -2547,7 +2562,7 @@ else:
     display_dataframe(
         evidence_table,
         hide_index=True,
-        use_container_width=True,
+        width="stretch",
         alt="Facility-level evidence status for eight Edayar candidate facilities",
     )
     st.caption(
@@ -2625,7 +2640,7 @@ else:
     display_dataframe(
         pollutant_comparison,
         hide_index=True,
-        use_container_width=True,
+        width="stretch",
         alt="Pollutant-level comparison of Eloor ambient report coverage and Edayar facility stack evidence",
     )
     st.caption(
@@ -2732,7 +2747,7 @@ if source_assessment["candidates"]:
             display_dataframe(
                 missing_actions,
                 hide_index=True,
-                use_container_width=True,
+                width="stretch",
                 alt="Actionable missing evidence requests for each industrial candidate",
             )
             st.warning(
@@ -2744,7 +2759,7 @@ if source_assessment["candidates"]:
             display_dataframe(
                 action_plan,
                 hide_index=True,
-                use_container_width=True,
+                width="stretch",
                 alt="Complete industrial source evidence checklist",
             )
 
@@ -2804,7 +2819,7 @@ if not source_review_table.empty:
     display_dataframe(
         source_review_table,
         hide_index=True,
-        use_container_width=True,
+        width="stretch",
         alt="Source register review dates and evidence status",
     )
     invalid_review_dates = int(

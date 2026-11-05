@@ -302,7 +302,7 @@ review_cols[2].metric(
 if register_review["review_rows"]:
     review_df = pd.DataFrame(register_review["review_rows"])
     st.markdown("### Project Register Review")
-    display_dataframe(review_df, hide_index=True, use_container_width=True)
+    display_dataframe(review_df, hide_index=True, width="stretch")
 
 st.caption(register_review["interpretation"])
 
@@ -420,7 +420,7 @@ if not chart_data.empty:
         ),
     )
 
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 
 
@@ -574,7 +574,7 @@ st.download_button(
     data=csv_data,
     file_name="AI_RESILIENCE_Kochi_Mitigation_Plan.csv",
     mime="text/csv",
-    use_container_width=True,
+    width="stretch",
 )
 
 st.caption(
