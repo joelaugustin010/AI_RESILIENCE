@@ -1,5 +1,7 @@
 """AI RESILIENCE prototype entry point and shared navigation."""
 
+# Deployment refresh marker: 2026-11-05 (forces Community Cloud to fetch current main).
+
 import streamlit as st
 
 
