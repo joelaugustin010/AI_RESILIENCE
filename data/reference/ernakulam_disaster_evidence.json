@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "district": "Ernakulam",
+  "state": "Kerala",
+  "location_options": [
+    "Ernakulam district (aggregate evidence only)"
+  ],
+  "hazards": [
+    {
+      "id": "flood",
+      "name": "Flooding and urban waterlogging",
+      "status": "Official district scenario context",
+      "observation_period": "KSDMA report published 2022; underlying historical-model reference period is not stated in the district summary.",
+      "spatial_coverage": "Ernakulam district aggregate only.",
+      "record_coverage": "Six official historical return-period scenario outputs; no dated district flood-event series or urban-waterlogging observations are included.",
+      "key_findings": [
+        "KSDMA reports modeled historical-scenario affected area from 458.67 km² at the 10-year return period to 596.45 km² at the 500-year return period.",
+        "The report's return periods correspond to approximate annual exceedance probabilities of 10% to 0.2%; these are source-reported scenario statistics, not a forecast for a specific year or location.",
+        "The source-reported exposed hospital and school counts increase across the return-period scenarios; these counts depend on the source inventory and are not independently revalidated here."
+      ],
+      "seasonal_pattern": null,
+      "seasonal_pattern_gap": "The district report contains return-period scenarios, not dated events or monthly rainfall/flood observations, so a seasonal chart cannot be calculated.",
+      "method": "Display only KSDMA's district-level historical scenario table and its source-reported return period/annual-exceedance labels. Do not fit or extrapolate a local model.",
+      "uncertainty": "The reported figures are model outputs and depend on the source model, scenario definition, and exposure inventory. They do not estimate urban waterlogging frequency, ward-level impacts, or current conditions.",
+      "sources": [
+        {
+          "title": "KSDMA Flood Hazard Probability Report 2022 and Ernakulam historical map",
+          "publisher": "Kerala State Disaster Management Authority",
+          "url": "https://sdma.kerala.gov.in/wp-content/uploads/2022/06/Flood-Probability-Report-2022_Final.pdf",
+          "source_page": "https://sdma.kerala.gov.in/hazard-maps/",
+          "reuse_note": "Official district-level published summary; the dashboard uses the source-reported historical-scenario table and does not sample the raster."
+        }
+      ]
+    },
+    {
+      "id": "cyclone",
+      "name": "Cyclones and coastal storm impacts",
+      "status": "Regional track context only",
+      "observation_period": "North Indian Ocean best-track archive is present; no verified Ernakulam impact period is available.",
+      "spatial_coverage": "The available IBTrACS file covers North Indian Ocean storm tracks; no district-boundary intersection or impact dataset has been validated.",
+      "record_coverage": "No verified Ernakulam track-impact/event count. The regional track file is not treated as an Ernakulam event series.",
+      "key_findings": [
+        "A NOAA/NCEI IBTrACS North Indian Ocean track file exists in the project, but track positions alone do not establish landfall, local wind, storm surge, rainfall, damage, or district impact.",
+        "No verified Ernakulam-scale storm impact inventory or district-boundary track analysis is available, so local event frequency and seasonal patterns are not reported."
+      ],
+      "seasonal_pattern": null,
+      "seasonal_pattern_gap": "No Ernakulam-specific cyclone-impact labels or verified district-intersection results are available for a monthly or seasonal summary.",
+      "method": "No local estimate is calculated. Regional best-track data are retained as source context only and are not converted into district impacts or probabilities.",
+      "uncertainty": "Best-track completeness and positional uncertainty vary by storm and period. A track near a city reference point is not evidence of district-wide impact.",
+      "sources": [
+        {
+          "title": "International Best Track Archive for Climate Stewardship (IBTrACS), version 4r01",
+          "publisher": "NOAA National Centers for Environmental Information",
+          "url": "https://www.ncei.noaa.gov/products/international-best-track-archive",
+          "reuse_note": "Regional storm-track source; no local impact estimate is made from the track file."
+        }
+      ]
+    },
+    {
+      "id": "landslide",
+      "name": "Landslides",
+      "status": "Historical report context; no usable local susceptibility overlay",
+      "observation_period": "NASA catalog reports dated 17 August 2012 and 5 August 2013; GSI susceptibility layer listed as 2022 mapping.",
+      "spatial_coverage": "KSDMA lists a GSI susceptibility layer for Ernakulam district; its project copy is not fit for spatial analysis.",
+      "record_coverage": "Three NASA Global Landslide Catalog entries explicitly mention Ernakulam/Erakulam across two reported dates; two 2012 entries may describe the same episode. The catalog is not exhaustive. The three GSI susceptibility polygons (High, Moderate, Low) all fail geometry validity checks.",
+      "key_findings": [
+        "The NASA Global Landslide Catalog contains reports naming Kadavoor/Erakulam in August 2012 and Cheeyappara, Ernakulam in August 2013.",
+        "These media-reported catalog entries are historical examples, not a complete event inventory or a frequency estimate.",
+        "The KSDMA-linked GSI layer contains High, Moderate, and Low classes, but all three polygons have self-intersections and cannot be used to assign a class to any selected local body."
+      ],
+      "seasonal_pattern": null,
+      "seasonal_pattern_gap": "The small, media-reported catalog sample is not complete enough to estimate seasonality or event frequency.",
+      "method": "Show the dated source reports as historical examples only. Do not infer a rate, assign them to selector locations, or use the invalid GSI polygons for spatial classification.",
+      "uncertainty": "Catalog coverage is reporting-biased; source coordinates have stated 1–5 km accuracy. The susceptibility geometry, legend, scale, currency, and reuse conditions need resolution with the provider.",
+      "sources": [
+        {
+          "title": "KSDMA hazard maps: GSI landslide susceptibility zones (2022)",
+          "publisher": "Kerala State Disaster Management Authority / Geological Survey of India",
+          "url": "https://sdma.kerala.gov.in/hazard-maps/",
+          "reuse_note": "The Ernakulam layer is present locally but is excluded from spatial analysis because all three geometries are invalid."
+        },
+        {
+          "title": "Global Landslide Catalog",
+          "publisher": "NASA",
+          "url": "https://data.nasa.gov/",
+          "reuse_note": "Historical media-reported examples only; not a complete local inventory or probability denominator."
+        }
+      ]
+    },
+    {
+      "id": "drought",
+      "name": "Drought and water scarcity",
+      "status": "Ernakulam evidence gap",
+      "observation_period": "No usable Ernakulam drought observation period is present in the checkout.",
+      "spatial_coverage": "No verified Ernakulam drought-index extraction, groundwater series, reservoir series, or drinking-water supply series is available locally.",
+      "record_coverage": "Zero verified Ernakulam drought or water-scarcity records are available in the dashboard data.",
+      "key_findings": [
+        "No district-scoped drought-index or water-scarcity time series is present in the current project data.",
+        "No Ernakulam groundwater, reservoir, drinking-water supply, or demand series is available to distinguish meteorological drought from water scarcity."
+      ],
+      "seasonal_pattern": null,
+      "seasonal_pattern_gap": "No local monthly drought or water-supply series is available to calculate seasonal conditions.",
+      "method": "Do not estimate drought conditions from unrelated district or national data. Obtain a verified district drought index and water-supply/groundwater observations before rating.",
+      "uncertainty": "There is no locally verified measure of meteorological drought, groundwater stress, reservoir status, or water-supply impacts.",
+      "sources": [
+        {
+          "title": "India Drought Monitor",
+          "publisher": "India Drought Monitor",
+          "url": "https://indiadroughtmonitor.in/",
+          "reuse_note": "Portal reference only; no validated Ernakulam district dataset was acquired into this checkout."
+        }
+      ]
+    }
+  ]
+}

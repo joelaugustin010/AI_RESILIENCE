@@ -2,11 +2,16 @@
 
 import streamlit as st
 
-# Command-centre layout; shared workspace styling is defined in app.py.
+# Landing-page-only polish. Global navigation and the scientific pages are untouched.
 st.markdown(
     """
     <style>
-    .stApp { background: transparent !important; }
+    .stApp {
+      background:
+        radial-gradient(ellipse at 78% 7%, rgba(34,184,207,.12), transparent 28rem),
+        radial-gradient(ellipse at 8% 42%, rgba(8,126,139,.055), transparent 24rem),
+        linear-gradient(180deg, #f4f8fb 0%, #ffffff 46rem);
+    }
     .ar-home-hero {
       position: relative; isolation: isolate; overflow: hidden;
       display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(180px, .75fr);
@@ -76,12 +81,12 @@ st.markdown(
       color: #bae6fd; font-size: .68rem; letter-spacing: .13em; text-transform: uppercase;
     }
     .ar-section-kicker {
-      color: #68e8d1; font-size: .72rem; text-transform: uppercase;
+      color: #087e8b; font-size: .72rem; text-transform: uppercase;
       letter-spacing: .15em; font-weight: 850; margin-bottom: .25rem;
     }
     .ar-work-card {
-      min-height: 190px; border: 1px solid rgba(130,190,199,.24); border-radius: 18px;
-      padding: 1.05rem 1.1rem; background: linear-gradient(150deg,rgba(17,49,66,.96),rgba(9,31,46,.96));
+      min-height: 190px; border: 1px solid #dbe7ee; border-radius: 18px;
+      padding: 1.05rem 1.1rem; background: rgba(255,255,255,.88);
       box-shadow: 0 7px 22px rgba(16,42,67,.045);
       transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
     }
@@ -90,8 +95,8 @@ st.markdown(
       box-shadow: 0 14px 30px rgba(16,42,67,.085);
     }
     .ar-work-icon { font-size: 1.45rem; margin-bottom: .55rem; }
-    .ar-work-title { color: #effafa; font-size: 1.02rem; font-weight: 800; margin-bottom: .35rem; }
-    .ar-work-copy { color: #b6d0d4; font-size: .88rem; line-height: 1.55; }
+    .ar-work-title { color: #102a43; font-size: 1.02rem; font-weight: 800; margin-bottom: .35rem; }
+    .ar-work-copy { color: #526579; font-size: .88rem; line-height: 1.55; }
     @media (max-width: 760px) {
       .ar-home-hero { grid-template-columns: 1fr; border-radius: 19px; }
       .ar-radar { display: none; }
@@ -118,7 +123,7 @@ st.markdown(
         </p>
         <span class="ar-home-pill">Evidence-first</span>
         <span class="ar-home-pill">Multi-hazard planning</span>
-        <span class="ar-home-pill">SDG 11 · SDG 13 · SDG 6 · SDG 9 aligned</span>
+        <span class="ar-home-pill">SDG 11 · SDG 13 aligned</span>
       </div>
       <div class="ar-radar" aria-hidden="true">
         <div class="ar-radar-ring"><span class="ar-radar-dot"></span></div>
@@ -156,7 +161,7 @@ tools = [
     ("Hazard Model Lab", "Review model readiness before interpreting outputs.", "app_pages/hazard_model_lab.py", ":material/model_training:"),
     ("Hospital Vulnerability", "Review evidence needed for critical-facility exposure.", "app_pages/hospital_vulnerability.py", ":material/local_hospital:"),
     ("Cyclone + Flood", "Open the integrated cyclone, flood and compound-impact workspace.", "app_pages/compound_scenario.py", ":material/thunderstorm:"),
-    ("Disaster Probability", "Inspect probability-model readiness and limitations.", "app_pages/disaster_probability.py", ":material/analytics:"),
+    ("AI Disaster Risk Assessment", "Assess one selected Ernakulam hazard at a time with transparent evidence and uncertainty.", "app_pages/disaster_probability.py", ":material/analytics:"),
     ("Mitigation Budget", "Compare supplied costs and check budget arithmetic.", "app_pages/mitigation_planner.py", ":material/account_balance_wallet:"),
     ("Smart Mitigation Design", "Structure a mitigation concept for a selected scenario.", "app_pages/smart_mitigation_design.py", ":material/engineering:"),
 ]
