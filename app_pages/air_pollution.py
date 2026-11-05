@@ -383,6 +383,55 @@ st.markdown(
       .disaster-hero { padding: 1.2rem 1.15rem; border-radius: 16px; }
       .air-nav { gap: .35rem; }
     }
+
+    /* Shared eco-glass treatment for the air-intelligence module. */
+    .air-nav { border-bottom-color: rgba(44,105,82,.18) !important; }
+    .air-nav a {
+      color: #315B4C !important;
+      background: rgba(255,255,255,.78) !important;
+      border-color: rgba(44,105,82,.20) !important;
+      backdrop-filter: blur(10px);
+    }
+    .air-nav a:hover {
+      color: #1B604F !important;
+      background: #EAF3EE !important;
+      border-color: rgba(36,122,101,.42) !important;
+    }
+    .disaster-hero {
+      color: #1D3030 !important;
+      background:
+        radial-gradient(ellipse at 90% -20%, rgba(131,185,165,.18), transparent 20rem),
+        linear-gradient(120deg, rgba(255,255,255,.98), rgba(234,243,238,.96)) !important;
+      border-color: rgba(44,105,82,.20) !important;
+      box-shadow: 0 12px 32px rgba(26,65,49,.08) !important;
+    }
+    .disaster-kicker, .disaster-step { color: #247A65 !important; }
+    .disaster-title { color: #1D3030 !important; }
+    .disaster-subtitle, .disaster-card-copy { color: #71827F !important; }
+    .disaster-card {
+      background: rgba(255,255,255,.84) !important;
+      border-color: rgba(44,105,82,.18) !important;
+      box-shadow: 0 8px 22px rgba(26,65,49,.06) !important;
+      backdrop-filter: blur(12px);
+    }
+    .disaster-card-title { color: #315B4C !important; }
+    .disaster-result {
+      background: linear-gradient(135deg, rgba(234,243,238,.98), rgba(255,255,255,.96)) !important;
+      border-color: rgba(36,122,101,.22) !important;
+    }
+    .disaster-result-label { color: #247A65 !important; }
+    .disaster-result-value { color: #1D3030 !important; }
+    .disaster-result-copy { color: #71827F !important; }
+    .disaster-pill {
+      color: #1B604F !important;
+      background: #EAF3EE !important;
+      border-color: rgba(36,122,101,.22) !important;
+    }
+    .disaster-empty {
+      color: #71827F !important;
+      background: rgba(255,255,255,.78) !important;
+      border-color: rgba(36,122,101,.30) !important;
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -601,15 +650,15 @@ def _render_scenario_visual_report(values: dict, baseline: dict, hourly: pd.Data
     interpretation = HEALTH_INFORMATION.get(concern, {}).get("summary", "No pollutant-specific interpretation is available.")
     precaution = HEALTH_INFORMATION.get(concern, {}).get("precautions", "Use official local guidance and avoid treating this scenario as an alert.")
     st.markdown(
-        f'<div style="border:1px solid rgba(130,190,199,.28);border-radius:18px;padding:22px;margin:12px 0;'
-        f'background:linear-gradient(135deg,#0b2333,#0b2333);">'
-        f'<div style="color:#5cc8e8;font-size:.78rem;font-weight:750;letter-spacing:.08em;text-transform:uppercase;">{status}</div>'
-        f'<div style="font-size:1.7rem;font-weight:800;color:#f1fbfb;margin:.25rem 0;">Air-quality scenario report</div>'
-        f'<div style="color:#a9c7cd;"><b>Scenario name:</b> {mode} · <b>Location:</b> {location}</div>'
+        f'<div style="border:1px solid rgba(44,105,82,.20);border-radius:18px;padding:22px;margin:12px 0;'
+        f'background:linear-gradient(135deg,#ffffff,#EAF3EE);">'
+        f'<div style="color:#247A65;font-size:.78rem;font-weight:750;letter-spacing:.08em;text-transform:uppercase;">{status}</div>'
+        f'<div style="font-size:1.7rem;font-weight:800;color:#1D3030;margin:.25rem 0;">Air-quality scenario report</div>'
+        f'<div style="color:#71827F;"><b>Scenario name:</b> {mode} · <b>Location:</b> {location}</div>'
         f'<div style="display:flex;gap:24px;flex-wrap:wrap;margin-top:14px;">'
-        f'<div><div style="color:#9fbec6;font-size:.78rem;">OVERALL ASSESSMENT</div><div style="font-size:1.25rem;font-weight:750;">{overall}</div></div>'
-        f'<div><div style="color:#9fbec6;font-size:.78rem;">MAIN POLLUTANT OF CONCERN</div><div style="font-size:1.25rem;font-weight:750;">{concern}</div></div>'
-        f'<div><div style="color:#9fbec6;font-size:.78rem;">RESULT STATUS</div><div style="font-size:1.25rem;font-weight:750;color:#5cc8e8;">{status}</div></div>'
+        f'<div><div style="color:#71827F;font-size:.78rem;">OVERALL ASSESSMENT</div><div style="font-size:1.25rem;font-weight:750;">{overall}</div></div>'
+        f'<div><div style="color:#71827F;font-size:.78rem;">MAIN POLLUTANT OF CONCERN</div><div style="font-size:1.25rem;font-weight:750;">{concern}</div></div>'
+        f'<div><div style="color:#71827F;font-size:.78rem;">RESULT STATUS</div><div style="font-size:1.25rem;font-weight:750;color:#247A65;">{status}</div></div>'
         f'</div></div>', unsafe_allow_html=True,
     )
 
@@ -620,7 +669,7 @@ def _render_scenario_visual_report(values: dict, baseline: dict, hourly: pd.Data
         item = values.get(pollutant)
         with cards[index % 3]:
             if not item:
-                st.markdown(f"<div style='border:1px solid rgba(130,190,199,.22);border-radius:14px;padding:13px;margin:5px 0;color:#9fbec6;'><b>{pollutant}</b><br>Unavailable</div>", unsafe_allow_html=True)
+                st.markdown(f"<div style='border:1px solid rgba(44,105,82,.18);border-radius:14px;padding:13px;margin:5px 0;color:#71827F;background:#ffffff;'><b>{pollutant}</b><br>Unavailable</div>", unsafe_allow_html=True)
                 continue
             base = baseline.get(pollutant)
             comparison = "No compatible baseline"
@@ -629,11 +678,11 @@ def _render_scenario_visual_report(values: dict, baseline: dict, hourly: pd.Data
                 comparison = f"{delta:+.1f} vs baseline"
             meaning = "CO₂ is context only; it is not an AQI pollutant." if pollutant == "CO2" else (subindices.get(pollutant, {}).get("category") or "Concentration available")
             st.markdown(
-                f"<div style='border:1px solid rgba(130,190,199,.28);border-radius:14px;padding:13px;margin:5px 0;background:#0b2333;'>"
-                f"<div style='font-weight:750;color:#d8fbf5;'>{pollutant}</div>"
+                f"<div style='border:1px solid rgba(44,105,82,.18);border-radius:14px;padding:13px;margin:5px 0;background:#ffffff;'>"
+                f"<div style='font-weight:750;color:#315B4C;'>{pollutant}</div>"
                 f"<div style='font-size:1.45rem;font-weight:800;'>{float(item['value']):.1f} <span style='font-size:.82rem;font-weight:500;'>{item['unit']}</span></div>"
-                f"<div style='font-size:.78rem;color:#5cc8e8;'>{item['source']}</div>"
-                f"<div style='font-size:.78rem;color:#a9c7cd;'>{comparison} · {meaning}</div></div>", unsafe_allow_html=True,
+                f"<div style='font-size:.78rem;color:#247A65;'>{item['source']}</div>"
+                f"<div style='font-size:.78rem;color:#71827F;'>{comparison} · {meaning}</div></div>", unsafe_allow_html=True,
             )
 
     st.markdown("**AQI indicators supplied by the external feed**")
@@ -645,7 +694,7 @@ def _render_scenario_visual_report(values: dict, baseline: dict, hourly: pd.Data
                 category = aqi_category("EAQI" if label == "European AQI" else "US AQI", supplied["value"])
                 colour = category["color"] if category else "#5cc8e8"
                 category_label = category["label"] if category else "Category unavailable"
-                st.markdown(f"<div style='border:3px solid {colour};border-radius:16px;padding:17px;background:linear-gradient(135deg,{colour}16,transparent);'><div style='color:#9fbec6;font-size:.78rem;font-weight:700;'>{title} · external forecast</div><div style='font-size:2.4rem;font-weight:850;'>{supplied['value']:.0f}</div><div style='font-weight:750;color:{colour};'>{category_label}</div></div>", unsafe_allow_html=True)
+                st.markdown(f"<div style='border:3px solid {colour};border-radius:16px;padding:17px;background:linear-gradient(135deg,{colour}16,transparent);'><div style='color:#71827F;font-size:.78rem;font-weight:700;'>{title} · external forecast</div><div style='font-size:2.4rem;font-weight:850;'>{supplied['value']:.0f}</div><div style='font-weight:750;color:{colour};'>{category_label}</div></div>", unsafe_allow_html=True)
             else:
                 st.info(f"{title} unavailable for this scenario. No unsupported AQI is calculated.")
 
@@ -1095,10 +1144,10 @@ def _render_co2_intelligence(live: dict) -> None:
             st.markdown(
                 f'<div style="border:3px solid {context["color"]};border-radius:18px;padding:16px 20px;'
                 f'background:linear-gradient(100deg,{context["color"]}18,transparent);">'
-                f'<div style="font-size:.86rem;color:#a9c7cd;">Modelled outdoor CO₂ estimate · {context["status"]}</div>'
+                f'<div style="font-size:.86rem;color:#71827F;">Modelled outdoor CO₂ estimate · {context["status"]}</div>'
                 f'<div style="font-size:3rem;font-weight:800;line-height:1.1;">{co2_item["value"]:g} <span style="font-size:1.1rem;font-weight:600;">{co2_item["unit"]}</span></div>'
                 f'<div style="font-weight:700;color:{context["color"]};">Kochi model grid · model timestamp {observed_label}</div>'
-                f'<div style="font-size:.82rem;color:#a9c7cd;">Source: CAMS via Open-Meteo · near-real-time modelled · cached up to 15 minutes</div></div>',
+                f'<div style="font-size:.82rem;color:#71827F;">Source: CAMS via Open-Meteo · near-real-time modelled · cached up to 15 minutes</div></div>',
                 unsafe_allow_html=True,
             )
             st.warning("Verified local ambient CO₂: Unavailable. The value above is a model estimate, not a validated station observation; it must not be treated as a measured Kochi concentration or an AQI input.")
@@ -1157,7 +1206,7 @@ def _render_co2_intelligence(live: dict) -> None:
         source_columns = st.columns(2)
         for index, (title, description) in enumerate(source_types.items()):
             with source_columns[index % 2]:
-                st.markdown(f'<div style="border:1px solid rgba(130,190,199,.32);border-radius:11px;padding:10px;margin:5px 0;"><b>{title}</b><br><span style="font-size:.83rem;color:#a9c7cd;">{description}</span></div>', unsafe_allow_html=True)
+                st.markdown(f'<div style="border:1px solid rgba(130,190,199,.32);border-radius:11px;padding:10px;margin:5px 0;"><b>{title}</b><br><span style="font-size:.83rem;color:#71827F;">{description}</span></div>', unsafe_allow_html=True)
 
         st.markdown("**Documented Edayar fuel-use evidence**")
         candidates = read_csv(INDUSTRIAL / "edayar_candidate_facilities.csv")
@@ -1516,7 +1565,7 @@ def _render_compact_dashboard() -> None:
                     st.markdown(
                         f'<div style="border:1px solid {evidence_color};border-left:5px solid {evidence_color};border-radius:12px;padding:11px 14px;margin:8px 0;">'
                         f'<div style="font-weight:750;font-size:1.02rem;">{match["Facility"]}</div>'
-                        f'<div style="font-size:.84rem;color:#a9c7cd;">{match["Location"]} · {match["Industry type"]}</div>'
+                        f'<div style="font-size:.84rem;color:#71827F;">{match["Location"]} · {match["Industry type"]}</div>'
                         f'<div style="margin-top:5px;"><span style="color:{evidence_color};font-weight:700;">{match["Evidence category"]}</span> · {match["Pollutant"]} · associated: {match["Associated pollutants"]}</div></div>',
                         unsafe_allow_html=True,
                     )
@@ -1557,7 +1606,7 @@ def _render_compact_dashboard() -> None:
                 f'<div style="border:1px solid rgba(130,190,199,.32);border-radius:11px;padding:10px 13px;margin:7px 0;">'
                 f'<div style="font-weight:750;">{source["name"]}</div>'
                 f'<div style="font-size:.85rem;">[{source["station"]}]({source["link"]}) · {source["type"]}</div>'
-                f'<div style="font-size:.8rem;color:#a9c7cd;">Last observed: {source["timestamp"]} · {source["limit"]}</div></div>',
+                f'<div style="font-size:.8rem;color:#71827F;">Last observed: {source["timestamp"]} · {source["limit"]}</div></div>',
                 unsafe_allow_html=True,
             )
         st.markdown("**Limitations**")
