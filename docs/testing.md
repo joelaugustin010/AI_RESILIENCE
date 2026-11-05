@@ -75,3 +75,15 @@ ignored-PDF source checks and the ignored annual-AQI snapshot audit. With
 passed and 155 deselected. Both runs used the same Python 3.15 interpreter;
 test temporary files were directed into the isolated workspace after the
 default sandbox denied fixture writes.
+
+On 2026-11-05, the same Python 3.15 environment completed the hardened suite
+with `python -m pytest -q`: 643 passed, 4 skipped, and 187 passing subtests in
+422.66 seconds. Three skips are the expected `local_research` snapshot checks
+(missing local AQI/PDF research files); the fourth is the optional WorldCover
+preview check that requires the local source raster and provenance sidecar. No
+test was disabled or deselected. Plotly 6.9.0 was installed locally
+for the Streamlit `AppTest` page smoke tests. A separate smoke run through
+`app.py` + `switch_page` exercised all twelve registered pages with zero
+uncaught exceptions. These results still do not verify Python 3.11, and the
+skipped local-research integrations are not evidence that the underlying
+snapshots were validated.
