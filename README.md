@@ -18,9 +18,14 @@ streamlit run app.py
 
 If PowerShell blocks activation, use a permitted environment or run the virtual environment's Python directly; do not weaken device security settings without permission.
 
+The homepage has its own implementation and customisation guide in
+[`docs/HOMEPAGE_EXPERIENCE.md`](docs/HOMEPAGE_EXPERIENCE.md). To use your own
+hero film, place it at `assets/videos/kerala_hero.mp4`; see
+[`assets/videos/README.md`](assets/videos/README.md) for export settings.
+
 ## Suggested demonstration (5–7 minutes)
 
-1. **Command Centre** — introduce the problem and the evidence-first approach.
+1. **Home** — open on the cinematic Kerala introduction: the landscape, the threats, why the evidence chain matters, and where each workspace fits.
 2. **Decision Workflow** — change scenario inputs, review the result and explain which inputs affect it.
 3. **Kochi Map** — inspect available geographic layers and point out coverage or boundary limitations.
 4. **Air Pollution** — show historical monitoring summaries and explain why AQI alone cannot prove which factory caused pollution.

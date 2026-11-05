@@ -7,11 +7,18 @@ from datetime import date
 import streamlit as st
 
 from src.compound_hazard_assessment import assess_compound_scenario
+from src.ui_theme import page_header
 
 
-st.set_page_config(page_title="Cyclone + Flood | AI RESILIENCE", page_icon="🌧️", layout="wide")
-st.title("Kochi Cyclone + Flood Resilience Workspace")
-st.caption("One integrated workspace for rainfall, river flooding, cyclone exposure, compound pathways and service continuity.")
+page_header(
+    "AI RESILIENCE · COMPOUND HAZARD WORKSPACE",
+    "Kochi Cyclone + Flood Resilience Workspace",
+    "One integrated workspace for rainfall, river flooding, cyclone exposure, compound "
+    "pathways and service continuity.",
+    meta=("Kochi · Ernakulam", "Cyclone + flood", "Research prototype"),
+    accent="violet",
+    key="compound-scenario",
+)
 
 st.warning(
     "Research and planning prototype only. It does not issue warnings or calculate validated "

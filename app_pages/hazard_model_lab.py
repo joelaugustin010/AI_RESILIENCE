@@ -10,6 +10,7 @@ import streamlit as st
 from src.dataframe_display import display_dataframe
 
 from src.hazard_manifest import build_hazard_manifest_frame
+from src.ui_theme import page_header
 
 ROOT = Path(__file__).resolve().parents[1]
 TRAINING_REPORT = ROOT / "reports" / "weather_hazard_training.json"
@@ -25,10 +26,14 @@ def read_json(path: Path) -> dict:
         return {}
 
 
-st.title("Hazard Model Lab")
-st.caption(
-    "Research and training status for the multi-hazard project. "
-    "A downloaded dataset is not automatically a training dataset."
+page_header(
+    "AI RESILIENCE · MODEL TRANSPARENCY",
+    "Hazard Model Lab",
+    "Research and training status for the multi-hazard project. A downloaded dataset is "
+    "not automatically a training dataset, and a trained baseline is not an operational warning.",
+    meta=("Research baselines", "Validation status", "Explicit blockers"),
+    accent="violet",
+    key="hazard-model-lab",
 )
 
 st.warning(

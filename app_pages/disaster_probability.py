@@ -5,6 +5,8 @@ from zoneinfo import ZoneInfo
 
 import streamlit as st
 
+from src.ui_theme import page_header
+
 from src.ernakulam_disaster_dashboard import load_location_registry, location_options
 from src.ernakulam_input_predictions import (
     HAZARD_GUIDANCE,
@@ -23,59 +25,51 @@ from src.ernakulam_input_predictions import (
 st.markdown(
     """
     <style>
-    .block-container { max-width: 1180px; padding: 1.5rem 1.5rem 3rem; }
-    [data-testid="stVerticalBlockBorderWrapper"] {
-        border: 1px solid #dfe8ec;
-        border-top: 3px solid #087e8b;
-        border-radius: 14px;
-        background: linear-gradient(145deg, #fff 65%, #f4f9fa);
-        box-shadow: 0 5px 18px rgba(16, 42, 67, .045);
-    }
-    [data-testid="stButton"] button[kind="primary"],
-    [data-testid="stFormSubmitButton"] button[kind="primary"] {
-        min-height: 3rem;
-        border-radius: 10px;
-        font-weight: 650;
-    }
-    @media (max-width: 720px) {
-        .block-container { padding: 1rem .75rem 2rem; }
-    }
+    /* Ernakulam risk module: measured blue accent, calm analytical surfaces. */
     .probability-panel {
-        border: 1px solid #d6e8eb;
-        border-radius: 12px;
-        padding: .8rem .9rem .7rem;
-        margin: .55rem 0 .8rem;
-        background: linear-gradient(135deg, #f4fbfb, #ffffff);
+      border: 1px solid rgba(127, 184, 255, .26);
+      border-radius: 16px;
+      padding: .95rem 1.05rem .8rem;
+      margin: .55rem 0 .8rem;
+      background:
+        radial-gradient(ellipse at 100% 0%, rgba(127, 184, 255, .10), transparent 16rem),
+        linear-gradient(145deg, rgba(15, 42, 62, .96), rgba(9, 28, 43, .96));
+      box-shadow: var(--ar-shadow-soft);
     }
     .probability-label {
-        color: #55727b;
-        font-size: .76rem;
-        font-weight: 700;
-        letter-spacing: .04em;
-        text-transform: uppercase;
+      color: #9db9d4;
+      font-size: .72rem;
+      font-weight: 750;
+      letter-spacing: .08em;
+      text-transform: uppercase;
     }
     .probability-value {
-        color: #0b6975;
-        font-size: 2.15rem;
-        font-weight: 800;
-        line-height: 1.1;
-        margin: .18rem 0 .35rem;
+      color: #cfe4ff;
+      font-size: 2.05rem;
+      font-weight: 800;
+      line-height: 1.1;
+      margin: .18rem 0 .35rem;
+      font-variant-numeric: tabular-nums;
     }
     .probability-unavailable {
-        color: #6d5a2c;
-        font-size: 1.18rem;
-        font-weight: 750;
-        margin: .18rem 0 .35rem;
+      color: #f0c56a;
+      font-size: 1.12rem;
+      font-weight: 750;
+      margin: .18rem 0 .35rem;
     }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-st.title("AI Disaster Risk Assessment")
-st.markdown(
-    "Understand local environmental conditions and assess potential disaster "
-    "risks in Ernakulam."
+page_header(
+    "AI RESILIENCE · ERNAKULAM RISK ASSESSMENT",
+    "AI Disaster Risk Assessment",
+    "Understand local environmental conditions and assess potential disaster risks in "
+    "Ernakulam, one hazard at a time.",
+    meta=("Ernakulam district", "Preliminary screening", "Not a forecast"),
+    accent="blue",
+    key="disaster-probability",
 )
 st.caption(
     "One independent hazard assessment at a time. Preliminary categories describe submitted "

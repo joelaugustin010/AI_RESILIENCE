@@ -2,9 +2,17 @@
 import streamlit as st
 
 from src.disaster_assistant import KnowledgeBaseError, answer_question, load_knowledge
+from src.ui_theme import page_header
 
-st.title("Disaster Intelligence Assistant")
-st.caption("Phase 2 · Source-grounded preparedness information · Not a live warning or prediction")
+page_header(
+    "AI RESILIENCE · SOURCE-GROUNDED GUIDANCE",
+    "Disaster Intelligence Assistant",
+    "Ask about flood preparedness, cyclones, earthquakes, air pollution or compound hazards. "
+    "Answers come from a reviewed local knowledge file with official source links.",
+    meta=("Phase 2", "Reviewed knowledge base", "Not a live warning"),
+    accent="teal",
+    key="disaster-assistant",
+)
 
 st.info(
     "Ask about flood preparedness, cyclones, earthquakes, air pollution, or compound hazards. "

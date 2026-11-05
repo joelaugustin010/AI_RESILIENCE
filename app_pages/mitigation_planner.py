@@ -36,63 +36,18 @@ from src.mitigation_intelligence import (
 
 
 
-st.markdown("""
-<style>
-.project-header {
-    background: rgba(12,35,51,.92);
-    padding: 28px 32px;
-    border: 1px solid #d9e2ec;
-    border-top: 4px solid #17365d;
-    border-radius: 8px;
-    margin: 8px 0 26px 0;
-    box-shadow: 0 2px 8px rgba(15, 35, 60, 0.05);
-}
+from src.ui_theme import page_header, section_intro
 
-.project-eyebrow {
-    color: #52677f !important;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 1.8px;
-    margin-bottom: 14px;
-}
-
-.project-title {
-    color: #17365d !important;
-    font-size: clamp(26px, 3vw, 36px);
-    font-weight: 750;
-    line-height: 1.25;
-    margin: 0 0 12px 0;
-}
-
-.project-description {
-    color: #526174 !important;
-    font-size: 15px;
-    line-height: 1.7;
-    max-width: 850px;
-    margin: 0;
-}
-</style>
-
-<div class="project-header">
-    <div class="project-eyebrow">
-        AI RESILIENCE &nbsp; | &nbsp; KOCHI, KERALA, INDIA
-    </div>
-
-    
-<h1 class="project-title">
-    Urban Flood Mitigation Budget
-    <br>
-    &amp; Project Planning
-</h1>
-
-<p class="project-description">
-    A public infrastructure planning dashboard for assessing proposed
-    flood mitigation investments, monitoring project implementation,
-    and supporting transparent budget allocation across Kochi, Kerala.
-</p>
-
-</div>
-""", unsafe_allow_html=True)
+page_header(
+    "AI RESILIENCE · KOCHI · PLANNING WORKSPACE",
+    "Urban Flood Mitigation Budget & Project Planning",
+    "A public infrastructure planning worksheet for assessing proposed flood-mitigation "
+    "investments, monitoring implementation, and keeping budget allocation transparent "
+    "across Kochi, Kerala.",
+    meta=("Kochi · Kerala · India", "User-supplied estimates", "Arithmetic comparison only"),
+    accent="amber",
+    key="mitigation-budget",
+)
 
 
 
@@ -166,7 +121,7 @@ starter = pd.DataFrame([
 ], columns=columns)
 
 
-st.markdown("### Project Register")
+section_intro("Project register", "Proposed mitigation works")
 st.caption(
     "Record proposed mitigation works, estimated expenditure, "
     "implementation status, beneficiaries, and supporting evidence."
@@ -241,7 +196,7 @@ plan = st.data_editor(
 # ==========================================
 
 st.markdown("---")
-st.markdown("## 🧠 Mitigation Planning Intelligence")
+section_intro("Review", "Mitigation planning intelligence")
 st.caption(
     "A transparent review of the project register, with the latest concept "
     "configuration shared from the Smart Mitigation Design Studio when available."
@@ -250,7 +205,7 @@ st.caption(
 design_state = st.session_state.get("mitigation_design_state")
 
 if design_state:
-    st.markdown("### Connected Design Studio Configuration")
+    st.markdown("#### Connected Design Studio configuration")
     design_cols = st.columns(4)
     design_cols[0].metric("Design area", design_state["area_type"])
     design_cols[1].metric(
@@ -268,7 +223,7 @@ if design_state:
         f"Model version {design_state['model_version']}"
     )
 
-    st.markdown("### Explainable planning prompts")
+    st.markdown("#### Explainable planning prompts")
     for item in design_recommendations(design_state):
         with st.container(border=True):
             st.markdown(
@@ -301,7 +256,7 @@ review_cols[2].metric(
 
 if register_review["review_rows"]:
     review_df = pd.DataFrame(register_review["review_rows"])
-    st.markdown("### Project Register Review")
+    st.markdown("#### Project register review")
     display_dataframe(review_df, hide_index=True, use_container_width=True)
 
 st.caption(register_review["interpretation"])
@@ -322,7 +277,7 @@ st.info(
     "or replace engineering and financial review."
 )
 
-st.markdown("## 📊 Mitigation Expenditure Report")
+section_intro("Expenditure", "Mitigation expenditure report")
 st.caption(
     "Estimated expenditure by proposed intervention. "
     "All amounts are based on user-entered project costs."
@@ -365,7 +320,7 @@ if not chart_data.empty:
         "Cost INR", ascending=True
     )
 
-    st.markdown("### Project-wise Estimated Expenditure")
+    st.markdown("#### Project-wise estimated expenditure")
     st.caption(
     "Comparison of proposed mitigation project costs in Indian Rupees (₹)."
     )
@@ -383,7 +338,7 @@ if not chart_data.empty:
         },
         text="Cost INR",
         color="Cost INR",
-        color_continuous_scale=["#b9e4e8", "#117477", "#103653"],
+        color_continuous_scale=["#0b4f5c", "#16a596", "#42e0c1"],
         template="plotly_dark",
     )
 
@@ -401,7 +356,7 @@ if not chart_data.empty:
             tickprefix="₹",
             tickformat=",.0f",
             showgrid=True,
-            gridcolor="#e4edf2",
+            gridcolor="rgba(130,190,199,.13)",
             zeroline=False,
         ),
         yaxis=dict(
@@ -416,7 +371,7 @@ if not chart_data.empty:
         font=dict(
             family="Arial, sans-serif",
             size=13,
-            color="#193247",
+            color="#cfe6e8",
         ),
     )
 
@@ -436,8 +391,12 @@ else:
 
 
 
-    st.markdown("## Financial Overview")
-    st.caption(
+section_intro(
+    "Finance",
+    "Financial overview",
+    "Monitor arithmetic budget use while keeping unknown costs and evidence gaps visible.",
+)
+st.caption(
     "Financial monitoring summary based on the budget and "
     "project costs entered in this planning worksheet."
 )
@@ -484,7 +443,7 @@ with col4:
     )
 
 # Utilization indicator
-st.markdown("### Budget Utilization Monitor")
+section_intro("Budget signal", "Budget utilisation monitor")
 
 if budget > 0:
     progress_value = min(max(total_known / budget, 0.0), 1.0)
@@ -507,7 +466,7 @@ else:
     )
 
 # Financial data quality and budget status
-st.markdown("### Financial Review")
+section_intro("Quality gate", "Financial review")
 
 if summary["within_budget"] is False:
     st.warning(
@@ -528,7 +487,7 @@ else:
     )
 
 
-st.markdown("## 📋 Project Summary")
+section_intro("Register", "Project summary")
 
 total_projects = len(plan)
 
@@ -546,7 +505,7 @@ with summary_cols[0]:
 with summary_cols[1]:
     st.metric("Missing Cost Estimates", int(missing_costs))
 
-st.markdown("## 📌 Project Status Overview")
+section_intro("Register", "Project status overview")
 
 status_counts = (
     plan["Project Status"]
@@ -565,7 +524,7 @@ for col, (status, count) in zip(status_cols, status_counts.items()):
         st.metric(status, int(count))
 
     
-st.markdown("## 📥 Export Mitigation Plan")
+section_intro("Handoff", "Export mitigation plan", "Download the current user-entered register for a separate review or funding process.")
 
 csv_data = plan.to_csv(index=False).encode("utf-8-sig")
 
@@ -590,7 +549,7 @@ evidence_missing = (
     .eq("")
 )
 
-st.markdown("## Evidence & Data Quality")
+section_intro("Evidence", "Evidence and data quality")
 st.caption(
     f"Risk-reduction evidence is missing for "
     f"{int(evidence_missing.sum())} intervention row(s). "
@@ -604,8 +563,11 @@ st.info(
     "population, and a defensible impact evaluation."
 )
 
-st.markdown("---")
-st.markdown("## 🎯 What Can You Do With Your Budget?")
+section_intro(
+    "Options",
+    "What can you do with your budget?",
+    "Explore arithmetic-only fits from the entered register. Fit does not imply effectiveness or priority.",
+)
 st.caption(
     "Find projects from your register that may fit within "
     "your available budget."
@@ -632,7 +594,7 @@ elif feasible_projects.empty:
     )
 
 else:
-    st.markdown("### Projects that fit individually")
+    section_intro("Screen", "Projects that fit individually")
 
     feasible_projects["_cost"] = pd.to_numeric(
         feasible_projects["Cost INR"], errors="coerce"
@@ -671,7 +633,7 @@ else:
 
 from itertools import combinations
 
-st.markdown("### 🧮 Affordable Project Combinations")
+section_intro("Screen", "Affordable project combinations")
 
 if budget <= 0:
     st.info("Enter a budget greater than ₹0 to compare combinations.")
