@@ -8,19 +8,10 @@ from __future__ import annotations
 import math
 from typing import Any
 
+from src.hazard_registry import HAZARD_EVIDENCE_FACTORS
 
-HAZARD_FACTORS: dict[str, tuple[str, ...]] = {
-    "Flood": ("rainfall_mm + accumulation period", "river level + station/datum where applicable", "drainage condition", "verified source and observation time"),
-    "Cyclone": ("official track/intensity or forecast source", "wind speed with averaging period", "rainfall/coastal surge context where relevant", "verified source and time"),
-    "Earthquake": ("event magnitude and origin time", "ground-shaking intensity/ground-motion evidence", "local geology and building vulnerability", "verified source and time"),
-    "Landslide": ("rainfall intensity and duration", "slope/terrain and geology", "dated, geolocated landslide inventory or field evidence", "verified source and time"),
-    "Heatwave": ("maximum temperature and station normal", "consecutive-day duration and qualifying station coverage", "humidity/night-time temperature and exposure context", "verified source and time"),
-    "Drought": ("rainfall anomaly over a defined period", "soil moisture/evaporative demand or drought index", "water-source/storage/demand context", "verified source and time"),
-    "Industrial incident": ("verified facility and incident/release details", "substance and quantity or monitoring evidence", "meteorology and downwind exposure", "verified source and time"),
-    "Infrastructure failure": ("identified asset and condition/failure evidence", "network/service dependencies", "outage and recovery context", "verified source and time"),
-    "Compound: cyclone + flood": ("aligned cyclone track/intensity and rainfall", "river/coastal water levels and drainage", "joint-event timing and verified impacts", "verified source and time"),
-    "Compound: heavy rainfall + drainage failure": ("rainfall intensity/accumulation and period", "drainage failure/capacity evidence", "waterlogging depth/duration and location", "verified source and time"),
-}
+
+HAZARD_FACTORS: dict[str, tuple[str, ...]] = dict(HAZARD_EVIDENCE_FACTORS)
 
 # Wide plausibility bounds are quality-control flags, not hazard thresholds.
 NUMERIC_BOUNDS = {
