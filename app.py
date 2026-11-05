@@ -385,6 +385,29 @@ st.markdown(
       backdrop-filter: blur(6px);
     }
 
+    /* Keep module photography available even when Streamlit hot-reloads an
+       older copy of src.ui_theme before the next full deployment restart. */
+    .st-key-ar-head-air-quality,
+    .st-key-ar-head-disaster-probability,
+    .st-key-ar-head-data-readiness,
+    .st-key-ar-head-hazard-model-lab,
+    .st-key-ar-head-hospital-vulnerability,
+    .st-key-ar-head-kochi-map,
+    .st-key-ar-head-mitigation-budget,
+    .st-key-ar-head-smart-mitigation,
+    .st-key-ar-head-compound-scenario,
+    .st-key-ar-head-disaster-assistant { --ar-hero-image: none; }
+    .st-key-ar-head-air-quality { --ar-hero-image: url('app/static/images/threats-monsoon.webp'); }
+    .st-key-ar-head-disaster-probability { --ar-hero-image: url('app/static/images/hero-kerala-fallback.jpg'); }
+    .st-key-ar-head-data-readiness,
+    .st-key-ar-head-hazard-model-lab,
+    .st-key-ar-head-hospital-vulnerability,
+    .st-key-ar-head-kochi-map { --ar-hero-image: url('app/static/images/beauty-city.webp'); }
+    .st-key-ar-head-mitigation-budget,
+    .st-key-ar-head-smart-mitigation { --ar-hero-image: url('app/static/images/hero-kerala-flood-road.jpg'); }
+    .st-key-ar-head-compound-scenario { --ar-hero-image: url('app/static/images/hero-kerala-coast.jpg'); }
+    .st-key-ar-head-disaster-assistant { --ar-hero-image: url('app/static/images/hero-kerala-ghats.jpg'); }
+
     /* ---------- Section rhythm ---------- */
     .ar-sec-intro { margin: 1.5rem 0 .6rem; }
     .ar-sec-overline {

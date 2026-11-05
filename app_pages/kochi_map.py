@@ -330,7 +330,6 @@ page_header(
     meta=("Kochi Municipal Corporation", "Source-reviewed layers", "No inferred exposure"),
     accent="violet",
     key="kochi-map",
-    image="app/static/images/beauty-city.webp",
 )
 st.markdown(
     "<style>.st-key-kochi-semantic-scenario-heading{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;}</style>",

@@ -18,7 +18,6 @@ page_header(
     meta=("Kochi · Ernakulam", "Cyclone + flood", "Research prototype"),
     accent="violet",
     key="compound-scenario",
-    image="app/static/images/hero-kerala-coast.jpg",
 )
 
 st.warning(
