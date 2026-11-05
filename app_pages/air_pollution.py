@@ -1290,7 +1290,7 @@ def _render_co2_intelligence(live: dict) -> None:
 
         report_rows = [
             {"Item": name, "Monthly activity / basis": value, "Emission factor": factor,
-             "Estimated monthly emissions (kg CO2e)": monthly_emissions[label]}
+             "Estimated emissions (kg CO2)": monthly_emissions[label]}
             for name, value, factor, label in [
                 ("Grid electricity", electricity_kwh, "0.675 kg CO2/kWh (CEA FY 2025-26)", "Electricity"),
                 ("Petrol", petrol_litres, "2.31 kg CO2/litre (indicative)", "Petrol"),
@@ -1301,15 +1301,15 @@ def _render_co2_intelligence(live: dict) -> None:
         report_rows.extend([
             {"Item": "Household total", "Monthly activity / basis": "Monthly estimate",
              "Emission factor": "Sum of categories",
-             "Estimated monthly emissions (kg CO2e)": total_monthly},
+             "Estimated emissions (kg CO2)": total_monthly},
             {"Item": "Annual household total", "Monthly activity / basis": "Monthly estimate × 12",
              "Emission factor": "Annualised estimate",
-             "Estimated monthly emissions (kg CO2e)": total_annual},
+             "Estimated emissions (kg CO2)": total_annual},
             {"Item": "Household size", "Monthly activity / basis": household_size,
-             "Emission factor": "People", "Estimated monthly emissions (kg CO2e)": ""},
+             "Emission factor": "People", "Estimated emissions (kg CO2)": ""},
             {"Item": "Per-person monthly estimate", "Monthly activity / basis": "Household total ÷ household size",
              "Emission factor": "Allocation only; not a separate measurement",
-             "Estimated monthly emissions (kg CO2e)": per_person_monthly},
+             "Estimated emissions (kg CO2)": per_person_monthly},
         ])
         report = pd.DataFrame(report_rows)
         st.download_button(
