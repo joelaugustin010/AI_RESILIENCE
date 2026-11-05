@@ -18,6 +18,13 @@ streamlit run app.py
 
 If PowerShell blocks activation, use a permitted environment or run the virtual environment's Python directly; do not weaken device security settings without permission.
 
+Optional dependency sets:
+
+- `requirements-data.txt` — PDF extraction and coordinate/geometry support used by some data-validation paths (`pypdf`, `shapely`, `pyproj`).
+- `requirements-scripts.txt` — one-off acquisition/audit scripts only (`openpyxl`, `mapbox-vector-tile`, `rasterio`). The Streamlit app and the standard test suite do not need these.
+
+The application entry point is `app.py`; the Command Centre is the default landing page. All pages are registered in that file through `st.navigation`.
+
 ## Suggested demonstration (5–7 minutes)
 
 1. **Command Centre** — introduce the problem and the evidence-first approach.
