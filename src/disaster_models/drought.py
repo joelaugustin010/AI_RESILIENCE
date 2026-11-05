@@ -23,15 +23,38 @@ SOURCES = [
     },
 ]
 
-SPI_CATEGORIES = (
-    (-math.inf, -2.0, "Extremely dry"),
-    (-2.0, -1.5, "Severely dry"),
-    (-1.5, -1.0, "Moderately dry"),
-    (-1.0, 1.0, "Near normal"),
-    (1.0, 1.5, "Moderately wet"),
-    (1.5, 2.0, "Very wet"),
-    (2.0, math.inf, "Extremely wet"),
+# McKee et al. (1993) category boundaries.  Threshold values belong to the more
+# severe category on the dry side (SPI <= -2.0 is extremely dry, -2.0 < SPI <=
+# -1.5 is severely dry, -1.5 < SPI <= -1.0 is moderately dry) and to the wetter
+# category on the wet side (SPI >= 1.0 is moderately wet, >= 1.5 very wet,
+# >= 2.0 extremely wet).  Near normal is strictly between -1.0 and 1.0.  A
+# previous ``lower <= spi < upper`` lookup misclassified exact threshold values.
+SPI_CATEGORY_BOUNDARIES = (
+    (-2.0, "Extremely dry"),
+    (-1.5, "Severely dry"),
+    (-1.0, "Moderately dry"),
+    (1.0, "Moderately wet"),
+    (1.5, "Very wet"),
+    (2.0, "Extremely wet"),
 )
+
+MIN_REFERENCE_YEARS = 30
+MIN_POSITIVE_REFERENCE_VALUES = 10
+
+
+def spi_category(spi: float) -> str:
+    """Return the McKee SPI category, inclusive at each documented threshold."""
+    if not math.isfinite(spi):
+        raise ValueError("SPI must be a finite number to assign a category.")
+    if spi <= -1.0:
+        for boundary, label in SPI_CATEGORY_BOUNDARIES[:3]:
+            if spi <= boundary:
+                return label
+    elif spi >= 1.0:
+        for boundary, label in reversed(SPI_CATEGORY_BOUNDARIES[3:]):
+            if spi >= boundary:
+                return label
+    return "Near normal"
 
 
 def parse_monthly_precipitation_csv(text: str) -> list[dict[str, Any]]:
@@ -89,12 +112,27 @@ def calculate_spi1(records: list[dict[str, Any]]) -> dict[str, Any]:
         if row["month"].month == month_number
     ]
     positive = [value for value in reference if value > 0]
-    if len(positive) < 30 or len(set(positive)) < 2:
+    if len(reference) < MIN_REFERENCE_YEARS:
         return {
             "status": "insufficient_evidence",
             "spi1": None,
             "category": None,
-            "reason": "Fewer than 30 positive reference values or no positive-value variability for the calendar month.",
+            "reason": (
+                f"Only {len(reference)} reference values exist for the target calendar "
+                f"month; at least {MIN_REFERENCE_YEARS} are required to fit the gamma "
+                "distribution."
+            ),
+        }
+    if len(positive) < MIN_POSITIVE_REFERENCE_VALUES or len(set(positive)) < 2:
+        return {
+            "status": "insufficient_evidence",
+            "spi1": None,
+            "category": None,
+            "reason": (
+                f"Only {len(positive)} positive reference values (minimum "
+                f"{MIN_POSITIVE_REFERENCE_VALUES}) or no positive-value variability "
+                "exist for the target calendar month; a gamma fit would be unreliable."
+            ),
         }
     try:
         from scipy.stats import gamma, norm
@@ -111,9 +149,7 @@ def calculate_spi1(records: list[dict[str, Any]]) -> dict[str, Any]:
     except (ImportError, ValueError, FloatingPointError, OverflowError) as exc:
         raise ValueError(f"SPI gamma-distribution fit failed: {exc}") from exc
 
-    category = next(
-        label for lower, upper, label in SPI_CATEGORIES if lower <= spi < upper
-    )
+    category = spi_category(spi)
     return {
         "status": "descriptive_spi1_calculated",
         "spi1": spi,

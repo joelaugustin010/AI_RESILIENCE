@@ -2,7 +2,12 @@
 
 import unittest
 
-from src.map_integration import build_map_context, selected_feature_properties
+from src.hazard_registry import WORKFLOW_HAZARDS, components_for
+from src.map_integration import (
+    build_map_context,
+    hazard_layer_availability,
+    selected_feature_properties,
+)
 
 
 class MapIntegrationTests(unittest.TestCase):
@@ -74,6 +79,63 @@ class MapIntegrationTests(unittest.TestCase):
 
     def test_unrecognized_selection_shape_returns_no_features(self):
         self.assertEqual(selected_feature_properties({"selection": None}), [])
+
+
+class HazardLayerAvailabilityTests(unittest.TestCase):
+    def test_availability_has_one_explicit_row_for_every_workflow_hazard(self):
+        rows = hazard_layer_availability()
+        self.assertEqual(len(rows), len(WORKFLOW_HAZARDS))
+        self.assertEqual([row["Hazard"] for row in rows], list(WORKFLOW_HAZARDS))
+        for row in rows:
+            with self.subTest(hazard=row["Hazard"]):
+                self.assertFalse(row["Selected"])
+                self.assertIn(
+                    row["Validated hazard footprint"],
+                    {"Not available", "Not displayed"},
+                )
+                self.assertTrue(row["Why no footprint is shown"])
+                self.assertEqual(
+                    row["Components"], ", ".join(components_for(row["Hazard"]))
+                )
+
+    def test_selected_hazard_is_marked_without_changing_availability(self):
+        rows = hazard_layer_availability("Cyclone")
+        selected = [row for row in rows if row["Selected"]]
+        self.assertEqual([row["Hazard"] for row in selected], ["Cyclone"])
+        self.assertEqual(
+            selected[0]["Validated hazard footprint"],
+            "Not available",
+        )
+
+    def test_flood_components_are_not_displayed_as_other_hazards(self):
+        by_hazard = {row["Hazard"]: row for row in hazard_layer_availability()}
+        self.assertEqual(
+            by_hazard["Flood"]["Validated hazard footprint"], "Not displayed"
+        )
+        self.assertEqual(
+            by_hazard["Compound: cyclone + flood"]["Validated hazard footprint"],
+            "Not displayed",
+        )
+        self.assertEqual(
+            by_hazard["Compound: heavy rainfall + drainage failure"][
+                "Validated hazard footprint"
+            ],
+            "Not displayed",
+        )
+        for hazard in ("Earthquake", "Industrial incident", "Infrastructure failure"):
+            with self.subTest(hazard=hazard):
+                self.assertEqual(
+                    by_hazard[hazard]["Validated hazard footprint"], "Not available"
+                )
+                self.assertEqual(by_hazard[hazard]["Context layer"], "None")
+
+    def test_unknown_hazard_selection_does_not_claim_a_footprint(self):
+        rows = hazard_layer_availability("Volcano")
+        self.assertFalse(any(row["Selected"] for row in rows))
+        self.assertEqual(
+            {row["Validated hazard footprint"] for row in rows},
+            {"Not available", "Not displayed"},
+        )
 
 
 if __name__ == "__main__":

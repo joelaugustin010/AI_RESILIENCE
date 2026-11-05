@@ -10,17 +10,34 @@ SOURCES = [
     {
         "title": "National Weather Service, Heat Index",
         "url": "https://www.weather.gov/ama/heatindex",
-        "role": "Rothfusz regression, applicability, and U.S. screening bands; not a Kerala warning threshold.",
+        "role": "Heat-index definition, worked examples, and U.S. screening bands; not a Kerala warning threshold.",
+    },
+    {
+        "title": "NOAA/NWS Weather Prediction Center, The Heat Index Equation",
+        "url": "https://www.wpc.ncep.noaa.gov/html/heatindex_equation.shtml",
+        "role": "Steadman screening formula, Rothfusz regression, and low/high-humidity adjustments.",
     },
 ]
 
 
 def heat_index_fahrenheit(temperature_f: float, relative_humidity_percent: float) -> float | None:
-    """Return NWS regression heat index when its stated screening domain applies."""
-    if temperature_f < 80 or relative_humidity_percent < 40:
+    """Return the NWS/Steadman heat index when its stated domain applies.
+
+    The NWS algorithm (WPC heat-index equation) first evaluates Steadman's
+    simple formula averaged with the air temperature.  Only when that screening
+    value reaches 80 F is the Rothfusz regression applied, together with the
+    published low-humidity (RH < 13%) and high-humidity (RH > 85%) adjustments.
+    Applying the regression directly at low humidity was both outside its
+    calibration range and made the low-humidity adjustment unreachable.
+    """
+    if temperature_f < 80:
         return None
     t = temperature_f
     rh = relative_humidity_percent
+    simple = 0.5 * (t + 61.0 + (t - 68.0) * 1.2 + rh * 0.094)
+    screening = (simple + t) / 2
+    if screening < 80:
+        return screening
     index = (
         -42.379
         + 2.04901523 * t
@@ -65,19 +82,19 @@ def assess(inputs: dict[str, Any]) -> dict[str, Any]:
         hazard="Heatwave",
         model_id="heat_index_screening",
         method="NOAA/NWS Rothfusz heat-index regression",
-        scientific_basis="Regression estimate from air temperature and relative humidity; NWS applies it in the warm/humid domain. Solar radiation, wind, acclimatization, exertion, health status and local warning criteria are not represented.",
+        scientific_basis="Steadman screening formula followed, when the screening value reaches 80 F, by the Rothfusz regression with the published low- and high-humidity adjustments. Solar radiation, wind, acclimatization, exertion, health status and local warning criteria are not represented.",
         inputs=inputs,
         result_status=(
             "screening_indicator_calculated_not_local_warning"
             if index_f is not None
-            else "insufficient_inputs_or_outside_regression_domain"
+            else "insufficient_inputs_or_outside_screening_domain"
         ),
         hazard_assessment={
             "severity": (
                 f"Calculated heat-index screening band: {_heat_index_band(index_f)}. "
                 "U.S. NWS bands are not a locally approved Kerala warning or medical diagnosis."
                 if index_f is not None
-                else "Heat index unavailable: both temperature and humidity are needed, and NWS regression requires temperature >=80 F and RH >=40%."
+                else "Heat index unavailable: both temperature and humidity are needed, and the NWS screening applies only at temperature >=80 F (26.7 C)."
             ),
             "indicators": {
                 "temperature_c": temperature_c,
@@ -88,8 +105,8 @@ def assess(inputs: dict[str, Any]) -> dict[str, Any]:
             },
         },
         calculation={
-            "equation": "NWS Rothfusz multiple-regression equation with published low/high-humidity adjustments.",
-            "calculation_status": "No output is produced outside the stated screening domain.",
+            "equation": "NWS/Steadman simple screening formula; Rothfusz multiple-regression equation with published low/high-humidity adjustments when the screening value reaches 80 F.",
+            "calculation_status": "No output is produced below the NWS 80 F screening domain.",
         },
         consequence_pathways=[
             "Heat illness depends on exposure duration, activity, shade, hydration, acclimatization, age and health.",

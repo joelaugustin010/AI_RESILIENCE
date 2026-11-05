@@ -7,8 +7,12 @@ from src.decision_workflow import HAZARD_OPTIONS
 from src.disaster_models import MODEL_DISPATCH, assess_disaster, disaster_model_mapping
 from src.disaster_models.cyclone import assess as assess_cyclone
 from src.disaster_models.drought import (
+    MIN_POSITIVE_REFERENCE_VALUES,
+    MIN_REFERENCE_YEARS,
+    SPI_CATEGORY_BOUNDARIES,
     calculate_spi1,
     parse_monthly_precipitation_csv,
+    spi_category,
 )
 from src.disaster_models.earthquake import assess as assess_earthquake
 from src.disaster_models.flood import assess as assess_flood
@@ -226,6 +230,30 @@ class HeatAndDroughtTests(unittest.TestCase):
         self.assertIsNotNone(index)
         self.assertEqual(round(index), 124)
 
+    def test_heat_index_matches_low_humidity_nws_example(self):
+        # WPC worked example: 100 F with 15% RH gives about 96 F.
+        example = heat_index_fahrenheit(100, 15)
+        self.assertIsNotNone(example)
+        self.assertAlmostEqual(example, 95.85, places=2)
+        humid = heat_index_fahrenheit(100, 40)
+        self.assertIsNotNone(humid)
+        self.assertGreater(humid, example)
+
+    def test_heat_index_applies_low_humidity_adjustment_below_13_percent(self):
+        # The published RH < 13% adjustment must be reachable and must lower the
+        # regression value; 100 F/10% gives about 94.12 F versus 94.75 F raw.
+        adjusted = heat_index_fahrenheit(100, 10)
+        self.assertIsNotNone(adjusted)
+        self.assertAlmostEqual(adjusted, 94.12, places=2)
+        self.assertLess(adjusted, heat_index_fahrenheit(100, 15))
+
+    def test_heat_index_returns_screening_value_below_regression_domain(self):
+        # 80 F with 10% RH screens below 80 F; the NWS algorithm returns the
+        # Steadman screening value rather than applying the regression.
+        screening = heat_index_fahrenheit(80, 10)
+        self.assertIsNotNone(screening)
+        self.assertLess(screening, 80)
+
     def test_heatwave_requires_humidity_and_valid_domain(self):
         missing = assess_heatwave(scenario("Heatwave", temperature_c=38))
         self.assertIsNone(missing["hazard_assessment"]["indicators"]["heat_index_f"])
@@ -259,6 +287,55 @@ class HeatAndDroughtTests(unittest.TestCase):
             "Very wet",
             "Extremely wet",
         })
+
+    def test_spi_category_uses_inclusive_documented_thresholds(self):
+        expected = {
+            -3.0: "Extremely dry",
+            -2.0: "Extremely dry",
+            -1.75: "Severely dry",
+            -1.5: "Severely dry",
+            -1.25: "Moderately dry",
+            -1.0: "Moderately dry",
+            -0.5: "Near normal",
+            0.0: "Near normal",
+            0.99: "Near normal",
+            1.0: "Moderately wet",
+            1.25: "Moderately wet",
+            1.5: "Very wet",
+            1.75: "Very wet",
+            2.0: "Extremely wet",
+            3.0: "Extremely wet",
+        }
+        for value, label in expected.items():
+            with self.subTest(spi=value):
+                self.assertEqual(spi_category(value), label)
+
+    def test_spi_category_boundaries_are_ordered_and_complete(self):
+        values = [boundary for boundary, _ in SPI_CATEGORY_BOUNDARIES]
+        self.assertEqual(values, sorted(values))
+        self.assertEqual(
+            [label for _, label in SPI_CATEGORY_BOUNDARIES],
+            [
+                "Extremely dry",
+                "Severely dry",
+                "Moderately dry",
+                "Moderately wet",
+                "Very wet",
+                "Extremely wet",
+            ],
+        )
+
+    def test_spi_category_rejects_non_finite_values(self):
+        for value in (float("nan"), float("inf"), float("-inf")):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                spi_category(value)
+
+    def test_spi_reference_sample_guards_are_explicit(self):
+        self.assertEqual(MIN_REFERENCE_YEARS, 30)
+        self.assertEqual(MIN_POSITIVE_REFERENCE_VALUES, 10)
+        short = calculate_spi1(monthly_test_series()[: MIN_REFERENCE_YEARS * 12 - 12])
+        self.assertEqual(short["status"], "insufficient_evidence")
+        self.assertIn(str(MIN_REFERENCE_YEARS), short["reason"])
 
     def test_spi_rejects_duplicate_or_gapped_months(self):
         duplicate = monthly_test_series()
