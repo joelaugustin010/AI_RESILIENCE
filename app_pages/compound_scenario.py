@@ -346,8 +346,15 @@ if submitted:
                 pd.DataFrame([
                     {
                         "Hazard": item["hazard"],
-                        "Action ID": item["action_id"],
-                        "Estimated damage reduction": item["estimated_damage_reduction"],
+                        "Recommended precaution": next(
+                            (
+                                action["action"]
+                                for action in preventive_actions
+                                if action["action_id"] == item["action_id"]
+                            ),
+                            item["action_id"],
+                        ),
+                        "Estimated damage reduction (research units)": item["estimated_damage_reduction"],
                         "Outcome unit": item["outcome_unit"],
                     }
                     for item in available_rankings
