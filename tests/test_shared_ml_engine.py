@@ -322,3 +322,12 @@ def test_presentation_rows_distinguish_regression_from_probability():
     }])[0]
     assert card["Task"] == "regression"
     assert card["MAE"] == 1.2
+
+
+
+def test_continuous_models_are_registered_in_shared_hazard_coverage():
+    coverage = build_coverage_matrix(write=False)
+    by_hazard = {entry["hazard"]: entry for entry in coverage["entries"]}
+    assert "weather_precipitation_kochi_nextday_regression" in by_hazard["Flood"]["model_ids"]
+    assert "weather_tmax_kochi_nextday_regression" in by_hazard["Heatwave"]["model_ids"]
+    assert "cyclone_wind_change_24h_regression" in by_hazard["Cyclone"]["model_ids"]
