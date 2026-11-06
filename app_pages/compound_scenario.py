@@ -4,10 +4,116 @@ from __future__ import annotations
 import json
 from datetime import date
 
+import pandas as pd
 import streamlit as st
 
 from src.compound_hazard_assessment import assess_compound_scenario
+from src.dataframe_display import display_dataframe
 from src.ui_theme import page_header
+
+
+def _render_shared_ml_evidence() -> None:
+    """Show the exploratory compound-association card, never a joint forecast."""
+    st.markdown("#### Shared ML association evidence (exploratory)")
+    try:
+        from src.ml.registry import load_model_card
+        from src.ml.service import ml_evidence_for
+    except Exception as exc:  # deployment may omit optional ML artifacts
+        st.info(f"Shared ML evidence is unavailable: {type(exc).__name__}: {exc}")
+        return
+    try:
+        evidence = ml_evidence_for("Compound: cyclone + flood", {})
+    except Exception as exc:
+        st.info(f"Shared ML evidence could not be loaded: {type(exc).__name__}: {exc}")
+        return
+    st.write(
+        "**ML status:**",
+        str(evidence.get("status", "unknown")).replace("_", " ").capitalize(),
+    )
+    st.caption(evidence.get("interpretation", ""))
+    card = load_model_card("compound_cyclone_rainfall_interaction")
+    if not card:
+        st.info(
+            "No shared compound-association model is present in this deployment. "
+            "The scenario review remains a separate evidence exercise."
+        )
+        return
+    st.write("**Model status:**", card.get("status", "Unknown"))
+    st.write("**Evidence tier:**", card.get("evidence_tier", "Unknown"))
+    st.write("**Research target:**", card.get("target_definition", "Not documented"))
+    st.caption(card.get("status_reason", ""))
+
+    metrics = card.get("metrics", {})
+    ablation = metrics.get("ablation")
+    if isinstance(ablation, dict) and ablation.get("available"):
+        st.markdown("**Ablation: does cyclone proximity add incremental skill?**")
+        display_dataframe(
+            pd.DataFrame(
+                [
+                    {
+                        "Model": "Full association model",
+                        "Test ROC-AUC": ablation.get("full_test_roc_auc"),
+                        "Test PR-AUC": ablation.get("full_test_average_precision"),
+                    },
+                    {
+                        "Model": "Reduced seasonal + prior-rainfall model",
+                        "Test ROC-AUC": ablation.get("reduced_test_roc_auc"),
+                        "Test PR-AUC": ablation.get("reduced_test_average_precision"),
+                    },
+                ]
+            ),
+            hide_index=True,
+            width="stretch",
+            alt="Ablation comparing the full compound association model with a reduced model that removes cyclone features",
+        )
+        delta = ablation.get("delta_average_precision")
+        if isinstance(delta, (int, float)) and delta <= 0.02:
+            st.warning(
+                "Removing every cyclone feature changes test PR-AUC by "
+                f"{delta:+.3f}. On this holdout, cyclone proximity has no demonstrated "
+                "incremental ranking skill beyond season and prior rainfall. The "
+                "unadjusted association below must not be read as a compound effect."
+            )
+        else:
+            st.info(
+                f"The full model's test PR-AUC is {delta:+.3f} higher than the reduced "
+                "seasonal/prior-rainfall model. This is an exploratory difference on one "
+                "holdout, not evidence of a causal or forecastable compound effect."
+            )
+
+    association = metrics.get("association_analysis")
+    if isinstance(association, dict):
+        st.markdown("**Unadjusted cyclone-near / extreme-rain association**")
+        rows = []
+        for split, label in (("final_train", "Training era"), ("test", "Test era")):
+            item = association.get(split, {})
+            table = item.get("table", {})
+            rows.append(
+                {
+                    "Period": label,
+                    "Exposed + event": table.get("exposed_event"),
+                    "Exposed + no event": table.get("exposed_no_event"),
+                    "Unexposed + event": table.get("unexposed_event"),
+                    "Unexposed + no event": table.get("unexposed_no_event"),
+                    "Odds ratio (Haldane)": item.get("odds_ratio_haldane_corrected"),
+                    "Fisher exact p": item.get("fisher_exact_p_value"),
+                }
+            )
+        display_dataframe(
+            pd.DataFrame(rows),
+            hide_index=True,
+            width="stretch",
+            alt="Unadjusted two-by-two association between cyclone proximity and extreme rainfall",
+        )
+        st.caption(
+            "Concurrent exposure and outcome; season and prior rainfall are unresolved "
+            "confounders. The test-era interval is wide and compatible with no association."
+        )
+    st.warning(
+        "No compound probability, joint return period, flood depth, or impact estimate "
+        "is produced from these inputs. The association model is exploratory and has no "
+        "forecast lead time."
+    )
 
 
 page_header(
@@ -157,6 +263,8 @@ if submitted:
                 st.caption(item["warning"])
         else:
             st.caption("No threshold comparison was made. A reference level is never assumed or invented.")
+
+        _render_shared_ml_evidence()
 
         st.markdown("#### Possible consequences to investigate")
         for item in result["service_reviews"]:

@@ -43,6 +43,7 @@ from src.decision_workflow import (
     validate_workflow_inputs,
 )
 from src.disaster_models import assess_disaster
+from src.ml.presentation import application_rows, model_rows
 from src.compound_hazard_assessment import assess_compound_scenario
 from src.historical_validation import historical_validation_checklist
 from src.disaster_models.drought import parse_monthly_precipitation_csv
@@ -446,6 +447,8 @@ def _render_disaster_assessment(result: dict) -> None:
         ]
         display_dataframe(pd.DataFrame(rows), hide_index=True, width="stretch", alt="Hazard-specific physical indicators and their user-supplied values")
 
+    _render_ml_evidence(result.get("ml_evidence", {}))
+
     consequences = result["potential_consequences"]
     st.write("**Potential consequences:**", consequences["status"])
     st.caption(consequences["human_population"]["interpretation"])
@@ -529,6 +532,71 @@ def _render_disaster_assessment(result: dict) -> None:
         for source in result["evidence"]["sources"]:
             st.markdown(f"- [{source['title']}]({source['url']}) — {source['role']}")
 
+
+
+def _render_ml_evidence(evidence: dict) -> None:
+    """Render supplementary shared-ML evidence without implying validation."""
+    st.markdown("### Shared ML evidence (supplementary)")
+    if not evidence:
+        st.info("No shared ML evidence block is attached to this assessment.")
+        return
+    status = str(evidence.get("status", "unknown")).replace("_", " ").capitalize()
+    support = str(evidence.get("support_level", "unknown")).replace("_", " ").capitalize()
+    st.write("**ML status:**", status)
+    st.write("**ML support level:**", support)
+    st.caption(evidence.get("interpretation", "No interpretation is available."))
+    st.caption(evidence.get("note", ""))
+
+    rows = model_rows(evidence)
+    if rows:
+        display_dataframe(
+            pd.DataFrame(rows),
+            hide_index=True,
+            width="stretch",
+            alt="Registered shared ML models, context completeness, and evidence tier",
+        )
+    else:
+        st.info("No shared ML model is registered for this hazard.")
+
+    applications = application_rows(evidence)
+    if applications:
+        display_dataframe(
+            pd.DataFrame(applications),
+            hide_index=True,
+            width="stretch",
+            alt="Supplementary shared ML model outputs and calibration diagnostics",
+        )
+        st.warning(
+            "Model probability estimates are research outputs for a documented event, "
+            "not calibrated probabilities of harm. They do not replace the deterministic "
+            "hazard assessment, official warnings, or local verification."
+        )
+    else:
+        st.info(
+            "No model output was produced. Missing scenario context or a non-usable model "
+            "status prevents a decision output; values are never defaulted or invented."
+        )
+        for model in evidence.get("models", []):
+            missing = (model.get("context") or {}).get("missing_features") or []
+            if not missing:
+                continue
+            with st.expander(
+                f"Required context for {model.get('model_id', 'model')} "
+                f"({len(missing)} missing feature(s))",
+                expanded=False,
+            ):
+                st.caption(
+                    "Supply every field explicitly through an advanced ML context if "
+                    "you have a complete, time-matched feature vector. Partial values "
+                    "are not filled from unrelated scenario inputs."
+                )
+                st.code(", ".join(missing), language="text")
+
+    with st.expander("ML limitations and validation boundary"):
+        st.write("**Independently validated predictive model available:**", "No")
+        st.write("**Validation status:**", "Single temporal holdout; not independently validated.")
+        for limitation in evidence.get("limitations", []):
+            st.write(f"- {limitation}")
 
 
 def _compound_scenario_inputs(inputs: dict) -> dict:

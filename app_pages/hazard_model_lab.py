@@ -8,6 +8,10 @@ import pandas as pd
 import streamlit as st
 
 from src.dataframe_display import display_dataframe
+from src.ml.coverage import build_coverage_matrix
+from src.ml.presentation import card_rows, coverage_rows
+from src.ml.registry import list_model_cards
+from src.ml.service import ml_registry_summary
 
 from src.hazard_manifest import build_hazard_manifest_frame
 from src.ui_theme import page_header
@@ -166,6 +170,106 @@ else:
     for limitation in flood_report.get("limitations", []):
         st.write(f"- {limitation}")
     st.caption("The source and full evaluation are documented in the milestone report.")
+
+st.subheader("Shared ML engine")
+try:
+    shared_cards = list_model_cards()
+    coverage = build_coverage_matrix(write=False)
+    shared_summary = ml_registry_summary()
+except Exception as exc:
+    st.info(f"Shared ML registry is unavailable: {type(exc).__name__}: {exc}")
+else:
+    sc1, sc2, sc3 = st.columns(3)
+    sc1.metric("Registered shared models", shared_summary["n_models"])
+    sc2.metric("Workflow hazards represented", coverage["n_hazards"])
+    sc3.metric("Hazards without released ML", coverage["n_hazards_without_ml"])
+    st.caption(
+        "Coverage records evidence roles, not predictive validity. No shared model is "
+        "independently validated; missing models remain explicit rather than fabricated."
+    )
+    shared_rows = card_rows(shared_cards)
+    if shared_rows:
+        display_dataframe(
+            pd.DataFrame(shared_rows),
+            hide_index=True,
+            width="stretch",
+            alt="Shared ML model cards with holdout metrics and validation boundary",
+        )
+    else:
+        st.info("No shared ML model cards are present in this deployment.")
+
+    st.markdown("**Coverage of the ten workflow hazards**")
+    display_dataframe(
+        pd.DataFrame(coverage_rows(coverage)),
+        hide_index=True,
+        width="stretch",
+        alt="Shared ML evidence coverage and explicit no-model hazards",
+    )
+
+    for card in shared_cards:
+        label = (
+            f"{card.get('model_id', 'Model')} — {card.get('hazard', 'Unknown hazard')} "
+            f"({card.get('status', 'Unknown status')})"
+        )
+        with st.expander(label, expanded=False):
+            st.write("**Status reason:**", card.get("status_reason", "Not recorded"))
+            st.write("**Target:**", card.get("target_definition", "Not documented"))
+            st.write("**Intended use:**", card.get("intended_use", "Not documented"))
+            st.write("**Prohibited use:**", card.get("prohibited_use", "Not documented"))
+            metrics = card.get("metrics", {})
+            majority = metrics.get("majority_baseline") or {}
+            persistence = metrics.get("persistence_baseline") or {}
+            metric_rows = [
+                {"Metric": "Held-out events", "Value": card.get("test_events")},
+                {"Metric": "Held-out rows", "Value": card.get("test_rows")},
+                {"Metric": "ROC-AUC", "Value": metrics.get("roc_auc")},
+                {"Metric": "Average precision (PR-AUC)", "Value": metrics.get("average_precision")},
+                {"Metric": "Precision", "Value": metrics.get("precision")},
+                {"Metric": "Recall", "Value": metrics.get("recall")},
+                {"Metric": "F1", "Value": metrics.get("f1")},
+                {"Metric": "Brier score", "Value": metrics.get("brier_score")},
+                {"Metric": "Base-rate Brier reference", "Value": metrics.get("base_rate_brier_score")},
+                {"Metric": "Expected calibration error", "Value": metrics.get("expected_calibration_error")},
+                {"Metric": "Majority baseline F1", "Value": majority.get("f1")},
+                {
+                    "Metric": "Persistence baseline F1",
+                    "Value": persistence.get("f1") if persistence.get("available") else None,
+                },
+                {
+                    "Metric": "Persistence baseline balanced accuracy",
+                    "Value": persistence.get("balanced_accuracy") if persistence.get("available") else None,
+                },
+            ]
+            display_dataframe(
+                pd.DataFrame(metric_rows),
+                hide_index=True,
+                width="stretch",
+                alt=f"Holdout metrics for shared model {card.get('model_id', '')}",
+            )
+            ablation = metrics.get("ablation")
+            if isinstance(ablation, dict) and ablation.get("available"):
+                st.write("**Ablation**")
+                display_dataframe(
+                    pd.DataFrame(
+                        [
+                            {
+                                "Model": "Full",
+                                "Test ROC-AUC": ablation.get("full_test_roc_auc"),
+                                "Test PR-AUC": ablation.get("full_test_average_precision"),
+                            },
+                            {
+                                "Model": "Reduced",
+                                "Test ROC-AUC": ablation.get("reduced_test_roc_auc"),
+                                "Test PR-AUC": ablation.get("reduced_test_average_precision"),
+                            },
+                        ]
+                    ),
+                    hide_index=True,
+                    width="stretch",
+                )
+                st.caption(ablation.get("interpretation", ""))
+            for limitation in card.get("limitations", []):
+                st.write(f"- {limitation}")
 
 st.subheader("Scientific data readiness by hazard")
 readiness = read_json(READINESS_REPORT)

@@ -40,6 +40,42 @@ The application entry point is `app.py`; all pages are registered there through 
 6. **Data Readiness** — review source provenance, integrity checks and unresolved blockers.
 7. **Mitigation Budget / Smart Mitigation Design** — demonstrate practical planning based on clearly stated assumptions.
 
+## Shared ML engine
+
+The repository includes a shared, leakage-aware ML engine under `src/ml/`.
+It is used as supplementary evidence; the deterministic, evidence-gated hazard
+assessments remain authoritative.
+
+```bash
+python scripts/train_shared_ml_models.py
+```
+
+The command rebuilds the six research models from repository-held data,
+performs chronological train/validation/test evaluation, and writes:
+
+- `models/ml/<model_id>/model.joblib` and `model_card.json`
+- `reports/ml_model_registry.json`
+- `reports/ml_disaster_coverage.json`
+- `reports/ml_validation_report.json`
+
+Current coverage of the ten Decision Workflow hazards:
+
+- **Screening models:** Cyclone (24-hour rapid intensification), Earthquake
+  (aftershock occurrence after an observed mainshock), Heatwave and Drought
+  (Kochi grid-point weather outlooks).
+- **Forcing evidence only:** Flood and Compound rainfall + drainage failure
+  (extreme-rainfall screening; no flood, depth, or impact prediction).
+- **Exploratory association:** Compound cyclone + flood (concurrent
+  cyclone-proximity/rainfall association, including an ablation that tests
+  whether cyclone features add incremental skill).
+- **No released ML model:** Landslide, Industrial incident, and Infrastructure
+  failure, because representative labels or non-event samples are missing.
+
+No shared model is independently validated, calibrated for decision use, or
+suitable for warnings, evacuation, damage estimates, or operational planning.
+The model cards record every threshold, split, holdout metric, calibration
+diagnostic and limitation. See `docs/SHARED_ML_ENGINE.md`.
+
 ## Important limitations
 
 - This is a student research and preparedness prototype, **not an official warning system** or emergency-response service.
