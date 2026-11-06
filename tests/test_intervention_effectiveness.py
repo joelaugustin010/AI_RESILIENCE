@@ -146,3 +146,43 @@ def test_ranking_withholds_when_candidate_actions_come_from_different_studies():
     assert result["status"] == "RANKING_WITHHELD"
     assert result["ranked_actions"] == []
     assert "same study" in result["reason"]
+
+
+
+def test_comparable_point_estimates_do_not_claim_pairwise_superiority():
+    class EligibleStub:
+        def __init__(self, action_id, reduction):
+            self.action_id = action_id
+            self.hazard = "Flood"
+            self.status = "CAUSAL_RESEARCH_SIGNAL_NOT_VALIDATED"
+            self.card = {
+                "eligible_for_ranking": True,
+                "hazard": "Flood",
+                "outcome_unit": "damage units",
+                "feature_columns": ["rainfall_before"],
+                "test_start": "2022-01-01",
+                "data_provenance": {
+                    "source_title": "Same study",
+                    "source_owner": "Research group",
+                    "collection_period": "2020-2023",
+                    "outcome_definition": "household flood damage",
+                    "geographic_scope": "Study catchment",
+                },
+            }
+            self.reduction = reduction
+
+        def estimate(self, context):
+            return {
+                "available": True,
+                "estimated_damage_reduction": self.reduction,
+                "action_id": self.action_id,
+            }
+
+    result = rank_interventions(
+        [EligibleStub("drainage", 2.0), EligibleStub("barrier", 1.0)],
+        {"rainfall_before": 100},
+    )
+    assert result["ranked_actions"][0]["action_id"] == "drainage"
+    assert result["pairwise_superiority"] == "NOT_ESTABLISHED"
+    assert result["context_specific_pairwise_intervals"] == "NOT_AVAILABLE"
+    assert result["top_action_is_proven_best"] is False
