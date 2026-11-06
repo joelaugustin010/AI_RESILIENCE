@@ -58,8 +58,9 @@ INTERPRETATION: dict[str, str] = {
         "It does not predict track, landfall, surge, or local wind at a specific place."
     ),
     "Earthquake": (
-        "The previous aftershock model is invalidated because its seven-day outcome windows could cross temporal split boundaries. "
-        "It does not predict mainshocks; no usable output is available until embargo retraining."
+        "The aftershock model uses a seven-day future-label-window embargo at temporal split boundaries. "
+        "Any reported score is research-only on a single temporal holdout, not independent validation. "
+        "It screens aftershock occurrence only after an observed mainshock; it does not predict mainshocks or ground shaking."
     ),
     "Landslide": (
         "No defensible supervised landslide model is released: the inventory is a "
@@ -70,8 +71,9 @@ INTERPRETATION: dict[str, str] = {
         "Neither is an official heatwave declaration, health-impact estimate, or warning."
     ),
     "Drought": (
-        "The previous 30-day rainfall-deficit model was invalidated after a target-window construction defect. "
-        "No usable drought ML output is available until corrected future-only training and validation."
+        "The retrained model uses a future-only 30-observation rainfall-deficit target. "
+        "Its single temporal holdout is research evidence only, not independent validation or a drought declaration. "
+        "It represents meteorological rainfall deficit, not agricultural or hydrological drought."
     ),
     "Industrial incident": (
         "No defensible supervised model is released: facility-level release labels, "
@@ -103,9 +105,9 @@ LIMITATIONS: dict[str, list[str]] = {
         "Rapid intensification is rare; held-out event counts are small.",
     ],
     "Earthquake": [
-        "The prior temporal split did not embargo the full seven-day future label window; previous metrics are invalidated pending retraining.",
+        "The corrected split purges labels whose seven-day outcome windows cross train/validation/test boundaries; results still have only one temporal holdout.",
         "The USGS catalogue is regionally clipped and capped at 20,000 events.",
-        "Aftershock screening does not predict mainshock occurrence or ground shaking.",
+        "Aftershock screening applies only after an observed mainshock and does not predict mainshock occurrence or ground shaking.",
     ],
     "Landslide": [
         "Reported-event catalogues are biased toward populated areas and accessible roads.",
@@ -116,9 +118,9 @@ LIMITATIONS: dict[str, list[str]] = {
         "Humidity, night-time temperature, and local exposure are not modelled.",
     ],
     "Drought": [
-        "The previous target builder overlapped most of the supposed future rainfall window with historical features; prior model metrics are invalidated.",
-        "A 30-day rainfall deficit is a meteorological indicator, not agricultural or hydrological drought.",
-        "Soil moisture, evaporative demand, storage, and demand are absent.",
+        "The corrected target sums the next 30 observations only; it is a meteorological rainfall-deficit proxy, not a validated drought-impact target.",
+        "A 30-day rainfall deficit is not agricultural or hydrological drought.",
+        "Soil moisture, evaporative demand, storage, and water demand are absent.",
     ],
     "Industrial incident": [
         "No quality-controlled release inventory or facility control data are available.",
