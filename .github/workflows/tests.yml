@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main, 'integration/**']
   push:
-    branches: [main]
+    branches: [main, 'ui/**']
     paths:
       - "app.py"
       - "app_pages/**"
@@ -158,7 +158,6 @@ jobs:
           path: reports/flood_event_severity_baseline.json
           if-no-files-found: error
           retention-days: 14
-
   shared-ml-research-training:
     if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && startsWith(github.head_ref, 'feature/shared-ml-intelligence-'))
     needs: test
@@ -190,3 +189,4 @@ jobs:
             models/ml/**/model_card.json
           if-no-files-found: error
           retention-days: 14
+
