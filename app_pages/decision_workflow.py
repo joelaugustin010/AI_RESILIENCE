@@ -43,6 +43,7 @@ from src.decision_workflow import (
     validate_workflow_inputs,
 )
 from src.disaster_models import assess_disaster
+from src.prevention_intelligence import generate_prevention_actions
 from src.ml.presentation import application_rows, model_rows
 from src.compound_hazard_assessment import assess_compound_scenario
 from src.historical_validation import historical_validation_checklist
@@ -1598,6 +1599,39 @@ st.header("5. Compare hypothetical scenarios")
 st.caption("The following cases differ only by their stated assumptions. Possible pathways are planning prompts, not calculated impacts.")
 scenarios = build_scenario_comparison(inputs)
 display_dataframe(scenarios, hide_index=True, width="stretch")
+
+st.header("6. Preventive action intelligence")
+preventive_actions = generate_prevention_actions(
+    str(inputs.get("hazard", "")),
+    inputs,
+)
+st.caption(
+    "These are hazard-specific prevention and preparedness options. Each item shows its "
+    "activation trigger, intended benefit, responsible owner, evidence required and safety caveat. "
+    "They are not ranked, do not quantify risk reduction, and never replace official instructions."
+)
+if preventive_actions:
+    display_dataframe(
+        pd.DataFrame(preventive_actions)[
+            ["phase", "hazard", "action", "trigger", "benefit", "owner", "evidence", "caution"]
+        ].rename(
+            columns={
+                "phase": "When",
+                "hazard": "Hazard",
+                "action": "Recommended precaution",
+                "trigger": "When it applies",
+                "benefit": "How it may reduce harm",
+                "owner": "Responsible party",
+                "evidence": "Evidence / verification needed",
+                "caution": "Safety boundary",
+            }
+        ),
+        hide_index=True,
+        width="stretch",
+        alt="Evidence-aware disaster prevention and preparedness actions",
+    )
+else:
+    st.info("Select a registered hazard to generate hazard-specific preparedness options.")
 
 st.header("6. Evidence-linked recommendation candidates")
 recommendations = recommendation_candidates(inputs)
