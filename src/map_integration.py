@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
-from src.hazard_registry import WORKFLOW_HAZARDS, components_for
+from src.hazard_registry import WORKFLOW_HAZARDS, components_for, is_workflow_hazard
 
 
 MAP_CONTEXT_KEY = "kochimap_assessment_context"
@@ -71,6 +71,83 @@ _LANDCOVER_CONTEXT_HAZARDS = {
 def hazard_has_flood_component(active_hazard: str | None) -> bool:
     """Whether the selected registered scenario contains a flood component."""
     return bool(active_hazard and "Flood" in components_for(active_hazard))
+
+
+_KSDMA_HAZARD_REFERENCES: dict[str, list[dict[str, str]]] = {
+    "Flood": [
+        {
+            "title": "KSDMA Ernakulam historical flood probability map (PDF)",
+            "url": "https://sdma.kerala.gov.in/wp-content/uploads/2022/05/Ernakulam_Hist.pdf",
+            "scope": "District-level historical model map; not a live forecast or ward-validated footprint.",
+        },
+        {
+            "title": "KSDMA historical flood return-probability rasters (10/25/50-year ZIP)",
+            "url": "https://sdma.kerala.gov.in/wp-content/uploads/2026/06/1.-Flood-Return-Probability-Historical-10-25-50-years.zip",
+            "scope": "Raster semantics and dataset-specific reuse terms remain unresolved; not rendered or used for exposure.",
+        },
+    ],
+    "Landslide": [
+        {
+            "title": "KSDMA / GSI 2022 Ernakulam landslide-susceptibility shapefile (ZIP)",
+            "url": "https://sdma.kerala.gov.in/wp-content/uploads/2025/08/Ernakulam.zip",
+            "scope": "Official district shapefile link; archive schema, CRS, licence and geometry still require local QA before map ingestion.",
+        },
+        {
+            "title": "KSDMA Ernakulam landslide-susceptibility district map (PDF)",
+            "url": "https://sdma.kerala.gov.in/wp-content/uploads/2025/06/Landslide_Susceptibility_Zones_Districts_FINAL.pdf",
+            "scope": "Reference map only; not a validated ward-level Kochi overlay.",
+        },
+    ],
+    "Drought": [
+        {
+            "title": "KSDMA drought-prone area map (Kerala; data period 2012–2013)",
+            "url": "https://sdma.kerala.gov.in/wp-content/uploads/2018/10/KL-Drought-1.jpg",
+            "scope": "Old state-level seasonal susceptibility reference; not current local water-availability evidence.",
+        },
+    ],
+    "Earthquake": [
+        {
+            "title": "KSDMA earthquake / tremor events and seismographs map",
+            "url": "https://sdma.kerala.gov.in/wp-content/uploads/2018/10/Map-Earthquake-incidents.jpg",
+            "scope": "Historical event/seismograph reference (map states 2000–2016); not a ground-shaking forecast or local susceptibility model.",
+        },
+    ],
+    "Industrial incident": [
+        {
+            "title": "KSDMA major industrial accident hazard susceptibility map",
+            "url": "https://sdma.kerala.gov.in/wp-content/uploads/2018/10/Map-Major-Industrial-Accident-Hazard-Zones.jpg",
+            "scope": "State-level reference only; does not establish current facility-specific release or downwind exposure zones.",
+        },
+    ],
+    "Cyclone": [
+        {
+            "title": "KSDMA coastal hazard susceptibility map",
+            "url": "https://sdma.kerala.gov.in/wp-content/uploads/2018/10/Map-Coastal-Hazard-Susceptibility.jpg",
+            "scope": "Coastal erosion / storm-surge / tsunami reference; not a cyclone track, wind-field or event-specific surge footprint.",
+        },
+    ],
+    "Compound: cyclone + flood": [
+        {
+            "title": "KSDMA Ernakulam historical flood probability map (PDF)",
+            "url": "https://sdma.kerala.gov.in/wp-content/uploads/2022/05/Ernakulam_Hist.pdf",
+            "scope": "Flood component only; no validated cyclone track, wind-field or storm-surge overlay is available.",
+        },
+    ],
+    "Compound: heavy rainfall + drainage failure": [
+        {
+            "title": "KSDMA Ernakulam historical flood probability map (PDF)",
+            "url": "https://sdma.kerala.gov.in/wp-content/uploads/2022/05/Ernakulam_Hist.pdf",
+            "scope": "Flood-context reference only; no validated municipal drainage inventory or drainage-capacity footprint is available.",
+        },
+    ],
+}
+
+
+def hazard_map_references(active_hazard: str | None) -> list[dict[str, str]]:
+    """Return official KSDMA map references without promoting PDFs to GIS layers."""
+    if not active_hazard or not is_workflow_hazard(active_hazard):
+        return []
+    return [dict(item) for item in _KSDMA_HAZARD_REFERENCES.get(active_hazard, [])]
 
 
 def hazard_layer_availability(active_hazard: str | None = None) -> list[dict[str, Any]]:
