@@ -24,6 +24,31 @@ PROVENANCE_FIELDS = (
 )
 
 
+def validate_training_provenance(provenance):
+    """Validate provenance metadata before reading or fitting supplied data."""
+    if not isinstance(provenance, dict):
+        raise ValueError("Provenance sidecar must contain a JSON object.")
+    missing = [
+        key for key in PROVENANCE_FIELDS
+        if key != "pre_treatment_features"
+        and (not isinstance(provenance.get(key), str) or not provenance[key].strip())
+    ]
+    if missing:
+        raise ValueError(f"Provenance sidecar is missing non-empty text fields: {missing}.")
+    if provenance.get("outcome_direction") != "lower_is_better":
+        raise ValueError("outcome_direction must be lower_is_better; transform and document higher-is-better outcomes before training.")
+    if provenance.get("synthetic") is True:
+        raise ValueError("Synthetic data cannot train or validate intervention-effect models.")
+    features = provenance.get("pre_treatment_features")
+    if (
+        not isinstance(features, list)
+        or not features
+        or any(not isinstance(item, str) or not item.strip() for item in features)
+        or len(set(features)) != len(features)
+    ):
+        raise ValueError("pre_treatment_features must be a non-empty list of unique, non-empty column names.")
+    return provenance
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--data", required=True, help="Real intervention-episode CSV.")
@@ -36,19 +61,9 @@ def main() -> int:
     data_path, provenance_path = Path(args.data), Path(args.provenance)
     if not data_path.is_file() or not provenance_path.is_file():
         raise SystemExit("BLOCKED: dataset and provenance sidecar must both exist.")
-    provenance = json.loads(provenance_path.read_text(encoding="utf-8"))
-    missing = [key for key in PROVENANCE_FIELDS if not provenance.get(key)]
-    if missing:
-        raise SystemExit(f"BLOCKED: provenance sidecar is missing {missing}.")
-    if provenance.get("outcome_direction") != "lower_is_better":
-        raise SystemExit(
-            "BLOCKED: outcome_direction must be explicitly documented as lower_is_better; "
-            "transform and document the outcome before training."
-        )
-    if provenance.get("synthetic") is True:
-        raise SystemExit("BLOCKED: synthetic data cannot train or validate intervention-effect models.")
-    if not isinstance(provenance.get("pre_treatment_features"), list) or not provenance["pre_treatment_features"]:
-        raise SystemExit("BLOCKED: provenance must explicitly enumerate pre_treatment_features.")
+    provenance = validate_training_provenance(
+        json.loads(provenance_path.read_text(encoding="utf-8"))
+    )
 
     frame = pd.read_csv(data_path)
     from src.intervention_effectiveness import validate_intervention_frame
