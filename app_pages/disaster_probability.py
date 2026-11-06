@@ -25,26 +25,27 @@ from src.ernakulam_input_predictions import (
 st.markdown(
     """
     <style>
-    /* Ernakulam risk module: measured blue accent, calm analytical surfaces. */
+    /* Eco-glass probability indicator; probability values remain evidence-gated. */
     .probability-panel {
-      border: 1px solid rgba(127, 184, 255, .26);
+      border: 1px solid rgba(44, 105, 82, .18);
       border-radius: 16px;
       padding: .95rem 1.05rem .8rem;
       margin: .55rem 0 .8rem;
       background:
-        radial-gradient(ellipse at 100% 0%, rgba(127, 184, 255, .10), transparent 16rem),
-        linear-gradient(145deg, rgba(15, 42, 62, .96), rgba(9, 28, 43, .96));
-      box-shadow: var(--ar-shadow-soft);
+        radial-gradient(ellipse at 100% 0%, rgba(131, 185, 165, .12), transparent 16rem),
+        linear-gradient(145deg, rgba(255, 255, 255, .96), rgba(234, 243, 238, .94));
+      box-shadow: 0 8px 24px rgba(26, 65, 49, .07);
+      backdrop-filter: blur(12px);
     }
     .probability-label {
-      color: #9db9d4;
+      color: #71827F;
       font-size: .72rem;
       font-weight: 750;
       letter-spacing: .08em;
       text-transform: uppercase;
     }
     .probability-value {
-      color: #cfe4ff;
+      color: #1D3030;
       font-size: 2.05rem;
       font-weight: 800;
       line-height: 1.1;
@@ -52,24 +53,11 @@ st.markdown(
       font-variant-numeric: tabular-nums;
     }
     .probability-unavailable {
-      color: #f0c56a;
+      color: #94620E;
       font-size: 1.12rem;
       font-weight: 750;
       margin: .18rem 0 .35rem;
     }
-
-    /* Eco-glass surfaces for the risk assessment page; assessment logic is unchanged. */
-    .probability-panel {
-      border-color: rgba(44,105,82,.18) !important;
-      background:
-        radial-gradient(ellipse at 100% 0%, rgba(131,185,165,.12), transparent 16rem),
-        linear-gradient(145deg, rgba(255,255,255,.94), rgba(234,243,238,.92)) !important;
-      box-shadow: 0 8px 24px rgba(26,65,49,.07) !important;
-      backdrop-filter: blur(12px);
-    }
-    .probability-label { color: #71827F !important; }
-    .probability-value { color: #1D3030 !important; }
-    .probability-unavailable { color: #94620E !important; }
     </style>
     """,
     unsafe_allow_html=True,
@@ -81,7 +69,7 @@ page_header(
     "Understand local environmental conditions and assess potential disaster risks in "
     "Ernakulam, one hazard at a time.",
     meta=("Ernakulam district", "Preliminary screening", "Not a forecast"),
-    accent="blue",
+    accent="teal",
     key="disaster-probability",
 )
 st.caption(
