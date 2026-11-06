@@ -63,7 +63,7 @@ These gaps are recorded rather than filled with synthetic negatives.
 
 ## Continuous ML conversion
 
-The shared workflow also trains next-day continuous rainfall and maximum-temperature regressors. Candidate estimators are selected using validation MAE only; the final test period is untouched until scoring. A model is eligible for research inference only when it beats the persistence MAE baseline. These estimates are weather components, not direct flood or heat-health predictions. The same feature contract, registry, artifact persistence, service boundary and Hazard Model Lab display are used; no parallel ML framework is introduced.
+The shared workflow also trains next-day continuous rainfall and maximum-temperature regressors, plus a 24-hour cyclone wind-change regressor from IBTrACS best-track sequences. Candidate estimators are selected using validation MAE only; the final test period is untouched until scoring. A model is eligible for research inference only when it beats the persistence MAE baseline. These estimates are weather components, not direct flood or heat-health predictions. The same feature contract, registry, artifact persistence, service boundary and Hazard Model Lab display are used; no parallel ML framework is introduced.
 
 ## Adding a model
 
