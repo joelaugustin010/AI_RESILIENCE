@@ -58,6 +58,7 @@ class InterventionModel:
     effect_model: Any
     status: str
     card: dict[str, Any]
+    support_profile: dict[str, Any] | None = None
 
     def estimate(self, context: dict[str, Any]) -> dict[str, Any]:
         if self.status != "CAUSAL_RESEARCH_SIGNAL_NOT_VALIDATED":
@@ -74,6 +75,21 @@ class InterventionModel:
                 "status": "CONTEXT_INCOMPLETE",
                 "available": False,
                 "missing_features": missing,
+            }
+        if self.support_profile is None:
+            return {
+                "action_id": self.action_id,
+                "status": "CONTEXT_SUPPORT_PROFILE_MISSING",
+                "available": False,
+                "reason": "This model artifact predates the feature-support guard; retrain it before inference.",
+            }
+        support_reason = _context_support_reason(context, self.support_profile)
+        if support_reason:
+            return {
+                "action_id": self.action_id,
+                "status": "CONTEXT_OUTSIDE_TRAINING_SUPPORT",
+                "available": False,
+                "reason": support_reason,
             }
         row = pd.DataFrame([{name: context[name] for name in self.feature_columns}])
         x = self.preprocessor.transform(row)
@@ -116,6 +132,57 @@ def _feature_preprocessor(frame: pd.DataFrame, columns: list[str]) -> ColumnTran
             categorical,
         ))
     return ColumnTransformer(transformers, remainder="drop")
+
+
+
+def _build_support_profile(frame: pd.DataFrame, columns: list[str]) -> dict[str, Any]:
+    """Capture observed training support so inference cannot silently extrapolate."""
+    numeric: dict[str, dict[str, float]] = {}
+    categorical: dict[str, list[str]] = {}
+    for column in columns:
+        series = frame[column]
+        if pd.api.types.is_numeric_dtype(series):
+            values = pd.to_numeric(series, errors="coerce").dropna().to_numpy(dtype=float)
+            if not len(values) or not np.isfinite(values).all():
+                raise InterventionDataError(
+                    f"Cannot establish finite training support for numeric feature {column!r}."
+                )
+            numeric[column] = {"minimum": float(values.min()), "maximum": float(values.max())}
+        else:
+            values = sorted(series.dropna().astype(str).unique().tolist())
+            if not values:
+                raise InterventionDataError(
+                    f"Cannot establish categorical training support for feature {column!r}."
+                )
+            categorical[column] = values
+    return {"numeric_ranges": numeric, "categorical_values": categorical}
+
+
+def _context_support_reason(
+    context: dict[str, Any], profile: dict[str, Any]
+) -> str | None:
+    """Return a reason when any requested context lies outside observed support."""
+    for column, bounds in profile.get("numeric_ranges", {}).items():
+        try:
+            value = float(context[column])
+        except (KeyError, TypeError, ValueError):
+            return f"Feature {column!r} must be a finite numeric value."
+        if not np.isfinite(value):
+            return f"Feature {column!r} must be finite."
+        if value < bounds["minimum"] or value > bounds["maximum"]:
+            return (
+                f"Feature {column!r}={value:g} is outside the observed training range "
+                f"[{bounds['minimum']:g}, {bounds['maximum']:g}]; no extrapolation is allowed."
+            )
+    for column, allowed in profile.get("categorical_values", {}).items():
+        if column not in context or context[column] is None:
+            return f"Categorical feature {column!r} is missing."
+        if str(context[column]) not in allowed:
+            return (
+                f"Category {context[column]!r} for {column!r} was not observed during training; "
+                "no extrapolation is allowed."
+            )
+    return None
 
 
 def _make_outcome_model(seed: int) -> RandomForestRegressor:
@@ -329,6 +396,7 @@ def train_intervention_model(
         random_state=seed, n_jobs=-1,
     )
     effect_model.fit(x_train, pseudo_train)
+    support_profile = _build_support_profile(train, features)
 
     # Held-out doubly-robust ATE: nuisance models are trained only on pre-test data.
     p_model = _make_propensity_model(seed + 500)
@@ -384,9 +452,11 @@ def train_intervention_model(
             "outcome_mean_control_test": float(np.mean(y_test[t_test == 0])),
         },
         "eligible_for_ranking": eligible,
+        "context_support_profile": support_profile,
+        "context_support_policy": "Reject any inference feature outside the observed training range or unseen categorical levels.",
         "ranking_note": "Eligible actions may be ranked by context-specific estimated damage reduction only against actions trained on the same hazard, outcome scale and target population.",
     }
-    return InterventionModel(action_id, hazard, features, preprocessor, effect_model, status, card)
+    return InterventionModel(action_id, hazard, features, preprocessor, effect_model, status, card, support_profile)
 
 
 def _intervention_comparison_signature(model: InterventionModel) -> tuple[Any, ...] | None:
@@ -523,6 +593,8 @@ def load_intervention_models(registry_path: str = "reports/intervention_effectiv
         if not artifact_path or not Path(artifact_path).is_file():
             continue
         bundle = joblib.load(artifact_path)
+        if not isinstance(bundle, dict) or not isinstance(bundle.get("support_profile"), dict):
+            continue
         models.append(InterventionModel(
             action_id=str(card["action_id"]),
             hazard=str(card["hazard"]),
@@ -531,6 +603,7 @@ def load_intervention_models(registry_path: str = "reports/intervention_effectiv
             effect_model=bundle["effect_model"],
             status=str(card["status"]),
             card=card,
+            support_profile=bundle.get("support_profile"),
         ))
     return models
 
