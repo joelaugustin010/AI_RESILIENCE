@@ -6,6 +6,8 @@ The engine never estimates risk reduction, ranks actions, or overrides authoriti
 from __future__ import annotations
 
 from typing import Any
+import hashlib
+import re
 
 from src.hazard_registry import WORKFLOW_HAZARDS, components_for
 
@@ -185,6 +187,13 @@ def generate_prevention_actions(
             "caution": "No hazard-specific model or tailored precaution is inferred for an unregistered scenario.",
             "activation_basis": "Custom scenario; specialist review required",
         })
+    # Stable action identifiers link the catalogue to intervention outcome records.
+    # The readable action text remains the display label; IDs change only if the
+    # hazard or intervention definition itself changes.
+    for item in actions:
+        hazard_key = re.sub(r"[^a-z0-9]+", "-", item["hazard"].casefold()).strip("-")
+        action_key = hashlib.sha1(item["action"].encode("utf-8")).hexdigest()[:10]
+        item["action_id"] = f"{hazard_key}:{action_key}"
     return actions
 
 
