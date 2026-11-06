@@ -72,6 +72,9 @@ def estimate_population_exposure(
             raise PopulationExposureError(f"Invalid hazard geometry at feature {index}: {exc}") from exc
         if geom.is_empty or not geom.is_valid or geom.geom_type not in {"Polygon", "MultiPolygon"}:
             raise PopulationExposureError(f"Hazard feature {index} must be a valid polygon.")
+        min_x, min_y, max_x, max_y = geom.bounds
+        if min_x < -180 or max_x > 180 or min_y < -90 or max_y > 90:
+            raise PopulationExposureError(f"Hazard feature {index} has coordinates outside EPSG:4326 bounds.")
         hazard_geometries.append(transform(forward, geom))
     hazard_union = unary_union(hazard_geometries)
     if hazard_union.is_empty or not hazard_union.is_valid:
@@ -103,6 +106,9 @@ def estimate_population_exposure(
             raise PopulationExposureError(f"Invalid population geometry at feature {index}: {exc}") from exc
         if geom.is_empty or not geom.is_valid or geom.geom_type not in {"Polygon", "MultiPolygon"}:
             raise PopulationExposureError(f"Population feature {index} must be a valid polygon.")
+        min_x, min_y, max_x, max_y = geom.bounds
+        if min_x < -180 or max_x > 180 or min_y < -90 or max_y > 90:
+            raise PopulationExposureError(f"Population feature {index} has coordinates outside EPSG:4326 bounds.")
         projected = transform(forward, geom)
         area = projected.area
         if not math.isfinite(area) or area <= 0:
@@ -129,6 +135,13 @@ def estimate_population_exposure(
     exposed_population = 0.0
     exposed_cells = 0
     ward_totals: dict[str, float] = defaultdict(float)
+    grid_union = unary_union(cell_geometries)
+    hazard_area = hazard_union.area
+    covered_hazard_area = hazard_union.intersection(grid_union).area
+    coverage_percent = (
+        100.0 * covered_hazard_area / hazard_area if hazard_area > 0 else 0.0
+    )
+    complete_coverage = coverage_percent >= 99.5
     for cell_id, props, population, geom, area in cells:
         total_population += population
         intersection_area = geom.intersection(hazard_union).area
@@ -142,9 +155,15 @@ def estimate_population_exposure(
             ward_totals[str(props[ward_field])] += estimate
 
     return {
-        "status": "SCREENING_ESTIMATE_NOT_VALIDATED",
-        "estimated_population_in_footprint": round(exposed_population),
+        "status": (
+            "SCREENING_ESTIMATE_NOT_VALIDATED"
+            if complete_coverage else "PARTIAL_POPULATION_GRID_COVERAGE"
+        ),
+        "estimated_population_in_footprint": round(exposed_population) if complete_coverage else None,
+        "estimated_population_in_covered_part": round(exposed_population),
         "estimated_population_fractional": round(exposed_population, 2),
+        "hazard_footprint_area_covered_percent": round(coverage_percent, 3),
+        "population_grid_covers_full_footprint": complete_coverage,
         "population_grid_total": round(total_population),
         "population_grid_cells": len(cells),
         "intersecting_population_cells": exposed_cells,
