@@ -79,3 +79,70 @@ def test_intervention_schema_rejects_duplicate_site_time_action_episodes():
     frame = pd.concat([frame, frame.iloc[[0]]], ignore_index=True)
     with pytest.raises(InterventionDataError, match="Duplicate"):
         validate_intervention_frame(frame)
+
+
+def test_ranking_withholds_when_eligible_models_lack_complete_provenance():
+    class EligibleStub:
+        def __init__(self, action_id):
+            self.action_id = action_id
+            self.hazard = "Flood"
+            self.status = "CAUSAL_RESEARCH_SIGNAL_NOT_VALIDATED"
+            self.card = {
+                "eligible_for_ranking": True,
+                "hazard": "Flood",
+                "outcome_unit": "damage units",
+                "feature_columns": ["rainfall_before"],
+                "test_start": "2022-01-01",
+            }
+
+        def estimate(self, context):
+            return {
+                "available": True,
+                "estimated_damage_reduction": 2.0,
+                "action_id": self.action_id,
+            }
+
+    result = rank_interventions(
+        [EligibleStub("drainage"), EligibleStub("barrier")],
+        {"rainfall_before": 100},
+    )
+    assert result["status"] == "RANKING_WITHHELD"
+    assert result["ranked_actions"] == []
+    assert "provenance" in result["reason"]
+
+
+def test_ranking_withholds_when_candidate_actions_come_from_different_studies():
+    class EligibleStub:
+        def __init__(self, action_id, source):
+            self.action_id = action_id
+            self.hazard = "Flood"
+            self.status = "CAUSAL_RESEARCH_SIGNAL_NOT_VALIDATED"
+            self.card = {
+                "eligible_for_ranking": True,
+                "hazard": "Flood",
+                "outcome_unit": "damage units",
+                "feature_columns": ["rainfall_before"],
+                "test_start": "2022-01-01",
+                "data_provenance": {
+                    "source_title": source,
+                    "source_owner": "Research group",
+                    "collection_period": "2020-2023",
+                    "outcome_definition": "household flood damage",
+                    "geographic_scope": "Study catchment",
+                },
+            }
+
+        def estimate(self, context):
+            return {
+                "available": True,
+                "estimated_damage_reduction": 2.0,
+                "action_id": self.action_id,
+            }
+
+    result = rank_interventions(
+        [EligibleStub("drainage", "Study A"), EligibleStub("barrier", "Study B")],
+        {"rainfall_before": 100},
+    )
+    assert result["status"] == "RANKING_WITHHELD"
+    assert result["ranked_actions"] == []
+    assert "same study" in result["reason"]
