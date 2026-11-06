@@ -32,6 +32,7 @@ from src.ml.paths import REPORTS_ROOT, VALIDATION_PATH
 from src.ml.persistence import write_json
 from src.ml.registry import register
 from src.ml.training import TrainingConfig, train_model
+from src.ml.regression import train_weather_regression_models
 
 MODEL_SPECS: tuple[tuple[str, dict], ...] = (
     (
@@ -323,6 +324,21 @@ def main() -> int:
             ),
         },
     )
+    regression_cards = []
+    regression_errors = {}
+    try:
+        regression_cards = train_weather_regression_models()
+        print(
+            "[REGRESSION] "
+            + ", ".join(
+                f"{card['model_id']}={card['status']}"
+                for card in regression_cards
+            )
+        )
+    except Exception as exc:
+        regression_errors["weather_regression"] = f"{type(exc).__name__}: {exc}"
+        print(f"[REGRESSION BLOCKED] {regression_errors['weather_regression']}")
+
     coverage = build_coverage_matrix(write=True)
 
     validation_report = {
@@ -330,7 +346,10 @@ def main() -> int:
         "status": "RESEARCH_MODELS_TRAINED_NOT_INDEPENDENTLY_VALIDATED",
         "validated_models": 0,
         "n_trained": len(results),
-        "n_blocked": len(errors),
+        "n_regression_trained": len(regression_cards),
+        "regression_trained": regression_cards,
+        "regression_blocked": regression_errors,
+        "n_blocked": len(errors) + len(regression_errors),
         "trained": [
             {
                 "model_id": result.card["model_id"],
@@ -372,6 +391,8 @@ def main() -> int:
     print(json.dumps(
         {
             "trained": [result.config.model_id for result in results],
+            "regression_trained": [card["model_id"] for card in regression_cards],
+            "regression_blocked": regression_errors,
             "blocked": errors,
             "documented_without_training": skipped,
             "coverage": validation_report["coverage"],
