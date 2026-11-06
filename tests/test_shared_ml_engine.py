@@ -161,3 +161,18 @@ def test_flood_assessment_still_renders_without_ml_context():
         "not_trained",
         "no_model_available",
     }
+
+
+def test_skill_grade_downgrades_when_model_does_not_beat_persistence():
+    result = grade_skill({
+        "n_test_events": 40,
+        "test_prevalence": 0.20,
+        "roc_auc": 0.82,
+        "average_precision": 0.55,
+        "brier_score": 0.10,
+        "base_rate_brier_score": 0.16,
+        "f1": 0.60,
+        "persistence_baseline": {"available": True, "f1": 0.70},
+    })
+    assert result["status"] == "WEAK_RESEARCH_SIGNAL"
+    assert "does not exceed the persistence baseline" in result["reason"]
