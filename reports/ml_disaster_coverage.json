@@ -32,7 +32,7 @@
   ],
   "coverage_complete": true,
   "validated_models": 0,
-  "interpretation": "Every workflow hazard is represented. Registered artifacts are not equivalent to usable research models: Drought and Earthquake are invalidated pending corrected retraining, three hazards have no defensible supervised model, and zero models are independently validated for operational use.",
+  "interpretation": "Every workflow hazard is represented. 7 have registered ML artifacts; 2 have a usable hazard-specific research model; 5 have usable component research evidence. Drought and Earthquake are invalidated pending corrected retraining, three hazards have no registered ML artifact, and zero models are independently validated for operational use.",
   "entries": [
     {
       "hazard": "Flood",
@@ -244,19 +244,27 @@
       "deterministic_model_retained": true
     }
   ],
-  "n_hazards_with_usable_research_model": 5,
+  "n_hazards_with_usable_research_model": 2,
   "hazards_with_usable_research_model": [
+    "Cyclone",
+    "Heatwave"
+  ],
+  "hazards_without_usable_research_model": [
+    "Flood",
+    "Earthquake",
+    "Landslide",
+    "Drought",
+    "Industrial incident",
+    "Infrastructure failure",
+    "Compound: cyclone + flood",
+    "Compound: heavy rainfall + drainage failure"
+  ],
+  "n_hazards_with_component_research_evidence": 5,
+  "hazards_with_component_research_evidence": [
     "Flood",
     "Cyclone",
     "Heatwave",
     "Compound: cyclone + flood",
     "Compound: heavy rainfall + drainage failure"
-  ],
-  "hazards_without_usable_research_model": [
-    "Earthquake",
-    "Landslide",
-    "Drought",
-    "Industrial incident",
-    "Infrastructure failure"
   ]
 }
