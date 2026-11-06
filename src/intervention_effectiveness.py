@@ -23,6 +23,7 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.linear_model import LogisticRegression, Ridge
 from sklearn.metrics import mean_absolute_error
+from sklearn.model_selection import GroupKFold
 
 
 SCHEMA_VERSION = "intervention-effectiveness/0.1.0"
@@ -122,16 +123,17 @@ def _make_propensity_model(seed: int) -> LogisticRegression:
 
 def _crossfit_dr_score(
     x: np.ndarray, treatment: np.ndarray, outcome: np.ndarray,
-    *, seed: int = 42, folds: int = 5,
+    groups: np.ndarray, *, seed: int = 42, folds: int = 5,
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Cross-fit nuisance outcome/propensity models and form DR pseudo-outcomes."""
-    rng = np.random.default_rng(seed)
-    indices = rng.permutation(len(outcome))
-    fold_ids = np.array_split(indices, min(folds, len(indices)))
+    """Group-cross-fit nuisance models so one site cannot leak across folds."""
+    n_groups = len(np.unique(groups))
+    if n_groups < 2:
+        raise InterventionDataError("At least two distinct sites are required for group cross-fitting.")
+    splitter = GroupKFold(n_splits=min(folds, n_groups))
+    splits = list(splitter.split(x, treatment, groups))
     pseudo = np.full(len(outcome), np.nan, dtype=float)
     propensities = np.full(len(outcome), np.nan, dtype=float)
-    for fold, held in enumerate(fold_ids):
-        train = np.setdiff1d(np.arange(len(outcome)), held, assume_unique=False)
+    for fold, (train, held) in enumerate(splits):
         if len(np.unique(treatment[train])) < 2:
             raise InterventionDataError("Cross-fitting fold lacks both treated and control episodes.")
         p_model = _make_propensity_model(seed + fold)
@@ -148,13 +150,23 @@ def _crossfit_dr_score(
     return pseudo, propensities
 
 
-def _bootstrap_mean_ci(values: np.ndarray, *, seed: int = 42, n_bootstrap: int = 2000) -> list[float]:
+def _bootstrap_mean_ci(
+    values: np.ndarray, clusters: np.ndarray, *, seed: int = 42,
+    n_bootstrap: int = 2000,
+) -> list[float]:
+    """Cluster bootstrap by site to respect repeated episodes within locations."""
     values = np.asarray(values, dtype=float)
-    if len(values) < 2:
+    clusters = np.asarray(clusters)
+    unique = np.unique(clusters)
+    if len(values) < 2 or len(unique) < 2:
         return [float("nan"), float("nan")]
+    members = {cluster: np.flatnonzero(clusters == cluster) for cluster in unique}
     rng = np.random.default_rng(seed)
-    samples = rng.integers(0, len(values), size=(n_bootstrap, len(values)))
-    means = values[samples].mean(axis=1)
+    means = []
+    for _ in range(n_bootstrap):
+        sampled = rng.choice(unique, size=len(unique), replace=True)
+        indices = np.concatenate([members[cluster] for cluster in sampled])
+        means.append(float(values[indices].mean()))
     return [float(v) for v in np.quantile(means, [0.025, 0.975])]
 
 
@@ -175,6 +187,8 @@ def validate_intervention_frame(
         raise InterventionDataError("implemented must be binary 0/1.")
     if frame["implemented"].isna().any():
         raise InterventionDataError("implemented contains missing values.")
+    if frame.duplicated(["episode_date", "site_id", "hazard", "action_id"]).any():
+        raise InterventionDataError("Duplicate site-date-hazard-action episodes are not allowed.")
     if not pd.to_numeric(frame["damage_outcome"], errors="coerce").notna().all():
         raise InterventionDataError("damage_outcome must be numeric and complete.")
     excluded = REQUIRED_COLUMNS | {"outcome_unit"}
@@ -239,6 +253,7 @@ def train_intervention_model(
             "Intervention delivery, quality, timing and compliance may vary.",
             "Effects may not transport to a different district, hazard intensity or population.",
             "A single chronological holdout is preliminary, not independent validation.",
+            "No separate geographic holdout has established transport to unseen locations.",
         ],
     }
 
@@ -259,7 +274,9 @@ def train_intervention_model(
     t_test = test["implemented"].to_numpy(dtype=int)
     y_test = test["damage_outcome"].to_numpy(dtype=float)
 
-    pseudo_train, propensity_train = _crossfit_dr_score(x_train, t_train, y_train, seed=seed)
+    pseudo_train, propensity_train = _crossfit_dr_score(
+        x_train, t_train, y_train, train["site_id"].astype(str).to_numpy(), seed=seed
+    )
     overlap_train = (propensity_train >= PROPENSITY_CLIP) & (propensity_train <= 1 - PROPENSITY_CLIP)
     overlap_share = float(overlap_train.mean())
     if overlap_share < MIN_OVERLAP_SHARE:
@@ -280,7 +297,9 @@ def train_intervention_model(
     m1.fit(x_train[t_train == 1], y_train[t_train == 1])
     mu0, mu1 = m0.predict(x_test), m1.predict(x_test)
     dr_test = (mu1 - mu0) + t_test * (y_test - mu1) / p_test - (1 - t_test) * (y_test - mu0) / (1 - p_test)
-    ci = _bootstrap_mean_ci(dr_test, seed=seed + 503)
+    ci = _bootstrap_mean_ci(
+        dr_test, test["site_id"].astype(str).to_numpy(), seed=seed + 503
+    )
     mean_effect = float(np.mean(dr_test))
     test_overlap = float(np.mean((raw_p_test >= PROPENSITY_CLIP) & (raw_p_test <= 1 - PROPENSITY_CLIP)))
     status = "CAUSAL_RESEARCH_SIGNAL_NOT_VALIDATED"
