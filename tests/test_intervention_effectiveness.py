@@ -16,6 +16,7 @@ def _small_frame(n: int = 80) -> pd.DataFrame:
     dates = pd.date_range("2010-01-01", periods=n, freq="D")
     return pd.DataFrame({
         "episode_date": dates,
+        "outcome_window_end": dates + pd.Timedelta(days=1),
         "site_id": [f"site-{i % 8}" for i in range(n)],
         "hazard": ["Flood"] * n,
         "action_id": ["drain_maintenance"] * n,
