@@ -58,4 +58,18 @@ def test_hazard_reference_maps_do_not_claim_to_be_validated_local_gis_layers():
 def test_compound_hazard_reference_is_limited_to_available_component():
     refs = hazard_map_references("Compound: cyclone + flood")
     assert refs
-    assert all("flood component only" in item["scope"].lower() for item in refs)
+    assert all("flood component only" in item["scope"].lower() for item in refs)\n
+def test_every_registered_hazard_has_a_district_multi_hazard_reference():
+    from src.hazard_registry import WORKFLOW_HAZARDS
+
+    for hazard in WORKFLOW_HAZARDS:
+        references = hazard_map_references(hazard)
+        assert any("Ernakulam multi-hazard map" in item["title"] for item in references)
+        assert all("not a georeferenced" in item["scope"].lower() for item in references if "multi-hazard" in item["title"].lower())
+
+
+def test_heatwave_portal_is_reference_only_not_a_local_gis_layer():
+    references = hazard_map_references("Heatwave")
+    heat_portal = next(item for item in references if "includes Heat" in item["title"])
+    assert heat_portal["url"] == "https://sdma.cditproject.org/"
+    assert "not a local" in heat_portal["scope"].lower()
