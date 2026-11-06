@@ -49,19 +49,31 @@ def main() -> int:
     output_dir = Path(args.artifacts)
     output_dir.mkdir(parents=True, exist_ok=True)
     for hazard, action_id in sorted(
-        {(str(h), str(a)) for h, a in zip(frame.get("hazard", []), frame.get("action_id", []))}
+        {(str(h), str(a)) for h, a in zip(frame["hazard"], frame["action_id"])}
     ):
-        model = train_intervention_model(
-            frame, action_id=action_id, hazard=hazard, test_start=args.test_start,
-            outcome_unit=str(provenance.get("outcome_unit", "normalised damage-severity units")),
-        )
-        card = {**model.card, "data_provenance": provenance}
-        if model.card.get("eligible_for_ranking"):
-            artifact_path = output_dir / f"{hazard.lower().replace(' ', '_')}__{action_id}.joblib"
-            joblib.dump({"preprocessor": model.preprocessor, "effect_model": model.effect_model}, artifact_path)
-            card["artifact_path"] = str(artifact_path)
-            trained.append(str(artifact_path))
-        cards.append(card)
+        try:
+            model = train_intervention_model(
+                frame, action_id=action_id, hazard=hazard, test_start=args.test_start,
+                outcome_unit=str(provenance.get("outcome_unit", "normalised damage-severity units")),
+            )
+            card = {**model.card, "data_provenance": provenance}
+            if model.card.get("eligible_for_ranking"):
+                safe_hazard = "".join(ch if ch.isalnum() or ch in "-_" else "_" for ch in hazard.lower())
+                safe_action = "".join(ch if ch.isalnum() or ch in "-_" else "_" for ch in action_id)
+                artifact_path = output_dir / f"{safe_hazard}__{safe_action}.joblib"
+                joblib.dump({"preprocessor": model.preprocessor, "effect_model": model.effect_model}, artifact_path)
+                card["artifact_path"] = str(artifact_path)
+                trained.append(str(artifact_path))
+            cards.append(card)
+        except Exception as exc:
+            cards.append({
+                "hazard": hazard,
+                "action_id": action_id,
+                "status": "TRAINING_BLOCKED",
+                "eligible_for_ranking": False,
+                "status_reason": f"{type(exc).__name__}: {exc}",
+                "data_provenance": provenance,
+            })
 
     registry = {
         "schema_version": "intervention-effectiveness-registry/1.0.0",
