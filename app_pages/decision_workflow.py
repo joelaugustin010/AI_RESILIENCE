@@ -5,6 +5,7 @@ import re
 import json
 
 import pandas as pd
+import pydeck as pdk
 import streamlit as st
 
 from src.dataframe_display import display_dataframe
@@ -1682,6 +1683,7 @@ with st.expander("Population exposure calculator (GeoJSON evidence inputs)", exp
                     "population_year": population_year.strip(),
                     "population_source_url": population_source_url.strip(),
                     "footprint_source_url": footprint_source_url.strip(),
+                    "footprint_geojson": footprint_payload,
                     "scenario_hazard": str(inputs.get("hazard", "")),
                     "scenario_location": str(inputs.get("location", "")),
                 }
@@ -1740,6 +1742,36 @@ with st.expander("Population exposure calculator (GeoJSON evidence inputs)", exp
                 width="stretch",
                 alt="Estimated population inside the uploaded hazard footprint by source-provided ward label",
             )
+        bounds = exposure_result["footprint_bounds_wgs84"]
+        center_lon = (bounds[0] + bounds[2]) / 2
+        center_lat = (bounds[1] + bounds[3]) / 2
+        st.markdown("**Supplied hazard footprint**")
+        st.pydeck_chart(
+            pdk.Deck(
+                layers=[
+                    pdk.Layer(
+                        "GeoJsonLayer",
+                        data=exposure_result["footprint_geojson"],
+                        get_fill_color=[220, 53, 69, 65],
+                        get_line_color=[170, 25, 40, 220],
+                        get_line_width=2,
+                        line_width_min_pixels=2,
+                        pickable=True,
+                        stroked=True,
+                        filled=True,
+                    )
+                ],
+                initial_view_state=pdk.ViewState(
+                    latitude=center_lat,
+                    longitude=center_lon,
+                    zoom=11,
+                    pitch=0,
+                ),
+                map_style=None,
+                tooltip={"text": "Hazard exposure footprint"},
+            ),
+            use_container_width=True,
+        )
         st.caption(exposure_result["method"])
         for limitation in exposure_result["limitations"]:
             st.caption(f"• {limitation}")
