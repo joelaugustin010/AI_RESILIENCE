@@ -395,6 +395,10 @@ def _intervention_comparison_signature(model: InterventionModel) -> tuple[Any, .
     provenance = card.get("data_provenance")
     if not isinstance(provenance, dict):
         return None
+    # Each candidate must document its own treatment version, but treatment
+    # descriptions must differ when comparing distinct actions. Comparability
+    # instead requires a shared study, population, outcome, hazard, feature
+    # contract and holdout period.
     required = (
         provenance.get("source_title"),
         provenance.get("source_owner"),
@@ -414,7 +418,6 @@ def _intervention_comparison_signature(model: InterventionModel) -> tuple[Any, .
         provenance.get("source_owner"),
         provenance.get("collection_period"),
         provenance.get("outcome_definition"),
-        provenance.get("treatment_definition"),
         provenance.get("geographic_scope"),
         card.get("hazard"),
         card.get("outcome_unit"),
