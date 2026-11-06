@@ -10,10 +10,10 @@
   "target_threshold": 5.7,
   "target_direction": "low",
   "threshold_source": "training target dates only (< validation_start)",
-  "evidence_tier": "baseline",
-  "status": "RESEARCH_SIGNAL_NOT_VALIDATED",
-  "skill_grade": "RESEARCH_SIGNAL_NOT_VALIDATED",
-  "status_reason": "ROC-AUC 0.998 and average precision 0.941 beat the no-skill prevalence 0.016 on one temporal holdout.",
+  "evidence_tier": "invalidated",
+  "status": "NO_SKILL",
+  "skill_grade": "NO_SKILL",
+  "status_reason": "INVALIDATED: the original target builder used a trailing 30-day rolling sum shifted by one day, overlapping most of the supposed future target with historical rainfall features. All previously reported metrics are superseded. No inference is permitted until the corrected future-only target is retrained and reevaluated.",
   "validation_status": "SINGLE_TEMPORAL_HOLDOUT_NOT_INDEPENDENTLY_VALIDATED",
   "trained_at_utc": "2026-11-06T13:51:30+00:00",
   "selected_model_type": "hist_gradient_boosting",
@@ -137,229 +137,229 @@
       "min": 24.2,
       "max": 34.2,
       "median": 28.9,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "temperature_2m_min": {
       "min": 18.6,
       "max": 28.8,
       "median": 24.3,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "precipitation_sum": {
-      "min": 0.0,
+      "min": 0,
       "max": 253.7,
       "median": 2.5,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "wind_speed_10m_max": {
       "min": 3.3,
       "max": 32.8,
       "median": 10.2,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "wind_gusts_10m_max": {
       "min": 11.2,
       "max": 72.4,
       "median": 29.9,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "temperature_2m_max_lag1": {
       "min": 24.2,
       "max": 34.2,
       "median": 28.9,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "temperature_2m_max_lag2": {
       "min": 24.2,
       "max": 34.2,
       "median": 28.9,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "temperature_2m_max_lag3": {
       "min": 24.2,
       "max": 34.2,
       "median": 28.9,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "temperature_2m_max_lag7": {
       "min": 24.2,
       "max": 34.2,
       "median": 28.9,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "temperature_2m_max_prior3_mean": {
       "min": 24.66666666666667,
       "max": 33.899999999999984,
       "median": 28.93333333333332,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "temperature_2m_max_prior7_mean": {
       "min": 25.357142857142858,
       "max": 33.31428571428572,
       "median": 28.885714285714283,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "temperature_2m_min_lag1": {
       "min": 18.6,
       "max": 28.8,
       "median": 24.3,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "temperature_2m_min_lag2": {
       "min": 18.6,
       "max": 28.8,
       "median": 24.3,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "temperature_2m_min_lag3": {
       "min": 18.6,
       "max": 28.8,
       "median": 24.3,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "temperature_2m_min_lag7": {
       "min": 18.6,
       "max": 28.8,
       "median": 24.3,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "temperature_2m_min_prior3_mean": {
       "min": 19.3,
       "max": 28.633333333333336,
       "median": 24.233333333333334,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "temperature_2m_min_prior7_mean": {
       "min": 19.957142857142856,
       "max": 28.25714285714286,
       "median": 24.228571428571428,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "precipitation_sum_lag1": {
-      "min": 0.0,
+      "min": 0,
       "max": 253.7,
       "median": 2.5,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "precipitation_sum_lag2": {
-      "min": 0.0,
+      "min": 0,
       "max": 253.7,
       "median": 2.5,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "precipitation_sum_lag3": {
-      "min": 0.0,
+      "min": 0,
       "max": 253.7,
       "median": 2.5,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "precipitation_sum_lag7": {
-      "min": 0.0,
+      "min": 0,
       "max": 253.7,
       "median": 2.5,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "precipitation_sum_prior3_mean": {
-      "min": 0.0,
+      "min": 0,
       "max": 157.29999999999998,
       "median": 3.599999999999985,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "precipitation_sum_prior7_mean": {
-      "min": 0.0,
+      "min": 0,
       "max": 72.04285714285714,
       "median": 4.3714285714285825,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "wind_speed_10m_max_lag1": {
       "min": 3.3,
       "max": 32.8,
       "median": 10.2,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "wind_speed_10m_max_lag2": {
       "min": 3.3,
       "max": 32.8,
       "median": 10.3,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "wind_speed_10m_max_lag3": {
       "min": 3.3,
       "max": 32.8,
       "median": 10.3,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "wind_speed_10m_max_lag7": {
       "min": 3.3,
       "max": 32.8,
       "median": 10.2,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "wind_speed_10m_max_prior3_mean": {
       "min": 4.499999999999999,
       "max": 30.33333333333336,
       "median": 10.233333333333348,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "wind_speed_10m_max_prior7_mean": {
       "min": 5.100000000000002,
       "max": 26.742857142857144,
       "median": 10.328571428571431,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "wind_gusts_10m_max_lag1": {
       "min": 11.2,
       "max": 72.4,
       "median": 29.9,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "wind_gusts_10m_max_lag2": {
       "min": 11.2,
       "max": 72.4,
       "median": 29.9,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "wind_gusts_10m_max_lag3": {
       "min": 11.2,
       "max": 72.4,
       "median": 29.9,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "wind_gusts_10m_max_lag7": {
       "min": 11.2,
       "max": 72.4,
       "median": 29.9,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "wind_gusts_10m_max_prior3_mean": {
       "min": 15.13333333333331,
       "max": 68.63333333333331,
       "median": 29.866666666666646,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "wind_gusts_10m_max_prior7_mean": {
       "min": 17.15714285714286,
       "max": 60.74285714285714,
       "median": 30.028571428571432,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "rain_3d_sum": {
-      "min": 0.0,
+      "min": 0,
       "max": 471.9,
       "median": 10.799999999999955,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "rain_7d_sum": {
-      "min": 0.0,
+      "min": 0,
       "max": 504.3,
       "median": 30.600000000000076,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "rain_30d_sum": {
-      "min": 0.0,
+      "min": 0,
       "max": 873.4000000000001,
       "median": 171.20000000000002,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "rain_90d_sum": {
       "min": 1.3999999999999857,
@@ -368,49 +368,81 @@
       "missing_fraction": 0.0029431311117440427
     },
     "dry_days_14": {
-      "min": 0.0,
-      "max": 14.0,
-      "median": 4.0,
-      "missing_fraction": 0.0
+      "min": 0,
+      "max": 14,
+      "median": 4,
+      "missing_fraction": 0
     },
     "tmax_prior30_mean": {
       "min": 26.36,
       "max": 32.75333333333333,
       "median": 28.84,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "tmax_anomaly_30d": {
       "min": -4.77,
       "max": 3.556666666666672,
       "median": 0.10666666666666913,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "doy_sin": {
       "min": -0.9999994220246925,
       "max": 0.9999855506507186,
       "median": -0.004300592702981974,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "doy_cos": {
       "min": -0.9999791929590823,
       "max": 0.9999907524084426,
       "median": -0.011826390691832589,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "month_sin": {
-      "min": -1.0,
-      "max": 1.0,
+      "min": -1,
+      "max": 1,
       "median": -2.4492935982947064e-16,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "month_cos": {
-      "min": -1.0,
-      "max": 1.0,
+      "min": -1,
+      "max": 1,
       "median": -1.8369701987210297e-16,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     }
   },
-  "metrics": {
+  "metrics": {},
+  "provenance": {
+    "source": "data\\external\\hazards\\raw\\weather\\kochi_daily_weather_1991_2025.json",
+    "source_type": "MODELLED_REANALYSIS_GRID_POINT_NOT_STATION_OBSERVATION",
+    "location": "kochi",
+    "lead_days": 30,
+    "target": "drought_onset"
+  },
+  "notes": [
+    "Reanalysis grid-point values, not station observations.",
+    "Features use current and prior values only; the target is future.",
+    "Event thresholds are estimated on training target dates only."
+  ],
+  "limitations": [
+    "A 30-day rainfall deficit is not agricultural or hydrological drought.",
+    "Soil moisture, evaporative demand, storage and demand are absent.",
+    "Reanalysis grid-point values, not station observations.",
+    "Features use current and prior values only; the target is future.",
+    "Event thresholds are estimated on training target dates only.",
+    "A single chronological holdout is preliminary evidence, not independent validation.",
+    "No calibration, geographic transferability, drift or operational-readiness claim is made.",
+    "Skill grade is RESEARCH_SIGNAL_NOT_VALIDATED: ROC-AUC 0.998 and average precision 0.941 beat the no-skill prevalence 0.016 on one temporal holdout.",
+    "The model card records the exact threshold, features and split; changing any of them requires retraining and re-evaluation.",
+    "Target construction defect: the prior 30-day rainfall target overlapped historical feature windows; all previous metrics are invalid and must not be used."
+  ],
+  "intended_use": "30-day meteorological rainfall-deficit screening at the Kochi reanalysis grid point, used only as supplementary drought context.",
+  "prohibited_use": "Not a drought declaration, SPI/SPEI index, agricultural or hydrological drought model, or water-supply forecast.",
+  "artifact": {
+    "path": "models/ml/weather_drought_onset_kochi_30day/model.joblib",
+    "format": "joblib-pipeline",
+    "loader": "src.ml.inference.predict_from_context"
+  },
+  "superseded_metrics": {
     "n_test": 2221,
     "n_test_events": 36,
     "test_prevalence": 0.01620891490319676,
@@ -433,7 +465,7 @@
     "expected_calibration_error": 0.0037159290692707473,
     "calibration_table": [
       {
-        "bin_lower": 0.0,
+        "bin_lower": 0,
         "bin_upper": 0.1,
         "n": 2163,
         "mean_probability": 0.0019137599864688152,
@@ -453,7 +485,7 @@
         "bin_upper": 0.30000000000000004,
         "n": 5,
         "mean_probability": 0.26198867859640185,
-        "observed_event_rate": 0.0,
+        "observed_event_rate": 0,
         "absolute_gap": 0.26198867859640185
       },
       {
@@ -461,7 +493,7 @@
         "bin_upper": 0.4,
         "n": 1,
         "mean_probability": 0.3053132215713415,
-        "observed_event_rate": 0.0,
+        "observed_event_rate": 0,
         "absolute_gap": 0.3053132215713415
       },
       {
@@ -469,7 +501,7 @@
         "bin_upper": 0.5,
         "n": 2,
         "mean_probability": 0.4430325592618053,
-        "observed_event_rate": 0.0,
+        "observed_event_rate": 0,
         "absolute_gap": 0.4430325592618053
       },
       {
@@ -477,7 +509,7 @@
         "bin_upper": 0.6000000000000001,
         "n": 3,
         "mean_probability": 0.547248524451631,
-        "observed_event_rate": 0.0,
+        "observed_event_rate": 0,
         "absolute_gap": 0.547248524451631
       },
       {
@@ -490,7 +522,7 @@
       },
       {
         "bin_lower": 0.9,
-        "bin_upper": 1.0,
+        "bin_upper": 1,
         "n": 31,
         "mean_probability": 0.9848129093801761,
         "observed_event_rate": 0.967741935483871,
@@ -502,7 +534,7 @@
       "predicted_class": 0,
       "accuracy": 0.9837910850968032,
       "balanced_accuracy": 0.5,
-      "f1": 0.0
+      "f1": 0
     },
     "base_rate_brier_score": 0.015946185980857685,
     "skill_over_base_rate_brier": 0.012566409227398904,
@@ -908,34 +940,5 @@
       "f1": 0.8611111111111112
     }
   },
-  "provenance": {
-    "source": "data\\external\\hazards\\raw\\weather\\kochi_daily_weather_1991_2025.json",
-    "source_type": "MODELLED_REANALYSIS_GRID_POINT_NOT_STATION_OBSERVATION",
-    "location": "kochi",
-    "lead_days": 30,
-    "target": "drought_onset"
-  },
-  "notes": [
-    "Reanalysis grid-point values, not station observations.",
-    "Features use current and prior values only; the target is future.",
-    "Event thresholds are estimated on training target dates only."
-  ],
-  "limitations": [
-    "A 30-day rainfall deficit is not agricultural or hydrological drought.",
-    "Soil moisture, evaporative demand, storage and demand are absent.",
-    "Reanalysis grid-point values, not station observations.",
-    "Features use current and prior values only; the target is future.",
-    "Event thresholds are estimated on training target dates only.",
-    "A single chronological holdout is preliminary evidence, not independent validation.",
-    "No calibration, geographic transferability, drift or operational-readiness claim is made.",
-    "Skill grade is RESEARCH_SIGNAL_NOT_VALIDATED: ROC-AUC 0.998 and average precision 0.941 beat the no-skill prevalence 0.016 on one temporal holdout.",
-    "The model card records the exact threshold, features and split; changing any of them requires retraining and re-evaluation."
-  ],
-  "intended_use": "30-day meteorological rainfall-deficit screening at the Kochi reanalysis grid point, used only as supplementary drought context.",
-  "prohibited_use": "Not a drought declaration, SPI/SPEI index, agricultural or hydrological drought model, or water-supply forecast.",
-  "artifact": {
-    "path": "models/ml/weather_drought_onset_kochi_30day/model.joblib",
-    "format": "joblib-pipeline",
-    "loader": "src.ml.inference.predict_from_context"
-  }
+  "evaluation_validity": "INVALIDATED_TARGET_CONSTRUCTION"
 }
