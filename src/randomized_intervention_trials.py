@@ -21,6 +21,9 @@ from sklearn.preprocessing import OneHotEncoder
 
 
 MIN_CONTEXT_SUPPORT_SHARE = 0.80
+# Cluster bootstrap intervals with fewer independent held-out units per arm
+# are too unstable to support a research-ranking gate.
+MIN_TEST_CLUSTERS_PER_ARM = 10
 
 
 class TrialDataError(ValueError):
@@ -287,10 +290,18 @@ def fit_randomized_contrast(
     train, test = data.loc[~is_test].copy(), data.loc[is_test].copy()
     train_counts = train.groupby(arm_col)[cluster_col].nunique().to_dict()
     test_counts = test.groupby(arm_col)[cluster_col].nunique().to_dict()
-    if any(train_counts.get(a, 0) < 5 or test_counts.get(a, 0) < 2
+    if any(train_counts.get(a, 0) < 10 or test_counts.get(a, 0) < MIN_TEST_CLUSTERS_PER_ARM
            for a in (treatment_arm, reference_arm)):
-        empty.update({"status_reason": "Cluster holdout left too few clusters in an arm.",
-                      "train_cluster_counts": train_counts, "test_cluster_counts": test_counts})
+        empty.update({
+            "status_reason": (
+                "Cluster holdout requires at least 10 training clusters and "
+                f"{MIN_TEST_CLUSTERS_PER_ARM} held-out clusters per comparison arm; "
+                "the current split does not meet that requirement."
+            ),
+            "train_cluster_counts": train_counts,
+            "test_cluster_counts": test_counts,
+            "minimum_test_clusters_per_arm": MIN_TEST_CLUSTERS_PER_ARM,
+        })
         return RandomizedContrast(treatment_arm, reference_arm, list(feature_columns),
                                   None, None, empty)
 
