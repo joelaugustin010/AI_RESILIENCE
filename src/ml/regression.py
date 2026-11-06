@@ -5,7 +5,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from src.ml.data import Dataset, build_weather_target_dataset
+from src.ml.data import Dataset, build_weather_target_dataset, build_cyclone_intensification_dataset
 from src.ml.estimators import REGRESSION_CANDIDATES, build_regressor
 from src.ml.features import assert_no_leakage, feature_frame
 from src.ml.persistence import save_model_bundle
@@ -26,8 +26,12 @@ def _regression_metrics(actual: np.ndarray, predicted: np.ndarray) -> dict[str, 
 
 def train_regression_dataset(
     dataset: Dataset, *, model_id: str, hazard: str,
-    persistence_column: str, unit: str,
+    persistence_column: str | None, unit: str,
     validation_start: str = "2015-01-01", test_start: str = "2020-01-01",
+    group_column: str | None = None, label_end_column: str | None = None,
+    baseline_constant: float | None = None,
+    target_definition: str | None = None,
+    extra_limitations: list[str] | None = None,
 ) -> dict[str, Any]:
     """Select by validation MAE and score once on a future temporal holdout."""
     frame = dataset.frame.copy()
@@ -42,6 +46,7 @@ def train_regression_dataset(
     train, validation, test, purge = temporal_split(
         frame, date_column=dataset.date_column,
         validation_start=pd.Timestamp(validation_start), test_start=pd.Timestamp(test_start),
+        group_column=group_column, label_end_column=label_end_column,
     )
     if min(len(train), len(validation), len(test)) < 100:
         raise ValueError(f"{model_id}: insufficient temporal rows (train={len(train)}, validation={len(validation)}, test={len(test)}).")
@@ -60,11 +65,13 @@ def train_regression_dataset(
     final_model.fit(features.loc[final_train.index, feature_columns], final_train["_continuous_target"].to_numpy(dtype=float))
     metrics = _regression_metrics(y_test, np.asarray(final_model.predict(X_test), dtype=float))
     baseline: dict[str, Any] = {"available": False}
-    if persistence_column in test.columns:
+    if persistence_column and persistence_column in test.columns:
         persistence = pd.to_numeric(test[persistence_column], errors="coerce").to_numpy(dtype=float)
         mask = np.isfinite(persistence) & np.isfinite(y_test)
         if mask.any():
-            baseline = {"available": True, **_regression_metrics(y_test[mask], persistence[mask])}
+            baseline = {"available": True, "type": "persistence", **_regression_metrics(y_test[mask], persistence[mask])}
+    elif baseline_constant is not None:
+        baseline = {"available": True, "type": "constant_no_change", **_regression_metrics(y_test, np.full_like(y_test, baseline_constant, dtype=float))}
     median = _regression_metrics(y_test, np.full_like(y_test, float(np.median(final_train["_continuous_target"]))))
     baseline["training_median"] = median
     reference_mae = baseline.get("mae", median["mae"])
@@ -74,7 +81,7 @@ def train_regression_dataset(
         "schema_version": 1, "engine_version": "shared-ml-engine/1.1.0",
         "model_id": model_id, "hazard": hazard, "task_type": "regression",
         "dataset_name": dataset.name, "target_column": dataset.target_column,
-        "target_definition": f"Next-day {hazard.lower()}-related {unit} at a reanalysis grid point.",
+        "target_definition": target_definition or f"Next-day {hazard.lower()}-related {unit} at a reanalysis grid point.",
         "prediction_unit": unit, "status": status, "skill_grade": status,
         "status_reason": f"MAE skill over persistence: {skill:.3f}.",
         "validation_status": VALIDATION_STATUS,
@@ -91,6 +98,7 @@ def train_regression_dataset(
             "Weather values are reanalysis grid-point data, not local station observations.",
             "A next-day weather estimate is not a flood, drought, heat-health, or impact prediction.",
             "No calibrated uncertainty interval is claimed.",
+            *(extra_limitations or []),
         ],
         "intended_use": "Supplementary continuous weather research output only.",
         "prohibited_use": "Not for public warnings, evacuation decisions, or disaster-impact prediction.",
@@ -100,15 +108,35 @@ def train_regression_dataset(
     return card
 
 
-def train_weather_regression_models() -> list[dict[str, Any]]:
-    """Train continuous next-day rainfall and temperature models from real weather records."""
+def train_continuous_regression_models() -> list[dict[str, Any]]:
+    """Train continuous weather and cyclone-intensity models from real source records."""
     specs = (
         (build_weather_target_dataset("kochi", lead_days=1, target="extreme_rainfall"), "weather_precipitation_kochi_nextday_regression", "Flood", "mm/day", "precipitation_sum"),
-        (build_weather_target_dataset("kochi", lead_days=1, target="high_temperature"), "weather_tmax_kochi_nextday_regression", "Heatwave", "degrees Celsius", "temperature_2m_max"),
+        (build_weather_target_dataset("kochi", lead_days=1, target="high_temperature"), "weather_tmax_kochi_nextday_regression", "Heatwave", "degrees Celsius", "temperature_2m_max", {}),
+        (build_cyclone_intensification_dataset(), "cyclone_wind_change_24h_regression", "Cyclone", "knots", None, {
+            "group_column": "storm_id",
+            "label_end_column": "future_time_24h",
+            "baseline_constant": 0.0,
+            "target_definition": "Change in maximum sustained wind over the next approximately 24 hours, in knots, from IBTrACS best-track sequences.",
+            "extra_limitations": [
+                "Storm groups are held out intact and future outcome windows are purged at temporal boundaries.",
+                "A best-track retrospective model is not an operational cyclone intensity forecast.",
+            ],
+        }),
     )
-    cards = [train_regression_dataset(ds, model_id=mid, hazard=hazard, unit=unit, persistence_column=baseline) for ds, mid, hazard, unit, baseline in specs]
+    cards = [
+        train_regression_dataset(
+            ds, model_id=mid, hazard=hazard, unit=unit,
+            persistence_column=baseline, **options,
+        )
+        for ds, mid, hazard, unit, baseline, options in specs
+    ]
     current = list_model_cards()
     merged = {card["model_id"]: card for card in current}
     merged.update({card["model_id"]: card for card in cards})
     register(merged.values(), extra={"validated_models": 0, "interpretation": "Regression models are supplementary continuous weather estimates; no operational model is validated."})
     return cards
+
+
+# Backwards-compatible name used by the training entry point.
+train_weather_regression_models = train_continuous_regression_models
