@@ -58,7 +58,7 @@ performs chronological train/validation/test evaluation, and writes:
 - `reports/ml_disaster_coverage.json`
 - `reports/ml_validation_report.json`
 
-The shared workflow now also fits continuous next-day Kochi rainfall and maximum-temperature regressors. They are selected on validation MAE, compared with persistence and training-median baselines, and remain blocked from inference unless they beat the persistence reference. These are weather estimates, not direct flood or heat-health predictions.
+The shared workflow now also fits continuous next-day Kochi rainfall and maximum-temperature regressors, plus a storm-grouped 24-hour cyclone wind-change regressor. They are selected on validation MAE, compared with persistence and training-median baselines, and remain blocked from inference unless they beat the persistence reference. These are continuous estimates, not direct flood or heat-health predictions; the cyclone wind-change estimate is a retrospective best-track research model, not an operational intensity forecast.
 
 Current coverage of the ten Decision Workflow hazards:
 
