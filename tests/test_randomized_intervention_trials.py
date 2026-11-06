@@ -68,3 +68,15 @@ def test_rejects_post_assignment_features():
     frame = _trial_frame()
     with pytest.raises(TrialDataError, match="leakage"):
         validate_trial_frame(frame, ["baseline_risk", "received_cash"])
+
+
+def test_rejects_incomplete_assignment_probability_vector():
+    frame = _trial_frame()
+    with pytest.raises(TrialDataError, match="sum to one"):
+        fit_randomized_contrast(
+            frame, treatment_arm="early", reference_arm="standard",
+            assignment_probabilities={"early": 1/3, "standard": 1/3},
+            feature_columns=["baseline_risk", "house_type"],
+            outcome_unit="illustrative damage-severity units",
+            min_clusters_per_arm=8,
+        )
