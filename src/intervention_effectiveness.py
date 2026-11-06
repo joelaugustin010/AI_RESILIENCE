@@ -37,6 +37,7 @@ MIN_TEST_PER_ARM = 30
 MIN_TRAIN_CLUSTERS = 10
 MIN_TEST_CLUSTERS = 10
 MIN_OVERLAP_SHARE = 0.80
+MIN_CONTEXT_SUPPORT_SHARE = 0.80
 PROPENSITY_CLIP = 0.05
 FORBIDDEN_FEATURE_TOKENS = (
     "outcome", "damage_after", "loss_after", "future", "post_",
@@ -414,7 +415,12 @@ def train_intervention_model(
     # Evaluate the learned CATE policy on untouched test episodes: apply this
     # intervention only where the predicted treatment effect is beneficial.
     cate_test = np.asarray(effect_model.predict(x_test), dtype=float)
-    policy_treat = cate_test < 0
+    test_support_mask = np.asarray([
+        _context_support_reason(row, support_profile) is None
+        for row in test[features].to_dict(orient="records")
+    ], dtype=bool)
+    test_support_share = float(test_support_mask.mean())
+    policy_treat = (cate_test < 0) & test_support_mask
     policy_effect_values = np.where(policy_treat, dr_test, 0.0)
     policy_effect = float(np.mean(policy_effect_values))
     policy_ci = _bootstrap_mean_ci(
@@ -428,6 +434,7 @@ def train_intervention_model(
         and policy_effect < 0
         and policy_ci[1] < 0
         and test_overlap >= MIN_OVERLAP_SHARE
+        and test_support_share >= MIN_CONTEXT_SUPPORT_SHARE
     )
     if not eligible:
         status = "NO_CLEAR_HARM_REDUCTION_SIGNAL"
@@ -443,6 +450,7 @@ def train_intervention_model(
             "heldout_dr_mean_effect": mean_effect,
             "heldout_dr_effect_95ci": ci,
             "heldout_overlap_share": test_overlap,
+            "heldout_context_support_share": test_support_share,
             "training_overlap_share": overlap_share,
             "heldout_cate_policy_damage_effect": policy_effect,
             "heldout_cate_policy_damage_effect_95ci": policy_ci,
@@ -453,7 +461,7 @@ def train_intervention_model(
         },
         "eligible_for_ranking": eligible,
         "context_support_profile": support_profile,
-        "context_support_policy": "Reject any inference feature outside the observed training range or unseen categorical levels.",
+        "context_support_policy": "Reject any inference feature outside the observed training range or unseen categorical levels; held-out policy evaluation requires at least 80% support coverage.",
         "ranking_note": "Eligible actions may be ranked by context-specific estimated damage reduction only against actions trained on the same hazard, outcome scale and target population.",
     }
     return InterventionModel(action_id, hazard, features, preprocessor, effect_model, status, card, support_profile)
