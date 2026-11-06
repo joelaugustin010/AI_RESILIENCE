@@ -58,8 +58,8 @@ INTERPRETATION: dict[str, str] = {
         "It does not predict track, landfall, surge, or local wind."
     ),
     "Earthquake": (
-        "Shared ML screens whether a mainshock is followed by a nearby M4+ event. "
-        "It does not predict earthquakes, mainshock timing, or shaking."
+        "The previous aftershock model is invalidated because its seven-day outcome windows could cross temporal split boundaries. "
+        "It does not predict mainshocks; no usable output is available until embargo retraining."
     ),
     "Landslide": (
         "No defensible supervised landslide model is released: the inventory is a "
