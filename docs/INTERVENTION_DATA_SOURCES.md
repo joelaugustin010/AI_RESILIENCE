@@ -23,9 +23,10 @@ For each stable action ID and hazard, collect comparable site-time episodes with
 - pre-intervention hazard intensity, forecast lead time, exposure, vulnerability,
   asset type, socioeconomic context and baseline condition;
 - measured post-event damage outcomes with units, spatial scope and outcome window;
-- site and event identifiers to handle repeated observations and clustered
-  uncertainty. For cluster-randomized studies, `site_id` must be the assignment
-  cluster (for example, panchayat), not merely an individual household;
+- unique observation IDs (for example, household-season) plus site/cluster and
+  event identifiers to handle repeated observations and clustered uncertainty.
+  For cluster-randomized studies, `site_id` must be the assignment cluster
+  (for example, panchayat), while `episode_id` identifies each household-season;
 - source ownership, collection methods, definitions, missingness and known bias.
 
 Where an intervention is deployed only at the highest-risk sites, simple
