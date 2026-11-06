@@ -13,16 +13,8 @@ st.set_page_config(
     layout="wide",
 )
 
-# Home is deliberately first: the application opens on the Kerala experience
-# rather than dropping a first-time visitor into a technical workflow.
+# Open directly on the main Kerala dashboard.
 pages = {
-    "Start": [
-        st.Page(
-            "app_pages/welcome.py",
-            title="Welcome",
-            icon=":material/shield:",
-        ),
-    ],
     "Home": [
         st.Page(
             "app_pages/home.py",
