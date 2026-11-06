@@ -351,9 +351,18 @@ if submitted:
             hazards,
             {
                 "evidence_type": evidence_type,
-                "rainfall_mm": rainfall_mm,
-                "river_level_m": river_level_m,
+                "input_classification": evidence_type,
+                "rainfall_mm": float(rainfall_mm) if str(rainfall_mm).strip() else None,
+                "rainfall_period": rainfall_period,
+                "river_level_m": float(river_level_m) if str(river_level_m).strip() else None,
+                "cyclone_distance_km": float(cyclone_distance_km) if str(cyclone_distance_km).strip() else None,
+                "cyclone_wind_knots": float(cyclone_wind_knots) if str(cyclone_wind_knots).strip() else None,
+                "drainage_status": drainage_status,
+                "infrastructure_status": infrastructure_status,
                 "services": services,
+                "observation_time": observation_time,
+                "forecast_issue_time": forecast_issue_time,
+                "forecast_valid_time": forecast_valid_time,
             },
         )
         available_rankings = [
