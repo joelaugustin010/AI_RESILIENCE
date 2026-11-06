@@ -34,6 +34,8 @@ REQUIRED_COLUMNS = {
 MIN_TOTAL_ROWS = 200
 MIN_PER_ARM = 50
 MIN_TEST_PER_ARM = 30
+MIN_TRAIN_CLUSTERS = 10
+MIN_TEST_CLUSTERS = 10
 MIN_OVERLAP_SHARE = 0.80
 PROPENSITY_CLIP = 0.05
 FORBIDDEN_FEATURE_TOKENS = (
@@ -248,8 +250,10 @@ def train_intervention_model(
         "purged_outcome_window_rows": purged_rows,
         "train_treated": int((train["implemented"] == 1).sum()),
         "train_control": int((train["implemented"] == 0).sum()),
+        "train_clusters": int(train["site_id"].nunique()),
         "test_treated": int((test["implemented"] == 1).sum()),
         "test_control": int((test["implemented"] == 0).sum()),
+        "test_clusters": int(test["site_id"].nunique()),
     }
     base_card = {
         "schema_version": SCHEMA_VERSION, "action_id": action_id, "hazard": hazard,
@@ -276,10 +280,25 @@ def train_intervention_model(
         card = {**base_card, "status": status, "status_reason": reason, "eligible_for_ranking": False}
         return InterventionModel(action_id, hazard, features, None, None, status, card)
 
-    if len(train) < MIN_TOTAL_ROWS or counts["train_treated"] < MIN_PER_ARM or counts["train_control"] < MIN_PER_ARM:
-        return blocked(f"Training requires at least {MIN_TOTAL_ROWS} episodes and {MIN_PER_ARM} in each arm; observed {counts}.")
-    if counts["test_treated"] < MIN_TEST_PER_ARM or counts["test_control"] < MIN_TEST_PER_ARM:
-        return blocked(f"Chronological test requires at least {MIN_TEST_PER_ARM} treated and control episodes; observed {counts}.")
+    if (
+        len(train) < MIN_TOTAL_ROWS
+        or counts["train_treated"] < MIN_PER_ARM
+        or counts["train_control"] < MIN_PER_ARM
+        or counts["train_clusters"] < MIN_TRAIN_CLUSTERS
+    ):
+        return blocked(
+            f"Training requires at least {MIN_TOTAL_ROWS} episodes, {MIN_PER_ARM} in each arm "
+            f"and {MIN_TRAIN_CLUSTERS} independent clusters; observed {counts}."
+        )
+    if (
+        counts["test_treated"] < MIN_TEST_PER_ARM
+        or counts["test_control"] < MIN_TEST_PER_ARM
+        or counts["test_clusters"] < MIN_TEST_CLUSTERS
+    ):
+        return blocked(
+            f"Chronological test requires at least {MIN_TEST_PER_ARM} treated/control episodes "
+            f"and {MIN_TEST_CLUSTERS} independent clusters; observed {counts}."
+        )
 
     preprocessor = _feature_preprocessor(train, features)
     x_train = preprocessor.fit_transform(train[features])
