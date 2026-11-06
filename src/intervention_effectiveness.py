@@ -383,32 +383,63 @@ def train_intervention_model(
     return InterventionModel(action_id, hazard, features, preprocessor, effect_model, status, card)
 
 
+def _intervention_comparison_signature(model: InterventionModel) -> tuple[Any, ...] | None:
+    """Return a strict same-study comparability key; None means not comparable."""
+    card = model.card
+    provenance = card.get("data_provenance")
+    if not isinstance(provenance, dict):
+        return None
+    required = (
+        provenance.get("source_title"),
+        provenance.get("source_owner"),
+        provenance.get("collection_period"),
+        provenance.get("outcome_definition"),
+        provenance.get("geographic_scope"),
+        card.get("hazard"),
+        card.get("outcome_unit"),
+        card.get("test_start"),
+        tuple(card.get("feature_columns", [])),
+    )
+    if any(value is None or value == "" or value == () for value in required):
+        return None
+    return (
+        provenance.get("source_title"),
+        provenance.get("source_owner"),
+        provenance.get("collection_period"),
+        provenance.get("outcome_definition"),
+        provenance.get("geographic_scope"),
+        card.get("hazard"),
+        card.get("outcome_unit"),
+        card.get("test_start"),
+        tuple(card.get("feature_columns", [])),
+    )
+
+
 def rank_interventions(
     models: Iterable[InterventionModel], context: dict[str, Any], *,
     max_actions: int = 5,
 ) -> dict[str, Any]:
-    """Rank only research-eligible interventions; never fabricate fallback scores."""
+    """Rank only eligible interventions with verified same-study comparability."""
     model_list = list(models)
-    signatures = set()
-    for model in model_list:
-        if not model.card.get("eligible_for_ranking"):
-            continue
-        provenance = model.card.get("data_provenance", {})
-        signatures.add((
-            model.card.get("hazard"),
-            model.card.get("outcome_unit"),
-            tuple(model.card.get("feature_columns", [])),
-            model.card.get("test_start"),
-            provenance.get("geographic_scope"),
-            provenance.get("collection_period"),
-            provenance.get("source_title"),
-        ))
-    if len(signatures) > 1:
+    eligible_models = [model for model in model_list if model.card.get("eligible_for_ranking")]
+    signatures = [_intervention_comparison_signature(model) for model in eligible_models]
+    if eligible_models and (
+        any(signature is None for signature in signatures)
+        or len(set(signatures)) != 1
+    ):
         return {
             "status": "RANKING_WITHHELD",
             "ranked_actions": [],
-            "excluded_actions": [],
-            "reason": "Candidate models do not share the same hazard, outcome unit, covariate contract and test period; their effects are not directly comparable.",
+            "excluded_actions": [
+                {"action_id": model.action_id, "status": "COMPARABILITY_NOT_ESTABLISHED"}
+                for model in eligible_models
+            ],
+            "reason": (
+                "Candidate effects lack complete matching provenance or do not share "
+                "the same study, population, outcome definition, hazard, covariate "
+                "contract and held-out period. Cross-study point estimates are not "
+                "a valid precaution ranking."
+            ),
         }
     estimates = []
     excluded = []
@@ -438,7 +469,7 @@ def rank_interventions(
             "status": "RANKING_WITHHELD",
             "ranked_actions": [],
             "excluded_actions": excluded,
-            "reason": "No action has sufficient held-out observational evidence to support a comparative ranking.",
+            "reason": "No action has sufficient held-out evidence and complete provenance for a comparative ranking.",
         }
     estimates.sort(key=lambda item: item["estimated_damage_reduction"], reverse=True)
     return {
@@ -448,11 +479,14 @@ def rank_interventions(
         ),
         "ranked_actions": estimates[:max_actions],
         "excluded_actions": excluded,
+        "comparison_basis": "Context-specific point estimates from eligible models trained and tested on the same documented study and outcome scale.",
         "warning": (
-            "This is a provisional observational ranking, not a causal guarantee or an instruction. "
-            + ("Some candidate actions were excluded, so this is not a complete comparison. " if excluded else "")
-            + "Unmeasured confounding and site-specific engineering constraints may reverse the ranking. "
+            "This is a provisional research ordering, not proof that the first action is best. "
+            "Point-estimate ordering does not establish statistically significant differences "
+            "between actions. Unmeasured confounding, model uncertainty, costs, feasibility, "
+            "intervention quality and site-specific engineering constraints may change the decision. "
             "Official authorities and qualified professionals retain decision authority."
+            + (" Some candidate actions were excluded, so this is not a complete comparison." if excluded else "")
         ),
     }
 
