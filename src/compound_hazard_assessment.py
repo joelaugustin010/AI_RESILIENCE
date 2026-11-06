@@ -112,6 +112,7 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
         raise ValueError("Scenario end date must be on or after the start date.")
 
     compound = len(hazards) > 1 or any(HAZARD_REGISTRY[name].kind == "compound" for name in hazards)
+    components = {component for name in hazards for component in HAZARD_REGISTRY[name].components}
     pathways = []
     for hazard in sorted(hazards):
         definition = HAZARD_REGISTRY[hazard]
@@ -167,27 +168,27 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
     for service in services:
         info = SERVICE_PATHWAYS[service]
         points = []
-        if "Flood" in hazards:
+        if "Flood" in components:
             points.append(info["flood"])
-        if "Cyclone" in hazards:
+        if "Cyclone" in components:
             points.append(info["cyclone"])
         for selected in sorted(hazards.difference({"Flood", "Cyclone"})):
             definition = HAZARD_REGISTRY[selected]
             points.append(selected + ": " + definition.summary + " Evidence needed: " + "; ".join(definition.evidence_factors) + ".")
-        if compound and {"Flood", "Cyclone"}.issubset(hazards):
+        if compound and {"Flood", "Cyclone"}.issubset(components):
             points.append(info["compound"])
         reviews.append({"service": service, "review_points": points})
 
-    if "Flood" in hazards:
+    if "Flood" in components:
         if rainfall is None: gaps.append("Time-stamped rainfall observation and measurement interval")
         if river is None: gaps.append("Time-stamped river-level observation, gauge ID and datum")
         gaps.extend(["Verified catchment connectivity, drainage/outfall and local elevation evidence",
                      "Independent, location-specific flood outcome or inundation evidence"])
-    if "Cyclone" in hazards:
+    if "Cyclone" in components:
         if cyclone_distance is None: gaps.append("Cyclone track position and time relative to the study area")
         if cyclone_wind is None: gaps.append("Source-defined cyclone intensity/wind observation and timestamp")
         gaps.append("Forecast issue time, valid time, wind/rainfall fields and coastal-water evidence")
-    if compound and {"Flood", "Cyclone"}.issubset(hazards):
+    if compound and {"Flood", "Cyclone"}.issubset(components):
         gaps.append("Aligned cyclone, rainfall, river, tide and flood-impact timelines for the same event")
     if custom_disaster:
         gaps.append("Domain-specific authoritative definition, verified event labels, exposure data and independent validation for the custom disaster")
