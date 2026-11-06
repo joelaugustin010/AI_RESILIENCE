@@ -20,6 +20,7 @@ PROVENANCE_FIELDS = (
     "source_title", "source_owner", "source_url_or_archive_id",
     "collection_period", "outcome_definition", "treatment_definition",
     "geographic_scope", "known_biases", "permission_or_access_basis",
+    "pre_treatment_features",
 )
 
 
@@ -41,10 +42,12 @@ def main() -> int:
         raise SystemExit(f"BLOCKED: provenance sidecar is missing {missing}.")
     if provenance.get("synthetic") is True:
         raise SystemExit("BLOCKED: synthetic data cannot train or validate intervention-effect models.")
+    if not isinstance(provenance.get("pre_treatment_features"), list) or not provenance["pre_treatment_features"]:
+        raise SystemExit("BLOCKED: provenance must explicitly enumerate pre_treatment_features.")
 
     frame = pd.read_csv(data_path)
     from src.intervention_effectiveness import validate_intervention_frame
-    validate_intervention_frame(frame)
+    validate_intervention_frame(frame, feature_columns=provenance["pre_treatment_features"])
     cards, trained = [], []
     output_dir = Path(args.artifacts)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -53,7 +56,9 @@ def main() -> int:
     ):
         try:
             model = train_intervention_model(
-                frame, action_id=action_id, hazard=hazard, test_start=args.test_start,
+                frame, action_id=action_id, hazard=hazard,
+                feature_columns=provenance["pre_treatment_features"],
+                test_start=args.test_start,
                 outcome_unit=str(provenance.get("outcome_unit", "normalised damage-severity units")),
             )
             card = {**model.card, "data_provenance": provenance}
