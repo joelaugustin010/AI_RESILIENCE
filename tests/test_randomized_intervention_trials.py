@@ -72,7 +72,7 @@ def test_rejects_post_assignment_features():
 
 def test_rejects_incomplete_assignment_probability_vector():
     frame = _trial_frame()
-    with pytest.raises(TrialDataError, match="sum to one"):
+    with pytest.raises(TrialDataError, match="every observed randomized arm"):
         fit_randomized_contrast(
             frame, treatment_arm="early", reference_arm="standard",
             assignment_probabilities={"early": 1/3, "standard": 1/3},
@@ -80,3 +80,48 @@ def test_rejects_incomplete_assignment_probability_vector():
             outcome_unit="illustrative damage-severity units",
             min_clusters_per_arm=8,
         )
+
+
+
+def test_rejects_negative_probability_for_an_unselected_arm():
+    frame = _trial_frame()
+    with pytest.raises(TrialDataError, match="finite probability"):
+        fit_randomized_contrast(
+            frame, treatment_arm="early", reference_arm="standard",
+            assignment_probabilities={"early": 0.6, "rapid": -0.2, "standard": 0.6},
+            feature_columns=["baseline_risk", "house_type"],
+            outcome_unit="illustrative damage-severity units",
+            min_clusters_per_arm=8,
+        )
+
+
+def test_rejects_probability_map_with_unobserved_or_missing_arm():
+    frame = _trial_frame()
+    with pytest.raises(TrialDataError, match="every observed randomized arm"):
+        fit_randomized_contrast(
+            frame, treatment_arm="early", reference_arm="standard",
+            assignment_probabilities={"early": 0.5, "standard": 0.5, "invented": 0.0},
+            feature_columns=["baseline_risk", "house_type"],
+            outcome_unit="illustrative damage-severity units",
+            min_clusters_per_arm=8,
+        )
+
+
+@pytest.mark.parametrize("test_fraction", [0, -0.1, 0.75, float("nan")])
+def test_rejects_invalid_cluster_holdout_fraction(test_fraction):
+    frame = _trial_frame()
+    with pytest.raises(TrialDataError, match="test_fraction"):
+        fit_randomized_contrast(
+            frame, treatment_arm="early", reference_arm="standard",
+            assignment_probabilities={"early": 1/3, "rapid": 1/3, "standard": 1/3},
+            feature_columns=["baseline_risk", "house_type"],
+            outcome_unit="illustrative damage-severity units",
+            min_clusters_per_arm=8, test_fraction=test_fraction,
+        )
+
+
+def test_rejects_blank_assignment_cluster_or_arm():
+    frame = _trial_frame()
+    frame.loc[0, "assignment_cluster_id"] = " "
+    with pytest.raises(TrialDataError, match="non-empty"):
+        validate_trial_frame(frame, ["baseline_risk", "house_type"])
