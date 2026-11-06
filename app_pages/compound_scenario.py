@@ -304,10 +304,11 @@ if submitted:
         )
         display_dataframe(
             pd.DataFrame(preventive_actions)[
-                ["phase", "hazard", "action", "trigger", "benefit", "owner", "evidence", "caution"]
+                ["action_id", "phase", "hazard", "action", "trigger", "benefit", "owner", "evidence", "caution"]
             ].rename(
                 columns={
-                    "phase": "When",
+                    "action_id": "Action ID",
+                "phase": "When",
                     "hazard": "Hazard",
                     "action": "Recommended precaution",
                     "trigger": "When it applies",
