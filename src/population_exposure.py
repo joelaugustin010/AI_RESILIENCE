@@ -166,6 +166,8 @@ def estimate_population_exposure(
         "estimated_population_fractional": round(exposed_population, 2),
         "hazard_footprint_area_covered_percent": round(coverage_percent, 3),
         "population_grid_covers_full_footprint": complete_coverage,
+        "hazard_footprint_area_km2": round(hazard_area / 1_000_000, 3),
+        "population_grid_covered_area_km2": round(covered_hazard_area / 1_000_000, 3),
         "footprint_bounds_wgs84": [
             min(item[0] for item in footprint_bounds),
             min(item[1] for item in footprint_bounds),
