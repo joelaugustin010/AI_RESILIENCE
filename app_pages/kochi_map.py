@@ -853,6 +853,24 @@ if processed_layers:
         "OSM layers remain provisional community-mapped context and are not used for exposure or causal analysis."
     )
 
+    checked_feature_count = sum(
+        int(item["report"].get("feature_count", 0)) for item in processed_layers
+    )
+    represented_roles = sorted({
+        str(item["metadata"].get("layer_role", "unclassified"))
+        for item in processed_layers
+    })
+    with st.container(border=True):
+        st.markdown("**Spatial data at a glance**")
+        overview_cols = st.columns(3)
+        overview_cols[0].metric("Processed layers", f"{len(processed_layers)}")
+        overview_cols[1].metric("Geometry-checked features", f"{checked_feature_count:,}")
+        overview_cols[2].metric("Layer roles represented", f"{len(represented_roles)}")
+        st.caption(
+            "These are file-level QA counts only. They do not measure completeness, positional accuracy, "
+            "current conditions, hazard severity, or verified infrastructure coverage."
+        )
+
 section_intro(
     "Map controls",
     "Map layers",
@@ -860,6 +878,14 @@ section_intro(
 )
 show_boundary = st.checkbox("Kochi Corporation administrative boundary", value=True)
 st.caption("Blue outline = administrative boundary only. It must not be interpreted as a hazard zone or as the full Greater Kochi urban area.")
+basemap_theme = st.radio(
+    "Basemap appearance",
+    options=["Light · Eco", "Dark"],
+    horizontal=True,
+    index=0,
+    key="kochi_basemap_theme",
+    help="Choose a basemap that keeps the selected evidence layers readable.",
+)
 deck_layers = []
 legend_rows = []
 active_components = components_for(active_hazard) if active_hazard else []
@@ -1235,7 +1261,7 @@ if deck_layers:
     deck = pdk.Deck(
         layers=deck_layers,
         initial_view_state=pdk.ViewState(longitude=map_center[0], latitude=map_center[1], zoom=10),
-        map_style=pdk.map_styles.CARTO_DARK,
+        map_style=(pdk.map_styles.CARTO_LIGHT if basemap_theme == "Light · Eco" else pdk.map_styles.CARTO_DARK),
         tooltip={"text": "Bound Name: {display_bound}\nWard Name: {display_ward}\nFeature ID: {display_feature_id}\nFeature: {display_name}\nType: {display_type}\nSource: {display_source}\nOSM updated: {display_timestamp}\nSource URL: {display_url}"},
     )
     map_selection = st.pydeck_chart(
