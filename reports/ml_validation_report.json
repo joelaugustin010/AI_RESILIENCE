@@ -2182,10 +2182,10 @@
     {
       "model_id": "earthquake_aftershock_occurrence",
       "hazard": "Earthquake",
-      "status": "RESEARCH_SIGNAL_NOT_VALIDATED",
-      "skill_grade": "RESEARCH_SIGNAL_NOT_VALIDATED",
-      "status_reason": "ROC-AUC 0.871 and average precision 0.912 beat the no-skill prevalence 0.596 on one temporal holdout. Calibration error is 0.109; probabilities are not suitable for decision thresholds without recalibration.",
-      "evidence_tier": "screening",
+      "status": "NO_SKILL",
+      "skill_grade": "NO_SKILL",
+      "status_reason": "INVALIDATED: the original seven-day aftershock outcome window could cross a temporal validation/test boundary because the split used only the mainshock timestamp. Previous holdout metrics are superseded. No inference is permitted until the label-window embargo and recent-seismicity baseline are retrained and reevaluated.",
+      "evidence_tier": "invalidated",
       "selected_model_type": "gradient_boosting",
       "target_definition": "target_aftershock_m4_7d_50km >= 0.5",
       "threshold_source": "fixed binary label",
@@ -2203,7 +2203,20 @@
       "train_events": 1180,
       "test_rows": 156,
       "test_events": 93,
-      "metrics": {
+      "metrics": {},
+      "limitations": [
+        "The USGS catalogue is regionally clipped and capped at 20,000 events.",
+        "Aftershock labelling depends on catalogue completeness and the chosen distance/time windows.",
+        "Aftershock sequence screening, not earthquake occurrence prediction.",
+        "The catalogue is regionally clipped and capped at 20,000 events.",
+        "Features use only prior events; the label uses future events.",
+        "A single chronological holdout is preliminary evidence, not independent validation.",
+        "No calibration, geographic transferability, drift or operational-readiness claim is made.",
+        "Skill grade is RESEARCH_SIGNAL_NOT_VALIDATED: ROC-AUC 0.871 and average precision 0.912 beat the no-skill prevalence 0.596 on one temporal holdout. Calibration error is 0.109; probabilities are not suitable for decision thresholds without recalibration.",
+        "The model card records the exact threshold, features and split; changing any of them requires retraining and re-evaluation.",
+        "The prior temporal split did not embargo the full seven-day future label window; previous metrics are invalidated pending retraining."
+      ],
+      "superseded_metrics": {
         "n_test": 156,
         "n_test_events": 93,
         "test_prevalence": 0.5961538461538461,
@@ -2709,17 +2722,7 @@
         ],
         "persistence_baseline": null
       },
-      "limitations": [
-        "The USGS catalogue is regionally clipped and capped at 20,000 events.",
-        "Aftershock labelling depends on catalogue completeness and the chosen distance/time windows.",
-        "Aftershock sequence screening, not earthquake occurrence prediction.",
-        "The catalogue is regionally clipped and capped at 20,000 events.",
-        "Features use only prior events; the label uses future events.",
-        "A single chronological holdout is preliminary evidence, not independent validation.",
-        "No calibration, geographic transferability, drift or operational-readiness claim is made.",
-        "Skill grade is RESEARCH_SIGNAL_NOT_VALIDATED: ROC-AUC 0.871 and average precision 0.912 beat the no-skill prevalence 0.596 on one temporal holdout. Calibration error is 0.109; probabilities are not suitable for decision thresholds without recalibration.",
-        "The model card records the exact threshold, features and split; changing any of them requires retraining and re-evaluation."
-      ]
+      "evaluation_validity": "INVALIDATED_LABEL_WINDOW_SPLIT"
     },
     {
       "model_id": "compound_cyclone_rainfall_interaction",
