@@ -60,9 +60,8 @@ performs chronological train/validation/test evaluation, and writes:
 
 Current coverage of the ten Decision Workflow hazards:
 
-- **Research screening models:** Cyclone (24-hour rapid intensification), Earthquake
-  (aftershock occurrence after an observed mainshock), and Heatwave. None is independently validated.
-- **Invalidated model:** Drought. Its previous 30-day target overlapped historical rainfall features; old metrics and inference are blocked until corrected future-only retraining.
+- **Research screening models:** Cyclone (24-hour rapid intensification) and Heatwave. Neither is independently validated.
+- **Invalidated models:** Drought (the old 30-day target overlapped historical rainfall features) and Earthquake aftershock (the old seven-day outcome windows crossed temporal split boundaries). Their old metrics and inference are blocked pending corrected retraining.
 - **Forcing evidence only:** Flood and Compound rainfall + drainage failure
   (extreme-rainfall screening; no flood, depth, or impact prediction).
 - **Exploratory association:** Compound cyclone + flood (concurrent
