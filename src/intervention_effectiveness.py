@@ -28,8 +28,8 @@ from sklearn.model_selection import GroupKFold
 
 SCHEMA_VERSION = "intervention-effectiveness/0.1.0"
 REQUIRED_COLUMNS = {
-    "episode_date", "outcome_window_end", "site_id", "hazard", "action_id",
-    "implemented", "damage_outcome",
+    "episode_id", "episode_date", "outcome_window_end", "site_id",
+    "hazard", "action_id", "implemented", "damage_outcome",
 }
 MIN_TOTAL_ROWS = 200
 MIN_PER_ARM = 50
@@ -188,14 +188,14 @@ def validate_intervention_frame(
         raise InterventionDataError("outcome_window_end must contain valid dates.")
     if (outcome_ends < episode_dates).any():
         raise InterventionDataError("outcome_window_end cannot precede episode_date.")
-    for column in ("site_id", "action_id", "hazard"):
+    for column in ("episode_id", "site_id", "action_id", "hazard"):
         if frame[column].isna().any() or frame[column].astype(str).str.strip().eq("").any():
             raise InterventionDataError(f"{column} cannot be blank.")
     treatment_numeric = pd.to_numeric(frame["implemented"], errors="coerce")
     if treatment_numeric.isna().any() or not set(treatment_numeric.unique()).issubset({0, 1}):
         raise InterventionDataError("implemented must contain only binary numeric 0/1 values.")
-    if frame.duplicated(["episode_date", "site_id", "hazard", "action_id"]).any():
-        raise InterventionDataError("Duplicate site-date-hazard-action episodes are not allowed.")
+    if frame.duplicated(["episode_id", "hazard", "action_id"]).any():
+        raise InterventionDataError("Duplicate episode-hazard-action records are not allowed.")
     numeric_outcome = pd.to_numeric(frame["damage_outcome"], errors="coerce")
     if numeric_outcome.isna().any() or not np.isfinite(numeric_outcome.to_numpy(dtype=float)).all():
         raise InterventionDataError("damage_outcome must be finite, numeric and complete.")
