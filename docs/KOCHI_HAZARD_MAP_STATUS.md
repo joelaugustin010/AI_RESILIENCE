@@ -22,8 +22,8 @@ Reviewed: 2026-11-06
 | Cyclone | KSDMA coastal-hazard reference | Coastal erosion/surge/tsunami reference is not a cyclone track, wind field or event-specific surge footprint. |
 | Compound cyclone + flood | Flood-component reference and JRC preview | No validated cyclone track/wind/surge overlay; this is not a compound footprint. |
 | Compound heavy rainfall + drainage failure | Flood-component reference and JRC preview | No validated municipal drainage inventory or drainage-capacity footprint. |
-| Heatwave | No suitable local hazard map registered | Do not substitute land cover for heat exposure. |
-| Infrastructure failure | No suitable local service-outage footprint registered | Community-mapped roads/bridges are context only, not outage observations. |
+| Heatwave | KSDMA/C-DIT portal index lists a state-level Heat map; Ernakulam multi-hazard PDF is also linked | Neither has been validated as a local temperature/exposure GIS layer. Do not substitute land cover for heat exposure. |
+| Infrastructure failure | Ernakulam multi-hazard PDF reference; no hazard-specific local outage layer | Community-mapped roads/bridges are context only, not outage observations. |
 
 ## Official KSDMA references
 
@@ -36,6 +36,9 @@ Reviewed: 2026-11-06
 - [KSDMA earthquake/tremor map (2000–2016 reference)](https://sdma.kerala.gov.in/wp-content/uploads/2018/10/Map-Earthquake-incidents.jpg)
 - [KSDMA coastal-hazard susceptibility map](https://sdma.kerala.gov.in/wp-content/uploads/2018/10/Map-Coastal-Hazard-Susceptibility.jpg)
 - [KSDMA major industrial accident hazard map](https://sdma.kerala.gov.in/wp-content/uploads/2018/10/Map-Major-Industrial-Accident-Hazard-Zones.jpg)
+
+- [Kerala Fire and Rescue Services — Ernakulam multi-hazard map (PDF)](https://fire.kerala.gov.in/wp-content/uploads/2021/11/7_Multi_hazard_Map_of_Ernakulam.pdf) — district-level reference only, not a georeferenced Kochi GIS layer.
+- [KSDMA/C-DIT disaster portal](https://sdma.cditproject.org/) — portal index includes a Heat map; the map itself has not been independently validated or ingested as a local GIS layer.
 
 ## Why the prone-area overlay is not yet complete
 
