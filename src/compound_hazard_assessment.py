@@ -192,11 +192,14 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
         gaps.extend(["Verified catchment connectivity, drainage/outfall and local elevation evidence",
                      "Independent, location-specific flood outcome or inundation evidence"])
     if "Infrastructure failure" in components:
-        if not str(inputs.get("infrastructure_status") or "").strip():
-            gaps.append("Verified infrastructure condition, affected asset ID, operator and outage/recovery evidence")
-    if str(inputs.get("drainage_status") or "").strip() in {
-        "Reported partially impaired", "Reported failed", "Hypothetical partial failure"
-    }:
+        supplied_status = str(inputs.get("infrastructure_status") or "").strip()
+        gaps.append(
+            "Independently verify infrastructure condition"
+            + (f" (user-supplied status: {supplied_status})" if supplied_status and supplied_status.casefold() != "not supplied" else "")
+            + ", affected asset ID, operator and outage/recovery evidence"
+        )
+    drainage_status = str(inputs.get("drainage_status") or "").strip()
+    if drainage_status and drainage_status.casefold() != "not supplied":
         gaps.append("Geotagged drainage inspection, asset identifier, operator confirmation and repair status")
     if "Cyclone" in components:
         if cyclone_distance is None: gaps.append("Cyclone track position and time relative to the study area")
