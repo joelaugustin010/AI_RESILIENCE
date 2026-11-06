@@ -191,7 +191,7 @@ def test_comparable_point_estimates_do_not_claim_pairwise_superiority():
 
 
 
-def test_ranking_withholds_when_treatment_definitions_differ_within_same_study():
+def test_distinct_treatment_definitions_can_be_compared_within_same_study():
     class EligibleStub:
         def __init__(self, action_id, treatment_definition, reduction):
             self.action_id = action_id
@@ -228,6 +228,8 @@ def test_ranking_withholds_when_treatment_definitions_differ_within_same_study()
         ],
         {"rainfall_before": 100},
     )
-    assert result["status"] == "RANKING_WITHHELD"
-    assert result["ranked_actions"] == []
-    assert "same study" in result["reason"]
+    assert result["status"] == "RESEARCH_RANKING_NOT_VALIDATED"
+    assert [item["action_id"] for item in result["ranked_actions"]] == [
+        "drain_maintenance", "household_barrier"
+    ]
+    assert result["top_action_is_proven_best"] is False
