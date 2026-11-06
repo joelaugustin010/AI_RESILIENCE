@@ -422,9 +422,19 @@ def intervention_effectiveness_for_hazards(
     registry_path: str = "reports/intervention_effectiveness_registry.json",
 ) -> dict[str, Any]:
     """Return independent, hazard-specific intervention rankings for a scenario."""
+    from src.hazard_registry import components_for
+
     models = load_intervention_models(registry_path)
+    expanded_hazards: list[str] = []
+    for selected_hazard in hazards:
+        label = str(selected_hazard)
+        for component in components_for(label):
+            if component not in expanded_hazards:
+                expanded_hazards.append(component)
+        if label not in expanded_hazards:
+            expanded_hazards.append(label)
     results = {}
-    for hazard in dict.fromkeys(str(item) for item in hazards):
+    for hazard in expanded_hazards:
         selected = [model for model in models if model.hazard == hazard]
         results[hazard] = (
             rank_interventions(selected, context)
