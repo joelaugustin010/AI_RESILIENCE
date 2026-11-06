@@ -85,13 +85,16 @@ def inspect_archive(archive_path: Path) -> dict[str, Any]:
         for shp_name in shapefiles:
             shp_path = PurePosixPath(shp_name)
             stem = str(shp_path.with_suffix("")).casefold()
-            members_by_stem = {
-                str(PurePosixPath(name).with_suffix("")).casefold(): name
+            members_by_stem_and_suffix = {
+                (
+                    str(PurePosixPath(name).with_suffix("")).casefold(),
+                    PurePosixPath(name).suffix.casefold(),
+                ): name
                 for name in names
             }
             sidecars = {}
             for suffix in (".shp", ".shx", ".dbf", ".prj", ".cpg"):
-                sidecars[suffix[1:]] = members_by_stem.get(stem + suffix)
+                sidecars[suffix[1:]] = members_by_stem_and_suffix.get((stem, suffix))
             missing_required = [
                 suffix for suffix in ("shp", "shx", "dbf", "prj")
                 if not sidecars[suffix]
