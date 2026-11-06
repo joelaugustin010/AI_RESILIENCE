@@ -144,10 +144,33 @@ _KSDMA_HAZARD_REFERENCES: dict[str, list[dict[str, str]]] = {
 
 
 def hazard_map_references(active_hazard: str | None) -> list[dict[str, str]]:
-    """Return official KSDMA map references without promoting PDFs to GIS layers."""
+    """Return official reference products without promoting PDFs/portals to GIS layers."""
     if not active_hazard or not is_workflow_hazard(active_hazard):
         return []
-    return [dict(item) for item in _KSDMA_HAZARD_REFERENCES.get(active_hazard, [])]
+
+    references = [dict(item) for item in _KSDMA_HAZARD_REFERENCES.get(active_hazard, [])]
+    references.append(
+        {
+            "title": "Kerala Fire and Rescue Services — Ernakulam multi-hazard map (PDF)",
+            "url": "https://fire.kerala.gov.in/wp-content/uploads/2021/11/7_Multi_hazard_Map_of_Ernakulam.pdf",
+            "scope": (
+                "Official district-level multi-hazard reference. PDF only: not a georeferenced "
+                "Kochi GIS overlay, current event forecast, or ward-level exposure layer."
+            ),
+        }
+    )
+    if active_hazard == "Heatwave":
+        references.append(
+            {
+                "title": "KSDMA / C-DIT disaster portal — hazard map index (includes Heat)",
+                "url": "https://sdma.cditproject.org/",
+                "scope": (
+                    "State-level portal reference only. The heat map is not independently "
+                    "validated here and is not a local temperature/exposure GIS layer."
+                ),
+            }
+        )
+    return references
 
 
 def hazard_layer_availability(active_hazard: str | None = None) -> list[dict[str, Any]]:
