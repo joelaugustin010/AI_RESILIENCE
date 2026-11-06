@@ -1,0 +1,74 @@
+# Intervention-effectiveness ML
+
+The preventive-action catalogue is not itself an intervention-effect model.
+This module adds a separate observational causal-ML research pipeline.
+
+## Estimand
+
+For one hazard and one named intervention, estimate the conditional average
+treatment effect (CATE) on a numeric damage-severity outcome:
+
+- treatment = the named intervention was implemented in that site-time episode;
+- control = the intervention was not implemented;
+- outcome = comparable damage severity measured after the episode, with lower
+  values representing less damage;
+- covariates = conditions measured before the intervention decision.
+
+A negative treatment effect means lower damage under the intervention. The UI
+converts its sign to a positive "estimated damage reduction" for readability.
+This is not a guaranteed benefit.
+
+## Method
+
+The research implementation uses cross-fitted nuisance models for treatment
+propensity and treated/control outcome response, forms a doubly-robust
+pseudo-outcome, then fits an ExtraTrees CATE model. It evaluates the average
+doubly-robust effect on a later chronological holdout and bootstraps its 95%
+interval. It checks minimum sample counts and treatment overlap. Ranking is
+withheld unless the held-out mean effect is below zero, the entire 95% interval
+is below zero, and overlap passes the configured gate.
+
+## Data contract
+
+One row per comparable site-time intervention episode. Required columns:
+
+| Column | Meaning |
+| --- | --- |
+| episode_date | Episode/decision date used for chronological split |
+| site_id | Stable site or asset identifier |
+| hazard | Registered hazard label |
+| action_id | Stable intervention identifier |
+| implemented | 1 if implemented, otherwise 0 |
+| damage_outcome | Numeric post-episode damage severity; lower is better |
+| other columns | Pre-intervention covariates only |
+
+Do not include outcomes, repair costs, measurements after treatment, treatment
+assignment fields, or variables caused by the intervention as features.
+The training CLI additionally requires a provenance JSON sidecar with source
+owner, source reference, collection period, outcome/treatment definitions,
+geographic scope, known biases and access basis. Synthetic data is rejected.
+
+## Run
+
+```bash
+python scripts/train_intervention_effectiveness.py --data path/to/verified_episodes.csv --provenance path/to/provenance.json
+```
+
+No intervention dataset is currently registered as a validated, comparable
+site-time episode table. Therefore the pipeline is implemented but cannot
+honestly produce learned action-effect rankings yet. It must remain
+`RANKING_WITHHELD` until suitable real observations are supplied and pass
+the evidence gates.
+
+## Assumptions and limits
+
+Doubly-robust estimation does not remove unmeasured confounding. Consistency,
+conditional exchangeability, positivity, no interference and comparable
+outcome measurement are required. Disaster interventions often violate these
+assumptions: authorities target the highest-risk locations, actions are bundled,
+treatment quality varies, and infrastructure effects spill across locations.
+The current model is preliminary research, not independently validated. It
+must not issue evacuation orders, replace engineering assessment, or claim
+lives/costs saved. Any public deployment requires domain-expert review,
+independent geographic/temporal validation, sensitivity analysis for
+unmeasured confounding, and prospective evaluation.
