@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main, 'integration/**']
   push:
-    branches: [main]
+    branches: [main, 'ui/**']
     paths:
       - "app.py"
       - "app_pages/**"
