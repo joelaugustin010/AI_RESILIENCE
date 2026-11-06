@@ -66,6 +66,15 @@ class CompoundHazardAssessmentTests(unittest.TestCase):
         hospital = next(x for x in result["service_reviews"] if x["service"] == "Hospitals")
         self.assertEqual(len(hospital["review_points"]), 3)
 
+    def test_rainfall_drainage_compound_reviews_infrastructure_component(self):
+        result = assess_compound_scenario(self.base(
+            hazards=["Compound: heavy rainfall + drainage failure"],
+            services=["Drainage"],
+        ))
+        drainage = next(item for item in result["service_reviews"] if item["service"] == "Drainage")
+        self.assertTrue(any("Infrastructure failure:" in point for point in drainage["review_points"]))
+        self.assertTrue(any("Flood" in point or "drain" in point.lower() for point in drainage["review_points"]))
+
     def test_invalid_hazard_and_negative_measurement_are_rejected(self):
         with self.assertRaises(ValueError):
             assess_compound_scenario(self.base(hazards=["Wildfire"]))
