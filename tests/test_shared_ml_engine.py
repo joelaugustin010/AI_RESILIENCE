@@ -161,3 +161,24 @@ def test_flood_assessment_still_renders_without_ml_context():
         "not_trained",
         "no_model_available",
     }
+
+
+def test_compound_workspace_assessment_accepts_all_ten_registered_hazards():
+    from src.compound_hazard_assessment import assess_compound_scenario
+
+    for hazard in WORKFLOW_HAZARDS:
+        result = assess_compound_scenario({"area": "Kochi", "hazards": [hazard]})
+        assert hazard in result["hazards"]
+        assert result["pathways"]
+        assert result["numerical_probability_provided"] is False
+
+
+def test_compound_workspace_custom_disaster_is_qualitative_and_unregistered():
+    from src.compound_hazard_assessment import assess_compound_scenario
+
+    result = assess_compound_scenario({
+        "area": "Kochi", "hazards": [], "custom_disaster": "Custom test scenario"
+    })
+    assert result["custom_disaster"] == "Custom test scenario"
+    assert any(item["hazard"] == "Custom disaster (unregistered)" for item in result["pathways"])
+    assert result["numerical_probability_provided"] is False
