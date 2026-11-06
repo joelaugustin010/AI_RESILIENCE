@@ -60,3 +60,20 @@ def test_ranking_withholds_when_no_action_model_is_eligible():
     result = rank_interventions([model], {"rainfall_before": 2, "exposure_before": 1})
     assert result["status"] == "RANKING_WITHHELD"
     assert result["ranked_actions"] == []
+
+
+def test_prevention_catalogue_emits_stable_action_identifiers():
+    from src.prevention_intelligence import generate_prevention_actions
+
+    first = generate_prevention_actions(["Flood"])
+    second = generate_prevention_actions(["Flood"])
+    assert first and all(item.get("action_id") for item in first)
+    assert [item["action_id"] for item in first] == [item["action_id"] for item in second]
+    assert len({item["action_id"] for item in first}) == len(first)
+
+
+def test_intervention_schema_rejects_duplicate_site_time_action_episodes():
+    frame = _small_frame()
+    frame = pd.concat([frame, frame.iloc[[0]]], ignore_index=True)
+    with pytest.raises(InterventionDataError, match="Duplicate"):
+        validate_intervention_frame(frame)
