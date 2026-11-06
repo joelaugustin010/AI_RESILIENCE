@@ -111,3 +111,31 @@ def positive_class_probability(model: Pipeline, features) -> "object":
     if 1 not in classes:
         raise ValueError("The fitted estimator has no positive class (1).")
     return model.predict_proba(features)[:, classes.index(1)]
+
+
+from sklearn.ensemble import ExtraTreesRegressor, HistGradientBoostingRegressor, RandomForestRegressor
+from sklearn.linear_model import Ridge
+
+REGRESSION_CANDIDATES = (
+    "random_forest_regressor", "extra_trees_regressor",
+    "hist_gradient_boosting_regressor", "ridge_regressor",
+)
+
+
+def build_regressor(model_type: str, *, random_state: int = 42, n_jobs: int = -1) -> Pipeline:
+    """Build a shared preprocessing + continuous regression pipeline."""
+    if model_type == "random_forest_regressor":
+        estimator = RandomForestRegressor(n_estimators=300, min_samples_leaf=8, max_features=1.0, random_state=random_state, n_jobs=n_jobs)
+        steps = [("imputer", SimpleImputer(strategy="median")), ("regressor", estimator)]
+    elif model_type == "extra_trees_regressor":
+        estimator = ExtraTreesRegressor(n_estimators=300, min_samples_leaf=8, max_features=1.0, random_state=random_state, n_jobs=n_jobs)
+        steps = [("imputer", SimpleImputer(strategy="median")), ("regressor", estimator)]
+    elif model_type == "hist_gradient_boosting_regressor":
+        estimator = HistGradientBoostingRegressor(learning_rate=0.05, max_iter=250, max_leaf_nodes=31, min_samples_leaf=20, l2_regularization=1.0, random_state=random_state)
+        steps = [("imputer", SimpleImputer(strategy="median")), ("regressor", estimator)]
+    elif model_type == "ridge_regressor":
+        estimator = Ridge(alpha=10.0)
+        steps = [("imputer", SimpleImputer(strategy="median")), ("scaler", StandardScaler()), ("regressor", estimator)]
+    else:
+        raise ValueError(f"Unsupported regression estimator {model_type!r}; choose from {sorted(REGRESSION_CANDIDATES)}.")
+    return Pipeline(steps)
