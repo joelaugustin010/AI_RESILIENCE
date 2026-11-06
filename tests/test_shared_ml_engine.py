@@ -182,3 +182,13 @@ def test_compound_workspace_custom_disaster_is_qualitative_and_unregistered():
     assert result["custom_disaster"] == "Custom test scenario"
     assert any(item["hazard"] == "Custom disaster (unregistered)" for item in result["pathways"])
     assert result["numerical_probability_provided"] is False
+
+
+def test_compound_registry_label_expands_to_component_evidence_requirements():
+    from src.compound_hazard_assessment import assess_compound_scenario
+
+    result = assess_compound_scenario({
+        "area": "Kochi", "hazards": ["Compound: cyclone + flood"]
+    })
+    assert any("rainfall observation" in gap.lower() for gap in result["data_gaps"])
+    assert any("cyclone track position" in gap.lower() for gap in result["data_gaps"])
