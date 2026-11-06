@@ -117,7 +117,7 @@ def _make_outcome_model(seed: int) -> RandomForestRegressor:
 
 def _make_propensity_model(seed: int) -> LogisticRegression:
     # Covariates have already passed through the shared preprocessor.
-    return LogisticRegression(max_iter=2000, class_weight="balanced", random_state=seed)
+    return LogisticRegression(max_iter=2000, random_state=seed)
 
 
 def _crossfit_dr_score(
@@ -345,3 +345,51 @@ def rank_interventions(
             "Official authorities and qualified professionals retain decision authority."
         ),
     }
+
+
+def load_intervention_models(registry_path: str = "reports/intervention_effectiveness_registry.json") -> list[InterventionModel]:
+    """Load only persisted eligible action models from a generated registry."""
+    import json
+    from pathlib import Path
+    import joblib
+
+    path = Path(registry_path)
+    if not path.is_file():
+        return []
+    registry = json.loads(path.read_text(encoding="utf-8"))
+    models: list[InterventionModel] = []
+    for card in registry.get("models", []):
+        if card.get("status") != "CAUSAL_RESEARCH_SIGNAL_NOT_VALIDATED":
+            continue
+        artifact_path = card.get("artifact_path")
+        if not artifact_path or not Path(artifact_path).is_file():
+            continue
+        bundle = joblib.load(artifact_path)
+        models.append(InterventionModel(
+            action_id=str(card["action_id"]),
+            hazard=str(card["hazard"]),
+            feature_columns=list(card["feature_columns"]),
+            preprocessor=bundle["preprocessor"],
+            effect_model=bundle["effect_model"],
+            status=str(card["status"]),
+            card=card,
+        ))
+    return models
+
+
+def intervention_effectiveness_for_context(
+    hazard: str,
+    context: dict[str, Any],
+    *,
+    registry_path: str = "reports/intervention_effectiveness_registry.json",
+) -> dict[str, Any]:
+    """Public app boundary: return a ranking only when eligible trained models exist."""
+    models = [model for model in load_intervention_models(registry_path) if model.hazard == hazard]
+    if not models:
+        return {
+            "status": "RANKING_WITHHELD",
+            "ranked_actions": [],
+            "excluded_actions": [],
+            "reason": "No verified, eligible intervention-effect model is currently registered for this hazard.",
+        }
+    return rank_interventions(models, context)
