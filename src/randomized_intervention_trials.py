@@ -20,6 +20,9 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 
 
+MIN_CONTEXT_SUPPORT_SHARE = 0.80
+
+
 class TrialDataError(ValueError):
     """The trial data do not match the declared randomized design."""
 
@@ -358,11 +361,19 @@ def fit_randomized_contrast(
     ate_ci = _cluster_bootstrap_ci(dr_test, test_group_values, seed=seed + 1001)
     ate = float(np.mean(dr_test))
     predicted_effect = cate.predict(x_test)
-    policy_choose_treatment = predicted_effect < 0
+    test_support_mask = np.asarray([
+        _context_support_reason(row, support_profile) is None
+        for row in test[list(feature_columns)].to_dict(orient="records")
+    ], dtype=bool)
+    test_support_share = float(test_support_mask.mean())
+    policy_choose_treatment = (predicted_effect < 0) & test_support_mask
     policy_scores = np.where(policy_choose_treatment, dr_test, 0.0)
     policy_ci = _cluster_bootstrap_ci(policy_scores, test_group_values, seed=seed + 1002)
     policy_effect = float(np.mean(policy_scores))
-    eligible = bool(ate_ci[1] < 0 and policy_ci[1] < 0)
+    eligible = bool(
+        ate_ci[1] < 0 and policy_ci[1] < 0
+        and test_support_share >= MIN_CONTEXT_SUPPORT_SHARE
+    )
     return RandomizedContrast(
         treatment_arm, reference_arm, list(feature_columns), prep, cate,
         {
@@ -382,6 +393,7 @@ def fit_randomized_contrast(
             "heldout_cate_policy_damage_change": policy_effect,
             "heldout_cate_policy_damage_change_95ci": policy_ci,
             "heldout_policy_treatment_share": float(np.mean(policy_choose_treatment)),
+            "heldout_context_support_share": test_support_share,
             "eligible_for_ranking": eligible,
             "context_specific_uncertainty": "NOT_ESTIMATED",
             "contextual_action_superiority_established": False,
