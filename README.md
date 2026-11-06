@@ -60,15 +60,15 @@ performs chronological train/validation/test evaluation, and writes:
 
 Current coverage of the ten Decision Workflow hazards:
 
-- **Screening models:** Cyclone (24-hour rapid intensification), Earthquake
-  (aftershock occurrence after an observed mainshock), Heatwave and Drought
-  (Kochi grid-point weather outlooks).
+- **Research screening models:** Cyclone (24-hour rapid intensification), Earthquake
+  (aftershock occurrence after an observed mainshock), and Heatwave. None is independently validated.
+- **Invalidated model:** Drought. Its previous 30-day target overlapped historical rainfall features; old metrics and inference are blocked until corrected future-only retraining.
 - **Forcing evidence only:** Flood and Compound rainfall + drainage failure
   (extreme-rainfall screening; no flood, depth, or impact prediction).
 - **Exploratory association:** Compound cyclone + flood (concurrent
   cyclone-proximity/rainfall association, including an ablation that tests
   whether cyclone features add incremental skill).
-- **No released ML model:** Landslide, Industrial incident, and Infrastructure
+- **No defensible supervised model:** Landslide, Industrial incident, and Infrastructure
   failure, because representative labels or non-event samples are missing.
 
 No shared model is independently validated, calibrated for decision use, or
