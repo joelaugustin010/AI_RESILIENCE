@@ -34,6 +34,8 @@ def test_population_is_prorated_by_equal_area_intersection_and_ward():
     assert result["ward_screening_estimates"][0]["ward"] == "Ward A"
     assert result["validated_exposure"] is False
     assert result["causal_effect_estimated"] is False
+    assert result["population_grid_covers_full_footprint"] is True
+    assert result["hazard_footprint_area_covered_percent"] == 100.0
 
 
 def test_negative_population_is_rejected():
@@ -56,3 +58,21 @@ def test_overlapping_population_cells_are_rejected_to_prevent_double_counting():
 def test_missing_or_invalid_geojson_is_rejected():
     with pytest.raises(PopulationExposureError, match="FeatureCollection"):
         estimate_population_exposure({}, collection(feature(polygon(76, 9, 76.1, 9.1), {})))
+
+
+
+def test_partial_population_grid_coverage_withholds_total_exposure_estimate():
+    grid = collection(feature(polygon(76, 9, 76.1, 9.1), {"grid_id": "a", "population": 100}))
+    footprint = collection(feature(polygon(76, 9, 76.2, 9.1), {}))
+    result = estimate_population_exposure(grid, footprint)
+    assert result["population_grid_covers_full_footprint"] is False
+    assert result["estimated_population_in_footprint"] is None
+    assert result["estimated_population_in_covered_part"] > 0
+    assert result["status"] == "PARTIAL_POPULATION_GRID_COVERAGE"
+
+
+def test_out_of_range_coordinates_are_rejected():
+    grid = collection(feature(polygon(190, 9, 191, 9.1), {"grid_id": "a", "population": 100}))
+    footprint = collection(feature(polygon(190, 9, 191, 9.1), {}))
+    with pytest.raises(PopulationExposureError, match="EPSG:4326 bounds"):
+        estimate_population_exposure(grid, footprint)
