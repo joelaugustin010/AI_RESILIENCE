@@ -1620,6 +1620,26 @@ for item in consequence_assessment["required_evidence"]:
 st.warning(consequence_assessment["scientific_guardrail"])
 st.caption(consequence_assessment["probability_semantics"])
 
+st.markdown("**Additional impact and response outputs**")
+st.caption(
+    "These outputs are part of every assessment. Values remain explicitly unavailable until "
+    "the required hazard, population, asset and outcome evidence is validated; no generic "
+    "percentages or casualty figures are invented."
+)
+impact_register = consequence_assessment.get("impact_outputs", [])
+if impact_register:
+    display_dataframe(
+        pd.DataFrame(impact_register).rename(columns={
+            "output": "Impact / prediction output",
+            "unit": "Unit",
+            "status": "Current estimate status",
+            "required_evidence": "Evidence needed to calculate it",
+        }),
+        hide_index=True,
+        width="stretch",
+        alt="Evidence-gated population, displacement, casualty, building, infrastructure, economic and hazard-intensity outputs",
+    )
+
 st.header("5. Compare hypothetical scenarios")
 st.caption("The following cases differ only by their stated assumptions. Possible pathways are planning prompts, not calculated impacts.")
 scenarios = build_scenario_comparison(inputs)
