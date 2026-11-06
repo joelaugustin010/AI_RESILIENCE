@@ -451,7 +451,7 @@ if isinstance(map_context, dict):
                             f"Limitations: {item.get('limitations', 'Not stated.')}"
                         )
 else:
-    st.info("No submitted scenario is attached. Select a disaster in the Decision Workflow and use “View prone areas on the Kochi map” to carry its context here.")
+    st.info("No submitted scenario is attached. Select a disaster in the Decision Workflow and use “Open Kochi map and available hazard evidence” to carry its context here.")
 
 st.subheader("Official hazard-map and district reference sources")
 reference_items = hazard_map_references(active_hazard)
