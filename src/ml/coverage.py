@@ -180,13 +180,19 @@ def build_coverage_matrix(*, write: bool = True) -> dict[str, Any]:
     hazards_with_ml = [entry["hazard"] for entry in entries if entry["model_ids"]]
     hazards_without_ml = [entry["hazard"] for entry in entries if not entry["model_ids"]]
     usable_statuses = {"WEAK_RESEARCH_SIGNAL", "RESEARCH_SIGNAL_NOT_VALIDATED"}
-    hazards_with_usable_research_model = [
+    hazards_with_component_research_evidence = [
         entry["hazard"] for entry in entries
         if any(status in usable_statuses for status in entry["model_statuses"].values())
     ]
+    hazards_with_usable_research_model = [
+        entry["hazard"] for entry in entries
+        if entry["support_level"] == "screening_model"
+        and bool(entry["model_ids"])
+        and entry["model_statuses"].get(entry["model_ids"][0]) in usable_statuses
+    ]
     hazards_without_usable_research_model = [
         entry["hazard"] for entry in entries
-        if not any(status in usable_statuses for status in entry["model_statuses"].values())
+        if entry["hazard"] not in hazards_with_usable_research_model
     ]
     payload = {
         "schema_version": 1,
@@ -197,6 +203,8 @@ def build_coverage_matrix(*, write: bool = True) -> dict[str, Any]:
         "n_hazards_without_ml": len(hazards_without_ml),
         "n_hazards_with_usable_research_model": len(hazards_with_usable_research_model),
         "hazards_with_usable_research_model": hazards_with_usable_research_model,
+        "n_hazards_with_component_research_evidence": len(hazards_with_component_research_evidence),
+        "hazards_with_component_research_evidence": hazards_with_component_research_evidence,
         "hazards_without_usable_research_model": hazards_without_usable_research_model,
         "hazards_with_ml_evidence": hazards_with_ml,
         "hazards_without_ml_evidence": hazards_without_ml,
@@ -204,8 +212,9 @@ def build_coverage_matrix(*, write: bool = True) -> dict[str, Any]:
         "validated_models": 0,
         "interpretation": (
             f"Every workflow hazard is represented. {len(hazards_with_ml)} hazards have a registered ML artifact, "
-            f"{len(hazards_with_usable_research_model)} currently have a usable research model, "
-            f"and {len(hazards_without_ml)} have no defensible supervised model. "
+            f"{len(hazards_with_usable_research_model)} have a usable hazard-specific research model, "
+            f"{len(hazards_with_component_research_evidence)} have usable component research evidence, "
+            f"and {len(hazards_without_ml)} have no registered ML artifact. "
             "Zero models are independently validated for operational use. Coverage is not predictive validity."
         ),
         "entries": entries,
