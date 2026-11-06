@@ -70,6 +70,7 @@ from src.phase2_data import (
 )
 from src.rainfall_forecast import RainfallForecastError, run_manual_rainfall_backtest
 from src.uncertainty import build_uncertainty_register
+from src.population_exposure import PopulationExposureError, estimate_population_exposure
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -1619,6 +1620,108 @@ for item in consequence_assessment["required_evidence"]:
     st.markdown(f"- {item}")
 st.warning(consequence_assessment["scientific_guardrail"])
 st.caption(consequence_assessment["probability_semantics"])
+
+with st.expander("Population exposure calculator (GeoJSON evidence inputs)", expanded=False):
+    st.caption(
+        "Upload a population grid and a hazard-footprint polygon dataset in EPSG:4326 GeoJSON. "
+        "The calculator estimates residents inside the supplied footprint by equal-area polygon "
+        "intersection. It does not estimate casualties, displacement or actual damage."
+    )
+    population_file = st.file_uploader(
+        "Population grid GeoJSON (each polygon needs a population count)",
+        type=["geojson", "json"],
+        key="population_exposure_grid_upload",
+    )
+    footprint_file = st.file_uploader(
+        "Hazard footprint GeoJSON (validated polygon features)",
+        type=["geojson", "json"],
+        key="population_exposure_footprint_upload",
+    )
+    population_year = st.text_input(
+        "Population grid reference year",
+        key="population_exposure_year",
+        placeholder="e.g. 2025",
+    )
+    population_source_url = st.text_input(
+        "Population dataset source URL",
+        key="population_exposure_source",
+        placeholder="https://…",
+    )
+    footprint_source_url = st.text_input(
+        "Hazard footprint source URL",
+        key="population_exposure_footprint_source",
+        placeholder="https://…",
+    )
+    population_provenance_confirmed = st.checkbox(
+        "I have checked the source attribution, reuse terms, CRS, date and geographic coverage for both files.",
+        key="population_exposure_provenance_confirmed",
+    )
+    if st.button("Calculate population inside footprint", key="calculate_population_exposure"):
+        if not population_file or not footprint_file:
+            st.error("Upload both GeoJSON files before calculating.")
+        elif not population_year.strip().isdigit():
+            st.error("Enter the population dataset reference year.")
+        elif not population_source_url.startswith("https://") or not footprint_source_url.startswith("https://"):
+            st.error("Provide HTTPS source URLs for both datasets.")
+        elif not population_provenance_confirmed:
+            st.error("Confirm source, licence, CRS, date and coverage review before calculating.")
+        else:
+            try:
+                population_payload = json.loads(population_file.getvalue().decode("utf-8-sig"))
+                footprint_payload = json.loads(footprint_file.getvalue().decode("utf-8-sig"))
+                exposure_result = estimate_population_exposure(
+                    population_payload,
+                    footprint_payload,
+                    population_field="population",
+                    grid_id_field="grid_id",
+                    ward_field="ward_name",
+                    source_crs="EPSG:4326",
+                )
+                st.session_state["population_exposure_result"] = {
+                    **exposure_result,
+                    "population_year": population_year.strip(),
+                    "population_source_url": population_source_url.strip(),
+                    "footprint_source_url": footprint_source_url.strip(),
+                }
+                st.session_state.pop("population_exposure_error", None)
+            except (UnicodeDecodeError, json.JSONDecodeError, PopulationExposureError, ValueError) as exc:
+                st.session_state.pop("population_exposure_result", None)
+                st.session_state["population_exposure_error"] = str(exc)
+
+    exposure_error = st.session_state.get("population_exposure_error")
+    if exposure_error:
+        st.error(f"Population exposure calculation blocked: {exposure_error}")
+    exposure_result = st.session_state.get("population_exposure_result")
+    if exposure_result:
+        st.warning(
+            "APPROXIMATE POPULATION-EXPOSURE SCREENING — not a count of people harmed, "
+            "displaced, injured or killed. Uniform population within each grid cell is assumed."
+        )
+        st.metric(
+            "Estimated population inside supplied footprint",
+            f"{exposure_result['estimated_population_in_footprint']:,}",
+        )
+        st.caption(
+            f"Population reference year: {exposure_result['population_year']}; "
+            f"{exposure_result['intersecting_population_cells']:,} intersecting cells out of "
+            f"{exposure_result['population_grid_cells']:,}. "
+            f"Share of uploaded grid population: {exposure_result['exposure_share_of_grid_percent']}%."
+        )
+        if exposure_result["ward_screening_estimates"]:
+            st.markdown("**Ward-level screening estimates**")
+            display_dataframe(
+                pd.DataFrame(exposure_result["ward_screening_estimates"]),
+                hide_index=True,
+                width="stretch",
+                alt="Estimated population inside the uploaded hazard footprint by source-provided ward label",
+            )
+        st.caption(exposure_result["method"])
+        for limitation in exposure_result["limitations"]:
+            st.caption(f"• {limitation}")
+        st.markdown(
+            f"[Population source]({exposure_result['population_source_url']}) · "
+            f"[Hazard footprint source]({exposure_result['footprint_source_url']})"
+        )
 
 st.markdown("**Additional impact and response outputs**")
 st.caption(
