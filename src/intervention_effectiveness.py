@@ -346,16 +346,20 @@ def rank_interventions(
 ) -> dict[str, Any]:
     """Rank only research-eligible interventions; never fabricate fallback scores."""
     model_list = list(models)
-    comparable_fields = ("hazard", "outcome_unit", "feature_columns", "test_start")
-    signatures = {
-        tuple(
-            tuple(model.card.get(field, [])) if field == "feature_columns"
-            else model.card.get(field)
-            for field in comparable_fields
-        )
-        for model in model_list
-        if model.card.get("eligible_for_ranking")
-    }
+    signatures = set()
+    for model in model_list:
+        if not model.card.get("eligible_for_ranking"):
+            continue
+        provenance = model.card.get("data_provenance", {})
+        signatures.add((
+            model.card.get("hazard"),
+            model.card.get("outcome_unit"),
+            tuple(model.card.get("feature_columns", [])),
+            model.card.get("test_start"),
+            provenance.get("geographic_scope"),
+            provenance.get("collection_period"),
+            provenance.get("source_title"),
+        ))
     if len(signatures) > 1:
         return {
             "status": "RANKING_WITHHELD",
