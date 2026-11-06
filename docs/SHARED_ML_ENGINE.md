@@ -131,3 +131,8 @@ model has been trained from real observations; the application must show
 never as training evidence or as a reported risk-reduction estimate. See
 `docs/INTERVENTION_EFFECTIVENESS_ML.md` for the schema, estimand, assumptions,
 limitations and training command.
+
+
+Potential public evidence sources and why none is directly trainable as an
+intervention/damage panel are catalogued in
+`docs/INTERVENTION_DATA_SOURCES.md`.
