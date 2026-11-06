@@ -1354,3 +1354,102 @@ with st.expander("Photography credits and licensing", expanded=False):
           [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Kerala_Monsoon_clouds_over_Western_Ghats_India.jpg).
         """
     )
+
+# ---------------------------------------------------------------------------
+# Final eco-glass layer
+# Kept after all page sections so later inline section styles cannot override
+# the shared light design system.
+# ---------------------------------------------------------------------------
+st.markdown(
+    """
+    <style>
+    /* AI RESILIENCE home-page final eco-glass pass */
+    .ar-threat {
+      border: 1px solid rgba(52,105,78,.20) !important;
+      background: #edf5ef !important;
+      box-shadow: 0 18px 48px rgba(33,72,51,.09) !important;
+    }
+    .ar-threat .ar-threat-bg {
+      filter: saturate(.62) contrast(1.02) brightness(.88) !important;
+    }
+    .ar-threat-scrim {
+      background:
+        linear-gradient(115deg, rgba(245,250,246,.94) 0%, rgba(239,247,241,.88) 58%, rgba(232,243,235,.76) 100%) !important;
+    }
+    .ar-threat .ar-story h2 { color: #173b32 !important; }
+    .ar-threat .ar-story p { color: #526e61 !important; }
+    .ar-threat .ar-overline { color: #287a58 !important; }
+    .ar-hazard {
+      border: 1px solid rgba(52,105,78,.17) !important;
+      background: rgba(255,255,255,.82) !important;
+      box-shadow: 0 8px 22px rgba(33,72,51,.06);
+      backdrop-filter: blur(14px);
+    }
+    .ar-hazard:hover {
+      border-color: rgba(40,122,88,.34) !important;
+      background: rgba(255,255,255,.96) !important;
+      box-shadow: 0 14px 28px rgba(33,72,51,.09);
+    }
+    .ar-hazard-icon { color: #287a58 !important; }
+    .ar-hazard h3 { color: #173b32 !important; }
+    .ar-hazard p { color: #5d756b !important; }
+    .ar-threat .ar-fineprint { color: #6d8175 !important; }
+
+    /* The SDG section is rendered later than the original shared style block. */
+    .ar-sdg-section {
+      border: 1px solid rgba(52,105,78,.18) !important;
+      background: linear-gradient(145deg, rgba(255,255,255,.97), rgba(237,246,239,.96)) !important;
+      box-shadow: 0 18px 48px rgba(33,72,51,.08) !important;
+      backdrop-filter: blur(16px);
+    }
+    .ar-sdg-intro .ar-overline { color: #287a58 !important; }
+    .ar-sdg-intro h2 { color: #173b32 !important; }
+    .ar-sdg-intro p { color: #5d756b !important; }
+    .ar-sdg-card {
+      border: 1px solid rgba(52,105,78,.17) !important;
+      background: rgba(255,255,255,.86) !important;
+      box-shadow: 0 8px 22px rgba(33,72,51,.05);
+    }
+    .ar-sdg-card:hover {
+      border-color: rgba(40,122,88,.34) !important;
+      background: #ffffff !important;
+      box-shadow: 0 14px 28px rgba(33,72,51,.09);
+    }
+    .ar-sdg-card h3 { color: #173b32 !important; }
+    .ar-sdg-card h3 span { color: #287a58 !important; }
+    .ar-sdg-card p { color: #5d756b !important; }
+    .ar-sdg-note {
+      color: #6d8175 !important;
+      border-top-color: rgba(52,105,78,.17) !important;
+    }
+    .ar-sdg-note a { color: #236b4b !important; }
+
+    /* Refine the workspace cards and footer without changing navigation. */
+    [class*="st-key-ar-nav-"] {
+      border: 1px solid rgba(52,105,78,.18) !important;
+      background: linear-gradient(145deg, rgba(255,255,255,.97), rgba(239,247,241,.95)) !important;
+      box-shadow: 0 12px 30px rgba(33,72,51,.07) !important;
+      backdrop-filter: blur(14px);
+    }
+    .ar-nav-icon {
+      color: #287a58 !important;
+      background: #e8f3eb !important;
+      border-color: rgba(40,122,88,.20) !important;
+    }
+    .ar-footer {
+      color: #6d8175 !important;
+      border-top-color: rgba(52,105,78,.18) !important;
+    }
+    .ar-footer strong { color: #173b32 !important; }
+
+    @media (max-width: 600px) {
+      .ar-threat-inner { padding: 1.25rem !important; }
+      .ar-sdg-section { border-radius: 20px !important; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .ar-hazard, .ar-sdg-card { transition: none !important; }
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
