@@ -82,18 +82,19 @@
       "components": [
         "Earthquake"
       ],
-      "support_level": "screening_model",
+      "support_level": "no_skill_model",
       "model_ids": [
         "earthquake_aftershock_occurrence"
       ],
       "model_statuses": {
-        "earthquake_aftershock_occurrence": "RESEARCH_SIGNAL_NOT_VALIDATED"
+        "earthquake_aftershock_occurrence": "NO_SKILL"
       },
-      "evidence_role": "supplementary",
-      "interpretation": "Shared ML screens whether a mainshock is followed by a nearby M4+ event. It does not predict earthquakes, mainshock timing, or shaking.",
+      "evidence_role": "none",
+      "interpretation": "The prior aftershock model is invalidated because its seven-day outcome windows could cross temporal split boundaries. It does not predict mainshocks; no usable output is available until embargo retraining.",
       "limitations": [
         "The USGS catalogue is regionally clipped and capped at 20,000 events.",
-        "Aftershock screening does not predict mainshock occurrence or ground shaking."
+        "Aftershock screening does not predict mainshock occurrence or ground shaking.",
+        "Prior aftershock metrics are invalidated pending sequence-aware evaluation and label-window embargo retraining."
       ],
       "deterministic_model_retained": true
     },
