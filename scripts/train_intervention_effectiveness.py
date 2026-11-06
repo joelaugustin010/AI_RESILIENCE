@@ -1,0 +1,90 @@
+"""Train action-effect models from a verified observational intervention dataset.
+
+No built-in or synthetic data is generated. Supply a real episode-level CSV and
+a provenance JSON sidecar. Each action is evaluated against contemporaneous
+no-action episodes for the same hazard.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+
+import joblib
+import pandas as pd
+
+from src.intervention_effectiveness import train_intervention_model
+
+
+PROVENANCE_FIELDS = (
+    "source_title", "source_owner", "source_url_or_archive_id",
+    "collection_period", "outcome_definition", "treatment_definition",
+    "geographic_scope", "known_biases", "permission_or_access_basis",
+)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--data", required=True, help="Real intervention-episode CSV.")
+    parser.add_argument("--provenance", required=True, help="JSON provenance sidecar.")
+    parser.add_argument("--output", default="reports/intervention_effectiveness_registry.json")
+    parser.add_argument("--artifacts", default="models/intervention_effectiveness")
+    parser.add_argument("--test-start", default="2022-01-01")
+    args = parser.parse_args()
+
+    data_path, provenance_path = Path(args.data), Path(args.provenance)
+    if not data_path.is_file() or not provenance_path.is_file():
+        raise SystemExit("BLOCKED: dataset and provenance sidecar must both exist.")
+    provenance = json.loads(provenance_path.read_text(encoding="utf-8"))
+    missing = [key for key in PROVENANCE_FIELDS if not provenance.get(key)]
+    if missing:
+        raise SystemExit(f"BLOCKED: provenance sidecar is missing {missing}.")
+    if provenance.get("synthetic") is True:
+        raise SystemExit("BLOCKED: synthetic data cannot train or validate intervention-effect models.")
+
+    frame = pd.read_csv(data_path)
+    cards, trained = [], []
+    output_dir = Path(args.artifacts)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    for hazard, action_id in sorted(
+        {(str(h), str(a)) for h, a in zip(frame.get("hazard", []), frame.get("action_id", []))}
+    ):
+        model = train_intervention_model(
+            frame, action_id=action_id, hazard=hazard, test_start=args.test_start,
+            outcome_unit=str(provenance.get("outcome_unit", "normalised damage-severity units")),
+        )
+        card = {**model.card, "data_provenance": provenance}
+        if model.card.get("eligible_for_ranking"):
+            artifact_path = output_dir / f"{hazard.lower().replace(' ', '_')}__{action_id}.joblib"
+            joblib.dump({"preprocessor": model.preprocessor, "effect_model": model.effect_model}, artifact_path)
+            card["artifact_path"] = str(artifact_path)
+            trained.append(str(artifact_path))
+        cards.append(card)
+
+    registry = {
+        "schema_version": "intervention-effectiveness-registry/1.0.0",
+        "status": "OBSERVATIONAL_RESEARCH_ONLY",
+        "validated_models": 0,
+        "data_path": str(data_path),
+        "data_provenance": provenance,
+        "models": cards,
+        "interpretation": (
+            "Eligible cards are preliminary doubly-robust observational estimates. "
+            "No model is independently validated or approved for operational decisions."
+        ),
+    }
+    output = Path(args.output)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(registry, indent=2, allow_nan=False), encoding="utf-8")
+    print(json.dumps({
+        "registry": str(output),
+        "action_models": len(cards),
+        "eligible_artifacts": len(trained),
+        "blocked_or_no_signal": len(cards) - len(trained),
+        "validated_models": 0,
+    }, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
