@@ -1,7 +1,6 @@
-"""Cinematic Kerala homepage for AI RESILIENCE.
+"""Kochi environmental and disaster intelligence homepage for AI RESILIENCE.
 
-The page is intentionally image-led: Kerala's landscapes, the pressures they
-face, the intelligence chain that connects them, and direct routes into the
+The page is intentionally image-led: Kochi's environment, the pressures it faces, the intelligence chain that connects them, and direct routes into the
 existing analytical workspaces.
 
 Hero film
@@ -863,7 +862,45 @@ st.markdown(
         color: CanvasText !important;
       }
     }
-    </style>
+    
+    /* ---------- Eco-glass home-page refinement ---------- */
+    :root { --ar-eco-ink: #173b32; --ar-eco-muted: #5d756b; --ar-eco-green: #287a58; --ar-eco-mint: #e8f3eb; --ar-eco-border: rgba(52, 105, 78, .17); }
+    .ar-signal { border-color: var(--ar-eco-border) !important; background: rgba(255,255,255,.72); border-radius: 18px; box-shadow: 0 12px 32px rgba(33,72,51,.06); }
+    .ar-signal > div { border-left-color: var(--ar-eco-border) !important; }
+    .ar-signal strong { color: var(--ar-eco-ink) !important; }
+    .ar-signal span, .ar-step-no { color: var(--ar-eco-green) !important; }
+    .ar-signal p, .ar-flow-step p { color: var(--ar-eco-muted) !important; }
+    .ar-story h2 { color: var(--ar-eco-ink) !important; }
+    .ar-story p { color: var(--ar-eco-muted) !important; }
+    .ar-overline { color: var(--ar-eco-green) !important; }
+    .ar-why { border-color: var(--ar-eco-border) !important; background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(237,246,239,.94)) !important; box-shadow: 0 18px 48px rgba(33,72,51,.08) !important; }
+    .ar-why .ar-story h2, .ar-flow-step h3 { color: var(--ar-eco-ink) !important; }
+    .ar-flow-step { border-top-color: rgba(40,122,88,.42) !important; background: linear-gradient(180deg, rgba(40,122,88,.07), rgba(40,122,88,0)) !important; }
+    .ar-transparency { border-color: var(--ar-eco-border) !important; background: rgba(224,240,228,.72) !important; }
+    .ar-transparency strong { color: var(--ar-eco-ink) !important; }
+    .ar-transparency p { color: var(--ar-eco-muted) !important; }
+    [class*="st-key-ar-nav-"] { border-color: var(--ar-eco-border) !important; background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(239,247,241,.94)) !important; box-shadow: 0 14px 34px rgba(33,72,51,.07) !important; }
+    .ar-nav-count { color: #71877a !important; }
+    .ar-nav-head h3 { color: var(--ar-eco-ink) !important; }
+    .ar-nav-copy { color: var(--ar-eco-muted) !important; }
+    [class*="st-key-ar-nav-"] [data-testid="stPageLink"] a { color: #285a43 !important; }
+    [class*="st-key-ar-nav-"] [data-testid="stPageLink"] a:hover { color: #176b48 !important; background: rgba(53,137,91,.09) !important; }
+    .ar-nav-icon { color: #287a58 !important; border-color: rgba(40,122,88,.18) !important; background: #e8f3eb !important; }
+    .ar-sdg-section { border-color: var(--ar-eco-border) !important; background: linear-gradient(145deg, #f8fbf8, #edf5ef) !important; box-shadow: 0 18px 48px rgba(33,72,51,.07) !important; }
+    .ar-sdg-intro .ar-overline { color: var(--ar-eco-green) !important; }
+    .ar-sdg-intro h2 { color: var(--ar-eco-ink) !important; }
+    .ar-sdg-intro p, .ar-sdg-card p { color: var(--ar-eco-muted) !important; }
+    .ar-sdg-card { border-color: var(--ar-eco-border) !important; background: rgba(255,255,255,.82) !important; }
+    .ar-sdg-card h3 { color: var(--ar-eco-ink) !important; }
+    .ar-sdg-card h3 span { color: var(--ar-eco-green) !important; }
+    .ar-sdg-note { color: var(--ar-eco-muted) !important; border-top-color: var(--ar-eco-border) !important; }
+    .ar-sdg-note a { color: #236b4b !important; }
+    .ar-footer { color: var(--ar-eco-muted) !important; border-top-color: var(--ar-eco-border) !important; }
+    .ar-footer strong { color: var(--ar-eco-ink) !important; }
+    .ar-fineprint { color: #70857a !important; }
+    .ar-tile { border-color: var(--ar-eco-border) !important; box-shadow: 0 14px 32px rgba(33,72,51,.10) !important; }
+    @media (prefers-reduced-motion: reduce) { .ar-signal, .ar-nav-icon, .ar-sdg-card { transition: none !important; } }
+</style>
     """,
     unsafe_allow_html=True,
 )
@@ -889,15 +926,15 @@ st.markdown(
       </div>
       <div class="ar-cine-inner">
         <div class="ar-cine-topline">
-          <div class="ar-cine-kicker"><span class="ar-live-dot"></span>Kerala · Environmental &amp; disaster intelligence</div>
+          <div class="ar-cine-kicker"><span class="ar-live-dot"></span>Kochi · Environmental &amp; disaster intelligence</div>
           <div class="ar-cine-coord">9.9312° N · 76.2673° E · Kochi</div>
         </div>
         <h1 class="ar-cine-title">AI <span>RESILIENCE</span></h1>
-        <p class="ar-cine-sub">Protecting Kerala. Predicting Risks. Building a Resilient Future.</p>
+        <p class="ar-cine-sub">Understanding Kochi. Strengthening Preparedness. Building Resilience.</p>
         <p class="ar-cine-desc">
-          One evidence-first platform for disaster intelligence, environmental monitoring,
-          hospital resilience and smart mitigation — turning complex risk into clearer
-          preparedness decisions for Kerala's people, landscapes and cities.
+          An evidence-first platform for Kochi-focused disaster intelligence, environmental monitoring,
+          hospital resilience and mitigation planning — helping users examine local risks,
+          understand evidence gaps and make more informed preparedness decisions.
         </p>
         <div class="ar-cine-chips">
           <span>Disaster intelligence</span>
@@ -944,10 +981,10 @@ with st.container(key="ar-hero-ctas"):
 st.markdown(
     """
     <div class="ar-signal">
-      <div><strong>14</strong><span>districts</span><p>A state-scale view, from the coast to the high ranges.</p></div>
-      <div><strong>10</strong><span>hazard families</span><p>Flood, cyclone, landslide, heat, drought, industrial and more.</p></div>
-      <div><strong>11</strong><span>workspaces</span><p>From evidence review to scenario design and mitigation planning.</p></div>
-      <div><strong>Open</strong><span>by design</span><p>Methods, provenance and limitations stay visible with every result.</p></div>
+      <div><strong>Kochi</strong><span>pilot geography</span><p>A focused environmental and disaster-resilience view of the city.</p></div>
+      <div><strong>Multi-hazard</strong><span>risk context</span><p>Explore flood, cyclone, landslide and other relevant hazard themes.</p></div>
+      <div><strong>Evidence-first</strong><span>assessment</span><p>Review sources, coverage, assumptions and validation before interpreting outputs.</p></div>
+      <div><strong>Planning</strong><span>workspaces</span><p>Explore mitigation concepts and budget arithmetic without treating them as certified designs.</p></div>
     </div>
     """,
     unsafe_allow_html=True,
@@ -962,10 +999,9 @@ st.markdown(
       <span class="ar-overline">01 · The beauty of Kerala</span>
       <h2>Landscapes that hold a civilisation.</h2>
       <p>
-        Kerala is a narrow ribbon of water, forest and coast. Its backwaters carry food and
-        memory; the Western Ghats shape its weather and hold its biodiversity; its beaches and
-        cities are home to millions. This is the landscape the platform is built to understand
-        and protect.
+        Kochi is shaped by its backwaters, coastline, rivers, wetlands, neighbourhoods and industrial corridors.
+        These connected systems support daily life while creating complex environmental and
+        infrastructure challenges. This is the local context the pilot is designed to examine.
       </p>
     </div>
     <div class="ar-gallery">
@@ -1267,10 +1303,10 @@ st.markdown(
     <div class="ar-footer">
       <div>
         <strong>AI RESILIENCE</strong>
-        Kerala environmental &amp; disaster intelligence · Evidence-first, human-centred.
+        Kochi environmental &amp; disaster intelligence · Evidence-first, human-centred.
       </div>
       <div class="ar-foot-right">
-        Built around open, documented data sources.<br>
+        Built around documented data sources, transparent methods and stated limitations.<br>
         SDG 11 · Sustainable cities and communities &nbsp;|&nbsp; SDG 13 · Climate action
       </div>
     </div>
