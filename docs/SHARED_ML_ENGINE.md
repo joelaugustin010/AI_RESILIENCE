@@ -52,9 +52,7 @@ holdout is still preliminary evidence.
 ## Coverage and missing models
 
 The full ten-hazard matrix is in `reports/ml_disaster_coverage.json` and is
-rendered in the Hazard Model Lab. The Drought model is currently invalidated:
-its previous target construction overlapped historical rainfall features, so
-its old metrics are superseded and inference is blocked until corrected retraining.
+rendered in the Hazard Model Lab. The Drought model is currently invalidated because its previous target construction overlapped historical rainfall features. The Earthquake aftershock model is also invalidated because the old seven-day future label windows could cross temporal split boundaries. Their old metrics are superseded and inference is blocked until corrected retraining.
 Landslide, Industrial incident, and Infrastructure failure have no released supervised model:
 
 - the landslide source is a reported-event inventory with no representative
