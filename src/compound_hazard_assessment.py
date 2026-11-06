@@ -118,7 +118,10 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
     compound = len(hazards) > 1 or any(HAZARD_REGISTRY[name].kind == "compound" for name in hazards)
     components = {component for name in hazards for component in HAZARD_REGISTRY[name].components}
     pathways = []
-    for hazard in sorted(hazards):
+    # Render the expanded physical components, not only the compound registry
+    # label. This ensures a compound option still exposes each component's
+    # evidence requirements when the user selects that single combined option.
+    for hazard in sorted(components):
         definition = HAZARD_REGISTRY[hazard]
         if hazard == "Flood":
             pathway = "Rainfall and river response interact with drainage, terrain, tide/backwater and land use. Verify local observations and catchment connectivity."
