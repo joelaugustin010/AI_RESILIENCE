@@ -357,6 +357,23 @@ def grade_skill(metrics: dict[str, Any]) -> dict[str, str]:
                 f"({base_brier:.3f}). Treat the score as a ranking signal only."
             ),
         }
+    persistence = metrics.get("persistence_baseline")
+    model_f1 = metrics.get("f1")
+    if (
+        isinstance(persistence, dict)
+        and persistence.get("available")
+        and isinstance(model_f1, (int, float))
+        and isinstance(persistence.get("f1"), (int, float))
+        and model_f1 <= float(persistence["f1"]) + 1e-9
+    ):
+        return {
+            "status": STATUS_WEAK,
+            "reason": (
+                f"Holdout F1 ({model_f1:.3f}) does not exceed the persistence "
+                f"baseline ({float(persistence['f1']):.3f}); the model has not "
+                "demonstrated incremental thresholded skill over persistence."
+            ),
+        }
     calibration_gap = metrics.get("expected_calibration_error")
     caveat = (
         f" Calibration error is {calibration_gap:.3f}; probabilities are not suitable "
