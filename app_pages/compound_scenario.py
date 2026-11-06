@@ -144,6 +144,22 @@ st.warning(
     "KSDMA and local-authority instructions for real safety decisions."
 )
 
+nav_left, nav_right = st.columns(2)
+with nav_left:
+    st.page_link(
+        "app_pages/decision_workflow.py",
+        label="Open Decision Workflow",
+        icon=":material/assignment_turned_in:",
+        width="stretch",
+    )
+with nav_right:
+    st.page_link(
+        "app_pages/kochi_map.py",
+        label="Open Kochi hazard map",
+        icon=":material/map:",
+        width="stretch",
+    )
+
 st.markdown(
     """
     **How this workspace works:** record whether the case is hypothetical, historical or based on
