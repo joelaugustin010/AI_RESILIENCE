@@ -16,11 +16,13 @@ try:
     from pyproj import Transformer
     from shapely.geometry import shape
     from shapely.ops import transform, unary_union
+    from shapely.strtree import STRtree
 except ImportError:  # optional spatial stack
     Transformer = None
     shape = None
     transform = None
     unary_union = None
+    STRtree = None
 
 
 class PopulationExposureError(ValueError):
@@ -44,7 +46,7 @@ def estimate_population_exposure(
     non-negative total population count. The function prorates each cell's
     population by the fraction of its area intersecting the hazard footprint.
     """
-    if shape is None or Transformer is None or transform is None or unary_union is None:
+    if shape is None or Transformer is None or transform is None or unary_union is None or STRtree is None:
         raise PopulationExposureError(
             "Population exposure requires the optional shapely and pyproj packages."
         )
@@ -109,11 +111,17 @@ def estimate_population_exposure(
 
     # Reject overlapping cells: otherwise the same residents could be counted
     # more than once. The conservative pairwise check is intentionally explicit.
+    cell_geometries = [cell[3] for cell in cells]
+    spatial_index = STRtree(cell_geometries)
     for index, (_, _, _, geom, _) in enumerate(cells):
-        for other_id, _, _, other, _ in cells[index + 1:]:
+        for candidate in spatial_index.query(geom):
+            other_index = int(candidate)
+            if other_index <= index:
+                continue
+            other = cell_geometries[other_index]
             if geom.intersection(other).area > max(1e-4, min(geom.area, other.area) * 1e-10):
                 raise PopulationExposureError(
-                    f"Population grid cells overlap ({cells[index][0]!r}, {other_id!r}); "
+                    f"Population grid cells overlap ({cells[index][0]!r}, {cells[other_index][0]!r}); "
                     "deduplicate or repair the source grid before estimating."
                 )
 
