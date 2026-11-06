@@ -190,6 +190,7 @@ MODEL_SPECS: tuple[tuple[str, dict], ...] = (
                 model_id="earthquake_aftershock_occurrence",
                 hazard="Earthquake",
                 target_mode="binary",
+                label_end_column="target_window_end",
                 validation_start="2018-01-01",
                 test_start="2022-01-01",
                 fixed_threshold=0.5,
