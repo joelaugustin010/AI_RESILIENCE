@@ -1746,6 +1746,14 @@ with st.expander("Population exposure calculator (GeoJSON evidence inputs)", exp
         center_lon = (bounds[0] + bounds[2]) / 2
         center_lat = (bounds[1] + bounds[3]) / 2
         st.markdown("**Supplied hazard footprint**")
+        st.metric(
+            "Area covered by supplied hazard footprint",
+            f"{exposure_result['hazard_footprint_area_km2']:,.3f} km²",
+        )
+        st.caption(
+            f"Population-grid coverage: {exposure_result['hazard_footprint_area_covered_percent']}% "
+            f"({exposure_result['population_grid_covered_area_km2']:,.3f} km²)."
+        )
         st.pydeck_chart(
             pdk.Deck(
                 layers=[
