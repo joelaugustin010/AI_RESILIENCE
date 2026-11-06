@@ -90,14 +90,14 @@ class HazardLayerAvailabilityTests(unittest.TestCase):
             with self.subTest(hazard=row["Hazard"]):
                 self.assertFalse(row["Selected"])
                 self.assertIn(
-                    row["Validated hazard footprint"],
+                    row["Hazard footprint / modelled context"],
                     {
                         "Not available",
                         "Modelled scenario context available",
                         "Modelled flood component only",
                     },
                 )
-                self.assertTrue(row["Why no footprint is shown"])
+                self.assertTrue(row["Footprint scope / limitation"])
                 self.assertEqual(
                     row["Components"], ", ".join(components_for(row["Hazard"]))
                 )
@@ -107,22 +107,22 @@ class HazardLayerAvailabilityTests(unittest.TestCase):
         selected = [row for row in rows if row["Selected"]]
         self.assertEqual([row["Hazard"] for row in selected], ["Cyclone"])
         self.assertEqual(
-            selected[0]["Validated hazard footprint"],
+            selected[0]["Hazard footprint / modelled context"],
             "Not available",
         )
 
     def test_flood_components_are_not_promoted_to_validated_hazard_footprints(self):
         by_hazard = {row["Hazard"]: row for row in hazard_layer_availability()}
         self.assertEqual(
-            by_hazard["Flood"]["Validated hazard footprint"],
+            by_hazard["Flood"]["Hazard footprint / modelled context"],
             "Modelled scenario context available",
         )
         self.assertIn(
             "not observed flooding",
-            by_hazard["Flood"]["Why no footprint is shown"],
+            by_hazard["Flood"]["Footprint scope / limitation"],
         )
         self.assertEqual(
-            by_hazard["Compound: cyclone + flood"]["Validated hazard footprint"],
+            by_hazard["Compound: cyclone + flood"]["Hazard footprint / modelled context"],
             "Modelled flood component only",
         )
         self.assertEqual(
@@ -134,7 +134,7 @@ class HazardLayerAvailabilityTests(unittest.TestCase):
         for hazard in ("Earthquake", "Industrial incident", "Infrastructure failure"):
             with self.subTest(hazard=hazard):
                 self.assertEqual(
-                    by_hazard[hazard]["Validated hazard footprint"], "Not available"
+                    by_hazard[hazard]["Hazard footprint / modelled context"], "Not available"
                 )
                 self.assertEqual(by_hazard[hazard]["Context layer"], "None")
 
@@ -142,7 +142,7 @@ class HazardLayerAvailabilityTests(unittest.TestCase):
         rows = hazard_layer_availability("Volcano")
         self.assertFalse(any(row["Selected"] for row in rows))
         self.assertEqual(
-            {row["Validated hazard footprint"] for row in rows},
+            {row["Hazard footprint / modelled context"] for row in rows},
             {
                 "Not available",
                 "Modelled scenario context available",
