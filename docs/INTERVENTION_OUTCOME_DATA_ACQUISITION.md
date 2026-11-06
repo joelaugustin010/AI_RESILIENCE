@@ -10,6 +10,18 @@ Do not fabricate episode-level labels from reports, maps, weather records, or sy
 2. **Published impact evaluations:** suitable now for a cited evidence library and conservative action guidance. Aggregate estimates are not individual training rows.
 3. **Simulation outputs:** suitable only for a separately labelled simulation-surrogate model within the simulation's domain. Never merge them with real-world causal training data or claim transfer to Kochi.
 
+
+## Priority 0 — Kochi Operation Breakthrough (local intervention evidence lead)
+
+- Official KSDMA event/project record: https://sdma.kerala.gov.in/%E0%B4%95%E0%B5%8A%E0%B4%9A%E0%B5%8D%E0%B4%9A%E0%B4%BF-2019/
+- KSDMA states that Kochi City flooded during the 21 October 2019 rainy spell, with critical assets including the main power sub-station and arterial roads affected; it records approval of Operation Breakthrough under GO (Ms) No. 35/2019/DMD dated 11 November 2019.
+- This is the most geographically relevant intervention lead found so far. It is **not yet an effectiveness dataset**: the public summary does not provide a matched pre/post damage series, intervention completion dates and geographies, treatment coverage/intensity, comparable untreated locations, or counterfactual outcomes.
+- Related state context: Kerala State Disaster Management Authority's post-disaster needs assessment describes damage to flood-protection and drainage infrastructure; CAG Report No. 6 of 2021 audits preparedness and response to floods in Kerala. These can help identify assets, projects, implementation and governance records, but neither should be treated as a causal outcome table without record-level linkage.
+- Required follow-up evidence: the GO and project scope; ward/asset-level work orders and completion dates; geospatial intervention footprints and capacity/design changes; maintenance records; rainfall/tide/drainage and water-level observations; geocoded inundation depth/duration; asset and household damage before/after; exposed population and infrastructure; and comparable untreated or not-yet-treated locations/events. Record data owner, access terms, collection method and definitions.
+- Potential design: a carefully scoped event/site panel or difference-in-differences/event-study only if implementation timing and comparison assumptions are defensible. Check for concurrent works, changing exposure, rainfall/tide differences, spillovers and changes in reporting. A simple before/after comparison is not sufficient to attribute improvement to the project.
+- Decision: prioritize this local evidence investigation before attempting to transfer foreign physical-mitigation estimates to Kochi. Until the missing records and a defensible design are obtained, show Operation Breakthrough as a documented local intervention example, not a measured damage-reduction effect or a trained ML label.
+
+
 ## Priority 1 — Bangladesh 2024 Forecast-Based Anticipatory Action Impact Evaluation
 
 - Catalog: https://microdata.worldbank.org/catalog/8009
