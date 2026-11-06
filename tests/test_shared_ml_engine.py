@@ -331,3 +331,16 @@ def test_continuous_models_are_registered_in_shared_hazard_coverage():
     assert "weather_precipitation_kochi_nextday_regression" in by_hazard["Flood"]["model_ids"]
     assert "weather_tmax_kochi_nextday_regression" in by_hazard["Heatwave"]["model_ids"]
     assert "cyclone_wind_change_24h_regression" in by_hazard["Cyclone"]["model_ids"]
+
+
+
+def test_regression_paired_bootstrap_requires_baseline_improvement():
+    import numpy as np
+    from src.ml.regression import _paired_mae_improvement_ci
+
+    actual = np.asarray([0.0, 1.0, 2.0, 3.0] * 20)
+    good = np.asarray([0.0, 1.0, 2.0, 3.0] * 20)
+    bad_baseline = good + 1.0
+    low, high = _paired_mae_improvement_ci(actual, good, bad_baseline)
+    assert low > 0
+    assert high > low
