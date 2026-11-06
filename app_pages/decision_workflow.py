@@ -3,6 +3,7 @@
 from pathlib import Path
 import re
 import json
+import hashlib
 
 import pandas as pd
 import pydeck as pdk
@@ -1701,6 +1702,8 @@ with st.expander("Population exposure calculator (GeoJSON evidence inputs)", exp
                     "ward_field": ward_field_name.strip() or None,
                     "population_source_url": population_source_url.strip(),
                     "footprint_source_url": footprint_source_url.strip(),
+                    "population_file_sha256": hashlib.sha256(population_file.getvalue()).hexdigest(),
+                    "footprint_file_sha256": hashlib.sha256(footprint_file.getvalue()).hexdigest(),
                     "footprint_geojson": footprint_payload,
                     "scenario_hazard": str(inputs.get("hazard", "")),
                     "scenario_location": str(inputs.get("location", "")),
@@ -1714,13 +1717,27 @@ with st.expander("Population exposure calculator (GeoJSON evidence inputs)", exp
     if exposure_error:
         st.error(f"Population exposure calculation blocked: {exposure_error}")
     exposure_result = st.session_state.get("population_exposure_result")
+    current_population_hash = (
+        hashlib.sha256(population_file.getvalue()).hexdigest() if population_file else None
+    )
+    current_footprint_hash = (
+        hashlib.sha256(footprint_file.getvalue()).hexdigest() if footprint_file else None
+    )
     if exposure_result and (
         exposure_result.get("scenario_hazard") != str(inputs.get("hazard", ""))
         or exposure_result.get("scenario_location") != str(inputs.get("location", ""))
+        or exposure_result.get("population_file_sha256") != current_population_hash
+        or exposure_result.get("footprint_file_sha256") != current_footprint_hash
+        or exposure_result.get("population_year") != population_year.strip()
+        or exposure_result.get("population_source_url") != population_source_url.strip()
+        or exposure_result.get("footprint_source_url") != footprint_source_url.strip()
+        or exposure_result.get("population_field") != (population_field_name.strip() or "population")
+        or exposure_result.get("grid_id_field") != (grid_id_field_name.strip() or "grid_id")
+        or exposure_result.get("ward_field") != (ward_field_name.strip() or None)
     ):
         st.warning(
-            "The saved exposure estimate belongs to a different hazard or location. "
-            "Recalculate it with a matching footprint before using it in this scenario."
+            "The saved exposure estimate no longer matches the selected scenario, uploaded files or source metadata. "
+            "Recalculate before using it in this scenario."
         )
     elif exposure_result:
         st.caption(
