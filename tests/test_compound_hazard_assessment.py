@@ -20,7 +20,7 @@ class CompoundHazardAssessmentTests(unittest.TestCase):
         result = assess_compound_scenario(self.base())
         self.assertTrue(result["compound"])
         self.assertEqual(result["status"], "SCENARIO_REVIEW_ONLY_NOT_A_VALIDATED_FORECAST")
-        self.assertTrue(any(p["hazard"] == "Compound interaction" for p in result["pathways"]))
+        self.assertTrue(any(p["hazard"] == "Multi-hazard interaction" for p in result["pathways"]))
 
     def test_no_probability_or_damage_estimate_is_generated(self):
         result = assess_compound_scenario(self.base(rainfall_mm=120, river_level_m=4.2))
@@ -68,7 +68,7 @@ class CompoundHazardAssessmentTests(unittest.TestCase):
 
     def test_invalid_hazard_and_negative_measurement_are_rejected(self):
         with self.assertRaises(ValueError):
-            assess_compound_scenario(self.base(hazards=["Earthquake"]))
+            assess_compound_scenario(self.base(hazards=["Wildfire"]))
         with self.assertRaises(ValueError):
             assess_compound_scenario(self.base(rainfall_mm=-1))
 
