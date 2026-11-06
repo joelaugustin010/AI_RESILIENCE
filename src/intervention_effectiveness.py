@@ -188,16 +188,17 @@ def validate_intervention_frame(
         raise InterventionDataError("outcome_window_end must contain valid dates.")
     if (outcome_ends < episode_dates).any():
         raise InterventionDataError("outcome_window_end cannot precede episode_date.")
-    if frame["site_id"].isna().any() or frame["action_id"].isna().any() or frame["hazard"].isna().any():
-        raise InterventionDataError("site_id, hazard and action_id cannot be blank.")
-    if not set(pd.to_numeric(frame["implemented"], errors="coerce").dropna().unique()).issubset({0, 1}):
-        raise InterventionDataError("implemented must be binary 0/1.")
-    if frame["implemented"].isna().any():
-        raise InterventionDataError("implemented contains missing values.")
+    for column in ("site_id", "action_id", "hazard"):
+        if frame[column].isna().any() or frame[column].astype(str).str.strip().eq("").any():
+            raise InterventionDataError(f"{column} cannot be blank.")
+    treatment_numeric = pd.to_numeric(frame["implemented"], errors="coerce")
+    if treatment_numeric.isna().any() or not set(treatment_numeric.unique()).issubset({0, 1}):
+        raise InterventionDataError("implemented must contain only binary numeric 0/1 values.")
     if frame.duplicated(["episode_date", "site_id", "hazard", "action_id"]).any():
         raise InterventionDataError("Duplicate site-date-hazard-action episodes are not allowed.")
-    if not pd.to_numeric(frame["damage_outcome"], errors="coerce").notna().all():
-        raise InterventionDataError("damage_outcome must be numeric and complete.")
+    numeric_outcome = pd.to_numeric(frame["damage_outcome"], errors="coerce")
+    if numeric_outcome.isna().any() or not np.isfinite(numeric_outcome.to_numpy(dtype=float)).all():
+        raise InterventionDataError("damage_outcome must be finite, numeric and complete.")
     excluded = REQUIRED_COLUMNS | {"outcome_unit"}
     inferred = list(feature_columns) if feature_columns is not None else [
         c for c in frame.columns if c not in excluded
@@ -210,6 +211,8 @@ def validate_intervention_frame(
     absent = [c for c in inferred if c not in frame.columns]
     if absent:
         raise InterventionDataError(f"Feature columns not found: {absent}")
+    if frame[inferred].isna().all(axis=0).any():
+        raise InterventionDataError("An entirely missing covariate column cannot be used.")
     if frame[inferred].isna().all(axis=1).mean() > 0.20:
         raise InterventionDataError("More than 20% of episodes have no observed covariates.")
     return inferred
@@ -372,13 +375,24 @@ def rank_interventions(
     excluded = []
     for model in model_list:
         result = model.estimate(context)
-        if result.get("available") and model.card.get("eligible_for_ranking"):
+        if (
+            result.get("available")
+            and model.card.get("eligible_for_ranking")
+            and float(result.get("estimated_damage_reduction", 0.0)) > 0
+        ):
             estimates.append(result)
         else:
             excluded.append({
                 "action_id": model.action_id,
-                "status": result.get("status"),
-                "reason": result.get("reason", model.card.get("status_reason")),
+                "status": (
+                    "NO_CONTEXTUAL_DAMAGE_REDUCTION_SIGNAL"
+                    if result.get("available") else result.get("status")
+                ),
+                "reason": (
+                    "The context-specific point estimate does not indicate a positive damage reduction."
+                    if result.get("available") else
+                    result.get("reason", model.card.get("status_reason"))
+                ),
             })
     if not estimates:
         return {
