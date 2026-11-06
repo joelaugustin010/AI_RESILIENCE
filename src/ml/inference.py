@@ -162,3 +162,38 @@ __all__ = [
     "predict_from_context",
     "required_context_fields",
 ]
+
+
+def predict_regression_from_context(model_id: str, context: dict[str, Any]) -> dict[str, Any]:
+    """Fail-closed inference for a registered continuous regression model."""
+    card = load_model_card(model_id)
+    if card is None or card.get("task_type") != "regression":
+        raise ModelNotUsableError(f"Model {model_id!r} is not a registered regression model.")
+    if str(card.get("evaluation_validity") or "").startswith("INVALIDATED_"):
+        raise ModelNotUsableError(f"Model {model_id!r} has invalidated evaluation provenance.")
+    if card.get("status") not in USABLE_STATUSES:
+        raise ModelNotUsableError(f"Model {model_id!r} has status {card.get('status')!r}; regression inference is blocked.")
+    problems = card_consistency_problems(card)
+    if problems:
+        raise ModelNotUsableError(f"Model card for {model_id!r} is inconsistent: {problems}")
+    frame = _context_frame(card, context)
+    pipeline = load_artifact(model_id)
+    if not hasattr(pipeline, "predict"):
+        raise ModelNotUsableError(f"Artifact for {model_id!r} has no predict method.")
+    value = float(np.asarray(pipeline.predict(frame), dtype=float)[0])
+    if not np.isfinite(value):
+        raise ModelNotUsableError(f"Model {model_id!r} produced a non-finite estimate.")
+    return {
+        "model_id": model_id, "hazard": card.get("hazard"), "task_type": "regression",
+        "status": card.get("status"), "estimate": value, "unit": card.get("prediction_unit"),
+        "target_definition": card.get("target_definition"),
+        "limitations": list(card.get("limitations", [])),
+        "warnings": ["Research-only continuous estimate; not a calibrated disaster-risk probability or official forecast."],
+    }
+
+
+__all__ = [
+    "InferenceInputError", "ModelNotUsableError", "USABLE_STATUSES",
+    "context_gaps", "predict_from_context", "predict_regression_from_context",
+    "required_context_fields",
+]
