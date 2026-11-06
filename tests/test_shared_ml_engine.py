@@ -298,3 +298,27 @@ def test_regression_inference_rejects_classification_model():
     from src.ml.inference import ModelNotUsableError, predict_regression_from_context
     with pytest.raises(ModelNotUsableError, match="not a registered regression model"):
         predict_regression_from_context("weather_extreme_rainfall_kochi_nextday", {})
+
+
+
+def test_presentation_rows_distinguish_regression_from_probability():
+    from src.ml.presentation import application_rows, card_rows
+
+    application = {
+        "model_id": "weather_tmax_kochi_nextday_regression",
+        "task_type": "regression",
+        "estimate": 31.2,
+        "unit": "degrees Celsius",
+        "target_definition": "Next-day maximum temperature",
+    }
+    row = application_rows({"applications": [application]})[0]
+    assert row["Task"] == "Regression"
+    assert row["Continuous estimate"] == 31.2
+    assert row["Model probability estimate"] is None
+    card = card_rows([{
+        "model_id": "weather_tmax_kochi_nextday_regression",
+        "task_type": "regression",
+        "metrics": {"mae": 1.2, "rmse": 1.6, "mae_skill_over_persistence": 0.1},
+    }])[0]
+    assert card["Task"] == "regression"
+    assert card["MAE"] == 1.2
