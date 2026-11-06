@@ -476,7 +476,7 @@ availability_rows = sorted(
 )
 display_dataframe(
     pd.DataFrame(availability_rows)[
-        ["Hazard", "Selected", "Validated hazard footprint", "Context layer", "Why no footprint is shown"]
+        ["Hazard", "Selected", "Hazard footprint / modelled context", "Context layer", "Footprint scope / limitation"]
     ],
     hide_index=True,
     width="stretch",
