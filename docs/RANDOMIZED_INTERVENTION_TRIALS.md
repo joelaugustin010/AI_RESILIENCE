@@ -32,16 +32,17 @@ as 100,000 independent households. The same household must not appear as
 multiple independent episodes unless repeated-measure dependence is explicitly
 handled in the analysis design.
 
-The caller must supply the assignment probabilities from the published
+The caller must supply the complete assignment-probability vector from the published
 randomization protocol. Do not estimate assignment probabilities from observed
-outcomes. This first implementation assumes fixed arm probabilities across
+outcomes. Probabilities for the two compared arms are renormalised to sum to one
+for the pairwise target population. This first implementation assumes fixed arm probabilities across
 clusters; stratified or block randomization with varying probabilities needs
 the cluster-specific assignment probabilities and must not be forced into this
 API.
 
 ## Estimand and safeguards
 
-- Primary: ITT effect of being assigned to an arm versus the reference arm.
+- Primary: pairwise ITT effect of being assigned to the selected arm versus the reference arm, conditional on assignment to one of those two arms. Other arms are excluded, never silently recoded as controls.
 - It does not estimate the effect of actually receiving or spending the cash.
   An as-treated analysis would be confounded; compliance effects require a
   separately specified instrumental-variable estimand.
