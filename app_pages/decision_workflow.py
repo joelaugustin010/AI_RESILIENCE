@@ -1682,6 +1682,8 @@ with st.expander("Population exposure calculator (GeoJSON evidence inputs)", exp
                     "population_year": population_year.strip(),
                     "population_source_url": population_source_url.strip(),
                     "footprint_source_url": footprint_source_url.strip(),
+                    "scenario_hazard": str(inputs.get("hazard", "")),
+                    "scenario_location": str(inputs.get("location", "")),
                 }
                 st.session_state.pop("population_exposure_error", None)
             except (UnicodeDecodeError, json.JSONDecodeError, PopulationExposureError, ValueError) as exc:
@@ -1692,7 +1694,19 @@ with st.expander("Population exposure calculator (GeoJSON evidence inputs)", exp
     if exposure_error:
         st.error(f"Population exposure calculation blocked: {exposure_error}")
     exposure_result = st.session_state.get("population_exposure_result")
-    if exposure_result:
+    if exposure_result and (
+        exposure_result.get("scenario_hazard") != str(inputs.get("hazard", ""))
+        or exposure_result.get("scenario_location") != str(inputs.get("location", ""))
+    ):
+        st.warning(
+            "The saved exposure estimate belongs to a different hazard or location. "
+            "Recalculate it with a matching footprint before using it in this scenario."
+        )
+    elif exposure_result:
+        st.caption(
+            f"Scenario: {exposure_result['scenario_hazard']} · "
+            f"Location: {exposure_result['scenario_location']}"
+        )
         st.warning(
             "APPROXIMATE POPULATION-EXPOSURE SCREENING — not a count of people harmed, "
             "displaced, injured or killed. Uniform population within each grid cell is assumed."
