@@ -17,11 +17,11 @@ from src.ml.persistence import write_json
 from src.ml.registry import list_model_cards
 
 HAZARD_MODEL_MAP: dict[str, tuple[str, ...]] = {
-    "Flood": ("weather_extreme_rainfall_kochi_nextday",),
+    "Flood": ("weather_extreme_rainfall_kochi_nextday", "weather_precipitation_kochi_nextday_regression"),
     "Cyclone": ("cyclone_rapid_intensification_24h",),
     "Earthquake": ("earthquake_aftershock_occurrence",),
     "Landslide": (),
-    "Heatwave": ("weather_high_temperature_kochi_nextday",),
+    "Heatwave": ("weather_high_temperature_kochi_nextday", "weather_tmax_kochi_nextday_regression"),
     "Drought": ("weather_drought_onset_kochi_30day",),
     "Industrial incident": (),
     "Infrastructure failure": (),
