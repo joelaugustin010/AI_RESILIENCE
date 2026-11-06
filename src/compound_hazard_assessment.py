@@ -56,16 +56,16 @@ SERVICE_PATHWAYS = {
 
 ACTIONS = {
     "before": [
-        "Verify official IMD cyclone bulletins and KSDMA/CWC flood guidance; record issue time, valid time and source.",
+        "Verify the relevant official hazard bulletins and local-authority guidance; record issue time, valid time and source.",
         "Map exposed people and critical facilities using verified coordinates, elevation and local authority records.",
-        "Confirm evacuation routes and alternatives against both flood exposure and cyclone-related access restrictions.",
+        "Review safe access routes and alternatives against the selected hazards using verified local information.",
         "Check backup power, fuel, communications, drinking water and continuity plans for critical services.",
-        "Have authorized local teams inspect drainage, outfalls and pump status.",
+        "Have authorized local teams verify hazard-specific conditions, critical assets and response readiness.",
     ],
     "during": [
         "Follow official warnings and evacuation orders; do not use this worksheet to decide whether to evacuate.",
-        "Track rainfall, river level, tide/coastal water and cyclone bulletins with timestamps and sources.",
-        "Keep people away from floodwater, damaged electrical infrastructure and exposed coastal areas.",
+        "Track only relevant observations and official bulletins with timestamps, locations, units and sources.",
+        "Follow official safety instructions and avoid entering hazard-affected or restricted areas.",
         "Coordinate road closures, hospital referrals, shelter occupancy and utility status through responsible authorities.",
     ],
     "after": [
