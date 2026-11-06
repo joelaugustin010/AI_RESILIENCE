@@ -161,3 +161,78 @@ def test_flood_assessment_still_renders_without_ml_context():
         "not_trained",
         "no_model_available",
     }
+
+
+def test_compound_workspace_assessment_accepts_all_ten_registered_hazards():
+    from src.compound_hazard_assessment import assess_compound_scenario
+
+    for hazard in WORKFLOW_HAZARDS:
+        result = assess_compound_scenario({"area": "Kochi", "hazards": [hazard]})
+        assert hazard in result["hazards"]
+        assert result["pathways"]
+        assert result["numerical_probability_provided"] is False
+
+
+def test_compound_workspace_custom_disaster_is_qualitative_and_unregistered():
+    from src.compound_hazard_assessment import assess_compound_scenario
+
+    result = assess_compound_scenario({
+        "area": "Kochi", "hazards": [], "custom_disaster": "Custom test scenario"
+    })
+    assert result["custom_disaster"] == "Custom test scenario"
+    assert any(item["hazard"] == "Custom disaster (unregistered)" for item in result["pathways"])
+    assert result["numerical_probability_provided"] is False
+
+
+def test_compound_registry_label_expands_to_component_evidence_requirements():
+    from src.compound_hazard_assessment import assess_compound_scenario
+
+    result = assess_compound_scenario({
+        "area": "Kochi", "hazards": ["Compound: cyclone + flood"]
+    })
+    assert any("rainfall observation" in gap.lower() for gap in result["data_gaps"])
+    assert any("cyclone track position" in gap.lower() for gap in result["data_gaps"])
+
+
+def test_temporal_split_purges_labels_whose_future_windows_cross_boundaries():
+    from src.ml.training import temporal_split
+
+    frame = pd.DataFrame({
+        "target_date": pd.to_datetime([
+            "2017-12-20", "2017-12-28", "2018-01-02",
+            "2021-12-20", "2021-12-28", "2022-01-02",
+        ]),
+        "target_window_end": pd.to_datetime([
+            "2017-12-27", "2018-01-04", "2018-01-09",
+            "2021-12-27", "2022-01-04", "2022-01-09",
+        ]),
+        "row": list(range(6)),
+    })
+    train, validation, test, purge = temporal_split(
+        frame,
+        date_column="target_date",
+        validation_start=pd.Timestamp("2018-01-01"),
+        test_start=pd.Timestamp("2022-01-01"),
+        label_end_column="target_window_end",
+    )
+    assert train["row"].tolist() == [0]
+    assert validation["row"].tolist() == [2, 3]
+    assert test["row"].tolist() == [5]
+    assert purge["purged_train_label_window_rows"] == 1
+    assert purge["purged_validation_label_window_rows"] == 1
+    assert purge["purged_label_window_rows"] == 2
+
+
+def test_skill_grade_downgrades_when_model_does_not_beat_persistence():
+    result = grade_skill({
+        "n_test_events": 40,
+        "test_prevalence": 0.20,
+        "roc_auc": 0.82,
+        "average_precision": 0.55,
+        "brier_score": 0.10,
+        "base_rate_brier_score": 0.16,
+        "f1": 0.60,
+        "persistence_baseline": {"available": True, "f1": 0.70},
+    })
+    assert result["status"] == "WEAK_RESEARCH_SIGNAL"
+    assert "does not exceed the persistence baseline" in result["reason"]
