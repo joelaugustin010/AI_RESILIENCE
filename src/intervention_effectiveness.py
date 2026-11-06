@@ -334,9 +334,27 @@ def rank_interventions(
     max_actions: int = 5,
 ) -> dict[str, Any]:
     """Rank only research-eligible interventions; never fabricate fallback scores."""
+    model_list = list(models)
+    comparable_fields = ("hazard", "outcome_unit", "feature_columns", "test_start")
+    signatures = {
+        tuple(
+            tuple(model.card.get(field, [])) if field == "feature_columns"
+            else model.card.get(field)
+            for field in comparable_fields
+        )
+        for model in model_list
+        if model.card.get("eligible_for_ranking")
+    }
+    if len(signatures) > 1:
+        return {
+            "status": "RANKING_WITHHELD",
+            "ranked_actions": [],
+            "excluded_actions": [],
+            "reason": "Candidate models do not share the same hazard, outcome unit, covariate contract and test period; their effects are not directly comparable.",
+        }
     estimates = []
     excluded = []
-    for model in models:
+    for model in model_list:
         result = model.estimate(context)
         if result.get("available") and model.card.get("eligible_for_ranking"):
             estimates.append(result)
@@ -355,12 +373,16 @@ def rank_interventions(
         }
     estimates.sort(key=lambda item: item["estimated_damage_reduction"], reverse=True)
     return {
-        "status": "RESEARCH_RANKING_NOT_VALIDATED",
+        "status": (
+            "PARTIAL_RESEARCH_RANKING_NOT_VALIDATED"
+            if excluded else "RESEARCH_RANKING_NOT_VALIDATED"
+        ),
         "ranked_actions": estimates[:max_actions],
         "excluded_actions": excluded,
         "warning": (
             "This is a provisional observational ranking, not a causal guarantee or an instruction. "
-            "Unmeasured confounding and site-specific engineering constraints may reverse the ranking. "
+            + ("Some candidate actions were excluded, so this is not a complete comparison. " if excluded else "")
+            + "Unmeasured confounding and site-specific engineering constraints may reverse the ranking. "
             "Official authorities and qualified professionals retain decision authority."
         ),
     }
