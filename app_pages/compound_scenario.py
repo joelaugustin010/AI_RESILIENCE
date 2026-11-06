@@ -213,10 +213,22 @@ with st.form("compound_scenario_form"):
     st.divider()
     st.subheader("4. Services and infrastructure to review")
     services = st.multiselect(
-        "Select exposed services",
+        "Select services to review (nomination does not confirm exposure)",
         ["Hospitals", "Roads and bridges", "Electricity", "Drinking water", "Communications",
          "Shelters", "Schools", "Drainage", "Industrial facilities"],
         default=["Hospitals", "Roads and bridges", "Electricity", "Drainage"],
+    )
+    drainage_status = st.selectbox(
+        "Drainage condition (if known)",
+        ["Not supplied", "Reported functioning", "Reported partially impaired",
+         "Reported failed", "Hypothetical partial failure"],
+        help="Record only a sourced or clearly hypothetical condition. This is not a verified asset inspection.",
+    )
+    infrastructure_status = st.selectbox(
+        "Critical-service disruption status (if known)",
+        ["Not supplied", "No disruption reported", "Possible / hypothetical disruption",
+         "Disruption reported by user"],
+        help="A user report is not independently verified by this application.",
     )
     submitted = st.form_submit_button("Generate integrated scenario review", type="primary")
 
@@ -249,6 +261,8 @@ if submitted:
             "cyclone_wind_knots": cyclone_wind_knots,
             "coastal_water_notes": coastal_water_notes,
             "services": services,
+            "drainage_status": drainage_status,
+            "infrastructure_status": infrastructure_status,
         })
     except ValueError as exc:
         st.error(str(exc))
@@ -295,7 +309,14 @@ if submitted:
                 "evidence_type": evidence_type,
                 "rainfall_mm": rainfall_mm,
                 "river_level_m": river_level_m,
+                "cyclone_distance_km": cyclone_distance_km,
+                "cyclone_wind_knots": cyclone_wind_knots,
+                "drainage_status": drainage_status,
+                "infrastructure_status": infrastructure_status,
                 "services": services,
+                "observation_time": observation_time,
+                "forecast_issue_time": forecast_issue_time,
+                "forecast_valid_time": forecast_valid_time,
             },
             custom_disaster=custom_disaster,
         )
