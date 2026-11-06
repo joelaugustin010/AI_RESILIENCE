@@ -125,3 +125,20 @@ def test_rejects_blank_assignment_cluster_or_arm():
     frame.loc[0, "assignment_cluster_id"] = " "
     with pytest.raises(TrialDataError, match="non-empty"):
         validate_trial_frame(frame, ["baseline_risk", "house_type"])
+
+def test_randomized_trial_context_support_guard_rejects_extrapolation():
+    from src.randomized_intervention_trials import _context_support_reason
+
+    profile = {
+        "numeric_ranges": {"baseline_risk": {"minimum": -2.0, "maximum": 2.0}},
+        "categorical_values": {"house_type": ["weak", "strong"]},
+    }
+    assert _context_support_reason(
+        {"baseline_risk": 2.1, "house_type": "weak"}, profile
+    ) is not None
+    assert _context_support_reason(
+        {"baseline_risk": 0.5, "house_type": "unknown"}, profile
+    ) is not None
+    assert _context_support_reason(
+        {"baseline_risk": 0.5, "house_type": "strong"}, profile
+    ) is None
