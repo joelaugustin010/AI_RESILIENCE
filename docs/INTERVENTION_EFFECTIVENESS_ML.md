@@ -38,8 +38,8 @@ is below zero, and overlap passes the configured gate.
 Even when separate action models pass their own evidence gates, the ranker
 withholds cross-action ordering unless every eligible candidate has complete,
 matching provenance for the same source study, owner, collection period,
-outcome definition, geographic scope, hazard, outcome unit, pre-treatment
-feature contract and chronological test cutoff. This prevents comparing
+outcome definition, treatment definition, geographic scope, hazard, outcome
+unit, pre-treatment feature contract and chronological test cutoff. This prevents comparing
 unlike damage measures or effects learned from unrelated populations as if
 they were head-to-head evidence.
 
