@@ -7,11 +7,11 @@
 
 The shared ML engine is a useful research foundation, but none of the six models is independently validated for operational use. All six use a single chronological holdout; no model has a demonstrated independent geographic holdout. The ten-hazard registry is a coverage map, not evidence that ten hazards have predictive models.
 
-Do not use model scores as official warnings, evacuation triggers, damage estimates, casualty estimates, or calibrated probabilities of harm. Deterministic evidence-based assessment and official agency guidance remain authoritative.
+Only Cyclone and Heatwave currently have usable hazard-specific research screening models. Flood and compound scenarios may display component forcing evidence, not direct hazard predictions. Do not use model scores as official warnings, evacuation triggers, damage estimates, casualty estimates, or calibrated probabilities of harm. Deterministic evidence-based assessment and official agency guidance remain authoritative.
 
 ## Existing holdout results
 
-Metrics below are copied from PR #82 model cards. They describe one temporal test period only.
+Metrics below preserve the historical PR #82 model-card snapshot for audit traceability. They describe one temporal test period only. **The Drought and Earthquake rows are now invalidated and superseded; their old values must not be interpreted as valid model performance.**
 
 | Model target | Test rows / events | Prevalence | Precision | Recall | F1 | PR-AUC | Brier | Base-rate Brier | Persistence F1 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
