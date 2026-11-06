@@ -23,8 +23,10 @@ This is not a guaranteed benefit.
 The research implementation uses site-grouped cross-fitting for nuisance
 models (unweighted treatment-propensity logistic regression and treated/control
 outcome forests), forms a doubly-robust pseudo-outcome, then fits an ExtraTrees
-CATE model. It evaluates the average doubly-robust effect on a later
-chronological holdout and uses a site-cluster bootstrap for its 95% interval.
+CATE model. On a later chronological holdout it evaluates both the average
+doubly-robust effect and the learned context-specific policy (apply the action
+only where predicted effect is beneficial); both must show a damage-reduction
+signal with site-cluster bootstrap intervals before ranking eligibility.
 This reduces within-site fold leakage and accounts for repeated episodes within
 sites, but does not replace a separate geographic holdout or external validation. It checks minimum sample counts and treatment overlap. Ranking is
 withheld unless the held-out mean effect is below zero, the entire 95% interval
