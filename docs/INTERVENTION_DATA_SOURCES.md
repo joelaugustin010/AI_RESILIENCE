@@ -85,3 +85,25 @@ Kochi-specific hydrological and exposure validation establishes transfer.
 
 Source: Bril et al., Zenodo dataset
 https://zenodo.org/records/15488420 (GPL-3.0 per the article's data statement).
+
+
+## Metadata-first archive acquisition
+
+A dedicated helper now retrieves the Zenodo record metadata before any large
+file transfer. Its default behavior is metadata-only; downloading requires an
+explicit flag, a per-file size ceiling, available disk-space checks, and
+published checksum verification. It never extracts archives or trains a model
+automatically.
+
+```bash
+# Inspect file sizes, checksums and record metadata only
+python scripts/download_geul_intervention_archive.py --metadata-only
+
+# Download and checksum-verify the main results archive (about 10.2 GB)
+python scripts/download_geul_intervention_archive.py --download
+```
+
+Additional publisher files can be selected explicitly with repeated
+`--file` arguments. After the main archive is verified, the helper invokes
+the non-extractive archive inspector and writes a manifest. Review the
+manifest and source scripts before building any target/feature adapter.
