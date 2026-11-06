@@ -52,7 +52,10 @@ Do not include outcomes, repair costs, measurements after treatment, treatment
 assignment fields, or variables caused by the intervention as features.
 The training CLI additionally requires a provenance JSON sidecar with source
 owner, source reference, collection period, outcome/treatment definitions,
-geographic scope, known biases and access basis. Synthetic data is rejected.
+geographic scope, known biases, access basis and an explicit
+`pre_treatment_features` allowlist. The allowlist is reviewed before training;
+structural, treatment and outcome columns are rejected even if nominated.
+Synthetic data is rejected.
 
 ## Run
 
