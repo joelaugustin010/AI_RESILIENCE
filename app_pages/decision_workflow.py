@@ -44,6 +44,7 @@ from src.decision_workflow import (
 )
 from src.disaster_models import assess_disaster
 from src.prevention_intelligence import generate_prevention_actions
+from src.intervention_effectiveness import intervention_effectiveness_for_hazards
 from src.ml.presentation import application_rows, model_rows
 from src.compound_hazard_assessment import assess_compound_scenario
 from src.historical_validation import historical_validation_checklist
@@ -1632,6 +1633,42 @@ if preventive_actions:
     )
 else:
     st.info("Select a registered hazard to generate hazard-specific preparedness options.")
+
+st.subheader("Intervention-effectiveness ML")
+effectiveness = intervention_effectiveness_for_hazards(
+    [str(inputs.get("hazard", ""))] if inputs.get("hazard") else [],
+    inputs,
+)
+hazard_effect = effectiveness.get("by_hazard", {}).get(str(inputs.get("hazard", "")), {})
+if hazard_effect.get("ranked_actions"):
+    st.caption(
+        "Preliminary observational ML estimates of expected damage reduction. "
+        "These are not guarantees, causal proof or instructions."
+    )
+    display_dataframe(
+        pd.DataFrame([
+            {
+                "Action ID": item["action_id"],
+                "Estimated damage reduction": item["estimated_damage_reduction"],
+                "Outcome unit": item["outcome_unit"],
+                "Evidence status": item["status"],
+            }
+            for item in hazard_effect["ranked_actions"]
+        ]),
+        hide_index=True,
+        width="stretch",
+        alt="Preliminary ML ranking of intervention effectiveness",
+    )
+    st.warning(hazard_effect.get("warning", effectiveness.get("warning", "")))
+else:
+    st.info(
+        "ML action-effect ranking is currently withheld. The project needs verified, "
+        "comparable intervention episodes (implemented and not implemented), measured "
+        "damage outcomes and pre-intervention conditions before it can estimate which "
+        "precaution reduces damage most."
+    )
+    if hazard_effect.get("reason"):
+        st.caption(hazard_effect["reason"])
 
 st.header("6. Evidence-linked recommendation candidates")
 recommendations = recommendation_candidates(inputs)
