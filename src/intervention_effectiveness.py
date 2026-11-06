@@ -26,7 +26,7 @@ from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import GroupKFold
 
 
-SCHEMA_VERSION = "intervention-effectiveness/0.1.0"
+SCHEMA_VERSION = "intervention-effectiveness/0.2.0"
 REQUIRED_COLUMNS = {
     "episode_id", "episode_date", "outcome_window_end", "site_id",
     "hazard", "action_id", "implemented", "damage_outcome",
