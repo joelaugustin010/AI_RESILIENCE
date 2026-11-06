@@ -88,3 +88,24 @@ depending on catalogue events that belong to the validation or test era.
 This embargo is distinct from storm-group purging. Both controls are recorded
 in split metadata. The aftershock model must be retrained after this change;
 its previous holdout metrics are not valid evidence for the purged protocol.
+
+
+## Preventive action intelligence
+
+The shared `src/prevention_intelligence.py` module converts registered hazard selections
+and user-supplied context into practical preparedness and mitigation options for both
+the general Decision Workflow and the specialized compound workspace. Each item carries
+a phase, hazard, activation trigger, intended benefit, responsible party, evidence needed
+and safety caveat. Registered hazards have hazard-specific action templates; compound
+selections expand into their component hazards; nominated critical services add continuity
+checks; entered rainfall and river values add provenance checks rather than invented
+warning thresholds.
+
+The action engine deliberately does **not** predict whether an action will work at a
+specific site, calculate lives or money saved, estimate percentage risk reduction, rank
+actions, or issue evacuation instructions. It distinguishes routine preparedness from
+actions that depend on an official warning. Local authorities, qualified engineers,
+health services and utility operators remain responsible for site-specific decisions.
+Unregistered custom scenarios receive a specialist-review prompt rather than fabricated
+hazard-specific advice. These recommendations are a preparedness layer alongside the
+scientific models, not ML predictions or a replacement for them.
