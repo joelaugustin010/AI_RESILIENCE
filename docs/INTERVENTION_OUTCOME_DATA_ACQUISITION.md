@@ -85,3 +85,7 @@ A dataset that lacks treatment assignment or implementation details may still be
 6. Publish only non-sensitive derived metrics, model cards, provenance, and limitations.
 
 **Current conclusion:** the strongest actionable real-data route is the licensed Bangladesh evaluation because its catalog exposes both randomized timing/administrative records and an asset-damage module. The missing ingredient is lawful, approved access to the underlying microdata. The Bihar trial gives directly relevant Indian evidence for community warning dissemination, but its raw microdata availability remains unverified. No responsible implementation can manufacture that missing access or data.
+
+## Additional inference guard — observed training support
+
+The observational intervention learner now records numeric feature ranges and observed categorical levels from its training partition. Context-specific inference is withheld if any numeric value falls outside the observed training range, if a categorical level was never observed, or if the model artifact predates this support profile. This is a conservative extrapolation guard, not proof that a point inside every marginal range is jointly well-supported; multivariate overlap and context-specific uncertainty remain unresolved. Existing intervention artifacts must be retrained to include the support profile.
