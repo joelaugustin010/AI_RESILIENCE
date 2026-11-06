@@ -146,13 +146,14 @@
         "weather_drought_onset_kochi_30day"
       ],
       "model_statuses": {
-        "weather_drought_onset_kochi_30day": "RESEARCH_SIGNAL_NOT_VALIDATED"
+        "weather_drought_onset_kochi_30day": "NO_SKILL"
       },
       "evidence_role": "supplementary",
-      "interpretation": "Shared ML screens a 30-day rainfall-deficit outlook at the Kochi grid point. It is not a drought declaration, SPI index, or water-supply forecast.",
+      "interpretation": "The previous 30-day rainfall-deficit model was invalidated after a target-window construction defect. No usable drought ML output is available until retraining with the corrected future-only target.",
       "limitations": [
         "A 30-day rainfall deficit is a meteorological indicator, not agricultural or hydrological drought.",
-        "Soil moisture, evaporative demand, storage, and demand are absent."
+        "Soil moisture, evaporative demand, storage, and demand are absent.",
+        "Prior drought model metrics are invalidated; corrected target retraining is required."
       ],
       "deterministic_model_retained": true
     },
