@@ -1648,8 +1648,11 @@ if hazard_effect.get("ranked_actions"):
     display_dataframe(
         pd.DataFrame([
             {
-                "Action ID": item["action_id"],
-                "Estimated damage reduction": item["estimated_damage_reduction"],
+                "Recommended precaution": next(
+                    (action["action"] for action in preventive_actions if action["action_id"] == item["action_id"]),
+                    item["action_id"],
+                ),
+                "Estimated damage reduction (research units)": item["estimated_damage_reduction"],
                 "Outcome unit": item["outcome_unit"],
                 "Evidence status": item["status"],
             }
