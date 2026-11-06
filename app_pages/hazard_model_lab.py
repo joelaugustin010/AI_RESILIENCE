@@ -219,27 +219,44 @@ else:
             metrics = card.get("metrics", {})
             majority = metrics.get("majority_baseline") or {}
             persistence = metrics.get("persistence_baseline") or {}
-            metric_rows = [
-                {"Metric": "Held-out events", "Value": card.get("test_events")},
-                {"Metric": "Held-out rows", "Value": card.get("test_rows")},
-                {"Metric": "ROC-AUC", "Value": metrics.get("roc_auc")},
-                {"Metric": "Average precision (PR-AUC)", "Value": metrics.get("average_precision")},
-                {"Metric": "Precision", "Value": metrics.get("precision")},
-                {"Metric": "Recall", "Value": metrics.get("recall")},
-                {"Metric": "F1", "Value": metrics.get("f1")},
-                {"Metric": "Brier score", "Value": metrics.get("brier_score")},
-                {"Metric": "Base-rate Brier reference", "Value": metrics.get("base_rate_brier_score")},
-                {"Metric": "Expected calibration error", "Value": metrics.get("expected_calibration_error")},
-                {"Metric": "Majority baseline F1", "Value": majority.get("f1")},
-                {
-                    "Metric": "Persistence baseline F1",
-                    "Value": persistence.get("f1") if persistence.get("available") else None,
-                },
-                {
-                    "Metric": "Persistence baseline balanced accuracy",
-                    "Value": persistence.get("balanced_accuracy") if persistence.get("available") else None,
-                },
-            ]
+            if card.get("task_type") == "regression":
+                baseline = metrics.get("persistence_baseline") or {}
+                median_baseline = baseline.get("training_median") or {}
+                metric_rows = [
+                    {"Metric": "Task", "Value": "Continuous regression"},
+                    {"Metric": "Selected estimator", "Value": card.get("selected_model_type")},
+                    {"Metric": "Held-out rows", "Value": metrics.get("n")},
+                    {"Metric": "Prediction unit", "Value": card.get("prediction_unit")},
+                    {"Metric": "Test MAE", "Value": metrics.get("mae")},
+                    {"Metric": "Test RMSE", "Value": metrics.get("rmse")},
+                    {"Metric": "Test R²", "Value": metrics.get("r2")},
+                    {"Metric": "Baseline MAE", "Value": baseline.get("mae")},
+                    {"Metric": "Training-median baseline MAE", "Value": median_baseline.get("mae")},
+                    {"Metric": "MAE skill over baseline", "Value": metrics.get("mae_skill_over_persistence")},
+                    {"Metric": "Paired bootstrap 95% CI for MAE improvement", "Value": metrics.get("paired_mae_improvement_bootstrap_95ci")},
+                ]
+            else:
+                metric_rows = [
+                    {"Metric": "Held-out events", "Value": card.get("test_events")},
+                    {"Metric": "Held-out rows", "Value": card.get("test_rows")},
+                    {"Metric": "ROC-AUC", "Value": metrics.get("roc_auc")},
+                    {"Metric": "Average precision (PR-AUC)", "Value": metrics.get("average_precision")},
+                    {"Metric": "Precision", "Value": metrics.get("precision")},
+                    {"Metric": "Recall", "Value": metrics.get("recall")},
+                    {"Metric": "F1", "Value": metrics.get("f1")},
+                    {"Metric": "Brier score", "Value": metrics.get("brier_score")},
+                    {"Metric": "Base-rate Brier reference", "Value": metrics.get("base_rate_brier_score")},
+                    {"Metric": "Expected calibration error", "Value": metrics.get("expected_calibration_error")},
+                    {"Metric": "Majority baseline F1", "Value": majority.get("f1")},
+                    {
+                        "Metric": "Persistence baseline F1",
+                        "Value": persistence.get("f1") if persistence.get("available") else None,
+                    },
+                    {
+                        "Metric": "Persistence baseline balanced accuracy",
+                        "Value": persistence.get("balanced_accuracy") if persistence.get("available") else None,
+                    },
+                ]
             display_dataframe(
                 pd.DataFrame(metric_rows),
                 hide_index=True,
