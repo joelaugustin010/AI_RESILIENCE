@@ -72,3 +72,34 @@ def test_compound_hazards_keep_joint_assessment_and_component_actions():
         action_hazards = {row["hazard"] for row in actions}
         assert expected_components.issubset(action_hazards)
         assert any(row["hazard"] == hazard for row in actions)
+
+
+def test_invalid_numeric_inputs_block_scenario_assessment_for_all_ten_hazards():
+    from src.scenario_output_model import validate_scenario_inputs
+    for hazard in WORKFLOW_HAZARDS:
+        result = predict_scenario_outcome({"hazard": hazard, "rainfall_mm": "not-a-number"})
+        assert result["concern_level"] == "Input validation required"
+        assert "not assessed" in result["conditional_outcome"].lower()
+        assert result["numerical_probability"] is None
+        assert result["is_trained_ml"] is False
+        assert result["input_validation"]["valid"] is False
+        assert result["input_validation"]["problems"][0]["field"] == "rainfall_mm"
+
+
+def test_numeric_input_validation_rejects_nonfinite_out_of_range_and_fractional_counts():
+    from src.scenario_output_model import validate_scenario_inputs
+    cases = [
+        ({"wind_speed_kmh": float("nan")}, "wind_speed_kmh"),
+        ({"temperature_c": 120}, "temperature_c"),
+        ({"earthquake_magnitude": -1}, "earthquake_magnitude"),
+        ({"heatwave_consecutive_days": 2.5}, "heatwave_consecutive_days"),
+        ({"river_level_m": True}, "river_level_m"),
+    ]
+    for values, expected_field in cases:
+        problems = validate_scenario_inputs(values)
+        assert problems and problems[0]["field"] == expected_field
+
+
+def test_valid_numeric_strings_are_accepted_as_measurements():
+    from src.scenario_output_model import validate_scenario_inputs
+    assert validate_scenario_inputs({"rainfall_mm": "120.5", "wind_speed_kmh": "45"}) == []
