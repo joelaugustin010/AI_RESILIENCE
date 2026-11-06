@@ -344,3 +344,42 @@ def test_regression_paired_bootstrap_requires_baseline_improvement():
     low, high = _paired_mae_improvement_ci(actual, good, bad_baseline)
     assert low > 0
     assert high > low
+
+
+
+def test_regression_training_uses_temporal_holdout_and_baseline(monkeypatch):
+    import numpy as np
+    from src.ml.data import Dataset
+    import src.ml.regression as regression
+
+    rng = np.random.default_rng(7)
+    dates = pd.date_range("2010-01-01", "2025-12-31", freq="D")
+    x = rng.normal(size=len(dates))
+    target = 2.5 * x + rng.normal(scale=0.15, size=len(dates))
+    frame = pd.DataFrame({
+        "target_date": dates,
+        "feature_x": x,
+        "target_value": target,
+        "naive_baseline": np.zeros(len(dates)),
+    })
+    dataset = Dataset(
+        name="synthetic_unit_test_only",
+        frame=frame,
+        target_column="target_value",
+        date_column="target_date",
+        feature_columns=["feature_x"],
+    )
+    monkeypatch.setattr(regression, "REGRESSION_CANDIDATES", ("ridge_regressor",))
+    monkeypatch.setattr(regression, "save_model_bundle", lambda *args, **kwargs: {})
+    card = regression.train_regression_dataset(
+        dataset,
+        model_id="unit_test_regression",
+        hazard="Test",
+        persistence_column="naive_baseline",
+        unit="test units",
+    )
+    assert card["task_type"] == "regression"
+    assert card["temporal_split"]["test_rows"] > 100
+    assert card["metrics"]["mae"] < card["metrics"]["persistence_baseline"]["mae"]
+    assert card["metrics"]["paired_mae_improvement_bootstrap_95ci"][0] > 0
+    assert card["status"] == "WEAK_RESEARCH_SIGNAL"
