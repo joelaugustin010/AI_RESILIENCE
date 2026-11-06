@@ -207,7 +207,10 @@ def validate_intervention_frame(
     ]
     if not inferred:
         raise InterventionDataError("At least one pre-intervention covariate is required.")
-    bad = [c for c in inferred if any(token in c.lower() for token in FORBIDDEN_FEATURE_TOKENS)]
+    bad = [
+        c for c in inferred
+        if c in excluded or any(token in c.lower() for token in FORBIDDEN_FEATURE_TOKENS)
+    ]
     if bad:
         raise InterventionDataError(f"Post-treatment or treatment-identifying features are forbidden: {bad}")
     absent = [c for c in inferred if c not in frame.columns]
