@@ -192,13 +192,13 @@ def hazard_layer_availability(active_hazard: str | None = None) -> list[dict[str
             {
                 "Hazard": hazard,
                 "Selected": hazard == active_hazard,
-                "Validated hazard footprint": status,
+                "Hazard footprint / modelled context": status,
                 "Context layer": (
                     "ESA WorldCover 2021 land-cover context"
                     if hazard in _LANDCOVER_CONTEXT_HAZARDS
                     else "None"
                 ),
-                "Why no footprint is shown": reason,
+                "Footprint scope / limitation": reason,
                 "Components": ", ".join(components_for(hazard)),
             }
         )
