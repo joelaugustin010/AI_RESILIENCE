@@ -2,7 +2,7 @@
 
 Input rows must be real, linked intervention episodes. Each row represents one
 site/time episode with a binary indicator for whether ONE named intervention
-was implemented, a pre-intervention damage-severity outcome, and covariates
+was implemented, a post-event damage-severity outcome, and covariates
 measured before treatment. Lower outcomes are better.
 
 This is an observational doubly-robust learner, not proof of causality:
@@ -16,12 +16,12 @@ from typing import Any, Iterable
 
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor, ExtraTreesRegressor
+from sklearn.ensemble import RandomForestRegressor, ExtraTreesRegressor
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
-from sklearn.linear_model import LogisticRegression, Ridge
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import GroupKFold
 
@@ -37,8 +37,9 @@ MIN_TEST_PER_ARM = 30
 MIN_OVERLAP_SHARE = 0.80
 PROPENSITY_CLIP = 0.05
 FORBIDDEN_FEATURE_TOKENS = (
-    "outcome", "damage_after", "loss_after", "future", "post_treatment",
-    "implemented", "treatment", "action_id", "recovery_cost",
+    "outcome", "damage_after", "loss_after", "future", "post_",
+    "after_", "_after", "implemented", "treatment", "action_id",
+    "recovery", "repair_cost", "fatalit", "casualt",
 )
 
 
