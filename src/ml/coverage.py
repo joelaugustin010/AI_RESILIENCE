@@ -103,6 +103,7 @@ LIMITATIONS: dict[str, list[str]] = {
         "Rapid intensification is rare; held-out event counts are small.",
     ],
     "Earthquake": [
+        "The prior temporal split did not embargo the full seven-day future label window; previous metrics are invalidated pending retraining.",
         "The USGS catalogue is regionally clipped and capped at 20,000 events.",
         "Aftershock screening does not predict mainshock occurrence or ground shaking.",
     ],
