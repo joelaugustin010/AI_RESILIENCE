@@ -126,7 +126,12 @@ def test_every_registered_card_is_consistent_and_makes_no_validation_claim():
         assert card_consistency_problems(card) == []
         assert card["validation_status"] == "SINGLE_TEMPORAL_HOLDOUT_NOT_INDEPENDENTLY_VALIDATED"
         assert card["status"] != "VALIDATED"
-        assert card["metrics"]["n_test"] > 0
+        if card.get("evaluation_validity") == "INVALIDATED_TARGET_CONSTRUCTION":
+            assert card["status"] == "NO_SKILL"
+            assert card["metrics"] == {}
+            assert "invalidated" in card["status_reason"].lower()
+        else:
+            assert card["metrics"]["n_test"] > 0
 
 
 @pytest.mark.skipif(not list_model_cards(), reason="Shared ML artifacts are not present in this checkout.")
@@ -262,3 +267,10 @@ def test_coverage_distinguishes_registered_artifacts_from_usable_models():
     assert drought["support_level"] == "no_skill_model"
     assert "Drought" in coverage["hazards_without_usable_research_model"]
     assert coverage["n_hazards_with_usable_research_model"] < coverage["n_hazards_with_ml_evidence"]
+
+
+def test_invalidated_drought_model_is_blocked_from_inference():
+    from src.ml.inference import ModelNotUsableError, predict_from_context
+
+    with pytest.raises(ModelNotUsableError, match="NO_SKILL"):
+        predict_from_context("weather_drought_onset_kochi_30day", {})
