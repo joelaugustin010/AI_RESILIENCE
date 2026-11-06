@@ -88,6 +88,11 @@ _KSDMA_HAZARD_REFERENCES: dict[str, list[dict[str, str]]] = {
     ],
     "Landslide": [
         {
+            "title": "GSI Bhusanket public portal — susceptibility, impact-probability and inventory viewer",
+            "url": "https://bhusanket.gsi.gov.in/",
+            "scope": "Official GSI portal reference. It lists meso-scale susceptibility maps, landslide impact-probability maps, forecasts and field-validated inventory; no Kochi GIS layer has been downloaded, licensed, or independently validated by this app.",
+        },
+        {
             "title": "KSDMA / GSI 2022 Ernakulam landslide-susceptibility shapefile (ZIP)",
             "url": "https://sdma.kerala.gov.in/wp-content/uploads/2025/08/Ernakulam.zip",
             "scope": "Official district shapefile link; archive schema, CRS, licence and geometry still require local QA before map ingestion.",
