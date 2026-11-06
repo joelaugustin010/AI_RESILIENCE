@@ -283,3 +283,18 @@ def test_invalidated_earthquake_model_is_blocked_from_inference():
 
     with pytest.raises(ModelNotUsableError, match="invalidated evaluation provenance"):
         predict_from_context("earthquake_aftershock_occurrence", {}, allow_no_skill=True)
+
+
+def test_regression_metrics_match_known_values():
+    import numpy as np
+    from src.ml.regression import _regression_metrics
+    metrics = _regression_metrics(np.asarray([1.0, 2.0, 3.0]), np.asarray([1.0, 2.0, 4.0]))
+    assert metrics["mae"] == pytest.approx(1.0 / 3.0)
+    assert metrics["rmse"] == pytest.approx((1.0 / 3.0) ** 0.5)
+    assert metrics["n"] == 3
+
+
+def test_regression_inference_rejects_classification_model():
+    from src.ml.inference import ModelNotUsableError, predict_regression_from_context
+    with pytest.raises(ModelNotUsableError, match="not a registered regression model"):
+        predict_regression_from_context("weather_extreme_rainfall_kochi_nextday", {})
