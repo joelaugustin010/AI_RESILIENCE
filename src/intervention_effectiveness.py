@@ -334,13 +334,27 @@ def train_intervention_model(
     m1.fit(x_train[t_train == 1], y_train[t_train == 1])
     mu0, mu1 = m0.predict(x_test), m1.predict(x_test)
     dr_test = (mu1 - mu0) + t_test * (y_test - mu1) / p_test - (1 - t_test) * (y_test - mu0) / (1 - p_test)
-    ci = _bootstrap_mean_ci(
-        dr_test, test["site_id"].astype(str).to_numpy(), seed=seed + 503
-    )
+    test_clusters = test["site_id"].astype(str).to_numpy()
+    ci = _bootstrap_mean_ci(dr_test, test_clusters, seed=seed + 503)
     mean_effect = float(np.mean(dr_test))
+    # Evaluate the learned CATE policy on untouched test episodes: apply this
+    # intervention only where the predicted treatment effect is beneficial.
+    cate_test = np.asarray(effect_model.predict(x_test), dtype=float)
+    policy_treat = cate_test < 0
+    policy_effect_values = np.where(policy_treat, dr_test, 0.0)
+    policy_effect = float(np.mean(policy_effect_values))
+    policy_ci = _bootstrap_mean_ci(
+        policy_effect_values, test_clusters, seed=seed + 504
+    )
     test_overlap = float(np.mean((raw_p_test >= PROPENSITY_CLIP) & (raw_p_test <= 1 - PROPENSITY_CLIP)))
     status = "CAUSAL_RESEARCH_SIGNAL_NOT_VALIDATED"
-    eligible = bool(mean_effect < 0 and ci[1] < 0 and test_overlap >= MIN_OVERLAP_SHARE)
+    eligible = bool(
+        mean_effect < 0
+        and ci[1] < 0
+        and policy_effect < 0
+        and policy_ci[1] < 0
+        and test_overlap >= MIN_OVERLAP_SHARE
+    )
     if not eligible:
         status = "NO_CLEAR_HARM_REDUCTION_SIGNAL"
     card = {
@@ -349,14 +363,17 @@ def train_intervention_model(
             "Held-out doubly-robust damage effect is below zero and its bootstrap 95% interval excludes zero; "
             "observational assumptions remain unverified."
             if eligible else
-            "Held-out data do not establish a damage-reduction effect with adequate overlap."
+            "Held-out data do not establish both an average and CATE-policy damage-reduction effect with adequate overlap."
         ),
         "metrics": {
             "heldout_dr_mean_effect": mean_effect,
             "heldout_dr_effect_95ci": ci,
             "heldout_overlap_share": test_overlap,
             "training_overlap_share": overlap_share,
-            "heldout_mae_of_dr_score_vs_cate": float(mean_absolute_error(dr_test, effect_model.predict(x_test))),
+            "heldout_cate_policy_damage_effect": policy_effect,
+            "heldout_cate_policy_damage_effect_95ci": policy_ci,
+            "heldout_cate_policy_treatment_share": float(np.mean(policy_treat)),
+            "heldout_mae_of_dr_score_vs_cate": float(mean_absolute_error(dr_test, cate_test)),
             "outcome_mean_treated_test": float(np.mean(y_test[t_test == 1])),
             "outcome_mean_control_test": float(np.mean(y_test[t_test == 0])),
         },
