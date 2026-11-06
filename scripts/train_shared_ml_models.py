@@ -194,6 +194,7 @@ MODEL_SPECS: tuple[tuple[str, dict], ...] = (
                 validation_start="2018-01-01",
                 test_start="2022-01-01",
                 fixed_threshold=0.5,
+                persistence_column="n_m4_prev7d_50km",
                 candidate_models=(
                     "random_forest",
                     "extra_trees",
