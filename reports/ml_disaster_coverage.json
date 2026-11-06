@@ -32,7 +32,7 @@
   ],
   "coverage_complete": true,
   "validated_models": 0,
-  "interpretation": "Every workflow hazard is represented. Seven hazards have registered ML artifacts, but only the listed usable research statuses are eligible for supplementary research output. Drought is invalidated after a target-window defect; three hazards have no defensible supervised model. Zero models are independently validated for operational use.",
+  "interpretation": "Every workflow hazard is represented. Registered artifacts are not equivalent to usable research models: Drought and Earthquake are invalidated pending corrected retraining, three hazards have no defensible supervised model, and zero models are independently validated for operational use.",
   "entries": [
     {
       "hazard": "Flood",
@@ -94,6 +94,7 @@
       "limitations": [
         "The USGS catalogue is regionally clipped and capped at 20,000 events.",
         "Aftershock screening does not predict mainshock occurrence or ground shaking.",
+        "Prior aftershock metrics are invalidated pending sequence-aware evaluation and label-window embargo retraining.",
         "Prior aftershock metrics are invalidated pending sequence-aware evaluation and label-window embargo retraining."
       ],
       "deterministic_model_retained": true
@@ -243,16 +244,16 @@
       "deterministic_model_retained": true
     }
   ],
-  "n_hazards_with_usable_research_model": 6,
+  "n_hazards_with_usable_research_model": 5,
   "hazards_with_usable_research_model": [
     "Flood",
     "Cyclone",
-    "Earthquake",
     "Heatwave",
     "Compound: cyclone + flood",
     "Compound: heavy rainfall + drainage failure"
   ],
   "hazards_without_usable_research_model": [
+    "Earthquake",
     "Landslide",
     "Drought",
     "Industrial incident",
