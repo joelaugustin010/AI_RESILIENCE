@@ -56,7 +56,7 @@ Every candidate training source must pass all of these checks:
 - Documented source, owner, collection dates, geographic scope, licence/access terms, and version.
 - A defined unit of analysis and stable episode/site/household identifiers.
 - A clearly specified intervention, treatment assignment or implementation status, and treatment timing.
-- A measurable outcome with definition, unit, observation window, and direction (whether lower or higher is better).
+- A measurable outcome with definition, exact unit, observation window, and direction. The current learner requires an explicitly documented lower_is_better outcome; higher-is-better outcomes must be transformed with a documented, reproducible rule before training.
 - Pre-intervention covariates only; no post-treatment variables or outcome leakage in features.
 - A defensible comparison group and study design; assignment probabilities or randomization fields where available.
 - Site/cluster identifiers and event/time boundaries for leakage-resistant splits.
@@ -89,3 +89,5 @@ A dataset that lacks treatment assignment or implementation details may still be
 ## Additional inference guard — observed training support
 
 The observational intervention learner now records numeric feature ranges and observed categorical levels from its training partition. Context-specific inference is withheld if any numeric value falls outside the observed training range, if a categorical level was never observed, or if the model artifact predates this support profile. This is a conservative extrapolation guard, not proof that a point inside every marginal range is jointly well-supported; multivariate overlap and context-specific uncertainty remain unresolved. Existing intervention artifacts must be retrained to include the support profile.
+
+The training CLI now requires an explicit outcome_unit and outcome_direction: "lower_is_better" in the provenance sidecar. It no longer silently assigns a generic damage-severity unit to an arbitrary numeric outcome. This prevents a model card from presenting an incorrect unit or direction.
