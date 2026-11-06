@@ -184,7 +184,7 @@ else:
     sc2.metric("Workflow hazards represented", coverage["n_hazards"])
     sc3.metric("Hazards without released ML", coverage["n_hazards_without_ml"])
     st.caption(
-        "Coverage records evidence roles, not predictive validity. No shared model is "
+        "The registry can contain both event classifiers and continuous regressors. Regression MAE/RMSE are not probabilities. Coverage records evidence roles, not predictive validity. No shared model is "
         "independently validated; missing models remain explicit rather than fabricated."
     )
     shared_rows = card_rows(shared_cards)
@@ -193,7 +193,7 @@ else:
             pd.DataFrame(shared_rows),
             hide_index=True,
             width="stretch",
-            alt="Shared ML model cards with holdout metrics and validation boundary",
+            alt="Shared ML model cards with classification and regression holdout metrics and validation boundary",
         )
     else:
         st.info("No shared ML model cards are present in this deployment.")
