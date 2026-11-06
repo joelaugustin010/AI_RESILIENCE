@@ -107,3 +107,14 @@ Additional publisher files can be selected explicitly with repeated
 `--file` arguments. After the main archive is verified, the helper invokes
 the non-extractive archive inspector and writes a manifest. Review the
 manifest and source scripts before building any target/feature adapter.
+
+
+## Kochi-local evidence lead: Operation Breakthrough
+
+Kerala State Disaster Management Authority's [Kochi 2019 record](https://sdma.kerala.gov.in/%E0%B4%95%E0%B5%8A%E0%B4%9A%E0%B5%8D%E0%B4%9A%E0%B4%BF-2019/) says Kochi flooded during the 21 October 2019 rainy spell, affecting critical assets, and records approval of Operation Breakthrough under GO (Ms) No. 35/2019/DMD dated 11 November 2019. This should be the first local intervention programme investigated for a Kochi flood-resilience evidence panel.
+
+**Current status: documented intervention, not measured effectiveness.** The public event summary does not supply ward/asset-level implementation dates and footprints, comparable pre/post damage outcomes, untreated comparison areas, or sufficient covariates for causal attribution. Do not create training labels from the project announcement or from the fact that works were approved.
+
+Evidence to seek from official project/asset records includes work orders and completion dates, geospatial work locations, design/capacity changes, maintenance records, drainage/water-level observations, rainfall/tide context, geocoded inundation depth/duration, asset/household damage, and comparable not-yet-treated locations or events. Any adult-supervised records request should preserve source terms and privacy. A before/after comparison alone is not causal evidence; concurrent works, changing exposure, weather differences, spillovers and reporting changes must be evaluated.
+
+Related official context includes the [Kerala Post-Disaster Needs Assessment](https://sdma.kerala.gov.in/wp-content/uploads/2020/08/Kerala-Post-Disaster-Needs-Assessment.pdf) and [CAG Report No. 6 of 2021 on preparedness and response to floods in Kerala](https://www.cag.gov.in/en/audit-report/details/114526). These are context/audit sources, not ready-made intervention outcome tables.
