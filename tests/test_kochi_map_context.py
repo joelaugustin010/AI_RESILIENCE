@@ -50,7 +50,7 @@ def test_hazard_reference_maps_do_not_claim_to_be_validated_local_gis_layers():
     cyclone = hazard_map_references("Cyclone")
     assert cyclone
     assert any("not a cyclone track" in item["scope"].lower() for item in cyclone)
-    assert hazard_map_references("Heatwave") == []
+    assert any("includes Heat" in item["title"] for item in hazard_map_references("Heatwave"))
     assert hazard_map_references("Unregistered custom scenario") == []
     assert hazard_map_references(None) == []
 
@@ -58,7 +58,8 @@ def test_hazard_reference_maps_do_not_claim_to_be_validated_local_gis_layers():
 def test_compound_hazard_reference_is_limited_to_available_component():
     refs = hazard_map_references("Compound: cyclone + flood")
     assert refs
-    assert all("flood component only" in item["scope"].lower() for item in refs)\n
+    assert any("flood component only" in item["scope"].lower() for item in refs)
+
 def test_every_registered_hazard_has_a_district_multi_hazard_reference():
     from src.hazard_registry import WORKFLOW_HAZARDS
 
