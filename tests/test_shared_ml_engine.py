@@ -126,7 +126,9 @@ def test_every_registered_card_is_consistent_and_makes_no_validation_claim():
         assert card_consistency_problems(card) == []
         assert card["validation_status"] == "SINGLE_TEMPORAL_HOLDOUT_NOT_INDEPENDENTLY_VALIDATED"
         assert card["status"] != "VALIDATED"
-        if card.get("evaluation_validity") == "INVALIDATED_TARGET_CONSTRUCTION":
+        if str(card.get("evaluation_validity", "")).startswith("INVALIDATED_"):
+            # Any invalidated target or split contract must have no usable metrics,
+            # regardless of the specific defect category.
             assert card["status"] == "NO_SKILL"
             assert card["metrics"] == {}
             assert "invalidated" in card["status_reason"].lower()
