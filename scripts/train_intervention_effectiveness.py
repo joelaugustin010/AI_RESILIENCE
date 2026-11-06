@@ -43,6 +43,8 @@ def main() -> int:
         raise SystemExit("BLOCKED: synthetic data cannot train or validate intervention-effect models.")
 
     frame = pd.read_csv(data_path)
+    from src.intervention_effectiveness import validate_intervention_frame
+    validate_intervention_frame(frame)
     cards, trained = [], []
     output_dir = Path(args.artifacts)
     output_dir.mkdir(parents=True, exist_ok=True)
