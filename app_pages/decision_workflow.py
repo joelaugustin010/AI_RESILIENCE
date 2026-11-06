@@ -1266,6 +1266,10 @@ st.caption(
     "flood-depth estimate, affected-area map, or official warning."
 )
 prediction = predict_scenario_outcome(inputs)
+if prediction.get("input_validation", {}).get("valid") is False:
+    st.error("Scenario assessment blocked: correct the invalid measurements below, then rerun the assessment.")
+    for problem in prediction["input_validation"].get("problems", []):
+        st.write(f"**{problem['field']}** — {problem['message']}")
 st.subheader("Conditional scenario output")
 st.metric("Scenario concern", prediction["concern_level"])
 st.markdown("**Potential outcome**")
