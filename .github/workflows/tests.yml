@@ -18,7 +18,9 @@ on:
 
 concurrency:
   group: ai-resilience-tests-${{ github.ref }}
-  cancel-in-progress: true
+  # Keep an active full test + research-training run alive when a newer commit is pushed.
+  # GitHub retains only the newest pending run for this concurrency group.
+  cancel-in-progress: false
 
 permissions:
   contents: read
