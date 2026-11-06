@@ -253,3 +253,12 @@ def test_forward_window_sum_rejects_non_positive_window():
 
     with pytest.raises(ValueError, match="at least one"):
         _forward_window_sum(pd.Series([1.0, 2.0]), 0)
+
+
+def test_coverage_distinguishes_registered_artifacts_from_usable_models():
+    coverage = build_coverage_matrix(write=False)
+    drought = next(item for item in coverage["entries"] if item["hazard"] == "Drought")
+    assert drought["model_statuses"]["weather_drought_onset_kochi_30day"] == "NO_SKILL"
+    assert drought["support_level"] == "no_skill_model"
+    assert "Drought" in coverage["hazards_without_usable_research_model"]
+    assert coverage["n_hazards_with_usable_research_model"] < coverage["n_hazards_with_ml_evidence"]
