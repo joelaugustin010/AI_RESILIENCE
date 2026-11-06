@@ -31,6 +31,7 @@ Reviewed: 2026-11-06
 - [Ernakulam historical flood probability map](https://sdma.kerala.gov.in/wp-content/uploads/2022/05/Ernakulam_Hist.pdf)
 - [KSDMA historical flood return-probability raster ZIP](https://sdma.kerala.gov.in/wp-content/uploads/2026/06/1.-Flood-Return-Probability-Historical-10-25-50-years.zip)
 - [GSI 2022 Ernakulam landslide-susceptibility shapefile ZIP](https://sdma.kerala.gov.in/wp-content/uploads/2025/08/Ernakulam.zip)
+- [GSI Bhusanket public portal](https://bhusanket.gsi.gov.in/) — portal lists susceptibility maps, landslide impact-probability products, forecasts and field-validated inventory; no Kochi layer is ingested or independently validated by this app.
 - [GSI 2022 Ernakulam landslide-susceptibility district PDF](https://sdma.kerala.gov.in/wp-content/uploads/2025/06/Landslide_Susceptibility_Zones_Districts_FINAL.pdf)
 - [KSDMA drought-prone area map (2012–2013 data period)](https://sdma.kerala.gov.in/wp-content/uploads/2018/10/KL-Drought-1.jpg)
 - [KSDMA earthquake/tremor map (2000–2016 reference)](https://sdma.kerala.gov.in/wp-content/uploads/2018/10/Map-Earthquake-incidents.jpg)
