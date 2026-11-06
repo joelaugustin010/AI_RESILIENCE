@@ -23,7 +23,7 @@ from src.spatial_data import classify_exposure, processed_layer_issues, read_pro
 from src.landcover_context import validate_worldcover_preview
 from src.map_integration import MAP_CONTEXT_KEY, selected_feature_properties
 from src.ui_theme import page_header, section_intro
-from src.map_integration import hazard_layer_availability
+from src.map_integration import hazard_has_flood_component, hazard_layer_availability
 
 ROOT = Path(__file__).resolve().parents[1]
 BOUNDARY_PATH = ROOT / "data" / "reference" / "kochi_corporation_boundary.geojson"
@@ -857,7 +857,7 @@ if active_hazard is None or "Flood" in active_components:
             jrc_preview = jrc_context["preview"]
             show_jrc = st.checkbox(
                 "JRC GloFAS RP100 modelled river-flood depth (scenario context, not observed flooding)",
-                value=False,
+                value=hazard_has_flood_component(active_hazard),
                 key=f"kochimap_jrc_{active_hazard}",
             )
             st.caption(JRC_DISPLAY_CAVEAT)
@@ -1188,6 +1188,21 @@ if uploaded is not None:
                 )
     except (UnicodeDecodeError, pd.errors.ParserError, ValueError) as error:
         st.error(f"Could not read the uploaded CSV: {error}")
+
+if not deck_layers:
+    # Keep a useful, geographically centred map available even when every optional
+    # thematic layer is disabled or unavailable for the selected hazard.
+    deck_layers.append(pdk.Layer(
+        "ScatterplotLayer",
+        id="kochi-map-centre-anchor",
+        data=[{"longitude": map_center[0], "latitude": map_center[1]}],
+        get_position="[longitude, latitude]",
+        get_fill_color=[38, 106, 166, 210],
+        get_radius=90,
+        radius_min_pixels=5,
+        pickable=False,
+    ))
+    legend_rows.append(("Kochi map centre", "#266AA6 marker", "Orientation marker only; not a hazard or asset location"))
 
 if deck_layers:
     deck = pdk.Deck(
