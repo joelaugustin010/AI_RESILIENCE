@@ -11,3 +11,7 @@ pytest
 plotly
 pyshp>=2.3,<3
 pyarrow>=14,<25
+
+# Required for the in-app equal-area population exposure calculator.
+shapely>=2.0,<3
+pyproj>=3.6,<4
