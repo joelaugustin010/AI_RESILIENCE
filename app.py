@@ -1262,8 +1262,8 @@ try:  # pragma: no cover - presentation only
                 gridcolor="rgba(44,105,82,.12)",
                 zerolinecolor="rgba(44,105,82,.18)",
                 linecolor="rgba(44,105,82,.24)",
-                tickfont=dict(color="#9dbac2"),
-                title=dict(font=dict(color="#b9d4d9")),
+                tickfont=dict(color="#71827F"),
+                title=dict(font=dict(color="#71827F")),
             ),
             legend=dict(
                 bgcolor="rgba(255,255,255,.88)",
