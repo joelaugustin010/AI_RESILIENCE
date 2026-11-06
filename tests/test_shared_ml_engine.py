@@ -262,6 +262,15 @@ def test_forward_window_sum_rejects_non_positive_window():
         _forward_window_sum(pd.Series([1.0, 2.0]), 0)
 
 
+def test_coverage_interpretation_does_not_repeat_superseded_drought_or_earthquake_status():
+    coverage = build_coverage_matrix(write=False)
+    by_hazard = {item["hazard"]: item for item in coverage["entries"]}
+    assert "no usable output is available until embargo retraining" not in by_hazard["Earthquake"]["interpretation"]
+    assert "no usable drought ML output is available until corrected future-only training" not in by_hazard["Drought"]["interpretation"]
+    assert "single temporal holdout" in by_hazard["Earthquake"]["interpretation"].lower()
+    assert "future-only" in by_hazard["Drought"]["interpretation"].lower()
+
+
 def test_coverage_distinguishes_registered_artifacts_from_usable_models():
     coverage = build_coverage_matrix(write=False)
     drought = next(item for item in coverage["entries"] if item["hazard"] == "Drought")
