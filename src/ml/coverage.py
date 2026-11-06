@@ -156,9 +156,10 @@ def build_coverage_matrix(*, write: bool = True) -> dict[str, Any]:
         model_ids = list(HAZARD_MODEL_MAP[hazard])
         support = SUPPORT_LEVEL[hazard]
         statuses = {model_id: _card_status(cards_by_id, model_id) for model_id in model_ids}
-        if any(status == "NO_SKILL" for status in statuses.values()):
+        primary_status = statuses.get(model_ids[0]) if model_ids else None
+        if support == "screening_model" and primary_status == "NO_SKILL":
             support = "no_skill_model"
-        elif any(status == "INSUFFICIENT_TEST_EVENTS" for status in statuses.values()):
+        elif support == "screening_model" and primary_status == "INSUFFICIENT_TEST_EVENTS":
             support = "insufficient_validation"
         entries.append(
             {
