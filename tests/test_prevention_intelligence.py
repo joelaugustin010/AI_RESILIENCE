@@ -83,3 +83,16 @@ def test_actions_are_not_ranked_or_assigned_risk_reduction_scores():
     actions = generate_prevention_actions("Compound: cyclone + flood")
     assert all("score" not in item for item in actions)
     assert all("risk_reduction_percent" not in item for item in actions)
+
+
+def test_every_workflow_hazard_has_before_during_and_recovery_actions():
+    for hazard in WORKFLOW_HAZARDS:
+        actions = generate_prevention_actions(hazard)
+        phases = {item["phase"] for item in actions}
+        assert "Before the event" in phases, hazard
+        assert any(
+            phase in {"During the event", "When an official warning is issued",
+                      "When an official alert is issued", "After shaking"}
+            for phase in phases
+        ), hazard
+        assert any(phase.startswith("After") for phase in phases), hazard
