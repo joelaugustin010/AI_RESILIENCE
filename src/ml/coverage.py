@@ -50,12 +50,12 @@ SUPPORT_LEVEL: dict[str, str] = {
 
 INTERPRETATION: dict[str, str] = {
     "Flood": (
-        "Shared ML contributes extreme-rainfall screening as forcing evidence only. "
-        "It is not a flood-occurrence, inundation, depth, or impact prediction."
+        "Shared ML contributes next-day rainfall screening and a continuous precipitation estimate as forcing evidence only. "
+        "Neither is a flood-occurrence, inundation, depth, or impact prediction."
     ),
     "Cyclone": (
-        "Shared ML screens 24-hour rapid intensification from best-track history. "
-        "It does not predict track, landfall, surge, or local wind."
+        "Shared ML screens 24-hour rapid intensification and estimates continuous wind change from storm-grouped best-track research. "
+        "It does not predict track, landfall, surge, or local wind at a specific place."
     ),
     "Earthquake": (
         "The previous aftershock model is invalidated because its seven-day outcome windows could cross temporal split boundaries. "
@@ -66,8 +66,8 @@ INTERPRETATION: dict[str, str] = {
         "reported-event catalogue without a representative non-event sample."
     ),
     "Heatwave": (
-        "Shared ML screens next-day high temperature at the Kochi reanalysis grid "
-        "point. It is not an official heatwave declaration or warning."
+        "Shared ML screens high-temperature events and estimates next-day maximum temperature at the Kochi reanalysis grid point. "
+        "Neither is an official heatwave declaration, health-impact estimate, or warning."
     ),
     "Drought": (
         "The previous 30-day rainfall-deficit model was invalidated after a target-window construction defect. "
