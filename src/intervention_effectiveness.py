@@ -115,11 +115,9 @@ def _make_outcome_model(seed: int) -> RandomForestRegressor:
     )
 
 
-def _make_propensity_model(seed: int) -> Pipeline:
-    return Pipeline([
-        ("imputer", SimpleImputer(strategy="median")),
-        ("model", LogisticRegression(max_iter=2000, class_weight="balanced", random_state=seed)),
-    ])
+def _make_propensity_model(seed: int) -> LogisticRegression:
+    # Covariates have already passed through the shared preprocessor.
+    return LogisticRegression(max_iter=2000, class_weight="balanced", random_state=seed)
 
 
 def _crossfit_dr_score(
@@ -138,14 +136,15 @@ def _crossfit_dr_score(
             raise InterventionDataError("Cross-fitting fold lacks both treated and control episodes.")
         p_model = _make_propensity_model(seed + fold)
         p_model.fit(x[train], treatment[train])
-        propensity = np.clip(p_model.predict_proba(x[held])[:, 1], PROPENSITY_CLIP, 1 - PROPENSITY_CLIP)
+        raw_propensity = p_model.predict_proba(x[held])[:, 1]
+        propensity = np.clip(raw_propensity, PROPENSITY_CLIP, 1 - PROPENSITY_CLIP)
         m0, m1 = _make_outcome_model(seed + 100 + fold), _make_outcome_model(seed + 200 + fold)
         m0.fit(x[train][treatment[train] == 0], outcome[train][treatment[train] == 0])
         m1.fit(x[train][treatment[train] == 1], outcome[train][treatment[train] == 1])
         mu0, mu1 = m0.predict(x[held]), m1.predict(x[held])
         t, y = treatment[held], outcome[held]
         pseudo[held] = (mu1 - mu0) + t * (y - mu1) / propensity - (1 - t) * (y - mu0) / (1 - propensity)
-        propensities[held] = propensity
+        propensities[held] = raw_propensity
     return pseudo, propensities
 
 
@@ -274,7 +273,8 @@ def train_intervention_model(
     # Held-out doubly-robust ATE: nuisance models are trained only on pre-test data.
     p_model = _make_propensity_model(seed + 500)
     p_model.fit(x_train, t_train)
-    p_test = np.clip(p_model.predict_proba(x_test)[:, 1], PROPENSITY_CLIP, 1 - PROPENSITY_CLIP)
+    raw_p_test = p_model.predict_proba(x_test)[:, 1]
+    p_test = np.clip(raw_p_test, PROPENSITY_CLIP, 1 - PROPENSITY_CLIP)
     m0, m1 = _make_outcome_model(seed + 501), _make_outcome_model(seed + 502)
     m0.fit(x_train[t_train == 0], y_train[t_train == 0])
     m1.fit(x_train[t_train == 1], y_train[t_train == 1])
@@ -282,7 +282,7 @@ def train_intervention_model(
     dr_test = (mu1 - mu0) + t_test * (y_test - mu1) / p_test - (1 - t_test) * (y_test - mu0) / (1 - p_test)
     ci = _bootstrap_mean_ci(dr_test, seed=seed + 503)
     mean_effect = float(np.mean(dr_test))
-    test_overlap = float(np.mean((p_test >= PROPENSITY_CLIP) & (p_test <= 1 - PROPENSITY_CLIP)))
+    test_overlap = float(np.mean((raw_p_test >= PROPENSITY_CLIP) & (raw_p_test <= 1 - PROPENSITY_CLIP)))
     status = "CAUSAL_RESEARCH_SIGNAL_NOT_VALIDATED"
     eligible = bool(mean_effect < 0 and ci[1] < 0 and test_overlap >= MIN_OVERLAP_SHARE)
     if not eligible:
