@@ -58,7 +58,7 @@ The current Kochi administrative outline and older ward geometry are provisional
 
 ## Engineering follow-up
 
-- Retrieve the GSI Ernakulam archive from the official KSDMA link in a network-enabled project environment.
+- Retrieve the GSI Ernakulam archive from the official KSDMA link in a network-enabled project environment. The new metadata-only helper is `python scripts/inspect_gsi_landslide_archive.py --download`; it preserves the ZIP, checks archive CRCs, inventories shapefile sidecars, reads the declared `.prj` and DBF field schema, and writes `reports/gsi_ernakulam_landslide_archive_inspection.json` without extracting or promoting the layer.
 - Inspect the ZIP members and shapefile sidecars; confirm CRS and licence with KSDMA/GSI metadata.
 - Convert only after the schema is confirmed, preserve the original archive, record checksums and processing provenance, and run independent geometry validation.
 - Add a separate hazard layer with explicit status and source attribution; do not merge it with the JRC flood scenario or treat susceptibility as event probability.
