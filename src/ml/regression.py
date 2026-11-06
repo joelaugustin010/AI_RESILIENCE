@@ -85,7 +85,8 @@ def train_regression_dataset(
     final_train = pd.concat([train, validation]).sort_values(dataset.date_column)
     final_model = build_regressor(selected["model_type"])
     final_model.fit(features.loc[final_train.index, feature_columns], final_train["_continuous_target"].to_numpy(dtype=float))
-    metrics = _regression_metrics(y_test, np.asarray(final_model.predict(X_test), dtype=float))
+    predicted = np.asarray(final_model.predict(X_test), dtype=float)
+    metrics = _regression_metrics(y_test, predicted)
     baseline: dict[str, Any] = {"available": False}
     baseline_prediction: np.ndarray | None = None
     comparison_actual = y_test
