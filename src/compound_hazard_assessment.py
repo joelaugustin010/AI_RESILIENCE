@@ -176,7 +176,7 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
             points.append(info["flood"])
         if "Cyclone" in components:
             points.append(info["cyclone"])
-        for selected in sorted(hazards.difference({"Flood", "Cyclone"})):
+        for selected in sorted(components.difference({"Flood", "Cyclone"})):
             definition = HAZARD_REGISTRY[selected]
             points.append(selected + ": " + definition.summary + " Evidence needed: " + "; ".join(definition.evidence_factors) + ".")
         if compound and {"Flood", "Cyclone"}.issubset(components):
