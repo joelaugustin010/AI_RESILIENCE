@@ -393,3 +393,36 @@ def intervention_effectiveness_for_context(
             "reason": "No verified, eligible intervention-effect model is currently registered for this hazard.",
         }
     return rank_interventions(models, context)
+
+
+
+def intervention_effectiveness_for_hazards(
+    hazards: Iterable[str],
+    context: dict[str, Any],
+    *,
+    registry_path: str = "reports/intervention_effectiveness_registry.json",
+) -> dict[str, Any]:
+    """Return independent, hazard-specific intervention rankings for a scenario."""
+    models = load_intervention_models(registry_path)
+    results = {}
+    for hazard in dict.fromkeys(str(item) for item in hazards):
+        selected = [model for model in models if model.hazard == hazard]
+        results[hazard] = (
+            rank_interventions(selected, context)
+            if selected else {
+                "status": "RANKING_WITHHELD",
+                "ranked_actions": [],
+                "excluded_actions": [],
+                "reason": f"No verified, eligible intervention-effect model is currently registered for {hazard}.",
+            }
+        )
+    return {
+        "status": "AVAILABLE" if any(
+            result.get("ranked_actions") for result in results.values()
+        ) else "RANKING_WITHHELD",
+        "by_hazard": results,
+        "warning": (
+            "Rankings are preliminary observational research estimates, not guarantees. "
+            "They must not override official instructions or qualified engineering judgement."
+        ),
+    }
