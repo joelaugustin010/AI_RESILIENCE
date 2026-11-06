@@ -272,3 +272,9 @@ def test_eligible_legacy_model_without_support_profile_fails_closed():
     result = model.estimate({"rainfall_before": 100})
     assert result["available"] is False
     assert result["status"] == "CONTEXT_SUPPORT_PROFILE_MISSING"
+
+def test_intervention_training_requires_explicit_outcome_unit_and_direction():
+    from scripts.train_intervention_effectiveness import PROVENANCE_FIELDS
+
+    assert "outcome_unit" in PROVENANCE_FIELDS
+    assert "outcome_direction" in PROVENANCE_FIELDS
