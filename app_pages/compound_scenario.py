@@ -8,11 +8,12 @@ import pandas as pd
 import streamlit as st
 
 from src.compound_hazard_assessment import assess_compound_scenario
+from src.hazard_registry import WORKFLOW_HAZARDS
 from src.dataframe_display import display_dataframe
 from src.ui_theme import page_header
 
 
-def _render_shared_ml_evidence() -> None:
+def _render_shared_ml_evidence(selected_hazards: list[str]) -> None:
     """Show the exploratory compound-association card, never a joint forecast."""
     st.markdown("#### Shared ML association evidence (exploratory)")
     try:
@@ -22,6 +23,15 @@ def _render_shared_ml_evidence() -> None:
         st.info(f"Shared ML evidence is unavailable: {type(exc).__name__}: {exc}")
         return
     try:
+        for selected_hazard in selected_hazards:
+            if selected_hazard == "Compound: cyclone + flood":
+                continue
+            item = ml_evidence_for(selected_hazard, {})
+            st.write("**" + selected_hazard + ":** " + str(item.get("status", "unknown")).replace("_", " ").capitalize())
+            st.caption(item.get("interpretation", ""))
+        has_cyclone_flood_compound = "Compound: cyclone + flood" in selected_hazards or {"Flood", "Cyclone"}.issubset(set(selected_hazards))
+        if not has_cyclone_flood_compound:
+            return
         evidence = ml_evidence_for("Compound: cyclone + flood", {})
     except Exception as exc:
         st.info(f"Shared ML evidence could not be loaded: {type(exc).__name__}: {exc}")
@@ -144,7 +154,8 @@ st.markdown(
 with st.form("compound_scenario_form"):
     st.subheader("1. Define the event")
     area = st.text_input("Study area", value="Kochi / Ernakulam")
-    hazards = st.multiselect("Hazards in this scenario", ["Flood", "Cyclone"], default=["Flood", "Cyclone"])
+    hazards = st.multiselect("Hazards in this scenario", list(WORKFLOW_HAZARDS), default=["Flood", "Cyclone"], help="Select any of the ten registered hazards, including multiple hazards and registered compound scenarios.")
+    custom_disaster = st.text_input("Custom disaster (optional)", placeholder="Describe an unregistered disaster; it receives a qualitative review only.")
     evidence_type = st.selectbox(
         "Evidence type",
         ["Hypothetical scenario", "Historical event", "Current sourced observations", "Official forecast product"],
@@ -212,6 +223,7 @@ if submitted:
         result = assess_compound_scenario({
             "area": area,
             "hazards": hazards,
+            "custom_disaster": custom_disaster,
             "evidence_type": evidence_type,
             "period_start": period_start,
             "period_end": period_end,
@@ -264,7 +276,7 @@ if submitted:
         else:
             st.caption("No threshold comparison was made. A reference level is never assumed or invented.")
 
-        _render_shared_ml_evidence()
+        _render_shared_ml_evidence(hazards)
 
         st.markdown("#### Possible consequences to investigate")
         for item in result["service_reviews"]:
