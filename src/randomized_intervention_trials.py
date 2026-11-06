@@ -183,16 +183,24 @@ def fit_randomized_contrast(
             "Assignment probabilities must name every observed randomized arm exactly; "
             f"observed={sorted(observed_arms)}, supplied={sorted(probability_arms)}."
         )
-    invalid_probabilities = {
-        arm: value for arm, value in assignment_probabilities.items()
-        if not np.isfinite(value) or float(value) <= 0 or float(value) >= 1
-    }
+    numeric_probabilities: dict[str, float] = {}
+    invalid_probabilities: dict[str, Any] = {}
+    for arm, value in assignment_probabilities.items():
+        try:
+            probability = float(value)
+        except (TypeError, ValueError):
+            invalid_probabilities[arm] = value
+            continue
+        if not np.isfinite(probability) or probability <= 0 or probability >= 1:
+            invalid_probabilities[arm] = value
+        else:
+            numeric_probabilities[arm] = probability
     if invalid_probabilities:
         raise TrialDataError(
             f"Every randomized arm needs a finite probability strictly between 0 and 1: "
             f"{invalid_probabilities}."
         )
-    probability_total = sum(float(v) for v in assignment_probabilities.values())
+    probability_total = sum(numeric_probabilities.values())
     if not np.isclose(probability_total, 1.0, atol=1e-6):
         raise TrialDataError(
             "Supply the complete, documented arm-probability vector; probabilities must sum to one."
@@ -248,11 +256,11 @@ def fit_randomized_contrast(
     # arms. Renormalise the protocol probabilities for that pair; other trial
     # arms are not silently treated as the reference group.
     pair_probability = (
-        float(assignment_probabilities[treatment_arm])
-        + float(assignment_probabilities[reference_arm])
+        numeric_probabilities[treatment_arm]
+        + numeric_probabilities[reference_arm]
     )
-    p_a = float(assignment_probabilities[treatment_arm]) / pair_probability
-    p_r = float(assignment_probabilities[reference_arm]) / pair_probability
+    p_a = numeric_probabilities[treatment_arm] / pair_probability
+    p_r = numeric_probabilities[reference_arm] / pair_probability
     for fold, (fit_idx, held_idx) in enumerate(splitter.split(x_train, a_train, groups)):
         if len(np.unique(a_train[fit_idx])) != 2:
             raise TrialDataError("A cross-fitting fold lacks one of the comparison arms.")
