@@ -66,7 +66,11 @@ def main() -> int:
                 safe_hazard = "".join(ch if ch.isalnum() or ch in "-_" else "_" for ch in hazard.lower())
                 safe_action = "".join(ch if ch.isalnum() or ch in "-_" else "_" for ch in action_id)
                 artifact_path = output_dir / f"{safe_hazard}__{safe_action}.joblib"
-                joblib.dump({"preprocessor": model.preprocessor, "effect_model": model.effect_model}, artifact_path)
+                joblib.dump({
+                    "preprocessor": model.preprocessor,
+                    "effect_model": model.effect_model,
+                    "support_profile": model.support_profile,
+                }, artifact_path)
                 card["artifact_path"] = str(artifact_path)
                 trained.append(str(artifact_path))
             cards.append(card)
