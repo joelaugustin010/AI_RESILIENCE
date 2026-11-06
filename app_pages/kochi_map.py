@@ -828,6 +828,24 @@ if processed_layers:
         "OSM layers remain provisional community-mapped context and are not used for exposure or causal analysis."
     )
 
+    checked_feature_count = sum(
+        int(item["report"].get("feature_count", 0)) for item in processed_layers
+    )
+    represented_roles = sorted({
+        str(item["metadata"].get("layer_role", "unclassified"))
+        for item in processed_layers
+    })
+    with st.container(border=True):
+        st.markdown("**Spatial data at a glance**")
+        overview_cols = st.columns(3)
+        overview_cols[0].metric("Processed layers", f"{len(processed_layers)}")
+        overview_cols[1].metric("Geometry-checked features", f"{checked_feature_count:,}")
+        overview_cols[2].metric("Layer roles represented", f"{len(represented_roles)}")
+        st.caption(
+            "These are file-level QA counts only. They do not measure completeness, positional accuracy, "
+            "current conditions, hazard severity, or verified infrastructure coverage."
+        )
+
 section_intro(
     "Map controls",
     "Map layers",
