@@ -58,7 +58,7 @@ from src.hydrology_analytics import (
     station_gap_summary,
 )
 from src.infrastructure_dependencies import dependency_review_table
-from src.map_integration import MAP_CONTEXT_KEY, build_map_context
+from src.map_integration import MAP_CONTEXT_KEY, build_map_context, hazard_has_flood_component
 from src.ui_theme import section_intro
 from src.phase2_data import (
     Phase2DataError,
@@ -1431,6 +1431,11 @@ if st.button(
     help="Opens the Kochi map with this scenario. A modelled flood-context layer is available for flood-component scenarios; other hazards remain explicitly unavailable until suitable local spatial evidence is approved.",
 ):
     st.session_state[MAP_CONTEXT_KEY] = build_map_context(inputs, disaster_assessment)
+    map_hazard = inputs.get("hazard")
+    if isinstance(map_hazard, str) and hazard_has_flood_component(map_hazard):
+        # A previous manual toggle may have left the per-hazard checkbox off.
+        # Re-entering the map from a flood scenario should enable its preview.
+        st.session_state[f"kochimap_jrc_{map_hazard}"] = True
     st.switch_page(ROOT / "app_pages" / "kochi_map.py")
 st.warning(assessment["status"], icon=":material/priority_high:")
 st.write("**Method:**", assessment["method"])
