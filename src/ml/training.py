@@ -73,6 +73,7 @@ class TrainingConfig:
     fixed_threshold: float | None = None
     candidate_models: tuple[str, ...] = DEFAULT_CANDIDATES
     group_column: str | None = None
+    label_end_column: str | None = None
     persistence_column: str | None = None
     evidence_tier: str = "baseline"
     intended_use: str = "Research screening only."
@@ -122,6 +123,7 @@ def temporal_split(
     validation_start: pd.Timestamp,
     test_start: pd.Timestamp,
     group_column: str | None = None,
+    label_end_column: str | None = None,
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, dict[str, Any]]:
     """Return train/validation/test frames with optional group purging."""
     if validation_start >= test_start:
@@ -136,7 +138,7 @@ def temporal_split(
         0,
         np.where(dates < test_start, 1, 2),
     ).astype(int)
-    purge: dict[str, Any] = {"group_column": group_column, "purged_groups": 0}
+    purge: dict[str, Any] = {"group_column": group_column, "purged_groups": 0, "label_end_column": label_end_column, "purged_label_window_rows": 0}
     if group_column:
         if group_column not in frame.columns:
             raise ValueError(f"Group column {group_column!r} is absent.")
@@ -158,6 +160,20 @@ def temporal_split(
         purge["purged_groups"] = int(
             group_keys[assignment != original].nunique()
         )
+
+    if label_end_column:
+        if label_end_column not in frame.columns:
+            raise ValueError(f"Label-window end column {label_end_column!r} is absent.")
+        label_ends = pd.to_datetime(frame[label_end_column])
+        if label_ends.isna().any():
+            raise ValueError(f"{label_end_column!r} contains missing or unparseable dates.")
+        label_ends = label_ends.map(lambda value: _boundary_for_series(label_ends, value))
+        train_crosses = (assignment == 0) & (label_ends >= validation_start)
+        validation_crosses = (assignment == 1) & (label_ends >= test_start)
+        purge["purged_train_label_window_rows"] = int(train_crosses.sum())
+        purge["purged_validation_label_window_rows"] = int(validation_crosses.sum())
+        purge["purged_label_window_rows"] = int(train_crosses.sum() + validation_crosses.sum())
+        assignment = np.where(train_crosses | validation_crosses, -1, assignment)
 
     train = frame.loc[assignment == 0].copy()
     validation = frame.loc[assignment == 1].copy()
@@ -245,6 +261,7 @@ def train_model(dataset: Dataset, config: TrainingConfig) -> TrainingResult:
         validation_start=validation_start,
         test_start=test_start,
         group_column=config.group_column,
+        label_end_column=config.label_end_column,
     )
     _require_split("train", train, min_rows=config.min_train_rows, min_events=config.min_train_events)
     _require_split(
