@@ -66,7 +66,7 @@ pages = {
         ),
         st.Page(
             "app_pages/disaster_probability.py",
-            title="Kochi Multi-Hazard Review",
+            title="Multi-Hazard Evidence Review",
             icon=":material/analytics:",
         ),
     ],
@@ -1293,6 +1293,79 @@ st.markdown(
     [data-testid="stVegaLiteChart"] canvas {
       border-radius: 12px;
     }
+
+    /* Page-specific components harmonised with the eco-glass system. */
+    .wf-step {
+      color: #48685B !important;
+      background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(239,247,242,.96)) !important;
+      border-color: rgba(44,105,82,.18) !important;
+      box-shadow: 0 8px 22px rgba(26,65,49,.07) !important;
+    }
+    .wf-step strong { color: #1D3030 !important; }
+    .air-nav { border-bottom-color: rgba(44,105,82,.16) !important; }
+    .air-nav a {
+      color: #315B4C !important;
+      background: rgba(255,255,255,.82) !important;
+      border-color: rgba(44,105,82,.20) !important;
+    }
+    .air-nav a:hover {
+      color: #17624f !important;
+      background: #EAF3EE !important;
+      border-color: rgba(36,122,101,.38) !important;
+    }
+    .disaster-hero {
+      color: #1D3030 !important;
+      background:
+        radial-gradient(ellipse at 90% -20%, rgba(131,185,165,.18), transparent 20rem),
+        linear-gradient(120deg, rgba(255,255,255,.98), rgba(234,243,238,.96)) !important;
+      border-color: rgba(44,105,82,.20) !important;
+    }
+    .disaster-kicker, .disaster-step { color: #247A65 !important; }
+    .disaster-title { color: #1D3030 !important; }
+    .disaster-subtitle, .disaster-card-copy,
+    .disaster-result-copy { color: #587267 !important; }
+    .disaster-card {
+      background: rgba(255,255,255,.88) !important;
+      border-color: rgba(44,105,82,.18) !important;
+    }
+    .disaster-card-title { color: #315B4C !important; }
+    .disaster-result {
+      background: linear-gradient(140deg, rgba(232,246,238,.98), rgba(255,255,255,.98)) !important;
+      border-color: rgba(44,105,82,.20) !important;
+    }
+    .disaster-result-label { color: #247A65 !important; }
+    .disaster-result-value { color: #1D3030 !important; }
+    .disaster-pill {
+      color: #315B4C !important;
+      background: #EAF3EE !important;
+      border-color: rgba(44,105,82,.20) !important;
+    }
+    .disaster-empty {
+      color: #587267 !important;
+      background: rgba(255,255,255,.82) !important;
+      border-color: rgba(44,105,82,.28) !important;
+    }
+    .concept-note {
+      color: #6f531e !important;
+      background: linear-gradient(145deg, rgba(255,249,232,.98), rgba(255,255,255,.96)) !important;
+      border-color: rgba(169,107,18,.26) !important;
+      border-left-color: #b7832e !important;
+    }
+    .concept-note strong { color: #7b5717 !important; }
+    .concept-note p { color: #765f36 !important; }
+    .smart-panel {
+      background: linear-gradient(140deg, rgba(255,255,255,.98), rgba(239,247,242,.96)) !important;
+      border-color: rgba(44,105,82,.18) !important;
+    }
+    .smart-panel h3 { color: #1D3030 !important; }
+    .smart-panel p { color: #587267 !important; }
+    .probability-panel {
+      background: linear-gradient(145deg, rgba(255,255,255,.98), rgba(239,247,242,.96)) !important;
+      border-color: rgba(44,105,82,.20) !important;
+    }
+    .probability-label { color: #71827F !important; }
+    .probability-value { color: #1D604F !important; }
+    .probability-unavailable { color: #94620e !important; }
 
     /* Alerts, forms and expandable content */
     [data-testid="stAlert"] {
