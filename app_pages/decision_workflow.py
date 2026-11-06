@@ -1425,10 +1425,10 @@ if inputs.get("hazard") == "Compound: cyclone + flood":
         _render_compound_assessment(compound_assessment)
 
 if st.button(
-    "View prone areas on the Kochi map",
+    "Open Kochi map and available hazard evidence",
     icon=":material/map:",
     key="wf_open_kochi_map",
-    help="Opens the existing map with this submitted scenario. Available map evidence may not support the selected hazard.",
+    help="Opens the Kochi map with this scenario. A modelled flood-context layer is available for flood-component scenarios; other hazards remain explicitly unavailable until suitable local spatial evidence is approved.",
 ):
     st.session_state[MAP_CONTEXT_KEY] = build_map_context(inputs, disaster_assessment)
     st.switch_page(ROOT / "app_pages" / "kochi_map.py")
