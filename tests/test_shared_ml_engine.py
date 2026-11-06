@@ -161,3 +161,32 @@ def test_flood_assessment_still_renders_without_ml_context():
         "not_trained",
         "no_model_available",
     }
+
+
+def test_temporal_split_purges_labels_whose_future_windows_cross_boundaries():
+    from src.ml.training import temporal_split
+
+    frame = pd.DataFrame({
+        "target_date": pd.to_datetime([
+            "2017-12-20", "2017-12-28", "2018-01-02",
+            "2021-12-20", "2021-12-28", "2022-01-02",
+        ]),
+        "target_window_end": pd.to_datetime([
+            "2017-12-27", "2018-01-04", "2018-01-09",
+            "2021-12-27", "2022-01-04", "2022-01-09",
+        ]),
+        "row": list(range(6)),
+    })
+    train, validation, test, purge = temporal_split(
+        frame,
+        date_column="target_date",
+        validation_start=pd.Timestamp("2018-01-01"),
+        test_start=pd.Timestamp("2022-01-01"),
+        label_end_column="target_window_end",
+    )
+    assert train["row"].tolist() == [0]
+    assert validation["row"].tolist() == [3]
+    assert test["row"].tolist() == [5]
+    assert purge["purged_train_label_window_rows"] == 1
+    assert purge["purged_validation_label_window_rows"] == 1
+    assert purge["purged_label_window_rows"] == 2
