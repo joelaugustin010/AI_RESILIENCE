@@ -76,6 +76,22 @@ class CompoundHazardAssessmentTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "end date"):
             assess_compound_scenario(self.base(period_start=date(2026, 11, 3), period_end=date(2026, 11, 2)))
 
+    def test_registered_compound_option_expands_component_level_evidence_gaps(self):
+        result = assess_compound_scenario(self.base(
+            hazards=["Compound: cyclone + flood"],
+            rainfall_mm=80,
+            cyclone_distance_km=120,
+        ))
+        self.assertEqual(set(result["components"]), {"Cyclone", "Flood"})
+        self.assertIn("Rainfall accumulation period", result["data_gaps"])
+        self.assertIn("Rainfall station ID", result["data_gaps"])
+        self.assertIn("Cyclone track-fix timestamp", result["data_gaps"])
+        self.assertIn("Cyclone storm ID or official storm name", result["data_gaps"])
+
+    def test_registered_compound_option_checks_date_types(self):
+        with self.assertRaisesRegex(ValueError, "start date must be a date"):
+            assess_compound_scenario(self.base(period_start="not-a-date"))
+
     def test_non_finite_measurements_are_rejected(self):
         with self.assertRaisesRegex(ValueError, "finite"):
             assess_compound_scenario(self.base(rainfall_mm="nan"))
