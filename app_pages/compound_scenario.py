@@ -11,6 +11,7 @@ from src.compound_hazard_assessment import assess_compound_scenario
 from src.hazard_registry import WORKFLOW_HAZARDS
 from src.dataframe_display import display_dataframe
 from src.ui_theme import page_header
+from src.prevention_intelligence import generate_prevention_actions
 
 
 def _render_shared_ml_evidence(selected_hazards: list[str]) -> None:
@@ -283,6 +284,42 @@ if submitted:
             with st.expander(item["service"], expanded=True):
                 for point in item["review_points"]:
                     st.write(f"- {point}")
+
+        st.markdown("#### Preventive action intelligence")
+        preventive_actions = generate_prevention_actions(
+            hazards,
+            {
+                "evidence_type": evidence_type,
+                "rainfall_mm": rainfall_mm,
+                "river_level_m": river_level_m,
+                "services": services,
+            },
+            custom_disaster=custom_disaster,
+        )
+        st.caption(
+            "Recommendations are matched to the selected registered hazards and the services "
+            "nominated for review. They are preparedness options, not a forecast, automatic "
+            "evacuation decision or substitute for IMD, CWC, KSDMA or local-authority instructions."
+        )
+        display_dataframe(
+            pd.DataFrame(preventive_actions)[
+                ["phase", "hazard", "action", "trigger", "benefit", "owner", "evidence", "caution"]
+            ].rename(
+                columns={
+                    "phase": "When",
+                    "hazard": "Hazard",
+                    "action": "Recommended precaution",
+                    "trigger": "When it applies",
+                    "benefit": "How it may reduce harm",
+                    "owner": "Responsible party",
+                    "evidence": "Evidence / verification needed",
+                    "caution": "Safety boundary",
+                }
+            ),
+            hide_index=True,
+            width="stretch",
+            alt="Evidence-aware preventive actions for selected hazards",
+        )
 
         st.markdown("#### Action framework")
         before, during, after = st.columns(3)
