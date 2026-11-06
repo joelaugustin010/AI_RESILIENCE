@@ -139,6 +139,102 @@ def build_consequence_assessment(
     if hazard in {"Infrastructure failure", "Compound: heavy rainfall + drainage failure"}:
         consequences.append("Service outage and recovery (requires verified network topology, asset condition and failure data)")
 
+    # A complete impact register makes the outputs explicit even when the
+    # evidence is not yet sufficient to calculate them. Never substitute
+    # population-at-risk for people actually harmed or displaced.
+    impact_outputs = [
+        {
+            "output": "Population inside the modelled exposure footprint",
+            "unit": "people",
+            "status": "Not estimated — validated population grid and hazard footprint required",
+            "required_evidence": "Current population grid, compatible boundary/CRS, validated event footprint and population year",
+        },
+        {
+            "output": "People potentially needing evacuation or displacement support",
+            "unit": "people",
+            "status": "Not estimated — evacuation/displacement model and local vulnerability evidence required",
+            "required_evidence": "Exposure, building habitability, evacuation orders, household vulnerability and shelter capacity",
+        },
+        {
+            "output": "Injuries and fatalities",
+            "unit": "people",
+            "status": "Not estimated — no validated casualty model or verified outcome labels",
+            "required_evidence": "Event-specific exposure, vulnerability/fragility, time-of-day, warning/response and verified outcome records",
+        },
+        {
+            "output": "Residential and other buildings exposed or damaged",
+            "unit": "buildings",
+            "status": "Not estimated — validated building inventory and hazard-specific vulnerability required",
+            "required_evidence": "Geocoded building inventory, occupancy/use, construction attributes and observed damage labels",
+        },
+        {
+            "output": "Critical facilities exposed",
+            "unit": "facilities",
+            "status": "Not estimated — facility locations and hazard footprint require validation",
+            "required_evidence": "Verified hospitals, schools, shelters, utilities and facility-level exposure overlay",
+        },
+        {
+            "output": "Roads and essential networks affected",
+            "unit": "km / network links",
+            "status": "Not estimated — validated network and hazard interaction required",
+            "required_evidence": "Road/bridge/utility network, closure/failure records and hazard-specific impact thresholds",
+        },
+        {
+            "output": "Direct economic damage",
+            "unit": "INR",
+            "status": "Not estimated — asset values and validated damage functions required",
+            "required_evidence": "Asset replacement values, event footprint, hazard intensity and locally calibrated damage functions",
+        },
+        {
+            "output": "Essential-service outage and recovery time",
+            "unit": "service-hours / days",
+            "status": "Not estimated — operational failure and restoration records required",
+            "required_evidence": "Service dependencies, outage start/end times, backup capacity and restoration logs",
+        },
+    ]
+    if hazard == "Flood" or hazard.startswith("Compound:"):
+        impact_outputs.append({
+            "output": "Flood extent, water depth and inundation duration",
+            "unit": "km² / metres / hours",
+            "status": "Not estimated — validated hydraulic model and boundary conditions required",
+            "required_evidence": "Terrain, drainage, river/tide boundaries, rainfall, calibrated hydraulics and observed flood marks",
+        })
+    if hazard in {"Cyclone", "Compound: cyclone + flood"}:
+        impact_outputs.append({
+            "output": "Wind and coastal-surge exposure",
+            "unit": "km/h / metres",
+            "status": "Not estimated — event-specific authoritative track and validated wind/surge model required",
+            "required_evidence": "Official track/intensity, gust field, coastal bathymetry/topography and surge validation",
+        })
+    if hazard == "Heatwave":
+        impact_outputs.append({
+            "output": "Population heat exposure by duration and vulnerability",
+            "unit": "people / person-hours",
+            "status": "Not estimated — local heat field and population vulnerability data required",
+            "required_evidence": "Temperature, humidity, hot-night duration, population age/occupation and health-service evidence",
+        })
+    if hazard == "Landslide":
+        impact_outputs.append({
+            "output": "Slope/runout footprint and exposed settlements",
+            "unit": "km² / people",
+            "status": "Not estimated — validated terrain, inventory and runout model required",
+            "required_evidence": "High-resolution terrain, geology, rainfall, landslide inventory and field-validated runout",
+        })
+    if hazard == "Industrial incident":
+        impact_outputs.append({
+            "output": "Hazardous-release plume and downwind population exposure",
+            "unit": "km² / people",
+            "status": "Not estimated — verified release conditions and dispersion model required",
+            "required_evidence": "Substance, quantity, release rate, meteorology, terrain and validated dispersion model",
+        })
+    if hazard == "Drought":
+        impact_outputs.append({
+            "output": "Population and services under water-supply stress",
+            "unit": "people / service-days",
+            "status": "Not estimated — supply-demand and service disruption records required",
+            "required_evidence": "Reservoir/storage, source yield, demand, distribution coverage and interruption records",
+        })
+
     if calibrated_probability_available:
         probability_status = "A model-specific probability may be reported only with model, calibration, time horizon, spatial scale, and uncertainty."
     else:
@@ -168,6 +264,7 @@ def build_consequence_assessment(
         "occurrence_probability": probability_status,
         "affected_area": area_status,
         "consequence_categories": list(dict.fromkeys(consequences)),
+        "impact_outputs": impact_outputs,
         "heatwave_screening": heatwave_screening,
         "required_evidence": [
             requirements["hazard_inputs"],
