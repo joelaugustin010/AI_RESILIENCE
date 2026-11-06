@@ -92,6 +92,17 @@ class CompoundHazardAssessmentTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "start date must be a date"):
             assess_compound_scenario(self.base(period_start="not-a-date"))
 
+    def test_drainage_and_infrastructure_status_are_reported_with_verification_gaps(self):
+        result = assess_compound_scenario(self.base(
+            hazards=["Compound: heavy rainfall + drainage failure"],
+            drainage_status="Reported failed",
+            infrastructure_status="Disruption reported by user",
+        ))
+        self.assertEqual(result["reported_inputs"]["drainage_status"], "Reported failed")
+        self.assertEqual(result["reported_inputs"]["infrastructure_status"], "Disruption reported by user")
+        self.assertTrue(any("Geotagged drainage inspection" in gap for gap in result["data_gaps"]))
+        self.assertTrue(any("affected asset ID" in gap for gap in result["data_gaps"]))
+
     def test_non_finite_measurements_are_rejected(self):
         with self.assertRaisesRegex(ValueError, "finite"):
             assess_compound_scenario(self.base(rainfall_mm="nan"))
