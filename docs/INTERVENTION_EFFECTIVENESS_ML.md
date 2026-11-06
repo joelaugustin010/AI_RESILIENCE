@@ -72,7 +72,7 @@ cluster used for grouped cross-fitting and uncertainty estimation. Required colu
 Do not include outcomes, repair costs, measurements after treatment, treatment
 assignment fields, or variables caused by the intervention as features.
 The training CLI additionally requires a provenance JSON sidecar with source
-owner, source reference, collection period, outcome/treatment definitions,
+owner, source reference, collection period, outcome definition and each action's documented treatment definition,
 geographic scope, known biases, access basis and an explicit
 `pre_treatment_features` allowlist. The allowlist is reviewed before training;
 structural, treatment and outcome columns are rejected even if nominated.
