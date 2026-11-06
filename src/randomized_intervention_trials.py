@@ -32,6 +32,7 @@ class RandomizedContrast:
     preprocessor: Any
     cate_model: Any
     report: dict[str, Any]
+    support_profile: dict[str, Any] | None = None
 
     def estimate(self, context: Mapping[str, Any]) -> dict[str, Any]:
         if not self.report.get("eligible_for_research_ranking", False):
@@ -41,6 +42,13 @@ class RandomizedContrast:
         if missing:
             return {"available": False, "status": "CONTEXT_INCOMPLETE",
                     "missing_features": missing}
+        if self.support_profile is None:
+            return {"available": False, "status": "CONTEXT_SUPPORT_PROFILE_MISSING",
+                    "reason": "This trial model has no recorded training-support profile."}
+        support_reason = _context_support_reason(context, self.support_profile)
+        if support_reason:
+            return {"available": False, "status": "CONTEXT_OUTSIDE_TRAINING_SUPPORT",
+                    "reason": support_reason}
         x = self.preprocessor.transform(pd.DataFrame(
             [{c: context[c] for c in self.feature_columns}]
         ))
@@ -112,6 +120,49 @@ def validate_trial_frame(
         raise TrialDataError("At least one pre-randomization covariate is required.")
     if frame[list(feature_columns)].isna().all(axis=0).any():
         raise TrialDataError("A covariate is entirely missing.")
+
+
+
+def _build_support_profile(frame: pd.DataFrame, columns: Sequence[str]) -> dict[str, Any]:
+    """Record observed training ranges/levels for fail-closed trial inference."""
+    numeric: dict[str, dict[str, float]] = {}
+    categorical: dict[str, list[str]] = {}
+    for column in columns:
+        series = frame[column]
+        if pd.api.types.is_numeric_dtype(series):
+            values = pd.to_numeric(series, errors="coerce").dropna().to_numpy(float)
+            if not len(values) or not np.isfinite(values).all():
+                raise TrialDataError(f"Cannot establish numeric support for {column!r}.")
+            numeric[column] = {"minimum": float(values.min()), "maximum": float(values.max())}
+        else:
+            values = sorted(series.dropna().astype(str).unique().tolist())
+            if not values:
+                raise TrialDataError(f"Cannot establish categorical support for {column!r}.")
+            categorical[column] = values
+    return {"numeric_ranges": numeric, "categorical_values": categorical}
+
+
+def _context_support_reason(
+    context: Mapping[str, Any], profile: Mapping[str, Any]
+) -> str | None:
+    for column, bounds in profile.get("numeric_ranges", {}).items():
+        try:
+            value = float(context[column])
+        except (KeyError, TypeError, ValueError):
+            return f"Feature {column!r} must be a finite numeric value."
+        if not np.isfinite(value):
+            return f"Feature {column!r} must be finite."
+        if value < bounds["minimum"] or value > bounds["maximum"]:
+            return (
+                f"Feature {column!r}={value:g} is outside observed training range "
+                f"[{bounds['minimum']:g}, {bounds['maximum']:g}]."
+            )
+    for column, allowed in profile.get("categorical_values", {}).items():
+        if column not in context or context[column] is None:
+            return f"Categorical feature {column!r} is missing."
+        if str(context[column]) not in allowed:
+            return f"Unseen category {context[column]!r} for feature {column!r}."
+    return None
 
 
 def _preprocessor(frame: pd.DataFrame, features: Sequence[str]) -> ColumnTransformer:
@@ -243,6 +294,7 @@ def fit_randomized_contrast(
     prep = _preprocessor(train, feature_columns)
     x_train = prep.fit_transform(train[list(feature_columns)])
     x_test = prep.transform(test[list(feature_columns)])
+    support_profile = _build_support_profile(train, feature_columns)
     a_train = (train[arm_col].to_numpy() == treatment_arm).astype(int)
     y_train = train[outcome_col].to_numpy(float)
     groups = train[cluster_col].astype(str).to_numpy()
@@ -351,4 +403,5 @@ def fit_randomized_contrast(
                 "No independent replication or prospective deployment validation is included.",
             ],
         },
+        support_profile,
     )
