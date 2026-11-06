@@ -41,16 +41,15 @@ def audit_panel(frame: pd.DataFrame) -> dict[str, Any]:
         data[col] = pd.to_datetime(data[col], errors="coerce")
     if data["event_date"].isna().any():
         problems.append("event_date contains missing or invalid dates.")
-    if data["implementation_date"].isna().all():
-        problems.append("No implementation dates are documented.")
-    elif data.loc[data["treated"].astype(str).isin(["1", "1.0", "True", "true"]), "implementation_date"].isna().any():
+    if "treated" in data:
+        raw_treatment = pd.to_numeric(data["treated"], errors="coerce")
+        if raw_treatment.isna().any() or not set(raw_treatment.dropna().unique()).issubset({0, 1}):
+            problems.append("treated must contain only binary 0/1 values.")
+        else:
+            data["treated"] = raw_treatment.astype(int)
+    if "treated" in data and data.loc[data["treated"].eq(1), "implementation_date"].isna().any():
         problems.append("Treated observations require a documented implementation_date.")
 
-    treated = pd.to_numeric(data["treated"], errors="coerce")
-    if treated.isna().any() or not set(treated.dropna().unique()).issubset({0, 1}):
-        problems.append("treated must contain only binary 0/1 values.")
-    else:
-        data["treated"] = treated.astype(int)
     numeric = pd.to_numeric(data["outcome_value"], errors="coerce")
     if numeric.isna().any() or not pd.Series(numeric).map(lambda x: pd.notna(x) and abs(float(x)) != float("inf")).all():
         problems.append("outcome_value must be finite numeric data with no missing values.")
@@ -78,17 +77,19 @@ def audit_panel(frame: pd.DataFrame) -> dict[str, Any]:
     if "river_level_m" not in data.columns:
         warnings.append("river_level_m is absent; river-level confounding cannot be assessed from this panel.")
 
-    treated_sites = int(data.loc[data.get("treated", pd.Series(dtype=int)).eq(1), "site_id"].nunique()) if "treated" in data else 0
-    control_sites = int(data.loc[data.get("treated", pd.Series(dtype=int)).eq(0), "site_id"].nunique()) if "treated" in data else 0
+    site_treatment = data.groupby("site_id")["treated"].max() if "treated" in data else pd.Series(dtype=int)
+    treated_sites = int(site_treatment.eq(1).sum())
+    control_sites = int(site_treatment.eq(0).sum())
     event_count = int(data["event_id"].nunique()) if "event_id" in data else 0
     pre_rows = post_rows = 0
-    if not data["event_date"].isna().any() and not data["implementation_date"].isna().all() and "treated" in data:
-        dated = data.dropna(subset=["implementation_date"]).copy()
-        pre_rows = int((dated["event_date"] < dated["implementation_date"]).sum())
-        post_rows = int((dated["event_date"] >= dated["implementation_date"]).sum())
-        if (dated.loc[dated["treated"].eq(1), "event_date"] < dated.loc[dated["treated"].eq(1), "implementation_date"]).any():
+    if not data["event_date"].isna().any() and "treated" in data:
+        treated_rows = data.loc[data["site_id"].isin(site_treatment[site_treatment.eq(1)].index)].copy()
+        treated_rows = treated_rows.dropna(subset=["implementation_date"])
+        pre_rows = int((treated_rows["event_date"] < treated_rows["implementation_date"]).sum())
+        post_rows = int((treated_rows["event_date"] >= treated_rows["implementation_date"]).sum())
+        if (treated_rows.loc[treated_rows["treated"].eq(1), "event_date"] < treated_rows.loc[treated_rows["treated"].eq(1), "implementation_date"]).any():
             problems.append("A treated=1 observation occurs before its intervention implementation date.")
-        if (dated.loc[dated["treated"].eq(0), "event_date"] >= dated.loc[dated["treated"].eq(0), "implementation_date"]).any():
+        if (treated_rows.loc[treated_rows["treated"].eq(0), "event_date"] >= treated_rows.loc[treated_rows["treated"].eq(0), "implementation_date"]).any():
             problems.append("A treated=0 observation occurs after its recorded implementation date.")
 
     if treated_sites < 2:
