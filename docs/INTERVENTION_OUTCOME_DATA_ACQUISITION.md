@@ -34,13 +34,23 @@ Do not fabricate episode-level labels from reports, maps, weather records, or sy
 ## Priority 3 — Bihar, India community flood-warning dissemination trial
 
 - Published evaluation: https://ie.yale.edu/research/community-messengers-turn-flood-forecasts-protection
-- Research summary: https://egc.yale.edu/research/community-level-flood-early-warning-systems-vulnerable-households-india
-- Trial: community messengers relayed official flood warnings through local channels, compared with smartphone alerts alone; 319 panchayats across Bihar.
-- Published outcomes include warning receipt and timing, household preparation, water entering homes, house damage, hunger, and distress borrowing. The published brief reports meaningful protection during severe flooding.
-- Current data status for this project: **published results located; household-level downloadable microdata not verified**. Do not scrape or reverse-engineer individual records from aggregate charts. Contact the study team through the official research page if a properly supervised data request is appropriate.
-- Immediate use: add the evaluation as a cited evidence record for community warning dissemination. Do not treat published average effects as thousands of synthetic training samples.
+- Research summary: https://egc.yale.edu/building-community-level-flood-early-warning-systems-vulnerable-households-india
+- Trial: four monsoon seasons (2022–2025), 319 panchayats across 12 north Bihar districts, testing trained community messengers relaying official forecasts against smartphone alerts alone.
+- The September 2026 research brief reports improvements in warning receipt and lead time, preparedness, and reduced household floodwater entry and damage in severely flooded areas. The result is directly relevant to warning dissemination, not to structural mitigation or other hazards.
+- Current data status for this project: **published randomized-trial findings located; household-level downloadable microdata not verified**. Do not scrape or reverse-engineer individual records from aggregate results. Contact the study team through the official research page if a properly supervised data request is appropriate.
+- Immediate use: cite the study in a clearly labelled evidence record for community warning dissemination. Do not treat published average effects as row-level training samples.
 
-## Priority 4 — Geul flood mitigation simulation archive
+## Priority 4 — Netherlands 2021 household flood-damage mitigation survey
+
+- Publication: https://doi.org/10.1029/2022WR034192
+- Data DOI stated by the publication: https://doi.org/10.4121/21603348
+- Study: Endendijk et al. (2023), *Flood Vulnerability Models and Household Flood Damage Mitigation Measures: An Econometric Analysis of Survey Data*.
+- Relevance: household-level flood damage observations and implemented emergency/structural flood-damage mitigation measures, with hazard, exposure and vulnerability covariates. The paper uses an instrumental-variable strategy to address selection into mitigation; it reports that emergency and structural measures reduce damage, while acknowledging limits in identifying multiple simultaneous measures and depth-specific effects.
+- Access/licence status: the paper points to the 4TU.ResearchData record, but the dataset landing page, file list, exact licence, and downloadability have **not yet been verified**. Do not assume that a repository DOI implies unrestricted reuse. Verify record metadata and terms before downloading or training.
+- Model fit: potentially the closest located real-world household dataset for physical flood-mitigation outcomes. It is observational and from the Netherlands, so it cannot validate Kochi effects. The current learner's minimum sample/cluster and time-split requirements may be unsuitable for a single-event survey; inspect the actual design before adapting thresholds. Do not lower evidence gates just to make training run.
+- Next step after access verification: inspect codebook, instrument, household/site identifiers, intervention definitions, damage ratios/units, survey design, and missingness. Determine whether a separate design-aware IV/observational estimator is required rather than forcing these data into the current repeated-episode learner.
+
+## Priority 5 — Geul flood mitigation simulation archive
 
 - Dataset: https://zenodo.org/records/15488420
 - DOI: https://doi.org/10.5281/zenodo.15488420
@@ -84,7 +94,7 @@ A dataset that lacks treatment assignment or implementation details may still be
 5. Run design-aware causal analysis and cluster-level uncertainty checks; validate on held-out sites/events where the study design permits.
 6. Publish only non-sensitive derived metrics, model cards, provenance, and limitations.
 
-**Current conclusion:** the strongest actionable real-data route is the licensed Bangladesh evaluation because its catalog exposes both randomized timing/administrative records and an asset-damage module. The missing ingredient is lawful, approved access to the underlying microdata. The Bihar trial gives directly relevant Indian evidence for community warning dissemination, but its raw microdata availability remains unverified. No responsible implementation can manufacture that missing access or data.
+**Current conclusion:** there are now three distinct real-world evidence leads: (1) the Netherlands 2021 household mitigation survey is the closest identified candidate for physical flood-damage-reduction measures, but its actual dataset access and licence must still be verified; (2) the Bangladesh randomized cash-timing evaluation has an asset-damage module but requires licensed access; and (3) the Bihar randomized warning-dissemination trial has directly relevant published Indian results, but household microdata availability is unverified. Geul remains simulation-only. No source should be described as integrated or trained until the raw files, rights, schema, and study design have been checked.
 
 ## Additional inference guard — observed training support
 
@@ -93,3 +103,7 @@ The observational intervention learner now records numeric feature ranges and ob
 The training CLI now requires an explicit outcome_unit and outcome_direction: "lower_is_better" in the provenance sidecar. It no longer silently assigns a generic damage-severity unit to an arbitrary numeric outcome. This prevents a model card from presenting an incorrect unit or direction.
 
 Held-out policy evaluation is also restricted to contexts inside the training support profile. Unsupported test contexts are assigned no learned intervention by the evaluated policy, and a research signal is withheld unless at least 80% of the held-out contexts meet the marginal support guard. This does not replace multivariate overlap diagnostics or context-specific uncertainty intervals.
+
+## Newly discovered evidence and data leads (research update)
+
+The 2023 Netherlands study explicitly states that the underlying household flood-damage dataset is deposited at 4TU.ResearchData under DOI 10.4121/21603348. The study's empirical analysis uses instrumental variables to address selection into flood-damage mitigation; it also documents limitations around simultaneous measures and depth-specific effects. This is a high-priority dataset to verify, not a claim that the files are already downloaded or reusable. The 2026 Yale/Inclusion Economics brief now reports the four-year Bihar randomized evaluation's household protection outcomes; these published aggregate results strengthen the evidence library but remain unsuitable as individual training rows without lawful microdata.
