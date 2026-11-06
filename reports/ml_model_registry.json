@@ -1593,10 +1593,10 @@
       "target_threshold": 0.5,
       "target_direction": "high",
       "threshold_source": "fixed binary label",
-      "evidence_tier": "screening",
-      "status": "RESEARCH_SIGNAL_NOT_VALIDATED",
-      "skill_grade": "RESEARCH_SIGNAL_NOT_VALIDATED",
-      "status_reason": "ROC-AUC 0.871 and average precision 0.912 beat the no-skill prevalence 0.596 on one temporal holdout. Calibration error is 0.109; probabilities are not suitable for decision thresholds without recalibration.",
+      "evidence_tier": "invalidated",
+      "status": "NO_SKILL",
+      "skill_grade": "NO_SKILL",
+      "status_reason": "INVALIDATED: the original seven-day aftershock outcome window could cross a temporal validation/test boundary because the split used only the mainshock timestamp. Previous holdout metrics are superseded. No inference is permitted until the label-window embargo and recent-seismicity baseline are retrained and reevaluated.",
       "validation_status": "SINGLE_TEMPORAL_HOLDOUT_NOT_INDEPENDENTLY_VALIDATED",
       "trained_at_utc": "2026-11-06T13:51:45+00:00",
       "selected_model_type": "gradient_boosting",
@@ -1773,7 +1773,39 @@
           "missing_fraction": 0
         }
       },
-      "metrics": {
+      "metrics": {},
+      "provenance": {
+        "source": "data\\external\\hazards\\raw\\earthquake\\usgs_india_events_2000_present.csv",
+        "catalogue_note": "USGS query is capped at 20,000 events and is not a complete local seismicity catalogue.",
+        "mainshocks": 1963
+      },
+      "notes": [
+        "Aftershock sequence screening, not earthquake occurrence prediction.",
+        "The catalogue is regionally clipped and capped at 20,000 events.",
+        "Features use only prior events; the label uses future events."
+      ],
+      "limitations": [
+        "The USGS catalogue is regionally clipped and capped at 20,000 events.",
+        "Aftershock labelling depends on catalogue completeness and the chosen distance/time windows.",
+        "Aftershock sequence screening, not earthquake occurrence prediction.",
+        "The catalogue is regionally clipped and capped at 20,000 events.",
+        "Features use only prior events; the label uses future events.",
+        "A single chronological holdout is preliminary evidence, not independent validation.",
+        "No calibration, geographic transferability, drift or operational-readiness claim is made.",
+        "Skill grade is RESEARCH_SIGNAL_NOT_VALIDATED: ROC-AUC 0.871 and average precision 0.912 beat the no-skill prevalence 0.596 on one temporal holdout. Calibration error is 0.109; probabilities are not suitable for decision thresholds without recalibration.",
+        "The model card records the exact threshold, features and split; changing any of them requires retraining and re-evaluation.",
+        "The prior temporal split did not embargo the full seven-day future label window; previous metrics are invalidated pending retraining."
+      ],
+      "intended_use": "Aftershock occurrence screening for an already observed M>=5 mainshock, used only as supplementary sequence context.",
+      "prohibited_use": "Not earthquake prediction, mainshock timing, shaking intensity, damage, or warning guidance.",
+      "artifact": {
+        "path": "models/ml/earthquake_aftershock_occurrence/model.joblib",
+        "format": "joblib-pipeline",
+        "loader": "src.ml.inference.predict_from_context",
+        "artifact": "models\\ml\\earthquake_aftershock_occurrence\\model.joblib",
+        "card": "models\\ml\\earthquake_aftershock_occurrence\\model_card.json"
+      },
+      "superseded_metrics": {
         "n_test": 156,
         "n_test_events": 93,
         "test_prevalence": 0.5961538461538461,
@@ -2279,36 +2311,7 @@
         ],
         "persistence_baseline": null
       },
-      "provenance": {
-        "source": "data\\external\\hazards\\raw\\earthquake\\usgs_india_events_2000_present.csv",
-        "catalogue_note": "USGS query is capped at 20,000 events and is not a complete local seismicity catalogue.",
-        "mainshocks": 1963
-      },
-      "notes": [
-        "Aftershock sequence screening, not earthquake occurrence prediction.",
-        "The catalogue is regionally clipped and capped at 20,000 events.",
-        "Features use only prior events; the label uses future events."
-      ],
-      "limitations": [
-        "The USGS catalogue is regionally clipped and capped at 20,000 events.",
-        "Aftershock labelling depends on catalogue completeness and the chosen distance/time windows.",
-        "Aftershock sequence screening, not earthquake occurrence prediction.",
-        "The catalogue is regionally clipped and capped at 20,000 events.",
-        "Features use only prior events; the label uses future events.",
-        "A single chronological holdout is preliminary evidence, not independent validation.",
-        "No calibration, geographic transferability, drift or operational-readiness claim is made.",
-        "Skill grade is RESEARCH_SIGNAL_NOT_VALIDATED: ROC-AUC 0.871 and average precision 0.912 beat the no-skill prevalence 0.596 on one temporal holdout. Calibration error is 0.109; probabilities are not suitable for decision thresholds without recalibration.",
-        "The model card records the exact threshold, features and split; changing any of them requires retraining and re-evaluation."
-      ],
-      "intended_use": "Aftershock occurrence screening for an already observed M>=5 mainshock, used only as supplementary sequence context.",
-      "prohibited_use": "Not earthquake prediction, mainshock timing, shaking intensity, damage, or warning guidance.",
-      "artifact": {
-        "path": "models/ml/earthquake_aftershock_occurrence/model.joblib",
-        "format": "joblib-pipeline",
-        "loader": "src.ml.inference.predict_from_context",
-        "artifact": "models\\ml\\earthquake_aftershock_occurrence\\model.joblib",
-        "card": "models\\ml\\earthquake_aftershock_occurrence\\model_card.json"
-      }
+      "evaluation_validity": "INVALIDATED_LABEL_WINDOW_SPLIT"
     },
     {
       "schema_version": 1,
