@@ -188,6 +188,13 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
         if river is None: gaps.append("Time-stamped river-level observation, gauge ID and datum")
         gaps.extend(["Verified catchment connectivity, drainage/outfall and local elevation evidence",
                      "Independent, location-specific flood outcome or inundation evidence"])
+    if "Infrastructure failure" in components:
+        if not str(inputs.get("infrastructure_status") or "").strip():
+            gaps.append("Verified infrastructure condition, affected asset ID, operator and outage/recovery evidence")
+    if str(inputs.get("drainage_status") or "").strip() in {
+        "Reported partially impaired", "Reported failed", "Hypothetical partial failure"
+    }:
+        gaps.append("Geotagged drainage inspection, asset identifier, operator confirmation and repair status")
     if "Cyclone" in components:
         if cyclone_distance is None: gaps.append("Cyclone track position and time relative to the study area")
         if cyclone_wind is None: gaps.append("Source-defined cyclone intensity/wind observation and timestamp")
@@ -247,6 +254,8 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
             "river_reference_level_m": river_ref, "rainfall_reference_mm": rain_ref,
             "cyclone_distance_km": cyclone_distance, "cyclone_wind_knots": cyclone_wind,
             "coastal_water_or_surge_notes": str(inputs.get("coastal_water_notes") or "").strip() or None,
+            "drainage_status": str(inputs.get("drainage_status") or "").strip() or None,
+            "infrastructure_status": str(inputs.get("infrastructure_status") or "").strip() or None,
         },
         "reference_comparisons": comparisons, "pathways": pathways,
         "service_reviews": reviews, "actions": ACTIONS,
