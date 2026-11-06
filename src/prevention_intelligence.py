@@ -66,6 +66,18 @@ _ACTIONS: dict[str, list[dict[str, str]]] = {
     ],
 }
 
+_COMPOUND_ACTIONS: dict[str, list[dict[str, str]]] = {
+    "Compound: cyclone + flood": [
+        {"phase": "Before the event", "action": "Coordinate cyclone, rainfall, river and coastal-water monitoring in one incident timeline, preserving each source's issue time, valid time and location.", "trigger": "Cyclone and flood are selected together or an official cyclone bulletin overlaps a local flood concern.", "benefit": "Helps responders see timing and dependencies without treating separate indicators as a validated joint probability.", "owner": "District emergency operations / relevant data providers", "evidence": "Time-aligned official IMD bulletins, CWC or gauge records, coastal observations and source metadata.", "caution": "Concurrent signals do not establish a compound forecast; no synthetic combined threshold is used."},
+        {"phase": "Before the event", "action": "Review continuity arrangements for hospitals, power, drinking water, communications and access routes against both wind and flood disruption pathways.", "trigger": "Critical services are nominated or the official forecast indicates possible multi-hazard disruption.", "benefit": "Identifies single points of failure and backup needs across connected services.", "owner": "District authority / facility and utility operators", "evidence": "Verified asset locations, dependency map, backup duration, facility plans and official hazard footprint.", "caution": "This workspace does not verify which facilities are inside a hazard footprint."},
+        {"phase": "When an official warning is issued", "action": "Use the district's official evacuation and shelter plan; check that the designated route is not closed or affected by flooding before movement.", "trigger": "An official evacuation instruction applies to the locality.", "benefit": "Reduces the chance of moving people onto a route affected by another hazard component.", "owner": "Local authorities / residents following official directions", "evidence": "Official evacuation instruction, live route closures and verified shelter status.", "caution": "Never enter floodwater or use a closed route; follow emergency services if routes change."},
+    ],
+    "Compound: heavy rainfall + drainage failure": [
+        {"phase": "Before the event", "action": "Have the drainage operator verify the reported asset failure, inspect upstream/downstream connections and record whether a safe repair or temporary service measure is feasible before rainfall.", "trigger": "A drainage failure is reported alongside a heavy-rainfall scenario.", "benefit": "Connects the rainfall forcing concern to a specific, verifiable maintenance response.", "owner": "Drainage operator / local body", "evidence": "Asset ID, field inspection, catchment context, work order and qualified engineering review.", "caution": "Do not infer local flood depth or capacity from rainfall alone; no one should enter drains or floodwater."},
+        {"phase": "Before the event", "action": "Identify critical facilities that depend on the affected drainage catchment and confirm their continuity and access plans.", "trigger": "A drainage asset is reported failed or partially impaired.", "benefit": "Helps identify services that may need contingency arrangements if local waterlogging occurs.", "owner": "Local body / facility managers", "evidence": "Verified drainage network, facility locations, access routes and dependency records.", "caution": "A network connection or facility exposure must be verified; it is not inferred by this tool."},
+    ],
+}
+
 _COMMON: list[dict[str, str]] = [
     {"phase": "Before the event", "action": "Keep an updated contact tree, accessible emergency information and a facility/community continuity plan.", "trigger": "General preparedness for every hazard.", "benefit": "Improves coordination when normal communications or services are disrupted.", "owner": "Households / institutions / local authorities", "evidence": "Named responsible persons, tested contacts and current plans.", "caution": "Use current official emergency contacts and instructions."},
 ]
@@ -101,6 +113,14 @@ def generate_prevention_actions(
                 continue
             seen.add(key)
             actions.append({**item, "hazard": component, "activation_basis": item["trigger"]})
+
+    for hazard in valid:
+        for item in _COMPOUND_ACTIONS.get(hazard, []):
+            key = (item["phase"], item["action"])
+            if key in seen:
+                continue
+            seen.add(key)
+            actions.append({**item, "hazard": hazard, "activation_basis": item["trigger"]})
 
     # Context only narrows relevance; user-entered measurements are never treated
     # as authenticated observations or converted into warning thresholds.
