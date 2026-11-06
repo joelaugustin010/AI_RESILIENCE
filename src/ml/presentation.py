@@ -34,12 +34,16 @@ def application_rows(evidence: dict[str, Any]) -> list[dict[str, Any]]:
         baselines = application.get("baselines", {})
         persistence = baselines.get("persistence_baseline") or {}
         majority = baselines.get("majority_baseline") or {}
+        is_regression = application.get("task_type") == "regression"
         rows.append(
             {
                 "Model": application.get("model_id", "Unknown"),
                 "Research event": application.get("target_definition", "Not documented"),
-                "Model probability estimate": round(
-                    float(application.get("probability_estimate", 0.0)), 4
+                "Task": "Regression" if is_regression else "Classification",
+                "Continuous estimate": application.get("estimate"),
+                "Unit": application.get("unit"),
+                "Model probability estimate": (
+                    None if is_regression else round(float(application.get("probability_estimate", 0.0)), 4)
                 ),
                 "Selected threshold": application.get("selected_probability_threshold"),
                 "Above threshold": "Yes" if application.get("event_flag_at_threshold") else "No",
@@ -47,7 +51,10 @@ def application_rows(evidence: dict[str, Any]) -> list[dict[str, Any]]:
                 "Calibration error": calibration.get("expected_calibration_error"),
                 "Majority F1": majority.get("f1"),
                 "Persistence F1": persistence.get("f1"),
-                "Interpretation": application.get("score_interpretation", ""),
+                "Interpretation": application.get("score_interpretation") or (
+                    "Continuous research estimate; not a disaster probability."
+                    if is_regression else ""
+                ),
             }
         )
     return rows
@@ -85,6 +92,7 @@ def card_rows(cards: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "Hazard": card.get("hazard", "Unknown"),
                 "Status": card.get("status", "Unknown"),
                 "Tier": card.get("evidence_tier", "Unknown"),
+                "Task": card.get("task_type", "classification"),
                 "Estimator": card.get("selected_model_type", "Unknown"),
                 "Test events": card.get("test_events"),
                 "Test rows": card.get("test_rows"),
@@ -92,6 +100,9 @@ def card_rows(cards: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "PR-AUC": metrics.get("average_precision"),
                 "F1": metrics.get("f1"),
                 "Brier": metrics.get("brier_score"),
+                "MAE": metrics.get("mae"),
+                "RMSE": metrics.get("rmse"),
+                "MAE skill vs persistence": metrics.get("mae_skill_over_persistence"),
                 "Validation": card.get("validation_status", "Unknown"),
             }
         )
