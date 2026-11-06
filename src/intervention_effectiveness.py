@@ -28,8 +28,8 @@ from sklearn.model_selection import GroupKFold
 
 SCHEMA_VERSION = "intervention-effectiveness/0.1.0"
 REQUIRED_COLUMNS = {
-    "episode_date", "site_id", "hazard", "action_id", "implemented",
-    "damage_outcome",
+    "episode_date", "outcome_window_end", "site_id", "hazard", "action_id",
+    "implemented", "damage_outcome",
 }
 MIN_TOTAL_ROWS = 200
 MIN_PER_ARM = 50
@@ -179,8 +179,14 @@ def validate_intervention_frame(
         raise InterventionDataError(f"Missing required columns: {missing}")
     if frame.empty:
         raise InterventionDataError("No intervention episodes supplied.")
-    if frame["episode_date"].isna().any() or pd.to_datetime(frame["episode_date"], errors="coerce").isna().any():
+    episode_dates = pd.to_datetime(frame["episode_date"], errors="coerce")
+    outcome_ends = pd.to_datetime(frame["outcome_window_end"], errors="coerce")
+    if episode_dates.isna().any():
         raise InterventionDataError("episode_date must contain valid dates.")
+    if outcome_ends.isna().any():
+        raise InterventionDataError("outcome_window_end must contain valid dates.")
+    if (outcome_ends < episode_dates).any():
+        raise InterventionDataError("outcome_window_end cannot precede episode_date.")
     if frame["site_id"].isna().any() or frame["action_id"].isna().any() or frame["hazard"].isna().any():
         raise InterventionDataError("site_id, hazard and action_id cannot be blank.")
     if not set(pd.to_numeric(frame["implemented"], errors="coerce").dropna().unique()).issubset({0, 1}):
@@ -223,14 +229,19 @@ def train_intervention_model(
     features = validate_intervention_frame(frame, feature_columns=feature_columns)
     data = frame.loc[(frame["hazard"].astype(str) == hazard) & (frame["action_id"].astype(str) == action_id)].copy()
     data["episode_date"] = pd.to_datetime(data["episode_date"])
+    data["outcome_window_end"] = pd.to_datetime(data["outcome_window_end"])
     data["implemented"] = data["implemented"].astype(int)
     data["damage_outcome"] = pd.to_numeric(data["damage_outcome"], errors="raise")
     cutoff = pd.Timestamp(test_start)
-    train = data.loc[data["episode_date"] < cutoff].copy()
+    pre_test = data["episode_date"] < cutoff
+    crosses_boundary = pre_test & (data["outcome_window_end"] >= cutoff)
+    train = data.loc[pre_test & (data["outcome_window_end"] < cutoff)].copy()
     test = data.loc[data["episode_date"] >= cutoff].copy()
+    purged_rows = int(crosses_boundary.sum())
 
     counts = {
         "total": int(len(data)),
+        "purged_outcome_window_rows": purged_rows,
         "train_treated": int((train["implemented"] == 1).sum()),
         "train_control": int((train["implemented"] == 0).sum()),
         "test_treated": int((test["implemented"] == 1).sum()),
