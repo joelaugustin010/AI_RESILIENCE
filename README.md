@@ -77,6 +77,10 @@ suitable for warnings, evacuation, damage estimates, or operational planning.
 The model cards record every threshold, split, holdout metric, calibration
 diagnostic and limitation. See `docs/SHARED_ML_ENGINE.md`.
 
+## Preventive action intelligence
+
+Both the Decision Workflow and Cyclone + Flood workspace include a shared prevention engine. It generates hazard-specific preparedness options with explicit triggers, responsible parties, evidence requirements and safety caveats. It does not issue warnings, rank effectiveness, or claim quantified risk reduction. See `src/prevention_intelligence.py` and `docs/SHARED_ML_ENGINE.md`.
+
 ## Important limitations
 
 - This is a student research and preparedness prototype, **not an official warning system** or emergency-response service.
