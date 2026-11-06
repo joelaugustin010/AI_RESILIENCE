@@ -3338,5 +3338,11 @@
     ],
     "coverage_complete": true
   },
-  "interpretation": "Metrics are single temporal holdouts. No model is calibrated for decision use, independently validated, or suitable for warnings."
+  "interpretation": "Historical model cards are single temporal holdouts, not independent validation. Two models (Drought and Earthquake) are currently invalidated and blocked from inference pending corrected retraining. Only Cyclone and Heatwave currently have usable hazard-specific research screening models. No model is calibrated for decision use or suitable for warnings.",
+  "n_invalidated": 2,
+  "invalidated_model_ids": [
+    "weather_drought_onset_kochi_30day",
+    "earthquake_aftershock_occurrence"
+  ],
+  "n_current_usable_hazard_specific_models": 2
 }
