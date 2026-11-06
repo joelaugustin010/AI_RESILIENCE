@@ -70,8 +70,8 @@ INTERPRETATION: dict[str, str] = {
         "point. It is not an official heatwave declaration or warning."
     ),
     "Drought": (
-        "Shared ML screens a 30-day rainfall-deficit outlook at the Kochi grid point. "
-        "It is not a drought declaration, SPI index, or water-supply forecast."
+        "The previous 30-day rainfall-deficit model was invalidated after a target-window construction defect. "
+        "No usable drought ML output is available until corrected future-only training and validation."
     ),
     "Industrial incident": (
         "No defensible supervised model is released: facility-level release labels, "
@@ -153,6 +153,11 @@ def build_coverage_matrix(*, write: bool = True) -> dict[str, Any]:
         definition = HAZARD_REGISTRY[hazard]
         model_ids = list(HAZARD_MODEL_MAP[hazard])
         support = SUPPORT_LEVEL[hazard]
+        statuses = {model_id: _card_status(cards_by_id, model_id) for model_id in model_ids}
+        if any(status == "NO_SKILL" for status in statuses.values()):
+            support = "no_skill_model"
+        elif any(status == "INSUFFICIENT_TEST_EVENTS" for status in statuses.values()):
+            support = "insufficient_validation"
         entries.append(
             {
                 "hazard": hazard,
@@ -160,9 +165,7 @@ def build_coverage_matrix(*, write: bool = True) -> dict[str, Any]:
                 "components": list(definition.components),
                 "support_level": support,
                 "model_ids": model_ids,
-                "model_statuses": {
-                    model_id: _card_status(cards_by_id, model_id) for model_id in model_ids
-                },
+                "model_statuses": statuses,
                 "evidence_role": (
                     "supplementary"
                     if support in {"screening_model", "forcing_evidence_only", "exploratory_association"}
@@ -175,6 +178,15 @@ def build_coverage_matrix(*, write: bool = True) -> dict[str, Any]:
         )
     hazards_with_ml = [entry["hazard"] for entry in entries if entry["model_ids"]]
     hazards_without_ml = [entry["hazard"] for entry in entries if not entry["model_ids"]]
+    usable_statuses = {"WEAK_RESEARCH_SIGNAL", "RESEARCH_SIGNAL_NOT_VALIDATED"}
+    hazards_with_usable_research_model = [
+        entry["hazard"] for entry in entries
+        if any(status in usable_statuses for status in entry["model_statuses"].values())
+    ]
+    hazards_without_usable_research_model = [
+        entry["hazard"] for entry in entries
+        if not any(status in usable_statuses for status in entry["model_statuses"].values())
+    ]
     payload = {
         "schema_version": 1,
         "generated_at_utc": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
@@ -182,14 +194,18 @@ def build_coverage_matrix(*, write: bool = True) -> dict[str, Any]:
         "n_hazards": len(entries),
         "n_hazards_with_ml_evidence": len(hazards_with_ml),
         "n_hazards_without_ml": len(hazards_without_ml),
+        "n_hazards_with_usable_research_model": len(hazards_with_usable_research_model),
+        "hazards_with_usable_research_model": hazards_with_usable_research_model,
+        "hazards_without_usable_research_model": hazards_without_usable_research_model,
         "hazards_with_ml_evidence": hazards_with_ml,
         "hazards_without_ml_evidence": hazards_without_ml,
         "coverage_complete": set(entry["hazard"] for entry in entries) == set(WORKFLOW_HAZARDS),
         "validated_models": 0,
         "interpretation": (
-            "Every workflow hazard is represented. Only four hazards have a shared "
-            "screening model; three have no defensible supervised model. Coverage is "
-            "not evidence of predictive validity."
+            f"Every workflow hazard is represented. {len(hazards_with_ml)} hazards have a registered ML artifact, "
+            f"{len(hazards_with_usable_research_model)} currently have a usable research model, "
+            f"and {len(hazards_without_ml)} have no defensible supervised model. "
+            "Zero models are independently validated for operational use. Coverage is not predictive validity."
         ),
         "entries": entries,
     }
