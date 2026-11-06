@@ -453,19 +453,19 @@ if isinstance(map_context, dict):
 else:
     st.info("No submitted scenario is attached. Select a disaster in the Decision Workflow and use “View prone areas on the Kochi map” to carry its context here.")
 
-st.subheader("Official hazard-map references")
+st.subheader("Official hazard-map and district reference sources")
 reference_items = hazard_map_references(active_hazard)
 if reference_items:
     st.caption(
-        "These are official KSDMA reference products. District/state PDFs and image maps are linked for review; "
-        "they are not overlaid as precise Kochi GIS footprints. The GSI Ernakulam ZIP still requires local schema, "
+        "These are official Kerala disaster-management reference products. District/state PDFs and portal pages are linked for review; "
+        "they are not overlaid as precise Kochi GIS footprints. The Ernakulam multi-hazard PDF is district-level reference only. " "The GSI Ernakulam ZIP still requires local schema, "
         "CRS, licence and geometry validation before it can become a map layer."
     )
     for reference in reference_items:
         st.markdown(f"- [{reference['title']}]({reference['url']}) — {reference['scope']}")
 else:
     st.info(
-        "No suitable official hazard-prone-area map is currently registered for this selection. "
+        "No hazard-specific official map reference is currently registered for this selection. "
         "The map will not substitute a different hazard's footprint."
     )
 
