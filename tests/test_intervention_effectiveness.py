@@ -233,3 +233,42 @@ def test_distinct_treatment_definitions_can_be_compared_within_same_study():
         "drain_maintenance", "household_barrier"
     ]
     assert result["top_action_is_proven_best"] is False
+
+def test_context_support_guard_rejects_numeric_extrapolation_and_unseen_categories():
+    from src.intervention_effectiveness import _context_support_reason
+
+    profile = {
+        "numeric_ranges": {"rainfall_before": {"minimum": 0.0, "maximum": 250.0}},
+        "categorical_values": {"building_type": ["concrete", "timber"]},
+    }
+    assert _context_support_reason(
+        {"rainfall_before": 251, "building_type": "concrete"}, profile
+    ) is not None
+    assert _context_support_reason(
+        {"rainfall_before": 100, "building_type": "unknown"}, profile
+    ) is not None
+    assert _context_support_reason(
+        {"rainfall_before": 100, "building_type": "timber"}, profile
+    ) is None
+
+
+def test_eligible_legacy_model_without_support_profile_fails_closed():
+    from src.intervention_effectiveness import InterventionModel
+
+    class IdentityPreprocessor:
+        def transform(self, frame):
+            return frame.to_numpy()
+
+    class ConstantEffect:
+        def predict(self, values):
+            return [1.0]
+
+    model = InterventionModel(
+        "drain_maintenance", "Flood", ["rainfall_before"],
+        IdentityPreprocessor(), ConstantEffect(),
+        "CAUSAL_RESEARCH_SIGNAL_NOT_VALIDATED",
+        {"outcome_unit": "damage units", "eligible_for_ranking": True},
+    )
+    result = model.estimate({"rainfall_before": 100})
+    assert result["available"] is False
+    assert result["status"] == "CONTEXT_SUPPORT_PROFILE_MISSING"
