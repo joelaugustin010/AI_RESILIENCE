@@ -21,6 +21,7 @@ depends only on `scikit-learn`, `pandas`, `numpy`, `scipy` and `joblib`.
 | `src/ml/monitoring.py` | Training-range and missingness warnings. |
 | `src/ml/coverage.py` | Evidence coverage for the exact ten workflow hazards. |
 | `src/ml/service.py` | `ml_evidence_for(hazard, inputs)` boundary used by assessments and pages. |
+| `src/intervention_effectiveness.py` | Doubly-robust, site-group-cross-fitted observational intervention-effect research, with chronological holdout, overlap gates, site-cluster bootstrap and fail-closed ranking. |
 
 ## Temporal protocol
 
@@ -109,3 +110,24 @@ health services and utility operators remain responsible for site-specific decis
 Unregistered custom scenarios receive a specialist-review prompt rather than fabricated
 hazard-specific advice. These recommendations are a preparedness layer alongside the
 scientific models, not ML predictions or a replacement for them.
+
+
+## Intervention-effectiveness ML
+
+The separate `src/intervention_effectiveness.py` engine estimates the effect of
+one registered precaution against no implementation on a comparable numeric
+damage-severity outcome. It uses cross-fitted propensity/outcome nuisance
+models, doubly-robust pseudo-outcomes, a CATE learner, a chronological holdout,
+treatment-overlap gates and site-cluster bootstrap uncertainty. Stable action
+IDs from `src/prevention_intelligence.py` join action definitions to outcome
+records. The Decision Workflow and compound workspace show a ranking only
+when eligible models exist and share a hazard, outcome unit, feature contract
+and test period.
+
+No real, provenance-verified intervention episode dataset is currently
+registered. Consequently the training CLI is implemented but no action-effect
+model has been trained from real observations; the application must show
+`RANKING_WITHHELD`. Synthetic data is allowed only in isolated software tests,
+never as training evidence or as a reported risk-reduction estimate. See
+`docs/INTERVENTION_EFFECTIVENESS_ML.md` for the schema, estimand, assumptions,
+limitations and training command.
