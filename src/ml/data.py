@@ -591,6 +591,7 @@ def build_aftershock_dataset() -> Dataset:
             {
                 "time": event_time,
                 "target_date": event_time,
+                "target_window_end": window_end,
                 "magnitude": float(mag[idx]),
                 "depth_km": float(events.loc[idx, "depth"]),
                 "latitude": float(lat[idx]),
