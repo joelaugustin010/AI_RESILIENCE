@@ -85,6 +85,12 @@ class InterventionModel:
             "available": True,
             "estimated_damage_reduction": reduction,
             "outcome_unit": self.card["outcome_unit"],
+            "context_specific_uncertainty": "NOT_ESTIMATED",
+            "contextual_action_superiority_established": False,
+            "ranking_restriction": (
+                "This context-specific point estimate has no valid confidence interval "
+                "and cannot establish superiority over another precaution."
+            ),
             "interpretation": (
                 "Positive values indicate lower damage outcome under the intervention "
                 "than under no intervention; this is an observational research estimate, "
@@ -480,6 +486,9 @@ def rank_interventions(
         "ranked_actions": estimates[:max_actions],
         "excluded_actions": excluded,
         "comparison_basis": "Context-specific point estimates from eligible models trained and tested on the same documented study and outcome scale.",
+        "pairwise_superiority": "NOT_ESTABLISHED",
+        "context_specific_pairwise_intervals": "NOT_AVAILABLE",
+        "top_action_is_proven_best": False,
         "warning": (
             "This is a provisional research ordering, not proof that the first action is best. "
             "Point-estimate ordering does not establish statistically significant differences "
