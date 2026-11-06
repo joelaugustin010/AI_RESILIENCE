@@ -40,8 +40,8 @@ def test_randomized_contrast_uses_whole_clusters_and_itt():
     report = model.report
     assert report["randomization_preserved"] is True
     assert report["estimand"].startswith("Intention-to-treat")
-    assert set(report["train_cluster_counts"]).isdisjoint(
-        set(report["test_cluster_counts"])
+    assert set(report["train_cluster_ids"]).isdisjoint(
+        set(report["test_cluster_ids"])
     )
     assert report["test_cluster_counts"]["early"] >= 2
     assert report["test_cluster_counts"]["standard"] >= 2
