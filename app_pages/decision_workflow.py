@@ -1638,6 +1638,21 @@ with st.expander("Population exposure calculator (GeoJSON evidence inputs)", exp
         type=["geojson", "json"],
         key="population_exposure_footprint_upload",
     )
+    population_field_name = st.text_input(
+        "Population-count property name",
+        value="population",
+        key="population_exposure_population_field",
+    )
+    grid_id_field_name = st.text_input(
+        "Grid-cell ID property name",
+        value="grid_id",
+        key="population_exposure_grid_id_field",
+    )
+    ward_field_name = st.text_input(
+        "Ward-label property name (optional)",
+        value="ward_name",
+        key="population_exposure_ward_field",
+    )
     population_year = st.text_input(
         "Population grid reference year",
         key="population_exposure_year",
@@ -1673,14 +1688,17 @@ with st.expander("Population exposure calculator (GeoJSON evidence inputs)", exp
                 exposure_result = estimate_population_exposure(
                     population_payload,
                     footprint_payload,
-                    population_field="population",
-                    grid_id_field="grid_id",
-                    ward_field="ward_name",
+                    population_field=population_field_name.strip() or "population",
+                    grid_id_field=grid_id_field_name.strip() or "grid_id",
+                    ward_field=ward_field_name.strip() or None,
                     source_crs="EPSG:4326",
                 )
                 st.session_state["population_exposure_result"] = {
                     **exposure_result,
                     "population_year": population_year.strip(),
+                    "population_field": population_field_name.strip() or "population",
+                    "grid_id_field": grid_id_field_name.strip() or "grid_id",
+                    "ward_field": ward_field_name.strip() or None,
                     "population_source_url": population_source_url.strip(),
                     "footprint_source_url": footprint_source_url.strip(),
                     "footprint_geojson": footprint_payload,
