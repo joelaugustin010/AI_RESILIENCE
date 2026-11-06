@@ -141,19 +141,20 @@
       "components": [
         "Drought"
       ],
-      "support_level": "screening_model",
+      "support_level": "no_skill_model",
       "model_ids": [
         "weather_drought_onset_kochi_30day"
       ],
       "model_statuses": {
         "weather_drought_onset_kochi_30day": "NO_SKILL"
       },
-      "evidence_role": "supplementary",
-      "interpretation": "The previous 30-day rainfall-deficit model was invalidated after a target-window construction defect. No usable drought ML output is available until retraining with the corrected future-only target.",
+      "evidence_role": "none",
+      "interpretation": "The previous 30-day rainfall-deficit model was invalidated after a target-window construction defect. No usable drought ML output is available until corrected future-only training and validation.",
       "limitations": [
         "A 30-day rainfall deficit is a meteorological indicator, not agricultural or hydrological drought.",
         "Soil moisture, evaporative demand, storage, and demand are absent.",
-        "Prior drought model metrics are invalidated; corrected target retraining is required."
+        "Prior drought model metrics are invalidated; corrected target retraining is required.",
+        "The previous target builder overlapped most of the supposed future rainfall window with historical features; prior model metrics are invalidated."
       ],
       "deterministic_model_retained": true
     },
