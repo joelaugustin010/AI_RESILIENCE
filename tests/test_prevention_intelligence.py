@@ -19,6 +19,29 @@ def test_compound_selection_includes_both_component_hazards():
     assert "Cyclone" in hazards
 
 
+def test_compound_cyclone_flood_adds_joint_timeline_and_route_review():
+    actions = generate_prevention_actions("Compound: cyclone + flood")
+    assert any(
+        item["hazard"] == "Compound: cyclone + flood"
+        and "incident timeline" in item["action"].lower()
+        for item in actions
+    )
+    assert any(
+        item["hazard"] == "Compound: cyclone + flood"
+        and "route" in item["action"].lower()
+        for item in actions
+    )
+
+
+def test_compound_rainfall_drainage_adds_asset_specific_operator_action():
+    actions = generate_prevention_actions("Compound: heavy rainfall + drainage failure")
+    assert any(
+        item["hazard"] == "Compound: heavy rainfall + drainage failure"
+        and "drainage operator" in item["owner"].lower()
+        for item in actions
+    )
+
+
 def test_entered_rainfall_adds_provenance_check_not_warning_threshold():
     actions = generate_prevention_actions(
         "Flood",
