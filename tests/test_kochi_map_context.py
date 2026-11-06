@@ -43,6 +43,7 @@ def test_official_flood_and_landslide_reference_maps_are_available():
     landslide = hazard_map_references("Landslide")
     assert any("Ernakulam" in item["title"] and item["url"].endswith("Ernakulam_Hist.pdf") for item in flood)
     assert any("shapefile" in item["title"].lower() and item["url"].endswith("Ernakulam.zip") for item in landslide)
+    assert any("Bhusanket" in item["title"] and item["url"] == "https://bhusanket.gsi.gov.in/" for item in landslide)
     assert all(item["scope"] for item in flood + landslide)
 
 
