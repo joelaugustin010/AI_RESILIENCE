@@ -287,6 +287,13 @@ def _weather_lag_features(frame: pd.DataFrame) -> pd.DataFrame:
     return frame
 
 
+def _forward_window_sum(series: pd.Series, window: int) -> pd.Series:
+    """Sum the next window observations, excluding the anchor day."""
+    if window < 1:
+        raise ValueError("Forward window must be at least one day.")
+    return series.rolling(window=window, min_periods=window).sum().shift(-window)
+
+
 def build_weather_target_dataset(
     location: str = "kochi",
     *,
@@ -311,12 +318,11 @@ def build_weather_target_dataset(
         frame[target_column] = frame.groupby("location")["temperature_2m_max"].shift(-lead_days)
     elif target == "drought_onset":
         target_column = "target_rain30_future"
-        # Sum the next 30 days (tomorrow through day 30).  Do not shift the
-        # rolling result again: that would silently move the target window to
-        # days 30-59 and break the documented 30-day outlook.
-        future_rain = (
-            frame.groupby("location")["precipitation_sum"]
-            .transform(lambda series: series.shift(-1).rolling(30, min_periods=30).sum())
+        # Sum exactly the next 30 days (tomorrow through day 30). The forward
+        # helper shifts a trailing rolling sum back 30 rows so no historical
+        # rainfall values overlap the target window.
+        future_rain = frame.groupby("location")["precipitation_sum"].transform(
+            lambda series: _forward_window_sum(series, 30)
         )
         frame[target_column] = future_rain
         lead_days = 30
