@@ -111,7 +111,7 @@ def train_regression_dataset(
 def train_continuous_regression_models() -> list[dict[str, Any]]:
     """Train continuous weather and cyclone-intensity models from real source records."""
     specs = (
-        (build_weather_target_dataset("kochi", lead_days=1, target="extreme_rainfall"), "weather_precipitation_kochi_nextday_regression", "Flood", "mm/day", "precipitation_sum"),
+        (build_weather_target_dataset("kochi", lead_days=1, target="extreme_rainfall"), "weather_precipitation_kochi_nextday_regression", "Flood", "mm/day", "precipitation_sum", {}),
         (build_weather_target_dataset("kochi", lead_days=1, target="high_temperature"), "weather_tmax_kochi_nextday_regression", "Heatwave", "degrees Celsius", "temperature_2m_max", {}),
         (build_cyclone_intensification_dataset(), "cyclone_wind_change_24h_regression", "Cyclone", "knots", None, {
             "group_column": "storm_id",
