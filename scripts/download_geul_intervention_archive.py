@@ -11,6 +11,7 @@ import argparse
 import hashlib
 import json
 import shutil
+import subprocess
 import sys
 import urllib.request
 from pathlib import Path
@@ -172,11 +173,15 @@ def main() -> int:
     result_archives = [Path(path) for path in downloaded
                        if Path(path).name.lower() == "final_results.zip"]
     if result_archives:
-        from scripts.inspect_intervention_archive import inspect_archive
-        inspection = inspect_archive(result_archives[0])
         manifest_path = Path(args.manifest)
         manifest_path.parent.mkdir(parents=True, exist_ok=True)
-        manifest_path.write_text(json.dumps(inspection, indent=2), encoding="utf-8")
+        inspector = Path(__file__).with_name("inspect_intervention_archive.py")
+        subprocess.run(
+            [sys.executable, str(inspector), "--archive", str(result_archives[0]),
+             "--output", str(manifest_path)],
+            check=True,
+        )
+        inspection = json.loads(manifest_path.read_text(encoding="utf-8"))
         summary["inspection_manifest"] = str(manifest_path)
         summary["archive_member_count"] = inspection["member_count"]
         summary["candidate_member_count"] = inspection["candidate_count"]
