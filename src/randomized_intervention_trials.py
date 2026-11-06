@@ -288,6 +288,8 @@ def fit_randomized_contrast(
             "outcome_unit": outcome_unit, "outcome_direction": "lower_is_better",
             "cluster_counts": counts, "train_cluster_counts": train_counts,
             "test_cluster_counts": test_counts,
+            "train_cluster_ids": sorted(train[cluster_col].astype(str).unique().tolist()),
+            "test_cluster_ids": sorted(test[cluster_col].astype(str).unique().tolist()),
             "heldout_itt_damage_change": ate, "heldout_itt_damage_change_95ci": ate_ci,
             "heldout_cate_policy_damage_change": policy_effect,
             "heldout_cate_policy_damage_change_95ci": policy_ci,
