@@ -274,12 +274,12 @@ def test_coverage_distinguishes_registered_artifacts_from_usable_models():
 def test_invalidated_drought_model_is_blocked_from_inference():
     from src.ml.inference import ModelNotUsableError, predict_from_context
 
-    with pytest.raises(ModelNotUsableError, match="NO_SKILL"):
+    with pytest.raises(ModelNotUsableError, match="invalidated evaluation provenance"):
         predict_from_context("weather_drought_onset_kochi_30day", {}, allow_no_skill=True)
 
 
 def test_invalidated_earthquake_model_is_blocked_from_inference():
     from src.ml.inference import ModelNotUsableError, predict_from_context
 
-    with pytest.raises(ModelNotUsableError, match="NO_SKILL"):
+    with pytest.raises(ModelNotUsableError, match="invalidated evaluation provenance"):
         predict_from_context("earthquake_aftershock_occurrence", {}, allow_no_skill=True)
