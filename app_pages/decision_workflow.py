@@ -1614,9 +1614,10 @@ st.caption(
 if preventive_actions:
     display_dataframe(
         pd.DataFrame(preventive_actions)[
-            ["phase", "hazard", "action", "trigger", "benefit", "owner", "evidence", "caution"]
+            ["action_id", "phase", "hazard", "action", "trigger", "benefit", "owner", "evidence", "caution"]
         ].rename(
             columns={
+                "action_id": "Action ID",
                 "phase": "When",
                 "hazard": "Hazard",
                 "action": "Recommended precaution",
