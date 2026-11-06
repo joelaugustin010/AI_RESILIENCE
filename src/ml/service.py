@@ -13,7 +13,7 @@ from typing import Any
 from src.hazard_registry import WORKFLOW_HAZARDS
 from src.ml.coverage import coverage_entry
 from src.ml.features import FeatureContractError, context_from_inputs
-from src.ml.inference import context_gaps, predict_from_context
+from src.ml.inference import context_gaps, predict_from_context, predict_regression_from_context
 from src.ml.registry import list_model_cards, load_model_card
 
 USABLE_STATUSES = {"WEAK_RESEARCH_SIGNAL", "RESEARCH_SIGNAL_NOT_VALIDATED"}
@@ -90,7 +90,11 @@ def _model_entry(model_id: str, inputs: dict[str, Any]) -> tuple[dict[str, Any],
         )
         return entry, None
     try:
-        prediction = predict_from_context(model_id, context)
+        prediction = (
+            predict_regression_from_context(model_id, context)
+            if card.get("task_type") == "regression"
+            else predict_from_context(model_id, context)
+        )
     except Exception as exc:  # fail closed on any artifact/runtime problem
         entry["status"] = "application_error"
         entry["note"] = f"{type(exc).__name__}: {exc}"
