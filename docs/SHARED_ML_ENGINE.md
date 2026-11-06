@@ -71,3 +71,18 @@ These gaps are recorded rather than filled with synthetic negatives.
 4. Run the training script and inspect the model card.
 5. Add the model to `HAZARD_MODEL_MAP` and the coverage interpretation.
 6. Add tests for leakage, fail-closed inference and card consistency.
+
+
+## Outcome-window boundary purging
+
+A temporal split must account for the full period used to construct each label,
+not only the event's issue/anchor date. For forward-looking labels, a row whose
+outcome window crosses a validation or test boundary is excluded from the
+earlier split. The aftershock dataset records `target_window_end` (seven days
+after the observed mainshock), and the training engine purges rows whose label
+window reaches into the next split. This prevents a training-era label from
+depending on catalogue events that belong to the validation or test era.
+
+This embargo is distinct from storm-group purging. Both controls are recorded
+in split metadata. The aftershock model must be retrained after this change;
+its previous holdout metrics are not valid evidence for the purged protocol.
