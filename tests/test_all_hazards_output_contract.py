@@ -48,6 +48,20 @@ def test_every_hazard_produces_the_complete_non_fabricated_output_contract():
         assert consequences["current_blockers"]
         assert consequences["prediction_permitted"] is False
         assert consequences["official_warning_permitted"] is False
+        impact_outputs = consequences["impact_outputs"]
+        output_names = {item["output"] for item in impact_outputs}
+        assert {
+            "Population inside the modelled exposure footprint",
+            "People potentially needing evacuation or displacement support",
+            "Injuries and fatalities",
+            "Residential and other buildings exposed or damaged",
+            "Critical facilities exposed",
+            "Roads and essential networks affected",
+            "Direct economic damage",
+            "Essential-service outage and recovery time",
+        }.issubset(output_names)
+        assert all(item["unit"] and item["status"].startswith("Not estimated") for item in impact_outputs)
+        assert all(item["required_evidence"] for item in impact_outputs)
 
         assert requirements["supported"] is True
         assert requirements["workflow_supported"] is True
