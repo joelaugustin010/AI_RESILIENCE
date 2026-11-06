@@ -4,6 +4,8 @@ from datetime import date
 from math import isfinite
 from typing import Any
 
+from src.hazard_registry import HAZARD_REGISTRY, WORKFLOW_HAZARDS
+
 SERVICE_PATHWAYS = {
     "Hospitals": {
         "flood": "Check ground-floor inundation, ambulance access, patient transfer routes, backup power, oxygen and medicine continuity.",
@@ -89,8 +91,12 @@ def _number(value: Any, label: str) -> float | None:
 def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
     """Organize evidence and pathways; never invent probabilities or impacts."""
     hazards = set(inputs.get("hazards") or [])
-    if not hazards or not hazards.issubset({"Flood", "Cyclone"}):
-        raise ValueError("Select Flood, Cyclone, or both.")
+    unknown = hazards.difference(WORKFLOW_HAZARDS)
+    if unknown:
+        raise ValueError(f"Unknown registered hazard selection: {sorted(unknown)}")
+    custom_disaster = str(inputs.get("custom_disaster") or "").strip()
+    if not hazards and not custom_disaster:
+        raise ValueError("Select at least one registered hazard or describe a custom disaster.")
     area = str(inputs.get("area") or "").strip()
     if not area:
         raise ValueError("A study area is required.")
@@ -105,14 +111,21 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
     if isinstance(start, date) and isinstance(end, date) and end < start:
         raise ValueError("Scenario end date must be on or after the start date.")
 
-    compound = hazards == {"Flood", "Cyclone"}
+    compound = len(hazards) > 1 or any(HAZARD_REGISTRY[name].kind == "compound" for name in hazards)
     pathways = []
-    if "Flood" in hazards:
-        pathways.append({"hazard": "Flood", "pathway": "Rainfall and river response interact with drainage, terrain, tide/backwater and land use. Verify local observations and catchment connectivity."})
-    if "Cyclone" in hazards:
-        pathways.append({"hazard": "Cyclone", "pathway": "Track, intensity, wind field, rainfall, coastal water and timing affect locations differently. Historical track proximity is not an impact forecast."})
+    for hazard in sorted(hazards):
+        definition = HAZARD_REGISTRY[hazard]
+        if hazard == "Flood":
+            pathway = "Rainfall and river response interact with drainage, terrain, tide/backwater and land use. Verify local observations and catchment connectivity."
+        elif hazard == "Cyclone":
+            pathway = "Track, intensity, wind field, rainfall, coastal water and timing affect locations differently. Historical track proximity is not an impact forecast."
+        else:
+            pathway = definition.summary + " Required evidence: " + "; ".join(definition.evidence_factors) + "."
+        pathways.append({"hazard": hazard, "pathway": pathway})
     if compound:
-        pathways.append({"hazard": "Compound interaction", "pathway": "Cyclone rainfall and coastal-water conditions may coincide with river flooding or drainage limitations. Verify sequence, overlap, tide/outfall conditions and local elevations."})
+        pathways.append({"hazard": "Multi-hazard interaction", "pathway": "Review timing, location and shared dependencies across selected hazards. Do not assume additive risk or a causal interaction without event-aligned evidence."})
+    if custom_disaster:
+        pathways.append({"hazard": "Custom disaster (unregistered)", "pathway": "User-described scenario: " + custom_disaster + ". This is outside the authoritative registry and requires domain-specific evidence and expert review; no registered ML model is assigned."})
 
     gaps = []
     comparisons = []
@@ -158,7 +171,10 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
             points.append(info["flood"])
         if "Cyclone" in hazards:
             points.append(info["cyclone"])
-        if compound:
+        for selected in sorted(hazards.difference({"Flood", "Cyclone"})):
+            definition = HAZARD_REGISTRY[selected]
+            points.append(selected + ": " + definition.summary + " Evidence needed: " + "; ".join(definition.evidence_factors) + ".")
+        if compound and {"Flood", "Cyclone"}.issubset(hazards):
             points.append(info["compound"])
         reviews.append({"service": service, "review_points": points})
 
@@ -171,8 +187,10 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
         if cyclone_distance is None: gaps.append("Cyclone track position and time relative to the study area")
         if cyclone_wind is None: gaps.append("Source-defined cyclone intensity/wind observation and timestamp")
         gaps.append("Forecast issue time, valid time, wind/rainfall fields and coastal-water evidence")
-    if compound:
+    if compound and {"Flood", "Cyclone"}.issubset(hazards):
         gaps.append("Aligned cyclone, rainfall, river, tide and flood-impact timelines for the same event")
+    if custom_disaster:
+        gaps.append("Domain-specific authoritative definition, verified event labels, exposure data and independent validation for the custom disaster")
     if not inputs.get("evidence_source"): gaps.append("Source URL or document reference for supplied observations")
     if not inputs.get("observation_time"): gaps.append("Observation timestamp and timezone")
     if not inputs.get("evidence_type"): gaps.append("Whether this is hypothetical, historical or a current sourced observation")
@@ -198,7 +216,7 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
 
     return {
         "status": "SCENARIO_REVIEW_ONLY_NOT_A_VALIDATED_FORECAST",
-        "area": area, "hazards": sorted(hazards), "compound": compound,
+        "area": area, "hazards": sorted(hazards), "custom_disaster": custom_disaster or None, "compound": compound,
         "period_start": str(start) if start else None, "period_end": str(end) if end else None,
         "evidence_type": str(inputs.get("evidence_type") or "Not specified"),
         "evidence_source": str(inputs.get("evidence_source") or "").strip() or None,
