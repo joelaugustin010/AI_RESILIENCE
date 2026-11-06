@@ -121,6 +121,12 @@ class CompoundHazardAssessmentTests(unittest.TestCase):
         self.assertTrue(any("Geotagged drainage inspection" in gap for gap in result["data_gaps"]))
         self.assertTrue(any("affected asset ID" in gap for gap in result["data_gaps"]))
 
+    def test_infrastructure_component_requires_verification_even_when_status_not_supplied(self):
+        result = assess_compound_scenario(self.base(
+            hazards=["Compound: heavy rainfall + drainage failure"],
+        ))
+        self.assertTrue(any("Independently verify infrastructure condition" in gap for gap in result["data_gaps"]))
+
     def test_non_finite_measurements_are_rejected(self):
         with self.assertRaisesRegex(ValueError, "finite"):
             assess_compound_scenario(self.base(rainfall_mm="nan"))
