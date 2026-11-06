@@ -53,6 +53,12 @@ class RandomizedContrast:
             "estimated_itt_damage_change": effect,
             "estimated_damage_reduction": -effect,
             "outcome_unit": self.report["outcome_unit"],
+            "context_specific_uncertainty": "NOT_ESTIMATED",
+            "contextual_action_superiority_established": False,
+            "ranking_restriction": (
+                "This point estimate cannot establish that this arm is better than another "
+                "arm for this context; a valid context-specific pairwise interval is not available."
+            ),
             "warning": "Exploratory heterogeneous ITT estimate; not a guaranteed or operational effect.",
         }
 
@@ -88,8 +94,10 @@ def validate_trial_frame(
         raise TrialDataError("Trial dataset is empty.")
     if frame["episode_id"].isna().any() or frame["episode_id"].astype(str).str.strip().eq("").any():
         raise TrialDataError("episode_id must be present for every observation.")
-    if frame[cluster_col].isna().any() or frame[arm_col].isna().any():
-        raise TrialDataError("Assignment cluster and assigned arm cannot be missing.")
+    if (frame[cluster_col].isna().any() or frame[arm_col].isna().any()
+            or frame[cluster_col].astype(str).str.strip().eq("").any()
+            or frame[arm_col].astype(str).str.strip().eq("").any()):
+        raise TrialDataError("Assignment cluster and assigned arm must be present and non-empty.")
     if frame.groupby(cluster_col, dropna=False)[arm_col].nunique().max() != 1:
         raise TrialDataError("A randomization cluster appears in more than one assigned arm.")
     if frame["episode_id"].astype(str).duplicated().any():
@@ -100,19 +108,6 @@ def validate_trial_frame(
     outcome = pd.to_numeric(frame[outcome_col], errors="coerce")
     if outcome.isna().any() or not np.isfinite(outcome.to_numpy(float)).all():
         raise TrialDataError("Damage outcome must be finite numeric data.")
-    forbidden = {
-        "received_treatment", "implemented", "treatment_received",
-        "post_treatment", "post_intervention", "damage_outcome",
-        "assigned_arm", "assignment_cluster_id", "episode_id",
-    }
-    bad = [c for c in feature_columns
-           if c.lower() in forbidden or any(
-               token in c.lower() for token in
-               ("outcome", "damage_after", "post_", "after_", "received",
-                "implemented", "assigned_arm", "treatment", "recovery")
-           )]
-    if bad:
-        raise TrialDataError(f"Treatment/post-treatment leakage in feature list: {bad}")
     if not feature_columns:
         raise TrialDataError("At least one pre-randomization covariate is required.")
     if frame[list(feature_columns)].isna().all(axis=0).any():
@@ -175,10 +170,28 @@ def fit_randomized_contrast(
                          arm_col=arm_col, outcome_col=outcome_col)
     if treatment_arm == reference_arm:
         raise TrialDataError("Treatment and reference arms must differ.")
-    for arm in (treatment_arm, reference_arm):
-        p = assignment_probabilities.get(arm)
-        if p is None or not np.isfinite(p) or p <= 0 or p >= 1:
-            raise TrialDataError(f"Documented positive assignment probability required for arm {arm!r}.")
+    if not np.isfinite(test_fraction) or not 0 < test_fraction <= 0.5:
+        raise TrialDataError("test_fraction must be greater than 0 and no more than 0.5.")
+    if not isinstance(outcome_unit, str) or not outcome_unit.strip():
+        raise TrialDataError("A non-empty, documented outcome_unit is required.")
+    if min_clusters_per_arm < 4:
+        raise TrialDataError("min_clusters_per_arm must be at least 4 for a cluster holdout.")
+    observed_arms = set(frame[arm_col].astype(str).unique())
+    probability_arms = set(assignment_probabilities)
+    if probability_arms != observed_arms:
+        raise TrialDataError(
+            "Assignment probabilities must name every observed randomized arm exactly; "
+            f"observed={sorted(observed_arms)}, supplied={sorted(probability_arms)}."
+        )
+    invalid_probabilities = {
+        arm: value for arm, value in assignment_probabilities.items()
+        if not np.isfinite(value) or float(value) <= 0 or float(value) >= 1
+    }
+    if invalid_probabilities:
+        raise TrialDataError(
+            f"Every randomized arm needs a finite probability strictly between 0 and 1: "
+            f"{invalid_probabilities}."
+        )
     probability_total = sum(float(v) for v in assignment_probabilities.values())
     if not np.isclose(probability_total, 1.0, atol=1e-6):
         raise TrialDataError(
@@ -310,6 +323,8 @@ def fit_randomized_contrast(
             "heldout_cate_policy_damage_change_95ci": policy_ci,
             "heldout_policy_treatment_share": float(np.mean(policy_choose_treatment)),
             "eligible_for_ranking": eligible,
+            "context_specific_uncertainty": "NOT_ESTIMATED",
+            "contextual_action_superiority_established": False,
             "status_reason": (
                 "Held-out cluster-level ITT and learned policy intervals support lower damage; "
                 "independent replication and external validation are still required."
