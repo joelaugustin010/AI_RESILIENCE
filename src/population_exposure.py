@@ -65,6 +65,7 @@ def estimate_population_exposure(
 
     forward = Transformer.from_crs("EPSG:4326", "EPSG:6933", always_xy=True).transform
     hazard_geometries = []
+    footprint_bounds = []
     for index, feature in enumerate(hazard_footprint["features"]):
         try:
             geom = shape(feature["geometry"])
@@ -75,6 +76,7 @@ def estimate_population_exposure(
         min_x, min_y, max_x, max_y = geom.bounds
         if min_x < -180 or max_x > 180 or min_y < -90 or max_y > 90:
             raise PopulationExposureError(f"Hazard feature {index} has coordinates outside EPSG:4326 bounds.")
+        footprint_bounds.append((min_x, min_y, max_x, max_y))
         hazard_geometries.append(transform(forward, geom))
     hazard_union = unary_union(hazard_geometries)
     if hazard_union.is_empty or not hazard_union.is_valid:
@@ -164,6 +166,12 @@ def estimate_population_exposure(
         "estimated_population_fractional": round(exposed_population, 2),
         "hazard_footprint_area_covered_percent": round(coverage_percent, 3),
         "population_grid_covers_full_footprint": complete_coverage,
+        "footprint_bounds_wgs84": [
+            min(item[0] for item in footprint_bounds),
+            min(item[1] for item in footprint_bounds),
+            max(item[2] for item in footprint_bounds),
+            max(item[3] for item in footprint_bounds),
+        ],
         "population_grid_total": round(total_population),
         "population_grid_cells": len(cells),
         "intersecting_population_cells": exposed_cells,
