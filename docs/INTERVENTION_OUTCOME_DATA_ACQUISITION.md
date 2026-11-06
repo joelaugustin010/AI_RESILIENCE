@@ -107,3 +107,14 @@ Held-out policy evaluation is also restricted to contexts inside the training su
 ## Newly discovered evidence and data leads (research update)
 
 The 2023 Netherlands study explicitly states that the underlying household flood-damage dataset is deposited at 4TU.ResearchData under DOI 10.4121/21603348. The study's empirical analysis uses instrumental variables to address selection into flood-damage mitigation; it also documents limitations around simultaneous measures and depth-specific effects. This is a high-priority dataset to verify, not a claim that the files are already downloaded or reusable. The 2026 Yale/Inclusion Economics brief now reports the four-year Bihar randomized evaluation's household protection outcomes; these published aggregate results strengthen the evidence library but remain unsuitable as individual training rows without lawful microdata.
+
+
+## Additional candidate — Pakistan 2023 flood-warning survey (screening only)
+
+- Repository record: https://zenodo.org/records/23455118
+- DOI: https://doi.org/10.5281/zenodo.23455118
+- Record published: 18 October 2026.
+- The record describes anonymized questionnaire data from 350 flood-affected households in Rajanpur District after the 2023 floods, alongside PLS-SEM result workbooks and the survey instrument.
+- **Important limitations:** the Zenodo record's Rights/License field is blank in the inspected metadata; reuse permission is therefore not established. The record describes a post-flood questionnaire and PLS-SEM analyses, not a randomized assignment design. The published metadata alone do not establish a validated household damage outcome, intervention implementation/timing, comparison group, cluster structure, or pre-treatment covariate set.
+- Decision: retain as a **candidate for codebook and rights review only**. Do not download into the project, train on it, infer causal intervention effects, or treat its PLS-SEM outputs as episode-level training labels unless the licence, questionnaire, variable definitions, and study design are independently verified. An adult research supervisor should review any reuse terms and contact the data author if necessary.
+- It may ultimately support descriptive research on warning quality and protective actions; it is not presently accepted by either intervention training pipeline.
