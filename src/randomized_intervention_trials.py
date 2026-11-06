@@ -77,6 +77,11 @@ def validate_trial_frame(
         raise TrialDataError("Assignment cluster and assigned arm cannot be missing.")
     if frame.groupby(cluster_col, dropna=False)[arm_col].nunique().max() != 1:
         raise TrialDataError("A randomization cluster appears in more than one assigned arm.")
+    if frame["episode_id"].astype(str).duplicated().any():
+        raise TrialDataError(
+            "Each episode_id must be one aggregated observation; aggregate asset-level rows "
+            "to the household/episode before fitting to avoid pseudoreplication."
+        )
     outcome = pd.to_numeric(frame[outcome_col], errors="coerce")
     if outcome.isna().any() or not np.isfinite(outcome.to_numpy(float)).all():
         raise TrialDataError("Damage outcome must be finite numeric data.")
@@ -159,8 +164,11 @@ def fit_randomized_contrast(
         p = assignment_probabilities.get(arm)
         if p is None or not np.isfinite(p) or p <= 0 or p >= 1:
             raise TrialDataError(f"Documented positive assignment probability required for arm {arm!r}.")
-    if sum(float(v) for v in assignment_probabilities.values()) > 1.000001:
-        raise TrialDataError("Assignment probabilities cannot sum to more than one.")
+    probability_total = sum(float(v) for v in assignment_probabilities.values())
+    if not np.isclose(probability_total, 1.0, atol=1e-6):
+        raise TrialDataError(
+            "Supply the complete, documented arm-probability vector; probabilities must sum to one."
+        )
 
     data = frame.loc[frame[arm_col].isin([treatment_arm, reference_arm])].copy()
     data[outcome_col] = pd.to_numeric(data[outcome_col], errors="raise")
