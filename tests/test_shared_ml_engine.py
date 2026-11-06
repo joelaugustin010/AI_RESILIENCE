@@ -266,7 +266,9 @@ def test_coverage_distinguishes_registered_artifacts_from_usable_models():
     assert drought["model_statuses"]["weather_drought_onset_kochi_30day"] == "NO_SKILL"
     assert drought["support_level"] == "no_skill_model"
     assert "Drought" in coverage["hazards_without_usable_research_model"]
-    assert coverage["n_hazards_with_usable_research_model"] < coverage["n_hazards_with_ml_evidence"]
+    assert coverage["n_hazards_with_usable_research_model"] == 2
+    assert coverage["hazards_with_usable_research_model"] == ["Cyclone", "Heatwave"]
+    assert coverage["n_hazards_with_component_research_evidence"] >= 2
 
 
 def test_invalidated_drought_model_is_blocked_from_inference():
