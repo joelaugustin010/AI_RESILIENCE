@@ -8,12 +8,12 @@ import streamlit as st
 
 
 st.set_page_config(
-    page_title="AI RESILIENCE | Kerala environmental & disaster intelligence",
+    page_title="AI RESILIENCE | Kochi environmental & disaster intelligence",
     page_icon=":material/shield:",
     layout="wide",
 )
 
-# Open directly on the main Kerala dashboard.
+# Open directly on the Kochi-focused project dashboard.
 pages = {
     "Home": [
         st.Page(
@@ -66,7 +66,7 @@ pages = {
         ),
         st.Page(
             "app_pages/disaster_probability.py",
-            title="Ernakulam Disaster Probability",
+            title="Multi-Hazard Evidence Review",
             icon=":material/analytics:",
         ),
     ],
@@ -1155,8 +1155,8 @@ try:  # pragma: no cover - presentation only
                 gridcolor="rgba(44,105,82,.12)",
                 zerolinecolor="rgba(44,105,82,.18)",
                 linecolor="rgba(44,105,82,.24)",
-                tickfont=dict(color="#9dbac2"),
-                title=dict(font=dict(color="#b9d4d9")),
+                tickfont=dict(color="#71827F"),
+                title=dict(font=dict(color="#71827F")),
             ),
             legend=dict(
                 bgcolor="rgba(255,255,255,.88)",
@@ -1219,15 +1219,203 @@ except Exception:  # pragma: no cover - optional dependency
 if page.title != "Home":
     st.markdown(
         """
-        <div style="display:flex;align-items:center;gap:.55rem;margin:.1rem 0 1rem;color:#a7c1c8;font-size:.82rem">
-          <span style="display:inline-block;width:.55rem;height:.55rem;border-radius:50%;background:#42e0c1"></span>
-          <span><strong style="color:#e7f5f5">AI RESILIENCE</strong> · KOCHI CLIMATE INTELLIGENCE · INTELLIGENT CITIES, RESILIENT FUTURES</span>
+        <div style="display:flex;align-items:center;gap:.55rem;margin:.1rem 0 1rem;color:#71827F;font-size:.82rem">
+          <span style="display:inline-block;width:.55rem;height:.55rem;border-radius:50%;background:#247A65"></span>
+          <span><strong style="color:#315B4C">AI RESILIENCE</strong> · KOCHI CLIMATE INTELLIGENCE · INTELLIGENT CITIES, RESILIENT FUTURES</span>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
 page.run()
+
+# Final application-wide polish is injected after the selected page renders so
+# page-local styles cannot accidentally break shared controls or readability.
+st.markdown(
+    """
+    <style>
+    /* Consistent controls */
+    [data-testid="stTextInput"] input,
+    [data-testid="stNumberInput"] input,
+    [data-testid="stDateInput"] input,
+    [data-testid="stTimeInput"] input,
+    [data-testid="stTextArea"] textarea,
+    [data-testid="stSelectbox"] [data-baseweb="select"] > div,
+    [data-testid="stMultiSelect"] [data-baseweb="select"] > div {
+      color: #294640 !important;
+      background: rgba(255,255,255,.96) !important;
+      border-color: rgba(44,105,82,.25) !important;
+      border-radius: 11px !important;
+      box-shadow: none !important;
+    }
+    [data-testid="stTextInput"] input:focus,
+    [data-testid="stNumberInput"] input:focus,
+    [data-testid="stDateInput"] input:focus,
+    [data-testid="stTextArea"] textarea:focus {
+      border-color: #247A65 !important;
+      box-shadow: 0 0 0 2px rgba(36,122,101,.13) !important;
+    }
+    [data-testid="stCheckbox"] label,
+    [data-testid="stRadio"] label,
+    [data-testid="stToggle"] label,
+    [data-testid="stSlider"] label,
+    [data-testid="stWidgetLabel"] {
+      color: #405D54 !important;
+    }
+    [data-testid="stCheckbox"] input,
+    [data-testid="stRadio"] input { accent-color: #247A65 !important; }
+    [data-testid="stSelectbox"] svg,
+    [data-testid="stMultiSelect"] svg { color: #48685B !important; }
+    [data-baseweb="popover"], [data-baseweb="menu"] {
+      background: #ffffff !important;
+      border: 1px solid rgba(44,105,82,.18) !important;
+      box-shadow: 0 14px 32px rgba(26,65,49,.13) !important;
+    }
+    [role="option"] { color: #294640 !important; }
+    [role="option"]:hover, [aria-selected="true"][role="option"] {
+      background: #EAF3EE !important;
+    }
+
+    /* Data and chart surfaces */
+    [data-testid="stDataFrame"], [data-testid="stTable"],
+    [data-testid="stPlotlyChart"], [data-testid="stVegaLiteChart"],
+    [data-testid="stPydeckChart"] {
+      border: 1px solid rgba(44,105,82,.15) !important;
+      border-radius: 14px !important;
+      background: rgba(255,255,255,.72) !important;
+      overflow: hidden;
+    }
+    [data-testid="stDataFrame"] [role="grid"],
+    [data-testid="stTable"] table {
+      color: #294640 !important;
+    }
+    [data-testid="stPlotlyChart"] .js-plotly-plot,
+    [data-testid="stVegaLiteChart"] canvas {
+      border-radius: 12px;
+    }
+
+    /* Page-specific components harmonised with the eco-glass system. */
+    .wf-step {
+      color: #48685B !important;
+      background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(239,247,242,.96)) !important;
+      border-color: rgba(44,105,82,.18) !important;
+      box-shadow: 0 8px 22px rgba(26,65,49,.07) !important;
+    }
+    .wf-step strong { color: #1D3030 !important; }
+    .air-nav { border-bottom-color: rgba(44,105,82,.16) !important; }
+    .air-nav a {
+      color: #315B4C !important;
+      background: rgba(255,255,255,.82) !important;
+      border-color: rgba(44,105,82,.20) !important;
+    }
+    .air-nav a:hover {
+      color: #17624f !important;
+      background: #EAF3EE !important;
+      border-color: rgba(36,122,101,.38) !important;
+    }
+    .disaster-hero {
+      color: #1D3030 !important;
+      background:
+        radial-gradient(ellipse at 90% -20%, rgba(131,185,165,.18), transparent 20rem),
+        linear-gradient(120deg, rgba(255,255,255,.98), rgba(234,243,238,.96)) !important;
+      border-color: rgba(44,105,82,.20) !important;
+    }
+    .disaster-kicker, .disaster-step { color: #247A65 !important; }
+    .disaster-title { color: #1D3030 !important; }
+    .disaster-subtitle, .disaster-card-copy,
+    .disaster-result-copy { color: #587267 !important; }
+    .disaster-card {
+      background: rgba(255,255,255,.88) !important;
+      border-color: rgba(44,105,82,.18) !important;
+    }
+    .disaster-card-title { color: #315B4C !important; }
+    .disaster-result {
+      background: linear-gradient(140deg, rgba(232,246,238,.98), rgba(255,255,255,.98)) !important;
+      border-color: rgba(44,105,82,.20) !important;
+    }
+    .disaster-result-label { color: #247A65 !important; }
+    .disaster-result-value { color: #1D3030 !important; }
+    .disaster-pill {
+      color: #315B4C !important;
+      background: #EAF3EE !important;
+      border-color: rgba(44,105,82,.20) !important;
+    }
+    .disaster-empty {
+      color: #587267 !important;
+      background: rgba(255,255,255,.82) !important;
+      border-color: rgba(44,105,82,.28) !important;
+    }
+    .concept-note {
+      color: #6f531e !important;
+      background: linear-gradient(145deg, rgba(255,249,232,.98), rgba(255,255,255,.96)) !important;
+      border-color: rgba(169,107,18,.26) !important;
+      border-left-color: #b7832e !important;
+    }
+    .concept-note strong { color: #7b5717 !important; }
+    .concept-note p { color: #765f36 !important; }
+    .smart-panel {
+      background: linear-gradient(140deg, rgba(255,255,255,.98), rgba(239,247,242,.96)) !important;
+      border-color: rgba(44,105,82,.18) !important;
+    }
+    .smart-panel h3 { color: #1D3030 !important; }
+    .smart-panel p { color: #587267 !important; }
+    .probability-panel {
+      background: linear-gradient(145deg, rgba(255,255,255,.98), rgba(239,247,242,.96)) !important;
+      border-color: rgba(44,105,82,.20) !important;
+    }
+    .probability-label { color: #71827F !important; }
+    .probability-value { color: #1D604F !important; }
+    .probability-unavailable { color: #94620e !important; }
+
+    /* Alerts, forms and expandable content */
+    [data-testid="stAlert"] {
+      border-radius: 13px !important;
+      border: 1px solid rgba(44,105,82,.18) !important;
+    }
+    [data-testid="stForm"] {
+      border: 1px solid rgba(44,105,82,.16) !important;
+      border-radius: 16px !important;
+      padding: 1rem !important;
+      background: rgba(255,255,255,.66) !important;
+    }
+    [data-testid="stExpander"] {
+      border-radius: 13px !important;
+      border-color: rgba(44,105,82,.18) !important;
+    }
+
+    /* Responsive page rhythm and keyboard accessibility */
+    @media (max-width: 900px) {
+      .block-container { padding-top: 1rem !important; }
+      [class*="st-key-ar-head-"] { padding: 1.25rem !important; }
+      [data-testid="stMetric"] { padding: .8rem !important; }
+    }
+    @media (max-width: 640px) {
+      .block-container { padding-left: .85rem !important; padding-right: .85rem !important; }
+      [data-testid="stHorizontalBlock"] { gap: .65rem !important; }
+      [class*="st-key-ar-head-"] h1,
+      [class*="st-key-ar-head-"] .ar-page-title {
+        font-size: clamp(1.65rem, 8vw, 2.25rem) !important;
+        line-height: 1.08 !important;
+      }
+      [data-testid="stMetricValue"] { font-size: 1.35rem !important; }
+      [data-testid="stDataFrame"], [data-testid="stTable"] { max-width: 100%; }
+    }
+    :focus-visible {
+      outline: 2px solid #247A65 !important;
+      outline-offset: 2px !important;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 if page.title != "Home":
     st.markdown(

@@ -1,8 +1,8 @@
-"""Cinematic Kerala homepage for AI RESILIENCE.
+"""Kochi-focused environmental and disaster-intelligence homepage for AI RESILIENCE.
 
-The page is intentionally image-led: Kerala's landscapes, the pressures they
-face, the intelligence chain that connects them, and direct routes into the
-existing analytical workspaces.
+The page introduces Kochi's urban resilience context, explains the evidence-first
+workflow, and routes users into the existing analytical workspaces. Regional
+photography is illustrative context; analytical scope remains Kochi-focused.
 
 Hero film
 ---------
@@ -873,7 +873,7 @@ st.markdown(
 # ---------------------------------------------------------------------------
 st.markdown(
     f"""
-    <section class="ar-cine-hero" aria-label="AI RESILIENCE - Kerala environmental and disaster intelligence">
+    <section class="ar-cine-hero" aria-label="AI RESILIENCE - Kochi environmental and disaster intelligence">
       <div class="ar-cine-media" aria-hidden="true">
         <img class="ar-cine-poster ar-cine-slide ar-slide-a" src="{_img('hero-kerala-fallback.jpg')}"
              alt="" fetchpriority="high" decoding="async">
@@ -889,15 +889,15 @@ st.markdown(
       </div>
       <div class="ar-cine-inner">
         <div class="ar-cine-topline">
-          <div class="ar-cine-kicker"><span class="ar-live-dot"></span>Kerala · Environmental &amp; disaster intelligence</div>
+          <div class="ar-cine-kicker"><span class="ar-scope-dot" aria-hidden="true"></span>Kochi · Environmental &amp; disaster intelligence</div>
           <div class="ar-cine-coord">9.9312° N · 76.2673° E · Kochi</div>
         </div>
         <h1 class="ar-cine-title">AI <span>RESILIENCE</span></h1>
-        <p class="ar-cine-sub">Protecting Kerala. Predicting Risks. Building a Resilient Future.</p>
+        <p class="ar-cine-sub">Understanding Kochi. Preparing for risk. Strengthening urban resilience.</p>
         <p class="ar-cine-desc">
-          One evidence-first platform for disaster intelligence, environmental monitoring,
-          hospital resilience and smart mitigation — turning complex risk into clearer
-          preparedness decisions for Kerala's people, landscapes and cities.
+          A Kochi-focused, evidence-first platform for environmental monitoring, multi-hazard
+          review, critical-service resilience and mitigation planning. Explore documented
+          data, understand uncertainty and support better-informed local decisions.
         </p>
         <div class="ar-cine-chips">
           <span>Disaster intelligence</span>
@@ -928,7 +928,7 @@ with st.container(key="ar-hero-ctas"):
             st.switch_page("app_pages/decision_workflow.py")
     with cta_secondary:
         if st.button(
-            "Explore Kerala's Risks",
+            "Explore Kochi's Risk Context",
             type="secondary",
             width="stretch",
             key="home_explore_risks",
@@ -943,11 +943,11 @@ with st.container(key="ar-hero-ctas"):
 
 st.markdown(
     """
-    <div class="ar-signal">
-      <div><strong>14</strong><span>districts</span><p>A state-scale view, from the coast to the high ranges.</p></div>
-      <div><strong>10</strong><span>hazard families</span><p>Flood, cyclone, landslide, heat, drought, industrial and more.</p></div>
-      <div><strong>11</strong><span>workspaces</span><p>From evidence review to scenario design and mitigation planning.</p></div>
-      <div><strong>Open</strong><span>by design</span><p>Methods, provenance and limitations stay visible with every result.</p></div>
+    <div class="ar-signal" aria-label="Platform principles and scope">
+      <div><strong>Kochi</strong><span>pilot geography</span><p>City-focused spatial and environmental intelligence.</p></div>
+      <div><strong>Evidence</strong><span>first approach</span><p>Source coverage, provenance and uncertainty stay visible.</p></div>
+      <div><strong>11</strong><span>workspaces</span><p>Monitoring, risk review, critical services and mitigation planning.</p></div>
+      <div><strong>Human</strong><span>led decisions</span><p>Research support — not an official warning or emergency service.</p></div>
     </div>
     """,
     unsafe_allow_html=True,
@@ -959,13 +959,12 @@ st.markdown(
 st.markdown(
     """
     <div class="ar-story">
-      <span class="ar-overline">01 · The beauty of Kerala</span>
-      <h2>Landscapes that hold a civilisation.</h2>
+      <span class="ar-overline">01 · Kochi and its regional context</span>
+      <h2>A coastal city shaped by water.</h2>
       <p>
-        Kerala is a narrow ribbon of water, forest and coast. Its backwaters carry food and
-        memory; the Western Ghats shape its weather and hold its biodiversity; its beaches and
-        cities are home to millions. This is the landscape the platform is built to understand
-        and protect.
+        Kochi's resilience is connected to its backwaters, coastal edge, canals, urban drainage
+        and essential services. Understanding the city means looking beyond isolated hazards
+        and making the evidence, geography and uncertainty behind each decision easier to see.
       </p>
     </div>
     <div class="ar-gallery">
@@ -1001,8 +1000,8 @@ st.markdown(
       </figure>
     </div>
     <p class="ar-fineprint">
-      Illustrative photography from Kerala, used to celebrate the landscape and its contexts.
-      Images are not evidence of current conditions or of a specific event.
+      Regional Kerala photography provides visual context only. The platform's analytical
+      focus is Kochi; images are not evidence of current conditions or a specific event.
     </p>
     """,
     unsafe_allow_html=True,
@@ -1022,9 +1021,9 @@ st.markdown(
           <span class="ar-overline">02 · The threats we face</span>
           <h2 id="ar-threat-title">Beauty under pressure.</h2>
           <p>
-            The same water, slopes and coastlines that make Kerala extraordinary also carry
-            risk. A changing climate and growing urban footprint are testing the systems that
-            keep communities safe. The platform treats these hazards as connected, not isolated.
+            Kochi's waterways, coastal setting and dense urban footprint create connected planning
+            questions. Heavy rainfall, drainage constraints, coastal pressures and environmental
+            change can affect neighbourhoods and essential services in different ways.
           </p>
         </div>
         <div class="ar-hazards">
@@ -1085,9 +1084,9 @@ st.markdown(
         <span class="ar-overline">03 · Why AI_RESILIENCE matters</span>
         <h2 id="ar-why-title">From observation to action, in one evidence chain.</h2>
         <p>
-          Preparedness improves when monitoring, risk assessment, critical-facility intelligence
-          and mitigation planning speak the same language. AI_RESILIENCE connects those steps
-          without hiding the uncertainty between them.
+          Urban preparedness improves when environmental monitoring, hazard review, critical-facility
+          context and mitigation planning speak the same language. AI RESILIENCE connects those
+          steps while keeping evidence gaps and uncertainty visible.
         </p>
       </div>
       <ol class="ar-flow">
@@ -1117,7 +1116,7 @@ st.markdown(
         <div>
           <strong>Evidence-first, not certainty-first.</strong>
           <p>
-            This is a research prototype, not an official warning service. Scenario outputs are
+            This is a Kochi-focused research prototype, not an official warning service. Scenario outputs are
             not automatically validated probabilities, and historical observations do not prove
             current conditions or identify a pollution source. In an emergency, follow the Kerala
             State Disaster Management Authority, IMD and district-administration guidance.
@@ -1155,7 +1154,7 @@ navigation_groups = [
         "Build a scenario, inspect the evidence and understand what the models can — and cannot — tell you.",
         [
             ("app_pages/decision_workflow.py", "Decision Workflow", ":material/assignment_turned_in:"),
-            ("app_pages/disaster_probability.py", "Ernakulam Risk Assessment", ":material/analytics:"),
+            ("app_pages/disaster_probability.py", "Multi-Hazard Evidence Review", ":material/analytics:"),
             ("app_pages/compound_scenario.py", "Cyclone + Flood", ":material/thunderstorm:"),
         ],
     ),
@@ -1251,7 +1250,7 @@ st.markdown(
         <article class="ar-sdg-card"><img src="app/static/images/sdg/sdg-9.png" alt="SDG 9: Industry, Innovation and Infrastructure"><div><h3><span>SDG 9</span>Industry, Innovation and Infrastructure</h3><p>Industrial pollution intelligence and resilient infrastructure planning bring transparent evidence into design conversations.</p></div></article>
         <article class="ar-sdg-card"><img src="app/static/images/sdg/sdg-11.png" alt="SDG 11: Sustainable Cities and Communities"><div><h3><span>SDG 11</span>Sustainable Cities and Communities</h3><p>Urban flood analysis, disaster intelligence, hospital resilience and mitigation planning support more prepared communities.</p></div></article>
         <article class="ar-sdg-card"><img src="app/static/images/sdg/sdg-13.png" alt="SDG 13: Climate Action"><div><h3><span>SDG 13</span>Climate Action</h3><p>Hazard monitoring and scenario work help users understand climate-related pressures and prepare with appropriate caution.</p></div></article>
-        <article class="ar-sdg-card"><img src="app/static/images/sdg/sdg-15.png" alt="SDG 15: Life on Land"><div><h3><span>SDG 15</span>Life on Land</h3><p>Kerala landscape and environmental-risk context can help surface threats to forests, the Western Ghats and connected ecosystems.</p></div></article>
+        <article class="ar-sdg-card"><img src="app/static/images/sdg/sdg-15.png" alt="SDG 15: Life on Land"><div><h3><span>SDG 15</span>Life on Land</h3><p>Kochi's wetlands, green spaces and connected ecosystems are important context for urban resilience planning.</p></div></article>
       </div>
       <div class="ar-sdg-note">Official SDG icons are used without the UN emblem for informational purposes. <a href="https://sdgs.un.org/goals" target="_blank" rel="noopener">Learn about the UN Sustainable Development Goals</a>. The content of this publication has not been approved by the United Nations and does not reflect the views of the United Nations or its officials or Member States.</div>
     </section>
@@ -1267,7 +1266,7 @@ st.markdown(
     <div class="ar-footer">
       <div>
         <strong>AI RESILIENCE</strong>
-        Kerala environmental &amp; disaster intelligence · Evidence-first, human-centred.
+        Kochi environmental &amp; disaster intelligence · Evidence-first, human-centred.
       </div>
       <div class="ar-foot-right">
         Built around open, documented data sources.<br>
@@ -1318,3 +1317,108 @@ with st.expander("Photography credits and licensing", expanded=False):
           [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Kerala_Monsoon_clouds_over_Western_Ghats_India.jpg).
         """
     )
+
+
+# Kochi homepage — UX refinement layer
+st.markdown(
+    """
+    <style>
+    .ar-scope-dot {
+      display:inline-block; width:8px; height:8px; margin-right:.5rem;
+      border-radius:50%; background:#8ce0b6; box-shadow:0 0 0 4px rgba(140,224,182,.16);
+      vertical-align:middle;
+    }
+    .ar-signal { grid-template-columns:repeat(4,minmax(0,1fr)); gap:.8rem; border:0; margin:1.5rem 0 0; }
+    .ar-signal > div {
+      min-width:0; padding:1.15rem 1.2rem; border:1px solid rgba(44,105,82,.16);
+      border-radius:18px; background:rgba(255,255,255,.82); box-shadow:0 8px 24px rgba(26,65,49,.06);
+    }
+    .ar-signal > div:first-child { padding-left:1.2rem; }
+    .ar-signal strong { color:#1d5e4b; }
+    .ar-signal span { color:#247a65; letter-spacing:.11em; }
+    .ar-signal p { color:#63766e; }
+    .ar-story h2 { color:#1d3030 !important; }
+    .ar-story p { color:#5d7068; }
+    .ar-overline { color:#247a65 !important; }
+    .ar-fineprint { color:#71827b; }
+    .ar-gallery { gap:1rem; }
+    .ar-tile { border-color:rgba(44,105,82,.16); box-shadow:0 12px 28px rgba(26,65,49,.08); }
+    .ar-threat { border-color:rgba(44,105,82,.16); background:rgba(255,255,255,.76); box-shadow:0 18px 42px rgba(26,65,49,.08); }
+    .ar-threat .ar-threat-bg { filter:saturate(.72) contrast(.96) brightness(1.12); }
+    .ar-threat-scrim { background:linear-gradient(115deg,rgba(246,251,247,.97),rgba(239,247,241,.91) 58%,rgba(232,244,237,.82)); }
+    .ar-threat .ar-story h2 { color:#1d3030 !important; }
+    .ar-threat .ar-story p { color:#5d7068 !important; }
+    .ar-hazard {
+      border:1px solid rgba(44,105,82,.15); background:rgba(255,255,255,.82);
+      box-shadow:0 8px 22px rgba(26,65,49,.045); backdrop-filter:blur(12px);
+    }
+    .ar-hazard:hover { border-color:rgba(36,122,101,.34); background:#fff; }
+    .ar-hazard h3 { color:#23473b !important; }
+    .ar-hazard p { color:#667970; }
+    .ar-hazard-icon { color:#247a65; }
+    .ar-why {
+      border-color:rgba(44,105,82,.16);
+      background:linear-gradient(145deg,rgba(255,255,255,.94),rgba(237,246,240,.92));
+      box-shadow:0 18px 42px rgba(26,65,49,.075);
+    }
+    .ar-why .ar-story h2 { color:#1d3030 !important; }
+    .ar-why .ar-story p { color:#5d7068; }
+    .ar-flow-step { border-top-color:rgba(36,122,101,.42); background:linear-gradient(180deg,rgba(36,122,101,.065),rgba(36,122,101,0)); }
+    .ar-step-no { color:#247a65; }
+    .ar-flow-step h3 { color:#24473b !important; }
+    .ar-flow-step p { color:#64766e; }
+    .ar-transparency { border-color:rgba(36,122,101,.18); background:rgba(231,243,235,.78); }
+    .ar-transparency strong { color:#23473b; }
+    .ar-transparency p { color:#5d7068; }
+    [class*="st-key-ar-nav-"] {
+      border-color:rgba(44,105,82,.16);
+      background:linear-gradient(145deg,rgba(255,255,255,.92),rgba(239,247,241,.9));
+      box-shadow:0 12px 28px rgba(26,65,49,.06);
+      transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;
+    }
+    [class*="st-key-ar-nav-"]:hover { border-color:rgba(36,122,101,.34); box-shadow:0 16px 34px rgba(26,65,49,.09); }
+    .ar-nav-icon { border-color:rgba(36,122,101,.18); background:rgba(36,122,101,.08); color:#247a65; }
+    .ar-nav-count { color:#71827b; }
+    .ar-nav-head h3 { color:#23473b !important; }
+    .ar-nav-copy { color:#63766e; }
+    [class*="st-key-ar-nav-"] [data-testid="stPageLink"] a { color:#315c4c !important; border-radius:10px; }
+    [class*="st-key-ar-nav-"] [data-testid="stPageLink"] a:hover { color:#176b54 !important; background:rgba(36,122,101,.08); }
+    .ar-sdg-section {
+      border-color:rgba(44,105,82,.16);
+      background:linear-gradient(145deg,rgba(255,255,255,.94),rgba(237,246,240,.94));
+      box-shadow:0 18px 42px rgba(26,65,49,.07);
+    }
+    .ar-sdg-intro .ar-overline { color:#247a65 !important; }
+    .ar-sdg-intro h2 { color:#1d3030 !important; }
+    .ar-sdg-intro p { color:#5d7068 !important; }
+    .ar-sdg-card { border-color:rgba(44,105,82,.14); background:rgba(255,255,255,.88); }
+    .ar-sdg-card:hover { border-color:rgba(36,122,101,.32); background:#fff; }
+    .ar-sdg-card h3 { color:#23473b !important; }
+    .ar-sdg-card h3 span { color:#247a65 !important; }
+    .ar-sdg-card p { color:#63766e !important; }
+    .ar-sdg-note { color:#71827b !important; border-top-color:rgba(44,105,82,.14) !important; }
+    .ar-sdg-note a { color:#176b54 !important; }
+    .ar-footer { color:#71827b; }
+    .ar-footer strong { color:#23473b; }
+    .ar-footer .ar-foot-right { color:#71827b; }
+    .ar-cine-hero :focus-visible, .ar-sdg-section a:focus-visible,
+    [class*="st-key-ar-nav-"] a:focus-visible {
+      outline:3px solid #e1a83a !important; outline-offset:3px !important;
+    }
+    @media (max-width:900px) {
+      .ar-signal { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .ar-flow { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    }
+    @media (max-width:600px) {
+      .ar-signal { grid-template-columns:1fr; }
+      .ar-signal > div { padding:1rem; }
+      .ar-flow, .ar-hazards { grid-template-columns:1fr; }
+      .ar-footer .ar-foot-right { text-align:left; }
+    }
+    @media (prefers-reduced-motion:reduce) {
+      .ar-signal > div, [class*="st-key-ar-nav-"] { transition:none !important; }
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)

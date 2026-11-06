@@ -1130,7 +1130,7 @@ fig3d.update_layout(
         font=dict(
             family="Arial",
             size=22,
-            color="#e7f5f5"
+            color="#1D3030"
         )
     ),
     height=760,
@@ -1140,17 +1140,17 @@ fig3d.update_layout(
     plot_bgcolor="rgba(0,0,0,0)",
 
     scene=dict(
-    bgcolor="#0b2435",
+    bgcolor="#F4F8F5",
 
         xaxis=dict(
             title="",
             range=[0, 100],
             showbackground=True,
-            backgroundcolor="#102b3c",
-            gridcolor="rgba(130,190,199,.25)",
-            zerolinecolor="rgba(130,190,199,.45)",
+            backgroundcolor="#EAF3EE",
+            gridcolor="rgba(44,105,82,.18)",
+            zerolinecolor="rgba(44,105,82,.30)",
             showspikes=False,
-            color="#b8d1d5",
+            color="#587267",
             tickfont=dict(size=10),
             nticks=6
         ),
@@ -1159,11 +1159,11 @@ fig3d.update_layout(
             title="",
             range=[0, 70],
             showbackground=True,
-            backgroundcolor="#102b3c",
-            gridcolor="rgba(130,190,199,.25)",
-            zerolinecolor="rgba(130,190,199,.45)",
+            backgroundcolor="#EAF3EE",
+            gridcolor="rgba(44,105,82,.18)",
+            zerolinecolor="rgba(44,105,82,.30)",
             showspikes=False,
-            color="#b8d1d5",
+            color="#587267",
             tickfont=dict(size=10),
             nticks=5
         ),
@@ -1172,11 +1172,11 @@ fig3d.update_layout(
             title="",
             range=[0, 10],
             showbackground=True,
-            backgroundcolor="#102b3c",
-            gridcolor="rgba(130,190,199,.25)",
-            zerolinecolor="rgba(130,190,199,.45)",
+            backgroundcolor="#EAF3EE",
+            gridcolor="rgba(44,105,82,.18)",
+            zerolinecolor="rgba(44,105,82,.30)",
             showspikes=False,
-            color="#b8d1d5",
+            color="#587267",
             tickfont=dict(size=10),
             nticks=5
         ),
@@ -1216,7 +1216,7 @@ fig3d.update_layout(
         title=dict(
             text="DESIGN COMPONENTS",
             font=dict(
-                color="#e7f5f5",
+                color="#1D3030",
                 size=11
             )
         ),
@@ -1226,25 +1226,25 @@ fig3d.update_layout(
         xanchor="center",
         x=0.5,
         font=dict(
-            color="#e7f5f5",
+            color="#1D3030",
             size=10
         ),
-        bgcolor="rgba(12,35,51,0.98)",
-        bordercolor="rgba(130,190,199,0.35)",
+        bgcolor="rgba(255,255,255,0.96)",
+        bordercolor="rgba(44,105,82,0.22)",
         borderwidth=1,
         itemsizing="constant"
     ),
 
     font=dict(
         family="Arial",
-        color="#e7f5f5"
+        color="#1D3030"
     ),
 
     hoverlabel=dict(
-        bgcolor="#102b3c",
-        bordercolor="rgba(130,190,199,.4)",
+        bgcolor="#ffffff",
+        bordercolor="rgba(44,105,82,.25)",
         font=dict(
-            color="#ffffff",
+            color="#1D3030",
             size=12
         )
     ),
