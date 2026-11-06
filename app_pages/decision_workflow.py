@@ -1711,10 +1711,21 @@ with st.expander("Population exposure calculator (GeoJSON evidence inputs)", exp
             "APPROXIMATE POPULATION-EXPOSURE SCREENING — not a count of people harmed, "
             "displaced, injured or killed. Uniform population within each grid cell is assumed."
         )
-        st.metric(
-            "Estimated population inside supplied footprint",
-            f"{exposure_result['estimated_population_in_footprint']:,}",
-        )
+        if exposure_result["population_grid_covers_full_footprint"]:
+            st.metric(
+                "Estimated population inside supplied footprint",
+                f"{exposure_result['estimated_population_in_footprint']:,}",
+            )
+        else:
+            st.metric(
+                "Estimated population in covered portion only",
+                f"{exposure_result['estimated_population_in_covered_part']:,}",
+            )
+            st.error(
+                f"The uploaded population grid covers only "
+                f"{exposure_result['hazard_footprint_area_covered_percent']}% of the hazard footprint. "
+                "A total exposed-population estimate is withheld because uncovered areas could contain residents."
+            )
         st.caption(
             f"Population reference year: {exposure_result['population_year']}; "
             f"{exposure_result['intersecting_population_cells']:,} intersecting cells out of "
