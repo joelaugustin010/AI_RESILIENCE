@@ -144,6 +144,30 @@ def build_consequence_assessment(
     # population-at-risk for people actually harmed or displaced.
     impact_outputs = [
         {
+            "output": "Hazard occurrence probability within a stated time horizon",
+            "unit": "probability / % with horizon",
+            "status": "Not estimated — calibrated, independently validated hazard model required",
+            "required_evidence": "Time-stamped predictors, event labels, leakage-safe temporal validation, calibration and uncertainty intervals",
+        },
+        {
+            "output": "Expected hazard intensity at the selected location",
+            "unit": "hazard-specific physical unit",
+            "status": "Not estimated — validated hazard-specific intensity model required",
+            "required_evidence": "Local observations, compatible spatial inputs, verified units/datum and independent intensity validation",
+        },
+        {
+            "output": "Forecast lead time and valid prediction window",
+            "unit": "hours / days",
+            "status": "Not estimated — forecast issue time, target time and demonstrated lead-time skill required",
+            "required_evidence": "Timestamped forecasts, target observations and skill evaluation at each claimed lead time",
+        },
+        {
+            "output": "Compound-hazard interaction and cascading risk",
+            "unit": "joint probability / conditional impact",
+            "status": "Not estimated — validated dependence and interaction model required",
+            "required_evidence": "Co-occurring hazard timelines, dependence structure, component validation and compound-event impact labels",
+        },
+        {
             "output": "Population inside the modelled exposure footprint",
             "unit": "people",
             "status": "Not estimated — validated population grid and hazard footprint required",
