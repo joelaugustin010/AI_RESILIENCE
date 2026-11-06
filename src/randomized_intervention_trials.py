@@ -65,6 +65,21 @@ def validate_trial_frame(
     arm_col: str = "assigned_arm",
     outcome_col: str = "damage_outcome",
 ) -> None:
+    # Check forbidden post-assignment fields before column-presence validation:
+    # a leakage attempt must be reported as leakage even when the column is absent.
+    forbidden = {
+        "received_treatment", "implemented", "treatment_received",
+        "post_treatment", "post_intervention", "damage_outcome",
+        "assigned_arm", "assignment_cluster_id", "episode_id",
+    }
+    bad = [c for c in feature_columns
+           if c.lower() in forbidden or any(
+               token in c.lower() for token in
+               ("outcome", "damage_after", "post_", "after_", "received",
+                "implemented", "assigned_arm", "treatment", "recovery")
+           )]
+    if bad:
+        raise TrialDataError(f"Treatment/post-treatment leakage in feature list: {bad}")
     required = {"episode_id", cluster_col, arm_col, outcome_col, *feature_columns}
     missing = sorted(required - set(frame.columns))
     if missing:
