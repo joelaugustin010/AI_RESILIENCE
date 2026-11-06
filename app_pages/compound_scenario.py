@@ -12,6 +12,7 @@ from src.hazard_registry import WORKFLOW_HAZARDS
 from src.dataframe_display import display_dataframe
 from src.ui_theme import page_header
 from src.prevention_intelligence import generate_prevention_actions
+from src.intervention_effectiveness import intervention_effectiveness_for_hazards
 
 
 def _render_shared_ml_evidence(selected_hazards: list[str]) -> None:
@@ -320,6 +321,48 @@ if submitted:
             width="stretch",
             alt="Evidence-aware preventive actions for selected hazards",
         )
+
+        st.markdown("#### Intervention-effectiveness ML")
+        effectiveness = intervention_effectiveness_for_hazards(
+            hazards,
+            {
+                "evidence_type": evidence_type,
+                "rainfall_mm": rainfall_mm,
+                "river_level_m": river_level_m,
+                "services": services,
+            },
+        )
+        available_rankings = [
+            item
+            for result_for_hazard in effectiveness.get("by_hazard", {}).values()
+            for item in result_for_hazard.get("ranked_actions", [])
+        ]
+        if available_rankings:
+            st.caption(
+                "Preliminary observational estimates only. Rankings are shown separately "
+                "for each hazard and must not be treated as guarantees or official instructions."
+            )
+            display_dataframe(
+                pd.DataFrame([
+                    {
+                        "Hazard": item["hazard"],
+                        "Action ID": item["action_id"],
+                        "Estimated damage reduction": item["estimated_damage_reduction"],
+                        "Outcome unit": item["outcome_unit"],
+                    }
+                    for item in available_rankings
+                ]),
+                hide_index=True,
+                width="stretch",
+                alt="Preliminary ML intervention-effect rankings by hazard",
+            )
+            st.warning(effectiveness.get("warning", "Observational research estimates only."))
+        else:
+            st.info(
+                "ML action-effect ranking is currently withheld. Verified intervention "
+                "episodes with comparable treated/control outcomes and pre-intervention "
+                "conditions are required before ranking precautions."
+            )
 
         st.markdown("#### Action framework")
         before, during, after = st.columns(3)
