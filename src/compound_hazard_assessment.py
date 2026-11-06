@@ -108,6 +108,10 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
     cyclone_distance = _number(inputs.get("cyclone_distance_km"), "Cyclone distance")
     cyclone_wind = _number(inputs.get("cyclone_wind_knots"), "Cyclone wind")
     start, end = inputs.get("period_start"), inputs.get("period_end")
+    if start is not None and not isinstance(start, date):
+        raise ValueError("Scenario start date must be a date value.")
+    if end is not None and not isinstance(end, date):
+        raise ValueError("Scenario end date must be a date value.")
     if isinstance(start, date) and isinstance(end, date) and end < start:
         raise ValueError("Scenario end date must be on or after the start date.")
 
@@ -195,7 +199,10 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
     if not inputs.get("evidence_source"): gaps.append("Source URL or document reference for supplied observations")
     if not inputs.get("observation_time"): gaps.append("Observation timestamp and timezone")
     if not inputs.get("evidence_type"): gaps.append("Whether this is hypothetical, historical or a current sourced observation")
-    if "Flood" in hazards:
+    # Validate evidence metadata against expanded components, not just the
+    # visible selection label. A single registered compound-hazard option must
+    # receive the same component-level checks as selecting both hazards.
+    if "Flood" in components:
         if rainfall is not None and not rainfall_period:
             gaps.append("Rainfall accumulation period")
         if rainfall is not None and not rainfall_station:
@@ -204,7 +211,7 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
             gaps.append("River gauge ID and station location")
         if river is not None and not river_gauge_datum:
             gaps.append("River gauge datum/reference")
-    if "Cyclone" in hazards:
+    if "Cyclone" in components:
         if cyclone_distance is not None and not inputs.get("cyclone_fix_time"):
             gaps.append("Cyclone track-fix timestamp")
         if "forecast" in str(inputs.get("evidence_type") or "").casefold():
@@ -217,7 +224,8 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
 
     return {
         "status": "SCENARIO_REVIEW_ONLY_NOT_A_VALIDATED_FORECAST",
-        "area": area, "hazards": sorted(hazards), "custom_disaster": custom_disaster or None, "compound": compound,
+        "area": area, "hazards": sorted(hazards), "components": sorted(components),
+        "custom_disaster": custom_disaster or None, "compound": compound,
         "period_start": str(start) if start else None, "period_end": str(end) if end else None,
         "evidence_type": str(inputs.get("evidence_type") or "Not specified"),
         "evidence_source": str(inputs.get("evidence_source") or "").strip() or None,
