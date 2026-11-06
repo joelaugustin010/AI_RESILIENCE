@@ -127,7 +127,7 @@ class HazardLayerAvailabilityTests(unittest.TestCase):
         )
         self.assertEqual(
             by_hazard["Compound: heavy rainfall + drainage failure"][
-                "Validated hazard footprint"
+                "Hazard footprint / modelled context"
             ],
             "Modelled flood component only",
         )
