@@ -33,8 +33,9 @@ multiple independent episodes unless repeated-measure dependence is explicitly
 handled in the analysis design.
 
 The caller must supply the complete assignment-probability vector from the published
-randomization protocol. Do not estimate assignment probabilities from observed
-outcomes. Probabilities for the two compared arms are renormalised to sum to one
+randomization protocol. Its keys must exactly match the observed randomized
+arms and every probability must be finite and strictly between zero and one.
+Do not estimate assignment probabilities from observed outcomes. Probabilities for the two compared arms are renormalised to sum to one
 for the pairwise target population. This first implementation assumes fixed arm probabilities across
 clusters; stratified or block randomization with varying probabilities needs
 the cluster-specific assignment probabilities and must not be forced into this
@@ -50,8 +51,17 @@ API.
   appears in both sets.
 - Cross-fitting is grouped by cluster.
 - Uncertainty is bootstrapped at the randomization-cluster level.
-- The model refuses insufficient cluster counts, invalid assignment
-  probabilities, treatment leakage, and clusters assigned to multiple arms.
+- The model refuses insufficient cluster counts, invalid or incomplete
+  assignment-probability vectors, invalid holdout fractions, treatment leakage,
+  blank cluster/arm identifiers, and clusters assigned to multiple arms.
+- Held-out average ITT and learned-policy intervals are cluster-bootstrap
+  intervals. They assess the average comparison and the learned policy on the
+  held-out population; they are not confidence intervals for a particular
+  user's context.
+- `estimate(context)` returns an exploratory CATE point estimate only.
+  Context-specific uncertainty and pairwise superiority between two actions
+  are not estimated. Such a point estimate must not be used to claim that one
+  precaution is the best choice for that context.
 - A learned CATE policy is exploratory. It is not a validated operational
   recommendation.
 
