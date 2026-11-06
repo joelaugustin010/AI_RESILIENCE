@@ -833,6 +833,21 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 st.caption("A historical rainfall measurement benchmark is available in the evidence explorer. It is separate from the assessment and is not a current rainfall or flood forecast.")
+nav_left, nav_right = st.columns(2)
+with nav_left:
+    st.page_link(
+        ROOT / "app_pages" / "compound_scenario.py",
+        label="Open Cyclone + Flood workspace",
+        icon=":material/thunderstorm:",
+        width="stretch",
+    )
+with nav_right:
+    st.page_link(
+        ROOT / "app_pages" / "kochi_map.py",
+        label="Open Kochi hazard map",
+        icon=":material/map:",
+        width="stretch",
+    )
 st.info(
     "Kochi evidence update: JRC 100-year river-flood depth tiles are licensed (ODbL 1.0 applied; CC BY 4.0 also stated) and displayed on the map as modelled scenario context with attribution. They are not observed flooding or an official warning. "
     "Operational asset-level flood exposure remains unavailable because there is no independently validated hospital or critical-facility location layer. "
