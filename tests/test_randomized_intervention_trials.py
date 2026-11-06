@@ -8,10 +8,10 @@ from src.randomized_intervention_trials import (
 )
 
 
-def _trial_frame(seed=7):
+def _trial_frame(seed=7, clusters=120):
     rng = np.random.default_rng(seed)
     rows = []
-    for cluster in range(36):
+    for cluster in range(clusters):
         arm = ("early" if cluster % 3 == 0 else
                "rapid" if cluster % 3 == 1 else "standard")
         for household in range(12):
@@ -43,8 +43,8 @@ def test_randomized_contrast_uses_whole_clusters_and_itt():
     assert set(report["train_cluster_ids"]).isdisjoint(
         set(report["test_cluster_ids"])
     )
-    assert report["test_cluster_counts"]["early"] >= 2
-    assert report["test_cluster_counts"]["standard"] >= 2
+    assert report["test_cluster_counts"]["early"] >= 10
+    assert report["test_cluster_counts"]["standard"] >= 10
     assert report["heldout_itt_damage_change"] < 0
 
 
@@ -142,3 +142,17 @@ def test_randomized_trial_context_support_guard_rejects_extrapolation():
     assert _context_support_reason(
         {"baseline_risk": 0.5, "house_type": "strong"}, profile
     ) is None
+
+
+def test_randomized_trial_with_too_few_heldout_clusters_is_not_ranking_eligible():
+    frame = _trial_frame(clusters=36)
+    model = fit_randomized_contrast(
+        frame, treatment_arm="early", reference_arm="standard",
+        assignment_probabilities={"early": 1/3, "rapid": 1/3, "standard": 1/3},
+        feature_columns=["baseline_risk", "house_type"],
+        outcome_unit="illustrative damage-severity units",
+        min_clusters_per_arm=8, seed=19,
+    )
+    assert model.report["eligible_for_research_ranking"] is False
+    assert model.report["status"] == "INSUFFICIENT_RANDOMIZED_CLUSTERS"
+    assert model.report["minimum_test_clusters_per_arm"] == 10
