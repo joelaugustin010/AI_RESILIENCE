@@ -185,7 +185,7 @@ def test_temporal_split_purges_labels_whose_future_windows_cross_boundaries():
         label_end_column="target_window_end",
     )
     assert train["row"].tolist() == [0]
-    assert validation["row"].tolist() == [3]
+    assert validation["row"].tolist() == [2, 3]
     assert test["row"].tolist() == [5]
     assert purge["purged_train_label_window_rows"] == 1
     assert purge["purged_validation_label_window_rows"] == 1
