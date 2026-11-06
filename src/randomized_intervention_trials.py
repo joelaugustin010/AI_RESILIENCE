@@ -216,8 +216,15 @@ def fit_randomized_contrast(
         raise TrialDataError("At least two training clusters are required for cross-fitting.")
     pseudo = np.full(len(train), np.nan)
     splitter = GroupKFold(n_splits=folds)
-    p_a = float(assignment_probabilities[treatment_arm])
-    p_r = float(assignment_probabilities[reference_arm])
+    # This estimator conditions on assignment to one of the two compared
+    # arms. Renormalise the protocol probabilities for that pair; other trial
+    # arms are not silently treated as the reference group.
+    pair_probability = (
+        float(assignment_probabilities[treatment_arm])
+        + float(assignment_probabilities[reference_arm])
+    )
+    p_a = float(assignment_probabilities[treatment_arm]) / pair_probability
+    p_r = float(assignment_probabilities[reference_arm]) / pair_probability
     for fold, (fit_idx, held_idx) in enumerate(splitter.split(x_train, a_train, groups)):
         if len(np.unique(a_train[fit_idx])) != 2:
             raise TrialDataError("A cross-fitting fold lacks one of the comparison arms.")
