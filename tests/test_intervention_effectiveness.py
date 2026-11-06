@@ -278,3 +278,23 @@ def test_intervention_training_requires_explicit_outcome_unit_and_direction():
 
     assert "outcome_unit" in PROVENANCE_FIELDS
     assert "outcome_direction" in PROVENANCE_FIELDS
+
+
+def test_training_provenance_rejects_invalid_metadata_and_feature_contracts():
+    from scripts.train_intervention_effectiveness import (
+        PROVENANCE_FIELDS, validate_training_provenance,
+    )
+    valid = {
+        key: "documented"
+        for key in PROVENANCE_FIELDS
+        if key != "pre_treatment_features"
+    }
+    valid["outcome_direction"] = "lower_is_better"
+    valid["pre_treatment_features"] = ["rainfall_before", "exposure_before"]
+    assert validate_training_provenance(valid)["outcome_unit"] == "documented"
+    with pytest.raises(ValueError, match="lower_is_better"):
+        validate_training_provenance({**valid, "outcome_direction": "higher_is_better"})
+    with pytest.raises(ValueError, match="unique"):
+        validate_training_provenance({**valid, "pre_treatment_features": ["rainfall_before", "rainfall_before"]})
+    with pytest.raises(ValueError, match="JSON object"):
+        validate_training_provenance(["not", "an", "object"])
