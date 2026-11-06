@@ -97,6 +97,15 @@ class CompoundHazardAssessmentTests(unittest.TestCase):
         self.assertIn("Cyclone track-fix timestamp", result["data_gaps"])
         self.assertIn("Cyclone storm ID or official storm name", result["data_gaps"])
 
+    def test_registered_compound_option_renders_each_component_pathway(self):
+        result = assess_compound_scenario(self.base(
+            hazards=["Compound: heavy rainfall + drainage failure"],
+        ))
+        pathway_hazards = {item["hazard"] for item in result["pathways"]}
+        self.assertIn("Flood", pathway_hazards)
+        self.assertIn("Infrastructure failure", pathway_hazards)
+        self.assertIn("Multi-hazard interaction", pathway_hazards)
+
     def test_registered_compound_option_checks_date_types(self):
         with self.assertRaisesRegex(ValueError, "start date must be a date"):
             assess_compound_scenario(self.base(period_start="not-a-date"))
