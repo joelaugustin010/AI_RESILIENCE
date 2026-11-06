@@ -57,3 +57,31 @@ observed causal evidence. Keep empirical and simulated training tracks
 separate. India Flood Inventory v4 can support Indian flood context/validation,
 but has no intervention assignment. The current empirical trainer remains
 blocked until a provenance-verified, compatible episode table is supplied.
+
+
+## Geul simulation archive inspection
+
+The open Geul archive is a potentially useful separate training track for
+simulation-surrogate learning. Its published Zenodo record lists a 10.2 GB
+`final_results.zip`, a 994.2 MB `geulnew.zip` and a 116 MB `scripts.zip`.
+Do not assume a particular CSV schema or train from file names alone. After
+obtaining the archive from the publisher, inspect it without extracting the
+full 10+ GB archive:
+
+```bash
+python scripts/inspect_intervention_archive.py \
+  --archive path/to/final_results.zip \
+  --output reports/geul_archive_manifest.json
+```
+
+The manifest lists members and samples headers from small CSV/TSV files.
+Review those columns against the paper, supporting information and model
+scripts before defining scenario, intervention, damage, cost, spatial unit
+and baseline/counterfactual pairings. The inspector does not train a model.
+Keep all generated simulation targets in a separate registry from observed
+trial/field outcomes. Any surrogate must be tested on held-out scenarios or
+spatial units, and its outputs remain Geul-model-conditioned until a separate
+Kochi-specific hydrological and exposure validation establishes transfer.
+
+Source: Bril et al., Zenodo dataset
+https://zenodo.org/records/15488420 (GPL-3.0 per the article's data statement).
