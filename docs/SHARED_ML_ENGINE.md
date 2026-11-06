@@ -13,7 +13,8 @@ depends only on `scikit-learn`, `pandas`, `numpy`, `scipy` and `joblib`.
 | `src/ml/features.py` | Feature contract, target/future leakage guards, context validation. |
 | `src/ml/estimators.py` | Deployment-compatible estimator factory. |
 | `src/ml/evaluation.py` | Metrics, calibration diagnostics, bootstrap intervals, skill grading, 2×2 association. |
-| `src/ml/training.py` | Temporal splits, threshold isolation, model selection, final fit, model-card construction. |
+| `src/ml/training.py` | Temporal splits, threshold isolation, classification model selection, final fit and model-card construction. |
+| `src/ml/regression.py` | Continuous next-day rainfall and temperature regression, validation-only estimator selection, persistence/median baselines and MAE/RMSE/R². |
 | `src/ml/persistence.py` | Atomic JSON and joblib persistence. |
 | `src/ml/registry.py` | Model-card registry and consistency checks. |
 | `src/ml/inference.py` | Fail-closed inference with an exact feature contract. |
@@ -44,10 +45,7 @@ clearly labelled research score when every required feature is supplied.
 `EXPLORATORY_ASSOCIATION` is reserved for the concurrent compound model and is
 withheld from inference. No status means validated.
 
-Metrics include precision, recall, F1, ROC-AUC, average precision (PR-AUC),
-Brier score, log loss, expected calibration error, confusion matrix, majority
-and persistence baselines, and bootstrap intervals. A single chronological
-holdout is still preliminary evidence.
+Classification metrics include precision, recall, F1, ROC-AUC, average precision (PR-AUC), Brier score, log loss, expected calibration error, confusion matrix, majority and persistence baselines, and bootstrap intervals. Regression metrics include MAE, RMSE and R² against persistence and training-median baselines. A single chronological holdout is still preliminary evidence.
 
 ## Coverage and missing models
 
@@ -62,6 +60,10 @@ Landslide, Industrial incident, and Infrastructure failure have no released supe
   restoration labels.
 
 These gaps are recorded rather than filled with synthetic negatives.
+
+## Continuous ML conversion
+
+The shared workflow also trains next-day continuous rainfall and maximum-temperature regressors. Candidate estimators are selected using validation MAE only; the final test period is untouched until scoring. A model is eligible for research inference only when it beats the persistence MAE baseline. These estimates are weather components, not direct flood or heat-health predictions. The same feature contract, registry, artifact persistence, service boundary and Hazard Model Lab display are used; no parallel ML framework is introduced.
 
 ## Adding a model
 
