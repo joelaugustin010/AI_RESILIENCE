@@ -8,7 +8,7 @@ import streamlit as st
 
 
 st.set_page_config(
-    page_title="AI RESILIENCE | Kerala environmental & disaster intelligence",
+    page_title="AI RESILIENCE | Kochi environmental & disaster intelligence",
     page_icon=":material/shield:",
     layout="wide",
 )
