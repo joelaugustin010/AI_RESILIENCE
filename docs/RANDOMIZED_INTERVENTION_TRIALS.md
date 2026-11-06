@@ -55,6 +55,27 @@ API.
 - A learned CATE policy is exploratory. It is not a validated operational
   recommendation.
 
+## Reproducible training command
+
+After authorized access, codebook review, aggregation and provenance approval,
+the training entry point is:
+
+```bash
+python scripts/train_randomized_intervention_trials.py \
+  --data data/authorized/household_trial_episodes.csv \
+  --provenance data/authorized/trial_provenance.json \
+  --reference-arm standard_post_shock \
+  --treatment-arms anticipatory,rapid_post_shock
+```
+
+The provenance JSON must include the source and protocol references, data
+permission basis, randomization unit, assignment definition, outcome definition
+and unit, pre-randomization feature allowlist, and the complete assignment
+probability map. The script refuses synthetic data, unknown/pending access
+permission, mismatched arm labels and incomplete provenance. It writes a
+separate randomized-trial registry and model artifacts; it does not mix these
+trial arms into the generic physical-precaution catalogue.
+
 ## Bangladesh candidate scope
 
 If licensed microdata access is granted and the codebook confirms the joins,
