@@ -257,9 +257,11 @@ if submitted:
         st.subheader("Integrated assessment")
         st.info("Status: scenario review only — not a validated forecast.")
         if result["compound"]:
-            st.success("Both hazards are selected. Compound interaction pathways are included in this review.")
+            st.success("Multi-hazard review enabled. Interaction pathways are included where the selected components support them.")
         else:
-            st.info("Only one hazard is selected; compound interaction analysis is not applicable.")
+            st.info("Single-hazard review. Compound interaction analysis is not applicable.")
+        if result.get("components"):
+            st.caption("Expanded hazard components: " + ", ".join(result["components"]))
 
         st.markdown("#### Hazard pathways")
         for item in result["pathways"]:
