@@ -24,6 +24,28 @@ def _regression_metrics(actual: np.ndarray, predicted: np.ndarray) -> dict[str, 
     }
 
 
+def _paired_mae_improvement_ci(
+    actual: np.ndarray,
+    model_prediction: np.ndarray,
+    baseline_prediction: np.ndarray,
+    *,
+    n_bootstrap: int = 500,
+    random_state: int = 42,
+) -> list[float]:
+    """Paired bootstrap CI for baseline absolute error minus model absolute error."""
+    actual = np.asarray(actual, dtype=float)
+    model_prediction = np.asarray(model_prediction, dtype=float)
+    baseline_prediction = np.asarray(baseline_prediction, dtype=float)
+    differences = np.abs(actual - baseline_prediction) - np.abs(actual - model_prediction)
+    if differences.size < 2:
+        return [float("nan"), float("nan")]
+    rng = np.random.default_rng(random_state)
+    samples = rng.integers(0, differences.size, size=(n_bootstrap, differences.size))
+    means = differences[samples].mean(axis=1)
+    low, high = np.quantile(means, [0.025, 0.975])
+    return [float(low), float(high)]
+
+
 def train_regression_dataset(
     dataset: Dataset, *, model_id: str, hazard: str,
     persistence_column: str | None, unit: str,
@@ -65,25 +87,40 @@ def train_regression_dataset(
     final_model.fit(features.loc[final_train.index, feature_columns], final_train["_continuous_target"].to_numpy(dtype=float))
     metrics = _regression_metrics(y_test, np.asarray(final_model.predict(X_test), dtype=float))
     baseline: dict[str, Any] = {"available": False}
+    baseline_prediction: np.ndarray | None = None
+    comparison_actual = y_test
+    comparison_model_prediction = predicted
     if persistence_column and persistence_column in test.columns:
         persistence = pd.to_numeric(test[persistence_column], errors="coerce").to_numpy(dtype=float)
         mask = np.isfinite(persistence) & np.isfinite(y_test)
         if mask.any():
-            baseline = {"available": True, "type": "persistence", **_regression_metrics(y_test[mask], persistence[mask])}
+            baseline_prediction = persistence[mask]
+            comparison_actual = y_test[mask]
+            comparison_model_prediction = predicted[mask]
+            baseline = {"available": True, "type": "persistence", **_regression_metrics(comparison_actual, baseline_prediction)}
     elif baseline_constant is not None:
-        baseline = {"available": True, "type": "constant_no_change", **_regression_metrics(y_test, np.full_like(y_test, baseline_constant, dtype=float))}
+        baseline_prediction = np.full_like(y_test, baseline_constant, dtype=float)
+        baseline = {"available": True, "type": "constant_no_change", **_regression_metrics(y_test, baseline_prediction)}
     median = _regression_metrics(y_test, np.full_like(y_test, float(np.median(final_train["_continuous_target"]))))
     baseline["training_median"] = median
     reference_mae = baseline.get("mae", median["mae"])
     skill = 1.0 - metrics["mae"] / max(float(reference_mae), 1e-12)
-    status = "WEAK_RESEARCH_SIGNAL" if skill > 0 else "NO_SKILL"
+    paired_ci = (
+        _paired_mae_improvement_ci(comparison_actual, comparison_model_prediction, baseline_prediction)
+        if baseline_prediction is not None else [float("nan"), float("nan")]
+    )
+    status = "WEAK_RESEARCH_SIGNAL" if paired_ci[0] > 0 else "NO_SKILL"
     card = {
         "schema_version": 1, "engine_version": "shared-ml-engine/1.1.0",
         "model_id": model_id, "hazard": hazard, "task_type": "regression",
         "dataset_name": dataset.name, "target_column": dataset.target_column,
         "target_definition": target_definition or f"Next-day {hazard.lower()}-related {unit} at a reanalysis grid point.",
         "prediction_unit": unit, "status": status, "skill_grade": status,
-        "status_reason": f"MAE skill over persistence: {skill:.3f}.",
+        "status_reason": (
+            f"MAE skill over baseline: {skill:.3f}; paired bootstrap 95% CI for MAE improvement: {paired_ci}."
+            if status == "WEAK_RESEARCH_SIGNAL" else
+            f"MAE skill over baseline: {skill:.3f}, but the paired bootstrap 95% CI does not establish improvement."
+        ),
         "validation_status": VALIDATION_STATUS,
         "trained_at_utc": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
         "selected_model_type": selected["model_type"],
@@ -91,7 +128,7 @@ def train_regression_dataset(
         "candidate_selection": candidates,
         "temporal_split": {"validation_start": validation_start, "test_start": test_start, "purged_rows": purge, "train_rows": len(train), "validation_rows": len(validation), "test_rows": len(test)},
         "feature_columns": feature_columns, "feature_count": len(feature_columns),
-        "metrics": {**metrics, "persistence_baseline": baseline, "mae_skill_over_persistence": float(skill)},
+        "metrics": {**metrics, "persistence_baseline": baseline, "mae_skill_over_persistence": float(skill), "paired_mae_improvement_bootstrap_95ci": paired_ci},
         "provenance": dataset.provenance,
         "limitations": [
             "Single temporal holdout is not independent validation.",
