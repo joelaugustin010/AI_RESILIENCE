@@ -18,8 +18,8 @@ from src.intervention_effectiveness import train_intervention_model
 
 PROVENANCE_FIELDS = (
     "source_title", "source_owner", "source_url_or_archive_id",
-    "collection_period", "outcome_definition", "treatment_definition",
-    "geographic_scope", "known_biases", "permission_or_access_basis",
+    "collection_period", "outcome_definition", "outcome_unit", "outcome_direction",
+    "treatment_definition", "geographic_scope", "known_biases", "permission_or_access_basis",
     "pre_treatment_features",
 )
 
@@ -40,6 +40,11 @@ def main() -> int:
     missing = [key for key in PROVENANCE_FIELDS if not provenance.get(key)]
     if missing:
         raise SystemExit(f"BLOCKED: provenance sidecar is missing {missing}.")
+    if provenance.get("outcome_direction") != "lower_is_better":
+        raise SystemExit(
+            "BLOCKED: outcome_direction must be explicitly documented as lower_is_better; "
+            "transform and document the outcome before training."
+        )
     if provenance.get("synthetic") is True:
         raise SystemExit("BLOCKED: synthetic data cannot train or validate intervention-effect models.")
     if not isinstance(provenance.get("pre_treatment_features"), list) or not provenance["pre_treatment_features"]:
@@ -59,7 +64,7 @@ def main() -> int:
                 frame, action_id=action_id, hazard=hazard,
                 feature_columns=provenance["pre_treatment_features"],
                 test_start=args.test_start,
-                outcome_unit=str(provenance.get("outcome_unit", "normalised damage-severity units")),
+                outcome_unit=str(provenance["outcome_unit"]),
             )
             card = {**model.card, "data_provenance": provenance}
             if model.card.get("eligible_for_ranking"):
