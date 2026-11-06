@@ -109,106 +109,106 @@
       "feature_count": 17,
       "feature_ranges": {
         "cyclone_near_500": {
-          "min": 0.0,
-          "max": 1.0,
-          "median": 0.0,
-          "missing_fraction": 0.0
+          "min": 0,
+          "max": 1,
+          "median": 0,
+          "missing_fraction": 0
         },
         "cyclone_near_300": {
-          "min": 0.0,
-          "max": 1.0,
-          "median": 0.0,
-          "missing_fraction": 0.0
+          "min": 0,
+          "max": 1,
+          "median": 0,
+          "missing_fraction": 0
         },
         "cyclone_distance_capped": {
           "min": 5.863287748708754,
-          "max": 2000.0,
-          "median": 2000.0,
-          "missing_fraction": 0.0
+          "max": 2000,
+          "median": 2000,
+          "missing_fraction": 0
         },
         "cyclone_max_wind_kt": {
-          "min": 0.0,
-          "max": 150.0,
-          "median": 0.0,
-          "missing_fraction": 0.0
+          "min": 0,
+          "max": 150,
+          "median": 0,
+          "missing_fraction": 0
         },
         "cyclone_fixes": {
-          "min": 0.0,
-          "max": 24.0,
-          "median": 0.0,
-          "missing_fraction": 0.0
+          "min": 0,
+          "max": 24,
+          "median": 0,
+          "missing_fraction": 0
         },
         "cyclone_wind_x_near": {
-          "min": 0.0,
-          "max": 115.0,
-          "median": 0.0,
-          "missing_fraction": 0.0
+          "min": 0,
+          "max": 115,
+          "median": 0,
+          "missing_fraction": 0
         },
         "prior_rain_1d": {
-          "min": 0.0,
+          "min": 0,
           "max": 253.7,
           "median": 2.5,
-          "missing_fraction": 9.441087613293051e-05
+          "missing_fraction": 0.00009441087613293051
         },
         "prior_rain_3d": {
-          "min": 0.0,
+          "min": 0,
           "max": 471.9,
           "median": 10.599999999999973,
           "missing_fraction": 0.00018882175226586103
         },
         "prior_rain_7d": {
-          "min": 0.0,
+          "min": 0,
           "max": 504.3,
           "median": 30.35000000000001,
           "missing_fraction": 0.00037764350453172205
         },
         "prior_rain_30d": {
-          "min": 0.0,
+          "min": 0,
           "max": 873.4000000000001,
           "median": 170.04999999999998,
           "missing_fraction": 0.0018882175226586104
         },
         "month_sin": {
-          "min": -1.0,
-          "max": 1.0,
+          "min": -1,
+          "max": 1,
           "median": -2.4492935982947064e-16,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "month_cos": {
-          "min": -1.0,
-          "max": 1.0,
+          "min": -1,
+          "max": 1,
           "median": -1.8369701987210297e-16,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "doy_sin": {
           "min": -0.9999994220246925,
           "max": 0.9999855506507186,
           "median": -0.004300592702981974,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "doy_cos": {
           "min": -0.9999791929590823,
           "max": 0.9999907524084426,
           "median": 0.001075151282798226,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "near500_x_prior7": {
-          "min": 0.0,
+          "min": 0,
           "max": 220.90000000000006,
-          "median": 0.0,
+          "median": 0,
           "missing_fraction": 0.00037764350453172205
         },
         "near500_x_month_sin": {
           "min": -0.8660254037844386,
-          "max": 1.0,
-          "median": 0.0,
-          "missing_fraction": 0.0
+          "max": 1,
+          "median": 0,
+          "missing_fraction": 0
         },
         "near500_x_month_cos": {
-          "min": -1.0,
-          "max": 1.0,
-          "median": 0.0,
-          "missing_fraction": 0.0
+          "min": -1,
+          "max": 1,
+          "median": 0,
+          "missing_fraction": 0
         }
       },
       "metrics": {
@@ -234,7 +234,7 @@
         "expected_calibration_error": 0.22917313856926358,
         "calibration_table": [
           {
-            "bin_lower": 0.0,
+            "bin_lower": 0,
             "bin_upper": 0.1,
             "n": 780,
             "mean_probability": 0.059759137151024495,
@@ -307,7 +307,7 @@
           },
           {
             "bin_lower": 0.9,
-            "bin_upper": 1.0,
+            "bin_upper": 1,
             "n": 137,
             "mean_probability": 0.9641736098649375,
             "observed_event_rate": 0.46715328467153283,
@@ -319,7 +319,7 @@
           "predicted_class": 0,
           "accuracy": 0.9302007299270073,
           "balanced_accuracy": 0.5,
-          "f1": 0.0
+          "f1": 0
         },
         "base_rate_brier_score": 0.06492733197027012,
         "skill_over_base_rate_brier": -0.07288979678087512,
@@ -813,7 +813,7 @@
       "target_column": "target_ri_24h",
       "target_mode": "continuous_high",
       "target_definition": "target_ri_24h >= 30 (training-period 0.950 quantile)",
-      "target_threshold": 30.0,
+      "target_threshold": 30,
       "target_direction": "high",
       "threshold_source": "training target dates only (< validation_start)",
       "evidence_tier": "screening",
@@ -915,130 +915,130 @@
       "feature_count": 21,
       "feature_ranges": {
         "wind_kt": {
-          "min": 4.0,
-          "max": 150.0,
-          "median": 30.0,
-          "missing_fraction": 0.0
+          "min": 4,
+          "max": 150,
+          "median": 30,
+          "missing_fraction": 0
         },
         "wind_squared": {
-          "min": 16.0,
-          "max": 22500.0,
-          "median": 900.0,
-          "missing_fraction": 0.0
+          "min": 16,
+          "max": 22500,
+          "median": 900,
+          "missing_fraction": 0
         },
         "pressure_hpa": {
-          "min": 898.0,
-          "max": 1012.0,
-          "median": 997.0,
+          "min": 898,
+          "max": 1012,
+          "median": 997,
           "missing_fraction": 0.014858841010401188
         },
         "latitude": {
           "min": 0.7,
           "max": 27.2,
           "median": 14.2,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "longitude": {
           "min": 43.8,
-          "max": 100.0,
-          "median": 83.0,
-          "missing_fraction": 0.0
+          "max": 100,
+          "median": 83,
+          "missing_fraction": 0
         },
         "abs_latitude": {
           "min": 0.7,
           "max": 27.2,
           "median": 14.2,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "distance_to_land_km": {
-          "min": 0.0,
-          "max": 1478.0,
-          "median": 335.0,
-          "missing_fraction": 0.0
+          "min": 0,
+          "max": 1478,
+          "median": 335,
+          "missing_fraction": 0
         },
         "storm_speed_kt": {
-          "min": 0.0,
-          "max": 54.0,
-          "median": 6.0,
-          "missing_fraction": 0.0
+          "min": 0,
+          "max": 54,
+          "median": 6,
+          "missing_fraction": 0
         },
         "wind_chg_6h": {
-          "min": -55.0,
-          "max": 40.0,
-          "median": 0.0,
+          "min": -55,
+          "max": 40,
+          "median": 0,
           "missing_fraction": 0.03813769192669639
         },
         "wind_chg_12h": {
-          "min": -80.0,
-          "max": 55.0,
-          "median": 0.0,
+          "min": -80,
+          "max": 55,
+          "median": 0,
           "missing_fraction": 0.10830444114247978
         },
         "wind_chg_24h": {
-          "min": -90.0,
-          "max": 75.0,
-          "median": 5.0,
+          "min": -90,
+          "max": 75,
+          "median": 5,
           "missing_fraction": 0.19200924550107315
         },
         "pressure_chg_6h": {
-          "min": -34.0,
-          "max": 41.0,
-          "median": 0.0,
+          "min": -34,
+          "max": 41,
+          "median": 0,
           "missing_fraction": 0.0549777117384844
         },
         "pressure_chg_12h": {
-          "min": -56.0,
-          "max": 60.0,
-          "median": 0.0,
+          "min": -56,
+          "max": 60,
+          "median": 0,
           "missing_fraction": 0.1258048538880634
         },
         "pressure_chg_24h": {
-          "min": -74.0,
-          "max": 80.0,
-          "median": -2.0,
+          "min": -74,
+          "max": 80,
+          "median": -2,
           "missing_fraction": 0.20934456001320786
         },
         "subbasin_AS": {
-          "min": 0.0,
-          "max": 1.0,
-          "median": 0.0,
-          "missing_fraction": 0.0
+          "min": 0,
+          "max": 1,
+          "median": 0,
+          "missing_fraction": 0
         },
         "doy_sin": {
           "min": -0.9999994220246925,
           "max": 0.9992088560679753,
           "median": -0.5412984521036173,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "doy_cos": {
           "min": -0.9999791929590823,
           "max": 0.9999907524084426,
           "median": 0.40221356823680365,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "month_sin": {
-          "min": -1.0,
-          "max": 1.0,
+          "min": -1,
+          "max": 1,
           "median": -0.5000000000000004,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "month_cos": {
-          "min": -1.0,
-          "max": 1.0,
+          "min": -1,
+          "max": 1,
           "median": 0.5000000000000001,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "hour_sin": {
-          "min": -1.0,
-          "max": 1.0,
+          "min": -1,
+          "max": 1,
           "median": 1.2246467991473532e-16,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "hour_cos": {
-          "min": -1.0,
-          "max": 1.0,
+          "min": -1,
+          "max": 1,
           "median": 6.123233995736766e-17,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         }
       },
       "metrics": {
@@ -1064,7 +1064,7 @@
         "expected_calibration_error": 0.08832192511280292,
         "calibration_table": [
           {
-            "bin_lower": 0.0,
+            "bin_lower": 0,
             "bin_upper": 0.1,
             "n": 1005,
             "mean_probability": 0.037473714922089174,
@@ -1124,7 +1124,7 @@
             "bin_upper": 0.8,
             "n": 5,
             "mean_probability": 0.7437066028697608,
-            "observed_event_rate": 0.0,
+            "observed_event_rate": 0,
             "absolute_gap": 0.7437066028697608
           },
           {
@@ -1132,7 +1132,7 @@
             "bin_upper": 0.9,
             "n": 3,
             "mean_probability": 0.8680574078045747,
-            "observed_event_rate": 0.0,
+            "observed_event_rate": 0,
             "absolute_gap": 0.8680574078045747
           }
         ],
@@ -1141,7 +1141,7 @@
           "predicted_class": 0,
           "accuracy": 0.9509412435824302,
           "balanced_accuracy": 0.5,
-          "f1": 0.0
+          "f1": 0
         },
         "base_rate_brier_score": 0.04665199483633143,
         "skill_over_base_rate_brier": -0.007060078499333294,
@@ -1163,7 +1163,7 @@
           {
             "threshold": 0.02,
             "precision": 0.0582891748675246,
-            "recall": 1.0,
+            "recall": 1,
             "f1": 0.11015736766809728,
             "balanced_accuracy": 0.6092964824120604,
             "predicted_positive_rate": 0.7914919113241462
@@ -1514,7 +1514,7 @@
           },
           {
             "threshold": 0.9,
-            "precision": 1.0,
+            "precision": 1,
             "recall": 0.025974025974025976,
             "f1": 0.05063291139240506,
             "balanced_accuracy": 0.512987012987013,
@@ -1522,19 +1522,19 @@
           },
           {
             "threshold": 0.92,
-            "precision": 0.0,
-            "recall": 0.0,
-            "f1": 0.0,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0,
             "balanced_accuracy": 0.5,
-            "predicted_positive_rate": 0.0
+            "predicted_positive_rate": 0
           },
           {
             "threshold": 0.94,
-            "precision": 0.0,
-            "recall": 0.0,
-            "f1": 0.0,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0,
             "balanced_accuracy": 0.5,
-            "predicted_positive_rate": 0.0
+            "predicted_positive_rate": 0
           }
         ],
         "persistence_baseline": {
@@ -1695,82 +1695,82 @@
       "feature_count": 13,
       "feature_ranges": {
         "magnitude": {
-          "min": 5.0,
+          "min": 5,
           "max": 7.8,
           "median": 5.2,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "depth_km": {
           "min": 1.6,
           "max": 400.57,
           "median": 26.1,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "latitude": {
           "min": 5.003,
           "max": 37.926,
           "median": 22.8004,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "longitude": {
           "min": 65.082,
           "max": 99.9993,
           "median": 92.9084,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "abs_latitude": {
           "min": 5.003,
           "max": 37.926,
           "median": 22.8004,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "days_since_prev_m5_100km": {
           "min": 0.00010104166666666667,
-          "max": 365.0,
+          "max": 365,
           "median": 21.798330671296295,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "n_m4_prev7d_50km": {
-          "min": 0.0,
-          "max": 586.0,
-          "median": 1.0,
-          "missing_fraction": 0.0
+          "min": 0,
+          "max": 586,
+          "median": 1,
+          "missing_fraction": 0
         },
         "n_m4_prev30d_100km": {
-          "min": 0.0,
-          "max": 711.0,
-          "median": 3.0,
-          "missing_fraction": 0.0
+          "min": 0,
+          "max": 711,
+          "median": 3,
+          "missing_fraction": 0
         },
         "month_sin": {
-          "min": -1.0,
-          "max": 1.0,
+          "min": -1,
+          "max": 1,
           "median": -2.4492935982947064e-16,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "month_cos": {
-          "min": -1.0,
-          "max": 1.0,
+          "min": -1,
+          "max": 1,
           "median": 0.5000000000000001,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "doy_sin": {
           "min": -0.9999994220246925,
           "max": 0.9999855506507186,
           "median": -0.021501372740813793,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "doy_cos": {
           "min": -0.9999791929590823,
           "max": 0.9999907524084426,
           "median": 0.28931997761869527,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "time_since_start_days": {
-          "min": 0.0,
+          "min": 0,
           "max": 8033.670681655092,
           "median": 3001.741267824074,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         }
       },
       "metrics": {
@@ -1796,7 +1796,7 @@
         "expected_calibration_error": 0.10921511346592937,
         "calibration_table": [
           {
-            "bin_lower": 0.0,
+            "bin_lower": 0,
             "bin_upper": 0.1,
             "n": 11,
             "mean_probability": 0.056815963098186706,
@@ -1869,10 +1869,10 @@
           },
           {
             "bin_lower": 0.9,
-            "bin_upper": 1.0,
+            "bin_upper": 1,
             "n": 26,
             "mean_probability": 0.9522508888087236,
-            "observed_event_rate": 1.0,
+            "observed_event_rate": 1,
             "absolute_gap": 0.04774911119127645
           }
         ],
@@ -1903,23 +1903,23 @@
           {
             "threshold": 0.02,
             "precision": 0.5112107623318386,
-            "recall": 1.0,
+            "recall": 1,
             "f1": 0.6765578635014837,
             "balanced_accuracy": 0.5,
-            "predicted_positive_rate": 1.0
+            "predicted_positive_rate": 1
           },
           {
             "threshold": 0.04,
             "precision": 0.5112107623318386,
-            "recall": 1.0,
+            "recall": 1,
             "f1": 0.6765578635014837,
             "balanced_accuracy": 0.5,
-            "predicted_positive_rate": 1.0
+            "predicted_positive_rate": 1
           },
           {
             "threshold": 0.06,
             "precision": 0.5181818181818182,
-            "recall": 1.0,
+            "recall": 1,
             "f1": 0.6826347305389222,
             "balanced_accuracy": 0.5137614678899083,
             "predicted_positive_rate": 0.9865470852017937
@@ -1927,7 +1927,7 @@
           {
             "threshold": 0.08,
             "precision": 0.5229357798165137,
-            "recall": 1.0,
+            "recall": 1,
             "f1": 0.6867469879518072,
             "balanced_accuracy": 0.5229357798165137,
             "predicted_positive_rate": 0.9775784753363229
@@ -2322,10 +2322,10 @@
       "target_threshold": 5.7,
       "target_direction": "low",
       "threshold_source": "training target dates only (< validation_start)",
-      "evidence_tier": "baseline",
-      "status": "RESEARCH_SIGNAL_NOT_VALIDATED",
-      "skill_grade": "RESEARCH_SIGNAL_NOT_VALIDATED",
-      "status_reason": "ROC-AUC 0.998 and average precision 0.941 beat the no-skill prevalence 0.016 on one temporal holdout.",
+      "evidence_tier": "invalidated",
+      "status": "NO_SKILL",
+      "skill_grade": "NO_SKILL",
+      "status_reason": "INVALIDATED: the original target builder used a trailing 30-day rolling sum shifted by one day, overlapping most of the supposed future target with historical rainfall features. All previously reported metrics are superseded. No inference is permitted until the corrected future-only target is retrained and reevaluated.",
       "validation_status": "SINGLE_TEMPORAL_HOLDOUT_NOT_INDEPENDENTLY_VALIDATED",
       "trained_at_utc": "2026-11-06T13:51:30+00:00",
       "selected_model_type": "hist_gradient_boosting",
@@ -2449,229 +2449,229 @@
           "min": 24.2,
           "max": 34.2,
           "median": 28.9,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "temperature_2m_min": {
           "min": 18.6,
           "max": 28.8,
           "median": 24.3,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "precipitation_sum": {
-          "min": 0.0,
+          "min": 0,
           "max": 253.7,
           "median": 2.5,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "wind_speed_10m_max": {
           "min": 3.3,
           "max": 32.8,
           "median": 10.2,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "wind_gusts_10m_max": {
           "min": 11.2,
           "max": 72.4,
           "median": 29.9,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "temperature_2m_max_lag1": {
           "min": 24.2,
           "max": 34.2,
           "median": 28.9,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "temperature_2m_max_lag2": {
           "min": 24.2,
           "max": 34.2,
           "median": 28.9,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "temperature_2m_max_lag3": {
           "min": 24.2,
           "max": 34.2,
           "median": 28.9,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "temperature_2m_max_lag7": {
           "min": 24.2,
           "max": 34.2,
           "median": 28.9,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "temperature_2m_max_prior3_mean": {
           "min": 24.66666666666667,
           "max": 33.899999999999984,
           "median": 28.93333333333332,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "temperature_2m_max_prior7_mean": {
           "min": 25.357142857142858,
           "max": 33.31428571428572,
           "median": 28.885714285714283,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "temperature_2m_min_lag1": {
           "min": 18.6,
           "max": 28.8,
           "median": 24.3,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "temperature_2m_min_lag2": {
           "min": 18.6,
           "max": 28.8,
           "median": 24.3,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "temperature_2m_min_lag3": {
           "min": 18.6,
           "max": 28.8,
           "median": 24.3,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "temperature_2m_min_lag7": {
           "min": 18.6,
           "max": 28.8,
           "median": 24.3,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "temperature_2m_min_prior3_mean": {
           "min": 19.3,
           "max": 28.633333333333336,
           "median": 24.233333333333334,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "temperature_2m_min_prior7_mean": {
           "min": 19.957142857142856,
           "max": 28.25714285714286,
           "median": 24.228571428571428,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "precipitation_sum_lag1": {
-          "min": 0.0,
+          "min": 0,
           "max": 253.7,
           "median": 2.5,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "precipitation_sum_lag2": {
-          "min": 0.0,
+          "min": 0,
           "max": 253.7,
           "median": 2.5,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "precipitation_sum_lag3": {
-          "min": 0.0,
+          "min": 0,
           "max": 253.7,
           "median": 2.5,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "precipitation_sum_lag7": {
-          "min": 0.0,
+          "min": 0,
           "max": 253.7,
           "median": 2.5,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "precipitation_sum_prior3_mean": {
-          "min": 0.0,
+          "min": 0,
           "max": 157.29999999999998,
           "median": 3.599999999999985,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "precipitation_sum_prior7_mean": {
-          "min": 0.0,
+          "min": 0,
           "max": 72.04285714285714,
           "median": 4.3714285714285825,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "wind_speed_10m_max_lag1": {
           "min": 3.3,
           "max": 32.8,
           "median": 10.2,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "wind_speed_10m_max_lag2": {
           "min": 3.3,
           "max": 32.8,
           "median": 10.3,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "wind_speed_10m_max_lag3": {
           "min": 3.3,
           "max": 32.8,
           "median": 10.3,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "wind_speed_10m_max_lag7": {
           "min": 3.3,
           "max": 32.8,
           "median": 10.2,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "wind_speed_10m_max_prior3_mean": {
           "min": 4.499999999999999,
           "max": 30.33333333333336,
           "median": 10.233333333333348,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "wind_speed_10m_max_prior7_mean": {
           "min": 5.100000000000002,
           "max": 26.742857142857144,
           "median": 10.328571428571431,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "wind_gusts_10m_max_lag1": {
           "min": 11.2,
           "max": 72.4,
           "median": 29.9,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "wind_gusts_10m_max_lag2": {
           "min": 11.2,
           "max": 72.4,
           "median": 29.9,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "wind_gusts_10m_max_lag3": {
           "min": 11.2,
           "max": 72.4,
           "median": 29.9,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "wind_gusts_10m_max_lag7": {
           "min": 11.2,
           "max": 72.4,
           "median": 29.9,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "wind_gusts_10m_max_prior3_mean": {
           "min": 15.13333333333331,
           "max": 68.63333333333331,
           "median": 29.866666666666646,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "wind_gusts_10m_max_prior7_mean": {
           "min": 17.15714285714286,
           "max": 60.74285714285714,
           "median": 30.028571428571432,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "rain_3d_sum": {
-          "min": 0.0,
+          "min": 0,
           "max": 471.9,
           "median": 10.799999999999955,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "rain_7d_sum": {
-          "min": 0.0,
+          "min": 0,
           "max": 504.3,
           "median": 30.600000000000076,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "rain_30d_sum": {
-          "min": 0.0,
+          "min": 0,
           "max": 873.4000000000001,
           "median": 171.20000000000002,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "rain_90d_sum": {
           "min": 1.3999999999999857,
@@ -2680,49 +2680,83 @@
           "missing_fraction": 0.0029431311117440427
         },
         "dry_days_14": {
-          "min": 0.0,
-          "max": 14.0,
-          "median": 4.0,
-          "missing_fraction": 0.0
+          "min": 0,
+          "max": 14,
+          "median": 4,
+          "missing_fraction": 0
         },
         "tmax_prior30_mean": {
           "min": 26.36,
           "max": 32.75333333333333,
           "median": 28.84,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "tmax_anomaly_30d": {
           "min": -4.77,
           "max": 3.556666666666672,
           "median": 0.10666666666666913,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "doy_sin": {
           "min": -0.9999994220246925,
           "max": 0.9999855506507186,
           "median": -0.004300592702981974,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "doy_cos": {
           "min": -0.9999791929590823,
           "max": 0.9999907524084426,
           "median": -0.011826390691832589,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "month_sin": {
-          "min": -1.0,
-          "max": 1.0,
+          "min": -1,
+          "max": 1,
           "median": -2.4492935982947064e-16,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "month_cos": {
-          "min": -1.0,
-          "max": 1.0,
+          "min": -1,
+          "max": 1,
           "median": -1.8369701987210297e-16,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         }
       },
-      "metrics": {
+      "metrics": {},
+      "provenance": {
+        "source": "data\\external\\hazards\\raw\\weather\\kochi_daily_weather_1991_2025.json",
+        "source_type": "MODELLED_REANALYSIS_GRID_POINT_NOT_STATION_OBSERVATION",
+        "location": "kochi",
+        "lead_days": 30,
+        "target": "drought_onset"
+      },
+      "notes": [
+        "Reanalysis grid-point values, not station observations.",
+        "Features use current and prior values only; the target is future.",
+        "Event thresholds are estimated on training target dates only."
+      ],
+      "limitations": [
+        "A 30-day rainfall deficit is not agricultural or hydrological drought.",
+        "Soil moisture, evaporative demand, storage and demand are absent.",
+        "Reanalysis grid-point values, not station observations.",
+        "Features use current and prior values only; the target is future.",
+        "Event thresholds are estimated on training target dates only.",
+        "A single chronological holdout is preliminary evidence, not independent validation.",
+        "No calibration, geographic transferability, drift or operational-readiness claim is made.",
+        "Skill grade is RESEARCH_SIGNAL_NOT_VALIDATED: ROC-AUC 0.998 and average precision 0.941 beat the no-skill prevalence 0.016 on one temporal holdout.",
+        "The model card records the exact threshold, features and split; changing any of them requires retraining and re-evaluation.",
+        "Target construction defect: the prior 30-day rainfall target overlapped historical feature windows; all previous metrics are invalid and must not be used."
+      ],
+      "intended_use": "30-day meteorological rainfall-deficit screening at the Kochi reanalysis grid point, used only as supplementary drought context.",
+      "prohibited_use": "Not a drought declaration, SPI/SPEI index, agricultural or hydrological drought model, or water-supply forecast.",
+      "artifact": {
+        "path": "models/ml/weather_drought_onset_kochi_30day/model.joblib",
+        "format": "joblib-pipeline",
+        "loader": "src.ml.inference.predict_from_context",
+        "artifact": "models\\ml\\weather_drought_onset_kochi_30day\\model.joblib",
+        "card": "models\\ml\\weather_drought_onset_kochi_30day\\model_card.json"
+      },
+      "superseded_metrics": {
         "n_test": 2221,
         "n_test_events": 36,
         "test_prevalence": 0.01620891490319676,
@@ -2745,7 +2779,7 @@
         "expected_calibration_error": 0.0037159290692707473,
         "calibration_table": [
           {
-            "bin_lower": 0.0,
+            "bin_lower": 0,
             "bin_upper": 0.1,
             "n": 2163,
             "mean_probability": 0.0019137599864688152,
@@ -2765,7 +2799,7 @@
             "bin_upper": 0.30000000000000004,
             "n": 5,
             "mean_probability": 0.26198867859640185,
-            "observed_event_rate": 0.0,
+            "observed_event_rate": 0,
             "absolute_gap": 0.26198867859640185
           },
           {
@@ -2773,7 +2807,7 @@
             "bin_upper": 0.4,
             "n": 1,
             "mean_probability": 0.3053132215713415,
-            "observed_event_rate": 0.0,
+            "observed_event_rate": 0,
             "absolute_gap": 0.3053132215713415
           },
           {
@@ -2781,7 +2815,7 @@
             "bin_upper": 0.5,
             "n": 2,
             "mean_probability": 0.4430325592618053,
-            "observed_event_rate": 0.0,
+            "observed_event_rate": 0,
             "absolute_gap": 0.4430325592618053
           },
           {
@@ -2789,7 +2823,7 @@
             "bin_upper": 0.6000000000000001,
             "n": 3,
             "mean_probability": 0.547248524451631,
-            "observed_event_rate": 0.0,
+            "observed_event_rate": 0,
             "absolute_gap": 0.547248524451631
           },
           {
@@ -2802,7 +2836,7 @@
           },
           {
             "bin_lower": 0.9,
-            "bin_upper": 1.0,
+            "bin_upper": 1,
             "n": 31,
             "mean_probability": 0.9848129093801761,
             "observed_event_rate": 0.967741935483871,
@@ -2814,7 +2848,7 @@
           "predicted_class": 0,
           "accuracy": 0.9837910850968032,
           "balanced_accuracy": 0.5,
-          "f1": 0.0
+          "f1": 0
         },
         "base_rate_brier_score": 0.015946185980857685,
         "skill_over_base_rate_brier": 0.012566409227398904,
@@ -3220,38 +3254,7 @@
           "f1": 0.8611111111111112
         }
       },
-      "provenance": {
-        "source": "data\\external\\hazards\\raw\\weather\\kochi_daily_weather_1991_2025.json",
-        "source_type": "MODELLED_REANALYSIS_GRID_POINT_NOT_STATION_OBSERVATION",
-        "location": "kochi",
-        "lead_days": 30,
-        "target": "drought_onset"
-      },
-      "notes": [
-        "Reanalysis grid-point values, not station observations.",
-        "Features use current and prior values only; the target is future.",
-        "Event thresholds are estimated on training target dates only."
-      ],
-      "limitations": [
-        "A 30-day rainfall deficit is not agricultural or hydrological drought.",
-        "Soil moisture, evaporative demand, storage and demand are absent.",
-        "Reanalysis grid-point values, not station observations.",
-        "Features use current and prior values only; the target is future.",
-        "Event thresholds are estimated on training target dates only.",
-        "A single chronological holdout is preliminary evidence, not independent validation.",
-        "No calibration, geographic transferability, drift or operational-readiness claim is made.",
-        "Skill grade is RESEARCH_SIGNAL_NOT_VALIDATED: ROC-AUC 0.998 and average precision 0.941 beat the no-skill prevalence 0.016 on one temporal holdout.",
-        "The model card records the exact threshold, features and split; changing any of them requires retraining and re-evaluation."
-      ],
-      "intended_use": "30-day meteorological rainfall-deficit screening at the Kochi reanalysis grid point, used only as supplementary drought context.",
-      "prohibited_use": "Not a drought declaration, SPI/SPEI index, agricultural or hydrological drought model, or water-supply forecast.",
-      "artifact": {
-        "path": "models/ml/weather_drought_onset_kochi_30day/model.joblib",
-        "format": "joblib-pipeline",
-        "loader": "src.ml.inference.predict_from_context",
-        "artifact": "models\\ml\\weather_drought_onset_kochi_30day\\model.joblib",
-        "card": "models\\ml\\weather_drought_onset_kochi_30day\\model_card.json"
-      }
+      "evaluation_validity": "INVALIDATED_TARGET_CONSTRUCTION"
     },
     {
       "schema_version": 1,
@@ -3391,43 +3394,43 @@
         "temperature_2m_max": {
           "min": 24.2,
           "max": 34.2,
-          "median": 29.0,
-          "missing_fraction": 0.0
+          "median": 29,
+          "missing_fraction": 0
         },
         "temperature_2m_min": {
           "min": 18.6,
           "max": 28.8,
           "median": 24.3,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "precipitation_sum": {
-          "min": 0.0,
+          "min": 0,
           "max": 253.7,
           "median": 2.5,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "wind_speed_10m_max": {
           "min": 3.3,
           "max": 32.8,
           "median": 10.3,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "wind_gusts_10m_max": {
           "min": 11.2,
           "max": 72.4,
           "median": 29.9,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "temperature_2m_max_lag1": {
           "min": 24.2,
           "max": 34.2,
-          "median": 29.0,
-          "missing_fraction": 9.441979038806533e-05
+          "median": 29,
+          "missing_fraction": 0.00009441979038806533
         },
         "temperature_2m_max_lag2": {
           "min": 24.2,
           "max": 34.2,
-          "median": 29.0,
+          "median": 29,
           "missing_fraction": 0.00018883958077613066
         },
         "temperature_2m_max_lag3": {
@@ -3458,7 +3461,7 @@
           "min": 18.6,
           "max": 28.8,
           "median": 24.3,
-          "missing_fraction": 9.441979038806533e-05
+          "missing_fraction": 0.00009441979038806533
         },
         "temperature_2m_min_lag2": {
           "min": 18.6,
@@ -3491,37 +3494,37 @@
           "missing_fraction": 0.00037767916155226133
         },
         "precipitation_sum_lag1": {
-          "min": 0.0,
+          "min": 0,
           "max": 253.7,
           "median": 2.5,
-          "missing_fraction": 9.441979038806533e-05
+          "missing_fraction": 0.00009441979038806533
         },
         "precipitation_sum_lag2": {
-          "min": 0.0,
+          "min": 0,
           "max": 253.7,
           "median": 2.5,
           "missing_fraction": 0.00018883958077613066
         },
         "precipitation_sum_lag3": {
-          "min": 0.0,
+          "min": 0,
           "max": 253.7,
           "median": 2.5,
           "missing_fraction": 0.000283259371164196
         },
         "precipitation_sum_lag7": {
-          "min": 0.0,
+          "min": 0,
           "max": 253.7,
           "median": 2.5,
           "missing_fraction": 0.0006609385327164573
         },
         "precipitation_sum_prior3_mean": {
-          "min": 0.0,
+          "min": 0,
           "max": 157.29999999999998,
           "median": 3.5333333333333248,
           "missing_fraction": 0.00018883958077613066
         },
         "precipitation_sum_prior7_mean": {
-          "min": 0.0,
+          "min": 0,
           "max": 72.04285714285714,
           "median": 4.342857142857143,
           "missing_fraction": 0.00037767916155226133
@@ -3530,7 +3533,7 @@
           "min": 3.3,
           "max": 32.8,
           "median": 10.3,
-          "missing_fraction": 9.441979038806533e-05
+          "missing_fraction": 0.00009441979038806533
         },
         "wind_speed_10m_max_lag2": {
           "min": 3.3,
@@ -3566,7 +3569,7 @@
           "min": 11.2,
           "max": 72.4,
           "median": 29.9,
-          "missing_fraction": 9.441979038806533e-05
+          "missing_fraction": 0.00009441979038806533
         },
         "wind_gusts_10m_max_lag2": {
           "min": 11.2,
@@ -3599,19 +3602,19 @@
           "missing_fraction": 0.00037767916155226133
         },
         "rain_3d_sum": {
-          "min": 0.0,
+          "min": 0,
           "max": 471.9,
           "median": 10.599999999999975,
           "missing_fraction": 0.00018883958077613066
         },
         "rain_7d_sum": {
-          "min": 0.0,
+          "min": 0,
           "max": 504.3,
           "median": 30.400000000000002,
           "missing_fraction": 0.00037767916155226133
         },
         "rain_30d_sum": {
-          "min": 0.0,
+          "min": 0,
           "max": 873.4000000000001,
           "median": 170.09999999999997,
           "missing_fraction": 0.0018883958077613068
@@ -3623,9 +3626,9 @@
           "missing_fraction": 0.00566518742328392
         },
         "dry_days_14": {
-          "min": 0.0,
-          "max": 14.0,
-          "median": 4.0,
+          "min": 0,
+          "max": 14,
+          "median": 4,
           "missing_fraction": 0.000566518742328392
         },
         "tmax_prior30_mean": {
@@ -3644,25 +3647,25 @@
           "min": -0.9999994220246925,
           "max": 0.9999855506507186,
           "median": -0.004300592702981974,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "doy_cos": {
           "min": -0.9999791929590823,
           "max": 0.9999907524084426,
           "median": 0.001075151282798226,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "month_sin": {
-          "min": -1.0,
-          "max": 1.0,
+          "min": -1,
+          "max": 1,
           "median": -2.4492935982947064e-16,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "month_cos": {
-          "min": -1.0,
-          "max": 1.0,
+          "min": -1,
+          "max": 1,
           "median": -1.8369701987210297e-16,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         }
       },
       "metrics": {
@@ -3688,7 +3691,7 @@
         "expected_calibration_error": 0.14446668745303232,
         "calibration_table": [
           {
-            "bin_lower": 0.0,
+            "bin_lower": 0,
             "bin_upper": 0.1,
             "n": 912,
             "mean_probability": 0.033408111558891354,
@@ -3765,7 +3768,7 @@
           "predicted_class": 0,
           "accuracy": 0.9302007299270073,
           "balanced_accuracy": 0.5,
-          "f1": 0.0
+          "f1": 0
         },
         "base_rate_brier_score": 0.06492733197027012,
         "skill_over_base_rate_brier": -0.023921998425561766,
@@ -3787,7 +3790,7 @@
           {
             "threshold": 0.02,
             "precision": 0.059752747252747256,
-            "recall": 1.0,
+            "recall": 1,
             "f1": 0.11276733635774465,
             "balanced_accuracy": 0.6063829787234043,
             "predicted_positive_rate": 0.7973713033953997
@@ -3795,7 +3798,7 @@
           {
             "threshold": 0.04,
             "precision": 0.06682027649769585,
-            "recall": 1.0,
+            "recall": 1,
             "f1": 0.12526997840172785,
             "balanced_accuracy": 0.6506612995974699,
             "predicted_positive_rate": 0.7130339539978094
@@ -4130,7 +4133,7 @@
           },
           {
             "threshold": 0.88,
-            "precision": 1.0,
+            "precision": 1,
             "recall": 0.011494252873563218,
             "f1": 0.022727272727272728,
             "balanced_accuracy": 0.5057471264367817,
@@ -4138,27 +4141,27 @@
           },
           {
             "threshold": 0.9,
-            "precision": 0.0,
-            "recall": 0.0,
-            "f1": 0.0,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0,
             "balanced_accuracy": 0.5,
-            "predicted_positive_rate": 0.0
+            "predicted_positive_rate": 0
           },
           {
             "threshold": 0.92,
-            "precision": 0.0,
-            "recall": 0.0,
-            "f1": 0.0,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0,
             "balanced_accuracy": 0.5,
-            "predicted_positive_rate": 0.0
+            "predicted_positive_rate": 0
           },
           {
             "threshold": 0.94,
-            "precision": 0.0,
-            "recall": 0.0,
-            "f1": 0.0,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0,
             "balanced_accuracy": 0.5,
-            "predicted_positive_rate": 0.0
+            "predicted_positive_rate": 0
           }
         ],
         "persistence_baseline": {
@@ -4343,43 +4346,43 @@
         "temperature_2m_max": {
           "min": 24.2,
           "max": 34.2,
-          "median": 29.0,
-          "missing_fraction": 0.0
+          "median": 29,
+          "missing_fraction": 0
         },
         "temperature_2m_min": {
           "min": 18.6,
           "max": 28.8,
           "median": 24.3,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "precipitation_sum": {
-          "min": 0.0,
+          "min": 0,
           "max": 253.7,
           "median": 2.5,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "wind_speed_10m_max": {
           "min": 3.3,
           "max": 32.8,
           "median": 10.3,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "wind_gusts_10m_max": {
           "min": 11.2,
           "max": 72.4,
           "median": 29.9,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "temperature_2m_max_lag1": {
           "min": 24.2,
           "max": 34.2,
-          "median": 29.0,
-          "missing_fraction": 9.441979038806533e-05
+          "median": 29,
+          "missing_fraction": 0.00009441979038806533
         },
         "temperature_2m_max_lag2": {
           "min": 24.2,
           "max": 34.2,
-          "median": 29.0,
+          "median": 29,
           "missing_fraction": 0.00018883958077613066
         },
         "temperature_2m_max_lag3": {
@@ -4410,7 +4413,7 @@
           "min": 18.6,
           "max": 28.8,
           "median": 24.3,
-          "missing_fraction": 9.441979038806533e-05
+          "missing_fraction": 0.00009441979038806533
         },
         "temperature_2m_min_lag2": {
           "min": 18.6,
@@ -4443,37 +4446,37 @@
           "missing_fraction": 0.00037767916155226133
         },
         "precipitation_sum_lag1": {
-          "min": 0.0,
+          "min": 0,
           "max": 253.7,
           "median": 2.5,
-          "missing_fraction": 9.441979038806533e-05
+          "missing_fraction": 0.00009441979038806533
         },
         "precipitation_sum_lag2": {
-          "min": 0.0,
+          "min": 0,
           "max": 253.7,
           "median": 2.5,
           "missing_fraction": 0.00018883958077613066
         },
         "precipitation_sum_lag3": {
-          "min": 0.0,
+          "min": 0,
           "max": 253.7,
           "median": 2.5,
           "missing_fraction": 0.000283259371164196
         },
         "precipitation_sum_lag7": {
-          "min": 0.0,
+          "min": 0,
           "max": 253.7,
           "median": 2.5,
           "missing_fraction": 0.0006609385327164573
         },
         "precipitation_sum_prior3_mean": {
-          "min": 0.0,
+          "min": 0,
           "max": 157.29999999999998,
           "median": 3.5333333333333248,
           "missing_fraction": 0.00018883958077613066
         },
         "precipitation_sum_prior7_mean": {
-          "min": 0.0,
+          "min": 0,
           "max": 72.04285714285714,
           "median": 4.342857142857143,
           "missing_fraction": 0.00037767916155226133
@@ -4482,7 +4485,7 @@
           "min": 3.3,
           "max": 32.8,
           "median": 10.3,
-          "missing_fraction": 9.441979038806533e-05
+          "missing_fraction": 0.00009441979038806533
         },
         "wind_speed_10m_max_lag2": {
           "min": 3.3,
@@ -4518,7 +4521,7 @@
           "min": 11.2,
           "max": 72.4,
           "median": 29.9,
-          "missing_fraction": 9.441979038806533e-05
+          "missing_fraction": 0.00009441979038806533
         },
         "wind_gusts_10m_max_lag2": {
           "min": 11.2,
@@ -4551,19 +4554,19 @@
           "missing_fraction": 0.00037767916155226133
         },
         "rain_3d_sum": {
-          "min": 0.0,
+          "min": 0,
           "max": 471.9,
           "median": 10.599999999999975,
           "missing_fraction": 0.00018883958077613066
         },
         "rain_7d_sum": {
-          "min": 0.0,
+          "min": 0,
           "max": 504.3,
           "median": 30.400000000000002,
           "missing_fraction": 0.00037767916155226133
         },
         "rain_30d_sum": {
-          "min": 0.0,
+          "min": 0,
           "max": 873.4000000000001,
           "median": 170.09999999999997,
           "missing_fraction": 0.0018883958077613068
@@ -4575,9 +4578,9 @@
           "missing_fraction": 0.00566518742328392
         },
         "dry_days_14": {
-          "min": 0.0,
-          "max": 14.0,
-          "median": 4.0,
+          "min": 0,
+          "max": 14,
+          "median": 4,
           "missing_fraction": 0.000566518742328392
         },
         "tmax_prior30_mean": {
@@ -4596,25 +4599,25 @@
           "min": -0.9999994220246925,
           "max": 0.9999855506507186,
           "median": -0.004300592702981974,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "doy_cos": {
           "min": -0.9999791929590823,
           "max": 0.9999907524084426,
           "median": 0.001075151282798226,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "month_sin": {
-          "min": -1.0,
-          "max": 1.0,
+          "min": -1,
+          "max": 1,
           "median": -2.4492935982947064e-16,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         },
         "month_cos": {
-          "min": -1.0,
-          "max": 1.0,
+          "min": -1,
+          "max": 1,
           "median": -1.8369701987210297e-16,
-          "missing_fraction": 0.0
+          "missing_fraction": 0
         }
       },
       "metrics": {
@@ -4640,7 +4643,7 @@
         "expected_calibration_error": 0.08784862889216613,
         "calibration_table": [
           {
-            "bin_lower": 0.0,
+            "bin_lower": 0,
             "bin_upper": 0.1,
             "n": 1530,
             "mean_probability": 0.008416960963721092,
@@ -4652,7 +4655,7 @@
             "bin_upper": 0.2,
             "n": 98,
             "mean_probability": 0.14512437230275704,
-            "observed_event_rate": 0.0,
+            "observed_event_rate": 0,
             "absolute_gap": 0.14512437230275704
           },
           {
@@ -4713,7 +4716,7 @@
           },
           {
             "bin_lower": 0.9,
-            "bin_upper": 1.0,
+            "bin_upper": 1,
             "n": 206,
             "mean_probability": 0.9704216676263429,
             "observed_event_rate": 0.7330097087378641,
@@ -4725,7 +4728,7 @@
           "predicted_class": 0,
           "accuracy": 0.8978102189781022,
           "balanced_accuracy": 0.5,
-          "f1": 0.0
+          "f1": 0
         },
         "base_rate_brier_score": 0.09174702967659437,
         "skill_over_base_rate_brier": 0.022235704919455743,
@@ -4747,7 +4750,7 @@
           {
             "threshold": 0.02,
             "precision": 0.20926517571884984,
-            "recall": 1.0,
+            "recall": 1,
             "f1": 0.34610303830911493,
             "balanced_accuracy": 0.8539823008849557,
             "predicted_positive_rate": 0.3428258488499452
@@ -4755,7 +4758,7 @@
           {
             "threshold": 0.04,
             "precision": 0.23861566484517305,
-            "recall": 1.0,
+            "recall": 1,
             "f1": 0.38529411764705884,
             "balanced_accuracy": 0.8766961651917404,
             "predicted_positive_rate": 0.30065717415115006
