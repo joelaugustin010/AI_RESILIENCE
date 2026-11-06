@@ -13,6 +13,8 @@ import json
 import shutil
 import subprocess
 import sys
+import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 from typing import Any
@@ -69,7 +71,7 @@ def fetch_record_metadata(timeout: int = 45) -> dict[str, Any]:
 
 def download_verified(item: dict[str, Any], destination: Path, *,
                       max_size_bytes: int, minimum_free_bytes: int) -> Path:
-    """Stream one archive to disk and verify its published size and checksum."""
+    """Resume a streamed archive safely, then verify its exact size and checksum."""
     size = int(item["size"])
     if size > max_size_bytes:
         raise ValueError(
@@ -78,41 +80,104 @@ def download_verified(item: dict[str, Any], destination: Path, *,
         )
     destination.parent.mkdir(parents=True, exist_ok=True)
     free = shutil.disk_usage(destination.parent).free
-    if free < size + minimum_free_bytes:
+    if free < max(0, size - destination.with_suffix(destination.suffix + ".part").stat().st_size
+                 if destination.with_suffix(destination.suffix + ".part").exists() else size) + minimum_free_bytes:
         raise OSError(
-            f"Insufficient free disk space: need at least "
-            f"{(size + minimum_free_bytes) / (1024 ** 3):.2f} GiB including safety margin; "
+            f"Insufficient free disk space for remaining download and safety margin; "
             f"available {free / (1024 ** 3):.2f} GiB."
         )
 
     algorithm, expected = item["checksum"].split(":", 1)
-    hasher = hashlib.new(algorithm)
     temporary = destination.with_suffix(destination.suffix + ".part")
-    request = urllib.request.Request(
-        item["url"], headers={"User-Agent": "AI_RESILIENCE-research-archive-inspector/1.0"}
-    )
-    written = 0
-    try:
-        with urllib.request.urlopen(request, timeout=90) as response, temporary.open("wb") as output:
-            while True:
-                chunk = response.read(8 * 1024 * 1024)
-                if not chunk:
-                    break
-                output.write(chunk)
+    if temporary.exists() and temporary.stat().st_size > size:
+        temporary.unlink()
+    written = temporary.stat().st_size if temporary.exists() else 0
+    hasher = hashlib.new(algorithm)
+    if written:
+        with temporary.open("rb") as existing:
+            for chunk in iter(lambda: existing.read(8 * 1024 * 1024), b""):
                 hasher.update(chunk)
-                written += len(chunk)
-        if written != size:
-            raise ValueError(f"Downloaded size mismatch for {item['key']}: {written} != {size}.")
-        actual = hasher.hexdigest()
-        if actual.lower() != expected.lower():
-            raise ValueError(
-                f"Checksum mismatch for {item['key']}: expected {expected}, got {actual}."
-            )
+
+    # A completed .part from an interrupted final verification can be accepted
+    # only after independently checking both published size and checksum.
+    if written == size and hasher.hexdigest().lower() == expected.lower():
         temporary.replace(destination)
-    except Exception:
-        # Keep a partial file for diagnosis, but never treat it as a verified archive.
-        raise
-    return destination
+        return destination
+
+    last_error: Exception | None = None
+    for attempt in range(8):
+        headers = {"User-Agent": "AI_RESILIENCE-research-archive-inspector/1.0"}
+        if written:
+            headers["Range"] = f"bytes={written}-"
+        request = urllib.request.Request(item["url"], headers=headers)
+        try:
+            with urllib.request.urlopen(request, timeout=180) as response:
+                status = getattr(response, "status", response.getcode())
+                if written and status == 206:
+                    content_range = response.headers.get("Content-Range", "")
+                    if not content_range.startswith(f"bytes {written}-"):
+                        raise ValueError(
+                            f"Server returned an unexpected Content-Range for resume: {content_range!r}."
+                        )
+                    mode = "ab"
+                elif status == 200:
+                    # Server ignored Range; restart from byte zero rather than
+                    # appending a full response to a partial file.
+                    written = 0
+                    hasher = hashlib.new(algorithm)
+                    mode = "wb"
+                elif status == 206 and written == 0:
+                    if not response.headers.get("Content-Range", "").startswith("bytes 0-"):
+                        raise ValueError("Server returned an invalid initial Content-Range.")
+                    mode = "wb"
+                else:
+                    raise ValueError(f"Unexpected HTTP status while downloading: {status}.")
+
+                with temporary.open(mode) as output:
+                    while True:
+                        chunk = response.read(8 * 1024 * 1024)
+                        if not chunk:
+                            break
+                        if written + len(chunk) > size:
+                            raise ValueError(
+                                f"Server sent more than the published size for {item['key']}."
+                            )
+                        output.write(chunk)
+                        hasher.update(chunk)
+                        written += len(chunk)
+
+            if written < size:
+                last_error = ConnectionError(
+                    f"Download ended early at {written} of {size} bytes; "
+                    "the partial file has been retained for resumption."
+                )
+                if attempt < 7:
+                    time.sleep(min(2 ** attempt, 30))
+                    continue
+                raise last_error
+
+            if written != size:
+                raise ValueError(f"Downloaded size mismatch for {item['key']}: {written} != {size}.")
+            actual = hasher.hexdigest()
+            if actual.lower() != expected.lower():
+                raise ValueError(
+                    f"Checksum mismatch for {item['key']}: expected {expected}, got {actual}. "
+                    "The unverified .part file has been retained; remove it only if a fresh "
+                    "download is intentionally required."
+                )
+            temporary.replace(destination)
+            return destination
+        except (urllib.error.URLError, TimeoutError, ConnectionError, OSError) as exc:
+            last_error = exc
+            if attempt == 7:
+                break
+            time.sleep(min(2 ** attempt, 30))
+
+    raise ConnectionError(
+        f"Could not complete {item['key']} after 8 attempts. "
+        f"Retained {written} of {size} bytes in {temporary}. "
+        f"Retry the same command to resume. Last error: {last_error}"
+    )
 
 
 def main() -> int:
