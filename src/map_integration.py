@@ -68,6 +68,11 @@ _LANDCOVER_CONTEXT_HAZARDS = {
 }
 
 
+def hazard_has_flood_component(active_hazard: str | None) -> bool:
+    """Whether the selected registered scenario contains a flood component."""
+    return bool(active_hazard and "Flood" in components_for(active_hazard))
+
+
 def hazard_layer_availability(active_hazard: str | None = None) -> list[dict[str, Any]]:
     """Return an explicit availability row for every workflow hazard.
 
