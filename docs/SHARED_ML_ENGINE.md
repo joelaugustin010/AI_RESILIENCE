@@ -52,8 +52,10 @@ holdout is still preliminary evidence.
 ## Coverage and missing models
 
 The full ten-hazard matrix is in `reports/ml_disaster_coverage.json` and is
-rendered in the Hazard Model Lab. Landslide, Industrial incident, and
-Infrastructure failure have no released supervised model:
+rendered in the Hazard Model Lab. The Drought model is currently invalidated:
+its previous target construction overlapped historical rainfall features, so
+its old metrics are superseded and inference is blocked until corrected retraining.
+Landslide, Industrial incident, and Infrastructure failure have no released supervised model:
 
 - the landslide source is a reported-event inventory with no representative
   non-event sample;
