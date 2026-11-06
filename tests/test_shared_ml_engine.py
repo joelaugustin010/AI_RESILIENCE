@@ -236,3 +236,20 @@ def test_skill_grade_downgrades_when_model_does_not_beat_persistence():
     })
     assert result["status"] == "WEAK_RESEARCH_SIGNAL"
     assert "does not exceed the persistence baseline" in result["reason"]
+
+
+def test_forward_window_sum_uses_only_future_observations():
+    from src.ml.data import _forward_window_sum
+
+    values = pd.Series(range(1, 41), dtype=float)
+    future = _forward_window_sum(values, 30)
+    assert future.iloc[0] == pytest.approx(sum(range(2, 32)))
+    assert future.iloc[5] == pytest.approx(sum(range(7, 37)))
+    assert pd.isna(future.iloc[10])
+
+
+def test_forward_window_sum_rejects_non_positive_window():
+    from src.ml.data import _forward_window_sum
+
+    with pytest.raises(ValueError, match="at least one"):
+        _forward_window_sum(pd.Series([1.0, 2.0]), 0)
