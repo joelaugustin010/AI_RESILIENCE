@@ -228,24 +228,25 @@ def audit_daily_extract(data: pd.DataFrame) -> tuple[dict, pd.DataFrame]:
 st.markdown(
     """
     <style>
-    /* Air-quality module: cyan accent and quiet industrial glass panels. */
+    /* Air-quality module: shared eco-glass surfaces with a restrained cyan data accent. */
     .air-nav {
       display: flex;
       flex-wrap: wrap;
       gap: .45rem;
       padding: .7rem 0 .35rem;
       margin: .1rem 0 1.1rem;
-      border-bottom: 1px solid rgba(130, 190, 199, .14);
+      border-bottom: 1px solid rgba(44, 105, 82, .18);
     }
     .air-nav a {
       display: inline-flex;
       align-items: center;
       min-height: 1.9rem;
       padding: .3rem .7rem;
-      border: 1px solid rgba(92, 200, 232, .20);
+      border: 1px solid rgba(44, 105, 82, .20);
       border-radius: 999px;
-      color: #b9e6f2 !important;
-      background: rgba(9, 33, 48, .62);
+      color: #315B4C !important;
+      background: rgba(255, 255, 255, .78);
+      backdrop-filter: blur(10px);
       text-decoration: none !important;
       font-size: .75rem;
       font-weight: 650;
@@ -253,9 +254,9 @@ st.markdown(
                   color .18s var(--ar-ease), transform .18s var(--ar-ease);
     }
     .air-nav a:hover {
-      background: rgba(92, 200, 232, .12);
-      border-color: rgba(92, 200, 232, .44);
-      color: #e4fbff !important;
+      background: #EAF3EE;
+      border-color: rgba(36, 122, 101, .42);
+      color: #1B604F !important;
       transform: translateY(-1px);
     }
     .disaster-hero {
@@ -263,12 +264,12 @@ st.markdown(
       overflow: hidden;
       padding: 1.55rem 1.7rem;
       border-radius: 20px;
+      color: #1D3030 !important;
       background:
-        radial-gradient(ellipse at 90% -20%, rgba(92, 200, 232, .20), transparent 20rem),
-        linear-gradient(120deg, #071d2c 0%, #0a3446 56%, #0a4b55 100%);
-      border: 1px solid rgba(92, 200, 232, .24);
-      box-shadow: var(--ar-shadow-soft);
-      color: #f2ffff;
+        radial-gradient(ellipse at 90% -20%, rgba(131, 185, 165, .18), transparent 20rem),
+        linear-gradient(120deg, rgba(255, 255, 255, .98), rgba(234, 243, 238, .96));
+      border: 1px solid rgba(44, 105, 82, .20);
+      box-shadow: 0 12px 32px rgba(26, 65, 49, .08);
       margin: 1rem 0 1.1rem;
     }
     .disaster-hero:after {
@@ -279,158 +280,90 @@ st.markdown(
       right: -70px;
       top: -150px;
       border-radius: 50%;
-      border: 1px solid rgba(92, 200, 232, .28);
-      box-shadow: 0 0 0 26px rgba(92, 200, 232, .05), 0 0 0 56px rgba(92, 200, 232, .03);
+      border: 1px solid rgba(36, 122, 101, .22);
+      box-shadow: 0 0 0 26px rgba(36, 122, 101, .045), 0 0 0 56px rgba(36, 122, 101, .025);
       pointer-events: none;
     }
-    .disaster-kicker {
-      color: #a8ecf8;
+    .disaster-kicker, .disaster-step {
+      color: #247A65;
       font-size: .7rem;
       font-weight: 800;
-      letter-spacing: .16em;
+      letter-spacing: .15em;
       text-transform: uppercase;
     }
     .disaster-title {
-      color: #f4ffff;
+      color: #1D3030;
       font-size: clamp(1.7rem, 3.2vw, 2.45rem);
       font-weight: 800;
       letter-spacing: -.035em;
       line-height: 1.1;
-      margin: .45rem 0 .45rem;
+      margin: .45rem 0;
     }
-    .disaster-subtitle {
-      color: #c7e4ea;
-      font-size: .98rem;
-      line-height: 1.62;
-      max-width: 790px;
-      margin: 0;
+    .disaster-subtitle, .disaster-card-copy, .disaster-result-copy {
+      color: #71827F;
+      font-size: .84rem;
+      line-height: 1.6;
     }
-    .disaster-step {
-      color: #7fdfea;
-      font-size: .69rem;
-      font-weight: 800;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      margin: 1.4rem 0 .5rem;
-    }
+    .disaster-subtitle { max-width: 790px; margin: 0; font-size: .98rem; }
+    .disaster-step { margin: 1.4rem 0 .5rem; }
     .disaster-card {
       min-height: 104px;
       padding: .95rem 1rem;
-      border: 1px solid rgba(130, 190, 199, .22);
+      border: 1px solid rgba(44, 105, 82, .18);
       border-radius: 16px;
-      background: linear-gradient(150deg, rgba(15, 44, 60, .95), rgba(9, 30, 44, .95));
-      box-shadow: var(--ar-shadow-soft);
+      background: rgba(255, 255, 255, .84);
+      box-shadow: 0 8px 22px rgba(26, 65, 49, .06);
+      backdrop-filter: blur(12px);
     }
     .disaster-card-title {
-      color: #c8f4f8;
+      color: #315B4C;
       font-weight: 750;
       font-size: .9rem;
       margin-bottom: .3rem;
     }
-    .disaster-card-copy {
-      color: #9fbec6;
-      font-size: .78rem;
-      line-height: 1.5;
-    }
     .disaster-result {
       padding: 1.25rem 1.4rem;
       border-radius: 18px;
-      background:
-        radial-gradient(ellipse at 100% 0%, rgba(92, 200, 232, .12), transparent 18rem),
-        linear-gradient(135deg, rgba(13, 54, 64, .96), rgba(9, 34, 48, .96));
-      border: 1px solid rgba(92, 200, 232, .24);
-      box-shadow: var(--ar-shadow-soft);
+      background: linear-gradient(135deg, rgba(234, 243, 238, .98), rgba(255, 255, 255, .96));
+      border: 1px solid rgba(36, 122, 101, .22);
+      box-shadow: 0 8px 24px rgba(26, 65, 49, .07);
       margin: 1rem 0 .8rem;
     }
     .disaster-result-label {
-      color: #9fe6ee;
+      color: #247A65;
       font-size: .69rem;
       font-weight: 800;
       letter-spacing: .13em;
       text-transform: uppercase;
     }
     .disaster-result-value {
-      color: #f3ffff;
+      color: #1D3030;
       font-size: clamp(1.8rem, 4vw, 2.7rem);
       font-weight: 800;
       letter-spacing: -.04em;
       line-height: 1.06;
       margin: .3rem 0 .25rem;
     }
-    .disaster-result-copy {
-      color: #a9c7cd;
-      font-size: .82rem;
-      line-height: 1.55;
-    }
     .disaster-pill {
       display: inline-block;
       padding: .2rem .6rem;
       border-radius: 999px;
-      background: rgba(92, 200, 232, .12);
-      border: 1px solid rgba(92, 200, 232, .24);
-      color: #b7f1fa;
+      background: #EAF3EE;
+      border: 1px solid rgba(36, 122, 101, .22);
+      color: #1B604F;
       font-size: .71rem;
       font-weight: 700;
     }
     .disaster-empty {
       padding: 1.2rem 1.3rem;
-      border: 1px dashed rgba(92, 200, 232, .32);
+      border: 1px dashed rgba(36, 122, 101, .30);
       border-radius: 16px;
-      background: rgba(9, 33, 48, .55);
-      color: #a9c7cd;
+      background: rgba(255, 255, 255, .78);
+      color: #71827F;
     }
     @media (max-width: 700px) {
       .disaster-hero { padding: 1.2rem 1.15rem; border-radius: 16px; }
       .air-nav { gap: .35rem; }
-    }
-
-    /* Shared eco-glass treatment for the air-intelligence module. */
-    .air-nav { border-bottom-color: rgba(44,105,82,.18) !important; }
-    .air-nav a {
-      color: #315B4C !important;
-      background: rgba(255,255,255,.78) !important;
-      border-color: rgba(44,105,82,.20) !important;
-      backdrop-filter: blur(10px);
-    }
-    .air-nav a:hover {
-      color: #1B604F !important;
-      background: #EAF3EE !important;
-      border-color: rgba(36,122,101,.42) !important;
-    }
-    .disaster-hero {
-      color: #1D3030 !important;
-      background:
-        radial-gradient(ellipse at 90% -20%, rgba(131,185,165,.18), transparent 20rem),
-        linear-gradient(120deg, rgba(255,255,255,.98), rgba(234,243,238,.96)) !important;
-      border-color: rgba(44,105,82,.20) !important;
-      box-shadow: 0 12px 32px rgba(26,65,49,.08) !important;
-    }
-    .disaster-kicker, .disaster-step { color: #247A65 !important; }
-    .disaster-title { color: #1D3030 !important; }
-    .disaster-subtitle, .disaster-card-copy { color: #71827F !important; }
-    .disaster-card {
-      background: rgba(255,255,255,.84) !important;
-      border-color: rgba(44,105,82,.18) !important;
-      box-shadow: 0 8px 22px rgba(26,65,49,.06) !important;
-      backdrop-filter: blur(12px);
-    }
-    .disaster-card-title { color: #315B4C !important; }
-    .disaster-result {
-      background: linear-gradient(135deg, rgba(234,243,238,.98), rgba(255,255,255,.96)) !important;
-      border-color: rgba(36,122,101,.22) !important;
-    }
-    .disaster-result-label { color: #247A65 !important; }
-    .disaster-result-value { color: #1D3030 !important; }
-    .disaster-result-copy { color: #71827F !important; }
-    .disaster-pill {
-      color: #1B604F !important;
-      background: #EAF3EE !important;
-      border-color: rgba(36,122,101,.22) !important;
-    }
-    .disaster-empty {
-      color: #71827F !important;
-      background: rgba(255,255,255,.78) !important;
-      border-color: rgba(36,122,101,.30) !important;
     }
     </style>
     """,
