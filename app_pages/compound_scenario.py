@@ -29,6 +29,9 @@ def _render_shared_ml_evidence(selected_hazards: list[str]) -> None:
             item = ml_evidence_for(selected_hazard, {})
             st.write("**" + selected_hazard + ":** " + str(item.get("status", "unknown")).replace("_", " ").capitalize())
             st.caption(item.get("interpretation", ""))
+        has_cyclone_flood_compound = "Compound: cyclone + flood" in selected_hazards or {"Flood", "Cyclone"}.issubset(set(selected_hazards))
+        if not has_cyclone_flood_compound:
+            return
         evidence = ml_evidence_for("Compound: cyclone + flood", {})
     except Exception as exc:
         st.info(f"Shared ML evidence could not be loaded: {type(exc).__name__}: {exc}")
