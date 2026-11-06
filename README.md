@@ -50,13 +50,15 @@ assessments remain authoritative.
 python scripts/train_shared_ml_models.py
 ```
 
-The command rebuilds the six research models from repository-held data,
+The command rebuilds six event-classification models and two continuous next-day weather regressors from repository-held data,
 performs chronological train/validation/test evaluation, and writes:
 
 - `models/ml/<model_id>/model.joblib` and `model_card.json`
 - `reports/ml_model_registry.json`
 - `reports/ml_disaster_coverage.json`
 - `reports/ml_validation_report.json`
+
+The shared workflow now also fits continuous next-day Kochi rainfall and maximum-temperature regressors. They are selected on validation MAE, compared with persistence and training-median baselines, and remain blocked from inference unless they beat the persistence reference. These are weather estimates, not direct flood or heat-health predictions.
 
 Current coverage of the ten Decision Workflow hazards:
 
