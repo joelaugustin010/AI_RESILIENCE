@@ -1,4 +1,4 @@
-"""Regression checks for the cinematic Kerala homepage and its navigation."""
+"""Regression checks for the Kochi-focused cinematic homepage and navigation."""
 
 from pathlib import Path
 
@@ -38,12 +38,12 @@ def test_home_is_the_default_page_with_the_cinematic_hero():
 
     assert "ar-cine-hero" in html
     assert "AI <span>RESILIENCE</span>" in html
-    assert "Protecting Kerala. Predicting Risks. Building a Resilient Future." in html
+    assert "Understanding Kochi. Preparing for risk. Strengthening urban resilience." in html
     assert "app/static/images/hero-kerala-fallback.jpg" in html
 
     labels = [button.label for button in app.button]
     assert "Explore Intelligence" in labels
-    assert "Explore Kerala's Risks" in labels
+    assert "Explore Kochi's Risk Context" in labels
 
 
 def test_home_links_every_registered_workspace():
