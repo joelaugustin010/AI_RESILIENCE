@@ -10,10 +10,10 @@
   "target_threshold": 0.5,
   "target_direction": "high",
   "threshold_source": "fixed binary label",
-  "evidence_tier": "screening",
-  "status": "RESEARCH_SIGNAL_NOT_VALIDATED",
-  "skill_grade": "RESEARCH_SIGNAL_NOT_VALIDATED",
-  "status_reason": "ROC-AUC 0.871 and average precision 0.912 beat the no-skill prevalence 0.596 on one temporal holdout. Calibration error is 0.109; probabilities are not suitable for decision thresholds without recalibration.",
+  "evidence_tier": "invalidated",
+  "status": "NO_SKILL",
+  "skill_grade": "NO_SKILL",
+  "status_reason": "INVALIDATED: the original seven-day aftershock outcome window could cross a temporal validation/test boundary because the split used only the mainshock timestamp. Previous holdout metrics are superseded. No inference is permitted until the label-window embargo and recent-seismicity baseline are retrained and reevaluated.",
   "validation_status": "SINGLE_TEMPORAL_HOLDOUT_NOT_INDEPENDENTLY_VALIDATED",
   "trained_at_utc": "2026-11-06T13:51:45+00:00",
   "selected_model_type": "gradient_boosting",
@@ -112,85 +112,115 @@
   "feature_count": 13,
   "feature_ranges": {
     "magnitude": {
-      "min": 5.0,
+      "min": 5,
       "max": 7.8,
       "median": 5.2,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "depth_km": {
       "min": 1.6,
       "max": 400.57,
       "median": 26.1,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "latitude": {
       "min": 5.003,
       "max": 37.926,
       "median": 22.8004,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "longitude": {
       "min": 65.082,
       "max": 99.9993,
       "median": 92.9084,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "abs_latitude": {
       "min": 5.003,
       "max": 37.926,
       "median": 22.8004,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "days_since_prev_m5_100km": {
       "min": 0.00010104166666666667,
-      "max": 365.0,
+      "max": 365,
       "median": 21.798330671296295,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "n_m4_prev7d_50km": {
-      "min": 0.0,
-      "max": 586.0,
-      "median": 1.0,
-      "missing_fraction": 0.0
+      "min": 0,
+      "max": 586,
+      "median": 1,
+      "missing_fraction": 0
     },
     "n_m4_prev30d_100km": {
-      "min": 0.0,
-      "max": 711.0,
-      "median": 3.0,
-      "missing_fraction": 0.0
+      "min": 0,
+      "max": 711,
+      "median": 3,
+      "missing_fraction": 0
     },
     "month_sin": {
-      "min": -1.0,
-      "max": 1.0,
+      "min": -1,
+      "max": 1,
       "median": -2.4492935982947064e-16,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "month_cos": {
-      "min": -1.0,
-      "max": 1.0,
+      "min": -1,
+      "max": 1,
       "median": 0.5000000000000001,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "doy_sin": {
       "min": -0.9999994220246925,
       "max": 0.9999855506507186,
       "median": -0.021501372740813793,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "doy_cos": {
       "min": -0.9999791929590823,
       "max": 0.9999907524084426,
       "median": 0.28931997761869527,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     },
     "time_since_start_days": {
-      "min": 0.0,
+      "min": 0,
       "max": 8033.670681655092,
       "median": 3001.741267824074,
-      "missing_fraction": 0.0
+      "missing_fraction": 0
     }
   },
-  "metrics": {
+  "metrics": {},
+  "provenance": {
+    "source": "data\\external\\hazards\\raw\\earthquake\\usgs_india_events_2000_present.csv",
+    "catalogue_note": "USGS query is capped at 20,000 events and is not a complete local seismicity catalogue.",
+    "mainshocks": 1963
+  },
+  "notes": [
+    "Aftershock sequence screening, not earthquake occurrence prediction.",
+    "The catalogue is regionally clipped and capped at 20,000 events.",
+    "Features use only prior events; the label uses future events."
+  ],
+  "limitations": [
+    "The USGS catalogue is regionally clipped and capped at 20,000 events.",
+    "Aftershock labelling depends on catalogue completeness and the chosen distance/time windows.",
+    "Aftershock sequence screening, not earthquake occurrence prediction.",
+    "The catalogue is regionally clipped and capped at 20,000 events.",
+    "Features use only prior events; the label uses future events.",
+    "A single chronological holdout is preliminary evidence, not independent validation.",
+    "No calibration, geographic transferability, drift or operational-readiness claim is made.",
+    "Skill grade is RESEARCH_SIGNAL_NOT_VALIDATED: ROC-AUC 0.871 and average precision 0.912 beat the no-skill prevalence 0.596 on one temporal holdout. Calibration error is 0.109; probabilities are not suitable for decision thresholds without recalibration.",
+    "The model card records the exact threshold, features and split; changing any of them requires retraining and re-evaluation.",
+    "The prior temporal split did not embargo the full seven-day future label window; previous metrics are invalidated pending retraining."
+  ],
+  "intended_use": "Aftershock occurrence screening for an already observed M>=5 mainshock, used only as supplementary sequence context.",
+  "prohibited_use": "Not earthquake prediction, mainshock timing, shaking intensity, damage, or warning guidance.",
+  "artifact": {
+    "path": "models/ml/earthquake_aftershock_occurrence/model.joblib",
+    "format": "joblib-pipeline",
+    "loader": "src.ml.inference.predict_from_context"
+  },
+  "superseded_metrics": {
     "n_test": 156,
     "n_test_events": 93,
     "test_prevalence": 0.5961538461538461,
@@ -213,7 +243,7 @@
     "expected_calibration_error": 0.10921511346592937,
     "calibration_table": [
       {
-        "bin_lower": 0.0,
+        "bin_lower": 0,
         "bin_upper": 0.1,
         "n": 11,
         "mean_probability": 0.056815963098186706,
@@ -286,10 +316,10 @@
       },
       {
         "bin_lower": 0.9,
-        "bin_upper": 1.0,
+        "bin_upper": 1,
         "n": 26,
         "mean_probability": 0.9522508888087236,
-        "observed_event_rate": 1.0,
+        "observed_event_rate": 1,
         "absolute_gap": 0.04774911119127645
       }
     ],
@@ -320,23 +350,23 @@
       {
         "threshold": 0.02,
         "precision": 0.5112107623318386,
-        "recall": 1.0,
+        "recall": 1,
         "f1": 0.6765578635014837,
         "balanced_accuracy": 0.5,
-        "predicted_positive_rate": 1.0
+        "predicted_positive_rate": 1
       },
       {
         "threshold": 0.04,
         "precision": 0.5112107623318386,
-        "recall": 1.0,
+        "recall": 1,
         "f1": 0.6765578635014837,
         "balanced_accuracy": 0.5,
-        "predicted_positive_rate": 1.0
+        "predicted_positive_rate": 1
       },
       {
         "threshold": 0.06,
         "precision": 0.5181818181818182,
-        "recall": 1.0,
+        "recall": 1,
         "f1": 0.6826347305389222,
         "balanced_accuracy": 0.5137614678899083,
         "predicted_positive_rate": 0.9865470852017937
@@ -344,7 +374,7 @@
       {
         "threshold": 0.08,
         "precision": 0.5229357798165137,
-        "recall": 1.0,
+        "recall": 1,
         "f1": 0.6867469879518072,
         "balanced_accuracy": 0.5229357798165137,
         "predicted_positive_rate": 0.9775784753363229
@@ -696,32 +726,5 @@
     ],
     "persistence_baseline": null
   },
-  "provenance": {
-    "source": "data\\external\\hazards\\raw\\earthquake\\usgs_india_events_2000_present.csv",
-    "catalogue_note": "USGS query is capped at 20,000 events and is not a complete local seismicity catalogue.",
-    "mainshocks": 1963
-  },
-  "notes": [
-    "Aftershock sequence screening, not earthquake occurrence prediction.",
-    "The catalogue is regionally clipped and capped at 20,000 events.",
-    "Features use only prior events; the label uses future events."
-  ],
-  "limitations": [
-    "The USGS catalogue is regionally clipped and capped at 20,000 events.",
-    "Aftershock labelling depends on catalogue completeness and the chosen distance/time windows.",
-    "Aftershock sequence screening, not earthquake occurrence prediction.",
-    "The catalogue is regionally clipped and capped at 20,000 events.",
-    "Features use only prior events; the label uses future events.",
-    "A single chronological holdout is preliminary evidence, not independent validation.",
-    "No calibration, geographic transferability, drift or operational-readiness claim is made.",
-    "Skill grade is RESEARCH_SIGNAL_NOT_VALIDATED: ROC-AUC 0.871 and average precision 0.912 beat the no-skill prevalence 0.596 on one temporal holdout. Calibration error is 0.109; probabilities are not suitable for decision thresholds without recalibration.",
-    "The model card records the exact threshold, features and split; changing any of them requires retraining and re-evaluation."
-  ],
-  "intended_use": "Aftershock occurrence screening for an already observed M>=5 mainshock, used only as supplementary sequence context.",
-  "prohibited_use": "Not earthquake prediction, mainshock timing, shaking intensity, damage, or warning guidance.",
-  "artifact": {
-    "path": "models/ml/earthquake_aftershock_occurrence/model.joblib",
-    "format": "joblib-pipeline",
-    "loader": "src.ml.inference.predict_from_context"
-  }
+  "evaluation_validity": "INVALIDATED_LABEL_WINDOW_SPLIT"
 }
