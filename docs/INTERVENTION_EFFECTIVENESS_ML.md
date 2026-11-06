@@ -32,6 +32,25 @@ sites, but does not replace a separate geographic holdout or external validation
 withheld unless the held-out mean effect is below zero, the entire 95% interval
 is below zero, and overlap passes the configured gate.
 
+
+## Comparative ranking safeguards
+
+Even when separate action models pass their own evidence gates, the ranker
+withholds cross-action ordering unless every eligible candidate has complete,
+matching provenance for the same source study, owner, collection period,
+outcome definition, geographic scope, hazard, outcome unit, pre-treatment
+feature contract and chronological test cutoff. This prevents comparing
+unlike damage measures or effects learned from unrelated populations as if
+they were head-to-head evidence.
+
+A permitted ordering is still based on context-specific point estimates. It
+does not establish that the top-ranked action is statistically superior to
+the next action. The current model does not yet calculate a valid
+context-specific pairwise confidence interval for every action difference;
+the output therefore remains a provisional research ordering, not a definitive
+"best precaution" decision. Cost, feasibility, intervention quality,
+engineering constraints and spillover effects are not automatically optimized.
+
 ## Data contract
 
 One row per comparable observation episode (for example, household-season),
