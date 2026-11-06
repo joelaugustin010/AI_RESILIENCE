@@ -50,7 +50,7 @@ assessments remain authoritative.
 python scripts/train_shared_ml_models.py
 ```
 
-The command rebuilds six event-classification models and two continuous next-day weather regressors from repository-held data,
+The command rebuilds six event-classification models and three continuous regressors (next-day rainfall, next-day temperature, and cyclone wind change) from repository-held data,
 performs chronological train/validation/test evaluation, and writes:
 
 - `models/ml/<model_id>/model.joblib` and `model_card.json`
