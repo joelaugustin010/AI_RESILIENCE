@@ -115,6 +115,7 @@ LIMITATIONS: dict[str, list[str]] = {
         "Humidity, night-time temperature, and local exposure are not modelled.",
     ],
     "Drought": [
+        "The previous target builder overlapped most of the supposed future rainfall window with historical features; prior model metrics are invalidated.",
         "A 30-day rainfall deficit is a meteorological indicator, not agricultural or hydrological drought.",
         "Soil moisture, evaporative demand, storage, and demand are absent.",
     ],
