@@ -34,7 +34,7 @@ def test_map_availability_remains_explicit_for_all_registered_hazards():
     assert flood["Selected"] is True
     assert flood["Hazard footprint / modelled context"] == "Modelled scenario context available"
     landslide = next(row for row in rows if row["Hazard"] == "Landslide")
-    assert landslide["Validated hazard footprint"] == "Not available"
+    assert landslide["Hazard footprint / modelled context"] == "Not available"
 
 
 
