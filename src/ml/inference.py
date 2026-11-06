@@ -78,6 +78,12 @@ def predict_from_context(
         raise ModelNotUsableError(
             f"Model card {model_id!r} is unusable: {'; '.join(problems)}"
         )
+    validity = str(card.get("evaluation_validity") or "")
+    if validity.startswith("INVALIDATED_"):
+        raise ModelNotUsableError(
+            f"Model {model_id!r} has invalidated evaluation provenance ({validity}); "
+            "no inference is permitted until it is retrained and reevaluated."
+        )
     status = card.get("status")
     if status == "NO_SKILL" and not allow_no_skill:
         raise ModelNotUsableError(
