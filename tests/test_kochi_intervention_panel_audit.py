@@ -65,6 +65,8 @@ def test_panel_audit_blocks_mixed_outcome_units_and_interventions():
 
 def test_panel_audit_blocks_non_finite_outcomes():
     frame = _panel()
+    # Pandas 3 no longer upcasts an integer column when assigning infinity.
+    frame["outcome_value"] = frame["outcome_value"].astype(float)
     frame.loc[0, "outcome_value"] = float("inf")
     result = audit_panel(frame)
     assert any("finite numeric" in issue for issue in result["problems"])
