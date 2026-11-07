@@ -231,9 +231,6 @@ else:
     )
 st.write(entry.get("interpretation", "No interpretation recorded."))
 if entry.get("trained_model_ids"):
-    selected_cards = [
-        card for card in cards if card.get("model_id") in entry["trained_model_ids"]
-    ]
     if not selected_cards:
         st.info("The coverage registry references model IDs, but matching model cards are unavailable.")
     for card in selected_cards:
