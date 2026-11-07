@@ -301,12 +301,24 @@ def historical_replay_context(model_id: str) -> dict[str, Any]:
     observed_target = float(row[target_column])
     if not np.isfinite(observed_target):
         raise ValueError("Historical target is not finite.")
+    observed_event = None
+    threshold = card.get("target_threshold")
+    direction = str(card.get("target_direction") or "").casefold()
+    if card.get("task_type") != "regression" and threshold is not None:
+        threshold_value = float(threshold)
+        if direction == "high":
+            observed_event = bool(observed_target >= threshold_value)
+        elif direction == "low":
+            observed_event = bool(observed_target <= threshold_value)
     return {
         "model_id": model_id,
         "context": context,
         "case_date": row[date_column].date().isoformat(),
         "target_column": target_column,
         "observed_target": observed_target,
+        "observed_event": observed_event,
+        "target_threshold": threshold,
+        "target_direction": direction or None,
         "target_definition": card.get("target_definition"),
         "source": provenance.get("source") or dataset.provenance.get("source"),
         "source_type": provenance.get("source_type") or dataset.provenance.get("source_type"),
