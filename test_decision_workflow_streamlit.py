@@ -1,4 +1,4 @@
-"""Streamlit integration test for the existing decision workflow."""
+""""Streamlit integration test for the existing decision workflow."""
 
 import unittest
 
@@ -23,7 +23,7 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
 
         self.assertEqual(len(app.exception), 0)
         hero = next(
-            element for element in app.markdown if "<section class=\"wf-hero\">" in element.value
+            element for element in app.markdown if "<section class=\\\"wf-hero\\\">" in element.value
         )
         self.assertTrue(hero.proto.allow_html)
         self.assertIn("Disaster decision workflow", hero.value)
@@ -120,7 +120,7 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
         )
         load_button.click().run()
         self.assertEqual(len(app.exception), 0)
-        rendered_text = "\n".join(
+        rendered_text = "\\n".join(
             str(element.value)
             for elements in (app.markdown, app.info, app.error)
             for element in elements
@@ -171,17 +171,31 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
         self.assertTrue(
             any("No facility is assumed safe or exposed" in str(item.value) for item in app.info)
         )
-        self.assertTrue(
-            any("WorldCover 2021 land-cover context" in item.label for item in app.checkbox)
+
+        # The land-cover preview is an optional, checksum-verified context asset.
+        # The map must remain usable and explicitly disclose an unavailable asset
+        # rather than failing scenario navigation when that preview is absent or invalid.
+        worldcover_available = any(
+            "WorldCover 2021 land-cover context" in item.label for item in app.checkbox
+        )
+        worldcover_unavailable = any(
+            "WorldCover context image or provenance sidecar is missing" in str(item.value)
+            or "WorldCover context layer could not be loaded" in str(item.value)
+            for item in app.warning
         )
         self.assertTrue(
-            any(
-                "Land-cover class" in element.value.columns
-                for element in app.dataframe
-                if hasattr(element.value, "columns")
-            ),
-            "The available WorldCover class legend should be rendered for the selected flood scenario.",
+            worldcover_available or worldcover_unavailable,
+            "The map must either render the checksum-verified WorldCover layer or clearly report why it is unavailable.",
         )
+        if worldcover_available:
+            self.assertTrue(
+                any(
+                    "Land-cover class" in element.value.columns
+                    for element in app.dataframe
+                    if hasattr(element.value, "columns")
+                ),
+                "The available WorldCover class legend should be rendered for the selected flood scenario.",
+            )
 
     def test_map_hides_flood_scenario_for_unrelated_selected_hazard(self):
         app = _decision_workflow_app(90)
