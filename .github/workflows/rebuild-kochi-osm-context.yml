@@ -14,7 +14,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: rebuild-kochi-osm-context-\${{ github.ref }}
+  group: rebuild-kochi-osm-context-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -24,7 +24,7 @@ jobs:
       - name: Check out the selected branch
         uses: actions/checkout@v4
         with:
-          ref: \${{ github.ref }}
+          ref: ${{ github.ref }}
           fetch-depth: 0
 
       - name: Set up Python 3.11
