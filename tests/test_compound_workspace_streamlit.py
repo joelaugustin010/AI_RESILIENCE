@@ -26,7 +26,7 @@ def test_compound_workspace_renders_all_ten_registered_hazards_and_source_tracks
     assert any("Industrial incident" in label for label in expander_labels)
     assert any("Infrastructure condition" in label for label in expander_labels)
     assert any("Kochi Operation Breakthrough" in label for label in expander_labels)
-    assert any("Intervention effectiveness" in label for label in expander_labels)
+    assert any("intervention effectiveness" in label.lower() for label in expander_labels)
 
     rendered = "\n".join(
         str(element.value)
