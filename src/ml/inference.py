@@ -180,8 +180,25 @@ __all__ = [
 
 def _apply_regression_constraints(value: float, card: dict[str, Any], model_id: str) -> tuple[float, dict[str, Any]]:
     """Apply finite, explicitly documented physical bounds to a regression output."""
-    value, constraints = _apply_regression_constraints(value, card, model_id)
-    return value, constraints
+    if not np.isfinite(value):
+        raise ModelNotUsableError(f"Model {model_id!r} produced a non-finite estimate.")
+    constraints = card.get("prediction_constraints", {})
+    if not isinstance(constraints, dict):
+        raise ModelNotUsableError(f"Model {model_id!r} has invalid prediction constraints.")
+    lower_bound = constraints.get("lower_bound")
+    if lower_bound is not None:
+        try:
+            lower_bound = float(lower_bound)
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise ModelNotUsableError(
+                f"Model {model_id!r} has an invalid lower-bound constraint."
+            ) from exc
+        if not np.isfinite(lower_bound):
+            raise ModelNotUsableError(
+                f"Model {model_id!r} has a non-finite lower-bound constraint."
+            )
+        value = max(float(value), lower_bound)
+    return float(value), constraints
 
 
 def predict_regression_from_context(model_id: str, context: dict[str, Any]) -> dict[str, Any]:
@@ -213,22 +230,7 @@ def predict_regression_from_context(model_id: str, context: dict[str, Any]) -> d
     value = float(np.asarray(pipeline.predict(frame), dtype=float)[0])
     if not np.isfinite(value):
         raise ModelNotUsableError(f"Model {model_id!r} produced a non-finite estimate.")
-    constraints = card.get("prediction_constraints", {})
-    if not isinstance(constraints, dict):
-        raise ModelNotUsableError(f"Model {model_id!r} has invalid prediction constraints.")
-    lower_bound = constraints.get("lower_bound")
-    if lower_bound is not None:
-        try:
-            lower_bound = float(lower_bound)
-        except (TypeError, ValueError, OverflowError) as exc:
-            raise ModelNotUsableError(
-                f"Model {model_id!r} has an invalid lower-bound constraint."
-            ) from exc
-        if not np.isfinite(lower_bound):
-            raise ModelNotUsableError(
-                f"Model {model_id!r} has a non-finite lower-bound constraint."
-            )
-        value = max(value, lower_bound)
+    value, constraints = _apply_regression_constraints(value, card, model_id)
     return {
         "model_id": model_id, "hazard": card.get("hazard"), "task_type": "regression",
         "status": card.get("status"), "estimate": value, "unit": card.get("prediction_unit"),
