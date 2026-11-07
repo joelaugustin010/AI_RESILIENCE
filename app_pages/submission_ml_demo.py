@@ -195,7 +195,11 @@ if selected_cards:
                 if replay.get("location"):
                     inference_inputs["location"] = replay["location"]
                 try:
-                    evidence_result = ml_evidence_for(selected_hazard, inference_inputs)
+                    evidence_result = ml_evidence_for(
+                        selected_hazard,
+                        inference_inputs,
+                        selected_model_id=selected_model_id,
+                    )
                     st.session_state["submission_ml_inference_result"] = {
                         "hazard": selected_hazard,
                         "model_id": selected_model_id,
@@ -263,7 +267,11 @@ if selected_cards:
             if location_required:
                 inference_inputs["location"] = location_value.strip()
             try:
-                evidence_result = ml_evidence_for(selected_hazard, inference_inputs)
+                evidence_result = ml_evidence_for(
+                        selected_hazard,
+                        inference_inputs,
+                        selected_model_id=selected_model_id,
+                    )
                 st.session_state["submission_ml_inference_result"] = {
                     "hazard": selected_hazard,
                     "model_id": selected_model_id,
