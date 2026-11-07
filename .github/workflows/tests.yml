@@ -240,13 +240,15 @@ jobs:
           git push origin "HEAD:${{ github.head_ref }}"
 
   kerala-cross-location-rainfall-research:
-    if: github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'synchronize') && startsWith(github.head_ref, 'research/kerala-cross-region-weather-')
-    needs: test
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'synchronize') && startsWith(github.head_ref, 'research/kerala-cross-region-weather-'))
+    # Run this isolated research experiment with its own focused preflight tests.
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - name: Check out research branch
+      - name: Check out the exact research commit
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
@@ -256,7 +258,11 @@ jobs:
             requirements.txt
             requirements-data.txt
       - name: Install declared dependencies
-        run: python -m pip install -r requirements.txt -r requirements-data.txt
+        run: python -m pip install -r requirements.txt -r requirements-data.txt pytest
+      - name: Compile and test the research experiment
+        run: |
+          python -m py_compile scripts/train_kerala_cross_location_rainfall.py
+          python -m pytest -q tests/test_kerala_cross_location_rainfall.py
       - name: Train spatially held-out Kerala rainfall model
         run: python scripts/train_kerala_cross_location_rainfall.py
       - name: Upload research model and evaluation card
@@ -266,7 +272,6 @@ jobs:
           path: models/research/kerala_cross_location_rainfall_nextday/
           if-no-files-found: error
           retention-days: 14
-
   india-flood-inventory-audit:
     if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'feature/shared-ml-intelligence-')
     needs: test
