@@ -162,11 +162,15 @@ def build_coverage_matrix(*, write: bool = True) -> dict[str, Any]:
             model_id for model_id in model_ids
             if model_id in cards_by_id
         ]
-        usable_ids = [
+        trained_ids = [
             model_id for model_id in registered_ids
+            if statuses[model_id] != "NOT_TRAINED"
+        ]
+        usable_ids = [
+            model_id for model_id in trained_ids
             if statuses[model_id] in {"WEAK_RESEARCH_SIGNAL", "RESEARCH_SIGNAL_NOT_VALIDATED"}
         ]
-        registered_statuses = [statuses[model_id] for model_id in registered_ids]
+        trained_statuses = [statuses[model_id] for model_id in trained_ids]
 
         # A hazard can have more than one model task (for example, a binary
         # cyclone screening model and a continuous wind-change model).  Never
@@ -174,25 +178,25 @@ def build_coverage_matrix(*, write: bool = True) -> dict[str, Any]:
         if support == "screening_model":
             if usable_ids:
                 support = "screening_model"
-            elif not registered_ids:
+            elif not trained_ids:
                 support = "not_trained"
-            elif all(status == "NO_SKILL" for status in registered_statuses):
+            elif all(status == "NO_SKILL" for status in trained_statuses):
                 support = "no_skill_model"
-            elif all(status == "INSUFFICIENT_TEST_EVENTS" for status in registered_statuses):
+            elif all(status == "INSUFFICIENT_TEST_EVENTS" for status in trained_statuses):
                 support = "insufficient_validation"
             else:
                 support = "model_evidence_unavailable"
         elif support == "forcing_evidence_only":
             if usable_ids:
                 support = "forcing_evidence_only"
-            elif not registered_ids:
+            elif not trained_ids:
                 support = "forcing_model_not_trained"
-            elif all(status == "NO_SKILL" for status in registered_statuses):
+            elif all(status == "NO_SKILL" for status in trained_statuses):
                 support = "no_skill_forcing_model"
             else:
                 support = "forcing_model_evidence_unavailable"
         elif support == "exploratory_association":
-            if not any(status == "EXPLORATORY_ASSOCIATION" for status in registered_statuses):
+            if not any(status == "EXPLORATORY_ASSOCIATION" for status in trained_statuses):
                 support = "exploratory_model_unavailable"
         entries.append(
             {
@@ -202,6 +206,7 @@ def build_coverage_matrix(*, write: bool = True) -> dict[str, Any]:
                 "support_level": support,
                 "model_ids": model_ids,
                 "registered_model_ids": registered_ids,
+                "trained_model_ids": trained_ids,
                 "usable_research_model_ids": usable_ids,
                 "model_ids_missing_cards": [model_id for model_id in model_ids if model_id not in cards_by_id],
                 "model_statuses": statuses,
@@ -216,7 +221,7 @@ def build_coverage_matrix(*, write: bool = True) -> dict[str, Any]:
             }
         )
     hazards_with_ml = [
-        entry["hazard"] for entry in entries if entry["registered_model_ids"]
+        entry["hazard"] for entry in entries if entry["trained_model_ids"]
     ]
     hazards_with_usable_models = [
         entry["hazard"] for entry in entries if entry["usable_research_model_ids"]
@@ -244,8 +249,10 @@ def build_coverage_matrix(*, write: bool = True) -> dict[str, Any]:
         "n_hazards": len(entries),
         "n_hazards_with_ml_evidence": len(hazards_with_ml),
         "n_hazards_without_ml": len(hazards_without_ml),
-        "n_hazards_with_registered_model_cards": len(hazards_with_ml),
-        "hazards_with_registered_model_cards": hazards_with_ml,
+        "n_hazards_with_registered_model_cards": sum(bool(entry["registered_model_ids"]) for entry in entries),
+        "hazards_with_registered_model_cards": [
+            entry["hazard"] for entry in entries if entry["registered_model_ids"]
+        ],
         "n_hazards_with_any_usable_research_model": len(hazards_with_usable_models),
         "hazards_with_any_usable_research_model": hazards_with_usable_models,
         "workflow_registry_complete": set(entry["hazard"] for entry in entries) == set(WORKFLOW_HAZARDS),
