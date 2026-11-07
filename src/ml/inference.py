@@ -164,6 +164,12 @@ __all__ = [
 ]
 
 
+def _apply_regression_constraints(value: float, card: dict[str, Any], model_id: str) -> tuple[float, dict[str, Any]]:
+    """Apply finite, explicitly documented physical bounds to a regression output."""
+    value, constraints = _apply_regression_constraints(value, card, model_id)
+    return value, constraints
+
+
 def predict_regression_from_context(model_id: str, context: dict[str, Any]) -> dict[str, Any]:
     """Fail-closed inference for a registered continuous regression model."""
     card = load_model_card(model_id)
