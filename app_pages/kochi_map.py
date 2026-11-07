@@ -827,28 +827,16 @@ if active_hazard is None or active_hazard in landcover_hazards:
             if show_landcover:
                 landcover_bytes = WORLDCOVER_PREVIEW_PATH.read_bytes()
                 validate_worldcover_preview(landcover_bytes, landcover_metadata)
-                landcover_image = base64.b64encode(landcover_bytes).decode("ascii")
-                landcover_bounds = landcover_processing["bounds_epsg4326"]
-                deck_layers.append(
-                    pdk.Layer(
-                        "BitmapLayer",
-                        id="worldcover-2021-context",
-                        image=f"data:image/png;base64,{landcover_image}",
-                        bounds=[
-                            landcover_bounds[0],
-                            landcover_bounds[1],
-                            landcover_bounds[2],
-                            landcover_bounds[3],
-                        ],
-                        opacity=0.58,
-                    )
-                )
-                legend_rows.append(
-                    (
-                        "ESA WorldCover 2021 categorical context",
-                        "ESA WorldCover class colors",
-                        "Land-cover classes only; not hazard severity or exposure",
-                    )
+                # Keep inline data: URIs out of pydeck: its browser-side JSON
+                # accessor parser interprets "data:image..." as JavaScript and
+                # fails on the colon. Render this optional preview separately.
+                st.image(
+                    landcover_bytes,
+                    caption=(
+                        "ESA WorldCover 2021 preview — shown separately from the interactive map. "
+                        "Its source bounds are recorded above; this preview is not an exposure or hazard layer."
+                    ),
+                    width="stretch",
                 )
             class_rows = [
                 {
