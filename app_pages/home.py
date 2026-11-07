@@ -1178,6 +1178,7 @@ navigation_groups = [
             ("app_pages/hospital_vulnerability.py", "Hospital Vulnerability", ":material/local_hospital:"),
             ("app_pages/disaster_assistant.py", "Disaster Intelligence Assistant", ":material/psychology_alt:"),
             ("app_pages/hazard_model_lab.py", "Hazard Model Lab", ":material/model_training:"),
+            ("app_pages/submission_ml_demo.py", "ML Evidence & Demonstration", ":material/science:"),
         ],
     ),
     (
