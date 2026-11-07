@@ -8,7 +8,7 @@
 1. Start on the AI RESILIENCE homepage and explain the Kochi-focused objective.
 2. Open **Decision Workflow**. Select a hazard and show how the workflow combines conditions, evidence quality, uncertainty, exposed services and preparedness actions.
 3. Open **Kochi Map**. Explain the legend before interpreting any layer. Distinguish land cover, infrastructure, exposure and hazard evidence; do not call a land-cover class a danger zone.
-4. Open **ML Evidence & Demonstration**. Select a hazard and show the persisted model card, held-out metrics, baseline and validation gate.
+4. Open **ML Evidence & Demonstration**. Select a hazard, choose one of its registered models, keep **Replay a historical test case** selected, and run the model on the latest complete row from its documented temporal test period. Show the model output and the separately displayed observed target; explain that the target was not passed into the model. The alternative manual mode requires independently sourced values for every feature.
 5. Finish with one concrete mitigation action and one honest limitation. Explain that the system supports preparedness research and does not issue official warnings.
 
 ## 2. What the current supervised-learning work demonstrates
@@ -23,7 +23,7 @@ The repository contains nine persisted research model cards: six classifiers and
 | Next-day maximum temperature at Kochi reanalysis grid | 2,192 | 0.645 | 0.691 (persistence) | 6.67% |
 | 24-hour cyclone wind change (storm-grouped research) | 1,753 | 8.338 | 11.647 (no-change) | 28.41% |
 
-These are retrospective research estimates from the persisted model cards. Units are those recorded by the underlying datasets/model cards. They are not flood forecasts, heat-health warnings, cyclone track/landfall forecasts, or local impact predictions. The weather inputs are reanalysis grid-point data rather than local station observations; the cyclone model uses retrospective best-track data.
+These are retrospective research estimates from the persisted model cards. Units are those recorded by the underlying datasets/model cards. The new interactive replay uses a complete historical row from the model's held-out test period and passes only the declared feature columns to the persisted model; the observed future target is displayed separately for retrospective comparison. It is a reproducible historical demonstration, not a current prediction. These are not flood forecasts, heat-health warnings, cyclone track/landfall forecasts, or local impact predictions. The weather inputs are reanalysis grid-point data rather than local station observations; the cyclone model uses retrospective best-track data.
 
 ### Classification results and caution
 
@@ -51,9 +51,10 @@ This project is a student research and preparedness prototype. It is not an offi
 ## 5. Final pre-submission verification checklist
 
 - [ ] Open the deployed application and confirm every primary navigation page loads.
-- [ ] Confirm the new **ML Evidence & Demonstration** page loads and displays persisted model cards.
+- [ ] Confirm the **ML Evidence & Demonstration** page loads, displays persisted model cards, and completes one historical holdout replay without using the observed target as an input.
+- [ ] Confirm the manual-input path leaves unknown values blank and refuses incomplete/out-of-domain inputs.
 - [ ] Demonstrate one Decision Workflow scenario and its precautions.
-- [ ] Check Kochi map tiles/layers and explain the legend accurately.
+- [ ] Check Kochi map tiles/layers, visible color swatches and plain-language legend explanations.
 - [ ] Verify that no research-only output is described as an operational warning.
 - [ ] Capture screenshots of the homepage, Decision Workflow, Kochi Map and ML demonstration page.
 - [ ] Keep the final source branch/commit and the presentation deck available for submission.
