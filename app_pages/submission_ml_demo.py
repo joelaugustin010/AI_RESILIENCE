@@ -13,7 +13,7 @@ from src.ml.coverage import build_coverage_matrix
 from src.ml.presentation import card_rows, model_rows
 from src.ml.registry import list_model_cards
 from src.ml.service import ml_evidence_for
-from src.ml.submission_summary import rank_classifier_cards, rank_regression_cards
+from src.ml.submission_summary import rank_classifier_cards, rank_regression_cards, regression_baseline_label
 from src.ml.validation_gates import model_card_validation_gate
 from src.ui_theme import page_header
 
@@ -72,8 +72,8 @@ if regressors:
     st.markdown("#### Strongest regression result against its recorded baseline")
     st.metric(
         best.get("hazard", best.get("model_id", "Regression model")),
-        f"{skill * 100:.1f}% lower MAE than persistence",
-        help="Computed from the persisted model card's held-out MAE skill metric.",
+        f"{skill * 100:.1f}% lower MAE than the recorded baseline",
+        help="Computed against the comparator recorded in this model card; the comparator may be persistence or a no-change baseline.",
     )
     baseline = metrics.get("persistence_baseline") or {}
     baseline_label = (
@@ -171,8 +171,8 @@ if entry.get("trained_model_ids"):
                 st.dataframe(
                     pd.DataFrame([
                         {"Metric": "Held-out MAE", "Value": metrics.get("mae")},
-                        {"Metric": "Persistence baseline MAE", "Value": (metrics.get("persistence_baseline") or {}).get("mae")},
-                        {"Metric": "MAE skill over persistence", "Value": metrics.get("mae_skill_over_persistence")},
+                        {"Metric": "Recorded baseline MAE", "Value": (metrics.get("persistence_baseline") or {}).get("mae")},
+                        {"Metric": "MAE skill over recorded baseline", "Value": metrics.get("mae_skill_over_persistence")},
                         {"Metric": "Held-out RMSE", "Value": metrics.get("rmse")},
                         {"Metric": "Held-out R²", "Value": metrics.get("r2")},
                         {"Metric": "Held-out cases", "Value": metrics.get("n")},
@@ -225,6 +225,8 @@ if entry.get("trained_model_ids"):
                         "not geographic transfer or operational reliability."
                     )
             st.write("**Research target:**", card.get("target_definition", "Not documented"))
+            if card.get("status_reason"):
+                st.caption(f"Model-card status rationale: {card['status_reason']}")
             feature_columns = card.get("feature_columns") or []
             if feature_columns:
                 with st.expander("Inspect model feature set", expanded=False):
