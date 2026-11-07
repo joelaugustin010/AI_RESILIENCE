@@ -142,9 +142,23 @@ LIMITATIONS: dict[str, list[str]] = {
 }
 
 
+TRAINED_MODEL_STATUSES = {
+    "NO_SKILL",
+    "WEAK_RESEARCH_SIGNAL",
+    "RESEARCH_SIGNAL_NOT_VALIDATED",
+    "EXPLORATORY_ASSOCIATION",
+    "INSUFFICIENT_TEST_EVENTS",
+}
+
+
 def _card_status(cards_by_id: dict[str, dict[str, Any]], model_id: str) -> str:
     card = cards_by_id.get(model_id)
-    return str(card.get("status", "NOT_TRAINED")) if card else "NOT_TRAINED"
+    if not card:
+        return "NOT_TRAINED"
+    status = str(card.get("status") or "NOT_TRAINED").strip()
+    if status == "NOT_TRAINED" or status in TRAINED_MODEL_STATUSES:
+        return status
+    return "INVALID_STATUS"
 
 
 def build_coverage_matrix(*, write: bool = True) -> dict[str, Any]:
@@ -164,7 +178,7 @@ def build_coverage_matrix(*, write: bool = True) -> dict[str, Any]:
         ]
         trained_ids = [
             model_id for model_id in registered_ids
-            if statuses[model_id] != "NOT_TRAINED"
+            if statuses[model_id] in TRAINED_MODEL_STATUSES
         ]
         usable_ids = [
             model_id for model_id in trained_ids
