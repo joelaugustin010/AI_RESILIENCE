@@ -1,13 +1,14 @@
 """Streamlit acceptance tests for the all-hazard compound workspace."""
+from pathlib import Path
+
 from streamlit.testing.v1 import AppTest
 
 from src.hazard_registry import WORKFLOW_HAZARDS
 
 
 def test_compound_workspace_renders_all_ten_registered_hazards_and_source_tracks():
-    app = AppTest.from_file(
-        "app_pages/compound_scenario.py", default_timeout=90
-    ).run()
+    app_path = Path(__file__).resolve().parents[1] / "app_pages" / "compound_scenario.py"
+    app = AppTest.from_file(str(app_path), default_timeout=90).run()
     assert not app.exception
     assert any(
         item.value == "Kochi Multi-Hazard Resilience Workspace"
