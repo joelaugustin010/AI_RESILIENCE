@@ -226,7 +226,7 @@ def build_coverage_matrix(*, write: bool = True) -> dict[str, Any]:
     hazards_with_usable_models = [
         entry["hazard"] for entry in entries if entry["usable_research_model_ids"]
     ]
-    hazards_without_ml = [entry["hazard"] for entry in entries if not entry["model_ids"]]
+    hazards_without_ml = [entry["hazard"] for entry in entries if not entry["trained_model_ids"]]
     usable_statuses = {"WEAK_RESEARCH_SIGNAL", "RESEARCH_SIGNAL_NOT_VALIDATED"}
     hazards_with_component_research_evidence = [
         entry["hazard"] for entry in entries
