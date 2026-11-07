@@ -275,8 +275,19 @@ def historical_replay_context(model_id: str) -> dict[str, Any]:
     cutoff_timestamp = pd.to_datetime(cutoff, utc=True).tz_convert(None)
     frame = frame.loc[frame[date_column] >= cutoff_timestamp]
     frame = frame.dropna(subset=required)
+    # Select a held-out row inside every recorded feature domain so the same
+    # out-of-training-range gate used by inference will not reject the replay.
+    for name in features:
+        bounds = (card.get("feature_ranges") or {}).get(name, {})
+        if isinstance(bounds, dict) and bounds.get("min") is not None and bounds.get("max") is not None:
+            values = pd.to_numeric(frame[name], errors="coerce")
+            frame = frame.loc[
+                values.between(float(bounds["min"]), float(bounds["max"]), inclusive="both")
+            ]
     if frame.empty:
-        raise ValueError("No complete historical test-period row is available for this model.")
+        raise ValueError(
+            "No complete in-domain historical test-period row is available for this model."
+        )
     row = frame.sort_values(date_column).iloc[-1]
     context: dict[str, float] = {}
     for name in features:
@@ -297,7 +308,7 @@ def historical_replay_context(model_id: str) -> dict[str, Any]:
         "source": provenance.get("source") or dataset.provenance.get("source"),
         "source_type": provenance.get("source_type") or dataset.provenance.get("source_type"),
         "location": provenance.get("location"),
-        "case_role": "latest complete row in the documented temporal test holdout",
+        "case_role": "latest complete in-domain row in the documented temporal test holdout",
         "warning": (
             "Retrospective historical replay only. The observed target is shown "
             "separately and is never supplied to the model."
