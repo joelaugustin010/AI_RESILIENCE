@@ -4,7 +4,7 @@
 The nine persisted models remain research artifacts. Synthetic data and simulation outputs cannot replace observed ground truth. This PR adds evaluation/monitoring tools but does not claim external datasets have been acquired or independently adjudicated.
 
 ## Phase 1 — Pipeline and deployment
-PR #97 is merged. Its CI verifies model artifact integrity, model-card scope, HTTPS Streamlit health and application-shell availability. HTTP health is not proof that Streamlit loaded the intended weights or that inference is valid. A deployed inference probe still needs to expose a non-sensitive build SHA, model ID, artifact SHA-256, feature-schema hash, input source timestamps and inference status.
+PR #97 is merged. CI verifies model artifact integrity, model-card scope, HTTPS Streamlit health and application-shell availability. This PR adds `scripts/verify_model_runtime.py` to deserialize all nine committed model binaries in the CI environment, verify their inference interfaces and compare loaded feature counts with model cards. This is still a checkout-level check, not proof that the live Streamlit process loaded the same weights. A deployed inference probe still needs to expose a non-sensitive build SHA, model ID, artifact SHA-256, feature-schema hash, input source timestamps and inference status.
 
 The shadow monitor computes KS statistics and PSI for numeric features, input-age and latency percentiles, source/model failure counts and a safe state. Drift is an alert, not permission to auto-swap models. A baseline fallback is eligible only when separately validated and explicitly approved; otherwise abstain and show deterministic preparedness guidance. Deployment rollback must be triggered by verified release-health failure and retain the last known-good release.
 
@@ -39,3 +39,10 @@ Judge-facing scope: AI_RESILIENCE is an evidence-gated multi-hazard decision-sup
 ## Executable observation-panel audit
 
 Run `python scripts/audit_observation_panel.py --kind flood --input <frozen_event_panel.csv>` or use `--kind landslide` for monitored site-period records. The audit checks required provenance fields, UTC timestamp offsets and monitored non-event requirements. Its output deliberately sets `training_ready=false`; a clean schema audit is not scientific adjudication or permission to train. It cannot validate the truth of a publisher's records or replace field review.
+
+
+## GitHub Actions startup failure investigation (2026-11-07)
+
+Runs 866 (PR #101), 868 (PR #99), 876 and 878 (PR #101), and 880 (PR #99) were inspected. The Windows test job and Ubuntu provenance job failed with no step records, no job log URL, and no downloadable log content (the log endpoint returned BlobNotFound). On PR #101, the independent Ubuntu rainfall-research job also failed with the same empty-step signature after it was detached from the full test job. Rerun requests were accepted but did not produce a step-level failure to diagnose.
+
+The workflow was changed on PR #99 to use Ubuntu for the main test job and to cancel superseded branch runs; the same startup signature persisted. The PR #101 research job was made independently dispatchable and given its own compile and focused-test preflight, but the run still failed before steps began. This evidence does not support attributing the failure to Python dependencies, test assertions, or the training script. It is consistent with a GitHub Actions control-plane/runner-admission problem, but the exact platform-side reason is not exposed by the available run/job APIs. The billing usage summary previously reviewed did not establish that a budget limit was reached. Do not claim billing exhaustion or alter workflow/test code to mask this failure. Escalation to GitHub Support with run IDs and timestamps is required for internal platform diagnostics.
