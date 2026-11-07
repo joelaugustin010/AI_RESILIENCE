@@ -40,8 +40,8 @@ class ProvenanceLineEndingTests(unittest.TestCase):
                 # Git may materialize either LF or CRLF depending on checkout
                 # configuration. Compare both byte representations against the
                 # recorded source digest; do not silently rewrite the register.
-                lf = raw.replace(b"\\r\\n", b"\\n").replace(b"\\r", b"\\n")
-                crlf = lf.replace(b"\\n", b"\\r\\n")
+                lf = raw.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+                crlf = lf.replace(b"\n", b"\r\n")
                 candidates = {
                     hashlib.sha256(raw).hexdigest(),
                     hashlib.sha256(lf).hexdigest(),
