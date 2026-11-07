@@ -70,7 +70,7 @@ workflow, but it has not run yet.
 
 After pinning the critical Linux jobs to `ubuntu-24.04`, PRs #99 and #101 were
 closed/reopened to emit fresh pull-request events and their failed jobs were
-rerun. Runs 896, 897, 901, 902 and 904 still show failed jobs with
+rerun. Runs 896, 897, 901, 902, 904 and 906 still show failed jobs with
 `steps=null`; the log download endpoint returns `BlobNotFound`. Thus the
 runner-image alias was not the cause. The public GitHub Status page currently
 reports Actions operational and no incident on 2026-11-07, although it records
