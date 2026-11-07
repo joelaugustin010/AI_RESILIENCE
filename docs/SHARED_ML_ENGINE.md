@@ -172,3 +172,14 @@ accept Kochi/Cochin location text only; they are not silently transferred to
 other Kerala districts or other cities. This is a geographic applicability gate,
 not proof of neighborhood-scale accuracy: the underlying source remains one
 reanalysis grid point and does not resolve street-level rainfall or heat.
+
+## Out-of-domain prediction guard
+
+Both classifier and regression inference now compare supplied numeric features
+with the training envelope recorded in the model card. If any required input is
+outside the observed minimum/maximum range, inference is withheld rather than
+silently extrapolated. Regression cards now persist the same feature-range
+metadata as classifier cards. This guard is intentionally conservative: it can
+withhold a useful extreme-event estimate, but it avoids presenting unsupported
+extrapolation as a meaningful forecast. It does not replace external validation
+or detect every form of distribution shift.
