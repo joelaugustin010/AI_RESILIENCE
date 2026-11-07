@@ -1,0 +1,82 @@
+name: Rebuild Kochi OSM road and bridge context
+
+on:
+  push:
+    branches:
+      - integration/autonomous-hardening-20261105
+    paths:
+      - "scripts/rebuild_kochi_osm_context.py"
+      - "test_rebuild_kochi_osm_context.py"
+      - ".github/workflows/rebuild-kochi-osm-context.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rebuild-kochi-osm-context-\${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the selected branch
+        uses: actions/checkout@v4
+        with:
+          ref: \${{ github.ref }}
+          fetch-depth: 0
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install test runner
+        run: python -m pip install --disable-pip-version-check pytest
+
+      - name: Test reproducible context rebuild
+        run: python -m pytest -q test_rebuild_kochi_osm_context.py test_osm_context_layers.py
+
+      - name: Rebuild bridge and major-road layers from verified OSM source
+        run: python scripts/rebuild_kochi_osm_context.py --replace
+
+      - name: Verify rebuilt sidecar hashes and map eligibility
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          root = Path("data/processed/spatial_layers")
+          names = (
+              "openstreetmap_bridges_kochi_context",
+              "openstreetmap_major_roads_kochi_context",
+          )
+          for name in names:
+              data_path = root / f"{name}.geojson"
+              metadata_path = root / f"{name}.metadata.json"
+              metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+              actual = hashlib.sha256(data_path.read_bytes()).hexdigest()
+              assert metadata["validation"]["source_sha256"] == actual, name
+              assert metadata["validation"]["errors"] == [], name
+              assert metadata["layer_role"] == "context", name
+              assert "not used for exposure" in metadata["analysis_status"], name
+              print(name, metadata["processed_feature_count"], actual)
+          PY
+
+      - name: Commit regenerated context files when changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            data/processed/spatial_layers/openstreetmap_bridges_kochi_context.geojson \
+            data/processed/spatial_layers/openstreetmap_bridges_kochi_context.metadata.json \
+            data/processed/spatial_layers/openstreetmap_major_roads_kochi_context.geojson \
+            data/processed/spatial_layers/openstreetmap_major_roads_kochi_context.metadata.json
+          if git diff --cached --quiet; then
+            echo "Generated files already match the verified source."
+          else
+            git commit -m "Rebuild Kochi OSM bridge and major-road context"
+            git push origin "HEAD:\${GITHUB_REF_NAME}"
+          fi
