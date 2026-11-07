@@ -66,3 +66,14 @@ def test_both_hero_calls_to_action_navigate():
         app.button(key=key).click().run()
         assert not app.exception
         assert "ar-cine-hero" not in _markup(app)
+
+
+def test_original_home_has_compact_1400x900_desktop_layout():
+    html = _markup(_home())
+    assert "ar-cine-hero" in html
+    assert "height: 520px !important" in html
+    assert "min-height: 520px !important" in html
+    assert "st-key-ar-hero-ctas" in html
+    # The original multi-image hero and optional local video remain in place.
+    assert "hero-kerala-ghats.jpg" in html
+    assert "hero-kerala-landslide.jpg" in html
