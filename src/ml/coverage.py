@@ -235,8 +235,7 @@ def build_coverage_matrix(*, write: bool = True) -> dict[str, Any]:
     hazards_with_usable_research_model = [
         entry["hazard"] for entry in entries
         if entry["support_level"] == "screening_model"
-        and bool(entry["model_ids"])
-        and entry["model_statuses"].get(entry["model_ids"][0]) in usable_statuses
+        and bool(entry["usable_research_model_ids"])
     ]
     hazards_without_usable_research_model = [
         entry["hazard"] for entry in entries
@@ -267,11 +266,11 @@ def build_coverage_matrix(*, write: bool = True) -> dict[str, Any]:
         "coverage_complete": set(entry["hazard"] for entry in entries) == set(WORKFLOW_HAZARDS),
         "validated_models": 0,
         "interpretation": (
-            f"Every workflow hazard is represented. {len(hazards_with_ml)} hazards have a registered ML artifact, "
+            f"Every workflow hazard is represented. {len(hazards_with_ml)} hazards have at least one trained model card, "
             f"{len(hazards_with_usable_research_model)} have a usable hazard-specific research model, "
             f"{len(hazards_with_component_research_evidence)} have usable component research evidence, "
             f"{len(hazards_with_usable_models)} have at least one usable research model, "
-            f"and {len(hazards_without_ml)} have no registered model card. "
+            f"and {len(hazards_without_ml)} have no trained model evidence. "
             "Zero models are independently validated for operational use. Coverage is not predictive validity."
         ),
         "entries": entries,
