@@ -73,6 +73,7 @@ from src.phase2_data import (
 from src.rainfall_forecast import RainfallForecastError, run_manual_rainfall_backtest
 from src.uncertainty import build_uncertainty_register
 from src.population_exposure import PopulationExposureError, estimate_population_exposure
+from src.flood_footprint import FloodFootprintError, summarize_flood_depth_geojson
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -1622,6 +1623,91 @@ for item in consequence_assessment["required_evidence"]:
     st.markdown(f"- {item}")
 st.warning(consequence_assessment["scientific_guardrail"])
 st.caption(consequence_assessment["probability_semantics"])
+
+if inputs.get("hazard") == "Flood":
+    with st.expander("Flood extent and depth analysis (upload a measured/modelled depth layer)", expanded=False):
+        st.caption(
+            "This tool makes extent and depth summaries available when you provide a quality-checked "
+            "flood-depth GeoJSON. It measures supplied data; it does not simulate or forecast flooding."
+        )
+        depth_file = st.file_uploader(
+            "Flood-depth GeoJSON (polygon features with a numeric depth_m property)",
+            type=["geojson", "json"],
+            key="flood_depth_geojson_upload",
+        )
+        depth_field = st.text_input("Depth property name", value="depth_m", key="flood_depth_property")
+        depth_source = st.text_input(
+            "Flood-depth dataset source URL", key="flood_depth_source_url", placeholder="https://…"
+        )
+        depth_event_date = st.text_input(
+            "Event / model reference date", key="flood_depth_event_date", placeholder="YYYY-MM-DD"
+        )
+        depth_provenance = st.checkbox(
+            "I verified the source, event date, horizontal CRS, vertical datum, depth units, coverage and reuse terms.",
+            key="flood_depth_provenance_confirmed",
+        )
+        if st.button("Summarize supplied flood extent and depth", key="summarize_flood_depth"):
+            if not depth_file:
+                st.error("Upload a flood-depth GeoJSON file.")
+            elif not depth_source.startswith("https://"):
+                st.error("Provide the dataset's HTTPS source URL.")
+            elif not depth_event_date.strip():
+                st.error("Provide the event or model reference date.")
+            elif not depth_provenance:
+                st.error("Verify the dataset metadata before calculating.")
+            else:
+                try:
+                    depth_payload = json.loads(depth_file.getvalue().decode("utf-8-sig"))
+                    depth_summary = summarize_flood_depth_geojson(
+                        depth_payload, depth_field=depth_field.strip() or "depth_m"
+                    )
+                    st.session_state["flood_depth_summary"] = {
+                        **depth_summary,
+                        "source_url": depth_source.strip(),
+                        "event_date": depth_event_date.strip(),
+                        "file_sha256": hashlib.sha256(depth_file.getvalue()).hexdigest(),
+                        "hazard": str(inputs.get("hazard", "")),
+                    }
+                    st.session_state.pop("flood_depth_error", None)
+                except (UnicodeDecodeError, json.JSONDecodeError, FloodFootprintError, ValueError) as exc:
+                    st.session_state.pop("flood_depth_summary", None)
+                    st.session_state["flood_depth_error"] = str(exc)
+
+        if st.session_state.get("flood_depth_error"):
+            st.error(f"Flood-depth analysis blocked: {st.session_state['flood_depth_error']}")
+        saved_depth = st.session_state.get("flood_depth_summary")
+        current_depth_hash = hashlib.sha256(depth_file.getvalue()).hexdigest() if depth_file else None
+        if saved_depth and (
+            saved_depth.get("file_sha256") != current_depth_hash
+            or saved_depth.get("source_url") != depth_source.strip()
+            or saved_depth.get("event_date") != depth_event_date.strip()
+            or saved_depth.get("hazard") != str(inputs.get("hazard", ""))
+        ):
+            st.warning("The saved flood-depth summary no longer matches the selected file or metadata. Recalculate it.")
+        elif saved_depth:
+            st.warning(
+                "MEASURED / MODEL-SUPPLIED LAYER SUMMARY — not a new flood prediction. "
+                "Do not use this output as an evacuation or route-safety instruction."
+            )
+            st.metric("Flood extent in supplied layer", f"{saved_depth['flooded_extent_km2']:.4f} km²")
+            st.metric("Area-weighted mean supplied depth", f"{saved_depth['area_weighted_mean_depth_m']:.3f} m")
+            st.metric("Maximum supplied polygon depth", f"{saved_depth['maximum_polygon_depth_m']:.3f} m")
+            st.write("**Area by descriptive depth band (not damage/safety thresholds)**")
+            display_dataframe(
+                pd.DataFrame([
+                    {"Depth band": key.replace("_", " ").replace("m", "m"), "Area (km²)": value}
+                    for key, value in saved_depth["area_by_depth_band_km2"].items()
+                ]),
+                hide_index=True, width="stretch",
+                alt="Area of supplied flood-depth polygons by descriptive depth band",
+            )
+            st.caption(
+                f"Reference date: {saved_depth['event_date']} · "
+                f"{saved_depth['polygon_count']:,} polygons · "
+                f"Source: {saved_depth['source_url']}"
+            )
+            for limitation in saved_depth["limitations"]:
+                st.caption(f"• {limitation}")
 
 with st.expander("Population exposure calculator (GeoJSON evidence inputs)", expanded=False):
     st.caption(
