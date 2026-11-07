@@ -10,7 +10,7 @@ import pandas as pd
 import streamlit as st
 
 from src.ml.coverage import build_coverage_matrix
-from src.ml.presentation import card_rows
+from src.ml.presentation import card_rows, model_rows
 from src.ml.registry import list_model_cards
 from src.ml.service import ml_evidence_for
 from src.ml.submission_summary import rank_classifier_cards, rank_regression_cards
