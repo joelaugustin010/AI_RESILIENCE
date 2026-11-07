@@ -18,14 +18,14 @@ import streamlit as st
 # page headers keep their own character while sharing typography and spacing.
 ACCENTS: dict[str, str] = {
     # Shared eco palette; hazard-specific colours remain distinct from severity.
-    "teal": "#247A65",
-    "cyan": "#83B9A5",
-    "blue": "#328BCB",
-    "emerald": "#31866B",
-    "amber": "#C5A13A",
-    "orange": "#D58A36",
-    "violet": "#8064B5",
-    "rose": "#C85C5C",
+    "teal": "#174E55",
+    "cyan": "#299B91",
+    "blue": "#4F8290",
+    "emerald": "#4F8A76",
+    "amber": "#9A6A25",
+    "orange": "#B97845",
+    "violet": "#76669A",
+    "rose": "#B94343",
 }
 
 
