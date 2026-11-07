@@ -1422,3 +1422,69 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+
+# Original cinematic homepage: compact desktop first-screen layout.
+# Keeps the existing Kerala image sequence, optional local video and copy.
+st.markdown(
+    """
+    <style>
+    @media (min-width: 1200px) and (min-height: 820px) {
+      .ar-cine-hero {
+        box-sizing: border-box !important;
+        height: 520px !important;
+        min-height: 520px !important;
+        padding: 2.25rem 3rem 4.15rem !important;
+      }
+      .ar-cine-inner {
+        max-width: 820px !important;
+        padding-top: .4rem !important;
+      }
+      .ar-cine-topline {
+        margin-bottom: 1.35rem !important;
+      }
+      .ar-cine-title {
+        font-size: clamp(3.8rem, 5.5vw, 5.2rem) !important;
+        line-height: .96 !important;
+      }
+      .ar-cine-sub {
+        max-width: 700px !important;
+        margin-top: .85rem !important;
+        font-size: 1.18rem !important;
+        line-height: 1.35 !important;
+      }
+      .ar-cine-desc {
+        max-width: 680px !important;
+        margin-top: .55rem !important;
+        font-size: .91rem !important;
+        line-height: 1.5 !important;
+      }
+      .ar-cine-chips {
+        margin-top: .8rem !important;
+        gap: .4rem !important;
+      }
+      .ar-cine-chips span {
+        padding: .3rem .62rem !important;
+        font-size: .68rem !important;
+      }
+      .ar-cine-foot {
+        bottom: 1.05rem !important;
+      }
+      .st-key-ar-hero-ctas {
+        margin-top: -3.25rem !important;
+      }
+      .st-key-ar-hero-ctas [data-testid="stButton"] > button {
+        min-height: 2.75rem !important;
+      }
+      .ar-signal {
+        margin-top: 1.55rem !important;
+      }
+      .ar-signal > div {
+        padding-top: .8rem !important;
+        padding-bottom: .8rem !important;
+      }
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
