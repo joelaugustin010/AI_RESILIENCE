@@ -139,6 +139,218 @@
       ]
     },
     {
+      "id": "landslide",
+      "title": "Landslide and slope-failure preparedness",
+      "keywords": [
+        "landslide",
+        "landslip",
+        "mudslide",
+        "slope failure",
+        "debris flow",
+        "rockfall",
+        "hillside",
+        "western ghats"
+      ],
+      "summary": "Landslide risk depends on rainfall, slope material, drainage, vegetation, excavation, and prior slope movement. The project holds only a small, media-reported historical catalogue and an unusable local susceptibility layer, so it does not assign a landslide class to a ward, road, or slope.",
+      "actions": [
+        "Follow official KSDMA, IMD, and district-administration warnings; do not treat this assistant as an early-warning service.",
+        "Avoid hill roads and steep slopes during intense or prolonged rainfall, especially where cracks, leaning trees, tilted poles, or new springs are visible.",
+        "If authorities advise evacuation, leave early by a safe route; do not wait for the slope to fail.",
+        "Refer any slope-stability concern to a qualified geotechnical authority for site assessment; do not rely on a statewide map to certify local safety."
+      ],
+      "limitations": [
+        "The project's GSI susceptibility polygons fail geometry validity checks and cannot be used for local classification.",
+        "The NASA Global Landslide Catalog entries naming Ernakulam are historical examples with reporting bias and stated coordinate uncertainty, not a complete event inventory or frequency estimate.",
+        "This assistant cannot predict when or where a specific slope will fail."
+      ],
+      "sources": [
+        {
+          "publisher": "Kerala State Disaster Management Authority / Geological Survey of India",
+          "title": "Hazard maps and disaster information",
+          "url": "https://sdma.kerala.gov.in/hazard-maps/"
+        },
+        {
+          "publisher": "NASA",
+          "title": "NASA open data and Global Landslide Catalog context",
+          "url": "https://data.nasa.gov/"
+        }
+      ]
+    },
+    {
+      "id": "extreme_weather",
+      "title": "Cyclone, storm, heatwave and lightning preparedness",
+      "keywords": [
+        "cyclone",
+        "storm",
+        "severe weather",
+        "heatwave",
+        "heat wave",
+        "extreme heat",
+        "lightning",
+        "thunderstorm",
+        "high wind",
+        "storm surge",
+        "imd warning"
+      ],
+      "summary": "Cyclones, severe storms, heatwaves, and lightning can disrupt power, communications, transport, water, and health services. The project holds regional storm-track context but no validated Ernakulam impact series, so it does not estimate local wind, storm-surge, heat, or lightning likelihood.",
+      "actions": [
+        "Use official IMD bulletins and KSDMA or district instructions for alert interpretation and evacuation decisions.",
+        "Secure loose outdoor objects only when it is safe; stay indoors during high winds and lightning and avoid trees, poles, and open ground.",
+        "Plan for power, communication, drinking-water, medicine, and transport disruption, including backup arrangements for critical services.",
+        "During extreme heat, reduce outdoor exertion, check on vulnerable people, and use cooling or hydration measures consistent with official heat-action guidance."
+      ],
+      "limitations": [
+        "Regional IBTrACS track positions do not establish Ernakulam landfall, local wind, storm surge, rainfall, damage, or district impact.",
+        "No live weather feed is connected; the assistant cannot issue or confirm a warning.",
+        "Heat and lightning advice is general preparedness guidance, not a local forecast."
+      ],
+      "sources": [
+        {
+          "publisher": "India Meteorological Department",
+          "title": "Official weather information and warnings",
+          "url": "https://mausam.imd.gov.in/"
+        },
+        {
+          "publisher": "National Disaster Management Authority",
+          "title": "Disaster management guidance",
+          "url": "https://ndma.gov.in/"
+        },
+        {
+          "publisher": "Kerala State Disaster Management Authority",
+          "title": "Hazard maps and disaster information",
+          "url": "https://sdma.kerala.gov.in/hazard-maps/"
+        }
+      ]
+    },
+    {
+      "id": "industrial_accident",
+      "title": "Industrial and chemical incident preparedness",
+      "keywords": [
+        "industrial accident",
+        "chemical accident",
+        "chemical leak",
+        "gas leak",
+        "chemical spill",
+        "factory fire",
+        "explosion",
+        "hazardous material",
+        "hazmat",
+        "ammonia",
+        "chlorine",
+        "toxic gas"
+      ],
+      "summary": "Industrial and chemical incidents can release toxic, flammable, or asphyxiant substances and may be worsened by flooding or fire. The project contains general industrial-area context and dated air monitoring, but no validated facility incident inventory, safe-distance model, or source-attribution result.",
+      "actions": [
+        "For an active release, call 112 or 101, move away and upwind if it is safe, and follow official evacuation or shelter-in-place instructions.",
+        "Do not re-enter an affected area or attempt to identify the substance yourself; wait for the responding authority.",
+        "Report the location, visible plume or odour, and symptoms to emergency services without approaching the source.",
+        "Facilities should maintain process-hazard analysis, emergency plans, drills, and coordination with the pollution-control and fire authorities."
+      ],
+      "limitations": [
+        "The project does not calculate a safe evacuation distance, plume extent, or facility-specific risk.",
+        "Air-quality measurements cannot by themselves identify the facility responsible for a release.",
+        "No verified Ernakulam industrial-incident event series is available in the project."
+      ],
+      "sources": [
+        {
+          "publisher": "National Disaster Management Authority",
+          "title": "Chemical disaster management guidance",
+          "url": "https://ndma.gov.in/"
+        },
+        {
+          "publisher": "Kerala State Pollution Control Board",
+          "title": "Water and air quality directory",
+          "url": "https://kspcb.kerala.gov.in/water-and-air-quality-directory"
+        },
+        {
+          "publisher": "Kerala Fire and Rescue Services",
+          "title": "Fire and rescue services",
+          "url": "https://fire.kerala.gov.in/"
+        }
+      ]
+    },
+    {
+      "id": "hospital_preparedness",
+      "title": "Hospital and health-service preparedness",
+      "keywords": [
+        "hospital",
+        "healthcare",
+        "health facility",
+        "critical care",
+        "backup power",
+        "patient evacuation",
+        "surge capacity",
+        "continuity of care",
+        "ambulance",
+        "hospital vulnerability"
+      ],
+      "summary": "Hospital preparedness covers continuity of power, water, oxygen, communications, staffing, supplies, access routes, and patient evacuation. The project has a hospital directory review and a normal-condition network cache, but no validated facility vulnerability ranking or disaster-time accessibility result.",
+      "actions": [
+        "Review continuity plans for power, water, oxygen, medical gases, communications, and essential supplies, including backup duration and fuel arrangements.",
+        "Identify alternate access routes and ambulance pick-up points, and coordinate them with district authorities and neighbouring facilities.",
+        "Plan patient evacuation, surge capacity, triage, infection control, and decontamination with the responsible health authorities.",
+        "Record the source, date, scope, and validation status of facility data before using it for planning; resolve coordinate and operational-status gaps first."
+      ],
+      "limitations": [
+        "All reviewed NIHFW coordinate rows are marked NOT VALIDATED; coordinate order, CRS, and positional quality are not established.",
+        "The network cache covers normal-condition drive times with assumed speeds and no observed traffic; it is not a disaster-time accessibility assessment.",
+        "No validated hospital vulnerability ranking exists in the project because facility hazard, structural, continuity, and scoring evidence are incomplete."
+      ],
+      "sources": [
+        {
+          "publisher": "National Institute of Health and Family Welfare (NIHFW), Government of India",
+          "title": "National Hospital Directory — Ernakulam coordinate quality review",
+          "url": "https://www.data.gov.in/resource/national-hospital-directory-geo-code-and-additional-parameters-updated-till-last-month"
+        },
+        {
+          "publisher": "Department of Health and Family Welfare, Government of Kerala",
+          "title": "Kerala health services",
+          "url": "https://health.kerala.gov.in/"
+        }
+      ]
+    },
+    {
+      "id": "mitigation_preparedness",
+      "title": "Mitigation, budget and preparedness planning",
+      "keywords": [
+        "mitigation",
+        "preparedness",
+        "risk reduction",
+        "intervention",
+        "budget",
+        "project cost",
+        "resilience",
+        "adaptation",
+        "early warning",
+        "maintenance",
+        "smart mitigation"
+      ],
+      "summary": "Mitigation planning links a documented risk to a candidate intervention, an evidence basis, a cost basis, technical review, and maintenance. The project's catalogue contains guideline candidates only; it does not rank effectiveness or certify that a funded project will reduce risk.",
+      "actions": [
+        "State the hazard, location, exposed assets, and decision trigger before selecting an intervention.",
+        "Record a source, date, scope, and unit basis for every cost; treat 'Cost unknown' as a gap rather than zero cost.",
+        "Require technical review and geotechnical, hydrological, or engineering assessment before approving a project.",
+        "Include maintenance, monitoring, co-benefits, and residual risk, and prefer low-regret measures that are robust to uncertainty."
+      ],
+      "limitations": [
+        "The 13 catalogue records are guideline candidates with 'Cost unknown' status; the budget page performs arithmetic on user-entered estimates only.",
+        "No validated local effectiveness ranking or benefit-cost result is available.",
+        "A project fitting a budget does not prove technical feasibility or risk reduction."
+      ],
+      "sources": [
+        {
+          "publisher": "Kerala State Disaster Management Authority",
+          "title": "Hazard maps and disaster information",
+          "url": "https://sdma.kerala.gov.in/hazard-maps/"
+        },
+        {
+          "publisher": "National Disaster Management Authority",
+          "title": "Disaster management guidance",
+          "url": "https://ndma.gov.in/"
+        }
+      ]
+    },
+    {
       "id": "compound",
       "title": "Compound disasters and critical services",
       "keywords": [
