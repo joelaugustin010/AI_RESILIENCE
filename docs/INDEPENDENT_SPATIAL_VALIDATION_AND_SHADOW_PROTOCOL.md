@@ -82,3 +82,27 @@ The tool is an evaluation harness. It does not supply missing observations,
 establish that an external dataset is licensed or representative, or turn
 research models into warnings. Synthetic data may be used for unit tests only,
 never for benchmark scores or ground-truth claims.
+
+
+## Runtime drift, freshness, latency and fallback
+
+`src.ml.production_monitoring.evaluate_production_health` calculates per-feature
+two-sample KS statistics/p-values, PSI, input age, p95 latency, out-of-domain
+rate and inference failure rate. Freshness, latency, OOD and failure budgets
+must be supplied from a reviewed deployment policy; this code does not invent
+local operational thresholds.
+
+PSI 0.20 and KS p-value 0.01 are configurable initial tripwires only, not
+universal scientific limits. Their false-alarm behaviour must be assessed for
+each feature and sample cadence before production. Any trigger returns
+`DETERMINISTIC_SCREENING_ONLY`: withhold ML-derived risk outputs and retain
+the existing evidence-gated deterministic assessment with its limitations.
+This is not a claim that a baseline is independently validated.
+
+The monitor does not issue alerts or execute rollback. A deployment controller
+must record the previously healthy artifact version, revert the deployment,
+and verify health and artifact identity after rollback. Streamlit's public
+health endpoint and root page smoke test do not prove which weights the running
+process loaded. A read-only, non-secret diagnostic endpoint exposing the app
+commit, registry version, artifact SHA-256 and inference self-test result is
+still required before artifact identity can be verified end-to-end.
