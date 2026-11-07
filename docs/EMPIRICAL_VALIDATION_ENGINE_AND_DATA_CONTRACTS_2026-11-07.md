@@ -46,3 +46,34 @@ Run `python scripts/audit_observation_panel.py --kind flood --input <frozen_even
 Runs 866 (PR #101), 868 (PR #99), 876 and 878 (PR #101), and 880 (PR #99) were inspected. The Windows test job and Ubuntu provenance job failed with no step records, no job log URL, and no downloadable log content (the log endpoint returned BlobNotFound). On PR #101, the independent Ubuntu rainfall-research job also failed with the same empty-step signature after it was detached from the full test job. Rerun requests were accepted but did not produce a step-level failure to diagnose.
 
 The workflow was changed on PR #99 to use Ubuntu for the main test job and to cancel superseded branch runs; the same startup signature persisted. The PR #101 research job was made independently dispatchable and given its own compile and focused-test preflight, but the run still failed before steps began. This evidence does not support attributing the failure to Python dependencies, test assertions, or the training script. It is consistent with a GitHub Actions control-plane/runner-admission problem, but the exact platform-side reason is not exposed by the available run/job APIs. The billing usage summary previously reviewed did not establish that a budget limit was reached. Do not claim billing exhaustion or alter workflow/test code to mask this failure. Escalation to GitHub Support with run IDs and timestamps is required for internal platform diagnostics.
+
+
+## Follow-up hardening after the initial audit
+
+The flood-panel audit now requires stable rain/river/tide station identifiers,
+explicit river and tide vertical datums, a SAR processing version and quality
+flag, and both observation and SAR coverage fractions. A negative flood label
+is rejected unless the observation and SAR coverage are each at least 90%,
+the SAR quality is accepted, a field/inspection method and inspector are
+recorded, and the label is adjudicated. Rainfall and water-level fields must be
+finite; negative rainfall and invalid coverage fractions are rejected. The
+audit still always returns `training_ready=false`.
+
+The Kerala rainfall experiment also now has an explicit clean-checkout
+acquisition stage because the shared raw weather JSON files are deliberately
+not committed. That stage downloads the four Open-Meteo records, checks
+date/field alignment and numeric values, writes source metadata and SHA-256
+hashes, and runs before training. This closes a reproducibility gap in the
+workflow, but it has not run yet.
+
+## Latest Actions retry evidence
+
+After pinning the critical Linux jobs to `ubuntu-24.04`, PRs #99 and #101 were
+closed/reopened to emit fresh pull-request events and their failed jobs were
+rerun. Runs 896, 897, 901, 902 and 904 still show failed jobs with
+`steps=null`; the log download endpoint returns `BlobNotFound`. Thus the
+runner-image alias was not the cause. The public GitHub Status page currently
+reports Actions operational and no incident on 2026-11-07, although it records
+recent Actions/runner-start incidents on Nov 5 and Nov 6. This is not enough
+to identify the account/repository-specific cause. GitHub Support needs to
+inspect the run IDs and internal runner-admission logs.
