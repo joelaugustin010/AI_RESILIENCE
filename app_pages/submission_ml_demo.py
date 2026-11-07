@@ -199,7 +199,7 @@ if entry.get("trained_model_ids"):
             if feature_columns:
                 with st.expander("Inspect model feature set", expanded=False):
                     st.write(f"{len(feature_columns)} recorded input features")
-                    st.code("\\n".join(str(item) for item in feature_columns), language="text")
+                    st.code("\n".join(str(item) for item in feature_columns), language="text")
             st.write("**Intended use:**", card.get("intended_use", "Not documented"))
             st.write("**Not suitable for:**", card.get("prohibited_use", "Not documented"))
             if gate["blocking_reasons"]:
