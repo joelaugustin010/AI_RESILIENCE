@@ -10,7 +10,7 @@ import pydeck as pdk
 
 from src.kochi_map_layers import build_jrc_preview_layer
 from src.kochi_boundary import build_display_boundary
-from src.spatial_data import validate_geojson
+from src.spatial_data import processed_layer_issues, validate_geojson
 
 
 ROOT = Path(__file__).resolve().parent
@@ -104,6 +104,10 @@ class KochiWardLayerIntegrationTests(unittest.TestCase):
         self.assertEqual(len(metadata["excluded_invalid_features"]), 3)
         self.assertEqual(metadata["validation"]["missing_property_values"], 12)
         self.assertEqual(metadata["layer_role"], "context")
+        issues = processed_layer_issues(ROOT / "data" / "processed")
+        ward_issue = next(issue for issue in issues if "kochi_wards_datameet_2022.geojson" in issue)
+        self.assertIn("6 of 74 legacy polygons", ward_issue)
+        self.assertIn("no inferred ward identities", ward_issue)
         self.assertEqual(metadata["license"], raw_metadata["license"])
 
 
