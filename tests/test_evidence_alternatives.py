@@ -201,3 +201,10 @@ def test_intervention_audit_rejects_mixed_domains_and_missing_control_group():
     result = audit_intervention_evidence(frame)
     assert result["status"] == "BLOCKED_EVIDENCE_MIX_OR_QUALITY"
     assert result["causal_effect_estimated"] is False
+
+
+def test_intervention_audit_blocks_missing_schema():
+    from src.evidence_alternatives import audit_intervention_evidence
+    result = audit_intervention_evidence(pd.DataFrame({"treatment": [0, 1]}))
+    assert result["status"] == "BLOCKED_SCHEMA"
+    assert result["causal_effect_estimated"] is False

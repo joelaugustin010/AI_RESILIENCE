@@ -3,6 +3,7 @@
 Examples:
   python scripts/audit_alternative_evidence.py flood-geojson --input map.geojson --output-report reports/flood_map_audit.json
   python scripts/audit_alternative_evidence.py landslide-pseudo-absence --positives events.csv --background eligible_background.csv --output-csv research/landslide_candidates.csv --output-report reports/landslide_sampling_audit.json
+  python scripts/audit_alternative_evidence.py intervention-csv --input intervention_records.csv --output-report reports/intervention_audit.json
 
 This script never downloads datasets or converts pseudo-absence into verified
 non-event labels. Input provenance and licence must be checked by the operator.
@@ -129,7 +130,11 @@ def audit_intervention(args: argparse.Namespace) -> int:
     })
     write_json(Path(args.output_report), result)
     print(json.dumps(result, indent=2))
-    return 0 if not result.get("problems") else 2
+    return 0 if result.get("status") in {
+        "SIMULATION_ONLY_KEEP_SEPARATE_FROM_EMPIRICAL_OUTCOMES",
+        "EMPIRICAL_CASH_ASSISTANCE_CANDIDATE_NOT_TRANSFERABLE_TO_PHYSICAL_WORKS",
+        "PHYSICAL_INFRASTRUCTURE_DESIGN_REVIEW_ONLY_NOT_CAUSAL_PROOF",
+    } else 2
 
 
 def build_parser() -> argparse.ArgumentParser:
