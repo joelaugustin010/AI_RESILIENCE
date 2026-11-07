@@ -7,6 +7,7 @@ from scripts.train_kerala_cross_location_rainfall import (
     HELD_OUT_LOCATION,
     TRAIN_LOCATIONS,
     _paired_block_ci,
+    _monthly_climatology,
 )
 
 
