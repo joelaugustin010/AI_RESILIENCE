@@ -2,10 +2,12 @@ from scripts.audit_observation_panel import audit
 
 def flood_row():
     return {"event_id":"e1","site_id":"s1","observation_time_utc":"2026-01-01T00:00:00Z",
-    "rain_observed_at_utc":"2026-01-01T00:00:00Z","rain_mm_24h":"80",
-    "river_observed_at_utc":"2026-01-01T00:00:00Z","river_level_m":"2.1",
-    "tide_observed_at_utc":"2026-01-01T00:00:00Z","tide_level_m":"0.8","flood_observed":"1",
-    "sar_scene_id":"S1","sar_acquired_at_utc":"2026-01-01T01:00:00Z","footprint_uri":"event.geojson",
+    "rain_gauge_id":"RG1","rain_observed_at_utc":"2026-01-01T00:00:00Z","rain_mm_24h":"80",
+    "river_gauge_id":"RV1","river_observed_at_utc":"2026-01-01T00:00:00Z","river_level_m":"2.1","river_datum":"MSL",
+    "tide_station_id":"TS1","tide_observed_at_utc":"2026-01-01T00:00:00Z","tide_level_m":"0.8","tide_datum":"LAT",
+    "flood_observed":"1","observation_coverage_fraction":"1.0","inspection_method":"field","inspected_by":"surveyor",
+    "sar_scene_id":"S1","sar_acquired_at_utc":"2026-01-01T01:00:00Z","sar_processing_version":"v1",
+    "sar_quality":"good","sar_coverage_fraction":"1.0","footprint_uri":"event.geojson",
     "source_record_id":"r1","source_publisher":"official","license":"terms","adjudication_status":"reviewed"}
 
 def test_flood_panel_audit_is_never_training_clearance():
@@ -47,3 +49,21 @@ def test_missing_panel_identity_blocks_audit():
     r=audit([row],"flood")
     assert any(p["issue"]=="MISSING_PANEL_IDENTITY" for p in r["problems"])
     assert r["status"]=="BLOCKED_DATA_QUALITY"
+
+
+def test_flood_non_event_requires_observation_and_sar_coverage():
+    row = flood_row()
+    row["flood_observed"] = "0"
+    row["footprint_uri"] = ""
+    row["observation_coverage_fraction"] = "0.5"
+    row["sar_coverage_fraction"] = "0.4"
+    result = audit([row], "flood")
+    assert any(problem["issue"] == "UNSUPPORTED_FLOOD_NON_EVENT" for problem in result["problems"])
+    assert result["training_ready"] is False
+
+
+def test_flood_negative_with_inadequate_vertical_datum_is_flagged():
+    row = flood_row()
+    row["river_datum"] = ""
+    result = audit([row], "flood")
+    assert any(problem["issue"] == "MISSING_VERTICAL_DATUM" for problem in result["problems"])
