@@ -157,13 +157,49 @@ if entry.get("trained_model_ids"):
                         {"Metric": "Average precision", "Value": metrics.get("average_precision")},
                         {"Metric": "F1", "Value": metrics.get("f1")},
                         {"Metric": "Brier score", "Value": metrics.get("brier_score")},
+                        {"Metric": "Base-rate Brier reference", "Value": metrics.get("base_rate_brier_score")},
+                        {"Metric": "Expected calibration error", "Value": metrics.get("expected_calibration_error")},
                         {"Metric": "Held-out rows", "Value": card.get("test_rows")},
                         {"Metric": "Held-out events", "Value": card.get("test_events")},
                     ]),
                     hide_index=True,
                     use_container_width=True,
                 )
+                calibration_rows = metrics.get("calibration_table") or []
+                if calibration_rows:
+                    st.markdown("**Held-out reliability bins**")
+                    st.dataframe(
+                        pd.DataFrame(calibration_rows),
+                        hide_index=True,
+                        use_container_width=True,
+                    )
+                    st.caption(
+                        "Reliability bins are descriptive for this historical holdout; "
+                        "they do not establish future or operational calibration."
+                    )
+                intervals = metrics.get("bootstrap_95ci") or {}
+                if intervals:
+                    interval_rows = [
+                        {"Metric": name, "95% bootstrap interval": str(bounds)}
+                        for name, bounds in intervals.items()
+                    ]
+                    st.markdown("**Recorded holdout uncertainty intervals**")
+                    st.dataframe(
+                        pd.DataFrame(interval_rows),
+                        hide_index=True,
+                        use_container_width=True,
+                    )
+                    st.caption(
+                        f"Bootstrap method: {metrics.get('bootstrap_method', 'not recorded')}. "
+                        "Intervals quantify resampling uncertainty under the recorded method, "
+                        "not geographic transfer or operational reliability."
+                    )
             st.write("**Research target:**", card.get("target_definition", "Not documented"))
+            feature_columns = card.get("feature_columns") or []
+            if feature_columns:
+                with st.expander("Inspect model feature set", expanded=False):
+                    st.write(f"{len(feature_columns)} recorded input features")
+                    st.code("\\n".join(str(item) for item in feature_columns), language="text")
             st.write("**Intended use:**", card.get("intended_use", "Not documented"))
             st.write("**Not suitable for:**", card.get("prohibited_use", "Not documented"))
             if gate["blocking_reasons"]:
