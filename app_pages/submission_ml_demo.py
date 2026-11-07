@@ -10,7 +10,7 @@ import pandas as pd
 import streamlit as st
 
 from src.ml.coverage import build_coverage_matrix
-from src.ml.presentation import card_rows, model_rows
+from src.ml.presentation import application_rows, card_rows, model_rows
 from src.ml.registry import list_model_cards
 from src.ml.service import ml_evidence_for
 from src.ml.submission_summary import rank_classifier_cards, rank_regression_cards, regression_baseline_label
@@ -128,24 +128,102 @@ hazard_names = [entry["hazard"] for entry in coverage["entries"]]
 selected_hazard = st.selectbox("Select a hazard or compound scenario", hazard_names)
 entry = next(item for item in coverage["entries"] if item["hazard"] == selected_hazard)
 st.markdown(f"**Evidence role:** {entry.get('support_level', 'Not recorded').replace('_', ' ').title()}")
-st.markdown("#### Inference readiness — no forecast generated")
-try:
-    readiness = ml_evidence_for(selected_hazard, {})
-    readiness_rows = model_rows(readiness)
-except Exception as exc:
-    readiness_rows = []
-    st.error(f"Inference-readiness check unavailable: {type(exc).__name__}: {exc}")
-if readiness_rows:
-    st.dataframe(
-        pd.DataFrame(readiness_rows),
-        hide_index=True,
-        use_container_width=True,
+selected_cards = [
+    card for card in cards if card.get("model_id") in entry.get("trained_model_ids", [])
+]
+if selected_cards:
+    st.markdown("#### Run a transparent research inference")
+    st.info(
+        "Enter observed or otherwise independently sourced values for the exact "
+        "features below. Leave unknown values blank. The engine will withhold "
+        "inference when required inputs are missing, invalid, or outside the "
+        "recorded training domain. Do not guess values."
     )
-    st.caption(
-        "This check intentionally supplies no feature values. It shows whether the "
-        "registered models have a complete, explicitly supplied input context. "
-        "Incomplete context means inference is withheld; no values are fabricated."
-    )
+    feature_names = list(dict.fromkeys(
+        str(feature)
+        for card in selected_cards
+        for feature in card.get("feature_columns", [])
+    ))
+    provenance_locations = {
+        str((card.get("provenance") or {}).get("location", "")).strip()
+        for card in selected_cards
+        if isinstance(card.get("provenance"), dict)
+    }
+    location_required = "kochi" in {item.casefold() for item in provenance_locations}
+    with st.form("submission_ml_inference_form", clear_on_submit=False):
+        location_value = ""
+        if location_required:
+            location_value = st.text_input(
+                "Model location (must match its documented geography)",
+                placeholder="Enter Kochi only if these inputs are for Kochi",
+            )
+        st.caption(f"Required model features across this hazard: {len(feature_names)}")
+        input_columns = st.columns(2)
+        supplied_values = {}
+        for index, feature in enumerate(feature_names):
+            with input_columns[index % 2]:
+                supplied_values[feature] = st.text_input(
+                    feature,
+                    value="",
+                    placeholder="Enter a measured value; leave blank if unknown",
+                    key=f"submission-ml-{selected_hazard}-{feature}",
+                )
+        run_inference = st.form_submit_button(
+            "Check inputs and run registered model(s)",
+            type="primary",
+            use_container_width=True,
+        )
+    if run_inference:
+        explicit_context = {
+            name: value.strip()
+            for name, value in supplied_values.items()
+            if value.strip() != ""
+        }
+        inference_inputs = {"ml_context": explicit_context}
+        if location_required:
+            inference_inputs["location"] = location_value.strip()
+        try:
+            st.session_state["submission_ml_inference_result"] = ml_evidence_for(
+                selected_hazard, inference_inputs
+            )
+            st.session_state.pop("submission_ml_inference_error", None)
+        except Exception as exc:
+            st.session_state["submission_ml_inference_error"] = (
+                f"{type(exc).__name__}: {exc}"
+            )
+            st.session_state.pop("submission_ml_inference_result", None)
+    inference_error = st.session_state.get("submission_ml_inference_error")
+    if inference_error:
+        st.error(f"Inference could not be completed: {inference_error}")
+    inference_result = st.session_state.get("submission_ml_inference_result")
+    if inference_result and inference_result.get("hazard") == selected_hazard:
+        st.markdown("**Input and model readiness**")
+        model_result_rows = model_rows(inference_result)
+        if model_result_rows:
+            st.dataframe(pd.DataFrame(model_result_rows), hide_index=True, use_container_width=True)
+        st.markdown(f"**Engine status:** {inference_result.get('status', 'unknown').replace('_', ' ').title()}")
+        if inference_result.get("applications"):
+            st.markdown("**Model output(s)**")
+            st.dataframe(
+                pd.DataFrame(application_rows(inference_result)),
+                hide_index=True,
+                use_container_width=True,
+            )
+            for application in inference_result["applications"]:
+                for warning in application.get("warnings", []):
+                    st.warning(warning)
+                for limitation in application.get("limitations", []):
+                    st.caption(f"Limitation: {limitation}")
+        else:
+            st.warning(
+                inference_result.get("note")
+                or "No output was produced. Review missing features, model status, "
+                   "geographic scope, and training-range checks above."
+            )
+        st.caption(
+            "These are model outputs for documented historical research targets, "
+            "not calibrated disaster probabilities, a live forecast, or an official warning."
+        )
 else:
     st.info(
         "No supervised model is registered for this hazard. The deterministic "
