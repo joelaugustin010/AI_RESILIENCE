@@ -52,3 +52,17 @@ as a short-lived research artifact; it does not add them to the release model
 registry or promote them into the application. The focused compile/unit-test
 preflight and training job is independent of the full test job and can also be
 manually dispatched on this research branch.
+
+
+## Reproducible CI input acquisition
+
+The raw Open-Meteo weather files used by the shared ML engine are local,
+uncommitted research inputs. A clean GitHub Actions checkout therefore does
+not contain them. The isolated workflow now runs
+`scripts/acquire_kerala_weather_transfer_data.py` before training. It fetches
+the exact four location records, validates daily date coverage, field lengths,
+numeric values and non-negative precipitation, writes per-file SHA-256 and
+source metadata, and uploads an acquisition manifest with the model artifact.
+This solves the missing-input failure mode in a clean checkout when the runner
+is available. It does not prove that Open-Meteo reanalysis equals station
+observations or that the model generalizes.
