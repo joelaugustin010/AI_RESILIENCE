@@ -286,7 +286,7 @@ def historical_replay_context(model_id: str) -> dict[str, Any]:
             ]
     if frame.empty:
         raise ValueError(
-            "No complete in-domain historical test-period row is available for this model."
+            "No complete historical test-period row is available inside the recorded feature domains."
         )
     row = frame.sort_values(date_column).iloc[-1]
     context: dict[str, float] = {}
