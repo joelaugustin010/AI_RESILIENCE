@@ -1277,6 +1277,8 @@ with st.expander("Photography credits and licensing", expanded=False):
         evidence of a specific event or current condition. Images were cropped, resized and
         colour-balanced for this interface.
 
+        - **Aerial view of Kochi** — Geyo John, [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/), [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Aerial_view_of_Kochi_-_panoramio.jpg). Used as the opening hero image; image is from 2012 and is illustrative, not a current map or monitoring source.
+
         - **Flooded NH544, Companypady (hero fallback)** — Dil Shad Roshan,
           [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0),
           [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Flooded-nh544-companypady-2018-kerala-floods.jpg).
