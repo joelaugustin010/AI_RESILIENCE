@@ -886,12 +886,37 @@ with map_display_slot:
     st.caption("Blue outline = administrative boundary only. It must not be interpreted as a hazard zone or as the full Greater Kochi urban area.")
     basemap_theme = st.radio(
         "Basemap appearance",
-        options=["Light · Eco", "Dark"],
+        options=["Light · Eco", "Dark", "Satellite imagery"],
         horizontal=True,
         index=0,
         key="kochi_basemap_theme",
-        help="Choose a basemap that keeps the selected evidence layers readable.",
+        help=(
+            "Satellite imagery uses Esri World Imagery tiles. It is interactive, but not live video; "
+            "image capture dates and resolution vary by location."
+        ),
     )
+    satellite_map_style = {
+        "version": 8,
+        "sources": {
+            "esri-world-imagery": {
+                "type": "raster",
+                "tiles": [
+                    "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                ],
+                "tileSize": 256,
+                "attribution": "Imagery © Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+            }
+        },
+        "layers": [
+            {
+                "id": "esri-world-imagery",
+                "type": "raster",
+                "source": "esri-world-imagery",
+                "minzoom": 0,
+                "maxzoom": 19,
+            }
+        ],
+    }
     deck_layers = []
     legend_rows = []
     active_components = components_for(active_hazard) if active_hazard else []
@@ -1185,12 +1210,25 @@ with map_display_slot:
         "The map is placed near the top for immediate access. Use the layer controls and source notes below to customise what is displayed.",
     )
     if deck_layers:
+        use_satellite_basemap = basemap_theme == "Satellite imagery"
         deck = pdk.Deck(
             layers=deck_layers,
             initial_view_state=pdk.ViewState(longitude=map_center[0], latitude=map_center[1], zoom=10),
-            map_style=(pdk.map_styles.CARTO_LIGHT if basemap_theme == "Light · Eco" else pdk.map_styles.CARTO_DARK),
+            map_provider="maplibre" if use_satellite_basemap else "carto",
+            map_style=(
+                satellite_map_style
+                if use_satellite_basemap
+                else pdk.map_styles.CARTO_LIGHT if basemap_theme == "Light · Eco"
+                else pdk.map_styles.CARTO_DARK
+            ),
             tooltip={"text": "Bound Name: {display_bound}\nWard Name: {display_ward}\nFeature ID: {display_feature_id}\nFeature: {display_name}\nType: {display_type}\nSource: {display_source}\nOSM updated: {display_timestamp}\nSource URL: {display_url}"},
         )
+        if use_satellite_basemap:
+            st.caption(
+                "Satellite basemap: Esri World Imagery. Zoom and pan to explore; the imagery is a mosaic "
+                "with capture dates that vary by place and is not real-time. "
+                "[Imagery service details](https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer)."
+            )
         map_selection = st.pydeck_chart(
             deck,
             width="stretch",
