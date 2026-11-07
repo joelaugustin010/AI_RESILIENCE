@@ -1,4 +1,4 @@
-"""Regression checks for the Kochi-focused cinematic homepage and navigation."""
+"""Regression checks for the Kochi-focused homepage and navigation."""
 
 from pathlib import Path
 
@@ -32,14 +32,15 @@ def _markup(app: AppTest) -> str:
     return "\n".join(element.value for element in app.markdown)
 
 
-def test_home_is_the_default_page_with_the_cinematic_hero():
+def test_home_is_the_default_page_with_the_minimal_koch_aerial_hero():
     app = _home()
     html = _markup(app)
 
-    assert "ar-cine-hero" in html
+    assert "ar-cine-hero ar-home-minimal" in html
     assert "AI <span>RESILIENCE</span>" in html
-    assert "Understanding Kochi. Preparing for risk. Strengthening urban resilience." in html
-    assert "app/static/images/hero-kerala-fallback.jpg" in html
+    assert "Understanding Kochi. Preparing for Risk. Building a Resilient Future." in html
+    assert "Aerial_view_of_Kochi_-_panoramio.jpg" in html
+    assert "Aerial view of Kochi, Kerala" in html
 
     labels = [button.label for button in app.button]
     assert "Explore Intelligence" in labels
