@@ -192,3 +192,28 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+  india-flood-inventory-audit:
+    if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'feature/shared-ml-intelligence-')
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - name: Install application dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Acquire and checksum-audit public India Flood Inventory v4
+        run: python scripts/audit_india_flood_inventory.py --output reports/india_flood_inventory_audit.json
+      - name: Upload source audit report only
+        uses: actions/upload-artifact@v4
+        with:
+          name: india-flood-inventory-audit-${{ github.sha }}
+          path: reports/india_flood_inventory_audit.json
+          if-no-files-found: error
+          retention-days: 14
