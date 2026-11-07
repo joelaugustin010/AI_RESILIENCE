@@ -97,7 +97,7 @@ def test_satellite_flood_audit_separates_simulations_from_observations():
         "type": "Feature",
         "geometry": {"type": "Polygon", "coordinates": [[[76, 9], [76.1, 9], [76.1, 9.1], [76, 9.1], [76, 9]]]},
         "properties": {
-            "event_id": "SIM-1", "observed_at": "2020-01-01",
+            "event_id": "SIM-1", "observed_at": "2020-01-01T00:00:00Z",
             "sensor": "hydraulic_model", "source_url": "https://example.org/model",
             "evidence_type": "simulated",
         },
@@ -125,5 +125,38 @@ def test_satellite_flood_audit_flags_missing_provenance():
     payload = {"type": "FeatureCollection", "features": [{
         "type": "Feature", "geometry": {"type": "Polygon", "coordinates": []},
         "properties": {},
+    }]}
+    assert audit_satellite_flood_geojson(payload)["status"] == "BLOCKED_METADATA_OR_GEOMETRY_ISSUES"
+
+
+def test_hazard_specific_alternative_routes_are_available():
+    from src.evidence_alternatives import alternative_evidence_for_hazard
+    assert {item["track_id"] for item in alternative_evidence_for_hazard("Landslide")} == {"landslide_inventory"}
+    assert {item["track_id"] for item in alternative_evidence_for_hazard("Infrastructure failure")} == {"infrastructure_reliability"}
+    assert alternative_evidence_for_hazard("Earthquake") == []
+
+
+def test_satellite_flood_audit_rejects_invalid_polygon_coordinates():
+    payload = {"type": "FeatureCollection", "features": [{
+        "type": "Feature",
+        "geometry": {"type": "Polygon", "coordinates": [[[200, 9], [201, 9], [201, 10], [200, 9]]]},
+        "properties": {
+            "event_id": "bad", "observed_at": "2020-01-01T00:00:00Z",
+            "sensor": "Sentinel-1", "source_url": "https://example.org/map",
+            "evidence_type": "observed_satellite",
+        },
+    }]}
+    assert audit_satellite_flood_geojson(payload)["status"] == "BLOCKED_METADATA_OR_GEOMETRY_ISSUES"
+
+
+def test_satellite_flood_audit_requires_timezone_aware_acquisition_time():
+    payload = {"type": "FeatureCollection", "features": [{
+        "type": "Feature",
+        "geometry": {"type": "Polygon", "coordinates": [[[76, 9], [76.1, 9], [76.1, 9.1], [76, 9.1], [76, 9]]]},
+        "properties": {
+            "event_id": "no-timezone", "observed_at": "2020-01-01",
+            "sensor": "Sentinel-1", "source_url": "https://example.org/map",
+            "evidence_type": "observed_satellite",
+        },
     }]}
     assert audit_satellite_flood_geojson(payload)["status"] == "BLOCKED_METADATA_OR_GEOMETRY_ISSUES"

@@ -12,6 +12,7 @@ import math
 
 import numpy as np
 import pandas as pd
+from shapely.geometry import shape as shapely_shape
 
 EARTH_RADIUS_KM = 6371.0088
 
@@ -226,6 +227,16 @@ def audit_satellite_flood_geojson(payload: Mapping[str, Any]) -> dict[str, Any]:
         if not isinstance(geometry, Mapping) or geometry.get("type") not in {"Polygon", "MultiPolygon"}:
             issues.append(f"Feature {index} must contain Polygon or MultiPolygon geometry.")
             continue
+        try:
+            spatial = shapely_shape(geometry)
+            if spatial.is_empty or not spatial.is_valid or spatial.area <= 0:
+                raise ValueError("empty, invalid or zero-area geometry")
+            min_lon, min_lat, max_lon, max_lat = spatial.bounds
+            if min_lon < -180 or max_lon > 180 or min_lat < -90 or max_lat > 90:
+                raise ValueError("coordinates outside longitude/latitude bounds")
+        except Exception as exc:
+            issues.append(f"Feature {index} has invalid polygon geometry: {exc}")
+            continue
         properties = feature.get("properties") or {}
         event_id = str(properties.get("event_id", "")).strip()
         observed_at = str(properties.get("observed_at", "")).strip()
@@ -237,8 +248,8 @@ def audit_satellite_flood_geojson(payload: Mapping[str, Any]) -> dict[str, Any]:
             continue
         try:
             date = pd.Timestamp(observed_at)
-            if pd.isna(date):
-                raise ValueError
+            if pd.isna(date) or date.tzinfo is None:
+                raise ValueError("observed_at must be an ISO timestamp with an explicit timezone")
         except Exception:
             issues.append(f"Feature {index} has an invalid observed_at date.")
             continue
