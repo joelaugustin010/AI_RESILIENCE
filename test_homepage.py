@@ -53,12 +53,19 @@ def test_home_links_every_registered_workspace():
     assert linked == EXPECTED_PAGES
 
 
-def test_hero_video_is_optional_and_always_local():
+def test_hero_video_uses_local_mp4_or_verified_koch_webm_with_poster_fallback():
     html = _markup(_home())
-    if "<video" in html:
-        assert 'src="app/static/videos/kerala_hero.mp4"' in html
-        assert "http://" not in html.split("<video", 1)[1].split("</video>", 1)[0]
-        assert 'poster="app/static/images/hero-kerala-fallback.jpg"' in html
+    assert "<video" in html
+    video = html.split("<video", 1)[1].split("</video>", 1)[0]
+    assert 'poster="app/static/images/hero-kerala-fallback.jpg"' in video
+    assert "autoplay muted loop playsinline" in video
+    assert (
+        'src="https://upload.wikimedia.org/wikipedia/commons/2/2b/Chinese_Fishing_nets.webm"'
+        in video
+        or 'src="app/static/videos/kerala_hero.mp4"' in video
+    )
+    assert "http://" not in video
+    assert "Chinese Fishing nets at Kochi" in html
 
 
 def test_both_hero_calls_to_action_navigate():
