@@ -54,9 +54,35 @@ jobs:
           print(f'numpy={numpy.__version__} scipy={scipy.__version__} scikit-learn={sklearn.__version__}')"
       - name: Compile application and research scripts
         run: python -m compileall -q app.py app_pages src scripts
+      - name: Verify persisted ML release artifacts and research-only status
+        run: python scripts/verify_release_artifacts.py
 
       - name: Run clean-checkout test suite
         run: python -m pytest -q -ra --strict-markers
+
+  live-deployment-smoke:
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+    needs: [test, provenance-hash-linux]
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Check out release commit
+        uses: actions/checkout@v4
+      - name: Verify deployed Streamlit health and application shell
+        run: >-
+          python scripts/verify_live_deployment.py
+          --attempts 20
+          --delay-seconds 15
+          --timeout-seconds 15
+          --output reports/live_deployment_smoke.json
+      - name: Upload deployment smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-deployment-smoke-${{ github.sha }}
+          path: reports/live_deployment_smoke.json
+          if-no-files-found: warn
+          retention-days: 30
 
   provenance-hash-linux:
     runs-on: ubuntu-latest
