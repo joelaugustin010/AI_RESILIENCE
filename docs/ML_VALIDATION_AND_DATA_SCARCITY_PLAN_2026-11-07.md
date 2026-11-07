@@ -191,3 +191,13 @@ Recommended flow:
 ### Completion definition
 
 The system is competition-ready as a **resilience decision-support demonstrator** only when the app is reliable, the local evidence layers are traceable, the demo clearly distinguishes research signals from verified facts, and preparedness recommendations are actionable. It must not be described as an operational disaster-warning system until at least one hazard-specific model passes the full independent validation and prospective governance process.
+
+
+## Implemented in the application branch
+
+- `src/ml/validation_gates.py` contains the calibration report, split-conformal interval helper and fail-closed promotion gate.
+- `src/ml/local_panel_contracts.py` audits observed event/non-event panels and rejects synthetic or unverified negatives.
+- `tests/test_ml_validation_gates.py` and `tests/test_ml_local_panel_contracts.py` cover the new statistical and data-quality contracts.
+- `app_pages/hazard_model_lab.py` displays the number of cards passing the independent gate and lists each model's blocking requirements.
+
+The independent gate is deliberately stricter than the current model-card statuses. It should report zero operationally eligible models until genuine independent evidence is recorded. This is a correct safety outcome, not a failure of the software.
