@@ -113,7 +113,7 @@ def test_satellite_flood_audit_rejects_mixed_evidence_types():
             "type": "Feature",
             "geometry": {"type": "Polygon", "coordinates": [[[76, 9], [76.1, 9], [76.1, 9.1], [76, 9.1], [76, 9]]]},
             "properties": {
-                "event_id": kind, "observed_at": "2020-01-01",
+                "event_id": kind, "observed_at": "2020-01-01T00:00:00Z",
                 "sensor": "sensor", "source_url": "https://example.org/source",
                 "evidence_type": kind,
             },
