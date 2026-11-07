@@ -163,7 +163,7 @@ jobs:
           if-no-files-found: error
           retention-days: 14
   shared-ml-research-training:
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && startsWith(github.head_ref, 'feature/persist-trained-ml-models-') && github.actor != 'github-actions[bot]')
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.action == 'opened' && startsWith(github.head_ref, 'feature/persist-trained-ml-models-') && github.actor != 'github-actions[bot]')
     needs: test
     runs-on: windows-latest
     permissions:
