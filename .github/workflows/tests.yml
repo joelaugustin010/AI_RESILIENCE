@@ -242,7 +242,7 @@ jobs:
   kerala-cross-location-rainfall-research:
     if: (github.event_name == 'workflow_dispatch' && startsWith(github.ref_name, 'research/kerala-cross-region-weather-')) || (github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'synchronize') && startsWith(github.head_ref, 'research/kerala-cross-region-weather-'))
     # Run this isolated research experiment with its own focused preflight tests.
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - name: Check out the exact research commit
