@@ -84,8 +84,16 @@ def evaluate_observed_impact_holdout(
     if metadata.get("outcome_definition") != (str(data["outcome_name"].iloc[0]) if len(data) else None):
         problems.append("Metadata outcome_definition does not match the observed holdout.")
 
-    training_events = {str(value) for value in metadata.get("training_event_ids", [])}
-    training_geographies = {str(value) for value in metadata.get("training_geographies", [])}
+    raw_training_events = metadata.get("training_event_ids")
+    raw_training_geographies = metadata.get("training_geographies")
+    if not isinstance(raw_training_events, list) or not raw_training_events:
+        problems.append("Metadata must list the training event IDs.")
+        raw_training_events = []
+    if not isinstance(raw_training_geographies, list) or not raw_training_geographies:
+        problems.append("Metadata must list the training geographies.")
+        raw_training_geographies = []
+    training_events = {str(value) for value in raw_training_events}
+    training_geographies = {str(value) for value in raw_training_geographies}
     holdout_events = set(data["event_id"].astype(str))
     holdout_geographies = set(data["geography_id"].astype(str))
     event_overlap = sorted(training_events & holdout_events)
@@ -94,10 +102,6 @@ def evaluate_observed_impact_holdout(
         problems.append(f"Training/holdout event leakage detected: {event_overlap[:10]}.")
     if geography_overlap:
         problems.append(f"Training/holdout geography leakage detected: {geography_overlap[:10]}.")
-    if not isinstance(metadata.get("training_event_ids"), list) or not training_events:
-        problems.append("Metadata must list the training event IDs.")
-    if not isinstance(metadata.get("training_geographies"), list) or not training_geographies:
-        problems.append("Metadata must list the training geographies.")
     if len(holdout_events) < minimum_events:
         problems.append(f"At least {minimum_events} independent holdout events are required.")
     if len(holdout_geographies) < minimum_geographies:
@@ -140,7 +144,7 @@ def evaluate_observed_impact_holdout(
         ),
         "r2": float(r2_score(actual, predicted)) if len(actual) >= 2 else None,
         "event_level_mae": {
-            str(event): float(np.mean(group["predicted_value"] - group["outcome_value"]).__abs__())
+            str(event): float(np.mean(np.abs(group["predicted_value"] - group["outcome_value"])))
             for event, group in data.groupby("event_id", sort=True)
         },
     }
