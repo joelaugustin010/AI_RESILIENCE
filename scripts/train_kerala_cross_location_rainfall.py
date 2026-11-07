@@ -147,11 +147,14 @@ def train(output_dir: Path) -> dict[str, Any]:
     if not np.isfinite(predicted).all() or not np.isfinite(actual).all():
         raise ValueError("Non-finite model predictions or test targets.")
     model_metrics = _metrics(actual, predicted)
+    if int(valid_baseline.sum()) < 2:
+        raise ValueError("Too few Kochi test rows for a persistence comparison.")
     baseline_metrics = _metrics(actual[valid_baseline], baseline_values[valid_baseline])
+    comparable_model_metrics = _metrics(actual[valid_baseline], predicted[valid_baseline])
     paired_ci = _paired_block_ci(
         actual[valid_baseline], predicted[valid_baseline], baseline_values[valid_baseline]
     )
-    skill = 1.0 - model_metrics["mae_mm"] / max(baseline_metrics["mae_mm"], 1e-12)
+    skill = 1.0 - comparable_model_metrics["mae_mm"] / max(baseline_metrics["mae_mm"], 1e-12)
 
     output_dir.mkdir(parents=True, exist_ok=True)
     joblib.dump(final_model, output_dir / "model.joblib")
@@ -179,6 +182,7 @@ def train(output_dir: Path) -> dict[str, Any]:
         "selected_model_type": selected["model_type"],
         "candidate_validation_metrics": candidates,
         "held_out_kochi_metrics": model_metrics,
+        "paired_comparison_model_metrics": comparable_model_metrics,
         "persistence_baseline_metrics": baseline_metrics,
         "mae_skill_over_persistence": float(skill),
         "paired_mae_improvement_95ci_mm": paired_ci,
