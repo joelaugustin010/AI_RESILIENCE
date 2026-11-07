@@ -75,7 +75,7 @@ Regression tasks: report MAE, RMSE, bias, R², baseline skill, error by season/r
 `src/ml/validation_gates.py` adds:
 - `binary_calibration_report`: Brier score, base-rate Brier reference, Brier skill and reliability-bin/ECE diagnostics.
 - `split_conformal_interval`: finite-sample split-conformal residual intervals for regression, with explicit exchangeability warning.
-- `model_card_validation_gate`: a fail-closed operational gate requiring independent temporal and spatial passes, calibration, baseline skill, complete provenance, domain-transfer evidence and at least 100 independently held-out positive events.
+- `model_card_validation_gate`: a fail-closed operational gate requiring independent temporal and spatial passes, calibration, baseline skill, complete provenance, domain-transfer evidence and a task-appropriate independent sample count (positive events for classification, held-out cases for regression).
 - `registry_validation_summary`: a registry-wide readiness summary.
 
 For time-series and spatially dependent data, ordinary iid conformal assumptions do not hold automatically. Use block/cluster conformal calibration and verify empirical coverage on separate future blocks or held-out storm/site groups. Keep calibration data separate from model fitting and final evaluation. Never calibrate on the final test set and then report that same set as untouched.
