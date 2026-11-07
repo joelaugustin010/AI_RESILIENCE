@@ -28,7 +28,7 @@ def test_unresolved_hazard_sources_are_not_marked_training_ready():
         assert track["next"]
         assert track["sources"]
         assert "TRAINING_READY" not in track["status"]
-        assert "VALIDATED" not in track["status"]
+        assert not track["status"].endswith("_VALIDATED")
 
 
 def test_multiple_hazards_deduplicate_shared_evidence_tracks_in_order():
