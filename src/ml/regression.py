@@ -194,6 +194,10 @@ def train_regression_dataset(
         "candidate_selection": candidates,
         "temporal_split": {"validation_start": validation_start, "test_start": test_start, "purged_rows": purge, "train_rows": len(train), "validation_rows": len(validation), "test_rows": len(test)},
         "feature_columns": feature_columns, "feature_count": len(feature_columns),
+        "prediction_constraints": (
+            {"lower_bound": float(prediction_lower_bound)}
+            if prediction_lower_bound is not None else {}
+        ),
         "metrics": {
             **metrics,
             "persistence_baseline": baseline,
