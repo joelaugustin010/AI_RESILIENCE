@@ -15,7 +15,7 @@
   "skill_grade": "RESEARCH_SIGNAL_NOT_VALIDATED",
   "status_reason": "ROC-AUC 0.966 and average precision 0.756 beat the no-skill prevalence 0.102 on one temporal holdout.",
   "validation_status": "SINGLE_TEMPORAL_HOLDOUT_NOT_INDEPENDENTLY_VALIDATED",
-  "trained_at_utc": "2026-11-07T08:42:52+00:00",
+  "trained_at_utc": "2026-11-07T09:08:22+00:00",
   "selected_model_type": "logistic_regression",
   "selected_probability_threshold": 0.82,
   "model_selection_metric": "Validation average precision (primary), then validation ROC-AUC, then F1; decision threshold selected by validation F1 with recall/precision tie-breaks.",
@@ -423,7 +423,7 @@
     "f1": 0.7430997876857749,
     "roc_auc": 0.9660301430023228,
     "average_precision": 0.7555741527620877,
-    "brier_score": 0.06951132474129017,
+    "brier_score": 0.06951132459601408,
     "confusion_matrix_tn_fp_fn_tp": [
       1896,
       72,
@@ -431,88 +431,88 @@
       175
     ],
     "predicted_positive_rate": 0.11268248175182481,
-    "log_loss": 0.2346616251585169,
-    "expected_calibration_error": 0.08784862887178677,
+    "log_loss": 0.23466162456015668,
+    "expected_calibration_error": 0.08784862868521803,
     "calibration_table": [
       {
         "bin_lower": 0.0,
         "bin_upper": 0.1,
         "n": 1530,
-        "mean_probability": 0.008416960965350858,
+        "mean_probability": 0.008416960980421847,
         "observed_event_rate": 0.0032679738562091504,
-        "absolute_gap": 0.005148987109141707
+        "absolute_gap": 0.005148987124212696
       },
       {
         "bin_lower": 0.1,
         "bin_upper": 0.2,
         "n": 98,
-        "mean_probability": 0.14512437228863495,
+        "mean_probability": 0.14512437216118163,
         "observed_event_rate": 0.0,
-        "absolute_gap": 0.14512437228863495
+        "absolute_gap": 0.14512437216118163
       },
       {
         "bin_lower": 0.2,
         "bin_upper": 0.30000000000000004,
         "n": 69,
-        "mean_probability": 0.24756540229391405,
+        "mean_probability": 0.24756540192715643,
         "observed_event_rate": 0.057971014492753624,
-        "absolute_gap": 0.18959438780116042
+        "absolute_gap": 0.1895943874344028
       },
       {
         "bin_lower": 0.30000000000000004,
         "bin_upper": 0.4,
         "n": 52,
-        "mean_probability": 0.3460723832447771,
+        "mean_probability": 0.3460723823307091,
         "observed_event_rate": 0.1346153846153846,
-        "absolute_gap": 0.21145699862939252
+        "absolute_gap": 0.21145699771532447
       },
       {
         "bin_lower": 0.4,
         "bin_upper": 0.5,
         "n": 59,
-        "mean_probability": 0.45813479870612667,
+        "mean_probability": 0.4581347978805196,
         "observed_event_rate": 0.11864406779661017,
-        "absolute_gap": 0.3394907309095165
+        "absolute_gap": 0.3394907300839094
       },
       {
         "bin_lower": 0.5,
         "bin_upper": 0.6000000000000001,
         "n": 40,
-        "mean_probability": 0.5481029702579473,
+        "mean_probability": 0.5481029691654452,
         "observed_event_rate": 0.15,
-        "absolute_gap": 0.3981029702579473
+        "absolute_gap": 0.3981029691654452
       },
       {
         "bin_lower": 0.6000000000000001,
         "bin_upper": 0.7000000000000001,
         "n": 35,
-        "mean_probability": 0.6509322769398346,
+        "mean_probability": 0.6509322752948105,
         "observed_event_rate": 0.17142857142857143,
-        "absolute_gap": 0.47950370551126315
+        "absolute_gap": 0.47950370386623903
       },
       {
         "bin_lower": 0.7000000000000001,
         "bin_upper": 0.8,
         "n": 52,
-        "mean_probability": 0.7509519495842578,
+        "mean_probability": 0.750951948176759,
         "observed_event_rate": 0.17307692307692307,
-        "absolute_gap": 0.5778750265073347
+        "absolute_gap": 0.5778750250998359
       },
       {
         "bin_lower": 0.8,
         "bin_upper": 0.9,
         "n": 51,
-        "mean_probability": 0.8567296570509184,
+        "mean_probability": 0.8567296559248684,
         "observed_event_rate": 0.5686274509803921,
-        "absolute_gap": 0.2881022060705263
+        "absolute_gap": 0.28810220494447625
       },
       {
         "bin_lower": 0.9,
         "bin_upper": 1.0,
         "n": 206,
-        "mean_probability": 0.9704216675913752,
+        "mean_probability": 0.9704216672705799,
         "observed_event_rate": 0.7330097087378641,
-        "absolute_gap": 0.23741195885351107
+        "absolute_gap": 0.2374119585327158
       }
     ],
     "calibration_interpretation": "Expected calibration error is descriptive for this holdout. It does not establish calibration in future or operational use.",
@@ -523,7 +523,7 @@
       "f1": 0.0
     },
     "base_rate_brier_score": 0.09174702967659437,
-    "skill_over_base_rate_brier": 0.022235704935304204,
+    "skill_over_base_rate_brier": 0.022235705080580287,
     "bootstrap_95ci": {
       "f1": [
         0.6858513189448441,

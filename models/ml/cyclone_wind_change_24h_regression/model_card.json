@@ -12,7 +12,7 @@
   "skill_grade": "WEAK_RESEARCH_SIGNAL",
   "status_reason": "MAE skill over baseline: 0.284; paired bootstrap 95% CI for MAE improvement: [1.8528724940850476, 5.0384403191577025].",
   "validation_status": "SINGLE_TEMPORAL_HOLDOUT_NOT_INDEPENDENTLY_VALIDATED",
-  "trained_at_utc": "2026-11-07T08:45:29+00:00",
+  "trained_at_utc": "2026-11-07T09:11:03+00:00",
   "selected_model_type": "extra_trees_regressor",
   "model_selection_metric": "Validation MAE, then RMSE.",
   "candidate_selection": [
@@ -39,9 +39,9 @@
     },
     {
       "model_type": "ridge_regressor",
-      "mae": 10.201639066266159,
-      "rmse": 14.623134801471709,
-      "r2": 0.4353653386463274,
+      "mae": 10.201639066266154,
+      "rmse": 14.623134801471707,
+      "r2": 0.43536533864632754,
       "n": 1669
     }
   ],

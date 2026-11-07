@@ -15,7 +15,7 @@
   "skill_grade": "WEAK_RESEARCH_SIGNAL",
   "status_reason": "ROC-AUC 0.843 and average precision 0.894 show a weak ranking signal only.",
   "validation_status": "SINGLE_TEMPORAL_HOLDOUT_NOT_INDEPENDENTLY_VALIDATED",
-  "trained_at_utc": "2026-11-07T08:43:26+00:00",
+  "trained_at_utc": "2026-11-07T09:08:52+00:00",
   "selected_model_type": "random_forest",
   "selected_probability_threshold": 0.28,
   "model_selection_metric": "Validation average precision (primary), then validation ROC-AUC, then F1; decision threshold selected by validation F1 with recall/precision tie-breaks.",
@@ -236,9 +236,9 @@
         "bin_lower": 0.2,
         "bin_upper": 0.30000000000000004,
         "n": 26,
-        "mean_probability": 0.24571119324660065,
+        "mean_probability": 0.24571119324660062,
         "observed_event_rate": 0.38461538461538464,
-        "absolute_gap": 0.13890419136878399
+        "absolute_gap": 0.138904191368784
       },
       {
         "bin_lower": 0.30000000000000004,

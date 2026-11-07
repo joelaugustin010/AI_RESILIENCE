@@ -10,23 +10,23 @@
   "prediction_unit": "degrees Celsius",
   "status": "WEAK_RESEARCH_SIGNAL",
   "skill_grade": "WEAK_RESEARCH_SIGNAL",
-  "status_reason": "MAE skill over baseline: 0.067; paired bootstrap 95% CI for MAE improvement: [0.028157816834184828, 0.06370132809385824].",
+  "status_reason": "MAE skill over baseline: 0.067; paired bootstrap 95% CI for MAE improvement: [0.028157816834184803, 0.06370132809385821].",
   "validation_status": "SINGLE_TEMPORAL_HOLDOUT_NOT_INDEPENDENTLY_VALIDATED",
-  "trained_at_utc": "2026-11-07T08:45:18+00:00",
+  "trained_at_utc": "2026-11-07T09:10:51+00:00",
   "selected_model_type": "extra_trees_regressor",
   "model_selection_metric": "Validation MAE, then RMSE.",
   "candidate_selection": [
     {
       "model_type": "random_forest_regressor",
-      "mae": 0.5706285183982902,
-      "rmse": 0.7341659993450268,
+      "mae": 0.57062851839829,
+      "rmse": 0.7341659993450269,
       "r2": 0.8018589348773866,
       "n": 1826
     },
     {
       "model_type": "extra_trees_regressor",
       "mae": 0.5632364312367805,
-      "rmse": 0.7235067587645714,
+      "rmse": 0.7235067587645715,
       "r2": 0.807570725247672,
       "n": 1826
     },
@@ -39,9 +39,9 @@
     },
     {
       "model_type": "ridge_regressor",
-      "mae": 0.5641111366669974,
-      "rmse": 0.7267574938292737,
-      "r2": 0.8058376609478066,
+      "mae": 0.5641111366669979,
+      "rmse": 0.7267574938292739,
+      "r2": 0.8058376609478064,
       "n": 1826
     }
   ],
@@ -388,8 +388,8 @@
   "prediction_constraints": {},
   "metrics": {
     "mae": 0.6447733372584189,
-    "rmse": 0.8354570756129415,
-    "r2": 0.776952029311136,
+    "rmse": 0.8354570756129416,
+    "r2": 0.7769520293111359,
     "n": 2192,
     "persistence_baseline": {
       "available": true,
@@ -408,8 +408,8 @@
     "mae_skill_over_persistence": 0.06666898549134648,
     "mae_skill_comparison_rows": 2192,
     "paired_mae_improvement_bootstrap_95ci": [
-      0.028157816834184828,
-      0.06370132809385824
+      0.028157816834184803,
+      0.06370132809385821
     ],
     "paired_bootstrap_method": "circular_moving_block_bootstrap_7_rows",
     "prediction_lower_bound": null
