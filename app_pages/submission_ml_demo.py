@@ -12,6 +12,7 @@ import streamlit as st
 from src.ml.coverage import build_coverage_matrix
 from src.ml.presentation import card_rows
 from src.ml.registry import list_model_cards
+from src.ml.service import ml_evidence_for
 from src.ml.submission_summary import rank_classifier_cards, rank_regression_cards
 from src.ml.validation_gates import model_card_validation_gate
 from src.ui_theme import page_header
@@ -131,6 +132,29 @@ hazard_names = [entry["hazard"] for entry in coverage["entries"]]
 selected_hazard = st.selectbox("Select a hazard or compound scenario", hazard_names)
 entry = next(item for item in coverage["entries"] if item["hazard"] == selected_hazard)
 st.markdown(f"**Evidence role:** {entry.get('support_level', 'Not recorded').replace('_', ' ').title()}")
+st.markdown("#### Inference readiness — no forecast generated")
+try:
+    readiness = ml_evidence_for(selected_hazard, {})
+    readiness_rows = model_rows(readiness)
+except Exception as exc:
+    readiness_rows = []
+    st.error(f"Inference-readiness check unavailable: {type(exc).__name__}: {exc}")
+if readiness_rows:
+    st.dataframe(
+        pd.DataFrame(readiness_rows),
+        hide_index=True,
+        use_container_width=True,
+    )
+    st.caption(
+        "This check intentionally supplies no feature values. It shows whether the "
+        "registered models have a complete, explicitly supplied input context. "
+        "Incomplete context means inference is withheld; no values are fabricated."
+    )
+else:
+    st.info(
+        "No supervised model is registered for this hazard. The deterministic "
+        "scenario assessment remains the available decision path."
+    )
 st.write(entry.get("interpretation", "No interpretation recorded."))
 if entry.get("trained_model_ids"):
     selected_cards = [
