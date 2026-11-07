@@ -137,6 +137,16 @@ st.markdown(f"**Evidence role:** {entry.get('support_level', 'Not recorded').rep
 selected_cards = [
     card for card in cards if card.get("model_id") in entry.get("trained_model_ids", [])
 ]
+# Put an actually applicable research model first for a smoother evaluator demo.
+# Regression models are preferred because their outputs retain physical units;
+# the model's validation status and scientific limitations remain visible below.
+selected_cards.sort(
+    key=lambda card: (
+        card.get("status") not in {"WEAK_RESEARCH_SIGNAL", "RESEARCH_SIGNAL_NOT_VALIDATED"},
+        card.get("task_type") != "regression",
+        str(card.get("model_id", "")),
+    )
+)
 if selected_cards:
     st.markdown("#### Run a transparent research inference")
     selected_model_id = st.selectbox(
