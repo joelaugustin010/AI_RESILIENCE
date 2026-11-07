@@ -17,7 +17,14 @@ from typing import Any
 import joblib
 import numpy as np
 import pandas as pd
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.metrics import (
+    f1_score,
+    mean_absolute_error,
+    mean_squared_error,
+    precision_score,
+    r2_score,
+    recall_score,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -42,6 +49,49 @@ def _metrics(actual: np.ndarray, predicted: np.ndarray) -> dict[str, float | int
         "r2": float(r2_score(actual, predicted)) if len(actual) > 1 else 0.0,
         "n": int(len(actual)),
     }
+
+
+def _wet_day_metrics(
+    actual: np.ndarray, predicted: np.ndarray, threshold_mm: float = 1.0
+) -> dict[str, float | int]:
+    """Evaluate wet-day occurrence at an explicit 1 mm/day threshold.
+
+    These are thresholded point-regression diagnostics, not calibrated
+    probabilities and not a public warning classifier.
+    """
+    if len(actual) != len(predicted) or len(actual) == 0:
+        raise ValueError("Wet-day metrics require paired non-empty arrays.")
+    actual_wet = np.asarray(actual, dtype=float) >= threshold_mm
+    predicted_wet = np.asarray(predicted, dtype=float) >= threshold_mm
+    return {
+        "threshold_mm": float(threshold_mm),
+        "actual_wet_days": int(actual_wet.sum()),
+        "predicted_wet_days": int(predicted_wet.sum()),
+        "precision": float(precision_score(actual_wet, predicted_wet, zero_division=0)),
+        "recall": float(recall_score(actual_wet, predicted_wet, zero_division=0)),
+        "f1": float(f1_score(actual_wet, predicted_wet, zero_division=0)),
+        "n": int(len(actual_wet)),
+    }
+
+
+def _seasonal_metrics(
+    actual: np.ndarray, predicted: np.ndarray, dates: pd.Series
+) -> dict[str, dict[str, float | int]]:
+    """Report holdout regression skill separately for monsoon and other months."""
+    month = pd.to_datetime(dates).dt.month
+    masks = {
+        "southwest_monsoon_jun_sep": month.between(6, 9).to_numpy(),
+        "other_months": (~month.between(6, 9)).to_numpy(),
+    }
+    result: dict[str, dict[str, float | int]] = {}
+    for name, mask in masks.items():
+        if not mask.any():
+            result[name] = {"n": 0}
+            continue
+        metrics = _metrics(actual[mask], predicted[mask])
+        metrics["mean_bias_mm"] = float(np.mean(actual[mask] - predicted[mask]))
+        result[name] = metrics
+    return result
 
 
 def _load_location(location: str) -> tuple[pd.DataFrame, list[str], str]:
@@ -229,6 +279,8 @@ def train(output_dir: Path) -> dict[str, Any]:
         "candidate_validation_metrics": candidates,
         "held_out_kochi_metrics": model_metrics,
         "regression_calibration_bins": _regression_calibration_bins(actual, predicted),
+        "wet_day_occurrence_metrics": _wet_day_metrics(actual, predicted, threshold_mm=1.0),
+        "seasonal_holdout_metrics": _seasonal_metrics(actual, predicted, test[DATE]),
         "mean_prediction_bias_mm": float(np.mean(actual - predicted)),
         "paired_model_metrics_vs_persistence": persistence_model_metrics,
         "persistence_baseline_metrics": baseline_metrics,
@@ -287,6 +339,8 @@ def main() -> None:
         "model_id": report["model_id"],
         "selected_model_type": report["selected_model_type"],
         "held_out_kochi_metrics": report["held_out_kochi_metrics"],
+        "wet_day_occurrence_metrics": report["wet_day_occurrence_metrics"],
+        "seasonal_holdout_metrics": report["seasonal_holdout_metrics"],
         "persistence_baseline_metrics": report["persistence_baseline_metrics"],
         "seasonal_climatology_baseline_metrics": report["seasonal_climatology_baseline_metrics"],
         "mae_skill_over_persistence": report["mae_skill_over_persistence"],
