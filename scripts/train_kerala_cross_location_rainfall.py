@@ -56,7 +56,8 @@ def _load_location(location: str) -> tuple[pd.DataFrame, list[str], str]:
     columns = [name for name in columns if name not in forbidden]
     if not columns or any(name.startswith("target_") for name in columns):
         raise ValueError("Feature contract is empty or contains a target column.")
-    frame = dataset.frame[[DATE, TARGET, BASELINE, *columns]].copy()
+    selected_columns = list(dict.fromkeys([DATE, TARGET, BASELINE, *columns]))
+    frame = dataset.frame[selected_columns].copy()
     frame["location"] = location
     frame[DATE] = pd.to_datetime(frame[DATE], errors="coerce")
     frame[TARGET] = pd.to_numeric(frame[TARGET], errors="coerce")
