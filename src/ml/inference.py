@@ -119,16 +119,6 @@ def predict_from_context(
             f"Model {model_id!r} received out-of-training-domain inputs; "
             "no extrapolative prediction is produced: " + details
         )
-    outside = out_of_training_range_features(card, context)
-    if outside:
-        details = ", ".join(
-            f"{name}={bounds['value']:g} outside [{bounds['min']:g}, {bounds['max']:g}]"
-            for name, bounds in outside.items()
-        )
-        raise ModelNotUsableError(
-            f"Model {model_id!r} received out-of-training-domain inputs; "
-            "no extrapolative estimate is produced: " + details
-        )
     frame = _context_frame(card, context)
     pipeline = load_artifact(model_id)
     if not hasattr(pipeline, "predict_proba"):
@@ -206,6 +196,16 @@ def predict_regression_from_context(model_id: str, context: dict[str, Any]) -> d
     problems = card_consistency_problems(card)
     if problems:
         raise ModelNotUsableError(f"Model card for {model_id!r} is inconsistent: {problems}")
+    outside = out_of_training_range_features(card, context)
+    if outside:
+        details = ", ".join(
+            f"{name}={bounds['value']:g} outside [{bounds['min']:g}, {bounds['max']:g}]"
+            for name, bounds in outside.items()
+        )
+        raise ModelNotUsableError(
+            f"Model {model_id!r} received out-of-training-domain inputs; "
+            "no extrapolative estimate is produced: " + details
+        )
     frame = _context_frame(card, context)
     pipeline = load_artifact(model_id)
     if not hasattr(pipeline, "predict"):
