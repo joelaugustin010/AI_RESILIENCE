@@ -1096,103 +1096,6 @@ with map_display_slot:
             report = layer["report"]
             validation_status = layer["metadata"].get("validation_status", "PROVISIONAL")
             legend_rows.append((title, color_hex, f"{report['feature_count']} features; {validation_status}; role={role}"))
-            st.caption(
-                f"{title}: {layer['metadata']['publisher']} | {layer['metadata']['license']} | "
-                f"retrieved {layer['metadata']['retrieved_on']} | {report['feature_count']} feature(s) passed structural checks | "
-                f"status {validation_status}. {layer['metadata'].get('analysis_status', 'Source truth and completeness are not independently authenticated.')}"
-            )
-            source_url = layer["metadata"].get("source_url", "")
-            if source_url.startswith(("https://", "http://")):
-                st.markdown(f"[Dataset source]({source_url})")
-            if logical_layer_id.startswith("osm_kochi_"):
-                copyright_url = layer["metadata"].get("copyright_url", "https://www.openstreetmap.org/copyright")
-                license_url = layer["metadata"].get("license_url", "https://opendatacommons.org/licenses/odbl/1-0/")
-                st.markdown(f"[© OpenStreetMap contributors]({copyright_url}) | [ODbL 1.0 terms]({license_url})")
-            if layer["metadata"].get("excluded_invalid_features"):
-                excluded = layer["metadata"]["excluded_invalid_features"]
-                st.warning(
-                    f"{len(excluded)} source feature(s) with invalid polygon geometry were excluded from this processed display. "
-                    f"The untouched {layer['metadata'].get('source_snapshot_file', 'source snapshot')} remains in data/raw; "
-                    "this map layer is incomplete and is not suitable for legal boundaries or exposure calculations."
-                )
-            if layer["metadata"].get("quality_notes"):
-                st.warning("Data-quality notes: " + " ".join(layer["metadata"]["quality_notes"]))
-            feature_records = layer.get("features", [])
-            if feature_records:
-                with st.expander(f"Inspect feature attributes — {layer['metadata']['title']}"):
-                    st.caption(
-                        "Choose a record to inspect every source property. Display aliases used by the map are added only in memory; "
-                        "the source GeoJSON files are not changed."
-                    )
-                    feature_number = st.number_input(
-                        "Feature number",
-                        min_value=1,
-                        max_value=len(feature_records),
-                        value=1,
-                        step=1,
-                        key=f"feature-inspector-{layer['metadata']['dataset_id']}",
-                    )
-                    inspected = feature_records[int(feature_number) - 1]
-                    properties = inspected.get("properties") or {}
-                    st.markdown("**Key location details**")
-                    detail_cols = st.columns(2)
-                    # Use the same alias resolver as map tooltips so GIS exports with
-                    # spaces, case changes, or suffixed fields (e.g. Ward_Name_1) resolve
-                    # consistently in the inspector as well.
-                    inspected_bound_name = _first_property(
-                        properties,
-                        (
-                            "Bound_Name", "Bound Name", "bound_name", "boundname", "bound_name_1",
-                            "boundname_1", "boundary_name", "boundaryname", "ward_boundary_name",
-                            "Ward_Name", "Ward Name", "ward_name", "wardname", "name_en", "name",
-                        ),
-                        f"Boundary label unavailable (feature {int(feature_number)})",
-                    )
-                    inspected_ward_name = _first_property(
-                        properties,
-                        (
-                            "Ward_Name", "Ward Name", "ward_name", "wardname", "ward_name_en",
-                            "wardnameen", "ward_label", "wardname_1", "name_en", "name",
-                        ),
-                        f"Ward name unavailable (feature {int(feature_number)})",
-                    )
-                    inspected_ward_number = _first_property(
-                        properties,
-                        ("Ward_No", "Ward No", "ward_no", "ward_number", "wardnumber", "ward_id", "wardid"),
-                        "",
-                    )
-                    inspected_ward_name = resolve_inspector_ward_name(
-                        inspected_ward_name, inspected_bound_name, inspected_ward_number, int(feature_number)
-                    )
-                    # A missing ward name may fall back to a genuine boundary label;
-                    # a numeric ward ID is never presented as the human-readable name.
-                    detail_cols[0].metric("Bound Name", inspected_bound_name)
-                    detail_cols[1].metric("Ward Name", inspected_ward_name)
-                    if properties:
-                        st.markdown("**All original source attributes**")
-                        st.json(properties)
-                    else:
-                        st.info("This feature has no recorded properties.")
-        asset_layers = [layer for layer in processed_layers if layer["metadata"].get("layer_role") == "asset"]
-        hazard_layers = [layer for layer in processed_layers if layer["metadata"].get("layer_role") == "hazard"]
-        st.subheader("Spatial exposure overlay")
-        if not asset_layers:
-            st.info("Unknown / unassessable exposure: no validated asset-location layer is available. OSM healthcare, emergency and road features are provisional community-mapped context, so they cannot support an operational exposure count. The JRC RP100 preview is modelled scenario context, not an observed footprint; KSDMA pixel values remain uninterpreted. NIHFW hospital coordinates are review-only because coordinate order, CRS/datum, and positional accuracy are undocumented. No facility is assumed safe or exposed.")
-        elif not hazard_layers:
-            st.info("Unknown exposure: no compatible processed hazard layer is available. No asset is assumed safe.")
-        else:
-            asset_options = {item["metadata"]["title"]: item for item in asset_layers}
-            hazard_options = {item["metadata"]["title"]: item for item in hazard_layers}
-            selected_assets = st.multiselect("Asset layers", list(asset_options), key="exposure_asset_layers")
-            selected_hazards = st.multiselect("Hazard layers", list(hazard_options), key="exposure_hazard_layers")
-            if selected_assets:
-                asset_features = [feature for label in selected_assets for feature in asset_options[label]["features"]]
-                hazard_features = [feature for label in selected_hazards for feature in hazard_options[label]["features"]]
-                results = classify_exposure(asset_features, hazard_features)
-                display_dataframe(pd.DataFrame(results), hide_index=True, width="stretch", alt="Asset-by-asset geometry intersection results and uncertainty labels")
-                st.caption("Intersection method: planar topological geometry overlay in EPSG:4326; boundary contact counts as intersection. No distance, depth, probability, vulnerability, or safety is inferred. A result with no detected intersection applies only within the selected hazard layer's documented coverage.")
-    else:
-        st.info("No processed source-reviewed geometry layers are available yet. The layer-ingestion instructions are in data/reference/SPATIAL_DATA_FOUNDATION.md.")
 
 if uploaded is not None:
     try:
@@ -1297,6 +1200,115 @@ with map_display_slot:
     if legend_rows:
         section_intro("Map key", "Legend", "Symbols describe displayed source layers and their role in this review.")
         display_dataframe(pd.DataFrame(legend_rows, columns=["Layer", "Symbol", "Meaning"]), hide_index=True, width="stretch")
+
+
+# Keep detailed source QA, provenance, and attribute inspection below the map so
+# the map remains the visual focus while all limitations stay available.
+if processed_layers:
+    st.subheader("Processed spatial layer sources and data-quality review")
+    for layer in processed_layers:
+        report = layer["report"]
+        validation_status = layer["metadata"].get("validation_status", "PROVISIONAL")
+        legend_rows.append((title, color_hex, f"{report['feature_count']} features; {validation_status}; role={role}"))
+        st.caption(
+            f"{title}: {layer['metadata']['publisher']} | {layer['metadata']['license']} | "
+            f"retrieved {layer['metadata']['retrieved_on']} | {report['feature_count']} feature(s) passed structural checks | "
+            f"status {validation_status}. {layer['metadata'].get('analysis_status', 'Source truth and completeness are not independently authenticated.')}"
+        )
+        source_url = layer["metadata"].get("source_url", "")
+        if source_url.startswith(("https://", "http://")):
+            st.markdown(f"[Dataset source]({source_url})")
+        if logical_layer_id.startswith("osm_kochi_"):
+            copyright_url = layer["metadata"].get("copyright_url", "https://www.openstreetmap.org/copyright")
+            license_url = layer["metadata"].get("license_url", "https://opendatacommons.org/licenses/odbl/1-0/")
+            st.markdown(f"[© OpenStreetMap contributors]({copyright_url}) | [ODbL 1.0 terms]({license_url})")
+        if layer["metadata"].get("excluded_invalid_features"):
+            excluded = layer["metadata"]["excluded_invalid_features"]
+            st.warning(
+                f"{len(excluded)} source feature(s) with invalid polygon geometry were excluded from this processed display. "
+                f"The untouched {layer['metadata'].get('source_snapshot_file', 'source snapshot')} remains in data/raw; "
+                "this map layer is incomplete and is not suitable for legal boundaries or exposure calculations."
+            )
+        if layer["metadata"].get("quality_notes"):
+            st.warning("Data-quality notes: " + " ".join(layer["metadata"]["quality_notes"]))
+        feature_records = layer.get("features", [])
+        if feature_records:
+            with st.expander(f"Inspect feature attributes — {layer['metadata']['title']}"):
+                st.caption(
+                    "Choose a record to inspect every source property. Display aliases used by the map are added only in memory; "
+                    "the source GeoJSON files are not changed."
+                )
+                feature_number = st.number_input(
+                    "Feature number",
+                    min_value=1,
+                    max_value=len(feature_records),
+                    value=1,
+                    step=1,
+                    key=f"feature-inspector-{layer['metadata']['dataset_id']}",
+                )
+                inspected = feature_records[int(feature_number) - 1]
+                properties = inspected.get("properties") or {}
+                st.markdown("**Key location details**")
+                detail_cols = st.columns(2)
+                # Use the same alias resolver as map tooltips so GIS exports with
+                # spaces, case changes, or suffixed fields (e.g. Ward_Name_1) resolve
+                # consistently in the inspector as well.
+                inspected_bound_name = _first_property(
+                    properties,
+                    (
+                        "Bound_Name", "Bound Name", "bound_name", "boundname", "bound_name_1",
+                        "boundname_1", "boundary_name", "boundaryname", "ward_boundary_name",
+                        "Ward_Name", "Ward Name", "ward_name", "wardname", "name_en", "name",
+                    ),
+                    f"Boundary label unavailable (feature {int(feature_number)})",
+                )
+                inspected_ward_name = _first_property(
+                    properties,
+                    (
+                        "Ward_Name", "Ward Name", "ward_name", "wardname", "ward_name_en",
+                        "wardnameen", "ward_label", "wardname_1", "name_en", "name",
+                    ),
+                    f"Ward name unavailable (feature {int(feature_number)})",
+                )
+                inspected_ward_number = _first_property(
+                    properties,
+                    ("Ward_No", "Ward No", "ward_no", "ward_number", "wardnumber", "ward_id", "wardid"),
+                    "",
+                )
+                inspected_ward_name = resolve_inspector_ward_name(
+                    inspected_ward_name, inspected_bound_name, inspected_ward_number, int(feature_number)
+                )
+                # A missing ward name may fall back to a genuine boundary label;
+                # a numeric ward ID is never presented as the human-readable name.
+                detail_cols[0].metric("Bound Name", inspected_bound_name)
+                detail_cols[1].metric("Ward Name", inspected_ward_name)
+                if properties:
+                    st.markdown("**All original source attributes**")
+                    st.json(properties)
+                else:
+                    st.info("This feature has no recorded properties.")
+
+        asset_layers = [layer for layer in processed_layers if layer["metadata"].get("layer_role") == "asset"]
+        hazard_layers = [layer for layer in processed_layers if layer["metadata"].get("layer_role") == "hazard"]
+        st.subheader("Spatial exposure overlay")
+        if not asset_layers:
+            st.info("Unknown / unassessable exposure: no validated asset-location layer is available. OSM healthcare, emergency and road features are provisional community-mapped context, so they cannot support an operational exposure count. The JRC RP100 preview is modelled scenario context, not an observed footprint; KSDMA pixel values remain uninterpreted. NIHFW hospital coordinates are review-only because coordinate order, CRS/datum, and positional accuracy are undocumented. No facility is assumed safe or exposed.")
+        elif not hazard_layers:
+            st.info("Unknown exposure: no compatible processed hazard layer is available. No asset is assumed safe.")
+        else:
+            asset_options = {item["metadata"]["title"]: item for item in asset_layers}
+            hazard_options = {item["metadata"]["title"]: item for item in hazard_layers}
+            selected_assets = st.multiselect("Asset layers", list(asset_options), key="exposure_asset_layers")
+            selected_hazards = st.multiselect("Hazard layers", list(hazard_options), key="exposure_hazard_layers")
+            if selected_assets:
+                asset_features = [feature for label in selected_assets for feature in asset_options[label]["features"]]
+                hazard_features = [feature for label in selected_hazards for feature in hazard_options[label]["features"]]
+                results = classify_exposure(asset_features, hazard_features)
+                display_dataframe(pd.DataFrame(results), hide_index=True, width="stretch", alt="Asset-by-asset geometry intersection results and uncertainty labels")
+                st.caption("Intersection method: planar topological geometry overlay in EPSG:4326; boundary contact counts as intersection. No distance, depth, probability, vulnerability, or safety is inferred. A result with no detected intersection applies only within the selected hazard layer's documented coverage.")
+    else:
+        st.info("No processed source-reviewed geometry layers are available yet. The layer-ingestion instructions are in data/reference/SPATIAL_DATA_FOUNDATION.md.")
+
 
 
 st.subheader("Modelled flood-depth screening at mapped assets (provisional)")
