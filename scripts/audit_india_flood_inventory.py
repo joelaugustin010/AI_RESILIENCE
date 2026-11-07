@@ -54,7 +54,8 @@ def audit_inventory(frame: pd.DataFrame, *, md5: str | None = None) -> dict[str,
         problems.append("Start Date contains missing or invalid dates.")
     if end.isna().any():
         problems.append("End Date contains missing or invalid dates.")
-    if not start.isna().any() and not end.isna().any() and (end < start).any():
+    comparable_dates = start.notna() & end.notna()
+    if (end[comparable_dates] < start[comparable_dates]).any():
         problems.append("End Date precedes Start Date for one or more events.")
 
     lat = pd.to_numeric(data["Latitude"], errors="coerce")
