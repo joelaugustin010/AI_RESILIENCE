@@ -1046,7 +1046,7 @@ with map_display_slot:
 
 with map_display_slot:
     if processed_layers:
-        st.subheader("Processed spatial layers (validation and exclusions shown per source)")
+        st.subheader("Map layer selection")
         processed_titles = {
             f"{layer['metadata']['title']} [{layer['metadata']['dataset_id']}]": layer
             for layer in processed_layers
