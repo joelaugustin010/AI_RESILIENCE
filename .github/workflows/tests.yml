@@ -262,14 +262,18 @@ jobs:
       - name: Compile and test the research experiment
         run: |
           python -m py_compile scripts/train_kerala_cross_location_rainfall.py
-          python -m pytest -q tests/test_kerala_cross_location_rainfall.py
+          python -m pytest -q tests/test_kerala_cross_location_rainfall.py tests/test_kerala_weather_acquisition.py
+      - name: Acquire and validate the four Open-Meteo weather records
+        run: python scripts/acquire_kerala_weather_transfer_data.py
       - name: Train spatially held-out Kerala rainfall model
         run: python scripts/train_kerala_cross_location_rainfall.py
       - name: Upload research model and evaluation card
         uses: actions/upload-artifact@v4
         with:
           name: kerala-cross-location-rainfall-${{ github.sha }}
-          path: models/research/kerala_cross_location_rainfall_nextday/
+          path: |
+            models/research/kerala_cross_location_rainfall_nextday/
+            reports/kerala_weather_transfer_acquisition.json
           if-no-files-found: error
           retention-days: 14
   india-flood-inventory-audit:
