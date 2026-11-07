@@ -1313,50 +1313,222 @@ for row_start in range(0, len(navigation_groups), 2):
                     st.page_link(path, label=label, icon=page_icon, width="stretch")
 
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 # 05 - Contribution to the Sustainable Development Goals
 # ---------------------------------------------------------------------------
 st.markdown(
     """
     <style>
-      .ar-sdg-section { margin: 4.4rem 0 2.6rem; padding: clamp(1.4rem, 3vw, 2.5rem); border: 1px solid rgba(130,190,199,.18); border-radius: 30px; background: linear-gradient(145deg, rgba(10,35,50,.94), rgba(6,25,38,.94)); box-shadow: 0 24px 70px rgba(0,0,0,.18); }
-      .ar-sdg-intro { max-width: 780px; margin-bottom: 1.35rem; }
-      .ar-sdg-intro .ar-overline { color: #7ff2dc; }
-      .ar-sdg-intro h2 { color: #f2ffff; font-size: clamp(1.7rem, 3vw, 2.65rem); line-height: 1.08; letter-spacing: -.04em; margin: .35rem 0 .65rem; }
-      .ar-sdg-intro p { color: #b9d4d8; line-height: 1.7; margin: 0; }
-      .ar-sdg-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .9rem; }
-      .ar-sdg-card { display: grid; grid-template-columns: 66px 1fr; gap: .85rem; min-height: 170px; padding: 1rem; border: 1px solid rgba(130,190,199,.18); border-radius: 20px; background: rgba(12,48,64,.64); transition: transform .22s var(--ar-ease), border-color .22s var(--ar-ease), background .22s var(--ar-ease); }
-      .ar-sdg-card:hover { transform: translateY(-4px); border-color: rgba(127,245,220,.52); background: rgba(16,67,78,.82); }
-      .ar-sdg-card img { width: 66px; height: 66px; border-radius: 10px; display: block; }
-      .ar-sdg-card h3 { color: #efffff; font-size: 1rem; line-height: 1.25; margin: .08rem 0 .35rem; }
-      .ar-sdg-card h3 span { color: #7ff2dc; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; display: block; margin-bottom: .18rem; }
-      .ar-sdg-card p { color: #b9d4d8; font-size: .82rem; line-height: 1.55; margin: 0; }
-      .ar-sdg-note { margin-top: 1rem; padding-top: .85rem; border-top: 1px solid rgba(130,190,199,.15); color: #8fb8bd; font-size: .73rem; line-height: 1.55; }
-      .ar-sdg-note a { color: #9cf8e6 !important; }
-      @media (max-width: 800px) { .ar-sdg-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-      @media (max-width: 560px) { .ar-sdg-grid { grid-template-columns: 1fr; } .ar-sdg-card { min-height: 0; } }
-      @media (prefers-reduced-motion: reduce) { .ar-sdg-card:hover { transform: none; } }
+      .ar-sdg-section {
+        position: relative;
+        isolation: isolate;
+        overflow: hidden;
+        margin: 4.4rem 0 2.6rem;
+        padding: clamp(1.5rem, 3.2vw, 2.8rem);
+        border: 1px solid rgba(23,78,85,.16);
+        border-radius: 28px;
+        background:
+          radial-gradient(ellipse at 92% 0%, rgba(41,155,145,.12), transparent 27rem),
+          linear-gradient(145deg, #ffffff 0%, #edf4f1 100%);
+        box-shadow: 0 20px 54px rgba(23,78,85,.08);
+      }
+      .ar-sdg-heading {
+        display: grid;
+        grid-template-columns: minmax(0,1.25fr) minmax(220px,.75fr);
+        align-items: end;
+        gap: 1.2rem 2rem;
+        margin-bottom: 1.5rem;
+      }
+      .ar-sdg-intro { max-width: 780px; }
+      .ar-sdg-intro .ar-overline { color: #247f77 !important; }
+      .ar-sdg-intro h2 {
+        margin: .5rem 0 .7rem !important;
+        color: #173f43 !important;
+        font-size: clamp(1.8rem,3.2vw,2.8rem) !important;
+        line-height: 1.04 !important;
+        letter-spacing: -.045em !important;
+      }
+      .ar-sdg-intro p {
+        max-width: 720px;
+        margin: 0;
+        color: #586f6b;
+        font-size: .96rem;
+        line-height: 1.7;
+      }
+      .ar-sdg-aside {
+        padding: 1rem 1.1rem;
+        border: 1px solid rgba(23,78,85,.13);
+        border-radius: 16px;
+        background: rgba(255,255,255,.76);
+        color: #536d68;
+        font-size: .8rem;
+        line-height: 1.55;
+      }
+      .ar-sdg-aside strong {
+        display: block;
+        margin-bottom: .25rem;
+        color: #174e55;
+        font-size: .78rem;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+      }
+      .ar-sdg-grid {
+        display: grid;
+        grid-template-columns: repeat(3,minmax(0,1fr));
+        gap: .9rem;
+      }
+      .ar-sdg-card {
+        --sdg-color: #247f77;
+        position: relative;
+        display: grid;
+        grid-template-columns: 76px minmax(0,1fr);
+        align-items: start;
+        gap: .9rem;
+        min-height: 174px;
+        padding: 1.1rem;
+        border: 1px solid rgba(23,78,85,.13);
+        border-top: 3px solid var(--sdg-color);
+        border-radius: 18px;
+        background: rgba(255,255,255,.88);
+        box-shadow: 0 8px 22px rgba(23,78,85,.045);
+        transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+      }
+      .ar-sdg-card:hover {
+        transform: translateY(-3px);
+        border-color: color-mix(in srgb, var(--sdg-color) 45%, white);
+        box-shadow: 0 14px 30px rgba(23,78,85,.10);
+      }
+      .ar-sdg-card img {
+        display: block;
+        width: 76px;
+        height: 76px;
+        object-fit: contain;
+        border-radius: 9px;
+        box-shadow: 0 3px 10px rgba(0,0,0,.08);
+      }
+      .ar-sdg-card h3 {
+        margin: .05rem 0 .45rem !important;
+        color: #173f43 !important;
+        font-size: .98rem !important;
+        line-height: 1.25 !important;
+        letter-spacing: -.015em !important;
+      }
+      .ar-sdg-card h3 span {
+        display: block;
+        margin-bottom: .22rem;
+        color: var(--sdg-color);
+        font-size: .68rem;
+        font-weight: 850;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+      }
+      .ar-sdg-card p {
+        margin: 0;
+        color: #5d716d;
+        font-size: .8rem;
+        line-height: 1.55;
+      }
+      .ar-sdg-link {
+        display: inline-block;
+        margin-top: .55rem;
+        color: #247f77;
+        font-size: .7rem;
+        font-weight: 750;
+        letter-spacing: .025em;
+      }
+      .ar-sdg-method {
+        display: flex;
+        align-items: flex-start;
+        gap: .7rem;
+        margin-top: 1.15rem;
+        padding: .95rem 1.05rem;
+        border: 1px solid rgba(41,155,145,.18);
+        border-radius: 14px;
+        background: rgba(220,231,232,.55);
+        color: #536d68;
+        font-size: .76rem;
+        line-height: 1.6;
+      }
+      .ar-sdg-method strong { color: #174e55; }
+      .ar-sdg-method-mark {
+        flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        background: rgba(41,155,145,.14);
+        color: #176e68;
+        font-weight: 900;
+      }
+      .ar-sdg-note {
+        margin-top: .9rem;
+        color: #71827b;
+        font-size: .68rem;
+        line-height: 1.55;
+      }
+      .ar-sdg-note a { color: #176b54 !important; text-decoration: underline; text-underline-offset: 2px; }
+      @media (max-width: 900px) {
+        .ar-sdg-heading { grid-template-columns: 1fr; }
+        .ar-sdg-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      }
+      @media (max-width: 600px) {
+        .ar-sdg-grid { grid-template-columns: 1fr; }
+        .ar-sdg-card { min-height: 0; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .ar-sdg-card { transition: none; }
+        .ar-sdg-card:hover { transform: none; }
+      }
     </style>
     <section class="ar-sdg-section" aria-labelledby="ar-sdg-title">
-      <div class="ar-sdg-intro">
-        <span class="ar-overline">06 · Shared direction</span>
-        <h2 id="ar-sdg-title">OUR CONTRIBUTION TO THE UNITED NATIONS SUSTAINABLE DEVELOPMENT GOALS</h2>
-        <p>AI RESILIENCE connects environmental evidence, disaster preparedness and infrastructure planning. These are the goals the platform supports through its existing workspaces — not a certification or claim of achievement.</p>
+      <div class="ar-sdg-heading">
+        <div class="ar-sdg-intro">
+          <span class="ar-overline">06 · Shared direction</span>
+          <h2 id="ar-sdg-title">Technology in service of a more resilient future.</h2>
+          <p>AI RESILIENCE connects environmental evidence, disaster preparedness and infrastructure planning in Kochi. These six Sustainable Development Goals describe the platform's areas of alignment and contribution pathways.</p>
+        </div>
+        <aside class="ar-sdg-aside">
+          <strong>How to read this section</strong>
+          Explore the goal, then see which existing platform capability relates to it. These are project contributions and intended pathways — not measured SDG outcomes or a claim of UN endorsement.
+        </aside>
       </div>
       <div class="ar-sdg-grid">
-        <article class="ar-sdg-card"><img src="app/static/images/sdg/sdg-3.png" alt="SDG 3: Good Health and Well-being"><div><h3><span>SDG 3</span>Good Health and Well-being</h3><p>Hospital accessibility and disaster-preparedness workspaces help teams think about healthcare continuity during emergencies.</p></div></article>
-        <article class="ar-sdg-card"><img src="app/static/images/sdg/sdg-6.png" alt="SDG 6: Clean Water and Sanitation"><div><h3><span>SDG 6</span>Clean Water and Sanitation</h3><p>Flood intelligence and environmental monitoring support understanding of water-related risks and evidence gaps.</p></div></article>
-        <article class="ar-sdg-card"><img src="app/static/images/sdg/sdg-9.png" alt="SDG 9: Industry, Innovation and Infrastructure"><div><h3><span>SDG 9</span>Industry, Innovation and Infrastructure</h3><p>Industrial pollution intelligence and resilient infrastructure planning bring transparent evidence into design conversations.</p></div></article>
-        <article class="ar-sdg-card"><img src="app/static/images/sdg/sdg-11.png" alt="SDG 11: Sustainable Cities and Communities"><div><h3><span>SDG 11</span>Sustainable Cities and Communities</h3><p>Urban flood analysis, disaster intelligence, hospital resilience and mitigation planning support more prepared communities.</p></div></article>
-        <article class="ar-sdg-card"><img src="app/static/images/sdg/sdg-13.png" alt="SDG 13: Climate Action"><div><h3><span>SDG 13</span>Climate Action</h3><p>Hazard monitoring and scenario work help users understand climate-related pressures and prepare with appropriate caution.</p></div></article>
-        <article class="ar-sdg-card"><img src="app/static/images/sdg/sdg-15.png" alt="SDG 15: Life on Land"><div><h3><span>SDG 15</span>Life on Land</h3><p>Kochi's wetlands, green spaces and connected ecosystems are important context for urban resilience planning.</p></div></article>
+        <article class="ar-sdg-card" style="--sdg-color:#4c9f38">
+          <img src="app/static/images/sdg/sdg-3.png" alt="United Nations Sustainable Development Goal 3 icon">
+          <div><h3><span>Goal 03 · People</span>Good Health and Well-being</h3><p>Hospital vulnerability and preparedness work help examine access, exposure and continuity questions for critical healthcare services.</p><span class="ar-sdg-link">Related workspace · Hospital Vulnerability</span></div>
+        </article>
+        <article class="ar-sdg-card" style="--sdg-color:#26bde2">
+          <img src="app/static/images/sdg/sdg-6.png" alt="United Nations Sustainable Development Goal 6 icon">
+          <div><h3><span>Goal 06 · Water</span>Clean Water and Sanitation</h3><p>Flood and hydrology evidence helps users investigate water-related pressures, drainage context and gaps in available observations.</p><span class="ar-sdg-link">Related workspace · Kochi Map and Flood Evidence</span></div>
+        </article>
+        <article class="ar-sdg-card" style="--sdg-color:#f36d25">
+          <img src="app/static/images/sdg/sdg-9.png" alt="United Nations Sustainable Development Goal 9 icon">
+          <div><h3><span>Goal 09 · Infrastructure</span>Industry, Innovation and Infrastructure</h3><p>Industrial air-quality context and mitigation planning bring documented evidence into infrastructure and resilience discussions.</p><span class="ar-sdg-link">Related workspace · Air Pollution and Mitigation Design</span></div>
+        </article>
+        <article class="ar-sdg-card" style="--sdg-color:#f99d26">
+          <img src="app/static/images/sdg/sdg-11.png" alt="United Nations Sustainable Development Goal 11 icon">
+          <div><h3><span>Goal 11 · Cities</span>Sustainable Cities and Communities</h3><p>Kochi-focused mapping, multi-hazard evidence review and preparedness workflows support more informed urban resilience planning.</p><span class="ar-sdg-link">Related workspace · Kochi Map and Decision Workflow</span></div>
+        </article>
+        <article class="ar-sdg-card" style="--sdg-color:#3f7e44">
+          <img src="app/static/images/sdg/sdg-13.png" alt="United Nations Sustainable Development Goal 13 icon">
+          <div><h3><span>Goal 13 · Climate</span>Climate Action</h3><p>Rainfall, hazard and scenario evidence can help users explore climate-related pressures while keeping uncertainty and validation limits visible.</p><span class="ar-sdg-link">Related workspace · Multi-Hazard Evidence Review</span></div>
+        </article>
+        <article class="ar-sdg-card" style="--sdg-color:#56c02b">
+          <img src="app/static/images/sdg/sdg-15.png" alt="United Nations Sustainable Development Goal 15 icon">
+          <div><h3><span>Goal 15 · Nature</span>Life on Land</h3><p>Wetlands, green spaces and connected ecosystems provide important environmental context for understanding urban resilience.</p><span class="ar-sdg-link">Related context · Kochi's ecological setting</span></div>
+        </article>
       </div>
-      <div class="ar-sdg-note">Official SDG icons are used without the UN emblem for informational purposes. <a href="https://sdgs.un.org/goals" target="_blank" rel="noopener">Learn about the UN Sustainable Development Goals</a>. The content of this publication has not been approved by the United Nations and does not reflect the views of the United Nations or its officials or Member States.</div>
+      <div class="ar-sdg-method">
+        <span class="ar-sdg-method-mark" aria-hidden="true">i</span>
+        <div><strong>Evidence and impact integrity.</strong> The platform currently describes capabilities and contribution pathways. It does not calculate lives saved, emissions avoided, hectares restored or progress against official SDG indicators. Such claims require independently sourced measurements and a documented methodology.</div>
+      </div>
+      <div class="ar-sdg-note">Official SDG icons are used for informational purposes. <a href="https://sdgs.un.org/goals" target="_blank" rel="noopener">Explore the United Nations Sustainable Development Goals</a>. The content of this publication has not been approved by the United Nations and does not reflect the views of the United Nations or its officials or Member States.</div>
     </section>
     """,
     unsafe_allow_html=True,
 )
 
-# ---------------------------------------------------------------------------
 # Footer and credits
 # ---------------------------------------------------------------------------
 st.markdown(
