@@ -36,7 +36,7 @@ class ProvenanceLineEndingTests(unittest.TestCase):
         for relative_path in HASHED_CSV_PATHS:
             with self.subTest(path=relative_path):
                 self.assertIn(relative_path, expected)
-                                # Canonicalize the registered source CSVs to CRLF before hashing.
+                # Canonicalize the registered source CSVs to CRLF before hashing.
                 # Git stores normalized text blobs, so checkout settings must not
                 # change the byte representation used by this provenance register.
                 raw = (ROOT / relative_path).read_bytes()
