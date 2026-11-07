@@ -888,7 +888,7 @@ with map_display_slot:
         "Basemap appearance",
         options=["Light · Eco", "Dark", "Satellite imagery"],
         horizontal=True,
-        index=0,
+        index=2,
         key="kochi_basemap_theme",
         help=(
             "Satellite imagery uses Esri World Imagery tiles. It is interactive, but not live video; "
@@ -1002,15 +1002,16 @@ with map_display_slot:
                 landcover_metadata = landcover_context["metadata"]
                 landcover_processing = landcover_metadata["processing"]
                 show_landcover = st.checkbox(
-                    "ESA WorldCover 2021 land-cover context (not a hazard or exposure layer)",
-                    value=True,
+                    "Show historical ESA WorldCover 2021 reference (not a 2026 map)",
+                    value=False,
                     key=f"kochimap_worldcover_{active_hazard}",
                 )
                 st.markdown("**What this map shows**")
                 st.write(
-                    "Each pixel is assigned to a land-cover category from satellite observations made in 2021. "
-                    "The colours identify the type of surface ESA classified; they do not show danger, risk, "
-                    "pollution level, flood depth, or how safe a place is."
+                    "This optional dataset classifies land cover from observations made in 2021. "
+                    "It is kept off by default so it cannot be mistaken for a current 2026 view. "
+                    "Use the interactive Satellite imagery basemap for visual inspection; its image "
+                    "capture dates vary by location and are not guaranteed to be from 2026."
                 )
                 st.markdown(
                     "[ESA WorldCover source](https://esa-worldcover.org/en/data-access) | "
