@@ -22,6 +22,7 @@ from src.kochi_map_layers import build_jrc_preview_layer
 from src.spatial_data import classify_exposure, processed_layer_issues, read_processed_layers, validate_geojson
 from src.landcover_context import validate_worldcover_preview
 from src.map_integration import MAP_CONTEXT_KEY, selected_feature_properties
+from src.map_legend import render_map_legend
 from src.ui_theme import page_header, section_intro
 from src.map_integration import hazard_has_flood_component, hazard_layer_availability, hazard_map_references
 
@@ -1257,8 +1258,8 @@ with map_display_slot:
     else:
         st.info("Turn on at least one layer to display the map.")
     if legend_rows:
-        section_intro("Map key", "Legend", "Symbols describe displayed source layers and their role in this review.")
-        display_dataframe(pd.DataFrame(legend_rows, columns=["Layer", "Symbol", "Meaning"]), hide_index=True, width="stretch")
+        section_intro("Map key", "Legend", "The colored swatches match the visible map layers. Each description states what the layer represents and its evidence status.")
+        st.markdown(render_map_legend(legend_rows), unsafe_allow_html=True)
 
 
 # Keep detailed source QA, provenance, and attribute inspection below the map so
