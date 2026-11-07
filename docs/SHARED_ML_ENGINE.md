@@ -136,3 +136,25 @@ limitations and training command.
 Potential public evidence sources and why none is directly trainable as an
 intervention/damage panel are catalogued in
 `docs/INTERVENTION_DATA_SOURCES.md`.
+
+
+## Regression forecast-quality hardening (2026-11-07)
+
+Continuous forecast skill intervals must respect dependence in the observations.
+The regression engine now uses a circular seven-row moving-block bootstrap for
+ordered daily weather holdouts and a whole-storm cluster bootstrap for cyclone
+track holdouts. It no longer treats every six-hourly storm fix as an independent
+sample when estimating the paired MAE-improvement interval. If fewer than two
+independent storm groups are present, the interval is unavailable and the
+research-skill gate cannot pass.
+
+Regression skill is calculated on the exact same rows for the model and its
+baseline. This matters when persistence values are missing for some holdout
+dates; comparing a full-sample model MAE to a smaller persistence sample would
+be invalid. Non-finite targets and predictions are rejected. The next-day
+precipitation regression applies a zero lower bound during validation selection
+and final prediction because negative precipitation is physically impossible.
+
+These changes improve the reliability of the *evaluation and output constraints*;
+they do not create new observations, improve the upstream reanalysis itself, or
+turn any of the weather regressors into a flood/heat/drought impact model.
