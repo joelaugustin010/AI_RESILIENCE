@@ -23,7 +23,7 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
 
         self.assertEqual(len(app.exception), 0)
         hero = next(
-            element for element in app.markdown if "<section class=\\\"wf-hero\\\">" in element.value
+            element for element in app.markdown if '<section class="wf-hero">' in element.value
         )
         self.assertTrue(hero.proto.allow_html)
         self.assertIn("Disaster decision workflow", hero.value)
@@ -179,7 +179,7 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
             "WorldCover 2021 land-cover context" in item.label for item in app.checkbox
         )
         worldcover_unavailable = any(
-            "WorldCover context image or provenance sidecar is missing" in str(item.value)
+            "context image or provenance sidecar is missing" in str(item.value)
             or "WorldCover context layer could not be loaded" in str(item.value)
             for item in app.warning
         )
