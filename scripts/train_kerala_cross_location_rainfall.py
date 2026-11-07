@@ -153,18 +153,30 @@ def train(output_dir: Path) -> dict[str, Any]:
     actual = test[TARGET].to_numpy(dtype=float)
     predicted = np.maximum(0.0, np.asarray(final_model.predict(test[common_features]), dtype=float))
     baseline_values = pd.to_numeric(test[BASELINE], errors="coerce").to_numpy(dtype=float)
+    climatology_values = _monthly_climatology(final_fit[DATE], final_fit[TARGET], test[DATE])
     valid_baseline = np.isfinite(baseline_values)
+    valid_climatology = np.isfinite(climatology_values)
     if not np.isfinite(predicted).all() or not np.isfinite(actual).all():
         raise ValueError("Non-finite model predictions or test targets.")
     model_metrics = _metrics(actual, predicted)
     if int(valid_baseline.sum()) < 2:
         raise ValueError("Too few Kochi test rows for a persistence comparison.")
+    if int(valid_climatology.sum()) < 2:
+        raise ValueError("Too few Kochi test rows for a seasonal-climatology comparison.")
+
     baseline_metrics = _metrics(actual[valid_baseline], baseline_values[valid_baseline])
-    comparable_model_metrics = _metrics(actual[valid_baseline], predicted[valid_baseline])
-    paired_ci = _paired_block_ci(
+    persistence_model_metrics = _metrics(actual[valid_baseline], predicted[valid_baseline])
+    persistence_ci = _paired_block_ci(
         actual[valid_baseline], predicted[valid_baseline], baseline_values[valid_baseline]
     )
-    skill = 1.0 - comparable_model_metrics["mae_mm"] / max(baseline_metrics["mae_mm"], 1e-12)
+    climatology_metrics = _metrics(actual[valid_climatology], climatology_values[valid_climatology])
+    climatology_model_metrics = _metrics(actual[valid_climatology], predicted[valid_climatology])
+    climatology_ci = _paired_block_ci(
+        actual[valid_climatology], predicted[valid_climatology], climatology_values[valid_climatology]
+    )
+    persistence_skill = 1.0 - persistence_model_metrics["mae_mm"] / max(baseline_metrics["mae_mm"], 1e-12)
+    climatology_skill = 1.0 - climatology_model_metrics["mae_mm"] / max(climatology_metrics["mae_mm"], 1e-12)
+    baseline_gate_passed = bool(persistence_ci[0] > 0 and climatology_ci[0] > 0)
 
     output_dir.mkdir(parents=True, exist_ok=True)
     joblib.dump(final_model, output_dir / "model.joblib")
@@ -207,8 +219,8 @@ def train(output_dir: Path) -> dict[str, Any]:
         },
         "status": "RESEARCH_TRANSFER_EXPERIMENT_NOT_INDEPENDENTLY_VALIDATED",
         "promotion_rule": (
-            "Do not promote unless the paired MAE-improvement interval is wholly "
-            "persistence and training-only monthly-climatology baselines are wholly " 
+            "Do not promote unless the paired MAE-improvement intervals against both "
+            "persistence and training-only monthly-climatology baselines are wholly "
             "above zero, calibration/uncertainty is assessed, and an independent "
             "station-observation evaluation is completed."
         ),
@@ -244,8 +256,12 @@ def main() -> None:
         "selected_model_type": report["selected_model_type"],
         "held_out_kochi_metrics": report["held_out_kochi_metrics"],
         "persistence_baseline_metrics": report["persistence_baseline_metrics"],
+        "seasonal_climatology_baseline_metrics": report["seasonal_climatology_baseline_metrics"],
         "mae_skill_over_persistence": report["mae_skill_over_persistence"],
-        "mae_skill_over_seasonal_climatology": report["mae_skill_over_seasonal_climatology"],\n        "paired_mae_improvement_vs_persistence_95ci_mm": report["paired_mae_improvement_vs_persistence_95ci_mm"],\n        "paired_mae_improvement_vs_climatology_95ci_mm": report["paired_mae_improvement_vs_climatology_95ci_mm"],\n        "baseline_gate_passed": report["baseline_gate_passed"],
+        "mae_skill_over_seasonal_climatology": report["mae_skill_over_seasonal_climatology"],
+        "paired_mae_improvement_vs_persistence_95ci_mm": report["paired_mae_improvement_vs_persistence_95ci_mm"],
+        "paired_mae_improvement_vs_climatology_95ci_mm": report["paired_mae_improvement_vs_climatology_95ci_mm"],
+        "baseline_gate_passed": report["baseline_gate_passed"],
         "status": report["status"],
     }, indent=2))
 
