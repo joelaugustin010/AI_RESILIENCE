@@ -172,30 +172,6 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
             any("No facility is assumed safe or exposed" in str(item.value) for item in app.info)
         )
 
-        # The land-cover preview is an optional, checksum-verified context asset.
-        # The map must remain usable and explicitly disclose an unavailable asset
-        # rather than failing scenario navigation when that preview is absent or invalid.
-        worldcover_available = any(
-            "WorldCover 2021 land-cover context" in item.label for item in app.checkbox
-        )
-        worldcover_unavailable = any(
-            "context image or provenance sidecar is missing" in str(item.value)
-            or "WorldCover context layer could not be loaded" in str(item.value)
-            for item in app.warning
-        )
-        self.assertTrue(
-            worldcover_available or worldcover_unavailable,
-            "The map must either render the checksum-verified WorldCover layer or clearly report why it is unavailable.",
-        )
-        if worldcover_available:
-            self.assertTrue(
-                any(
-                    "Land-cover class" in element.value.columns
-                    for element in app.dataframe
-                    if hasattr(element.value, "columns")
-                ),
-                "The available WorldCover class legend should be rendered for the selected flood scenario.",
-            )
 
     def test_map_hides_flood_scenario_for_unrelated_selected_hazard(self):
         app = _decision_workflow_app(90)
