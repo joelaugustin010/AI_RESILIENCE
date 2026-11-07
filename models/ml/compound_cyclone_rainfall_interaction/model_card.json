@@ -15,7 +15,7 @@
   "skill_grade": "WEAK_RESEARCH_SIGNAL",
   "status_reason": "Exploratory concurrent association only; no forecast lead time and no joint-probability or impact interpretation. Ranking beats the no-skill prevalence (ROC-AUC 0.863, average precision 0.418), but probability error (Brier 0.138) is not better than the base-rate reference (0.065). Treat the score as a ranking signal only.",
   "validation_status": "SINGLE_TEMPORAL_HOLDOUT_NOT_INDEPENDENTLY_VALIDATED",
-  "trained_at_utc": "2026-11-06T13:51:52+00:00",
+  "trained_at_utc": "2026-11-07T08:43:36+00:00",
   "selected_model_type": "logistic_regression",
   "selected_probability_threshold": 0.82,
   "model_selection_metric": "Validation average precision (primary), then validation ROC-AUC, then F1; decision threshold selected by validation F1 with recall/precision tie-breaks.",
@@ -80,7 +80,9 @@
     "test_target_dates_from": "2020-01-01",
     "grouped_purge": {
       "group_column": null,
-      "purged_groups": 0
+      "purged_groups": 0,
+      "label_end_column": null,
+      "purged_label_window_rows": 0
     }
   },
   "feature_columns": [
@@ -321,18 +323,19 @@
     "skill_over_base_rate_brier": -0.07288979678087512,
     "bootstrap_95ci": {
       "f1": [
-        0.40221253852080124,
-        0.5310639502923489
+        0.38009616840829924,
+        0.5350829904951055
       ],
       "roc_auc": [
-        0.8351953393189391,
-        0.8916669343575312
+        0.8248392535677754,
+        0.8924512120124015
       ],
       "average_precision": [
-        0.34749368594844093,
-        0.517309758176463
+        0.3172896450760537,
+        0.5120313357518262
       ]
     },
+    "bootstrap_method": "circular_moving_block_bootstrap_7_rows",
     "validation_threshold_scores": [
       {
         "threshold": 0.02,

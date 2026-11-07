@@ -15,7 +15,7 @@
   "skill_grade": "WEAK_RESEARCH_SIGNAL",
   "status_reason": "Ranking beats the no-skill prevalence (ROC-AUC 0.891, average precision 0.247), but probability error (Brier 0.054) is not better than the base-rate reference (0.047). Treat the score as a ranking signal only.",
   "validation_status": "SINGLE_TEMPORAL_HOLDOUT_NOT_INDEPENDENTLY_VALIDATED",
-  "trained_at_utc": "2026-11-06T13:51:38+00:00",
+  "trained_at_utc": "2026-11-07T08:43:17+00:00",
   "selected_model_type": "extra_trees",
   "selected_probability_threshold": 0.54,
   "model_selection_metric": "Validation average precision (primary), then validation ROC-AUC, then F1; decision threshold selected by validation F1 with recall/precision tie-breaks.",
@@ -80,7 +80,9 @@
     "test_target_dates_from": "2020-01-01",
     "grouped_purge": {
       "group_column": "storm_id",
-      "purged_groups": 0
+      "purged_groups": 0,
+      "label_end_column": null,
+      "purged_label_window_rows": 0
     }
   },
   "feature_columns": [
@@ -325,9 +327,9 @@
         "bin_lower": 0.8,
         "bin_upper": 0.9,
         "n": 3,
-        "mean_probability": 0.8680574078045747,
+        "mean_probability": 0.8680574078045749,
         "observed_event_rate": 0.0,
-        "absolute_gap": 0.8680574078045747
+        "absolute_gap": 0.8680574078045749
       }
     ],
     "calibration_interpretation": "Expected calibration error is descriptive for this holdout. It does not establish calibration in future or operational use.",
@@ -341,18 +343,19 @@
     "skill_over_base_rate_brier": -0.007060078499333294,
     "bootstrap_95ci": {
       "f1": [
-        0.11903846153846155,
-        0.2908061594202898
+        0.07238329238329239,
+        0.3269202226345083
       ],
       "roc_auc": [
-        0.8578762036597254,
-        0.9147902925306096
+        0.8210285504019814,
+        0.9539080802099096
       ],
       "average_precision": [
-        0.19035558659369076,
-        0.3115948199494545
+        0.1137006480492058,
+        0.45844589840283173
       ]
     },
+    "bootstrap_method": "cluster_bootstrap_by_storm_id",
     "validation_threshold_scores": [
       {
         "threshold": 0.02,

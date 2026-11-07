@@ -15,7 +15,7 @@
   "skill_grade": "WEAK_RESEARCH_SIGNAL",
   "status_reason": "Ranking beats the no-skill prevalence (ROC-AUC 0.857, average precision 0.358), but probability error (Brier 0.089) is not better than the base-rate reference (0.065). Treat the score as a ranking signal only.",
   "validation_status": "SINGLE_TEMPORAL_HOLDOUT_NOT_INDEPENDENTLY_VALIDATED",
-  "trained_at_utc": "2026-11-06T13:51:19+00:00",
+  "trained_at_utc": "2026-11-07T08:42:42+00:00",
   "selected_model_type": "extra_trees",
   "selected_probability_threshold": 0.58,
   "model_selection_metric": "Validation average precision (primary), then validation ROC-AUC, then F1; decision threshold selected by validation F1 with recall/precision tie-breaks.",
@@ -80,7 +80,9 @@
     "test_target_dates_from": "2020-01-01",
     "grouped_purge": {
       "group_column": null,
-      "purged_groups": 0
+      "purged_groups": 0,
+      "label_end_column": null,
+      "purged_label_window_rows": 0
     }
   },
   "feature_columns": [
@@ -421,7 +423,7 @@
     "f1": 0.4247787610619469,
     "roc_auc": 0.8572092561072164,
     "average_precision": 0.3581338500183841,
-    "brier_score": 0.08884933039583189,
+    "brier_score": 0.0888493303958319,
     "confusion_matrix_tn_fp_fn_tp": [
       1925,
       114,
@@ -436,9 +438,9 @@
         "bin_lower": 0.0,
         "bin_upper": 0.1,
         "n": 912,
-        "mean_probability": 0.033408111558891354,
+        "mean_probability": 0.03340811155889136,
         "observed_event_rate": 0.009868421052631578,
-        "absolute_gap": 0.023539690506259776
+        "absolute_gap": 0.023539690506259783
       },
       {
         "bin_lower": 0.1,
@@ -476,9 +478,9 @@
         "bin_lower": 0.5,
         "bin_upper": 0.6000000000000001,
         "n": 109,
-        "mean_probability": 0.5414183970283957,
+        "mean_probability": 0.5414183970283956,
         "observed_event_rate": 0.2018348623853211,
-        "absolute_gap": 0.33958353464307456
+        "absolute_gap": 0.33958353464307445
       },
       {
         "bin_lower": 0.6000000000000001,
@@ -492,9 +494,9 @@
         "bin_lower": 0.7000000000000001,
         "bin_upper": 0.8,
         "n": 69,
-        "mean_probability": 0.7479084661773077,
+        "mean_probability": 0.7479084661773076,
         "observed_event_rate": 0.43478260869565216,
-        "absolute_gap": 0.3131258574816555
+        "absolute_gap": 0.3131258574816554
       },
       {
         "bin_lower": 0.8,
@@ -513,21 +515,22 @@
       "f1": 0.0
     },
     "base_rate_brier_score": 0.06492733197027012,
-    "skill_over_base_rate_brier": -0.023921998425561766,
+    "skill_over_base_rate_brier": -0.02392199842556178,
     "bootstrap_95ci": {
       "f1": [
-        0.3597560975609756,
-        0.49221189862333997
+        0.3250285212812637,
+        0.5084291291250727
       ],
       "roc_auc": [
-        0.8263775550423073,
-        0.8834825621921737
+        0.8166235430872453,
+        0.8867824448223752
       ],
       "average_precision": [
-        0.2885470402320767,
-        0.45279333983665876
+        0.2677979055825714,
+        0.4489939141363407
       ]
     },
+    "bootstrap_method": "circular_moving_block_bootstrap_7_rows",
     "validation_threshold_scores": [
       {
         "threshold": 0.02,

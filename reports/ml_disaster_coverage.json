@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at_utc": "2026-11-06T13:51:53+00:00",
+  "generated_at_utc": "2026-11-07T08:45:30+00:00",
   "workflow_hazards": [
     "Flood",
     "Cyclone",
@@ -16,6 +16,53 @@
   "n_hazards": 10,
   "n_hazards_with_ml_evidence": 7,
   "n_hazards_without_ml": 3,
+  "n_hazards_with_registered_model_cards": 7,
+  "hazards_with_registered_model_cards": [
+    "Flood",
+    "Cyclone",
+    "Earthquake",
+    "Heatwave",
+    "Drought",
+    "Compound: cyclone + flood",
+    "Compound: heavy rainfall + drainage failure"
+  ],
+  "n_hazards_with_any_usable_research_model": 7,
+  "hazards_with_any_usable_research_model": [
+    "Flood",
+    "Cyclone",
+    "Earthquake",
+    "Heatwave",
+    "Drought",
+    "Compound: cyclone + flood",
+    "Compound: heavy rainfall + drainage failure"
+  ],
+  "workflow_registry_complete": true,
+  "predictive_model_coverage_complete": false,
+  "n_hazards_with_usable_research_model": 4,
+  "hazards_with_usable_research_model": [
+    "Cyclone",
+    "Earthquake",
+    "Heatwave",
+    "Drought"
+  ],
+  "n_hazards_with_component_research_evidence": 7,
+  "hazards_with_component_research_evidence": [
+    "Flood",
+    "Cyclone",
+    "Earthquake",
+    "Heatwave",
+    "Drought",
+    "Compound: cyclone + flood",
+    "Compound: heavy rainfall + drainage failure"
+  ],
+  "hazards_without_usable_research_model": [
+    "Flood",
+    "Landslide",
+    "Industrial incident",
+    "Infrastructure failure",
+    "Compound: cyclone + flood",
+    "Compound: heavy rainfall + drainage failure"
+  ],
   "hazards_with_ml_evidence": [
     "Flood",
     "Cyclone",
@@ -32,7 +79,7 @@
   ],
   "coverage_complete": true,
   "validated_models": 0,
-  "interpretation": "Every workflow hazard is represented. 7 have registered ML artifacts; 2 have a usable hazard-specific research model; 5 have usable component research evidence. Drought and Earthquake are invalidated pending corrected retraining, three hazards have no registered ML artifact, and zero models are independently validated for operational use.",
+  "interpretation": "Every workflow hazard is represented. 7 hazards have at least one trained model card, 4 have a usable hazard-specific research model, 7 have usable component research evidence, 7 have at least one usable research model, and 3 have no trained model evidence. Zero models are independently validated for operational use. Coverage is not predictive validity.",
   "entries": [
     {
       "hazard": "Flood",
@@ -42,13 +89,28 @@
       ],
       "support_level": "forcing_evidence_only",
       "model_ids": [
-        "weather_extreme_rainfall_kochi_nextday"
+        "weather_extreme_rainfall_kochi_nextday",
+        "weather_precipitation_kochi_nextday_regression"
       ],
+      "registered_model_ids": [
+        "weather_extreme_rainfall_kochi_nextday",
+        "weather_precipitation_kochi_nextday_regression"
+      ],
+      "trained_model_ids": [
+        "weather_extreme_rainfall_kochi_nextday",
+        "weather_precipitation_kochi_nextday_regression"
+      ],
+      "usable_research_model_ids": [
+        "weather_extreme_rainfall_kochi_nextday",
+        "weather_precipitation_kochi_nextday_regression"
+      ],
+      "model_ids_missing_cards": [],
       "model_statuses": {
-        "weather_extreme_rainfall_kochi_nextday": "WEAK_RESEARCH_SIGNAL"
+        "weather_extreme_rainfall_kochi_nextday": "WEAK_RESEARCH_SIGNAL",
+        "weather_precipitation_kochi_nextday_regression": "WEAK_RESEARCH_SIGNAL"
       },
       "evidence_role": "supplementary",
-      "interpretation": "Shared ML contributes extreme-rainfall screening as forcing evidence only. It is not a flood-occurrence, inundation, depth, or impact prediction.",
+      "interpretation": "Shared ML contributes next-day rainfall screening and a continuous precipitation estimate as forcing evidence only. Neither is a flood-occurrence, inundation, depth, or impact prediction.",
       "limitations": [
         "Rainfall is not a flood observation; drainage, river level, and inundation outcomes are absent.",
         "The weather model is trained at one reanalysis grid point and does not transfer automatically."
@@ -63,13 +125,28 @@
       ],
       "support_level": "screening_model",
       "model_ids": [
-        "cyclone_rapid_intensification_24h"
+        "cyclone_rapid_intensification_24h",
+        "cyclone_wind_change_24h_regression"
       ],
+      "registered_model_ids": [
+        "cyclone_rapid_intensification_24h",
+        "cyclone_wind_change_24h_regression"
+      ],
+      "trained_model_ids": [
+        "cyclone_rapid_intensification_24h",
+        "cyclone_wind_change_24h_regression"
+      ],
+      "usable_research_model_ids": [
+        "cyclone_rapid_intensification_24h",
+        "cyclone_wind_change_24h_regression"
+      ],
+      "model_ids_missing_cards": [],
       "model_statuses": {
-        "cyclone_rapid_intensification_24h": "WEAK_RESEARCH_SIGNAL"
+        "cyclone_rapid_intensification_24h": "WEAK_RESEARCH_SIGNAL",
+        "cyclone_wind_change_24h_regression": "WEAK_RESEARCH_SIGNAL"
       },
       "evidence_role": "supplementary",
-      "interpretation": "Shared ML screens 24-hour rapid intensification from best-track history. It does not predict track, landfall, surge, or local wind.",
+      "interpretation": "Shared ML screens 24-hour rapid intensification and estimates continuous wind change from storm-grouped best-track research. It does not predict track, landfall, surge, or local wind at a specific place.",
       "limitations": [
         "IBTrACS is a post-event best-track reanalysis, not an operational forecast.",
         "Rapid intensification is rare; held-out event counts are small."
@@ -82,20 +159,29 @@
       "components": [
         "Earthquake"
       ],
-      "support_level": "no_skill_model",
+      "support_level": "screening_model",
       "model_ids": [
         "earthquake_aftershock_occurrence"
       ],
+      "registered_model_ids": [
+        "earthquake_aftershock_occurrence"
+      ],
+      "trained_model_ids": [
+        "earthquake_aftershock_occurrence"
+      ],
+      "usable_research_model_ids": [
+        "earthquake_aftershock_occurrence"
+      ],
+      "model_ids_missing_cards": [],
       "model_statuses": {
-        "earthquake_aftershock_occurrence": "NO_SKILL"
+        "earthquake_aftershock_occurrence": "WEAK_RESEARCH_SIGNAL"
       },
-      "evidence_role": "none",
-      "interpretation": "The prior aftershock model is invalidated because its seven-day outcome windows could cross temporal split boundaries. It does not predict mainshocks; no usable output is available until embargo retraining.",
+      "evidence_role": "supplementary",
+      "interpretation": "The aftershock model uses a seven-day future-label-window embargo at temporal split boundaries. Any reported score is research-only on a single temporal holdout, not independent validation. It screens aftershock occurrence only after an observed mainshock; it does not predict mainshocks or ground shaking.",
       "limitations": [
+        "The corrected split purges labels whose seven-day outcome windows cross train/validation/test boundaries; results still have only one temporal holdout.",
         "The USGS catalogue is regionally clipped and capped at 20,000 events.",
-        "Aftershock screening does not predict mainshock occurrence or ground shaking.",
-        "Prior aftershock metrics are invalidated pending sequence-aware evaluation and label-window embargo retraining.",
-        "Prior aftershock metrics are invalidated pending sequence-aware evaluation and label-window embargo retraining."
+        "Aftershock screening applies only after an observed mainshock and does not predict mainshock occurrence or ground shaking."
       ],
       "deterministic_model_retained": true
     },
@@ -107,6 +193,10 @@
       ],
       "support_level": "no_defensible_model",
       "model_ids": [],
+      "registered_model_ids": [],
+      "trained_model_ids": [],
+      "usable_research_model_ids": [],
+      "model_ids_missing_cards": [],
       "model_statuses": {},
       "evidence_role": "none",
       "interpretation": "No defensible supervised landslide model is released: the inventory is a reported-event catalogue without a representative non-event sample.",
@@ -124,13 +214,28 @@
       ],
       "support_level": "screening_model",
       "model_ids": [
-        "weather_high_temperature_kochi_nextday"
+        "weather_high_temperature_kochi_nextday",
+        "weather_tmax_kochi_nextday_regression"
       ],
+      "registered_model_ids": [
+        "weather_high_temperature_kochi_nextday",
+        "weather_tmax_kochi_nextday_regression"
+      ],
+      "trained_model_ids": [
+        "weather_high_temperature_kochi_nextday",
+        "weather_tmax_kochi_nextday_regression"
+      ],
+      "usable_research_model_ids": [
+        "weather_high_temperature_kochi_nextday",
+        "weather_tmax_kochi_nextday_regression"
+      ],
+      "model_ids_missing_cards": [],
       "model_statuses": {
-        "weather_high_temperature_kochi_nextday": "RESEARCH_SIGNAL_NOT_VALIDATED"
+        "weather_high_temperature_kochi_nextday": "RESEARCH_SIGNAL_NOT_VALIDATED",
+        "weather_tmax_kochi_nextday_regression": "WEAK_RESEARCH_SIGNAL"
       },
       "evidence_role": "supplementary",
-      "interpretation": "Shared ML screens next-day high temperature at the Kochi reanalysis grid point. It is not an official heatwave declaration or warning.",
+      "interpretation": "Shared ML screens high-temperature events and estimates next-day maximum temperature at the Kochi reanalysis grid point. Neither is an official heatwave declaration, health-impact estimate, or warning.",
       "limitations": [
         "Reanalysis grid-point temperature is not a station observation or an official heatwave index.",
         "Humidity, night-time temperature, and local exposure are not modelled."
@@ -143,20 +248,29 @@
       "components": [
         "Drought"
       ],
-      "support_level": "no_skill_model",
+      "support_level": "screening_model",
       "model_ids": [
         "weather_drought_onset_kochi_30day"
       ],
+      "registered_model_ids": [
+        "weather_drought_onset_kochi_30day"
+      ],
+      "trained_model_ids": [
+        "weather_drought_onset_kochi_30day"
+      ],
+      "usable_research_model_ids": [
+        "weather_drought_onset_kochi_30day"
+      ],
+      "model_ids_missing_cards": [],
       "model_statuses": {
-        "weather_drought_onset_kochi_30day": "NO_SKILL"
+        "weather_drought_onset_kochi_30day": "WEAK_RESEARCH_SIGNAL"
       },
-      "evidence_role": "none",
-      "interpretation": "The previous 30-day rainfall-deficit model was invalidated after a target-window construction defect. No usable drought ML output is available until corrected future-only training and validation.",
+      "evidence_role": "supplementary",
+      "interpretation": "The retrained model uses a future-only 30-observation rainfall-deficit target. Its single temporal holdout is research evidence only, not independent validation or a drought declaration. It represents meteorological rainfall deficit, not agricultural or hydrological drought.",
       "limitations": [
-        "A 30-day rainfall deficit is a meteorological indicator, not agricultural or hydrological drought.",
-        "Soil moisture, evaporative demand, storage, and demand are absent.",
-        "Prior drought model metrics are invalidated; corrected target retraining is required.",
-        "The previous target builder overlapped most of the supposed future rainfall window with historical features; prior model metrics are invalidated."
+        "The corrected target sums the next 30 observations only; it is a meteorological rainfall-deficit proxy, not a validated drought-impact target.",
+        "A 30-day rainfall deficit is not agricultural or hydrological drought.",
+        "Soil moisture, evaporative demand, storage, and water demand are absent."
       ],
       "deterministic_model_retained": true
     },
@@ -168,6 +282,10 @@
       ],
       "support_level": "no_defensible_model",
       "model_ids": [],
+      "registered_model_ids": [],
+      "trained_model_ids": [],
+      "usable_research_model_ids": [],
+      "model_ids_missing_cards": [],
       "model_statuses": {},
       "evidence_role": "none",
       "interpretation": "No defensible supervised model is released: facility-level release labels, controls, and representative non-events are unavailable.",
@@ -185,6 +303,10 @@
       ],
       "support_level": "no_defensible_model",
       "model_ids": [],
+      "registered_model_ids": [],
+      "trained_model_ids": [],
+      "usable_research_model_ids": [],
+      "model_ids_missing_cards": [],
       "model_statuses": {},
       "evidence_role": "none",
       "interpretation": "No defensible supervised model is released: asset condition, network state, and outage/recovery labels are unavailable.",
@@ -207,6 +329,21 @@
         "weather_extreme_rainfall_kochi_nextday",
         "cyclone_rapid_intensification_24h"
       ],
+      "registered_model_ids": [
+        "compound_cyclone_rainfall_interaction",
+        "weather_extreme_rainfall_kochi_nextday",
+        "cyclone_rapid_intensification_24h"
+      ],
+      "trained_model_ids": [
+        "compound_cyclone_rainfall_interaction",
+        "weather_extreme_rainfall_kochi_nextday",
+        "cyclone_rapid_intensification_24h"
+      ],
+      "usable_research_model_ids": [
+        "weather_extreme_rainfall_kochi_nextday",
+        "cyclone_rapid_intensification_24h"
+      ],
+      "model_ids_missing_cards": [],
       "model_statuses": {
         "compound_cyclone_rainfall_interaction": "EXPLORATORY_ASSOCIATION",
         "weather_extreme_rainfall_kochi_nextday": "WEAK_RESEARCH_SIGNAL",
@@ -232,6 +369,16 @@
       "model_ids": [
         "weather_extreme_rainfall_kochi_nextday"
       ],
+      "registered_model_ids": [
+        "weather_extreme_rainfall_kochi_nextday"
+      ],
+      "trained_model_ids": [
+        "weather_extreme_rainfall_kochi_nextday"
+      ],
+      "usable_research_model_ids": [
+        "weather_extreme_rainfall_kochi_nextday"
+      ],
+      "model_ids_missing_cards": [],
       "model_statuses": {
         "weather_extreme_rainfall_kochi_nextday": "WEAK_RESEARCH_SIGNAL"
       },
@@ -243,28 +390,5 @@
       ],
       "deterministic_model_retained": true
     }
-  ],
-  "n_hazards_with_usable_research_model": 2,
-  "hazards_with_usable_research_model": [
-    "Cyclone",
-    "Heatwave"
-  ],
-  "hazards_without_usable_research_model": [
-    "Flood",
-    "Earthquake",
-    "Landslide",
-    "Drought",
-    "Industrial incident",
-    "Infrastructure failure",
-    "Compound: cyclone + flood",
-    "Compound: heavy rainfall + drainage failure"
-  ],
-  "n_hazards_with_component_research_evidence": 5,
-  "hazards_with_component_research_evidence": [
-    "Flood",
-    "Cyclone",
-    "Heatwave",
-    "Compound: cyclone + flood",
-    "Compound: heavy rainfall + drainage failure"
   ]
 }

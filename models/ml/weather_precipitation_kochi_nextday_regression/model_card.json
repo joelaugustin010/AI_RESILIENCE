@@ -1,0 +1,439 @@
+{
+  "schema_version": 1,
+  "engine_version": "shared-ml-engine/1.1.0",
+  "model_id": "weather_precipitation_kochi_nextday_regression",
+  "hazard": "Flood",
+  "task_type": "regression",
+  "dataset_name": "weather_extreme_rainfall_kochi",
+  "target_column": "target_rain_nextday",
+  "target_definition": "Next-day flood-related mm/day at a reanalysis grid point.",
+  "prediction_unit": "mm/day",
+  "status": "WEAK_RESEARCH_SIGNAL",
+  "skill_grade": "WEAK_RESEARCH_SIGNAL",
+  "status_reason": "MAE skill over baseline: 0.092; paired bootstrap 95% CI for MAE improvement: [0.35395467378770223, 0.8724446460230155].",
+  "validation_status": "SINGLE_TEMPORAL_HOLDOUT_NOT_INDEPENDENTLY_VALIDATED",
+  "trained_at_utc": "2026-11-07T08:44:31+00:00",
+  "selected_model_type": "extra_trees_regressor",
+  "model_selection_metric": "Validation MAE, then RMSE.",
+  "candidate_selection": [
+    {
+      "model_type": "random_forest_regressor",
+      "mae": 4.82820830899818,
+      "rmse": 8.723340397312422,
+      "r2": 0.383643663872953,
+      "n": 1826
+    },
+    {
+      "model_type": "extra_trees_regressor",
+      "mae": 4.676697212691958,
+      "rmse": 8.589094960445422,
+      "r2": 0.40246818439004084,
+      "n": 1826
+    },
+    {
+      "model_type": "hist_gradient_boosting_regressor",
+      "mae": 4.858515440223107,
+      "rmse": 8.90814960768195,
+      "r2": 0.35725126583663747,
+      "n": 1826
+    },
+    {
+      "model_type": "ridge_regressor",
+      "mae": 4.685068542388338,
+      "rmse": 8.798432839191532,
+      "r2": 0.37298652786787434,
+      "n": 1826
+    }
+  ],
+  "temporal_split": {
+    "validation_start": "2015-01-01",
+    "test_start": "2020-01-01",
+    "purged_rows": {
+      "group_column": null,
+      "purged_groups": 0,
+      "label_end_column": null,
+      "purged_label_window_rows": 0
+    },
+    "train_rows": 8765,
+    "validation_rows": 1826,
+    "test_rows": 2192
+  },
+  "feature_columns": [
+    "temperature_2m_max",
+    "temperature_2m_min",
+    "precipitation_sum",
+    "wind_speed_10m_max",
+    "wind_gusts_10m_max",
+    "temperature_2m_max_lag1",
+    "temperature_2m_max_lag2",
+    "temperature_2m_max_lag3",
+    "temperature_2m_max_lag7",
+    "temperature_2m_max_prior3_mean",
+    "temperature_2m_max_prior7_mean",
+    "temperature_2m_min_lag1",
+    "temperature_2m_min_lag2",
+    "temperature_2m_min_lag3",
+    "temperature_2m_min_lag7",
+    "temperature_2m_min_prior3_mean",
+    "temperature_2m_min_prior7_mean",
+    "precipitation_sum_lag1",
+    "precipitation_sum_lag2",
+    "precipitation_sum_lag3",
+    "precipitation_sum_lag7",
+    "precipitation_sum_prior3_mean",
+    "precipitation_sum_prior7_mean",
+    "wind_speed_10m_max_lag1",
+    "wind_speed_10m_max_lag2",
+    "wind_speed_10m_max_lag3",
+    "wind_speed_10m_max_lag7",
+    "wind_speed_10m_max_prior3_mean",
+    "wind_speed_10m_max_prior7_mean",
+    "wind_gusts_10m_max_lag1",
+    "wind_gusts_10m_max_lag2",
+    "wind_gusts_10m_max_lag3",
+    "wind_gusts_10m_max_lag7",
+    "wind_gusts_10m_max_prior3_mean",
+    "wind_gusts_10m_max_prior7_mean",
+    "rain_3d_sum",
+    "rain_7d_sum",
+    "rain_30d_sum",
+    "rain_90d_sum",
+    "dry_days_14",
+    "tmax_prior30_mean",
+    "tmax_anomaly_30d",
+    "doy_sin",
+    "doy_cos",
+    "month_sin",
+    "month_cos"
+  ],
+  "feature_count": 46,
+  "feature_ranges": {
+    "temperature_2m_max": {
+      "min": 24.2,
+      "max": 34.2,
+      "median": 29.0,
+      "missing_fraction": 0.0
+    },
+    "temperature_2m_min": {
+      "min": 18.6,
+      "max": 28.8,
+      "median": 24.3,
+      "missing_fraction": 0.0
+    },
+    "precipitation_sum": {
+      "min": 0.0,
+      "max": 253.7,
+      "median": 2.5,
+      "missing_fraction": 0.0
+    },
+    "wind_speed_10m_max": {
+      "min": 3.3,
+      "max": 32.8,
+      "median": 10.3,
+      "missing_fraction": 0.0
+    },
+    "wind_gusts_10m_max": {
+      "min": 11.2,
+      "max": 72.4,
+      "median": 29.9,
+      "missing_fraction": 0.0
+    },
+    "temperature_2m_max_lag1": {
+      "min": 24.2,
+      "max": 34.2,
+      "median": 29.0,
+      "missing_fraction": 9.441979038806533e-05
+    },
+    "temperature_2m_max_lag2": {
+      "min": 24.2,
+      "max": 34.2,
+      "median": 29.0,
+      "missing_fraction": 0.00018883958077613066
+    },
+    "temperature_2m_max_lag3": {
+      "min": 24.2,
+      "max": 34.2,
+      "median": 28.95,
+      "missing_fraction": 0.000283259371164196
+    },
+    "temperature_2m_max_lag7": {
+      "min": 24.2,
+      "max": 34.2,
+      "median": 28.9,
+      "missing_fraction": 0.0006609385327164573
+    },
+    "temperature_2m_max_prior3_mean": {
+      "min": 24.66666666666667,
+      "max": 33.899999999999984,
+      "median": 28.933333333333326,
+      "missing_fraction": 0.00018883958077613066
+    },
+    "temperature_2m_max_prior7_mean": {
+      "min": 25.357142857142858,
+      "max": 33.31428571428572,
+      "median": 28.9,
+      "missing_fraction": 0.00037767916155226133
+    },
+    "temperature_2m_min_lag1": {
+      "min": 18.6,
+      "max": 28.8,
+      "median": 24.3,
+      "missing_fraction": 9.441979038806533e-05
+    },
+    "temperature_2m_min_lag2": {
+      "min": 18.6,
+      "max": 28.8,
+      "median": 24.3,
+      "missing_fraction": 0.00018883958077613066
+    },
+    "temperature_2m_min_lag3": {
+      "min": 18.6,
+      "max": 28.8,
+      "median": 24.3,
+      "missing_fraction": 0.000283259371164196
+    },
+    "temperature_2m_min_lag7": {
+      "min": 18.6,
+      "max": 28.8,
+      "median": 24.3,
+      "missing_fraction": 0.0006609385327164573
+    },
+    "temperature_2m_min_prior3_mean": {
+      "min": 19.3,
+      "max": 28.633333333333336,
+      "median": 24.233333333333334,
+      "missing_fraction": 0.00018883958077613066
+    },
+    "temperature_2m_min_prior7_mean": {
+      "min": 19.957142857142856,
+      "max": 28.25714285714286,
+      "median": 24.228571428571428,
+      "missing_fraction": 0.00037767916155226133
+    },
+    "precipitation_sum_lag1": {
+      "min": 0.0,
+      "max": 253.7,
+      "median": 2.5,
+      "missing_fraction": 9.441979038806533e-05
+    },
+    "precipitation_sum_lag2": {
+      "min": 0.0,
+      "max": 253.7,
+      "median": 2.5,
+      "missing_fraction": 0.00018883958077613066
+    },
+    "precipitation_sum_lag3": {
+      "min": 0.0,
+      "max": 253.7,
+      "median": 2.5,
+      "missing_fraction": 0.000283259371164196
+    },
+    "precipitation_sum_lag7": {
+      "min": 0.0,
+      "max": 253.7,
+      "median": 2.5,
+      "missing_fraction": 0.0006609385327164573
+    },
+    "precipitation_sum_prior3_mean": {
+      "min": 0.0,
+      "max": 157.29999999999998,
+      "median": 3.5333333333333248,
+      "missing_fraction": 0.00018883958077613066
+    },
+    "precipitation_sum_prior7_mean": {
+      "min": 0.0,
+      "max": 72.04285714285714,
+      "median": 4.342857142857143,
+      "missing_fraction": 0.00037767916155226133
+    },
+    "wind_speed_10m_max_lag1": {
+      "min": 3.3,
+      "max": 32.8,
+      "median": 10.3,
+      "missing_fraction": 9.441979038806533e-05
+    },
+    "wind_speed_10m_max_lag2": {
+      "min": 3.3,
+      "max": 32.8,
+      "median": 10.3,
+      "missing_fraction": 0.00018883958077613066
+    },
+    "wind_speed_10m_max_lag3": {
+      "min": 3.3,
+      "max": 32.8,
+      "median": 10.3,
+      "missing_fraction": 0.000283259371164196
+    },
+    "wind_speed_10m_max_lag7": {
+      "min": 3.3,
+      "max": 32.8,
+      "median": 10.3,
+      "missing_fraction": 0.0006609385327164573
+    },
+    "wind_speed_10m_max_prior3_mean": {
+      "min": 4.499999999999999,
+      "max": 30.33333333333336,
+      "median": 10.266666666666664,
+      "missing_fraction": 0.00018883958077613066
+    },
+    "wind_speed_10m_max_prior7_mean": {
+      "min": 5.100000000000002,
+      "max": 26.742857142857144,
+      "median": 10.342857142857142,
+      "missing_fraction": 0.00037767916155226133
+    },
+    "wind_gusts_10m_max_lag1": {
+      "min": 11.2,
+      "max": 72.4,
+      "median": 29.9,
+      "missing_fraction": 9.441979038806533e-05
+    },
+    "wind_gusts_10m_max_lag2": {
+      "min": 11.2,
+      "max": 72.4,
+      "median": 29.9,
+      "missing_fraction": 0.00018883958077613066
+    },
+    "wind_gusts_10m_max_lag3": {
+      "min": 11.2,
+      "max": 72.4,
+      "median": 29.9,
+      "missing_fraction": 0.000283259371164196
+    },
+    "wind_gusts_10m_max_lag7": {
+      "min": 11.2,
+      "max": 72.4,
+      "median": 29.9,
+      "missing_fraction": 0.0006609385327164573
+    },
+    "wind_gusts_10m_max_prior3_mean": {
+      "min": 15.13333333333331,
+      "max": 68.63333333333331,
+      "median": 29.866666666666642,
+      "missing_fraction": 0.00018883958077613066
+    },
+    "wind_gusts_10m_max_prior7_mean": {
+      "min": 17.15714285714286,
+      "max": 60.74285714285714,
+      "median": 30.014285714285712,
+      "missing_fraction": 0.00037767916155226133
+    },
+    "rain_3d_sum": {
+      "min": 0.0,
+      "max": 471.9,
+      "median": 10.599999999999975,
+      "missing_fraction": 0.00018883958077613066
+    },
+    "rain_7d_sum": {
+      "min": 0.0,
+      "max": 504.3,
+      "median": 30.400000000000002,
+      "missing_fraction": 0.00037767916155226133
+    },
+    "rain_30d_sum": {
+      "min": 0.0,
+      "max": 873.4000000000001,
+      "median": 170.09999999999997,
+      "missing_fraction": 0.0018883958077613068
+    },
+    "rain_90d_sum": {
+      "min": 1.3999999999999857,
+      "max": 1796.2,
+      "median": 612.6,
+      "missing_fraction": 0.00566518742328392
+    },
+    "dry_days_14": {
+      "min": 0.0,
+      "max": 14.0,
+      "median": 4.0,
+      "missing_fraction": 0.000566518742328392
+    },
+    "tmax_prior30_mean": {
+      "min": 26.36,
+      "max": 32.75333333333333,
+      "median": 28.846666666666668,
+      "missing_fraction": 0.0018883958077613068
+    },
+    "tmax_anomaly_30d": {
+      "min": -4.77,
+      "max": 3.556666666666672,
+      "median": 0.10666666666666913,
+      "missing_fraction": 0.0018883958077613068
+    },
+    "doy_sin": {
+      "min": -0.9999994220246925,
+      "max": 0.9999855506507186,
+      "median": -0.004300592702981974,
+      "missing_fraction": 0.0
+    },
+    "doy_cos": {
+      "min": -0.9999791929590823,
+      "max": 0.9999907524084426,
+      "median": 0.001075151282798226,
+      "missing_fraction": 0.0
+    },
+    "month_sin": {
+      "min": -1.0,
+      "max": 1.0,
+      "median": -2.4492935982947064e-16,
+      "missing_fraction": 0.0
+    },
+    "month_cos": {
+      "min": -1.0,
+      "max": 1.0,
+      "median": -1.8369701987210297e-16,
+      "missing_fraction": 0.0
+    }
+  },
+  "prediction_constraints": {
+    "lower_bound": 0.0
+  },
+  "metrics": {
+    "mae": 5.794357421405943,
+    "rmse": 10.841284612184433,
+    "r2": 0.3885546383727212,
+    "n": 2192,
+    "persistence_baseline": {
+      "available": true,
+      "type": "persistence",
+      "mae": 6.384580291970803,
+      "rmse": 12.206260359782718,
+      "r2": 0.22489342409860402,
+      "n": 2192,
+      "training_median": {
+        "mae": 7.739142335766424,
+        "rmse": 15.161536825305985,
+        "r2": -0.195866260585142,
+        "n": 2192
+      }
+    },
+    "mae_skill_over_persistence": 0.09244505411062331,
+    "mae_skill_comparison_rows": 2192,
+    "paired_mae_improvement_bootstrap_95ci": [
+      0.35395467378770223,
+      0.8724446460230155
+    ],
+    "paired_bootstrap_method": "circular_moving_block_bootstrap_7_rows",
+    "prediction_lower_bound": 0.0
+  },
+  "provenance": {
+    "source": "data\\external\\hazards\\raw\\weather\\kochi_daily_weather_1991_2025.json",
+    "source_type": "MODELLED_REANALYSIS_GRID_POINT_NOT_STATION_OBSERVATION",
+    "location": "kochi",
+    "lead_days": 1,
+    "target": "extreme_rainfall"
+  },
+  "limitations": [
+    "Single temporal holdout is not independent validation.",
+    "Weather values are reanalysis grid-point data, not local station observations.",
+    "A next-day weather estimate is not a flood, drought, heat-health, or impact prediction.",
+    "No calibrated uncertainty interval is claimed."
+  ],
+  "intended_use": "Supplementary continuous weather research output only.",
+  "prohibited_use": "Not for public warnings, evacuation decisions, or disaster-impact prediction.",
+  "artifact": {
+    "path": "models/ml/weather_precipitation_kochi_nextday_regression/model.joblib",
+    "format": "joblib-pipeline",
+    "loader": "src.ml.inference.predict_regression_from_context"
+  }
+}
