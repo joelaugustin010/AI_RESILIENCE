@@ -65,6 +65,11 @@ def validate_payload(payload: dict, *, start_date: str, end_date: str) -> dict:
     if dates != sorted(set(dates)):
         raise ValueError("Weather dates must be unique and strictly increasing.")
     parsed = [date.fromisoformat(value) for value in dates]
+    if any((current - previous).days != 1 for previous, current in zip(parsed, parsed[1:])):
+        raise ValueError(
+            "Weather dates must be continuous daily dates; missing calendar dates "
+            "would misalign lag features and next-day targets."
+        )
     if parsed[0] > date.fromisoformat(start_date) or parsed[-1] < date.fromisoformat(end_date):
         raise ValueError("Weather response does not cover the complete requested date range.")
     for field in FIELDS:
