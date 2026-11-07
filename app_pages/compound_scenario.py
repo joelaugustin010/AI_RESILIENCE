@@ -131,9 +131,9 @@ def _render_shared_ml_evidence(selected_hazards: list[str]) -> None:
 
 page_header(
     "AI RESILIENCE · COMPOUND HAZARD WORKSPACE",
-    "Kochi Cyclone + Flood Resilience Workspace",
-    "One integrated workspace for rainfall, river flooding, cyclone exposure, compound "
-    "pathways and service continuity.",
+    "Kochi Multi-Hazard Resilience Workspace",
+    "Select any of the ten registered hazards, review component evidence and compound "
+    "pathways, and examine consequences and critical-service continuity.",
     meta=("Kochi · Ernakulam", "Cyclone + flood", "Research prototype"),
     accent="violet",
     key="compound-scenario",
@@ -164,8 +164,8 @@ with nav_right:
 st.markdown(
     """
     **How this workspace works:** record whether the case is hypothetical, historical or based on
-    current observations; add source and timing; review flood and cyclone pathways together;
-    then inspect consequences and preparedness actions for critical services. Blank or unknown
+    current observations; add source and timing; review the selected hazard pathways and their
+    interactions; then inspect consequences and preparedness actions for critical services. Blank or unknown
     inputs remain explicit data gaps.
     """
 )
@@ -460,14 +460,14 @@ if submitted:
         st.download_button(
             "Download scenario review (JSON)",
             data=json.dumps(result, indent=2, ensure_ascii=False),
-            file_name="ai_resilience_compound_cyclone_flood_review.json",
+            file_name="ai_resilience_multi_hazard_scenario_review.json",
             mime="application/json",
         )
 
 st.divider()
 st.caption(
-    "Scientific boundary: historical cyclone tracks, event-only flood records, rainfall observations "
-    "and river gauges are not interchangeable. Prediction requires aligned issue times, valid times, "
-    "verified locations, independent outcomes and held-out event evaluation. The workspace keeps "
-    "these requirements visible rather than manufacturing a risk score."
+    "Scientific boundary: observations, forecasts, event inventories and component hazard records "
+    "are not interchangeable. Prediction requires aligned issue times, valid times, verified "
+    "locations, independent outcomes and held-out event evaluation. The workspace keeps these "
+    "requirements visible rather than manufacturing a joint risk score."
 )
