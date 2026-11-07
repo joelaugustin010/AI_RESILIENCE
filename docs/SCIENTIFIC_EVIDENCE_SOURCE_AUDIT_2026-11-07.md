@@ -132,3 +132,17 @@ Sources: [KSDMA Kochi 2019](https://sdma.kerala.gov.in/kochi-2019/), [Kerala Irr
 | Kochi causal evaluation | Project reports and sanction records; no linked site-event panel | No causal effect estimate |
 
 The compound workspace now displays this evidence-readiness information for selected flood, landslide, industrial, infrastructure and compound scenarios. It continues to display component evidence and scenario pathways, not a fabricated joint probability or damage prediction.
+
+
+## Reproducible public flood-inventory audit
+
+The branch now includes `scripts/audit_india_flood_inventory.py`. It retrieves
+the published IFI-Impacts v4 event CSV, verifies the publisher-listed MD5
+checksum, checks required columns, event-ID uniqueness, date order, coordinate
+ranges, Kerala/Ernakulam text coverage and missingness of the reported impact
+fields. It emits a compact JSON audit; the raw CSV is held in a temporary
+runtime directory and is not committed to the repository.
+
+The `india-flood-inventory-audit` CI job runs this acquisition/audit on PR #82
+and uploads only the JSON report. Its expected result is an event-inventory
+audit status, never a training-ready or validated-flood-model status.
