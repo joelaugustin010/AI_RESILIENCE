@@ -150,3 +150,41 @@ Keep the five evidence streams separate in code, registries and UI:
 - observed impact prediction/validation.
 
 No stream may silently supply labels or validation claims to another.
+
+
+## Updated six-track evidence resolution — 2026-11-07
+
+A new source audit is maintained at
+`docs/SCIENTIFIC_EVIDENCE_SOURCE_AUDIT_2026-11-07.md`. It records the
+public-source leads and the exact scientific boundaries for:
+
+1. Flood event and district impacts (IFI-Impacts v4 and USGS GFID), while
+   retaining the missing local inundation depth/duration and gauge data gap.
+2. Kerala and India landslide inventories (Kerala 2018 and NRSC/ISRO), while
+   refusing to treat unobserved cells as verified non-events.
+3. Industrial incidents, where public statutory and annual factory reports
+   are aggregate/governance evidence rather than facility-level ML labels.
+4. Infrastructure outages, where KSEB SAIFI/SAIDI indicators are aggregate
+   reliability measures rather than asset failure/restoration histories.
+5. Intervention effectiveness, keeping licensed randomized cash-assistance
+   evidence separate from simulated Geul intervention outputs.
+6. Kochi Operation Breakthrough, where public project records identify works
+   and milestones but do not form a site-by-event counterfactual panel.
+
+The compound cyclone/flood workspace now exposes the relevant evidence tracks
+for the selected registered hazards. This is a source-readiness improvement,
+not a new forecast or trained model. Component hazards remain separate; no
+joint probability, damage reduction, or causal intervention effect is inferred.
+
+### Acceptance boundary
+
+- Open aggregate or event inventories may improve context and data discovery,
+  but they do not automatically satisfy local event labels, exposure, or
+  non-event requirements.
+- Licensed records remain unavailable to training until authorized access and
+  a codebook/design review are completed.
+- Simulation outputs remain in a separate simulation-only training/evaluation
+  stream.
+- A source being listed in the app is not evidence that it has been downloaded,
+  parsed, licensed for reuse, or accepted for training.
+- No unresolved track is marked operationally validated by this update.
