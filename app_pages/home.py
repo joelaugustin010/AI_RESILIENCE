@@ -1424,8 +1424,8 @@ st.markdown(
 )
 
 
-/* Original cinematic homepage: compact desktop first-screen layout.
-   Keeps the existing Kerala image sequence, optional local video and copy. */
+# Original cinematic homepage: compact desktop first-screen layout.
+# Keeps the existing Kerala image sequence, optional local video and copy.
 st.markdown(
     """
     <style>
