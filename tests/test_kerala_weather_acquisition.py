@@ -46,3 +46,24 @@ def test_weather_payload_rejects_negative_precipitation():
     data["daily"]["precipitation_sum"][0] = -1.0
     with pytest.raises(ValueError, match="negative"):
         validate_payload(data, start_date=dates[0], end_date=dates[-1])
+
+
+def test_weather_payload_rejects_missing_calendar_days():
+    data = payload()
+    import pandas as pd
+
+    dates = pd.date_range("2020-01-01", periods=311, freq="D").strftime("%Y-%m-%d").tolist()
+    data["daily"]["time"] = dates
+    missing_index = 100
+    data["daily"]["time"].pop(missing_index)
+    for field in (
+        "temperature_2m_max",
+        "temperature_2m_min",
+        "precipitation_sum",
+        "wind_speed_10m_max",
+        "wind_gusts_10m_max",
+    ):
+        data["daily"][field].pop(missing_index)
+
+    with pytest.raises(ValueError, match="continuous daily dates"):
+        validate_payload(data, start_date=dates[0], end_date=dates[-1])
