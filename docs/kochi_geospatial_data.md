@@ -9,7 +9,7 @@ accurate.
 
 | Layer | Status | Accepted features | Source snapshot | Map use and limits |
 | --- | --- | ---: | --- | --- |
-| Kochi Corporation administrative outline | PROVISIONAL | 1 | Existing project copy | Orientation only. The polygon self-intersects; it is not a validated coverage mask or legal boundary. |
+| Kochi Corporation administrative outline | PROVISIONAL | 1 | Existing project copy | The source polygon self-intersects and remains unchanged. The map derives a separate Shapely make_valid outline for orientation only; neither source nor derivative is a validated coverage mask or legal boundary. |
 | Kochi wards, DataMeet 2022 | PROVISIONAL | 74 of 77 | Existing project copy | Context only. Three invalid polygons are excluded; ward attributes and full current coverage are incomplete or unverified. CC BY-SA 2.5 India. |
 | OSM selected roads | PROVISIONAL | 13,123 lines | OSM database 2026-10-28 19:25:34 UTC | Selected routable highway classes within the provisional boundary's numeric extent. Not a complete road register, condition survey, access, or travel-time layer. |
 | OSM rail and transit ways | PROVISIONAL | 442 lines | OSM database 2026-10-28 19:25:34 UTC | Selected rail/transit tags in the Ernakulam urban query window; not a complete public transport network or timetable. |
