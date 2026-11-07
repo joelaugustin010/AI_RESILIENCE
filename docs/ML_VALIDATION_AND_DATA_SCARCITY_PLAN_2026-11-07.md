@@ -9,7 +9,7 @@ This plan applies to the ten-hazard AI_RESILIENCE workflow and its Kochi/Ernakul
 3. **Validated predictor** — a model that beats a relevant baseline on independent temporal and spatial data, with acceptable calibration/uncertainty and a defined domain.
 4. **Operational warning component** — a validated predictor additionally supplied with current authoritative inputs, monitored prospectively, reviewed by responsible domain authorities, and governed by a deployment protocol.
 
-No amount of synthetic data, imputation, model complexity, or transfer learning can substitute for independent observed outcomes. The strict helper in `src/ml/validation_gates.py` deliberately leaves the current cards in `RESEARCH_ONLY`.
+No amount of synthetic data, imputation, model complexity, or transfer learning can substitute for independent observed outcomes. The strict helper in `src/ml/validation_gates.py` deliberately leaves the current cards in `RESEARCH_ONLY`. The observed-panel contract in `src/ml/local_panel_contracts.py` prevents unobserved intervals from silently becoming negative labels.
 
 ## Phase 1 — Model risk and signal audit
 
@@ -31,7 +31,7 @@ The persisted registry currently contains nine model artifacts: six classificati
 | Infrastructure failure | No defensible supervised model | No asset-level failure, outage, restoration and exposure history panel. |
 | Heavy rainfall + drainage failure | Component evidence only | No ward/drain-level observed overflow or inundation outcome panel to train the compound target. |
 
-The hazard registry has ten entries because the two compound scenarios are part of the authoritative workflow; the table above also separates their underlying component tasks to make the evidence boundary explicit.
+The hazard registry has ten entries because the two compound scenarios are part of the authoritative workflow; the table above also separates their underlying component tasks to make the evidence boundary explicit.\n\nThe new `src/ml/local_panel_contracts.py` helper audits proposed observed-outcome panels. It rejects missing provenance, invalid intervals, duplicate unit/time rows, unknown negatives and synthetic/simulated rows as training evidence. Its configured row-count floor is a screening threshold, not proof of statistical adequacy.
 
 ### Release-blocking risks
 
