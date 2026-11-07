@@ -53,9 +53,12 @@ def _paired_mae_improvement_ci(
     rng = np.random.default_rng(random_state)
     means = np.empty(n_bootstrap, dtype=float)
     if group_ids is not None:
-        groups = np.asarray(group_ids).astype(str)
-        if len(groups) != len(differences) or pd.isna(groups).any():
+        raw_groups = np.asarray(group_ids, dtype=object)
+        if len(raw_groups) != len(differences) or pd.isna(raw_groups).any():
             raise ValueError("Bootstrap group IDs must be complete and match score rows.")
+        groups = np.asarray([str(value).strip() for value in raw_groups])
+        if any(not value for value in groups):
+            raise ValueError("Bootstrap group IDs cannot be blank.")
         unique_groups = np.unique(groups)
         if len(unique_groups) < 2:
             return [float("nan"), float("nan")]
