@@ -70,3 +70,10 @@ def test_audit_blocks_missing_source_schema():
     report = audit_inventory(pd.DataFrame({"UEI": ["x"]}))
     assert report["status"] == "BLOCKED_SCHEMA"
     assert report["training_ready"] is False
+
+
+def test_audit_distinguishes_successful_audit_from_training_readiness():
+    from scripts.audit_india_flood_inventory import audit_inventory
+    report = audit_inventory(_frame())
+    assert report["status"] == "AUDITED_EVENT_INVENTORY_NOT_LOCAL_INUNDATION_GROUND_TRUTH"
+    assert report["training_ready"] is False
