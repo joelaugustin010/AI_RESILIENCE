@@ -91,6 +91,30 @@ def _paired_block_ci(
     return [float(low), float(high)]
 
 
+def _regression_calibration_bins(
+    actual: np.ndarray, predicted: np.ndarray, bins: int = 10
+) -> list[dict[str, float | int]]:
+    """Return equal-count prediction-reliability bins for a point regressor."""
+    if bins < 2 or len(actual) != len(predicted) or len(actual) == 0:
+        raise ValueError("Calibration bins require paired non-empty arrays and at least two bins.")
+    order = np.argsort(predicted, kind="mergesort")
+    groups = np.array_split(order, min(bins, len(order)))
+    result = []
+    for index, rows in enumerate(groups, start=1):
+        if len(rows) == 0:
+            continue
+        mean_prediction = float(np.mean(predicted[rows]))
+        mean_observed = float(np.mean(actual[rows]))
+        result.append({
+            "bin": index,
+            "n": int(len(rows)),
+            "mean_prediction_mm": mean_prediction,
+            "mean_observed_mm": mean_observed,
+            "bias_observed_minus_predicted_mm": mean_observed - mean_prediction,
+        })
+    return result
+
+
 def _monthly_climatology(
     training_dates: pd.Series, training_targets: pd.Series, test_dates: pd.Series
 ) -> np.ndarray:
@@ -204,6 +228,8 @@ def train(output_dir: Path) -> dict[str, Any]:
         "selected_model_type": selected["model_type"],
         "candidate_validation_metrics": candidates,
         "held_out_kochi_metrics": model_metrics,
+        "regression_calibration_bins": _regression_calibration_bins(actual, predicted),
+        "mean_prediction_bias_mm": float(np.mean(actual - predicted)),
         "paired_model_metrics_vs_persistence": persistence_model_metrics,
         "persistence_baseline_metrics": baseline_metrics,
         "paired_model_metrics_vs_climatology": climatology_model_metrics,
