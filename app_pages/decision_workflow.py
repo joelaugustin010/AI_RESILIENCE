@@ -62,6 +62,7 @@ from src.hydrology_analytics import (
 from src.infrastructure_dependencies import dependency_review_table
 from src.map_integration import MAP_CONTEXT_KEY, build_map_context, hazard_has_flood_component
 from src.ui_theme import section_intro
+from src.evidence_alternatives import alternative_evidence_for_hazard
 from src.phase2_data import (
     Phase2DataError,
     Phase2DataUnavailable,
@@ -1420,6 +1421,29 @@ st.info(
     "Readiness status is descriptive, not a numerical risk score. Items marked not connected or unverified "
     "must not be treated as evidence that the hazard or exposure is absent."
 )
+
+
+st.subheader("Alternative evidence routes for this hazard")
+alternative_routes = alternative_evidence_for_hazard(inputs["hazard"])
+if alternative_routes:
+    st.caption(
+        "These are practical additional evidence routes. They do not automatically "
+        "make a dataset training-ready; access, coverage, metadata and validation remain required."
+    )
+    for route in alternative_routes:
+        with st.expander(route["title"]):
+            st.write(route["method"])
+            st.markdown("**Useful for**")
+            for capability in route["supports"]:
+                st.write(f"- {capability.replace('_', ' ')}")
+            st.markdown("**Not sufficient for**")
+            for limitation in route["does_not_support"]:
+                st.write(f"- {limitation.replace('_', ' ')}")
+            st.caption(route["status"])
+            for source in route["sources"]:
+                st.markdown(f"- [{source['publisher']} — {source['title']}]({source['url']})")
+else:
+    st.caption("No additional alternative-evidence route is registered for this hazard yet.")
 
 st.subheader("Evidence provenance gate")
 provenance = evidence_provenance_summary(inputs)

@@ -76,6 +76,26 @@ ALTERNATIVE_EVIDENCE: dict[str, dict[str, Any]] = {
 }
 
 
+HAZARD_ALTERNATIVE_TRACKS: dict[str, tuple[str, ...]] = {
+    "Flood": ("flood_satellite", "kochi_intervention_reconstruction"),
+    "Landslide": ("landslide_inventory",),
+    "Industrial incident": ("industrial_process_risk",),
+    "Infrastructure failure": ("infrastructure_reliability",),
+    "Compound: cyclone + flood": ("flood_satellite", "kochi_intervention_reconstruction"),
+    "Compound: heavy rainfall + drainage failure": (
+        "flood_satellite", "infrastructure_reliability", "kochi_intervention_reconstruction"
+    ),
+}
+
+
+def alternative_evidence_for_hazard(hazard: str) -> list[dict[str, Any]]:
+    """Return relevant alternative evidence routes for one workflow hazard."""
+    return [
+        {"track_id": track_id, **ALTERNATIVE_EVIDENCE[track_id]}
+        for track_id in HAZARD_ALTERNATIVE_TRACKS.get(str(hazard), ())
+    ]
+
+
 def _coordinates(frame: pd.DataFrame, lat_col: str, lon_col: str) -> tuple[np.ndarray, np.ndarray]:
     if lat_col not in frame or lon_col not in frame:
         raise ValueError(f"Required coordinate columns are missing: {lat_col}, {lon_col}")
@@ -256,6 +276,8 @@ def audit_satellite_flood_geojson(payload: Mapping[str, Any]) -> dict[str, Any]:
 
 __all__ = [
     "ALTERNATIVE_EVIDENCE",
+    "HAZARD_ALTERNATIVE_TRACKS",
+    "alternative_evidence_for_hazard",
     "assign_spatial_block_splits",
     "audit_satellite_flood_geojson",
     "generate_pseudo_absence_samples",
