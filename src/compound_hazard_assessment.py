@@ -4,6 +4,8 @@ from datetime import date
 from math import isfinite
 from typing import Any
 
+from src.hazard_registry import HAZARD_REGISTRY, WORKFLOW_HAZARDS
+
 SERVICE_PATHWAYS = {
     "Hospitals": {
         "flood": "Check ground-floor inundation, ambulance access, patient transfer routes, backup power, oxygen and medicine continuity.",
@@ -54,16 +56,16 @@ SERVICE_PATHWAYS = {
 
 ACTIONS = {
     "before": [
-        "Verify official IMD cyclone bulletins and KSDMA/CWC flood guidance; record issue time, valid time and source.",
+        "Verify the relevant official hazard bulletins and local-authority guidance; record issue time, valid time and source.",
         "Map exposed people and critical facilities using verified coordinates, elevation and local authority records.",
-        "Confirm evacuation routes and alternatives against both flood exposure and cyclone-related access restrictions.",
+        "Review safe access routes and alternatives against the selected hazards using verified local information.",
         "Check backup power, fuel, communications, drinking water and continuity plans for critical services.",
-        "Have authorized local teams inspect drainage, outfalls and pump status.",
+        "Have authorized local teams verify hazard-specific conditions, critical assets and response readiness.",
     ],
     "during": [
         "Follow official warnings and evacuation orders; do not use this worksheet to decide whether to evacuate.",
-        "Track rainfall, river level, tide/coastal water and cyclone bulletins with timestamps and sources.",
-        "Keep people away from floodwater, damaged electrical infrastructure and exposed coastal areas.",
+        "Track only relevant observations and official bulletins with timestamps, locations, units and sources.",
+        "Follow official safety instructions and avoid entering hazard-affected or restricted areas.",
         "Coordinate road closures, hospital referrals, shelter occupancy and utility status through responsible authorities.",
     ],
     "after": [
@@ -89,8 +91,12 @@ def _number(value: Any, label: str) -> float | None:
 def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
     """Organize evidence and pathways; never invent probabilities or impacts."""
     hazards = set(inputs.get("hazards") or [])
-    if not hazards or not hazards.issubset({"Flood", "Cyclone"}):
-        raise ValueError("Select Flood, Cyclone, or both.")
+    unknown = hazards.difference(WORKFLOW_HAZARDS)
+    if unknown:
+        raise ValueError(f"Unknown registered hazard selection: {sorted(unknown)}")
+    custom_disaster = str(inputs.get("custom_disaster") or "").strip()
+    if not hazards and not custom_disaster:
+        raise ValueError("Select at least one registered hazard or describe a custom disaster.")
     area = str(inputs.get("area") or "").strip()
     if not area:
         raise ValueError("A study area is required.")
@@ -102,17 +108,32 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
     cyclone_distance = _number(inputs.get("cyclone_distance_km"), "Cyclone distance")
     cyclone_wind = _number(inputs.get("cyclone_wind_knots"), "Cyclone wind")
     start, end = inputs.get("period_start"), inputs.get("period_end")
+    if start is not None and not isinstance(start, date):
+        raise ValueError("Scenario start date must be a date value.")
+    if end is not None and not isinstance(end, date):
+        raise ValueError("Scenario end date must be a date value.")
     if isinstance(start, date) and isinstance(end, date) and end < start:
         raise ValueError("Scenario end date must be on or after the start date.")
 
-    compound = hazards == {"Flood", "Cyclone"}
+    compound = len(hazards) > 1 or any(HAZARD_REGISTRY[name].kind == "compound" for name in hazards)
+    components = {component for name in hazards for component in HAZARD_REGISTRY[name].components}
     pathways = []
-    if "Flood" in hazards:
-        pathways.append({"hazard": "Flood", "pathway": "Rainfall and river response interact with drainage, terrain, tide/backwater and land use. Verify local observations and catchment connectivity."})
-    if "Cyclone" in hazards:
-        pathways.append({"hazard": "Cyclone", "pathway": "Track, intensity, wind field, rainfall, coastal water and timing affect locations differently. Historical track proximity is not an impact forecast."})
+    # Render the expanded physical components, not only the compound registry
+    # label. This ensures a compound option still exposes each component's
+    # evidence requirements when the user selects that single combined option.
+    for hazard in sorted(components):
+        definition = HAZARD_REGISTRY[hazard]
+        if hazard == "Flood":
+            pathway = "Rainfall and river response interact with drainage, terrain, tide/backwater and land use. Verify local observations and catchment connectivity."
+        elif hazard == "Cyclone":
+            pathway = "Track, intensity, wind field, rainfall, coastal water and timing affect locations differently. Historical track proximity is not an impact forecast."
+        else:
+            pathway = definition.summary + " Required evidence: " + "; ".join(definition.evidence_factors) + "."
+        pathways.append({"hazard": hazard, "pathway": pathway})
     if compound:
-        pathways.append({"hazard": "Compound interaction", "pathway": "Cyclone rainfall and coastal-water conditions may coincide with river flooding or drainage limitations. Verify sequence, overlap, tide/outfall conditions and local elevations."})
+        pathways.append({"hazard": "Multi-hazard interaction", "pathway": "Review timing, location and shared dependencies across selected hazards. Do not assume additive risk or a causal interaction without event-aligned evidence."})
+    if custom_disaster:
+        pathways.append({"hazard": "Custom disaster (unregistered)", "pathway": "User-described scenario: " + custom_disaster + ". This is outside the authoritative registry and requires domain-specific evidence and expert review; no registered ML model is assigned."})
 
     gaps = []
     comparisons = []
@@ -154,29 +175,47 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
     for service in services:
         info = SERVICE_PATHWAYS[service]
         points = []
-        if "Flood" in hazards:
+        if "Flood" in components:
             points.append(info["flood"])
-        if "Cyclone" in hazards:
+        if "Cyclone" in components:
             points.append(info["cyclone"])
-        if compound:
+        for selected in sorted(components.difference({"Flood", "Cyclone"})):
+            definition = HAZARD_REGISTRY[selected]
+            points.append(selected + ": " + definition.summary + " Evidence needed: " + "; ".join(definition.evidence_factors) + ".")
+        if compound and {"Flood", "Cyclone"}.issubset(components):
             points.append(info["compound"])
         reviews.append({"service": service, "review_points": points})
 
-    if "Flood" in hazards:
+    if "Flood" in components:
         if rainfall is None: gaps.append("Time-stamped rainfall observation and measurement interval")
         if river is None: gaps.append("Time-stamped river-level observation, gauge ID and datum")
         gaps.extend(["Verified catchment connectivity, drainage/outfall and local elevation evidence",
                      "Independent, location-specific flood outcome or inundation evidence"])
-    if "Cyclone" in hazards:
+    if "Infrastructure failure" in components:
+        supplied_status = str(inputs.get("infrastructure_status") or "").strip()
+        gaps.append(
+            "Independently verify infrastructure condition"
+            + (f" (user-supplied status: {supplied_status})" if supplied_status and supplied_status.casefold() != "not supplied" else "")
+            + ", affected asset ID, operator and outage/recovery evidence"
+        )
+    drainage_status = str(inputs.get("drainage_status") or "").strip()
+    if drainage_status and drainage_status.casefold() != "not supplied":
+        gaps.append("Geotagged drainage inspection, asset identifier, operator confirmation and repair status")
+    if "Cyclone" in components:
         if cyclone_distance is None: gaps.append("Cyclone track position and time relative to the study area")
         if cyclone_wind is None: gaps.append("Source-defined cyclone intensity/wind observation and timestamp")
         gaps.append("Forecast issue time, valid time, wind/rainfall fields and coastal-water evidence")
-    if compound:
+    if compound and {"Flood", "Cyclone"}.issubset(components):
         gaps.append("Aligned cyclone, rainfall, river, tide and flood-impact timelines for the same event")
+    if custom_disaster:
+        gaps.append("Domain-specific authoritative definition, verified event labels, exposure data and independent validation for the custom disaster")
     if not inputs.get("evidence_source"): gaps.append("Source URL or document reference for supplied observations")
     if not inputs.get("observation_time"): gaps.append("Observation timestamp and timezone")
     if not inputs.get("evidence_type"): gaps.append("Whether this is hypothetical, historical or a current sourced observation")
-    if "Flood" in hazards:
+    # Validate evidence metadata against expanded components, not just the
+    # visible selection label. A single registered compound-hazard option must
+    # receive the same component-level checks as selecting both hazards.
+    if "Flood" in components:
         if rainfall is not None and not rainfall_period:
             gaps.append("Rainfall accumulation period")
         if rainfall is not None and not rainfall_station:
@@ -185,7 +224,7 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
             gaps.append("River gauge ID and station location")
         if river is not None and not river_gauge_datum:
             gaps.append("River gauge datum/reference")
-    if "Cyclone" in hazards:
+    if "Cyclone" in components:
         if cyclone_distance is not None and not inputs.get("cyclone_fix_time"):
             gaps.append("Cyclone track-fix timestamp")
         if "forecast" in str(inputs.get("evidence_type") or "").casefold():
@@ -198,7 +237,8 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
 
     return {
         "status": "SCENARIO_REVIEW_ONLY_NOT_A_VALIDATED_FORECAST",
-        "area": area, "hazards": sorted(hazards), "compound": compound,
+        "area": area, "hazards": sorted(hazards), "components": sorted(components),
+        "custom_disaster": custom_disaster or None, "compound": compound,
         "period_start": str(start) if start else None, "period_end": str(end) if end else None,
         "evidence_type": str(inputs.get("evidence_type") or "Not specified"),
         "evidence_source": str(inputs.get("evidence_source") or "").strip() or None,
@@ -220,6 +260,8 @@ def assess_compound_scenario(inputs: dict[str, Any]) -> dict[str, Any]:
             "river_reference_level_m": river_ref, "rainfall_reference_mm": rain_ref,
             "cyclone_distance_km": cyclone_distance, "cyclone_wind_knots": cyclone_wind,
             "coastal_water_or_surge_notes": str(inputs.get("coastal_water_notes") or "").strip() or None,
+            "drainage_status": str(inputs.get("drainage_status") or "").strip() or None,
+            "infrastructure_status": str(inputs.get("infrastructure_status") or "").strip() or None,
         },
         "reference_comparisons": comparisons, "pathways": pathways,
         "service_reviews": reviews, "actions": ACTIONS,

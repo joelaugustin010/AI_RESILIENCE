@@ -150,7 +150,7 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
         map_button = next(
             button
             for button in app.button
-            if button.label == "View prone areas on the Kochi map"
+            if button.label == "Open Kochi map and available hazard evidence"
         )
         map_button.click().run()
 
@@ -193,7 +193,7 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
         next(
             button
             for button in app.button
-            if button.label == "View prone areas on the Kochi map"
+            if button.label == "Open Kochi map and available hazard evidence"
         ).click().run()
 
         self.assertEqual(len(app.exception), 0)

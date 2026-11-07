@@ -20,7 +20,7 @@ class CompoundHazardAssessmentTests(unittest.TestCase):
         result = assess_compound_scenario(self.base())
         self.assertTrue(result["compound"])
         self.assertEqual(result["status"], "SCENARIO_REVIEW_ONLY_NOT_A_VALIDATED_FORECAST")
-        self.assertTrue(any(p["hazard"] == "Compound interaction" for p in result["pathways"]))
+        self.assertTrue(any(p["hazard"] == "Multi-hazard interaction" for p in result["pathways"]))
 
     def test_no_probability_or_damage_estimate_is_generated(self):
         result = assess_compound_scenario(self.base(rainfall_mm=120, river_level_m=4.2))
@@ -66,15 +66,66 @@ class CompoundHazardAssessmentTests(unittest.TestCase):
         hospital = next(x for x in result["service_reviews"] if x["service"] == "Hospitals")
         self.assertEqual(len(hospital["review_points"]), 3)
 
+    def test_rainfall_drainage_compound_reviews_infrastructure_component(self):
+        result = assess_compound_scenario(self.base(
+            hazards=["Compound: heavy rainfall + drainage failure"],
+            services=["Drainage"],
+        ))
+        drainage = next(item for item in result["service_reviews"] if item["service"] == "Drainage")
+        self.assertTrue(any("Infrastructure failure:" in point for point in drainage["review_points"]))
+        self.assertTrue(any("Flood" in point or "drain" in point.lower() for point in drainage["review_points"]))
+
     def test_invalid_hazard_and_negative_measurement_are_rejected(self):
         with self.assertRaises(ValueError):
-            assess_compound_scenario(self.base(hazards=["Earthquake"]))
+            assess_compound_scenario(self.base(hazards=["Wildfire"]))
         with self.assertRaises(ValueError):
             assess_compound_scenario(self.base(rainfall_mm=-1))
 
     def test_end_date_cannot_precede_start_date(self):
         with self.assertRaisesRegex(ValueError, "end date"):
             assess_compound_scenario(self.base(period_start=date(2026, 11, 3), period_end=date(2026, 11, 2)))
+
+    def test_registered_compound_option_expands_component_level_evidence_gaps(self):
+        result = assess_compound_scenario(self.base(
+            hazards=["Compound: cyclone + flood"],
+            rainfall_mm=80,
+            cyclone_distance_km=120,
+        ))
+        self.assertEqual(set(result["components"]), {"Cyclone", "Flood"})
+        self.assertIn("Rainfall accumulation period", result["data_gaps"])
+        self.assertIn("Rainfall station ID", result["data_gaps"])
+        self.assertIn("Cyclone track-fix timestamp", result["data_gaps"])
+        self.assertIn("Cyclone storm ID or official storm name", result["data_gaps"])
+
+    def test_registered_compound_option_renders_each_component_pathway(self):
+        result = assess_compound_scenario(self.base(
+            hazards=["Compound: heavy rainfall + drainage failure"],
+        ))
+        pathway_hazards = {item["hazard"] for item in result["pathways"]}
+        self.assertIn("Flood", pathway_hazards)
+        self.assertIn("Infrastructure failure", pathway_hazards)
+        self.assertIn("Multi-hazard interaction", pathway_hazards)
+
+    def test_registered_compound_option_checks_date_types(self):
+        with self.assertRaisesRegex(ValueError, "start date must be a date"):
+            assess_compound_scenario(self.base(period_start="not-a-date"))
+
+    def test_drainage_and_infrastructure_status_are_reported_with_verification_gaps(self):
+        result = assess_compound_scenario(self.base(
+            hazards=["Compound: heavy rainfall + drainage failure"],
+            drainage_status="Reported failed",
+            infrastructure_status="Disruption reported by user",
+        ))
+        self.assertEqual(result["reported_inputs"]["drainage_status"], "Reported failed")
+        self.assertEqual(result["reported_inputs"]["infrastructure_status"], "Disruption reported by user")
+        self.assertTrue(any("Geotagged drainage inspection" in gap for gap in result["data_gaps"]))
+        self.assertTrue(any("affected asset ID" in gap for gap in result["data_gaps"]))
+
+    def test_infrastructure_component_requires_verification_even_when_status_not_supplied(self):
+        result = assess_compound_scenario(self.base(
+            hazards=["Compound: heavy rainfall + drainage failure"],
+        ))
+        self.assertTrue(any("Independently verify infrastructure condition" in gap for gap in result["data_gaps"]))
 
     def test_non_finite_measurements_are_rejected(self):
         with self.assertRaisesRegex(ValueError, "finite"):

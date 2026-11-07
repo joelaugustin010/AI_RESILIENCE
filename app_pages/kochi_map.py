@@ -9,7 +9,7 @@ import pydeck as pdk
 import streamlit as st
 
 from src.dataframe_display import display_dataframe
-from src.hazard_registry import components_for, is_workflow_hazard
+from src.hazard_registry import WORKFLOW_HAZARDS, components_for, is_workflow_hazard
 from src.jrc_flood_context import (
     DISPLAY_CAVEAT as JRC_DISPLAY_CAVEAT,
     LICENCE_SOURCES as JRC_LICENCE_SOURCES,
@@ -23,7 +23,7 @@ from src.spatial_data import classify_exposure, processed_layer_issues, read_pro
 from src.landcover_context import validate_worldcover_preview
 from src.map_integration import MAP_CONTEXT_KEY, selected_feature_properties
 from src.ui_theme import page_header, section_intro
-from src.map_integration import hazard_layer_availability
+from src.map_integration import hazard_has_flood_component, hazard_layer_availability, hazard_map_references
 
 ROOT = Path(__file__).resolve().parents[1]
 BOUNDARY_PATH = ROOT / "data" / "reference" / "kochi_corporation_boundary.geojson"
@@ -360,6 +360,15 @@ if map_context is not None:
         else:
             active_hazard = candidate_hazard
 
+if map_context is None:
+    st.subheader("Choose a disaster to inspect")
+    active_hazard = st.selectbox(
+        "Hazard",
+        options=list(WORKFLOW_HAZARDS),
+        key="kochi_map_hazard_selector",
+        help="Select any registered hazard to inspect its available Kochi/Kerala spatial evidence. A reference map is not automatically a validated local GIS layer.",
+    )
+
 if isinstance(map_context, dict):
     active_hazard = map_context.get("hazard")
     with st.container(key="kochi-semantic-scenario-heading"):
@@ -442,7 +451,23 @@ if isinstance(map_context, dict):
                             f"Limitations: {item.get('limitations', 'Not stated.')}"
                         )
 else:
-    st.info("No submitted scenario is attached. Select a disaster in the Decision Workflow and use “View prone areas on the Kochi map” to carry its context here.")
+    st.info("No submitted scenario is attached. Select a disaster in the Decision Workflow and use “Open Kochi map and available hazard evidence” to carry its context here.")
+
+st.subheader("Official hazard-map and district reference sources")
+reference_items = hazard_map_references(active_hazard)
+if reference_items:
+    st.caption(
+        "These are official Kerala disaster-management reference products. District/state PDFs and portal pages are linked for review; "
+        "they are not overlaid as precise Kochi GIS footprints. The Ernakulam multi-hazard PDF is district-level reference only. " "The GSI Ernakulam ZIP still requires local schema, "
+        "CRS, licence and geometry validation before it can become a map layer."
+    )
+    for reference in reference_items:
+        st.markdown(f"- [{reference['title']}]({reference['url']}) — {reference['scope']}")
+else:
+    st.info(
+        "No hazard-specific official map reference is currently registered for this selection. "
+        "The map will not substitute a different hazard's footprint."
+    )
 
 st.subheader("Hazard layer availability")
 availability_rows = sorted(
@@ -451,7 +476,7 @@ availability_rows = sorted(
 )
 display_dataframe(
     pd.DataFrame(availability_rows)[
-        ["Hazard", "Selected", "Validated hazard footprint", "Context layer", "Why no footprint is shown"]
+        ["Hazard", "Selected", "Hazard footprint / modelled context", "Context layer", "Footprint scope / limitation"]
     ],
     hide_index=True,
     width="stretch",
@@ -853,7 +878,6 @@ section_intro(
 )
 show_boundary = st.checkbox("Kochi Corporation administrative boundary", value=True)
 st.caption("Blue outline = administrative boundary only. It must not be interpreted as a hazard zone or as the full Greater Kochi urban area.")
-
 basemap_theme = st.radio(
     "Basemap appearance",
     options=["Light · Eco", "Dark"],
@@ -882,10 +906,12 @@ if active_hazard is None or "Flood" in active_components:
             jrc_metadata = jrc_context["metadata"]
             jrc_licence = jrc_context["licence"]
             jrc_preview = jrc_context["preview"]
+            jrc_checkbox_key = f"kochimap_jrc_{active_hazard}"
+            if jrc_checkbox_key not in st.session_state:
+                st.session_state[jrc_checkbox_key] = hazard_has_flood_component(active_hazard)
             show_jrc = st.checkbox(
                 "JRC GloFAS RP100 modelled river-flood depth (scenario context, not observed flooding)",
-                value=False,
-                key=f"kochimap_jrc_{active_hazard}",
+                key=jrc_checkbox_key,
             )
             st.caption(JRC_DISPLAY_CAVEAT)
             st.caption(
@@ -1215,6 +1241,21 @@ if uploaded is not None:
                 )
     except (UnicodeDecodeError, pd.errors.ParserError, ValueError) as error:
         st.error(f"Could not read the uploaded CSV: {error}")
+
+if not deck_layers:
+    # Keep a useful, geographically centred map available even when every optional
+    # thematic layer is disabled or unavailable for the selected hazard.
+    deck_layers.append(pdk.Layer(
+        "ScatterplotLayer",
+        id="kochi-map-centre-anchor",
+        data=[{"longitude": map_center[0], "latitude": map_center[1]}],
+        get_position="[longitude, latitude]",
+        get_fill_color=[38, 106, 166, 210],
+        get_radius=90,
+        radius_min_pixels=5,
+        pickable=False,
+    ))
+    legend_rows.append(("Kochi map centre", "#266AA6 marker", "Orientation marker only; not a hazard or asset location"))
 
 if deck_layers:
     deck = pdk.Deck(

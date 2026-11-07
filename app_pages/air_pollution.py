@@ -1333,7 +1333,12 @@ def _render_co2_intelligence(live: dict) -> None:
                     "Monthly CO₂ (kg)": round(amount, 2),
                     "Share of included total (%)": round(amount / total_monthly * 100, 1) if total_monthly else 0.0,
                 })
-            display_dataframe(pd.DataFrame(share_rows), hide_index=True, use_container_width=True)
+            display_dataframe(
+                pd.DataFrame(share_rows),
+                hide_index=True,
+                use_container_width=True,
+                alt="Household monthly emissions by included source",
+            )
 
         with st.container(border=True):
             st.markdown("#### 04 · Practical reduction ideas")

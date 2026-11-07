@@ -3,8 +3,10 @@
 from pathlib import Path
 import re
 import json
+import hashlib
 
 import pandas as pd
+import pydeck as pdk
 import streamlit as st
 
 from src.dataframe_display import display_dataframe
@@ -43,6 +45,9 @@ from src.decision_workflow import (
     validate_workflow_inputs,
 )
 from src.disaster_models import assess_disaster
+from src.prevention_intelligence import generate_prevention_actions
+from src.intervention_effectiveness import intervention_effectiveness_for_hazards
+from src.ml.presentation import application_rows, model_rows
 from src.compound_hazard_assessment import assess_compound_scenario
 from src.historical_validation import historical_validation_checklist
 from src.disaster_models.drought import parse_monthly_precipitation_csv
@@ -55,8 +60,9 @@ from src.hydrology_analytics import (
     station_gap_summary,
 )
 from src.infrastructure_dependencies import dependency_review_table
-from src.map_integration import MAP_CONTEXT_KEY, build_map_context
+from src.map_integration import MAP_CONTEXT_KEY, build_map_context, hazard_has_flood_component
 from src.ui_theme import section_intro
+from src.evidence_alternatives import alternative_evidence_for_hazard
 from src.phase2_data import (
     Phase2DataError,
     Phase2DataUnavailable,
@@ -67,6 +73,8 @@ from src.phase2_data import (
 )
 from src.rainfall_forecast import RainfallForecastError, run_manual_rainfall_backtest
 from src.uncertainty import build_uncertainty_register
+from src.population_exposure import PopulationExposureError, estimate_population_exposure
+from src.flood_footprint import FloodFootprintError, summarize_flood_depth_geojson
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -446,6 +454,8 @@ def _render_disaster_assessment(result: dict) -> None:
         ]
         display_dataframe(pd.DataFrame(rows), hide_index=True, width="stretch", alt="Hazard-specific physical indicators and their user-supplied values")
 
+    _render_ml_evidence(result.get("ml_evidence", {}))
+
     consequences = result["potential_consequences"]
     st.write("**Potential consequences:**", consequences["status"])
     st.caption(consequences["human_population"]["interpretation"])
@@ -529,6 +539,71 @@ def _render_disaster_assessment(result: dict) -> None:
         for source in result["evidence"]["sources"]:
             st.markdown(f"- [{source['title']}]({source['url']}) — {source['role']}")
 
+
+
+def _render_ml_evidence(evidence: dict) -> None:
+    """Render supplementary shared-ML evidence without implying validation."""
+    st.markdown("### Shared ML evidence (supplementary)")
+    if not evidence:
+        st.info("No shared ML evidence block is attached to this assessment.")
+        return
+    status = str(evidence.get("status", "unknown")).replace("_", " ").capitalize()
+    support = str(evidence.get("support_level", "unknown")).replace("_", " ").capitalize()
+    st.write("**ML status:**", status)
+    st.write("**ML support level:**", support)
+    st.caption(evidence.get("interpretation", "No interpretation is available."))
+    st.caption(evidence.get("note", ""))
+
+    rows = model_rows(evidence)
+    if rows:
+        display_dataframe(
+            pd.DataFrame(rows),
+            hide_index=True,
+            width="stretch",
+            alt="Registered shared ML models, context completeness, and evidence tier",
+        )
+    else:
+        st.info("No shared ML model is registered for this hazard.")
+
+    applications = application_rows(evidence)
+    if applications:
+        display_dataframe(
+            pd.DataFrame(applications),
+            hide_index=True,
+            width="stretch",
+            alt="Supplementary shared ML model outputs and calibration diagnostics",
+        )
+        st.warning(
+            "Model probability estimates are research outputs for a documented event, "
+            "not calibrated probabilities of harm. They do not replace the deterministic "
+            "hazard assessment, official warnings, or local verification."
+        )
+    else:
+        st.info(
+            "No model output was produced. Missing scenario context or a non-usable model "
+            "status prevents a decision output; values are never defaulted or invented."
+        )
+        for model in evidence.get("models", []):
+            missing = (model.get("context") or {}).get("missing_features") or []
+            if not missing:
+                continue
+            with st.expander(
+                f"Required context for {model.get('model_id', 'model')} "
+                f"({len(missing)} missing feature(s))",
+                expanded=False,
+            ):
+                st.caption(
+                    "Supply every field explicitly through an advanced ML context if "
+                    "you have a complete, time-matched feature vector. Partial values "
+                    "are not filled from unrelated scenario inputs."
+                )
+                st.code(", ".join(missing), language="text")
+
+    with st.expander("ML limitations and validation boundary"):
+        st.write("**Independently validated predictive model available:**", "No")
+        st.write("**Validation status:**", "Single temporal holdout; not independently validated.")
+        for limitation in evidence.get("limitations", []):
+            st.write(f"- {limitation}")
 
 
 def _compound_scenario_inputs(inputs: dict) -> dict:
@@ -763,6 +838,21 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 st.caption("A historical rainfall measurement benchmark is available in the evidence explorer. It is separate from the assessment and is not a current rainfall or flood forecast.")
+nav_left, nav_right = st.columns(2)
+with nav_left:
+    st.page_link(
+        ROOT / "app_pages" / "compound_scenario.py",
+        label="Open Cyclone + Flood workspace",
+        icon=":material/thunderstorm:",
+        width="stretch",
+    )
+with nav_right:
+    st.page_link(
+        ROOT / "app_pages" / "kochi_map.py",
+        label="Open Kochi hazard map",
+        icon=":material/map:",
+        width="stretch",
+    )
 st.info(
     "Kochi evidence update: JRC 100-year river-flood depth tiles are licensed (ODbL 1.0 applied; CC BY 4.0 also stated) and displayed on the map as modelled scenario context with attribution. They are not observed flooding or an official warning. "
     "Operational asset-level flood exposure remains unavailable because there is no independently validated hospital or critical-facility location layer. "
@@ -1181,6 +1271,10 @@ st.caption(
     "flood-depth estimate, affected-area map, or official warning."
 )
 prediction = predict_scenario_outcome(inputs)
+if prediction.get("input_validation", {}).get("valid") is False:
+    st.error("Scenario assessment blocked: correct the invalid measurements below, then rerun the assessment.")
+    for problem in prediction["input_validation"].get("problems", []):
+        st.write(f"**{problem['field']}** — {problem['message']}")
 st.subheader("Conditional scenario output")
 st.metric("Scenario concern", prediction["concern_level"])
 st.markdown("**Potential outcome**")
@@ -1328,6 +1422,29 @@ st.info(
     "must not be treated as evidence that the hazard or exposure is absent."
 )
 
+
+st.subheader("Alternative evidence routes for this hazard")
+alternative_routes = alternative_evidence_for_hazard(inputs["hazard"])
+if alternative_routes:
+    st.caption(
+        "These are practical additional evidence routes. They do not automatically "
+        "make a dataset training-ready; access, coverage, metadata and validation remain required."
+    )
+    for route in alternative_routes:
+        with st.expander(route["title"]):
+            st.write(route["method"])
+            st.markdown("**Useful for**")
+            for capability in route["supports"]:
+                st.write(f"- {capability.replace('_', ' ')}")
+            st.markdown("**Not sufficient for**")
+            for limitation in route["does_not_support"]:
+                st.write(f"- {limitation.replace('_', ' ')}")
+            st.caption(route["status"])
+            for source in route["sources"]:
+                st.markdown(f"- [{source['publisher']} — {source['title']}]({source['url']})")
+else:
+    st.caption("No additional alternative-evidence route is registered for this hazard yet.")
+
 st.subheader("Evidence provenance gate")
 provenance = evidence_provenance_summary(inputs)
 st.warning(f"**{provenance['Provenance status']}**")
@@ -1355,12 +1472,17 @@ if inputs.get("hazard") == "Compound: cyclone + flood":
         _render_compound_assessment(compound_assessment)
 
 if st.button(
-    "View prone areas on the Kochi map",
+    "Open Kochi map and available hazard evidence",
     icon=":material/map:",
     key="wf_open_kochi_map",
-    help="Opens the existing map with this submitted scenario. Available map evidence may not support the selected hazard.",
+    help="Opens the Kochi map with this scenario. A modelled flood-context layer is available for flood-component scenarios; other hazards remain explicitly unavailable until suitable local spatial evidence is approved.",
 ):
     st.session_state[MAP_CONTEXT_KEY] = build_map_context(inputs, disaster_assessment)
+    map_hazard = inputs.get("hazard")
+    if isinstance(map_hazard, str) and hazard_has_flood_component(map_hazard):
+        # A previous manual toggle may have left the per-hazard checkbox off.
+        # Re-entering the map from a flood scenario should enable its preview.
+        st.session_state[f"kochimap_jrc_{map_hazard}"] = True
     st.switch_page(ROOT / "app_pages" / "kochi_map.py")
 st.warning(assessment["status"], icon=":material/priority_high:")
 st.write("**Method:**", assessment["method"])
@@ -1526,10 +1648,388 @@ for item in consequence_assessment["required_evidence"]:
 st.warning(consequence_assessment["scientific_guardrail"])
 st.caption(consequence_assessment["probability_semantics"])
 
+if inputs.get("hazard") == "Flood":
+    with st.expander("Flood extent and depth analysis (upload a measured/modelled depth layer)", expanded=False):
+        st.caption(
+            "This tool makes extent and depth summaries available when you provide a quality-checked "
+            "flood-depth GeoJSON. It measures supplied data; it does not simulate or forecast flooding."
+        )
+        depth_file = st.file_uploader(
+            "Flood-depth GeoJSON (polygon features with a numeric depth_m property)",
+            type=["geojson", "json"],
+            key="flood_depth_geojson_upload",
+        )
+        depth_field = st.text_input("Depth property name", value="depth_m", key="flood_depth_property")
+        depth_source = st.text_input(
+            "Flood-depth dataset source URL", key="flood_depth_source_url", placeholder="https://…"
+        )
+        depth_event_date = st.text_input(
+            "Event / model reference date", key="flood_depth_event_date", placeholder="YYYY-MM-DD"
+        )
+        depth_provenance = st.checkbox(
+            "I verified the source, event date, horizontal CRS, vertical datum, depth units, coverage and reuse terms.",
+            key="flood_depth_provenance_confirmed",
+        )
+        if st.button("Summarize supplied flood extent and depth", key="summarize_flood_depth"):
+            if not depth_file:
+                st.error("Upload a flood-depth GeoJSON file.")
+            elif not depth_source.startswith("https://"):
+                st.error("Provide the dataset's HTTPS source URL.")
+            elif not depth_event_date.strip():
+                st.error("Provide the event or model reference date.")
+            elif not depth_provenance:
+                st.error("Verify the dataset metadata before calculating.")
+            else:
+                try:
+                    depth_payload = json.loads(depth_file.getvalue().decode("utf-8-sig"))
+                    depth_summary = summarize_flood_depth_geojson(
+                        depth_payload, depth_field=depth_field.strip() or "depth_m"
+                    )
+                    st.session_state["flood_depth_summary"] = {
+                        **depth_summary,
+                        "source_url": depth_source.strip(),
+                        "event_date": depth_event_date.strip(),
+                        "file_sha256": hashlib.sha256(depth_file.getvalue()).hexdigest(),
+                        "hazard": str(inputs.get("hazard", "")),
+                    }
+                    st.session_state.pop("flood_depth_error", None)
+                except (UnicodeDecodeError, json.JSONDecodeError, FloodFootprintError, ValueError) as exc:
+                    st.session_state.pop("flood_depth_summary", None)
+                    st.session_state["flood_depth_error"] = str(exc)
+
+        if st.session_state.get("flood_depth_error"):
+            st.error(f"Flood-depth analysis blocked: {st.session_state['flood_depth_error']}")
+        saved_depth = st.session_state.get("flood_depth_summary")
+        current_depth_hash = hashlib.sha256(depth_file.getvalue()).hexdigest() if depth_file else None
+        if saved_depth and (
+            saved_depth.get("file_sha256") != current_depth_hash
+            or saved_depth.get("source_url") != depth_source.strip()
+            or saved_depth.get("event_date") != depth_event_date.strip()
+            or saved_depth.get("hazard") != str(inputs.get("hazard", ""))
+        ):
+            st.warning("The saved flood-depth summary no longer matches the selected file or metadata. Recalculate it.")
+        elif saved_depth:
+            st.warning(
+                "MEASURED / MODEL-SUPPLIED LAYER SUMMARY — not a new flood prediction. "
+                "Do not use this output as an evacuation or route-safety instruction."
+            )
+            st.metric("Flood extent in supplied layer", f"{saved_depth['flooded_extent_km2']:.4f} km²")
+            st.metric("Area-weighted mean supplied depth", f"{saved_depth['area_weighted_mean_depth_m']:.3f} m")
+            st.metric("Maximum supplied polygon depth", f"{saved_depth['maximum_polygon_depth_m']:.3f} m")
+            st.write("**Area by descriptive depth band (not damage/safety thresholds)**")
+            display_dataframe(
+                pd.DataFrame([
+                    {"Depth band": key.replace("_", " ").replace("m", "m"), "Area (km²)": value}
+                    for key, value in saved_depth["area_by_depth_band_km2"].items()
+                ]),
+                hide_index=True, width="stretch",
+                alt="Area of supplied flood-depth polygons by descriptive depth band",
+            )
+            st.caption(
+                f"Reference date: {saved_depth['event_date']} · "
+                f"{saved_depth['polygon_count']:,} polygons · "
+                f"Source: {saved_depth['source_url']}"
+            )
+            for limitation in saved_depth["limitations"]:
+                st.caption(f"• {limitation}")
+
+with st.expander("Population exposure calculator (GeoJSON evidence inputs)", expanded=False):
+    st.caption(
+        "Upload a population grid and a hazard-footprint polygon dataset in EPSG:4326 GeoJSON. "
+        "The calculator estimates residents inside the supplied footprint by equal-area polygon "
+        "intersection. It does not estimate casualties, displacement or actual damage."
+    )
+    population_file = st.file_uploader(
+        "Population grid GeoJSON (each polygon needs a population count)",
+        type=["geojson", "json"],
+        key="population_exposure_grid_upload",
+    )
+    footprint_file = st.file_uploader(
+        "Hazard footprint GeoJSON (validated polygon features)",
+        type=["geojson", "json"],
+        key="population_exposure_footprint_upload",
+    )
+    population_field_name = st.text_input(
+        "Population-count property name",
+        value="population",
+        key="population_exposure_population_field",
+    )
+    grid_id_field_name = st.text_input(
+        "Grid-cell ID property name",
+        value="grid_id",
+        key="population_exposure_grid_id_field",
+    )
+    ward_field_name = st.text_input(
+        "Ward-label property name (optional)",
+        value="ward_name",
+        key="population_exposure_ward_field",
+    )
+    population_year = st.text_input(
+        "Population grid reference year",
+        key="population_exposure_year",
+        placeholder="e.g. 2025",
+    )
+    population_source_url = st.text_input(
+        "Population dataset source URL",
+        key="population_exposure_source",
+        placeholder="https://…",
+    )
+    footprint_source_url = st.text_input(
+        "Hazard footprint source URL",
+        key="population_exposure_footprint_source",
+        placeholder="https://…",
+    )
+    population_provenance_confirmed = st.checkbox(
+        "I have checked the source attribution, reuse terms, CRS, date and geographic coverage for both files.",
+        key="population_exposure_provenance_confirmed",
+    )
+    if st.button("Calculate population inside footprint", key="calculate_population_exposure"):
+        if not population_file or not footprint_file:
+            st.error("Upload both GeoJSON files before calculating.")
+        elif not population_year.strip().isdigit():
+            st.error("Enter the population dataset reference year.")
+        elif not population_source_url.startswith("https://") or not footprint_source_url.startswith("https://"):
+            st.error("Provide HTTPS source URLs for both datasets.")
+        elif not population_provenance_confirmed:
+            st.error("Confirm source, licence, CRS, date and coverage review before calculating.")
+        else:
+            try:
+                population_payload = json.loads(population_file.getvalue().decode("utf-8-sig"))
+                footprint_payload = json.loads(footprint_file.getvalue().decode("utf-8-sig"))
+                exposure_result = estimate_population_exposure(
+                    population_payload,
+                    footprint_payload,
+                    population_field=population_field_name.strip() or "population",
+                    grid_id_field=grid_id_field_name.strip() or "grid_id",
+                    ward_field=ward_field_name.strip() or None,
+                    source_crs="EPSG:4326",
+                )
+                st.session_state["population_exposure_result"] = {
+                    **exposure_result,
+                    "population_year": population_year.strip(),
+                    "population_field": population_field_name.strip() or "population",
+                    "grid_id_field": grid_id_field_name.strip() or "grid_id",
+                    "ward_field": ward_field_name.strip() or None,
+                    "population_source_url": population_source_url.strip(),
+                    "footprint_source_url": footprint_source_url.strip(),
+                    "population_file_sha256": hashlib.sha256(population_file.getvalue()).hexdigest(),
+                    "footprint_file_sha256": hashlib.sha256(footprint_file.getvalue()).hexdigest(),
+                    "footprint_geojson": footprint_payload,
+                    "scenario_hazard": str(inputs.get("hazard", "")),
+                    "scenario_location": str(inputs.get("location", "")),
+                }
+                st.session_state.pop("population_exposure_error", None)
+            except (UnicodeDecodeError, json.JSONDecodeError, PopulationExposureError, ValueError) as exc:
+                st.session_state.pop("population_exposure_result", None)
+                st.session_state["population_exposure_error"] = str(exc)
+
+    exposure_error = st.session_state.get("population_exposure_error")
+    if exposure_error:
+        st.error(f"Population exposure calculation blocked: {exposure_error}")
+    exposure_result = st.session_state.get("population_exposure_result")
+    current_population_hash = (
+        hashlib.sha256(population_file.getvalue()).hexdigest() if population_file else None
+    )
+    current_footprint_hash = (
+        hashlib.sha256(footprint_file.getvalue()).hexdigest() if footprint_file else None
+    )
+    if exposure_result and (
+        exposure_result.get("scenario_hazard") != str(inputs.get("hazard", ""))
+        or exposure_result.get("scenario_location") != str(inputs.get("location", ""))
+        or exposure_result.get("population_file_sha256") != current_population_hash
+        or exposure_result.get("footprint_file_sha256") != current_footprint_hash
+        or exposure_result.get("population_year") != population_year.strip()
+        or exposure_result.get("population_source_url") != population_source_url.strip()
+        or exposure_result.get("footprint_source_url") != footprint_source_url.strip()
+        or exposure_result.get("population_field") != (population_field_name.strip() or "population")
+        or exposure_result.get("grid_id_field") != (grid_id_field_name.strip() or "grid_id")
+        or exposure_result.get("ward_field") != (ward_field_name.strip() or None)
+    ):
+        st.warning(
+            "The saved exposure estimate no longer matches the selected scenario, uploaded files or source metadata. "
+            "Recalculate before using it in this scenario."
+        )
+    elif exposure_result:
+        st.caption(
+            f"Scenario: {exposure_result['scenario_hazard']} · "
+            f"Location: {exposure_result['scenario_location']}"
+        )
+        st.warning(
+            "APPROXIMATE POPULATION-EXPOSURE SCREENING — not a count of people harmed, "
+            "displaced, injured or killed. Uniform population within each grid cell is assumed."
+        )
+        if exposure_result["population_grid_covers_full_footprint"]:
+            st.metric(
+                "Estimated population inside supplied footprint",
+                f"{exposure_result['estimated_population_in_footprint']:,}",
+            )
+        else:
+            st.metric(
+                "Estimated population in covered portion only",
+                f"{exposure_result['estimated_population_in_covered_part']:,}",
+            )
+            st.error(
+                f"The uploaded population grid covers only "
+                f"{exposure_result['hazard_footprint_area_covered_percent']}% of the hazard footprint. "
+                "A total exposed-population estimate is withheld because uncovered areas could contain residents."
+            )
+        st.caption(
+            f"Population reference year: {exposure_result['population_year']}; "
+            f"{exposure_result['intersecting_population_cells']:,} intersecting cells out of "
+            f"{exposure_result['population_grid_cells']:,}. "
+            f"Share of uploaded grid population: {exposure_result['exposure_share_of_grid_percent']}%."
+        )
+        if exposure_result["ward_screening_estimates"]:
+            st.markdown("**Ward-level screening estimates**")
+            display_dataframe(
+                pd.DataFrame(exposure_result["ward_screening_estimates"]),
+                hide_index=True,
+                width="stretch",
+                alt="Estimated population inside the uploaded hazard footprint by source-provided ward label",
+            )
+        bounds = exposure_result["footprint_bounds_wgs84"]
+        center_lon = (bounds[0] + bounds[2]) / 2
+        center_lat = (bounds[1] + bounds[3]) / 2
+        st.markdown("**Supplied hazard footprint**")
+        st.metric(
+            "Area covered by supplied hazard footprint",
+            f"{exposure_result['hazard_footprint_area_km2']:,.3f} km²",
+        )
+        st.caption(
+            f"Population-grid coverage: {exposure_result['hazard_footprint_area_covered_percent']}% "
+            f"({exposure_result['population_grid_covered_area_km2']:,.3f} km²)."
+        )
+        st.pydeck_chart(
+            pdk.Deck(
+                layers=[
+                    pdk.Layer(
+                        "GeoJsonLayer",
+                        data=exposure_result["footprint_geojson"],
+                        get_fill_color=[220, 53, 69, 65],
+                        get_line_color=[170, 25, 40, 220],
+                        get_line_width=2,
+                        line_width_min_pixels=2,
+                        pickable=True,
+                        stroked=True,
+                        filled=True,
+                    )
+                ],
+                initial_view_state=pdk.ViewState(
+                    latitude=center_lat,
+                    longitude=center_lon,
+                    zoom=11,
+                    pitch=0,
+                ),
+                map_style=None,
+                tooltip={"text": "Hazard exposure footprint"},
+            ),
+            use_container_width=True,
+        )
+        st.caption(exposure_result["method"])
+        for limitation in exposure_result["limitations"]:
+            st.caption(f"• {limitation}")
+        st.markdown(
+            f"[Population source]({exposure_result['population_source_url']}) · "
+            f"[Hazard footprint source]({exposure_result['footprint_source_url']})"
+        )
+
+st.markdown("**Additional impact and response outputs**")
+st.caption(
+    "These outputs are part of every assessment. Values remain explicitly unavailable until "
+    "the required hazard, population, asset and outcome evidence is validated; no generic "
+    "percentages or casualty figures are invented."
+)
+impact_register = consequence_assessment.get("impact_outputs", [])
+if impact_register:
+    display_dataframe(
+        pd.DataFrame(impact_register).rename(columns={
+            "output": "Impact / prediction output",
+            "unit": "Unit",
+            "status": "Current estimate status",
+            "required_evidence": "Evidence needed to calculate it",
+        }),
+        hide_index=True,
+        width="stretch",
+        alt="Evidence-gated population, displacement, casualty, building, infrastructure, economic and hazard-intensity outputs",
+    )
+
 st.header("5. Compare hypothetical scenarios")
 st.caption("The following cases differ only by their stated assumptions. Possible pathways are planning prompts, not calculated impacts.")
 scenarios = build_scenario_comparison(inputs)
 display_dataframe(scenarios, hide_index=True, width="stretch")
+
+st.header("6. Preventive action intelligence")
+preventive_actions = generate_prevention_actions(
+    str(inputs.get("hazard", "")),
+    inputs,
+)
+st.caption(
+    "These are hazard-specific prevention and preparedness options. Each item shows its "
+    "activation trigger, intended benefit, responsible owner, evidence required and safety caveat. "
+    "They are not ranked, do not quantify risk reduction, and never replace official instructions."
+)
+if preventive_actions:
+    display_dataframe(
+        pd.DataFrame(preventive_actions)[
+            ["action_id", "phase", "hazard", "action", "trigger", "benefit", "owner", "evidence", "caution"]
+        ].rename(
+            columns={
+                "action_id": "Action ID",
+                "phase": "When",
+                "hazard": "Hazard",
+                "action": "Recommended precaution",
+                "trigger": "When it applies",
+                "benefit": "How it may reduce harm",
+                "owner": "Responsible party",
+                "evidence": "Evidence / verification needed",
+                "caution": "Safety boundary",
+            }
+        ),
+        hide_index=True,
+        width="stretch",
+        alt="Evidence-aware disaster prevention and preparedness actions",
+    )
+else:
+    st.info("Select a registered hazard to generate hazard-specific preparedness options.")
+
+st.subheader("Intervention-effectiveness ML")
+effectiveness = intervention_effectiveness_for_hazards(
+    [str(inputs.get("hazard", ""))] if inputs.get("hazard") else [],
+    inputs,
+)
+hazard_effect = effectiveness.get("by_hazard", {}).get(str(inputs.get("hazard", "")), {})
+if hazard_effect.get("ranked_actions"):
+    st.caption(
+        "Preliminary observational ML estimates of expected damage reduction. "
+        "These are not guarantees, causal proof or instructions."
+    )
+    display_dataframe(
+        pd.DataFrame([
+            {
+                "Recommended precaution": next(
+                    (action["action"] for action in preventive_actions if action["action_id"] == item["action_id"]),
+                    item["action_id"],
+                ),
+                "Estimated damage reduction (research units)": item["estimated_damage_reduction"],
+                "Outcome unit": item["outcome_unit"],
+                "Evidence status": item["status"],
+            }
+            for item in hazard_effect["ranked_actions"]
+        ]),
+        hide_index=True,
+        width="stretch",
+        alt="Preliminary ML ranking of intervention effectiveness",
+    )
+    st.warning(hazard_effect.get("warning", effectiveness.get("warning", "")))
+else:
+    st.info(
+        "ML action-effect ranking is currently withheld. The project needs verified, "
+        "comparable intervention episodes (implemented and not implemented), measured "
+        "damage outcomes and pre-intervention conditions before it can estimate which "
+        "precaution reduces damage most."
+    )
+    if hazard_effect.get("reason"):
+        st.caption(hazard_effect["reason"])
 
 st.header("6. Evidence-linked recommendation candidates")
 recommendations = recommendation_candidates(inputs)

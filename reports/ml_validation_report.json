@@ -1,0 +1,3348 @@
+{
+  "schema_version": 1,
+  "status": "RESEARCH_MODELS_TRAINED_NOT_INDEPENDENTLY_VALIDATED",
+  "validated_models": 0,
+  "n_trained": 6,
+  "n_blocked": 0,
+  "trained": [
+    {
+      "model_id": "weather_extreme_rainfall_kochi_nextday",
+      "hazard": "Flood",
+      "status": "WEAK_RESEARCH_SIGNAL",
+      "skill_grade": "WEAK_RESEARCH_SIGNAL",
+      "status_reason": "Ranking beats the no-skill prevalence (ROC-AUC 0.857, average precision 0.358), but probability error (Brier 0.089) is not better than the base-rate reference (0.065). Treat the score as a ranking signal only.",
+      "evidence_tier": "baseline",
+      "selected_model_type": "extra_trees",
+      "target_definition": "target_rain_nextday >= 28.7 (training-period 0.950 quantile)",
+      "threshold_source": "training target dates only (< validation_start)",
+      "temporal_split": {
+        "train_target_dates_before": "2015-01-01",
+        "validation_target_dates": "2015-01-01 through before 2020-01-01",
+        "final_train_target_dates_before": "2020-01-01",
+        "test_target_dates_from": "2020-01-01",
+        "grouped_purge": {
+          "group_column": null,
+          "purged_groups": 0
+        }
+      },
+      "train_rows": 10591,
+      "train_events": 528,
+      "test_rows": 2192,
+      "test_events": 153,
+      "metrics": {
+        "n_test": 2192,
+        "n_test_events": 153,
+        "test_prevalence": 0.0697992700729927,
+        "accuracy": 0.9110401459854015,
+        "balanced_accuracy": 0.7073392378039984,
+        "precision": 0.3870967741935484,
+        "recall": 0.47058823529411764,
+        "f1": 0.4247787610619469,
+        "roc_auc": 0.8572092561072164,
+        "average_precision": 0.3581338500183841,
+        "brier_score": 0.08884933039583189,
+        "confusion_matrix_tn_fp_fn_tp": [
+          1925,
+          114,
+          81,
+          72
+        ],
+        "predicted_positive_rate": 0.08485401459854014,
+        "log_loss": 0.29232221728783286,
+        "expected_calibration_error": 0.14446668745303232,
+        "calibration_table": [
+          {
+            "bin_lower": 0,
+            "bin_upper": 0.1,
+            "n": 912,
+            "mean_probability": 0.033408111558891354,
+            "observed_event_rate": 0.009868421052631578,
+            "absolute_gap": 0.023539690506259776
+          },
+          {
+            "bin_lower": 0.1,
+            "bin_upper": 0.2,
+            "n": 395,
+            "mean_probability": 0.14544392537127496,
+            "observed_event_rate": 0.027848101265822784,
+            "absolute_gap": 0.11759582410545218
+          },
+          {
+            "bin_lower": 0.2,
+            "bin_upper": 0.30000000000000004,
+            "n": 250,
+            "mean_probability": 0.2488968717119291,
+            "observed_event_rate": 0.036,
+            "absolute_gap": 0.2128968717119291
+          },
+          {
+            "bin_lower": 0.30000000000000004,
+            "bin_upper": 0.4,
+            "n": 206,
+            "mean_probability": 0.3455535612431464,
+            "observed_event_rate": 0.0825242718446602,
+            "absolute_gap": 0.2630292893984862
+          },
+          {
+            "bin_lower": 0.4,
+            "bin_upper": 0.5,
+            "n": 148,
+            "mean_probability": 0.4479306967868495,
+            "observed_event_rate": 0.10810810810810811,
+            "absolute_gap": 0.3398225886787414
+          },
+          {
+            "bin_lower": 0.5,
+            "bin_upper": 0.6000000000000001,
+            "n": 109,
+            "mean_probability": 0.5414183970283957,
+            "observed_event_rate": 0.2018348623853211,
+            "absolute_gap": 0.33958353464307456
+          },
+          {
+            "bin_lower": 0.6000000000000001,
+            "bin_upper": 0.7000000000000001,
+            "n": 77,
+            "mean_probability": 0.6457377825621772,
+            "observed_event_rate": 0.2987012987012987,
+            "absolute_gap": 0.3470364838608785
+          },
+          {
+            "bin_lower": 0.7000000000000001,
+            "bin_upper": 0.8,
+            "n": 69,
+            "mean_probability": 0.7479084661773077,
+            "observed_event_rate": 0.43478260869565216,
+            "absolute_gap": 0.3131258574816555
+          },
+          {
+            "bin_lower": 0.8,
+            "bin_upper": 0.9,
+            "n": 26,
+            "mean_probability": 0.834936048674735,
+            "observed_event_rate": 0.6153846153846154,
+            "absolute_gap": 0.2195514332901196
+          }
+        ],
+        "calibration_interpretation": "Expected calibration error is descriptive for this holdout. It does not establish calibration in future or operational use.",
+        "majority_baseline": {
+          "predicted_class": 0,
+          "accuracy": 0.9302007299270073,
+          "balanced_accuracy": 0.5,
+          "f1": 0
+        },
+        "base_rate_brier_score": 0.06492733197027012,
+        "skill_over_base_rate_brier": -0.023921998425561766,
+        "bootstrap_95ci": {
+          "f1": [
+            0.3597560975609756,
+            0.49221189862333997
+          ],
+          "roc_auc": [
+            0.8263775550423073,
+            0.8834825621921737
+          ],
+          "average_precision": [
+            0.2885470402320767,
+            0.45279333983665876
+          ]
+        },
+        "validation_threshold_scores": [
+          {
+            "threshold": 0.02,
+            "precision": 0.059752747252747256,
+            "recall": 1,
+            "f1": 0.11276733635774465,
+            "balanced_accuracy": 0.6063829787234043,
+            "predicted_positive_rate": 0.7973713033953997
+          },
+          {
+            "threshold": 0.04,
+            "precision": 0.06682027649769585,
+            "recall": 1,
+            "f1": 0.12526997840172785,
+            "balanced_accuracy": 0.6506612995974699,
+            "predicted_positive_rate": 0.7130339539978094
+          },
+          {
+            "threshold": 0.06,
+            "precision": 0.07136859781696053,
+            "recall": 0.9770114942528736,
+            "f1": 0.13302034428794993,
+            "balanced_accuracy": 0.6705068972126933,
+            "predicted_positive_rate": 0.6522453450164294
+          },
+          {
+            "threshold": 0.08,
+            "precision": 0.07783882783882784,
+            "recall": 0.9770114942528736,
+            "f1": 0.1441899915182358,
+            "balanced_accuracy": 0.6989715320603068,
+            "predicted_positive_rate": 0.5980284775465499
+          },
+          {
+            "threshold": 0.1,
+            "precision": 0.08432539682539683,
+            "recall": 0.9770114942528736,
+            "f1": 0.1552511415525114,
+            "balanced_accuracy": 0.7231233434461608,
+            "predicted_positive_rate": 0.552026286966046
+          },
+          {
+            "threshold": 0.12,
+            "precision": 0.0897571277719113,
+            "recall": 0.9770114942528736,
+            "f1": 0.1644100580270793,
+            "balanced_accuracy": 0.7406621588573166,
+            "predicted_positive_rate": 0.5186199342825849
+          },
+          {
+            "threshold": 0.14,
+            "precision": 0.09582863585118377,
+            "recall": 0.9770114942528736,
+            "f1": 0.17453798767967146,
+            "balanced_accuracy": 0.7579134527043552,
+            "predicted_positive_rate": 0.48576122672508215
+          },
+          {
+            "threshold": 0.16,
+            "precision": 0.10059880239520957,
+            "recall": 0.9655172413793104,
+            "f1": 0.1822125813449024,
+            "balanced_accuracy": 0.7668299260375563,
+            "predicted_positive_rate": 0.45728368017524645
+          },
+          {
+            "threshold": 0.18,
+            "precision": 0.10824742268041238,
+            "recall": 0.9655172413793104,
+            "f1": 0.19466975666280417,
+            "balanced_accuracy": 0.7837936983204775,
+            "predicted_positive_rate": 0.4249726177437021
+          },
+          {
+            "threshold": 0.2,
+            "precision": 0.1172316384180791,
+            "recall": 0.9540229885057471,
+            "f1": 0.2088050314465409,
+            "balanced_accuracy": 0.7973105166795555,
+            "predicted_positive_rate": 0.3877327491785323
+          },
+          {
+            "threshold": 0.22,
+            "precision": 0.1225114854517611,
+            "recall": 0.9195402298850575,
+            "f1": 0.21621621621621623,
+            "balanced_accuracy": 0.7950202587033108,
+            "predicted_positive_rate": 0.35761226725082146
+          },
+          {
+            "threshold": 0.24,
+            "precision": 0.1310116086235489,
+            "recall": 0.9080459770114943,
+            "f1": 0.2289855072463768,
+            "balanced_accuracy": 0.8033616889082773,
+            "predicted_positive_rate": 0.3302300109529025
+          },
+          {
+            "threshold": 0.26,
+            "precision": 0.13780918727915195,
+            "recall": 0.896551724137931,
+            "f1": 0.23889739663093415,
+            "balanced_accuracy": 0.8079653387797188,
+            "predicted_positive_rate": 0.3099671412924425
+          },
+          {
+            "threshold": 0.28,
+            "precision": 0.14555765595463138,
+            "recall": 0.8850574712643678,
+            "f1": 0.25,
+            "balanced_accuracy": 0.8125689886511603,
+            "predicted_positive_rate": 0.2897042716319825
+          },
+          {
+            "threshold": 0.3,
+            "precision": 0.15778688524590165,
+            "recall": 0.8850574712643678,
+            "f1": 0.2678260869565217,
+            "balanced_accuracy": 0.82435737277997,
+            "predicted_positive_rate": 0.2672508214676889
+          },
+          {
+            "threshold": 0.32,
+            "precision": 0.16304347826086957,
+            "recall": 0.8620689655172413,
+            "f1": 0.2742230347349177,
+            "balanced_accuracy": 0.8203386805734567,
+            "predicted_positive_rate": 0.25191675794085433
+          },
+          {
+            "threshold": 0.34,
+            "precision": 0.16972477064220184,
+            "recall": 0.8505747126436781,
+            "f1": 0.2829827915869981,
+            "balanced_accuracy": 0.8212045501113733,
+            "predicted_positive_rate": 0.23877327491785322
+          },
+          {
+            "threshold": 0.36,
+            "precision": 0.17114914425427874,
+            "recall": 0.8045977011494253,
+            "f1": 0.28225806451612906,
+            "balanced_accuracy": 0.804829040338945,
+            "predicted_positive_rate": 0.223986856516977
+          },
+          {
+            "threshold": 0.38,
+            "precision": 0.17553191489361702,
+            "recall": 0.7586206896551724,
+            "f1": 0.28509719222462204,
+            "balanced_accuracy": 0.7901786599512204,
+            "predicted_positive_rate": 0.2059145673603505
+          },
+          {
+            "threshold": 0.4,
+            "precision": 0.17647058823529413,
+            "recall": 0.7241379310344828,
+            "f1": 0.28378378378378377,
+            "balanced_accuracy": 0.7775376256667526,
+            "predicted_positive_rate": 0.1955093099671413
+          },
+          {
+            "threshold": 0.42,
+            "precision": 0.18674698795180722,
+            "recall": 0.7126436781609196,
+            "f1": 0.29594272076372313,
+            "balanced_accuracy": 0.7786910167687864,
+            "predicted_positive_rate": 0.18181818181818182
+          },
+          {
+            "threshold": 0.44,
+            "precision": 0.19480519480519481,
+            "recall": 0.6896551724137931,
+            "f1": 0.3037974683544304,
+            "balanced_accuracy": 0.773522238305804,
+            "predicted_positive_rate": 0.1686746987951807
+          },
+          {
+            "threshold": 0.46,
+            "precision": 0.2013888888888889,
+            "recall": 0.6666666666666666,
+            "f1": 0.30933333333333335,
+            "balanced_accuracy": 0.7672033735863523,
+            "predicted_positive_rate": 0.15772179627601315
+          },
+          {
+            "threshold": 0.48,
+            "precision": 0.20522388059701493,
+            "recall": 0.632183908045977,
+            "f1": 0.30985915492957744,
+            "balanced_accuracy": 0.7548498608660017,
+            "predicted_positive_rate": 0.14676889375684557
+          },
+          {
+            "threshold": 0.5,
+            "precision": 0.20948616600790515,
+            "recall": 0.6091954022988506,
+            "f1": 0.31176470588235294,
+            "balanced_accuracy": 0.7470933883259636,
+            "predicted_positive_rate": 0.13855421686746988
+          },
+          {
+            "threshold": 0.52,
+            "precision": 0.22707423580786026,
+            "recall": 0.5977011494252874,
+            "f1": 0.3291139240506329,
+            "balanced_accuracy": 0.7479592578638801,
+            "predicted_positive_rate": 0.1254107338444688
+          },
+          {
+            "threshold": 0.54,
+            "precision": 0.22897196261682243,
+            "recall": 0.5632183908045977,
+            "f1": 0.32558139534883723,
+            "balanced_accuracy": 0.734168137322943,
+            "predicted_positive_rate": 0.1171960569550931
+          },
+          {
+            "threshold": 0.56,
+            "precision": 0.23880597014925373,
+            "recall": 0.5517241379310345,
+            "f1": 0.3333333333333333,
+            "balanced_accuracy": 0.7318712696555689,
+            "predicted_positive_rate": 0.11007667031763417
+          },
+          {
+            "threshold": 0.58,
+            "precision": 0.25280898876404495,
+            "recall": 0.5172413793103449,
+            "f1": 0.33962264150943394,
+            "balanced_accuracy": 0.7203803216275704,
+            "predicted_positive_rate": 0.09748083242059145
+          },
+          {
+            "threshold": 0.6,
+            "precision": 0.2484076433121019,
+            "recall": 0.4482758620689655,
+            "f1": 0.319672131147541,
+            "balanced_accuracy": 0.6902103864686403,
+            "predicted_positive_rate": 0.0859802847754655
+          },
+          {
+            "threshold": 0.62,
+            "precision": 0.2537313432835821,
+            "recall": 0.39080459770114945,
+            "f1": 0.3076923076923077,
+            "balanced_accuracy": 0.6666501424388438,
+            "predicted_positive_rate": 0.07338444687842278
+          },
+          {
+            "threshold": 0.64,
+            "precision": 0.26229508196721313,
+            "recall": 0.367816091954023,
+            "f1": 0.3062200956937799,
+            "balanced_accuracy": 0.6580311052064537,
+            "predicted_positive_rate": 0.06681270536692223
+          },
+          {
+            "threshold": 0.66,
+            "precision": 0.2616822429906542,
+            "recall": 0.3218390804597701,
+            "f1": 0.28865979381443296,
+            "balanced_accuracy": 0.6382053366646177,
+            "predicted_positive_rate": 0.05859802847754655
+          },
+          {
+            "threshold": 0.68,
+            "precision": 0.28421052631578947,
+            "recall": 0.3103448275862069,
+            "f1": 0.2967032967032967,
+            "balanced_accuracy": 0.6356209474331265,
+            "predicted_positive_rate": 0.052026286966046005
+          },
+          {
+            "threshold": 0.7,
+            "precision": 0.2894736842105263,
+            "recall": 0.25287356321839083,
+            "f1": 0.26993865030674846,
+            "balanced_accuracy": 0.6109106171468608,
+            "predicted_positive_rate": 0.0416210295728368
+          },
+          {
+            "threshold": 0.72,
+            "precision": 0.3125,
+            "recall": 0.22988505747126436,
+            "f1": 0.26490066225165565,
+            "balanced_accuracy": 0.6022915799144706,
+            "predicted_positive_rate": 0.03504928806133625
+          },
+          {
+            "threshold": 0.74,
+            "precision": 0.32142857142857145,
+            "recall": 0.20689655172413793,
+            "f1": 0.2517482517482518,
+            "balanced_accuracy": 0.5925224564256113,
+            "predicted_positive_rate": 0.03066812705366922
+          },
+          {
+            "threshold": 0.76,
+            "precision": 0.3191489361702128,
+            "recall": 0.1724137931034483,
+            "f1": 0.22388059701492538,
+            "balanced_accuracy": 0.5770062064999703,
+            "predicted_positive_rate": 0.02573932092004381
+          },
+          {
+            "threshold": 0.78,
+            "precision": 0.35135135135135137,
+            "recall": 0.14942528735632185,
+            "f1": 0.20967741935483872,
+            "balanced_accuracy": 0.5678121261393455,
+            "predicted_positive_rate": 0.020262869660460023
+          },
+          {
+            "threshold": 0.8,
+            "precision": 0.391304347826087,
+            "recall": 0.10344827586206896,
+            "f1": 0.16363636363636364,
+            "balanced_accuracy": 0.5476988360333922,
+            "predicted_positive_rate": 0.012595837897042717
+          },
+          {
+            "threshold": 0.82,
+            "precision": 0.47058823529411764,
+            "recall": 0.09195402298850575,
+            "f1": 0.15384615384615385,
+            "balanced_accuracy": 0.5433893174171971,
+            "predicted_positive_rate": 0.009309967141292442
+          },
+          {
+            "threshold": 0.84,
+            "precision": 0.5555555555555556,
+            "recall": 0.05747126436781609,
+            "f1": 0.10416666666666667,
+            "balanced_accuracy": 0.5275855459274388,
+            "predicted_positive_rate": 0.004928806133625411
+          },
+          {
+            "threshold": 0.86,
+            "precision": 0.6666666666666666,
+            "recall": 0.022988505747126436,
+            "f1": 0.044444444444444446,
+            "balanced_accuracy": 0.5112067313094459,
+            "predicted_positive_rate": 0.0016429353778751369
+          },
+          {
+            "threshold": 0.88,
+            "precision": 1,
+            "recall": 0.011494252873563218,
+            "f1": 0.022727272727272728,
+            "balanced_accuracy": 0.5057471264367817,
+            "predicted_positive_rate": 0.000547645125958379
+          },
+          {
+            "threshold": 0.9,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0,
+            "balanced_accuracy": 0.5,
+            "predicted_positive_rate": 0
+          },
+          {
+            "threshold": 0.92,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0,
+            "balanced_accuracy": 0.5,
+            "predicted_positive_rate": 0
+          },
+          {
+            "threshold": 0.94,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0,
+            "balanced_accuracy": 0.5,
+            "predicted_positive_rate": 0
+          }
+        ],
+        "persistence_baseline": {
+          "available": true,
+          "n": 2192,
+          "accuracy": 0.9197080291970803,
+          "balanced_accuracy": 0.6908390951607061,
+          "precision": 0.42483660130718953,
+          "recall": 0.42483660130718953,
+          "f1": 0.42483660130718953
+        }
+      },
+      "limitations": [
+        "At the validation-selected threshold, held-out F1 (0.425) does not exceed the simple persistence baseline (0.425); the model is not an improvement over persistence for this event definition.",
+        "Kochi grid-point reanalysis is not a station observation or a local flood gauge.",
+        "The 95th-percentile event definition is a research threshold, not an IMD warning threshold.",
+        "Reanalysis grid-point values, not station observations.",
+        "Features use current and prior values only; the target is future.",
+        "Event thresholds are estimated on training target dates only.",
+        "A single chronological holdout is preliminary evidence, not independent validation.",
+        "No calibration, geographic transferability, drift or operational-readiness claim is made.",
+        "Skill grade is WEAK_RESEARCH_SIGNAL: Ranking beats the no-skill prevalence (ROC-AUC 0.857, average precision 0.358), but probability error (Brier 0.089) is not better than the base-rate reference (0.065). Treat the score as a ranking signal only.",
+        "The model card records the exact threshold, features and split; changing any of them requires retraining and re-evaluation."
+      ]
+    },
+    {
+      "model_id": "weather_high_temperature_kochi_nextday",
+      "hazard": "Heatwave",
+      "status": "RESEARCH_SIGNAL_NOT_VALIDATED",
+      "skill_grade": "RESEARCH_SIGNAL_NOT_VALIDATED",
+      "status_reason": "ROC-AUC 0.966 and average precision 0.756 beat the no-skill prevalence 0.102 on one temporal holdout.",
+      "evidence_tier": "baseline",
+      "selected_model_type": "logistic_regression",
+      "target_definition": "target_tmax_nextday >= 31.9 (training-period 0.950 quantile)",
+      "threshold_source": "training target dates only (< validation_start)",
+      "temporal_split": {
+        "train_target_dates_before": "2015-01-01",
+        "validation_target_dates": "2015-01-01 through before 2020-01-01",
+        "final_train_target_dates_before": "2020-01-01",
+        "test_target_dates_from": "2020-01-01",
+        "grouped_purge": {
+          "group_column": null,
+          "purged_groups": 0
+        }
+      },
+      "train_rows": 10591,
+      "train_events": 576,
+      "test_rows": 2192,
+      "test_events": 224,
+      "metrics": {
+        "n_test": 2192,
+        "n_test_events": 224,
+        "test_prevalence": 0.10218978102189781,
+        "accuracy": 0.9447992700729927,
+        "balanced_accuracy": 0.8723323170731707,
+        "precision": 0.708502024291498,
+        "recall": 0.78125,
+        "f1": 0.7430997876857749,
+        "roc_auc": 0.9660301430023228,
+        "average_precision": 0.7555741527620877,
+        "brier_score": 0.06951132475713863,
+        "confusion_matrix_tn_fp_fn_tp": [
+          1896,
+          72,
+          49,
+          175
+        ],
+        "predicted_positive_rate": 0.11268248175182481,
+        "log_loss": 0.23466162522375375,
+        "expected_calibration_error": 0.08784862889216613,
+        "calibration_table": [
+          {
+            "bin_lower": 0,
+            "bin_upper": 0.1,
+            "n": 1530,
+            "mean_probability": 0.008416960963721092,
+            "observed_event_rate": 0.0032679738562091504,
+            "absolute_gap": 0.005148987107511941
+          },
+          {
+            "bin_lower": 0.1,
+            "bin_upper": 0.2,
+            "n": 98,
+            "mean_probability": 0.14512437230275704,
+            "observed_event_rate": 0,
+            "absolute_gap": 0.14512437230275704
+          },
+          {
+            "bin_lower": 0.2,
+            "bin_upper": 0.30000000000000004,
+            "n": 69,
+            "mean_probability": 0.24756540233411778,
+            "observed_event_rate": 0.057971014492753624,
+            "absolute_gap": 0.18959438784136415
+          },
+          {
+            "bin_lower": 0.30000000000000004,
+            "bin_upper": 0.4,
+            "n": 52,
+            "mean_probability": 0.3460723833446512,
+            "observed_event_rate": 0.1346153846153846,
+            "absolute_gap": 0.21145699872926657
+          },
+          {
+            "bin_lower": 0.4,
+            "bin_upper": 0.5,
+            "n": 59,
+            "mean_probability": 0.45813479879636076,
+            "observed_event_rate": 0.11864406779661017,
+            "absolute_gap": 0.3394907309997506
+          },
+          {
+            "bin_lower": 0.5,
+            "bin_upper": 0.6000000000000001,
+            "n": 40,
+            "mean_probability": 0.5481029703772219,
+            "observed_event_rate": 0.15,
+            "absolute_gap": 0.39810297037722187
+          },
+          {
+            "bin_lower": 0.6000000000000001,
+            "bin_upper": 0.7000000000000001,
+            "n": 35,
+            "mean_probability": 0.6509322771190116,
+            "observed_event_rate": 0.17142857142857143,
+            "absolute_gap": 0.47950370569044015
+          },
+          {
+            "bin_lower": 0.7000000000000001,
+            "bin_upper": 0.8,
+            "n": 52,
+            "mean_probability": 0.7509519497377017,
+            "observed_event_rate": 0.17307692307692307,
+            "absolute_gap": 0.5778750266607786
+          },
+          {
+            "bin_lower": 0.8,
+            "bin_upper": 0.9,
+            "n": 51,
+            "mean_probability": 0.8567296571737656,
+            "observed_event_rate": 0.5686274509803921,
+            "absolute_gap": 0.28810220619337346
+          },
+          {
+            "bin_lower": 0.9,
+            "bin_upper": 1,
+            "n": 206,
+            "mean_probability": 0.9704216676263429,
+            "observed_event_rate": 0.7330097087378641,
+            "absolute_gap": 0.23741195888847877
+          }
+        ],
+        "calibration_interpretation": "Expected calibration error is descriptive for this holdout. It does not establish calibration in future or operational use.",
+        "majority_baseline": {
+          "predicted_class": 0,
+          "accuracy": 0.8978102189781022,
+          "balanced_accuracy": 0.5,
+          "f1": 0
+        },
+        "base_rate_brier_score": 0.09174702967659437,
+        "skill_over_base_rate_brier": 0.022235704919455743,
+        "bootstrap_95ci": {
+          "f1": [
+            0.7002333243997415,
+            0.7865251587226381
+          ],
+          "roc_auc": [
+            0.957912114697182,
+            0.9740273996652582
+          ],
+          "average_precision": [
+            0.6969735085893617,
+            0.8137605048678478
+          ]
+        },
+        "validation_threshold_scores": [
+          {
+            "threshold": 0.02,
+            "precision": 0.20926517571884984,
+            "recall": 1,
+            "f1": 0.34610303830911493,
+            "balanced_accuracy": 0.8539823008849557,
+            "predicted_positive_rate": 0.3428258488499452
+          },
+          {
+            "threshold": 0.04,
+            "precision": 0.23861566484517305,
+            "recall": 1,
+            "f1": 0.38529411764705884,
+            "balanced_accuracy": 0.8766961651917404,
+            "predicted_positive_rate": 0.30065717415115006
+          },
+          {
+            "threshold": 0.06,
+            "precision": 0.2589641434262948,
+            "recall": 0.9923664122137404,
+            "f1": 0.4107424960505529,
+            "balanced_accuracy": 0.8864486928325339,
+            "predicted_positive_rate": 0.27491785323110624
+          },
+          {
+            "threshold": 0.08,
+            "precision": 0.2765957446808511,
+            "recall": 0.9923664122137404,
+            "f1": 0.43261231281198004,
+            "balanced_accuracy": 0.8958882208561327,
+            "predicted_positive_rate": 0.2573932092004381
+          },
+          {
+            "threshold": 0.1,
+            "precision": 0.29318181818181815,
+            "recall": 0.9847328244274809,
+            "f1": 0.45183887915936954,
+            "balanced_accuracy": 0.9006259992343895,
+            "predicted_positive_rate": 0.24096385542168675
+          },
+          {
+            "threshold": 0.12,
+            "precision": 0.30424528301886794,
+            "recall": 0.9847328244274809,
+            "f1": 0.4648648648648649,
+            "balanced_accuracy": 0.9053457632461888,
+            "predicted_positive_rate": 0.2322015334063527
+          },
+          {
+            "threshold": 0.14,
+            "precision": 0.31009615384615385,
+            "recall": 0.9847328244274809,
+            "f1": 0.4716636197440585,
+            "balanced_accuracy": 0.9077056452520885,
+            "predicted_positive_rate": 0.22782037239868566
+          },
+          {
+            "threshold": 0.16,
+            "precision": 0.31695331695331697,
+            "recall": 0.9847328244274809,
+            "f1": 0.4795539033457249,
+            "balanced_accuracy": 0.9103605125087257,
+            "predicted_positive_rate": 0.22289156626506024
+          },
+          {
+            "threshold": 0.18,
+            "precision": 0.3265822784810127,
+            "recall": 0.9847328244274809,
+            "f1": 0.49049429657794674,
+            "balanced_accuracy": 0.9139003355175752,
+            "predicted_positive_rate": 0.21631982475355968
+          },
+          {
+            "threshold": 0.2,
+            "precision": 0.3324607329842932,
+            "recall": 0.9694656488549618,
+            "f1": 0.4951267056530214,
+            "balanced_accuracy": 0.9095115854894278,
+            "predicted_positive_rate": 0.20920043811610076
+          },
+          {
+            "threshold": 0.22,
+            "precision": 0.34794520547945207,
+            "recall": 0.9694656488549618,
+            "f1": 0.5120967741935484,
+            "balanced_accuracy": 0.9145263347519647,
+            "predicted_positive_rate": 0.19989047097480833
+          },
+          {
+            "threshold": 0.24,
+            "precision": 0.3557422969187675,
+            "recall": 0.9694656488549618,
+            "f1": 0.5204918032786885,
+            "balanced_accuracy": 0.9168862167578644,
+            "predicted_positive_rate": 0.1955093099671413
+          },
+          {
+            "threshold": 0.26,
+            "precision": 0.3681159420289855,
+            "recall": 0.9694656488549618,
+            "f1": 0.5336134453781513,
+            "balanced_accuracy": 0.9204260397667139,
+            "predicted_positive_rate": 0.18893756845564075
+          },
+          {
+            "threshold": 0.28,
+            "precision": 0.3813813813813814,
+            "recall": 0.9694656488549618,
+            "f1": 0.5474137931034483,
+            "balanced_accuracy": 0.9239658627755635,
+            "predicted_positive_rate": 0.1823658269441402
+          },
+          {
+            "threshold": 0.3,
+            "precision": 0.38650306748466257,
+            "recall": 0.9618320610687023,
+            "f1": 0.5514223194748359,
+            "balanced_accuracy": 0.9219189803868586,
+            "predicted_positive_rate": 0.17853231106243153
+          },
+          {
+            "threshold": 0.32,
+            "precision": 0.39556962025316456,
+            "recall": 0.9541984732824428,
+            "f1": 0.5592841163310962,
+            "balanced_accuracy": 0.920757053750366,
+            "predicted_positive_rate": 0.17305585980284777
+          },
+          {
+            "threshold": 0.34,
+            "precision": 0.40064102564102566,
+            "recall": 0.9541984732824428,
+            "f1": 0.5643340857787811,
+            "balanced_accuracy": 0.9219369947533158,
+            "predicted_positive_rate": 0.17086527929901424
+          },
+          {
+            "threshold": 0.36,
+            "precision": 0.4098360655737705,
+            "recall": 0.9541984732824428,
+            "f1": 0.573394495412844,
+            "balanced_accuracy": 0.924001891508478,
+            "predicted_positive_rate": 0.16703176341730558
+          },
+          {
+            "threshold": 0.38,
+            "precision": 0.4175084175084175,
+            "recall": 0.9465648854961832,
+            "f1": 0.5794392523364486,
+            "balanced_accuracy": 0.9222499943705105,
+            "predicted_positive_rate": 0.16265060240963855
+          },
+          {
+            "threshold": 0.4,
+            "precision": 0.43157894736842106,
+            "recall": 0.9389312977099237,
+            "f1": 0.5913461538461539,
+            "balanced_accuracy": 0.9216780382354928,
+            "predicted_positive_rate": 0.156078860898138
+          },
+          {
+            "threshold": 0.42,
+            "precision": 0.44244604316546765,
+            "recall": 0.9389312977099237,
+            "f1": 0.6014669926650367,
+            "balanced_accuracy": 0.9237429349906551,
+            "predicted_positive_rate": 0.15224534501642936
+          },
+          {
+            "threshold": 0.44,
+            "precision": 0.44525547445255476,
+            "recall": 0.9312977099236641,
+            "f1": 0.6024691358024692,
+            "balanced_accuracy": 0.9208110968497376,
+            "predicted_positive_rate": 0.15005476451259583
+          },
+          {
+            "threshold": 0.46,
+            "precision": 0.4485294117647059,
+            "recall": 0.9312977099236641,
+            "f1": 0.6054590570719603,
+            "balanced_accuracy": 0.9214010673512125,
+            "predicted_positive_rate": 0.14895947426067907
+          },
+          {
+            "threshold": 0.48,
+            "precision": 0.4618320610687023,
+            "recall": 0.9236641221374046,
+            "f1": 0.6157760814249363,
+            "balanced_accuracy": 0.9202391407147199,
+            "predicted_positive_rate": 0.14348302300109528
+          },
+          {
+            "threshold": 0.5,
+            "precision": 0.47265625,
+            "recall": 0.9236641221374046,
+            "f1": 0.6253229974160207,
+            "balanced_accuracy": 0.9220090522191448,
+            "predicted_positive_rate": 0.140197152245345
+          },
+          {
+            "threshold": 0.52,
+            "precision": 0.4819277108433735,
+            "recall": 0.916030534351145,
+            "f1": 0.631578947368421,
+            "balanced_accuracy": 0.9199621698304398,
+            "predicted_positive_rate": 0.13636363636363635
+          },
+          {
+            "threshold": 0.54,
+            "precision": 0.4918032786885246,
+            "recall": 0.916030534351145,
+            "f1": 0.64,
+            "balanced_accuracy": 0.921437096084127,
+            "predicted_positive_rate": 0.13362541073384446
+          },
+          {
+            "threshold": 0.56,
+            "precision": 0.5128205128205128,
+            "recall": 0.916030534351145,
+            "f1": 0.6575342465753424,
+            "balanced_accuracy": 0.9243869485915017,
+            "predicted_positive_rate": 0.12814895947426067
+          },
+          {
+            "threshold": 0.58,
+            "precision": 0.5194805194805194,
+            "recall": 0.916030534351145,
+            "f1": 0.6629834254143646,
+            "balanced_accuracy": 0.9252719043437141,
+            "predicted_positive_rate": 0.12650602409638553
+          },
+          {
+            "threshold": 0.6,
+            "precision": 0.5409090909090909,
+            "recall": 0.9083969465648855,
+            "f1": 0.6780626780626781,
+            "balanced_accuracy": 0.9244049629579589,
+            "predicted_positive_rate": 0.12048192771084337
+          },
+          {
+            "threshold": 0.62,
+            "precision": 0.5539906103286385,
+            "recall": 0.9007633587786259,
+            "f1": 0.686046511627907,
+            "balanced_accuracy": 0.922358080569254,
+            "predicted_positive_rate": 0.11664841182913473
+          },
+          {
+            "threshold": 0.64,
+            "precision": 0.5870646766169154,
+            "recall": 0.9007633587786259,
+            "f1": 0.7108433734939759,
+            "balanced_accuracy": 0.9258979035781035,
+            "predicted_positive_rate": 0.11007667031763417
+          },
+          {
+            "threshold": 0.66,
+            "precision": 0.5948717948717949,
+            "recall": 0.8854961832061069,
+            "f1": 0.7116564417177914,
+            "balanced_accuracy": 0.9194442567947938,
+            "predicted_positive_rate": 0.10679079956188389
+          },
+          {
+            "threshold": 0.68,
+            "precision": 0.6042780748663101,
+            "recall": 0.8625954198473282,
+            "f1": 0.710691823899371,
+            "balanced_accuracy": 0.9094688013690919,
+            "predicted_positive_rate": 0.10240963855421686
+          },
+          {
+            "threshold": 0.7,
+            "precision": 0.6120218579234973,
+            "recall": 0.8549618320610687,
+            "f1": 0.7133757961783439,
+            "balanced_accuracy": 0.9065369632281745,
+            "predicted_positive_rate": 0.10021905805038335
+          },
+          {
+            "threshold": 0.72,
+            "precision": 0.6306818181818182,
+            "recall": 0.8473282442748091,
+            "f1": 0.7231270358306189,
+            "balanced_accuracy": 0.9044900808394695,
+            "predicted_positive_rate": 0.0963855421686747
+          },
+          {
+            "threshold": 0.74,
+            "precision": 0.6432748538011696,
+            "recall": 0.8396946564885496,
+            "f1": 0.7284768211920529,
+            "balanced_accuracy": 0.9018532279492895,
+            "predicted_positive_rate": 0.09364731653888281
+          },
+          {
+            "threshold": 0.76,
+            "precision": 0.6445783132530121,
+            "recall": 0.816793893129771,
+            "f1": 0.7205387205387206,
+            "balanced_accuracy": 0.8909928167713752,
+            "predicted_positive_rate": 0.09090909090909091
+          },
+          {
+            "threshold": 0.78,
+            "precision": 0.65625,
+            "recall": 0.8015267175572519,
+            "f1": 0.7216494845360825,
+            "balanced_accuracy": 0.8845391699880655,
+            "predicted_positive_rate": 0.08762322015334063
+          },
+          {
+            "threshold": 0.8,
+            "precision": 0.6842105263157895,
+            "recall": 0.7938931297709924,
+            "f1": 0.734982332155477,
+            "balanced_accuracy": 0.882787272850098,
+            "predicted_positive_rate": 0.0832420591456736
+          },
+          {
+            "threshold": 0.82,
+            "precision": 0.6959459459459459,
+            "recall": 0.7862595419847328,
+            "f1": 0.7383512544802867,
+            "balanced_accuracy": 0.8798554347091805,
+            "predicted_positive_rate": 0.08105147864184009
+          },
+          {
+            "threshold": 0.84,
+            "precision": 0.7092198581560284,
+            "recall": 0.7633587786259542,
+            "f1": 0.7352941176470589,
+            "balanced_accuracy": 0.8695849940327411,
+            "predicted_positive_rate": 0.07721796276013143
+          },
+          {
+            "threshold": 0.86,
+            "precision": 0.7322834645669292,
+            "recall": 0.7099236641221374,
+            "f1": 0.7209302325581395,
+            "balanced_accuracy": 0.844932333535995,
+            "predicted_positive_rate": 0.06955093099671412
+          },
+          {
+            "threshold": 0.88,
+            "precision": 0.7520661157024794,
+            "recall": 0.6946564885496184,
+            "f1": 0.7222222222222222,
+            "balanced_accuracy": 0.8384786867526852,
+            "predicted_positive_rate": 0.06626506024096386
+          },
+          {
+            "threshold": 0.9,
+            "precision": 0.7570093457943925,
+            "recall": 0.6183206106870229,
+            "f1": 0.680672268907563,
+            "balanced_accuracy": 0.8014906888243374,
+            "predicted_positive_rate": 0.05859802847754655
+          },
+          {
+            "threshold": 0.92,
+            "precision": 0.77,
+            "recall": 0.5877862595419847,
+            "f1": 0.6666666666666666,
+            "balanced_accuracy": 0.7871084690040306,
+            "predicted_positive_rate": 0.054764512595837894
+          },
+          {
+            "threshold": 0.94,
+            "precision": 0.7849462365591398,
+            "recall": 0.5572519083969466,
+            "f1": 0.6517857142857143,
+            "balanced_accuracy": 0.772726249183724,
+            "predicted_positive_rate": 0.05093099671412924
+          }
+        ],
+        "persistence_baseline": {
+          "available": true,
+          "n": 2192,
+          "accuracy": 0.9370437956204379,
+          "balanced_accuracy": 0.8284516550522648,
+          "precision": 0.6919642857142857,
+          "recall": 0.6919642857142857,
+          "f1": 0.6919642857142857
+        }
+      },
+      "limitations": [
+        "Reanalysis grid-point temperature is not a station observation.",
+        "The research threshold is not an IMD heatwave criterion.",
+        "Reanalysis grid-point values, not station observations.",
+        "Features use current and prior values only; the target is future.",
+        "Event thresholds are estimated on training target dates only.",
+        "A single chronological holdout is preliminary evidence, not independent validation.",
+        "No calibration, geographic transferability, drift or operational-readiness claim is made.",
+        "Skill grade is RESEARCH_SIGNAL_NOT_VALIDATED: ROC-AUC 0.966 and average precision 0.756 beat the no-skill prevalence 0.102 on one temporal holdout.",
+        "The model card records the exact threshold, features and split; changing any of them requires retraining and re-evaluation."
+      ]
+    },
+    {
+      "model_id": "weather_drought_onset_kochi_30day",
+      "hazard": "Drought",
+      "status": "NO_SKILL",
+      "skill_grade": "NO_SKILL",
+      "status_reason": "INVALIDATED: the original target builder used a trailing 30-day rolling sum shifted by one day, overlapping most of the supposed future target with historical rainfall features. All previously reported metrics are superseded. No inference is permitted until the corrected future-only target is retrained and reevaluated.",
+      "evidence_tier": "invalidated",
+      "selected_model_type": "hist_gradient_boosting",
+      "target_definition": "target_rain30_future <= 5.7 (training-period 0.100 quantile)",
+      "threshold_source": "training target dates only (< validation_start)",
+      "temporal_split": {
+        "train_target_dates_before": "2015-01-01",
+        "validation_target_dates": "2015-01-01 through before 2020-01-01",
+        "final_train_target_dates_before": "2020-01-01",
+        "test_target_dates_from": "2020-01-01",
+        "grouped_purge": {
+          "group_column": null,
+          "purged_groups": 0
+        }
+      },
+      "train_rows": 10533,
+      "train_events": 941,
+      "test_rows": 2221,
+      "test_events": 36,
+      "metrics": {},
+      "limitations": [
+        "A 30-day rainfall deficit is not agricultural or hydrological drought.",
+        "Soil moisture, evaporative demand, storage and demand are absent.",
+        "Reanalysis grid-point values, not station observations.",
+        "Features use current and prior values only; the target is future.",
+        "Event thresholds are estimated on training target dates only.",
+        "A single chronological holdout is preliminary evidence, not independent validation.",
+        "No calibration, geographic transferability, drift or operational-readiness claim is made.",
+        "Skill grade is RESEARCH_SIGNAL_NOT_VALIDATED: ROC-AUC 0.998 and average precision 0.941 beat the no-skill prevalence 0.016 on one temporal holdout.",
+        "The model card records the exact threshold, features and split; changing any of them requires retraining and re-evaluation.",
+        "Target construction defect invalidates the prior metrics; corrected target must be retrained."
+      ],
+      "superseded_metrics": {
+        "n_test": 2221,
+        "n_test_events": 36,
+        "test_prevalence": 0.01620891490319676,
+        "accuracy": 0.9963980189104007,
+        "balanced_accuracy": 0.9025489448258327,
+        "precision": 0.9666666666666667,
+        "recall": 0.8055555555555556,
+        "f1": 0.8787878787878788,
+        "roc_auc": 0.9984744469870328,
+        "average_precision": 0.9409829536320845,
+        "brier_score": 0.0033797767534587803,
+        "confusion_matrix_tn_fp_fn_tp": [
+          2184,
+          1,
+          7,
+          29
+        ],
+        "predicted_positive_rate": 0.0135074290859973,
+        "log_loss": 0.012431032506660373,
+        "expected_calibration_error": 0.0037159290692707473,
+        "calibration_table": [
+          {
+            "bin_lower": 0,
+            "bin_upper": 0.1,
+            "n": 2163,
+            "mean_probability": 0.0019137599864688152,
+            "observed_event_rate": 0.0009246417013407304,
+            "absolute_gap": 0.0009891182851280848
+          },
+          {
+            "bin_lower": 0.1,
+            "bin_upper": 0.2,
+            "n": 14,
+            "mean_probability": 0.1382878967283712,
+            "observed_event_rate": 0.21428571428571427,
+            "absolute_gap": 0.07599781755734308
+          },
+          {
+            "bin_lower": 0.2,
+            "bin_upper": 0.30000000000000004,
+            "n": 5,
+            "mean_probability": 0.26198867859640185,
+            "observed_event_rate": 0,
+            "absolute_gap": 0.26198867859640185
+          },
+          {
+            "bin_lower": 0.30000000000000004,
+            "bin_upper": 0.4,
+            "n": 1,
+            "mean_probability": 0.3053132215713415,
+            "observed_event_rate": 0,
+            "absolute_gap": 0.3053132215713415
+          },
+          {
+            "bin_lower": 0.4,
+            "bin_upper": 0.5,
+            "n": 2,
+            "mean_probability": 0.4430325592618053,
+            "observed_event_rate": 0,
+            "absolute_gap": 0.4430325592618053
+          },
+          {
+            "bin_lower": 0.5,
+            "bin_upper": 0.6000000000000001,
+            "n": 3,
+            "mean_probability": 0.547248524451631,
+            "observed_event_rate": 0,
+            "absolute_gap": 0.547248524451631
+          },
+          {
+            "bin_lower": 0.6000000000000001,
+            "bin_upper": 0.7000000000000001,
+            "n": 2,
+            "mean_probability": 0.6886893345490841,
+            "observed_event_rate": 0.5,
+            "absolute_gap": 0.1886893345490841
+          },
+          {
+            "bin_lower": 0.9,
+            "bin_upper": 1,
+            "n": 31,
+            "mean_probability": 0.9848129093801761,
+            "observed_event_rate": 0.967741935483871,
+            "absolute_gap": 0.017070973896305075
+          }
+        ],
+        "calibration_interpretation": "Expected calibration error is descriptive for this holdout. It does not establish calibration in future or operational use.",
+        "majority_baseline": {
+          "predicted_class": 0,
+          "accuracy": 0.9837910850968032,
+          "balanced_accuracy": 0.5,
+          "f1": 0
+        },
+        "base_rate_brier_score": 0.015946185980857685,
+        "skill_over_base_rate_brier": 0.012566409227398904,
+        "bootstrap_95ci": {
+          "f1": [
+            0.7833333333333333,
+            0.9549016282225238
+          ],
+          "roc_auc": [
+            0.9969009524226985,
+            0.9996918181956992
+          ],
+          "average_precision": [
+            0.8771981162206108,
+            0.9861473626276257
+          ]
+        },
+        "validation_threshold_scores": [
+          {
+            "threshold": 0.02,
+            "precision": 0.5555555555555556,
+            "recall": 0.9420289855072463,
+            "f1": 0.6989247311827957,
+            "balanced_accuracy": 0.956216541700692,
+            "predicted_positive_rate": 0.06407447973713033
+          },
+          {
+            "threshold": 0.04,
+            "precision": 0.5963302752293578,
+            "recall": 0.9420289855072463,
+            "f1": 0.7303370786516854,
+            "balanced_accuracy": 0.9584931495549891,
+            "predicted_positive_rate": 0.059693318729463304
+          },
+          {
+            "threshold": 0.06,
+            "precision": 0.6037735849056604,
+            "recall": 0.927536231884058,
+            "f1": 0.7314285714285714,
+            "balanced_accuracy": 0.9518159247069693,
+            "predicted_positive_rate": 0.05805038335158817
+          },
+          {
+            "threshold": 0.08,
+            "precision": 0.6336633663366337,
+            "recall": 0.927536231884058,
+            "f1": 0.7529411764705882,
+            "balanced_accuracy": 0.9532388046159049,
+            "predicted_positive_rate": 0.055312157721796276
+          },
+          {
+            "threshold": 0.1,
+            "precision": 0.64,
+            "recall": 0.927536231884058,
+            "f1": 0.757396449704142,
+            "balanced_accuracy": 0.953523380597692,
+            "predicted_positive_rate": 0.054764512595837894
+          },
+          {
+            "threshold": 0.12,
+            "precision": 0.6597938144329897,
+            "recall": 0.927536231884058,
+            "f1": 0.7710843373493976,
+            "balanced_accuracy": 0.9543771085430535,
+            "predicted_positive_rate": 0.05312157721796276
+          },
+          {
+            "threshold": 0.14,
+            "precision": 0.6808510638297872,
+            "recall": 0.927536231884058,
+            "f1": 0.7852760736196319,
+            "balanced_accuracy": 0.9552308364884149,
+            "predicted_positive_rate": 0.05147864184008762
+          },
+          {
+            "threshold": 0.16,
+            "precision": 0.6881720430107527,
+            "recall": 0.927536231884058,
+            "f1": 0.7901234567901234,
+            "balanced_accuracy": 0.955515412470202,
+            "predicted_positive_rate": 0.05093099671412924
+          },
+          {
+            "threshold": 0.18,
+            "precision": 0.6881720430107527,
+            "recall": 0.927536231884058,
+            "f1": 0.7901234567901234,
+            "balanced_accuracy": 0.955515412470202,
+            "predicted_positive_rate": 0.05093099671412924
+          },
+          {
+            "threshold": 0.2,
+            "precision": 0.6847826086956522,
+            "recall": 0.9130434782608695,
+            "f1": 0.782608695652174,
+            "balanced_accuracy": 0.9482690356586078,
+            "predicted_positive_rate": 0.050383351588170866
+          },
+          {
+            "threshold": 0.22,
+            "precision": 0.7,
+            "recall": 0.9130434782608695,
+            "f1": 0.7924528301886793,
+            "balanced_accuracy": 0.9488381876221821,
+            "predicted_positive_rate": 0.04928806133625411
+          },
+          {
+            "threshold": 0.24,
+            "precision": 0.7241379310344828,
+            "recall": 0.9130434782608695,
+            "f1": 0.8076923076923077,
+            "balanced_accuracy": 0.9496919155675434,
+            "predicted_positive_rate": 0.04764512595837897
+          },
+          {
+            "threshold": 0.26,
+            "precision": 0.7176470588235294,
+            "recall": 0.8840579710144928,
+            "f1": 0.7922077922077922,
+            "balanced_accuracy": 0.9351991619443552,
+            "predicted_positive_rate": 0.04654983570646221
+          },
+          {
+            "threshold": 0.28,
+            "precision": 0.7176470588235294,
+            "recall": 0.8840579710144928,
+            "f1": 0.7922077922077922,
+            "balanced_accuracy": 0.9351991619443552,
+            "predicted_positive_rate": 0.04654983570646221
+          },
+          {
+            "threshold": 0.3,
+            "precision": 0.7176470588235294,
+            "recall": 0.8840579710144928,
+            "f1": 0.7922077922077922,
+            "balanced_accuracy": 0.9351991619443552,
+            "predicted_positive_rate": 0.04654983570646221
+          },
+          {
+            "threshold": 0.32,
+            "precision": 0.7142857142857143,
+            "recall": 0.8695652173913043,
+            "f1": 0.7843137254901961,
+            "balanced_accuracy": 0.9279527851327609,
+            "predicted_positive_rate": 0.04600219058050383
+          },
+          {
+            "threshold": 0.34,
+            "precision": 0.7228915662650602,
+            "recall": 0.8695652173913043,
+            "f1": 0.7894736842105263,
+            "balanced_accuracy": 0.928237361114548,
+            "predicted_positive_rate": 0.045454545454545456
+          },
+          {
+            "threshold": 0.36,
+            "precision": 0.7228915662650602,
+            "recall": 0.8695652173913043,
+            "f1": 0.7894736842105263,
+            "balanced_accuracy": 0.928237361114548,
+            "predicted_positive_rate": 0.045454545454545456
+          },
+          {
+            "threshold": 0.38,
+            "precision": 0.7228915662650602,
+            "recall": 0.8695652173913043,
+            "f1": 0.7894736842105263,
+            "balanced_accuracy": 0.928237361114548,
+            "predicted_positive_rate": 0.045454545454545456
+          },
+          {
+            "threshold": 0.4,
+            "precision": 0.7317073170731707,
+            "recall": 0.8695652173913043,
+            "f1": 0.7947019867549668,
+            "balanced_accuracy": 0.9285219370963351,
+            "predicted_positive_rate": 0.044906900328587074
+          },
+          {
+            "threshold": 0.42,
+            "precision": 0.75,
+            "recall": 0.8695652173913043,
+            "f1": 0.8053691275167785,
+            "balanced_accuracy": 0.9290910890599093,
+            "predicted_positive_rate": 0.04381161007667032
+          },
+          {
+            "threshold": 0.44,
+            "precision": 0.75,
+            "recall": 0.8695652173913043,
+            "f1": 0.8053691275167785,
+            "balanced_accuracy": 0.9290910890599093,
+            "predicted_positive_rate": 0.04381161007667032
+          },
+          {
+            "threshold": 0.46,
+            "precision": 0.7468354430379747,
+            "recall": 0.855072463768116,
+            "f1": 0.7972972972972973,
+            "balanced_accuracy": 0.9218447122483152,
+            "predicted_positive_rate": 0.04326396495071194
+          },
+          {
+            "threshold": 0.48,
+            "precision": 0.7468354430379747,
+            "recall": 0.855072463768116,
+            "f1": 0.7972972972972973,
+            "balanced_accuracy": 0.9218447122483152,
+            "predicted_positive_rate": 0.04326396495071194
+          },
+          {
+            "threshold": 0.5,
+            "precision": 0.7564102564102564,
+            "recall": 0.855072463768116,
+            "f1": 0.8027210884353742,
+            "balanced_accuracy": 0.9221292882301024,
+            "predicted_positive_rate": 0.04271631982475356
+          },
+          {
+            "threshold": 0.52,
+            "precision": 0.7564102564102564,
+            "recall": 0.855072463768116,
+            "f1": 0.8027210884353742,
+            "balanced_accuracy": 0.9221292882301024,
+            "predicted_positive_rate": 0.04271631982475356
+          },
+          {
+            "threshold": 0.54,
+            "precision": 0.7564102564102564,
+            "recall": 0.855072463768116,
+            "f1": 0.8027210884353742,
+            "balanced_accuracy": 0.9221292882301024,
+            "predicted_positive_rate": 0.04271631982475356
+          },
+          {
+            "threshold": 0.56,
+            "precision": 0.7564102564102564,
+            "recall": 0.855072463768116,
+            "f1": 0.8027210884353742,
+            "balanced_accuracy": 0.9221292882301024,
+            "predicted_positive_rate": 0.04271631982475356
+          },
+          {
+            "threshold": 0.58,
+            "precision": 0.7662337662337663,
+            "recall": 0.855072463768116,
+            "f1": 0.8082191780821918,
+            "balanced_accuracy": 0.9224138642118895,
+            "predicted_positive_rate": 0.04216867469879518
+          },
+          {
+            "threshold": 0.6,
+            "precision": 0.7733333333333333,
+            "recall": 0.8405797101449275,
+            "f1": 0.8055555555555556,
+            "balanced_accuracy": 0.9154520633820824,
+            "predicted_positive_rate": 0.04107338444687842
+          },
+          {
+            "threshold": 0.62,
+            "precision": 0.8169014084507042,
+            "recall": 0.8405797101449275,
+            "f1": 0.8285714285714286,
+            "balanced_accuracy": 0.916590367309231,
+            "predicted_positive_rate": 0.03888280394304491
+          },
+          {
+            "threshold": 0.64,
+            "precision": 0.8405797101449275,
+            "recall": 0.8405797101449275,
+            "f1": 0.8405797101449275,
+            "balanced_accuracy": 0.9171595192728053,
+            "predicted_positive_rate": 0.03778751369112815
+          },
+          {
+            "threshold": 0.66,
+            "precision": 0.8405797101449275,
+            "recall": 0.8405797101449275,
+            "f1": 0.8405797101449275,
+            "balanced_accuracy": 0.9171595192728053,
+            "predicted_positive_rate": 0.03778751369112815
+          },
+          {
+            "threshold": 0.68,
+            "precision": 0.8405797101449275,
+            "recall": 0.8405797101449275,
+            "f1": 0.8405797101449275,
+            "balanced_accuracy": 0.9171595192728053,
+            "predicted_positive_rate": 0.03778751369112815
+          },
+          {
+            "threshold": 0.7,
+            "precision": 0.8529411764705882,
+            "recall": 0.8405797101449275,
+            "f1": 0.8467153284671532,
+            "balanced_accuracy": 0.9174440952545924,
+            "predicted_positive_rate": 0.03723986856516977
+          },
+          {
+            "threshold": 0.72,
+            "precision": 0.8529411764705882,
+            "recall": 0.8405797101449275,
+            "f1": 0.8467153284671532,
+            "balanced_accuracy": 0.9174440952545924,
+            "predicted_positive_rate": 0.03723986856516977
+          },
+          {
+            "threshold": 0.74,
+            "precision": 0.8529411764705882,
+            "recall": 0.8405797101449275,
+            "f1": 0.8467153284671532,
+            "balanced_accuracy": 0.9174440952545924,
+            "predicted_positive_rate": 0.03723986856516977
+          },
+          {
+            "threshold": 0.76,
+            "precision": 0.8656716417910447,
+            "recall": 0.8405797101449275,
+            "f1": 0.8529411764705882,
+            "balanced_accuracy": 0.9177286712363795,
+            "predicted_positive_rate": 0.03669222343921139
+          },
+          {
+            "threshold": 0.78,
+            "precision": 0.8656716417910447,
+            "recall": 0.8405797101449275,
+            "f1": 0.8529411764705882,
+            "balanced_accuracy": 0.9177286712363795,
+            "predicted_positive_rate": 0.03669222343921139
+          },
+          {
+            "threshold": 0.8,
+            "precision": 0.8656716417910447,
+            "recall": 0.8405797101449275,
+            "f1": 0.8529411764705882,
+            "balanced_accuracy": 0.9177286712363795,
+            "predicted_positive_rate": 0.03669222343921139
+          },
+          {
+            "threshold": 0.82,
+            "precision": 0.8656716417910447,
+            "recall": 0.8405797101449275,
+            "f1": 0.8529411764705882,
+            "balanced_accuracy": 0.9177286712363795,
+            "predicted_positive_rate": 0.03669222343921139
+          },
+          {
+            "threshold": 0.84,
+            "precision": 0.8787878787878788,
+            "recall": 0.8405797101449275,
+            "f1": 0.8592592592592593,
+            "balanced_accuracy": 0.9180132472181666,
+            "predicted_positive_rate": 0.03614457831325301
+          },
+          {
+            "threshold": 0.86,
+            "precision": 0.8787878787878788,
+            "recall": 0.8405797101449275,
+            "f1": 0.8592592592592593,
+            "balanced_accuracy": 0.9180132472181666,
+            "predicted_positive_rate": 0.03614457831325301
+          },
+          {
+            "threshold": 0.88,
+            "precision": 0.8769230769230769,
+            "recall": 0.8260869565217391,
+            "f1": 0.8507462686567164,
+            "balanced_accuracy": 0.9107668704065724,
+            "predicted_positive_rate": 0.035596933187294635
+          },
+          {
+            "threshold": 0.9,
+            "precision": 0.9166666666666666,
+            "recall": 0.7971014492753623,
+            "f1": 0.8527131782945736,
+            "balanced_accuracy": 0.8971278447287454,
+            "predicted_positive_rate": 0.03285870755750274
+          },
+          {
+            "threshold": 0.92,
+            "precision": 0.9322033898305084,
+            "recall": 0.7971014492753623,
+            "f1": 0.859375,
+            "balanced_accuracy": 0.8974124207105326,
+            "predicted_positive_rate": 0.03231106243154436
+          },
+          {
+            "threshold": 0.94,
+            "precision": 0.9482758620689655,
+            "recall": 0.7971014492753623,
+            "f1": 0.8661417322834646,
+            "balanced_accuracy": 0.8976969966923197,
+            "predicted_positive_rate": 0.03176341730558598
+          }
+        ],
+        "persistence_baseline": {
+          "available": true,
+          "n": 2221,
+          "accuracy": 0.9954975236380009,
+          "balanced_accuracy": 0.9294113907958301,
+          "precision": 0.8611111111111112,
+          "recall": 0.8611111111111112,
+          "f1": 0.8611111111111112
+        }
+      },
+      "evaluation_validity": "INVALIDATED_TARGET_CONSTRUCTION"
+    },
+    {
+      "model_id": "cyclone_rapid_intensification_24h",
+      "hazard": "Cyclone",
+      "status": "WEAK_RESEARCH_SIGNAL",
+      "skill_grade": "WEAK_RESEARCH_SIGNAL",
+      "status_reason": "Ranking beats the no-skill prevalence (ROC-AUC 0.891, average precision 0.247), but probability error (Brier 0.054) is not better than the base-rate reference (0.047). Treat the score as a ranking signal only.",
+      "evidence_tier": "screening",
+      "selected_model_type": "extra_trees",
+      "target_definition": "target_ri_24h >= 30 (training-period 0.950 quantile)",
+      "threshold_source": "training target dates only (< validation_start)",
+      "temporal_split": {
+        "train_target_dates_before": "2015-01-01",
+        "validation_target_dates": "2015-01-01 through before 2020-01-01",
+        "final_train_target_dates_before": "2020-01-01",
+        "test_target_dates_from": "2020-01-01",
+        "grouped_purge": {
+          "group_column": "storm_id",
+          "purged_groups": 0
+        }
+      },
+      "train_rows": 6057,
+      "train_events": 279,
+      "test_rows": 1753,
+      "test_events": 86,
+      "metrics": {
+        "n_test": 1753,
+        "n_test_events": 86,
+        "test_prevalence": 0.04905875641756988,
+        "accuracy": 0.9401026811180833,
+        "balanced_accuracy": 0.5714973284412885,
+        "precision": 0.2978723404255319,
+        "recall": 0.16279069767441862,
+        "f1": 0.21052631578947367,
+        "roc_auc": 0.8905707230646894,
+        "average_precision": 0.24714098954446606,
+        "brier_score": 0.053712073335664724,
+        "confusion_matrix_tn_fp_fn_tp": [
+          1634,
+          33,
+          72,
+          14
+        ],
+        "predicted_positive_rate": 0.026811180832857957,
+        "log_loss": 0.196604424947753,
+        "expected_calibration_error": 0.08832192511280292,
+        "calibration_table": [
+          {
+            "bin_lower": 0,
+            "bin_upper": 0.1,
+            "n": 1005,
+            "mean_probability": 0.037473714922089174,
+            "observed_event_rate": 0.005970149253731343,
+            "absolute_gap": 0.03150356566835783
+          },
+          {
+            "bin_lower": 0.1,
+            "bin_upper": 0.2,
+            "n": 332,
+            "mean_probability": 0.14307450194471014,
+            "observed_event_rate": 0.024096385542168676,
+            "absolute_gap": 0.11897811640254147
+          },
+          {
+            "bin_lower": 0.2,
+            "bin_upper": 0.30000000000000004,
+            "n": 152,
+            "mean_probability": 0.2497230388544515,
+            "observed_event_rate": 0.05263157894736842,
+            "absolute_gap": 0.19709145990708307
+          },
+          {
+            "bin_lower": 0.30000000000000004,
+            "bin_upper": 0.4,
+            "n": 111,
+            "mean_probability": 0.3470624102838692,
+            "observed_event_rate": 0.16216216216216217,
+            "absolute_gap": 0.18490024812170702
+          },
+          {
+            "bin_lower": 0.4,
+            "bin_upper": 0.5,
+            "n": 79,
+            "mean_probability": 0.44604727250653214,
+            "observed_event_rate": 0.3037974683544304,
+            "absolute_gap": 0.14224980415210176
+          },
+          {
+            "bin_lower": 0.5,
+            "bin_upper": 0.6000000000000001,
+            "n": 45,
+            "mean_probability": 0.5363678000619585,
+            "observed_event_rate": 0.35555555555555557,
+            "absolute_gap": 0.18081224450640293
+          },
+          {
+            "bin_lower": 0.6000000000000001,
+            "bin_upper": 0.7000000000000001,
+            "n": 21,
+            "mean_probability": 0.6422712554498721,
+            "observed_event_rate": 0.2857142857142857,
+            "absolute_gap": 0.35655696973558637
+          },
+          {
+            "bin_lower": 0.7000000000000001,
+            "bin_upper": 0.8,
+            "n": 5,
+            "mean_probability": 0.7437066028697608,
+            "observed_event_rate": 0,
+            "absolute_gap": 0.7437066028697608
+          },
+          {
+            "bin_lower": 0.8,
+            "bin_upper": 0.9,
+            "n": 3,
+            "mean_probability": 0.8680574078045747,
+            "observed_event_rate": 0,
+            "absolute_gap": 0.8680574078045747
+          }
+        ],
+        "calibration_interpretation": "Expected calibration error is descriptive for this holdout. It does not establish calibration in future or operational use.",
+        "majority_baseline": {
+          "predicted_class": 0,
+          "accuracy": 0.9509412435824302,
+          "balanced_accuracy": 0.5,
+          "f1": 0
+        },
+        "base_rate_brier_score": 0.04665199483633143,
+        "skill_over_base_rate_brier": -0.007060078499333294,
+        "bootstrap_95ci": {
+          "f1": [
+            0.11903846153846155,
+            0.2908061594202898
+          ],
+          "roc_auc": [
+            0.8578762036597254,
+            0.9147902925306096
+          ],
+          "average_precision": [
+            0.19035558659369076,
+            0.3115948199494545
+          ]
+        },
+        "validation_threshold_scores": [
+          {
+            "threshold": 0.02,
+            "precision": 0.0582891748675246,
+            "recall": 1,
+            "f1": 0.11015736766809728,
+            "balanced_accuracy": 0.6092964824120604,
+            "predicted_positive_rate": 0.7914919113241462
+          },
+          {
+            "threshold": 0.04,
+            "precision": 0.06928838951310862,
+            "recall": 0.961038961038961,
+            "f1": 0.12925764192139738,
+            "balanced_accuracy": 0.6683335508712394,
+            "predicted_positive_rate": 0.639904134212103
+          },
+          {
+            "threshold": 0.06,
+            "precision": 0.0768409818569904,
+            "recall": 0.935064935064935,
+            "f1": 0.14201183431952663,
+            "balanced_accuracy": 0.6958616132611107,
+            "predicted_positive_rate": 0.5614140203714799
+          },
+          {
+            "threshold": 0.08,
+            "precision": 0.08450704225352113,
+            "recall": 0.935064935064935,
+            "f1": 0.155005382131324,
+            "balanced_accuracy": 0.7225575931606083,
+            "predicted_positive_rate": 0.5104853205512283
+          },
+          {
+            "threshold": 0.1,
+            "precision": 0.09536423841059603,
+            "recall": 0.935064935064935,
+            "f1": 0.17307692307692307,
+            "balanced_accuracy": 0.7530224172812112,
+            "predicted_positive_rate": 0.45236668663870583
+          },
+          {
+            "threshold": 0.12,
+            "precision": 0.10147058823529412,
+            "recall": 0.8961038961038961,
+            "f1": 0.18229854689564068,
+            "balanced_accuracy": 0.756154963127325,
+            "predicted_positive_rate": 0.40742959856201316
+          },
+          {
+            "threshold": 0.14,
+            "precision": 0.11092985318107668,
+            "recall": 0.8831168831168831,
+            "f1": 0.19710144927536233,
+            "balanced_accuracy": 0.7703900998498988,
+            "predicted_positive_rate": 0.36728579988016774
+          },
+          {
+            "threshold": 0.16,
+            "precision": 0.11785714285714285,
+            "recall": 0.8571428571428571,
+            "f1": 0.20722135007849293,
+            "balanced_accuracy": 0.7734206748025843,
+            "predicted_positive_rate": 0.335530257639305
+          },
+          {
+            "threshold": 0.18,
+            "precision": 0.126953125,
+            "recall": 0.8441558441558441,
+            "f1": 0.22071307300509338,
+            "balanced_accuracy": 0.7816884748417412,
+            "predicted_positive_rate": 0.3067705212702217
+          },
+          {
+            "threshold": 0.2,
+            "precision": 0.13771186440677965,
+            "recall": 0.8441558441558441,
+            "f1": 0.23679417122040072,
+            "balanced_accuracy": 0.794251288912093,
+            "predicted_positive_rate": 0.28280407429598564
+          },
+          {
+            "threshold": 0.22,
+            "precision": 0.14678899082568808,
+            "recall": 0.8311688311688312,
+            "f1": 0.24951267056530213,
+            "balanced_accuracy": 0.7987502447301442,
+            "predicted_positive_rate": 0.26123427201917315
+          },
+          {
+            "threshold": 0.24,
+            "precision": 0.15829145728643215,
+            "recall": 0.8181818181818182,
+            "f1": 0.26526315789473687,
+            "balanced_accuracy": 0.8038773412517131,
+            "predicted_positive_rate": 0.23846614739364888
+          },
+          {
+            "threshold": 0.26,
+            "precision": 0.16445623342175067,
+            "recall": 0.8051948051948052,
+            "f1": 0.27312775330396477,
+            "balanced_accuracy": 0.8036652417933825,
+            "predicted_positive_rate": 0.22588376273217495
+          },
+          {
+            "threshold": 0.28,
+            "precision": 0.17142857142857143,
+            "recall": 0.7792207792207793,
+            "f1": 0.2810304449648712,
+            "balanced_accuracy": 0.7985299876003393,
+            "predicted_positive_rate": 0.2097064110245656
+          },
+          {
+            "threshold": 0.3,
+            "precision": 0.17378048780487804,
+            "recall": 0.7402597402597403,
+            "f1": 0.2814814814814815,
+            "balanced_accuracy": 0.785016804803237,
+            "predicted_positive_rate": 0.19652486518873577
+          },
+          {
+            "threshold": 0.32,
+            "precision": 0.18,
+            "recall": 0.7012987012987013,
+            "f1": 0.2864721485411141,
+            "balanced_accuracy": 0.7733880441166874,
+            "predicted_positive_rate": 0.17974835230677053
+          },
+          {
+            "threshold": 0.34,
+            "precision": 0.18888888888888888,
+            "recall": 0.6623376623376623,
+            "f1": 0.29394812680115273,
+            "balanced_accuracy": 0.7623874241336552,
+            "predicted_positive_rate": 0.16177351707609347
+          },
+          {
+            "threshold": 0.36,
+            "precision": 0.20833333333333334,
+            "recall": 0.6493506493506493,
+            "f1": 0.31545741324921134,
+            "balanced_accuracy": 0.7650019578411538,
+            "predicted_positive_rate": 0.14379868184541642
+          },
+          {
+            "threshold": 0.38,
+            "precision": 0.22897196261682243,
+            "recall": 0.6363636363636364,
+            "f1": 0.33676975945017185,
+            "balanced_accuracy": 0.7663602101416171,
+            "predicted_positive_rate": 0.12822049131216298
+          },
+          {
+            "threshold": 0.4,
+            "precision": 0.2512820512820513,
+            "recall": 0.6363636363636364,
+            "f1": 0.3602941176470588,
+            "balanced_accuracy": 0.7723275468250342,
+            "predicted_positive_rate": 0.11683642899940083
+          },
+          {
+            "threshold": 0.42,
+            "precision": 0.2541436464088398,
+            "recall": 0.5974025974025974,
+            "f1": 0.35658914728682173,
+            "balanced_accuracy": 0.7563018012138615,
+            "predicted_positive_rate": 0.10844817255841821
+          },
+          {
+            "threshold": 0.44,
+            "precision": 0.2710843373493976,
+            "recall": 0.5844155844155844,
+            "f1": 0.37037037037037035,
+            "balanced_accuracy": 0.7542052796449781,
+            "predicted_positive_rate": 0.09946075494307968
+          },
+          {
+            "threshold": 0.46,
+            "precision": 0.2662337662337662,
+            "recall": 0.5324675324675324,
+            "f1": 0.354978354978355,
+            "balanced_accuracy": 0.7307438164850225,
+            "predicted_positive_rate": 0.09227082085080887
+          },
+          {
+            "threshold": 0.48,
+            "precision": 0.2867647058823529,
+            "recall": 0.5064935064935064,
+            "f1": 0.36619718309859156,
+            "balanced_accuracy": 0.7227819291261501,
+            "predicted_positive_rate": 0.08148591971240264
+          },
+          {
+            "threshold": 0.5,
+            "precision": 0.3220338983050847,
+            "recall": 0.4935064935064935,
+            "f1": 0.38974358974358975,
+            "balanced_accuracy": 0.7216276186125432,
+            "predicted_positive_rate": 0.07070101857399641
+          },
+          {
+            "threshold": 0.52,
+            "precision": 0.3465346534653465,
+            "recall": 0.45454545454545453,
+            "f1": 0.39325842696629215,
+            "balanced_accuracy": 0.7065440840566468,
+            "predicted_positive_rate": 0.06051527860994608
+          },
+          {
+            "threshold": 0.54,
+            "precision": 0.3707865168539326,
+            "recall": 0.42857142857142855,
+            "f1": 0.39759036144578314,
+            "balanced_accuracy": 0.6966977745872218,
+            "predicted_positive_rate": 0.053325344517675254
+          },
+          {
+            "threshold": 0.56,
+            "precision": 0.3493975903614458,
+            "recall": 0.37662337662337664,
+            "f1": 0.3625,
+            "balanced_accuracy": 0.6713518893167134,
+            "predicted_positive_rate": 0.04973037747153984
+          },
+          {
+            "threshold": 0.58,
+            "precision": 0.36363636363636365,
+            "recall": 0.36363636363636365,
+            "f1": 0.36363636363636365,
+            "balanced_accuracy": 0.6664287345820009,
+            "predicted_positive_rate": 0.046135410425404436
+          },
+          {
+            "threshold": 0.6,
+            "precision": 0.34782608695652173,
+            "recall": 0.3116883116883117,
+            "f1": 0.3287671232876712,
+            "balanced_accuracy": 0.6417109900150101,
+            "predicted_positive_rate": 0.04134212103055722
+          },
+          {
+            "threshold": 0.62,
+            "precision": 0.3709677419354839,
+            "recall": 0.2987012987012987,
+            "f1": 0.33093525179856115,
+            "balanced_accuracy": 0.6371019056320564,
+            "predicted_positive_rate": 0.03714799281006591
+          },
+          {
+            "threshold": 0.64,
+            "precision": 0.41509433962264153,
+            "recall": 0.2857142857142857,
+            "f1": 0.3384615384615385,
+            "balanced_accuracy": 0.6331209619526202,
+            "predicted_positive_rate": 0.03175554224086279
+          },
+          {
+            "threshold": 0.66,
+            "precision": 0.4318181818181818,
+            "recall": 0.24675324675324675,
+            "f1": 0.3140495867768595,
+            "balanced_accuracy": 0.6155248645826535,
+            "predicted_positive_rate": 0.026363091671659677
+          },
+          {
+            "threshold": 0.68,
+            "precision": 0.4117647058823529,
+            "recall": 0.18181818181818182,
+            "f1": 0.25225225225225223,
+            "balanced_accuracy": 0.5846276838739151,
+            "predicted_positive_rate": 0.02037147992810066
+          },
+          {
+            "threshold": 0.7,
+            "precision": 0.4482758620689655,
+            "recall": 0.16883116883116883,
+            "f1": 0.24528301886792453,
+            "balanced_accuracy": 0.5793904587874437,
+            "predicted_positive_rate": 0.01737567405632115
+          },
+          {
+            "threshold": 0.72,
+            "precision": 0.44,
+            "recall": 0.14285714285714285,
+            "f1": 0.21568627450980393,
+            "balanced_accuracy": 0.5670315865039484,
+            "predicted_positive_rate": 0.014979029358897543
+          },
+          {
+            "threshold": 0.74,
+            "precision": 0.4090909090909091,
+            "recall": 0.11688311688311688,
+            "f1": 0.18181818181818182,
+            "balanced_accuracy": 0.5543586438686942,
+            "predicted_positive_rate": 0.013181545835829839
+          },
+          {
+            "threshold": 0.76,
+            "precision": 0.47058823529411764,
+            "recall": 0.1038961038961039,
+            "f1": 0.1702127659574468,
+            "balanced_accuracy": 0.5491214187822228,
+            "predicted_positive_rate": 0.01018573996405033
+          },
+          {
+            "threshold": 0.78,
+            "precision": 0.5,
+            "recall": 0.09090909090909091,
+            "f1": 0.15384615384615385,
+            "balanced_accuracy": 0.5432560529922339,
+            "predicted_positive_rate": 0.008388256440982624
+          },
+          {
+            "threshold": 0.8,
+            "precision": 0.6,
+            "recall": 0.07792207792207792,
+            "f1": 0.13793103448275862,
+            "balanced_accuracy": 0.5377047575540038,
+            "predicted_positive_rate": 0.005991611743559017
+          },
+          {
+            "threshold": 0.82,
+            "precision": 0.7142857142857143,
+            "recall": 0.06493506493506493,
+            "f1": 0.11904761904761904,
+            "balanced_accuracy": 0.5318393917640148,
+            "predicted_positive_rate": 0.004194128220491312
+          },
+          {
+            "threshold": 0.84,
+            "precision": 0.8,
+            "recall": 0.05194805194805195,
+            "f1": 0.0975609756097561,
+            "balanced_accuracy": 0.5256599556222672,
+            "predicted_positive_rate": 0.0029958058717795086
+          },
+          {
+            "threshold": 0.86,
+            "precision": 0.8,
+            "recall": 0.05194805194805195,
+            "f1": 0.0975609756097561,
+            "balanced_accuracy": 0.5256599556222672,
+            "predicted_positive_rate": 0.0029958058717795086
+          },
+          {
+            "threshold": 0.88,
+            "precision": 0.6666666666666666,
+            "recall": 0.025974025974025976,
+            "f1": 0.05,
+            "balanced_accuracy": 0.5126729426352542,
+            "predicted_positive_rate": 0.0017974835230677051
+          },
+          {
+            "threshold": 0.9,
+            "precision": 1,
+            "recall": 0.025974025974025976,
+            "f1": 0.05063291139240506,
+            "balanced_accuracy": 0.512987012987013,
+            "predicted_positive_rate": 0.0011983223487118035
+          },
+          {
+            "threshold": 0.92,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0,
+            "balanced_accuracy": 0.5,
+            "predicted_positive_rate": 0
+          },
+          {
+            "threshold": 0.94,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0,
+            "balanced_accuracy": 0.5,
+            "predicted_positive_rate": 0
+          }
+        ],
+        "persistence_baseline": {
+          "available": true,
+          "n": 1381,
+          "accuracy": 0.9080376538740044,
+          "balanced_accuracy": 0.599250576479631,
+          "precision": 0.22988505747126436,
+          "recall": 0.25,
+          "f1": 0.23952095808383234
+        }
+      },
+      "limitations": [
+        "At the validation-selected threshold, held-out F1 (0.211) does not exceed the simple persistence baseline (0.240); the model is not an improvement over persistence for this event definition.",
+        "Best-track data are post-event reanalysis, not operational forecasts.",
+        "Rapid intensification is rare; held-out event counts are small and uncertainty is wide.",
+        "Agency wind-source changes create inhomogeneity.",
+        "Best-track reanalysis, not an operational forecast.",
+        "USA_WIND is preferred; agency changes create inhomogeneity.",
+        "The label is a >=30 kt increase over the next ~24 hours.",
+        "A single chronological holdout is preliminary evidence, not independent validation.",
+        "No calibration, geographic transferability, drift or operational-readiness claim is made.",
+        "Skill grade is WEAK_RESEARCH_SIGNAL: Ranking beats the no-skill prevalence (ROC-AUC 0.891, average precision 0.247), but probability error (Brier 0.054) is not better than the base-rate reference (0.047). Treat the score as a ranking signal only.",
+        "The model card records the exact threshold, features and split; changing any of them requires retraining and re-evaluation."
+      ]
+    },
+    {
+      "model_id": "earthquake_aftershock_occurrence",
+      "hazard": "Earthquake",
+      "status": "NO_SKILL",
+      "skill_grade": "NO_SKILL",
+      "status_reason": "INVALIDATED: the original seven-day aftershock outcome window could cross a temporal validation/test boundary because the split used only the mainshock timestamp. Previous holdout metrics are superseded. No inference is permitted until the label-window embargo and recent-seismicity baseline are retrained and reevaluated.",
+      "evidence_tier": "invalidated",
+      "selected_model_type": "gradient_boosting",
+      "target_definition": "target_aftershock_m4_7d_50km >= 0.5",
+      "threshold_source": "fixed binary label",
+      "temporal_split": {
+        "train_target_dates_before": "2018-01-01",
+        "validation_target_dates": "2018-01-01 through before 2022-01-01",
+        "final_train_target_dates_before": "2022-01-01",
+        "test_target_dates_from": "2022-01-01",
+        "grouped_purge": {
+          "group_column": null,
+          "purged_groups": 0
+        }
+      },
+      "train_rows": 1807,
+      "train_events": 1180,
+      "test_rows": 156,
+      "test_events": 93,
+      "metrics": {},
+      "limitations": [
+        "The USGS catalogue is regionally clipped and capped at 20,000 events.",
+        "Aftershock labelling depends on catalogue completeness and the chosen distance/time windows.",
+        "Aftershock sequence screening, not earthquake occurrence prediction.",
+        "The catalogue is regionally clipped and capped at 20,000 events.",
+        "Features use only prior events; the label uses future events.",
+        "A single chronological holdout is preliminary evidence, not independent validation.",
+        "No calibration, geographic transferability, drift or operational-readiness claim is made.",
+        "Skill grade is RESEARCH_SIGNAL_NOT_VALIDATED: ROC-AUC 0.871 and average precision 0.912 beat the no-skill prevalence 0.596 on one temporal holdout. Calibration error is 0.109; probabilities are not suitable for decision thresholds without recalibration.",
+        "The model card records the exact threshold, features and split; changing any of them requires retraining and re-evaluation.",
+        "The prior temporal split did not embargo the full seven-day future label window; previous metrics are invalidated pending retraining."
+      ],
+      "superseded_metrics": {
+        "n_test": 156,
+        "n_test_events": 93,
+        "test_prevalence": 0.5961538461538461,
+        "accuracy": 0.782051282051282,
+        "balanced_accuracy": 0.7788018433179723,
+        "precision": 0.8314606741573034,
+        "recall": 0.7956989247311828,
+        "f1": 0.8131868131868132,
+        "roc_auc": 0.870626386755419,
+        "average_precision": 0.9122249567756925,
+        "brier_score": 0.15701764959812659,
+        "confusion_matrix_tn_fp_fn_tp": [
+          48,
+          15,
+          19,
+          74
+        ],
+        "predicted_positive_rate": 0.5705128205128205,
+        "log_loss": 0.4756285699088498,
+        "expected_calibration_error": 0.10921511346592937,
+        "calibration_table": [
+          {
+            "bin_lower": 0,
+            "bin_upper": 0.1,
+            "n": 11,
+            "mean_probability": 0.056815963098186706,
+            "observed_event_rate": 0.09090909090909091,
+            "absolute_gap": 0.034093127810904206
+          },
+          {
+            "bin_lower": 0.1,
+            "bin_upper": 0.2,
+            "n": 32,
+            "mean_probability": 0.14932534610540166,
+            "observed_event_rate": 0.1875,
+            "absolute_gap": 0.03817465389459834
+          },
+          {
+            "bin_lower": 0.2,
+            "bin_upper": 0.30000000000000004,
+            "n": 20,
+            "mean_probability": 0.23649513863662103,
+            "observed_event_rate": 0.45,
+            "absolute_gap": 0.21350486136337898
+          },
+          {
+            "bin_lower": 0.30000000000000004,
+            "bin_upper": 0.4,
+            "n": 12,
+            "mean_probability": 0.34388971610429714,
+            "observed_event_rate": 0.6666666666666666,
+            "absolute_gap": 0.3227769505623695
+          },
+          {
+            "bin_lower": 0.4,
+            "bin_upper": 0.5,
+            "n": 5,
+            "mean_probability": 0.46275448493070215,
+            "observed_event_rate": 0.4,
+            "absolute_gap": 0.06275448493070213
+          },
+          {
+            "bin_lower": 0.5,
+            "bin_upper": 0.6000000000000001,
+            "n": 8,
+            "mean_probability": 0.5677107052713883,
+            "observed_event_rate": 0.625,
+            "absolute_gap": 0.05728929472861166
+          },
+          {
+            "bin_lower": 0.6000000000000001,
+            "bin_upper": 0.7000000000000001,
+            "n": 9,
+            "mean_probability": 0.6524275724136748,
+            "observed_event_rate": 0.8888888888888888,
+            "absolute_gap": 0.23646131647521407
+          },
+          {
+            "bin_lower": 0.7000000000000001,
+            "bin_upper": 0.8,
+            "n": 12,
+            "mean_probability": 0.7415362213508659,
+            "observed_event_rate": 0.9166666666666666,
+            "absolute_gap": 0.1751304453158007
+          },
+          {
+            "bin_lower": 0.8,
+            "bin_upper": 0.9,
+            "n": 21,
+            "mean_probability": 0.8597258509809403,
+            "observed_event_rate": 0.8095238095238095,
+            "absolute_gap": 0.05020204145713081
+          },
+          {
+            "bin_lower": 0.9,
+            "bin_upper": 1,
+            "n": 26,
+            "mean_probability": 0.9522508888087236,
+            "observed_event_rate": 1,
+            "absolute_gap": 0.04774911119127645
+          }
+        ],
+        "calibration_interpretation": "Expected calibration error is descriptive for this holdout. It does not establish calibration in future or operational use.",
+        "majority_baseline": {
+          "predicted_class": 1,
+          "accuracy": 0.5961538461538461,
+          "balanced_accuracy": 0.5,
+          "f1": 0.7469879518072289
+        },
+        "base_rate_brier_score": 0.24075443786982248,
+        "skill_over_base_rate_brier": 0.0837367882716959,
+        "bootstrap_95ci": {
+          "f1": [
+            0.750719696969697,
+            0.8653162585910653
+          ],
+          "roc_auc": [
+            0.8112177047508654,
+            0.9203012353931472
+          ],
+          "average_precision": [
+            0.8674580423280808,
+            0.9505692148684015
+          ]
+        },
+        "validation_threshold_scores": [
+          {
+            "threshold": 0.02,
+            "precision": 0.5112107623318386,
+            "recall": 1,
+            "f1": 0.6765578635014837,
+            "balanced_accuracy": 0.5,
+            "predicted_positive_rate": 1
+          },
+          {
+            "threshold": 0.04,
+            "precision": 0.5112107623318386,
+            "recall": 1,
+            "f1": 0.6765578635014837,
+            "balanced_accuracy": 0.5,
+            "predicted_positive_rate": 1
+          },
+          {
+            "threshold": 0.06,
+            "precision": 0.5181818181818182,
+            "recall": 1,
+            "f1": 0.6826347305389222,
+            "balanced_accuracy": 0.5137614678899083,
+            "predicted_positive_rate": 0.9865470852017937
+          },
+          {
+            "threshold": 0.08,
+            "precision": 0.5229357798165137,
+            "recall": 1,
+            "f1": 0.6867469879518072,
+            "balanced_accuracy": 0.5229357798165137,
+            "predicted_positive_rate": 0.9775784753363229
+          },
+          {
+            "threshold": 0.1,
+            "precision": 0.5305164319248826,
+            "recall": 0.9912280701754386,
+            "f1": 0.691131498470948,
+            "balanced_accuracy": 0.536898438757444,
+            "predicted_positive_rate": 0.9551569506726457
+          },
+          {
+            "threshold": 0.12,
+            "precision": 0.553921568627451,
+            "recall": 0.9912280701754386,
+            "f1": 0.710691823899371,
+            "balanced_accuracy": 0.5781828424271689,
+            "predicted_positive_rate": 0.9147982062780269
+          },
+          {
+            "threshold": 0.14,
+            "precision": 0.5736040609137056,
+            "recall": 0.9912280701754386,
+            "f1": 0.7266881028938906,
+            "balanced_accuracy": 0.6102929341702881,
+            "predicted_positive_rate": 0.8834080717488789
+          },
+          {
+            "threshold": 0.16,
+            "precision": 0.6075268817204301,
+            "recall": 0.9912280701754386,
+            "f1": 0.7533333333333333,
+            "balanced_accuracy": 0.6607516497666184,
+            "predicted_positive_rate": 0.8340807174887892
+          },
+          {
+            "threshold": 0.18,
+            "precision": 0.6111111111111112,
+            "recall": 0.9649122807017544,
+            "f1": 0.7482993197278912,
+            "balanced_accuracy": 0.6613552229196845,
+            "predicted_positive_rate": 0.8071748878923767
+          },
+          {
+            "threshold": 0.2,
+            "precision": 0.621301775147929,
+            "recall": 0.9210526315789473,
+            "f1": 0.7420494699646644,
+            "balanced_accuracy": 0.6669483341380975,
+            "predicted_positive_rate": 0.757847533632287
+          },
+          {
+            "threshold": 0.22,
+            "precision": 0.6375,
+            "recall": 0.8947368421052632,
+            "f1": 0.7445255474452555,
+            "balanced_accuracy": 0.6813133751810719,
+            "predicted_positive_rate": 0.7174887892376681
+          },
+          {
+            "threshold": 0.24,
+            "precision": 0.6455696202531646,
+            "recall": 0.8947368421052632,
+            "f1": 0.75,
+            "balanced_accuracy": 0.6904876871076775,
+            "predicted_positive_rate": 0.7085201793721974
+          },
+          {
+            "threshold": 0.26,
+            "precision": 0.6644736842105263,
+            "recall": 0.8859649122807017,
+            "f1": 0.7593984962406015,
+            "balanced_accuracy": 0.7090375020119105,
+            "predicted_positive_rate": 0.6816143497757847
+          },
+          {
+            "threshold": 0.28,
+            "precision": 0.6711409395973155,
+            "recall": 0.8771929824561403,
+            "f1": 0.7604562737642585,
+            "balanced_accuracy": 0.7138258490262352,
+            "predicted_positive_rate": 0.6681614349775785
+          },
+          {
+            "threshold": 0.3,
+            "precision": 0.6875,
+            "recall": 0.868421052631579,
+            "f1": 0.7674418604651163,
+            "balanced_accuracy": 0.7277885079671657,
+            "predicted_positive_rate": 0.6457399103139013
+          },
+          {
+            "threshold": 0.32,
+            "precision": 0.7132352941176471,
+            "recall": 0.8508771929824561,
+            "f1": 0.776,
+            "balanced_accuracy": 0.7465395139224207,
+            "predicted_positive_rate": 0.6098654708520179
+          },
+          {
+            "threshold": 0.34,
+            "precision": 0.7175572519083969,
+            "recall": 0.8245614035087719,
+            "f1": 0.7673469387755102,
+            "balanced_accuracy": 0.7425559311121841,
+            "predicted_positive_rate": 0.5874439461883408
+          },
+          {
+            "threshold": 0.36,
+            "precision": 0.7301587301587301,
+            "recall": 0.8070175438596491,
+            "f1": 0.7666666666666667,
+            "balanced_accuracy": 0.747545469177531,
+            "predicted_positive_rate": 0.5650224215246636
+          },
+          {
+            "threshold": 0.38,
+            "precision": 0.7295081967213115,
+            "recall": 0.7807017543859649,
+            "f1": 0.7542372881355932,
+            "balanced_accuracy": 0.7389747304039916,
+            "predicted_positive_rate": 0.547085201793722
+          },
+          {
+            "threshold": 0.4,
+            "precision": 0.75,
+            "recall": 0.7631578947368421,
+            "f1": 0.7565217391304347,
+            "balanced_accuracy": 0.7485514244326412,
+            "predicted_positive_rate": 0.5201793721973094
+          },
+          {
+            "threshold": 0.42,
+            "precision": 0.7631578947368421,
+            "recall": 0.7631578947368421,
+            "f1": 0.7631578947368421,
+            "balanced_accuracy": 0.7577257363592468,
+            "predicted_positive_rate": 0.5112107623318386
+          },
+          {
+            "threshold": 0.44,
+            "precision": 0.7589285714285714,
+            "recall": 0.7456140350877193,
+            "f1": 0.7522123893805309,
+            "balanced_accuracy": 0.7489538065346854,
+            "predicted_positive_rate": 0.5022421524663677
+          },
+          {
+            "threshold": 0.46,
+            "precision": 0.7735849056603774,
+            "recall": 0.7192982456140351,
+            "f1": 0.7454545454545455,
+            "balanced_accuracy": 0.7495573796877515,
+            "predicted_positive_rate": 0.47533632286995514
+          },
+          {
+            "threshold": 0.48,
+            "precision": 0.7735849056603774,
+            "recall": 0.7192982456140351,
+            "f1": 0.7454545454545455,
+            "balanced_accuracy": 0.7495573796877515,
+            "predicted_positive_rate": 0.47533632286995514
+          },
+          {
+            "threshold": 0.5,
+            "precision": 0.7647058823529411,
+            "recall": 0.6842105263157895,
+            "f1": 0.7222222222222222,
+            "balanced_accuracy": 0.7320135200386286,
+            "predicted_positive_rate": 0.45739910313901344
+          },
+          {
+            "threshold": 0.52,
+            "precision": 0.7653061224489796,
+            "recall": 0.6578947368421053,
+            "f1": 0.7075471698113207,
+            "balanced_accuracy": 0.7234427812650894,
+            "predicted_positive_rate": 0.43946188340807174
+          },
+          {
+            "threshold": 0.54,
+            "precision": 0.78125,
+            "recall": 0.6578947368421053,
+            "f1": 0.7142857142857143,
+            "balanced_accuracy": 0.7326170931916949,
+            "predicted_positive_rate": 0.4304932735426009
+          },
+          {
+            "threshold": 0.56,
+            "precision": 0.7802197802197802,
+            "recall": 0.6228070175438597,
+            "f1": 0.6926829268292682,
+            "balanced_accuracy": 0.7196603895058749,
+            "predicted_positive_rate": 0.4080717488789238
+          },
+          {
+            "threshold": 0.58,
+            "precision": 0.7802197802197802,
+            "recall": 0.6228070175438597,
+            "f1": 0.6926829268292682,
+            "balanced_accuracy": 0.7196603895058749,
+            "predicted_positive_rate": 0.4080717488789238
+          },
+          {
+            "threshold": 0.6,
+            "precision": 0.797752808988764,
+            "recall": 0.6228070175438597,
+            "f1": 0.6995073891625616,
+            "balanced_accuracy": 0.7288347014324803,
+            "predicted_positive_rate": 0.3991031390134529
+          },
+          {
+            "threshold": 0.62,
+            "precision": 0.8045977011494253,
+            "recall": 0.6140350877192983,
+            "f1": 0.6965174129353234,
+            "balanced_accuracy": 0.7290358924835023,
+            "predicted_positive_rate": 0.3901345291479821
+          },
+          {
+            "threshold": 0.64,
+            "precision": 0.8023255813953488,
+            "recall": 0.6052631578947368,
+            "f1": 0.69,
+            "balanced_accuracy": 0.7246499275712217,
+            "predicted_positive_rate": 0.38565022421524664
+          },
+          {
+            "threshold": 0.66,
+            "precision": 0.8117647058823529,
+            "recall": 0.6052631578947368,
+            "f1": 0.6934673366834171,
+            "balanced_accuracy": 0.7292370835345243,
+            "predicted_positive_rate": 0.3811659192825112
+          },
+          {
+            "threshold": 0.68,
+            "precision": 0.8095238095238095,
+            "recall": 0.5964912280701754,
+            "f1": 0.6868686868686869,
+            "balanced_accuracy": 0.7248511186222437,
+            "predicted_positive_rate": 0.37668161434977576
+          },
+          {
+            "threshold": 0.7,
+            "precision": 0.8354430379746836,
+            "recall": 0.5789473684210527,
+            "f1": 0.6839378238341969,
+            "balanced_accuracy": 0.7298406566875906,
+            "predicted_positive_rate": 0.3542600896860987
+          },
+          {
+            "threshold": 0.72,
+            "precision": 0.8533333333333334,
+            "recall": 0.5614035087719298,
+            "f1": 0.6772486772486772,
+            "balanced_accuracy": 0.7302430387896346,
+            "predicted_positive_rate": 0.336322869955157
+          },
+          {
+            "threshold": 0.74,
+            "precision": 0.8428571428571429,
+            "recall": 0.5175438596491229,
+            "f1": 0.6413043478260869,
+            "balanced_accuracy": 0.7083132142282311,
+            "predicted_positive_rate": 0.31390134529147984
+          },
+          {
+            "threshold": 0.76,
+            "precision": 0.8382352941176471,
+            "recall": 0.5,
+            "f1": 0.6263736263736264,
+            "balanced_accuracy": 0.6995412844036697,
+            "predicted_positive_rate": 0.30493273542600896
+          },
+          {
+            "threshold": 0.78,
+            "precision": 0.8636363636363636,
+            "recall": 0.5,
+            "f1": 0.6333333333333333,
+            "balanced_accuracy": 0.7087155963302753,
+            "predicted_positive_rate": 0.29596412556053814
+          },
+          {
+            "threshold": 0.8,
+            "precision": 0.8769230769230769,
+            "recall": 0.5,
+            "f1": 0.6368715083798883,
+            "balanced_accuracy": 0.713302752293578,
+            "predicted_positive_rate": 0.2914798206278027
+          },
+          {
+            "threshold": 0.82,
+            "precision": 0.875,
+            "recall": 0.49122807017543857,
+            "f1": 0.6292134831460674,
+            "balanced_accuracy": 0.7089167873812973,
+            "predicted_positive_rate": 0.28699551569506726
+          },
+          {
+            "threshold": 0.84,
+            "precision": 0.896551724137931,
+            "recall": 0.45614035087719296,
+            "f1": 0.6046511627906976,
+            "balanced_accuracy": 0.70054723965878,
+            "predicted_positive_rate": 0.2600896860986547
+          },
+          {
+            "threshold": 0.86,
+            "precision": 0.9259259259259259,
+            "recall": 0.43859649122807015,
+            "f1": 0.5952380952380952,
+            "balanced_accuracy": 0.7009496217608241,
+            "predicted_positive_rate": 0.242152466367713
+          },
+          {
+            "threshold": 0.88,
+            "precision": 0.9574468085106383,
+            "recall": 0.39473684210526316,
+            "f1": 0.5590062111801242,
+            "balanced_accuracy": 0.6881941091260261,
+            "predicted_positive_rate": 0.21076233183856502
+          },
+          {
+            "threshold": 0.9,
+            "precision": 0.9545454545454546,
+            "recall": 0.3684210526315789,
+            "f1": 0.5316455696202531,
+            "balanced_accuracy": 0.6750362143891839,
+            "predicted_positive_rate": 0.19730941704035873
+          },
+          {
+            "threshold": 0.92,
+            "precision": 0.9512195121951219,
+            "recall": 0.34210526315789475,
+            "f1": 0.5032258064516129,
+            "balanced_accuracy": 0.6618783196523419,
+            "predicted_positive_rate": 0.18385650224215247
+          },
+          {
+            "threshold": 0.94,
+            "precision": 0.96875,
+            "recall": 0.2719298245614035,
+            "f1": 0.4246575342465753,
+            "balanced_accuracy": 0.631377756317399,
+            "predicted_positive_rate": 0.14349775784753363
+          }
+        ],
+        "persistence_baseline": null
+      },
+      "evaluation_validity": "INVALIDATED_LABEL_WINDOW_SPLIT"
+    },
+    {
+      "model_id": "compound_cyclone_rainfall_interaction",
+      "hazard": "Compound: cyclone + flood",
+      "status": "EXPLORATORY_ASSOCIATION",
+      "skill_grade": "WEAK_RESEARCH_SIGNAL",
+      "status_reason": "Exploratory concurrent association only; no forecast lead time and no joint-probability or impact interpretation. Ranking beats the no-skill prevalence (ROC-AUC 0.863, average precision 0.418), but probability error (Brier 0.138) is not better than the base-rate reference (0.065). Treat the score as a ranking signal only.",
+      "evidence_tier": "exploratory_association",
+      "selected_model_type": "logistic_regression",
+      "target_definition": "target_extreme_rain >= 28.7 (training-period 0.950 quantile)",
+      "threshold_source": "training target dates only (< validation_start)",
+      "temporal_split": {
+        "train_target_dates_before": "2015-01-01",
+        "validation_target_dates": "2015-01-01 through before 2020-01-01",
+        "final_train_target_dates_before": "2020-01-01",
+        "test_target_dates_from": "2020-01-01",
+        "grouped_purge": {
+          "group_column": null,
+          "purged_groups": 0
+        }
+      },
+      "train_rows": 10592,
+      "train_events": 528,
+      "test_rows": 2192,
+      "test_events": 153,
+      "metrics": {
+        "n_test": 2192,
+        "n_test_events": 153,
+        "test_prevalence": 0.0697992700729927,
+        "accuracy": 0.9156021897810219,
+        "balanced_accuracy": 0.7369962207541183,
+        "precision": 0.4175257731958763,
+        "recall": 0.5294117647058824,
+        "f1": 0.4668587896253602,
+        "roc_auc": 0.8633477258812631,
+        "average_precision": 0.41838861053117843,
+        "brier_score": 0.13781712875114524,
+        "confusion_matrix_tn_fp_fn_tp": [
+          1926,
+          113,
+          72,
+          81
+        ],
+        "predicted_positive_rate": 0.0885036496350365,
+        "log_loss": 0.47475474306216703,
+        "expected_calibration_error": 0.22917313856926358,
+        "calibration_table": [
+          {
+            "bin_lower": 0,
+            "bin_upper": 0.1,
+            "n": 780,
+            "mean_probability": 0.059759137151024495,
+            "observed_event_rate": 0.0038461538461538464,
+            "absolute_gap": 0.05591298330487065
+          },
+          {
+            "bin_lower": 0.1,
+            "bin_upper": 0.2,
+            "n": 323,
+            "mean_probability": 0.14570879263195666,
+            "observed_event_rate": 0.034055727554179564,
+            "absolute_gap": 0.11165306507777709
+          },
+          {
+            "bin_lower": 0.2,
+            "bin_upper": 0.30000000000000004,
+            "n": 278,
+            "mean_probability": 0.24849595838646385,
+            "observed_event_rate": 0.039568345323741004,
+            "absolute_gap": 0.20892761306272284
+          },
+          {
+            "bin_lower": 0.30000000000000004,
+            "bin_upper": 0.4,
+            "n": 185,
+            "mean_probability": 0.34553411920165433,
+            "observed_event_rate": 0.021621621621621623,
+            "absolute_gap": 0.3239124975800327
+          },
+          {
+            "bin_lower": 0.4,
+            "bin_upper": 0.5,
+            "n": 141,
+            "mean_probability": 0.44691109173909277,
+            "observed_event_rate": 0.028368794326241134,
+            "absolute_gap": 0.41854229741285165
+          },
+          {
+            "bin_lower": 0.5,
+            "bin_upper": 0.6000000000000001,
+            "n": 122,
+            "mean_probability": 0.5392917078477311,
+            "observed_event_rate": 0.13114754098360656,
+            "absolute_gap": 0.40814416686412447
+          },
+          {
+            "bin_lower": 0.6000000000000001,
+            "bin_upper": 0.7000000000000001,
+            "n": 83,
+            "mean_probability": 0.646846922280307,
+            "observed_event_rate": 0.14457831325301204,
+            "absolute_gap": 0.502268609027295
+          },
+          {
+            "bin_lower": 0.7000000000000001,
+            "bin_upper": 0.8,
+            "n": 75,
+            "mean_probability": 0.7498823567959937,
+            "observed_event_rate": 0.13333333333333333,
+            "absolute_gap": 0.6165490234626604
+          },
+          {
+            "bin_lower": 0.8,
+            "bin_upper": 0.9,
+            "n": 68,
+            "mean_probability": 0.8505361192509548,
+            "observed_event_rate": 0.2647058823529412,
+            "absolute_gap": 0.5858302368980137
+          },
+          {
+            "bin_lower": 0.9,
+            "bin_upper": 1,
+            "n": 137,
+            "mean_probability": 0.9641736098649375,
+            "observed_event_rate": 0.46715328467153283,
+            "absolute_gap": 0.49702032519340467
+          }
+        ],
+        "calibration_interpretation": "Expected calibration error is descriptive for this holdout. It does not establish calibration in future or operational use.",
+        "majority_baseline": {
+          "predicted_class": 0,
+          "accuracy": 0.9302007299270073,
+          "balanced_accuracy": 0.5,
+          "f1": 0
+        },
+        "base_rate_brier_score": 0.06492733197027012,
+        "skill_over_base_rate_brier": -0.07288979678087512,
+        "bootstrap_95ci": {
+          "f1": [
+            0.40221253852080124,
+            0.5310639502923489
+          ],
+          "roc_auc": [
+            0.8351953393189391,
+            0.8916669343575312
+          ],
+          "average_precision": [
+            0.34749368594844093,
+            0.517309758176463
+          ]
+        },
+        "validation_threshold_scores": [
+          {
+            "threshold": 0.02,
+            "precision": 0.047487575924903366,
+            "recall": 0.9885057471264368,
+            "f1": 0.09062170706006323,
+            "balanced_accuracy": 0.49827817546086073,
+            "predicted_positive_rate": 0.9917853231106243
+          },
+          {
+            "threshold": 0.04,
+            "precision": 0.047592695074709465,
+            "recall": 0.9885057471264368,
+            "f1": 0.0908130939809926,
+            "balanced_accuracy": 0.49942826171732996,
+            "predicted_positive_rate": 0.9895947426067908
+          },
+          {
+            "threshold": 0.06,
+            "precision": 0.05874316939890711,
+            "recall": 0.9885057471264368,
+            "f1": 0.11089619600257898,
+            "balanced_accuracy": 0.5980481582095669,
+            "predicted_positive_rate": 0.8017524644030668
+          },
+          {
+            "threshold": 0.08,
+            "precision": 0.0685805422647528,
+            "recall": 0.9885057471264368,
+            "f1": 0.12826249067859807,
+            "balanced_accuracy": 0.6584276866742017,
+            "predicted_positive_rate": 0.6867469879518072
+          },
+          {
+            "threshold": 0.1,
+            "precision": 0.0740418118466899,
+            "recall": 0.9770114942528736,
+            "f1": 0.13765182186234817,
+            "balanced_accuracy": 0.6828703244697376,
+            "predicted_positive_rate": 0.628696604600219
+          },
+          {
+            "threshold": 0.12,
+            "precision": 0.08007626310772165,
+            "recall": 0.9655172413793104,
+            "f1": 0.14788732394366197,
+            "balanced_accuracy": 0.7053003113164522,
+            "predicted_positive_rate": 0.5744797371303395
+          },
+          {
+            "threshold": 0.14,
+            "precision": 0.08433734939759036,
+            "recall": 0.9655172413793104,
+            "f1": 0.15512465373961218,
+            "balanced_accuracy": 0.7205389542146696,
+            "predicted_positive_rate": 0.5454545454545454
+          },
+          {
+            "threshold": 0.16,
+            "precision": 0.08867521367521368,
+            "recall": 0.9540229885057471,
+            "f1": 0.16226783968719452,
+            "balanced_accuracy": 0.7317556000608092,
+            "predicted_positive_rate": 0.5125958378970427
+          },
+          {
+            "threshold": 0.18,
+            "precision": 0.09242761692650334,
+            "recall": 0.9540229885057471,
+            "f1": 0.16852791878172588,
+            "balanced_accuracy": 0.7426814194972668,
+            "predicted_positive_rate": 0.49178532311062434
+          },
+          {
+            "threshold": 0.2,
+            "precision": 0.09590643274853801,
+            "recall": 0.9425287356321839,
+            "f1": 0.1740976645435244,
+            "balanced_accuracy": 0.7490101987534122,
+            "predicted_positive_rate": 0.46823658269441404
+          },
+          {
+            "threshold": 0.22,
+            "precision": 0.10161090458488228,
+            "recall": 0.9425287356321839,
+            "f1": 0.18344519015659955,
+            "balanced_accuracy": 0.7628112338310431,
+            "predicted_positive_rate": 0.4419496166484118
+          },
+          {
+            "threshold": 0.24,
+            "precision": 0.10471204188481675,
+            "recall": 0.9195402298850575,
+            "f1": 0.18801410105757932,
+            "balanced_accuracy": 0.7631053650862896,
+            "predicted_positive_rate": 0.4184008762322015
+          },
+          {
+            "threshold": 0.26,
+            "precision": 0.1092436974789916,
+            "recall": 0.896551724137931,
+            "f1": 0.1947565543071161,
+            "balanced_accuracy": 0.7654121472903571,
+            "predicted_positive_rate": 0.3910186199342826
+          },
+          {
+            "threshold": 0.28,
+            "precision": 0.11458333333333333,
+            "recall": 0.8850574712643678,
+            "f1": 0.2028985507246377,
+            "balanced_accuracy": 0.7714534049823851,
+            "predicted_positive_rate": 0.36801752464403065
+          },
+          {
+            "threshold": 0.3,
+            "precision": 0.11912225705329153,
+            "recall": 0.8735632183908046,
+            "f1": 0.2096551724137931,
+            "balanced_accuracy": 0.7751944901614748,
+            "predicted_positive_rate": 0.3493975903614458
+          },
+          {
+            "threshold": 0.32,
+            "precision": 0.12666666666666668,
+            "recall": 0.8735632183908046,
+            "f1": 0.22125181950509462,
+            "balanced_accuracy": 0.7861203095979326,
+            "predicted_positive_rate": 0.32858707557502737
+          },
+          {
+            "threshold": 0.34,
+            "precision": 0.1335676625659051,
+            "recall": 0.8735632183908046,
+            "f1": 0.23170731707317074,
+            "balanced_accuracy": 0.795033478085569,
+            "predicted_positive_rate": 0.31161007667031765
+          },
+          {
+            "threshold": 0.36,
+            "precision": 0.13812154696132597,
+            "recall": 0.8620689655172413,
+            "f1": 0.23809523809523808,
+            "balanced_accuracy": 0.7964743907517202,
+            "predicted_positive_rate": 0.2973713033953998
+          },
+          {
+            "threshold": 0.38,
+            "precision": 0.14619883040935672,
+            "recall": 0.8620689655172413,
+            "f1": 0.25,
+            "balanced_accuracy": 0.8051000376752394,
+            "predicted_positive_rate": 0.2809419496166484
+          },
+          {
+            "threshold": 0.4,
+            "precision": 0.15145228215767634,
+            "recall": 0.8390804597701149,
+            "f1": 0.2565905096660808,
+            "balanced_accuracy": 0.8019439101610781,
+            "predicted_positive_rate": 0.26396495071193865
+          },
+          {
+            "threshold": 0.42,
+            "precision": 0.15938864628820962,
+            "recall": 0.8390804597701149,
+            "f1": 0.26788990825688075,
+            "balanced_accuracy": 0.8088444276998936,
+            "predicted_positive_rate": 0.2508214676889376
+          },
+          {
+            "threshold": 0.44,
+            "precision": 0.16247139588100687,
+            "recall": 0.8160919540229885,
+            "f1": 0.27099236641221375,
+            "balanced_accuracy": 0.8028130845445592,
+            "predicted_positive_rate": 0.2393209200438116
+          },
+          {
+            "threshold": 0.46,
+            "precision": 0.16985645933014354,
+            "recall": 0.8160919540229885,
+            "f1": 0.2811881188118812,
+            "balanced_accuracy": 0.8082759942627882,
+            "predicted_positive_rate": 0.2289156626506024
+          },
+          {
+            "threshold": 0.48,
+            "precision": 0.1760204081632653,
+            "recall": 0.7931034482758621,
+            "f1": 0.2881002087682672,
+            "balanced_accuracy": 0.8036822589280403,
+            "predicted_positive_rate": 0.21467688937568455
+          },
+          {
+            "threshold": 0.5,
+            "precision": 0.18498659517426275,
+            "recall": 0.7931034482758621,
+            "f1": 0.3,
+            "balanced_accuracy": 0.8091451686462692,
+            "predicted_positive_rate": 0.20427163198247536
+          },
+          {
+            "threshold": 0.52,
+            "precision": 0.19263456090651557,
+            "recall": 0.7816091954022989,
+            "f1": 0.3090909090909091,
+            "balanced_accuracy": 0.8088609519277165,
+            "predicted_positive_rate": 0.19331872946330778
+          },
+          {
+            "threshold": 0.54,
+            "precision": 0.19940476190476192,
+            "recall": 0.7701149425287356,
+            "f1": 0.31678486997635935,
+            "balanced_accuracy": 0.8077141705168117,
+            "predicted_positive_rate": 0.18400876232201532
+          },
+          {
+            "threshold": 0.56,
+            "precision": 0.2087227414330218,
+            "recall": 0.7701149425287356,
+            "f1": 0.3284313725490196,
+            "balanced_accuracy": 0.8120269939785714,
+            "predicted_positive_rate": 0.17579408543263966
+          },
+          {
+            "threshold": 0.58,
+            "precision": 0.2098360655737705,
+            "recall": 0.735632183908046,
+            "f1": 0.32653061224489793,
+            "balanced_accuracy": 0.7985233950017516,
+            "predicted_positive_rate": 0.16703176341730558
+          },
+          {
+            "threshold": 0.6,
+            "precision": 0.2198581560283688,
+            "recall": 0.7126436781609196,
+            "f1": 0.33604336043360433,
+            "balanced_accuracy": 0.7930670949746519,
+            "predicted_positive_rate": 0.15443592552026286
+          },
+          {
+            "threshold": 0.62,
+            "precision": 0.22348484848484848,
+            "recall": 0.6781609195402298,
+            "f1": 0.33618233618233617,
+            "balanced_accuracy": 0.7801385391260667,
+            "predicted_positive_rate": 0.14457831325301204
+          },
+          {
+            "threshold": 0.64,
+            "precision": 0.22357723577235772,
+            "recall": 0.632183908045977,
+            "f1": 0.3303303303303303,
+            "balanced_accuracy": 0.7611753352765825,
+            "predicted_positive_rate": 0.13472070098576122
+          },
+          {
+            "threshold": 0.66,
+            "precision": 0.22413793103448276,
+            "recall": 0.5977011494252874,
+            "f1": 0.32601880877742945,
+            "balanced_accuracy": 0.7470966931715282,
+            "predicted_positive_rate": 0.12705366922234393
+          },
+          {
+            "threshold": 0.68,
+            "precision": 0.24413145539906103,
+            "recall": 0.5977011494252874,
+            "f1": 0.3466666666666667,
+            "balanced_accuracy": 0.752559602889757,
+            "predicted_positive_rate": 0.11664841182913473
+          },
+          {
+            "threshold": 0.7,
+            "precision": 0.25757575757575757,
+            "recall": 0.5862068965517241,
+            "f1": 0.35789473684210527,
+            "balanced_accuracy": 0.7508377783506177,
+            "predicted_positive_rate": 0.10843373493975904
+          },
+          {
+            "threshold": 0.72,
+            "precision": 0.26373626373626374,
+            "recall": 0.5517241379310345,
+            "f1": 0.35687732342007433,
+            "balanced_accuracy": 0.7373341793737979,
+            "predicted_positive_rate": 0.09967141292442497
+          },
+          {
+            "threshold": 0.74,
+            "precision": 0.2774566473988439,
+            "recall": 0.5517241379310345,
+            "f1": 0.36923076923076925,
+            "balanced_accuracy": 0.7399218734508537,
+            "predicted_positive_rate": 0.09474260679079956
+          },
+          {
+            "threshold": 0.76,
+            "precision": 0.2848101265822785,
+            "recall": 0.5172413793103449,
+            "f1": 0.3673469387755102,
+            "balanced_accuracy": 0.7261307529099166,
+            "predicted_positive_rate": 0.08652792990142388
+          },
+          {
+            "threshold": 0.78,
+            "precision": 0.2916666666666667,
+            "recall": 0.4827586206896552,
+            "f1": 0.36363636363636365,
+            "balanced_accuracy": 0.7120521108048621,
+            "predicted_positive_rate": 0.07886089813800658
+          },
+          {
+            "threshold": 0.8,
+            "precision": 0.30597014925373134,
+            "recall": 0.47126436781609193,
+            "f1": 0.37104072398190047,
+            "balanced_accuracy": 0.7088926784451363,
+            "predicted_positive_rate": 0.07338444687842278
+          },
+          {
+            "threshold": 0.82,
+            "precision": 0.319672131147541,
+            "recall": 0.4482758620689655,
+            "f1": 0.37320574162679426,
+            "balanced_accuracy": 0.7002736412127462,
+            "predicted_positive_rate": 0.06681270536692223
+          },
+          {
+            "threshold": 0.84,
+            "precision": 0.3274336283185841,
+            "recall": 0.42528735632183906,
+            "f1": 0.37,
+            "balanced_accuracy": 0.690792039288004,
+            "predicted_positive_rate": 0.061883899233296825
+          },
+          {
+            "threshold": 0.86,
+            "precision": 0.3469387755102041,
+            "recall": 0.39080459770114945,
+            "f1": 0.3675675675675676,
+            "balanced_accuracy": 0.6770009187470669,
+            "predicted_positive_rate": 0.05366922234392114
+          },
+          {
+            "threshold": 0.88,
+            "precision": 0.32941176470588235,
+            "recall": 0.3218390804597701,
+            "f1": 0.32558139534883723,
+            "balanced_accuracy": 0.6445308110751985,
+            "predicted_positive_rate": 0.04654983570646221
+          },
+          {
+            "threshold": 0.9,
+            "precision": 0.3466666666666667,
+            "recall": 0.2988505747126437,
+            "f1": 0.32098765432098764,
+            "balanced_accuracy": 0.6353367307145737,
+            "predicted_positive_rate": 0.04107338444687842
+          },
+          {
+            "threshold": 0.92,
+            "precision": 0.37681159420289856,
+            "recall": 0.2988505747126437,
+            "f1": 0.3333333333333333,
+            "balanced_accuracy": 0.6370618600992776,
+            "predicted_positive_rate": 0.03778751369112815
+          },
+          {
+            "threshold": 0.94,
+            "precision": 0.41379310344827586,
+            "recall": 0.27586206896551724,
+            "f1": 0.3310344827586207,
+            "balanced_accuracy": 0.6281553013027701,
+            "predicted_positive_rate": 0.03176341730558598
+          }
+        ],
+        "persistence_baseline": {
+          "available": true,
+          "n": 2192,
+          "accuracy": 0.9197080291970803,
+          "balanced_accuracy": 0.6908390951607061,
+          "precision": 0.42483660130718953,
+          "recall": 0.42483660130718953,
+          "f1": 0.42483660130718953
+        },
+        "ablation": {
+          "available": true,
+          "excluded_columns": [
+            "cyclone_near_500",
+            "cyclone_near_300",
+            "cyclone_distance_capped",
+            "cyclone_max_wind_kt",
+            "cyclone_fixes",
+            "cyclone_wind_x_near",
+            "near500_x_prior7",
+            "near500_x_month_sin",
+            "near500_x_month_cos"
+          ],
+          "kept_feature_count": 8,
+          "full_test_roc_auc": 0.8633477258812631,
+          "full_test_average_precision": 0.41838861053117843,
+          "reduced_test_roc_auc": 0.8649793087089339,
+          "reduced_test_average_precision": 0.41331312380850077,
+          "delta_average_precision": 0.005075486722677658,
+          "interpretation": "If the reduced model performs similarly, the excluded variables have no demonstrated incremental ranking skill on this holdout."
+        },
+        "association_analysis": {
+          "final_train": {
+            "exposure": "cyclone_near_500",
+            "table": {
+              "exposed_event": 10,
+              "exposed_no_event": 58,
+              "unexposed_event": 518,
+              "unexposed_no_event": 10006
+            },
+            "odds_ratio_haldane_corrected": 3.463912172687486,
+            "fisher_exact_p_value": 0.0018620775446182806,
+            "interpretation": "Unadjusted association only; exposure is concurrent with the outcome and confounding by season and prior rainfall is unresolved."
+          },
+          "test": {
+            "exposure": "cyclone_near_500",
+            "table": {
+              "exposed_event": 3,
+              "exposed_no_event": 17,
+              "unexposed_event": 150,
+              "unexposed_no_event": 2022
+            },
+            "odds_ratio_haldane_corrected": 2.6877076411960132,
+            "fisher_exact_p_value": 0.1592690146274441,
+            "interpretation": "Unadjusted association only; exposure is concurrent with the outcome and confounding by season and prior rainfall is unresolved."
+          }
+        }
+      },
+      "limitations": [
+        "Cyclone position and rainfall are concurrent; there is no forecast lead time.",
+        "Only 128 cyclone-near days and about 20 compound extreme-rain days are available.",
+        "Association is not causation and does not establish a compound impact pathway.",
+        "Concurrent association dataset, not a lead-time forecast.",
+        "Cyclone proximity is rare: interpret interaction estimates with wide uncertainty.",
+        "Extreme-rain threshold is estimated on training dates only.",
+        "A single chronological holdout is preliminary evidence, not independent validation.",
+        "No calibration, geographic transferability, drift or operational-readiness claim is made.",
+        "Skill grade is WEAK_RESEARCH_SIGNAL: Ranking beats the no-skill prevalence (ROC-AUC 0.863, average precision 0.418), but probability error (Brier 0.138) is not better than the base-rate reference (0.065). Treat the score as a ranking signal only.",
+        "The model card records the exact threshold, features and split; changing any of them requires retraining and re-evaluation."
+      ]
+    }
+  ],
+  "blocked": {},
+  "documented_without_training": {
+    "landslide_reported_events_kerala": "Readiness only: 50 reported events and no representative non-event sample; no supervised model is released."
+  },
+  "coverage": {
+    "n_hazards": 10,
+    "n_hazards_with_ml_evidence": 7,
+    "n_hazards_without_ml": 3,
+    "hazards_without_ml_evidence": [
+      "Landslide",
+      "Industrial incident",
+      "Infrastructure failure"
+    ],
+    "coverage_complete": true
+  },
+  "interpretation": "Historical model cards are single temporal holdouts, not independent validation. Two models (Drought and Earthquake) are currently invalidated and blocked from inference pending corrected retraining. Only Cyclone and Heatwave currently have usable hazard-specific research screening models. No model is calibrated for decision use or suitable for warnings.",
+  "n_invalidated": 2,
+  "invalidated_model_ids": [
+    "weather_drought_onset_kochi_30day",
+    "earthquake_aftershock_occurrence"
+  ],
+  "n_current_usable_hazard_specific_models": 2
+}
