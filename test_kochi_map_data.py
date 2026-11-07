@@ -9,6 +9,7 @@ from pathlib import Path
 import pydeck as pdk
 
 from src.kochi_map_layers import build_jrc_preview_layer
+from src.kochi_boundary import build_display_boundary
 from src.spatial_data import validate_geojson
 
 
@@ -56,6 +57,32 @@ class KochiBoundaryDataTests(unittest.TestCase):
         self.assertFalse(report["invalid_features"] == [])
         self.assertTrue(any("self-intersects" in message for issue in report["invalid_features"] for message in issue["errors"]))
         self.assertEqual(hashlib.sha256(geojson_path.read_bytes()).hexdigest(), metadata["sha256"])
+
+
+    def test_self_intersecting_boundary_gets_valid_display_only_derivative_without_source_mutation(self):
+        source_feature = {
+            "type": "Feature",
+            "properties": {"name": "Provisional Kochi boundary"},
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [[[0, 0], [2, 2], [0, 2], [2, 0], [0, 0]]],
+            },
+        }
+        original = json.loads(json.dumps(source_feature))
+
+        display_feature, report = build_display_boundary(source_feature)
+
+        self.assertEqual(source_feature, original)
+        self.assertFalse(report["source_geometry_valid"])
+        self.assertTrue(report["display_geometry_valid"])
+        self.assertIn(report["display_geometry_type"], {"Polygon", "MultiPolygon"})
+        self.assertFalse(report["analysis_eligible"])
+        self.assertFalse(display_feature["properties"]["display_geometry_is_analysis_eligible"])
+        self.assertEqual(
+            display_feature["properties"]["display_geometry_status"],
+            "REPAIRED_DERIVATIVE_FOR_ORIENTATION_ONLY",
+        )
+
 
 
 class KochiWardLayerIntegrationTests(unittest.TestCase):
