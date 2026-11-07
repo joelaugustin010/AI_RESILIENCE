@@ -124,18 +124,22 @@ def _paired_block_ci(
     draws: int = 1000,
     seed: int = 42,
 ) -> list[float]:
-    """95% circular moving-block CI for baseline MAE minus model MAE."""
+    """95% non-circular moving-block CI for baseline MAE minus model MAE."""
     delta = np.abs(actual - baseline) - np.abs(actual - model)
     if len(delta) < 2:
         return [float("nan"), float("nan")]
+    if block < 1 or draws < 1:
+        raise ValueError("Bootstrap block length and draw count must be positive.")
     rng = np.random.default_rng(seed)
     width = min(block, len(delta))
     count = int(np.ceil(len(delta) / width))
     estimates = np.empty(draws, dtype=float)
     offsets = np.arange(width)
     for i in range(draws):
-        starts = rng.integers(0, len(delta), size=count)
-        idx = ((starts[:, None] + offsets) % len(delta)).ravel()[:len(delta)]
+        # Sample only valid contiguous windows. Do not create artificial
+        # adjacency between the end and beginning of the held-out time series.
+        starts = rng.integers(0, len(delta) - width + 1, size=count)
+        idx = (starts[:, None] + offsets).ravel()[:len(delta)]
         estimates[i] = float(delta[idx].mean())
     low, high = np.quantile(estimates, [0.025, 0.975])
     return [float(low), float(high)]
