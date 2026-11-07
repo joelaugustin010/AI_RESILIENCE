@@ -1,4 +1,4 @@
-from src.ml.submission_summary import rank_classifier_cards, rank_regression_cards
+from src.ml.submission_summary import rank_classifier_cards, rank_regression_cards, regression_baseline_label
 
 
 def test_regressions_rank_by_finite_mae_skill():
@@ -36,3 +36,9 @@ def test_classifier_ranking_ignores_missing_and_nonfinite_metrics():
         {"model_id": "regression", "task_type": "regression", "metrics": {"f1": 0.9, "persistence_baseline": {"f1": 0.1}}},
     ]
     assert rank_classifier_cards(cards) == []
+
+
+def test_regression_baseline_label_uses_recorded_comparator():
+    assert regression_baseline_label({"metrics": {"persistence_baseline": {"type": "constant_no_change"}}}) == "No-change baseline"
+    assert regression_baseline_label({"metrics": {"persistence_baseline": {"type": "persistence"}}}) == "Persistence baseline"
+    assert regression_baseline_label({"metrics": {}}) == "Recorded baseline"
