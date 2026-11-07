@@ -25,7 +25,7 @@ def _card():
 def _dataset():
     frame = pd.DataFrame(
         {
-            "target_date": pd.to_datetime(["2019-12-31", "2020-01-01", "2020-01-02"]),
+            "target_date": pd.to_datetime(["2019-12-31", "2020-01-01", "2020-01-02"], utc=True),
             "target_rain_nextday": [1.0, 8.0, 12.0],
             "rain_lag1": [2.0, 3.0, 4.0],
             "temperature": [28.0, 29.0, 30.0],
