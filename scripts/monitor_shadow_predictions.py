@@ -67,6 +67,6 @@ def main():
     p.add_argument("--max-age-minutes",type=float,default=180); p.add_argument("--baseline-approved",action="store_true")
     a=p.parse_args()
     report=build_report(read_csv(a.reference),read_csv(a.current),[x.strip() for x in a.features.split(",") if x.strip()],a.max_age_minutes,a.baseline_approved)
-    out=Path(a.output); out.parent.mkdir(parents=True,exist_ok=True); out.write_text(json.dumps(report,indent=2,allow_nan=False)+"\\n",encoding="utf-8")
+    out=Path(a.output); out.parent.mkdir(parents=True,exist_ok=True); out.write_text(json.dumps(report,indent=2,allow_nan=False)+"\n",encoding="utf-8")
     print(json.dumps({"safe_state":report["safe_state"],"reasons":report["reasons"],"output":str(out)})); return 0
 if __name__=="__main__": raise SystemExit(main())
