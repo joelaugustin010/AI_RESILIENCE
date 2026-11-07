@@ -1394,6 +1394,22 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+st.markdown("#### Explore the related workspaces")
+sdg_workspace_cols = st.columns(3, gap="medium")
+with sdg_workspace_cols[0]:
+    st.page_link("app_pages/hospital_vulnerability.py", label="SDG 3 · Hospital Vulnerability", icon="🏥")
+with sdg_workspace_cols[1]:
+    st.page_link("app_pages/kochi_map.py", label="SDG 6 · Kochi Map", icon="💧")
+with sdg_workspace_cols[2]:
+    st.page_link("app_pages/air_pollution.py", label="SDG 9 · Air Pollution", icon="🏭")
+sdg_workspace_cols_2 = st.columns(3, gap="medium")
+with sdg_workspace_cols_2[0]:
+    st.page_link("app_pages/decision_workflow.py", label="SDG 11 · Decision Workflow", icon="🏙️")
+with sdg_workspace_cols_2[1]:
+    st.page_link("app_pages/disaster_probability.py", label="SDG 13 · Multi-Hazard Evidence", icon="🌦️")
+with sdg_workspace_cols_2[2]:
+    st.page_link("app_pages/kochi_map.py", label="SDG 15 · Ecological Context", icon="🌿")
+
 # Footer and credits
 # ---------------------------------------------------------------------------
 st.markdown(
