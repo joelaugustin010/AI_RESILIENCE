@@ -27,6 +27,7 @@ def test_missing_cards_are_not_reported_as_trained_or_predictive_coverage():
     assert coverage["coverage_complete"] is True  # registry representation only
     assert coverage["predictive_model_coverage_complete"] is False
     assert coverage["n_hazards_with_registered_model_cards"] == 0
+    assert coverage["n_hazards_without_ml"] == 10
     assert coverage["n_hazards_with_any_usable_research_model"] == 0
 
     cyclone = next(row for row in coverage["entries"] if row["hazard"] == "Cyclone")
