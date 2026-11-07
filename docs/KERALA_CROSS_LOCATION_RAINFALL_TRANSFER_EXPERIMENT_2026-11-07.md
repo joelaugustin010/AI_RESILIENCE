@@ -27,6 +27,10 @@ held-out Kochi grid point?
   Kochi holdout, with paired seven-day moving-block bootstrap intervals for
   model MAE improvement. Promotion is blocked unless both lower confidence
   bounds are above zero.
+- The holdout report also separates southwest-monsoon (June–September) error
+  from other months and reports thresholded wet-day occurrence diagnostics at
+  1 mm/day. These are descriptive diagnostics from a point regressor, not
+  calibrated event probabilities.
 
 ## Interpretation
 
