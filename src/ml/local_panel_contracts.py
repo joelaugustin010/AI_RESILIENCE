@@ -64,7 +64,12 @@ def audit_observed_hazard_panel(
 
         start = _parse_timestamp(row.get("observation_start"))
         end = _parse_timestamp(row.get("observation_end"))
-        if (\n            start is None\n            or end is None\n            or ((start.tzinfo is None) != (end.tzinfo is None))\n            or start > end\n        ):
+        if (
+            start is None
+            or end is None
+            or ((start.tzinfo is None) != (end.tzinfo is None))
+            or start > end
+        ):
             issues.append(f"row {index}: invalid observation interval")
             continue
         unit_id = str(row.get("unit_id") or "").strip()
