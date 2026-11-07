@@ -104,13 +104,11 @@ def prepare_population_grid(
                 f"limit is {max_features:,}. Use a coarser grid or raise the reviewed limit."
             )
 
-        from affine import Affine
         cell_geometries_equal = []
         for row in range(rows):
             for col in range(cols):
                 if not valid[row, col]:
                     continue
-                cell = rasterio.features.geometry_window if False else None
                 x0, y0 = clipped_transform * (col, row)
                 x1, y1 = clipped_transform * (col + 1, row + 1)
                 # Handles north-up rasters; rotated grids are rejected explicitly.
