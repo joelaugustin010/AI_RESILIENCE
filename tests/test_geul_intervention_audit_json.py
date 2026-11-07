@@ -1,4 +1,4 @@
-"""Regression tests for strict-JSON and feature-grouping diagnostics."""
+""""Regression tests for strict-JSON and feature-grouping diagnostics."""
 import json
 import math
 
@@ -48,7 +48,8 @@ def test_group_damage_diagnostics_reports_duplicate_keys_without_validating_aggr
     assert result["maximum_rows_per_group"] == 2
     assert result["raw_damage_sum"] == 21.0
     assert result["sum_of_group_max_damage"] == 17.0
-    assert result["sum_of_group_mean_damage"] == 16.0
+    # Mean per group: (10 + 4) / 2 + 7 = 14.
+    assert result["sum_of_group_mean_damage"] == 14.0
     assert result["aggregation_is_validated"] is False
 
 
