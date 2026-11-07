@@ -144,6 +144,10 @@ if selected_cards:
         for card in selected_cards
         for feature in card.get("feature_columns", [])
     ))
+    feature_ranges = {}
+    for card in selected_cards:
+        for feature, bounds in (card.get("feature_ranges") or {}).items():
+            feature_ranges.setdefault(str(feature), bounds)
     provenance_locations = {
         str((card.get("provenance") or {}).get("location", "")).strip()
         for card in selected_cards
@@ -162,9 +166,18 @@ if selected_cards:
         supplied_values = {}
         for index, feature in enumerate(feature_names):
             with input_columns[index % 2]:
+                bounds = feature_ranges.get(feature, {})
+                if isinstance(bounds, dict) and bounds.get("min") is not None and bounds.get("max") is not None:
+                    range_help = (
+                        f"Recorded training range: {bounds['min']} to {bounds['max']}. "
+                        "This is a domain-check reference, not a suggested or current observation."
+                    )
+                else:
+                    range_help = "No numeric training range is recorded for this feature."
                 supplied_values[feature] = st.text_input(
                     feature,
                     value="",
+                    help=range_help,
                     placeholder="Enter a measured value; leave blank if unknown",
                     key=f"submission-ml-{selected_hazard}-{feature}",
                 )
