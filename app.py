@@ -55,6 +55,11 @@ pages = {
             icon=":material/model_training:",
         ),
         st.Page(
+            "app_pages/submission_ml_demo.py",
+            title="ML Evidence & Demonstration",
+            icon=":material/science:",
+        ),
+        st.Page(
             "app_pages/hospital_vulnerability.py",
             title="Hospital Vulnerability",
             icon=":material/local_hospital:",
