@@ -102,6 +102,16 @@ def train_regression_dataset(
     order = np.argsort(pd.to_datetime(frame[dataset.date_column]).to_numpy(), kind="mergesort")
     frame, features, target = frame.iloc[order].reset_index(drop=True), features.iloc[order].reset_index(drop=True), target.iloc[order].reset_index(drop=True)
     frame["_continuous_target"] = target.to_numpy()
+    feature_ranges: dict[str, dict[str, Any]] = {}
+    for column in feature_columns:
+        values = pd.to_numeric(features[column], errors="coerce")
+        finite = values[np.isfinite(values)]
+        feature_ranges[column] = {
+            "min": float(finite.min()) if len(finite) else None,
+            "max": float(finite.max()) if len(finite) else None,
+            "median": float(finite.median()) if len(finite) else None,
+            "missing_fraction": float(values.isna().mean()),
+        }
     train, validation, test, purge = temporal_split(
         frame, date_column=dataset.date_column,
         validation_start=pd.Timestamp(validation_start), test_start=pd.Timestamp(test_start),
@@ -194,6 +204,7 @@ def train_regression_dataset(
         "candidate_selection": candidates,
         "temporal_split": {"validation_start": validation_start, "test_start": test_start, "purged_rows": purge, "train_rows": len(train), "validation_rows": len(validation), "test_rows": len(test)},
         "feature_columns": feature_columns, "feature_count": len(feature_columns),
+        "feature_ranges": feature_ranges,
         "prediction_constraints": (
             {"lower_bound": float(prediction_lower_bound)}
             if prediction_lower_bound is not None else {}
