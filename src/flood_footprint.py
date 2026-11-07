@@ -15,10 +15,12 @@ try:
     from pyproj import Transformer
     from shapely.geometry import shape
     from shapely.ops import transform
+    from shapely.strtree import STRtree
 except ImportError:  # optional spatial stack
     Transformer = None
     shape = None
     transform = None
+    STRtree = None
 
 
 class FloodFootprintError(ValueError):
@@ -30,10 +32,10 @@ def summarize_flood_depth_geojson(
     *,
     depth_field: str = "depth_m",
     source_crs: str = "EPSG:4326",
-    max_features: int = 100_000,
+    max_features: int = 25_000,
 ) -> dict[str, Any]:
     """Measure extent and depth statistics from a supplied polygon depth layer."""
-    if shape is None or Transformer is None or transform is None:
+    if shape is None or Transformer is None or transform is None or STRtree is None:
         raise FloodFootprintError("Flood-depth analysis requires optional shapely and pyproj packages.")
     if source_crs != "EPSG:4326":
         raise FloodFootprintError("Only EPSG:4326 GeoJSON is accepted; reproject and document the source first.")
@@ -53,8 +55,8 @@ def summarize_flood_depth_geojson(
             depth = float(props[depth_field])
         except (KeyError, TypeError, ValueError, OverflowError) as exc:
             raise FloodFootprintError(f"Feature {index} requires a numeric {depth_field!r} property.") from exc
-        if not math.isfinite(depth) or depth < 0 or depth > 100:
-            raise FloodFootprintError(f"Feature {index} depth must be finite and between 0 and 100 metres.")
+        if not math.isfinite(depth) or depth <= 0 or depth > 100:
+            raise FloodFootprintError(f"Feature {index} depth must be finite, greater than 0 and at most 100 metres.")
         try:
             geom = shape(feature["geometry"])
         except Exception as exc:
@@ -70,9 +72,15 @@ def summarize_flood_depth_geojson(
             raise FloodFootprintError(f"Feature {index} has invalid or zero area.")
         measured.append((projected, depth, area))
 
-    # Avoid double-counting overlapping depth polygons. Shared boundaries are fine.
-    for index, (geom, _, _) in enumerate(measured):
-        for other, _, _ in measured[index + 1:]:
+    # Use a spatial index so overlap QA does not require all-pairs comparisons.
+    geometries = [item[0] for item in measured]
+    spatial_index = STRtree(geometries)
+    for position, (geom, _, _) in enumerate(measured):
+        for candidate in spatial_index.query(geom):
+            other_position = int(candidate)
+            if other_position <= position:
+                continue
+            other = geometries[other_position]
             overlap = geom.intersection(other).area
             if overlap > max(1e-4, min(geom.area, other.area) * 1e-10):
                 raise FloodFootprintError("Depth polygons overlap; resolve overlaps before calculating extent.")
