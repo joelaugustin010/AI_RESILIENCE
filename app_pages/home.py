@@ -109,15 +109,27 @@ ICON_LEAF = _svg(
 )
 
 VIDEO_URL = _sync_hero_video()
+# Confirmed Kochi footage: Thomas Kallarackal, Wikimedia Commons, CC BY 3.0.
+# The remote WebM is used only when no locally supplied MP4 is present.
+KOCHI_FORT_KOCHI_WEBM = (
+    "https://upload.wikimedia.org/wikipedia/commons/2/2b/Chinese_Fishing_nets.webm"
+)
 VIDEO_MARKUP = ""
 if VIDEO_URL:
-    # Keep the video tag on one line. A blank line inside the surrounding raw
-    # HTML block makes Markdown start a new block, which can turn the following
-    # nested spans into a visible code fragment.
+    # Prefer an operator-supplied, locally hosted MP4 when one is available.
     VIDEO_MARKUP = (
         f'<video class="ar-cine-video" autoplay muted loop playsinline preload="metadata" '
         f'poster="{_img("hero-kerala-fallback.jpg")}" tabindex="-1" aria-hidden="true">'
         f'<source src="{VIDEO_URL}" type="video/mp4">'
+        "</video>"
+    )
+else:
+    # Remote Commons WebM is progressive enhancement: the existing Kochi
+    # photograph remains underneath as the visual fallback if playback fails.
+    VIDEO_MARKUP = (
+        f'<video class="ar-cine-video" autoplay muted loop playsinline preload="none" '
+        f'poster="{_img("hero-kerala-fallback.jpg")}" tabindex="-1" aria-hidden="true">'
+        f'<source src="{KOCHI_FORT_KOCHI_WEBM}" type="video/webm">'
         "</video>"
     )
 
@@ -1278,6 +1290,7 @@ with st.expander("Photography credits and licensing", expanded=False):
         colour-balanced for this interface.
 
         - **Aerial view of Kochi** — Geyo John, [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/), [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Aerial_view_of_Kochi_-_panoramio.jpg). Used as the opening hero image; image is from 2012 and is illustrative, not a current map or monitoring source.
+        - **Chinese Fishing nets at Kochi, Kerala, India** — Thomas Kallarackal, [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/), [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Chinese_Fishing_nets.webm). Used as an optional looping hero background; attribution is provided here. The aerial photograph remains the poster/fallback.
 
         - **Flooded NH544, Companypady (hero fallback)** — Dil Shad Roshan,
           [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0),
