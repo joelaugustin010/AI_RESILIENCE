@@ -268,10 +268,10 @@ if selected_cards:
                 inference_inputs["location"] = location_value.strip()
             try:
                 evidence_result = ml_evidence_for(
-                        selected_hazard,
-                        inference_inputs,
-                        selected_model_id=selected_model_id,
-                    )
+                    selected_hazard,
+                    inference_inputs,
+                    selected_model_id=selected_model_id,
+                )
                 st.session_state["submission_ml_inference_result"] = {
                     "hazard": selected_hazard,
                     "model_id": selected_model_id,
