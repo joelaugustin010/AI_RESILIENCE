@@ -275,6 +275,9 @@ def historical_replay_context(model_id: str) -> dict[str, Any]:
     cutoff_timestamp = pd.to_datetime(cutoff, utc=True).tz_convert(None)
     frame = frame.loc[frame[date_column] >= cutoff_timestamp]
     frame = frame.dropna(subset=required)
+    for name in [*features, target_column]:
+        numeric_values = pd.to_numeric(frame[name], errors="coerce")
+        frame = frame.loc[np.isfinite(numeric_values)]
     # Select a held-out row inside every recorded feature domain so the same
     # out-of-training-range gate used by inference will not reject the replay.
     for name in features:
