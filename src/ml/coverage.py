@@ -158,11 +158,42 @@ def build_coverage_matrix(*, write: bool = True) -> dict[str, Any]:
         model_ids = list(HAZARD_MODEL_MAP[hazard])
         support = SUPPORT_LEVEL[hazard]
         statuses = {model_id: _card_status(cards_by_id, model_id) for model_id in model_ids}
-        primary_status = statuses.get(model_ids[0]) if model_ids else None
-        if support == "screening_model" and primary_status == "NO_SKILL":
-            support = "no_skill_model"
-        elif support == "screening_model" and primary_status == "INSUFFICIENT_TEST_EVENTS":
-            support = "insufficient_validation"
+        registered_ids = [
+            model_id for model_id in model_ids
+            if model_id in cards_by_id
+        ]
+        usable_ids = [
+            model_id for model_id in registered_ids
+            if statuses[model_id] in {"WEAK_RESEARCH_SIGNAL", "RESEARCH_SIGNAL_NOT_VALIDATED"}
+        ]
+        registered_statuses = [statuses[model_id] for model_id in registered_ids]
+
+        # A hazard can have more than one model task (for example, a binary
+        # cyclone screening model and a continuous wind-change model).  Never
+        # let a failed primary model hide a usable secondary task.
+        if support == "screening_model":
+            if usable_ids:
+                support = "screening_model"
+            elif not registered_ids:
+                support = "not_trained"
+            elif all(status == "NO_SKILL" for status in registered_statuses):
+                support = "no_skill_model"
+            elif all(status == "INSUFFICIENT_TEST_EVENTS" for status in registered_statuses):
+                support = "insufficient_validation"
+            else:
+                support = "model_evidence_unavailable"
+        elif support == "forcing_evidence_only":
+            if usable_ids:
+                support = "forcing_evidence_only"
+            elif not registered_ids:
+                support = "forcing_model_not_trained"
+            elif all(status == "NO_SKILL" for status in registered_statuses):
+                support = "no_skill_forcing_model"
+            else:
+                support = "forcing_model_evidence_unavailable"
+        elif support == "exploratory_association":
+            if not any(status == "EXPLORATORY_ASSOCIATION" for status in registered_statuses):
+                support = "exploratory_model_unavailable"
         entries.append(
             {
                 "hazard": hazard,
@@ -170,6 +201,9 @@ def build_coverage_matrix(*, write: bool = True) -> dict[str, Any]:
                 "components": list(definition.components),
                 "support_level": support,
                 "model_ids": model_ids,
+                "registered_model_ids": registered_ids,
+                "usable_research_model_ids": usable_ids,
+                "model_ids_missing_cards": [model_id for model_id in model_ids if model_id not in cards_by_id],
                 "model_statuses": statuses,
                 "evidence_role": (
                     "supplementary"
@@ -181,7 +215,12 @@ def build_coverage_matrix(*, write: bool = True) -> dict[str, Any]:
                 "deterministic_model_retained": True,
             }
         )
-    hazards_with_ml = [entry["hazard"] for entry in entries if entry["model_ids"]]
+    hazards_with_ml = [
+        entry["hazard"] for entry in entries if entry["registered_model_ids"]
+    ]
+    hazards_with_usable_models = [
+        entry["hazard"] for entry in entries if entry["usable_research_model_ids"]
+    ]
     hazards_without_ml = [entry["hazard"] for entry in entries if not entry["model_ids"]]
     usable_statuses = {"WEAK_RESEARCH_SIGNAL", "RESEARCH_SIGNAL_NOT_VALIDATED"}
     hazards_with_component_research_evidence = [
@@ -205,6 +244,12 @@ def build_coverage_matrix(*, write: bool = True) -> dict[str, Any]:
         "n_hazards": len(entries),
         "n_hazards_with_ml_evidence": len(hazards_with_ml),
         "n_hazards_without_ml": len(hazards_without_ml),
+        "n_hazards_with_registered_model_cards": len(hazards_with_ml),
+        "hazards_with_registered_model_cards": hazards_with_ml,
+        "n_hazards_with_any_usable_research_model": len(hazards_with_usable_models),
+        "hazards_with_any_usable_research_model": hazards_with_usable_models,
+        "workflow_registry_complete": set(entry["hazard"] for entry in entries) == set(WORKFLOW_HAZARDS),
+        "predictive_model_coverage_complete": set(hazards_with_usable_research_model) == set(WORKFLOW_HAZARDS),
         "n_hazards_with_usable_research_model": len(hazards_with_usable_research_model),
         "hazards_with_usable_research_model": hazards_with_usable_research_model,
         "n_hazards_with_component_research_evidence": len(hazards_with_component_research_evidence),
@@ -218,7 +263,8 @@ def build_coverage_matrix(*, write: bool = True) -> dict[str, Any]:
             f"Every workflow hazard is represented. {len(hazards_with_ml)} hazards have a registered ML artifact, "
             f"{len(hazards_with_usable_research_model)} have a usable hazard-specific research model, "
             f"{len(hazards_with_component_research_evidence)} have usable component research evidence, "
-            f"and {len(hazards_without_ml)} have no registered ML artifact. "
+            f"{len(hazards_with_usable_models)} have at least one usable research model, "
+            f"and {len(hazards_without_ml)} have no registered model card. "
             "Zero models are independently validated for operational use. Coverage is not predictive validity."
         ),
         "entries": entries,
