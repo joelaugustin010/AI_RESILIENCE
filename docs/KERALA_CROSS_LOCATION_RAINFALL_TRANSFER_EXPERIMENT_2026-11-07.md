@@ -21,8 +21,11 @@ held-out Kochi grid point?
   target-prefixed fields are excluded.
 - Candidate estimators are the existing deployment-compatible scikit-learn
   regressors. Selection uses validation MAE only.
-- Test comparison includes a same-day rainfall persistence baseline and a
-  paired seven-day moving-block bootstrap interval for MAE improvement.
+- Test comparisons include same-day rainfall persistence and a training-only
+  calendar-month median climatology baseline. Both are evaluated on the same
+  Kochi holdout, with paired seven-day moving-block bootstrap intervals for
+  model MAE improvement. Promotion is blocked unless both lower confidence
+  bounds are above zero.
 
 ## Interpretation
 
