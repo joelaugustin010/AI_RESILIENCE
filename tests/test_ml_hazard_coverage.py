@@ -90,5 +90,5 @@ def test_unrecognized_model_status_fails_closed():
     cyclone = next(row for row in coverage["entries"] if row["hazard"] == "Cyclone")
     assert cyclone["model_statuses"][cyclone_ids[0]] == "INVALID_STATUS"
     assert cyclone["trained_model_ids"] == []
-    assert cyclone["support_level"] == "not_trained"
+    assert cyclone["support_level"] == "invalid_model_card"
     assert "Cyclone" not in coverage["hazards_with_ml_evidence"]
