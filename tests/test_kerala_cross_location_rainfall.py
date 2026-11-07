@@ -33,3 +33,13 @@ def test_model_has_nonnegative_prediction_constraint_in_training_protocol() -> N
     # be negative; this guards the experiment's physical output contract.
     prediction = np.maximum(0.0, np.array([-2.0, 0.0, 3.0]))
     assert prediction.tolist() == [0.0, 0.0, 3.0]
+
+
+def test_monthly_climatology_uses_training_targets_only() -> None:
+    import pandas as pd
+
+    train_dates = pd.Series(pd.to_datetime(["2010-01-01", "2011-01-01", "2010-02-01", "2011-02-01"]))
+    train_targets = pd.Series([10.0, 20.0, 2.0, 4.0])
+    test_dates = pd.Series(pd.to_datetime(["2024-01-01", "2024-02-01"]))
+    result = _monthly_climatology(train_dates, train_targets, test_dates)
+    assert result.tolist() == [15.0, 3.0]
