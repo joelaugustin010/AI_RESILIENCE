@@ -19,6 +19,30 @@ from src.ml.registry import list_model_cards, load_model_card
 USABLE_STATUSES = {"WEAK_RESEARCH_SIGNAL", "RESEARCH_SIGNAL_NOT_VALIDATED"}
 
 
+def _geographic_scope_problem(card: dict[str, Any], inputs: dict[str, Any]) -> str | None:
+    """Prevent a location-specific weather model being applied to another place."""
+    provenance = card.get("provenance", {})
+    if not isinstance(provenance, dict):
+        return None
+    expected = str(provenance.get("location") or "").strip().casefold()
+    if expected != "kochi":
+        return None
+    supplied = inputs.get("location") or inputs.get("city") or inputs.get("place")
+    if not isinstance(supplied, str) or not supplied.strip():
+        return (
+            "This model is trained for the Kochi reanalysis grid point. "
+            "An explicit location is required; no location is inferred."
+        )
+    normalized = supplied.casefold()
+    if "kochi" not in normalized and "cochin" not in normalized:
+        return (
+            "This model is trained for the Kochi reanalysis grid point and cannot "
+            f"be applied to {supplied!r}. Use a separately trained and evaluated "
+            "model for another location."
+        )
+    return None
+
+
 def _model_entry(model_id: str, inputs: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any] | None]:
     card = load_model_card(model_id)
     if card is None:
@@ -40,6 +64,26 @@ def _model_entry(model_id: str, inputs: dict[str, Any]) -> tuple[dict[str, Any],
             None,
         )
     features = [str(name) for name in card.get("feature_columns", [])]
+    scope_problem = _geographic_scope_problem(card, inputs)
+    if scope_problem:
+        return (
+            {
+                "model_id": model_id,
+                "status": "geographic_scope_mismatch",
+                "evidence_tier": card.get("evidence_tier"),
+                "intended_use": card.get("intended_use"),
+                "validation_status": card.get("validation_status"),
+                "geographic_scope": card.get("provenance", {}).get("location"),
+                "context": {
+                    "required_features": len(features),
+                    "supplied_features": 0,
+                    "missing_features": features,
+                    "complete": False,
+                },
+                "note": scope_problem,
+            },
+            None,
+        )
     try:
         context = context_from_inputs(features, inputs)
     except FeatureContractError as exc:
@@ -69,6 +113,7 @@ def _model_entry(model_id: str, inputs: dict[str, Any]) -> tuple[dict[str, Any],
         "intended_use": card.get("intended_use"),
         "validation_status": card.get("validation_status"),
         "target_definition": card.get("target_definition"),
+        "geographic_scope": card.get("provenance", {}).get("location") if isinstance(card.get("provenance"), dict) else None,
         "context": {
             "required_features": len(features),
             "supplied_features": len(context),
