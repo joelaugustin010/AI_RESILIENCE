@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 
 from src.ml.regression import _paired_mae_improvement_ci
+from src.ml.inference import ModelNotUsableError, _apply_regression_constraints
 
 
 def test_moving_block_bootstrap_is_reproducible_and_finite():
@@ -52,3 +53,22 @@ def test_block_bootstrap_rejects_invalid_block_length():
 
     with pytest.raises(ValueError, match="block_length"):
         _paired_mae_improvement_ci(values, values, values + 1, block_length=0)
+
+
+
+def test_regression_inference_enforces_nonnegative_precipitation():
+    value, constraints = _apply_regression_constraints(
+        -3.5,
+        {"prediction_constraints": {"lower_bound": 0.0}},
+        "weather_precipitation_kochi_nextday_regression",
+    )
+
+    assert value == 0.0
+    assert constraints == {"lower_bound": 0.0}
+
+
+def test_regression_inference_rejects_invalid_physical_constraint():
+    with pytest.raises(ModelNotUsableError, match="non-finite"):
+        _apply_regression_constraints(
+            2.0, {"prediction_constraints": {"lower_bound": float("nan")}}, "bad-model"
+        )
