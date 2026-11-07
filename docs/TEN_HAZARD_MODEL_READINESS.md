@@ -68,3 +68,17 @@ Compound scenarios must preserve component identity, timing, dependence and casc
 ## Current completion statement
 
 The repository currently has deterministic assessment modules and a shared ML research engine, but it does not have ten independently validated predictive models. This document is an implementation and release standard, not a claim that missing observations, calibration, validation or expert review have been completed. Each hazard remains eligible for transparent scenario assessment even when its ML model is withheld.
+
+
+## Repository snapshot inspected during remediation
+
+At PR #82 head `5ce84514f135b5aad1ae9c1948dc0726dbe65940` (2026-11-07):
+
+- All ten workflow hazards have deterministic dispatch modules and are exercised by the existing ten-hazard integration tests.
+- The model registry currently contains six model cards: rainfall forcing (`WEAK_RESEARCH_SIGNAL`), cyclone rapid-intensification (`WEAK_RESEARCH_SIGNAL`), earthquake aftershock (`NO_SKILL`), Kochi high-temperature screening (`RESEARCH_SIGNAL_NOT_VALIDATED`), drought rainfall-deficit proxy (`NO_SKILL`), and concurrent cyclone/rainfall association (`EXPLORATORY_ASSOCIATION`).
+- The continuous regression training path is present in code, but its three regression model cards are not present in the inspected registry snapshot. Their existence or skill must not be inferred from the training function alone.
+- The two compound scenarios reuse component evidence; neither has a validated joint-probability or impact model.
+- Landslide, Industrial incident and Infrastructure failure have no registered supervised model task in the current mapping.
+- Independently validated operational models: **zero**.
+
+The coverage implementation was hardened so a failed primary model cannot hide a usable secondary task, and so a model ID or a `NOT_TRAINED` card cannot be counted as trained ML evidence. The new regression tests cover those cases. The updated tests have been committed, but the latest GitHub Actions run is pending and has not yet returned job results.
