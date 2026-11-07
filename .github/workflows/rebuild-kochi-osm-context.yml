@@ -26,6 +26,7 @@ jobs:
         with:
           ref: ${{ github.ref }}
           fetch-depth: 0
+          lfs: true
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
