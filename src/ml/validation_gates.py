@@ -153,7 +153,11 @@ def model_card_validation_gate(card: Mapping[str, Any]) -> dict[str, Any]:
     for key in required_true:
         if independent.get(key) is not True:
             reasons.append(f"Independent validation requirement {key!r} is not passed.")
-    if int(independent.get("independent_test_events", 0) or 0) < 100:
+    task_type = str(card.get("task_type") or "classification").casefold()
+    if task_type == "regression":
+        if int(independent.get("independent_test_cases", 0) or 0) < 100:
+            reasons.append("Fewer than 100 independently held-out regression cases are documented.")
+    elif int(independent.get("independent_test_events", 0) or 0) < 100:
         reasons.append("Fewer than 100 independently held-out positive events are documented.")
     if not metrics:
         reasons.append("No evaluation metrics are recorded.")
