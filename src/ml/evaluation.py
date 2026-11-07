@@ -233,18 +233,46 @@ def bootstrap_confidence_intervals(
     probabilities: Sequence[float],
     *,
     threshold: float,
-    n_resamples: int = 300,
+    group_ids: Sequence[str] | None = None,
+    block_length: int = 7,
+    n_resamples: int = 500,
     seed: int = 42,
 ) -> dict[str, list[float] | None]:
-    """Percentile bootstrap intervals for F1, ROC-AUC and average precision."""
+    """Intervals using whole-group or moving-block resampling for dependent data."""
     actual = np.asarray(y_true, dtype=int)
     scores = np.asarray(probabilities, dtype=float)
-    if actual.size < 10:
+    if actual.size < 10 or actual.size != scores.size:
         return {"f1": None, "roc_auc": None, "average_precision": None}
     rng = np.random.default_rng(seed)
+    if group_ids is not None:
+        raw_groups = np.asarray(group_ids, dtype=object)
+        if len(raw_groups) != actual.size or pd.isna(raw_groups).any():
+            raise ValueError("Bootstrap group IDs must be complete and match score rows.")
+        groups = np.asarray([str(value).strip() for value in raw_groups])
+        if any(not value for value in groups):
+            raise ValueError("Bootstrap group IDs cannot be blank.")
+        unique_groups = np.unique(groups)
+        if len(unique_groups) < 2:
+            return {"f1": None, "roc_auc": None, "average_precision": None}
+        members = [np.flatnonzero(groups == group) for group in unique_groups]
+        sample_indices = []
+        for _ in range(n_resamples):
+            chosen = rng.integers(0, len(members), size=len(members))
+            sample_indices.append(np.concatenate([members[index] for index in chosen]))
+    else:
+        if block_length < 1:
+            raise ValueError("block_length must be at least one.")
+        length = min(int(block_length), actual.size)
+        n_blocks = int(np.ceil(actual.size / length))
+        offsets = np.arange(length)
+        sample_indices = []
+        for _ in range(n_resamples):
+            starts = rng.integers(0, actual.size, size=n_blocks)
+            indices = ((starts[:, None] + offsets[None, :]) % actual.size).ravel()[:actual.size]
+            sample_indices.append(indices)
+
     values: dict[str, list[float]] = {"f1": [], "roc_auc": [], "average_precision": []}
-    for _ in range(n_resamples):
-        indices = rng.integers(0, actual.size, actual.size)
+    for indices in sample_indices:
         sample_y = actual[indices]
         sample_p = scores[indices]
         if np.unique(sample_y).size < 2:
