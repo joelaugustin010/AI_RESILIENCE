@@ -1306,8 +1306,8 @@ if processed_layers:
             results = classify_exposure(asset_features, hazard_features)
             display_dataframe(pd.DataFrame(results), hide_index=True, width="stretch", alt="Asset-by-asset geometry intersection results and uncertainty labels")
             st.caption("Intersection method: planar topological geometry overlay in EPSG:4326; boundary contact counts as intersection. No distance, depth, probability, vulnerability, or safety is inferred. A result with no detected intersection applies only within the selected hazard layer's documented coverage.")
-    else:
-        st.info("No processed source-reviewed geometry layers are available yet. The layer-ingestion instructions are in data/reference/SPATIAL_DATA_FOUNDATION.md.")
+else:
+    st.info("No processed source-reviewed geometry layers are available yet. The layer-ingestion instructions are in data/reference/SPATIAL_DATA_FOUNDATION.md.")
 
 
 
