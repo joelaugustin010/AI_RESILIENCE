@@ -93,14 +93,17 @@ def _group_damage_diagnostics(keys: Any, damage_values: Any) -> dict[str, Any]:
             "sum_of_group_mean_damage": 0.0,
             "aggregation_is_validated": False,
         }
-    grouped = data.groupby("_key", sort=False)["_damage"].agg(["count", "sum", "max", "mean"])
-    duplicated = grouped["count"] > 1
+    grouped_values = data.groupby("_key", sort=False)["_damage"]
+    row_counts = grouped_values.size()
+    grouped = grouped_values.agg(["sum", "max", "mean"])
+    duplicated = row_counts > 1
     return {
         "groups": int(len(grouped)),
-        "rows_with_key": int(grouped["count"].sum()),
+        "rows_with_key": int(len(data)),
+        "rows_with_non_null_damage_and_key": int(data["_damage"].notna().sum()),
         "duplicate_groups": int(duplicated.sum()),
-        "rows_in_duplicate_groups": int(grouped.loc[duplicated, "count"].sum()),
-        "maximum_rows_per_group": int(grouped["count"].max()),
+        "rows_in_duplicate_groups": int(row_counts.loc[duplicated].sum()),
+        "maximum_rows_per_group": int(row_counts.max()),
         "raw_damage_sum": float(grouped["sum"].sum()),
         "sum_of_group_max_damage": float(grouped["max"].sum()),
         "sum_of_group_mean_damage": float(grouped["mean"].sum()),
