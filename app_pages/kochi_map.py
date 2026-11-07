@@ -11,6 +11,7 @@ import streamlit as st
 from src.dataframe_display import display_dataframe
 from src.hazard_registry import components_for, is_workflow_hazard
 from src.spatial_data import classify_exposure, processed_layer_issues, read_processed_layers, validate_geojson
+from src.kochi_boundary import BoundaryDisplayError, build_display_boundary
 from src.landcover_context import validate_worldcover_preview
 from src.map_integration import (
     MAP_CONTEXT_KEY,
@@ -689,18 +690,39 @@ except (OSError, json.JSONDecodeError, ValueError) as error:
     st.error(f"The Kochi boundary could not be loaded: {error}")
     st.stop()
 
+try:
+    boundary_display, boundary_display_report = build_display_boundary(boundary)
+except BoundaryDisplayError as error:
+    boundary_display = None
+    boundary_display_report = {"display_geometry_valid": False, "analysis_eligible": False}
+    st.error(f"The provisional boundary could not be safely drawn, even as an orientation-only outline: {error}")
+
 if boundary_report["errors"]:
     geometry_details = [
         detail
         for issue in boundary_report["invalid_features"]
         for detail in issue["errors"]
     ]
-    st.warning(
-        "The provisional boundary file is displayed unchanged for orientation, but its geometry QA found issues. "
-        "It is not used as a verified coverage boundary for spatial validation. "
-        + " ".join(boundary_report["errors"] + geometry_details),
-        icon=":material/warning:",
-    )
+    if boundary_display_report.get("display_geometry_valid"):
+        st.warning(
+            "The original provisional boundary remains invalid and unchanged. "
+            "The map draws a separate Shapely make_valid derivative for visual orientation only; "
+            "it is not a verified coverage boundary, ward layer, legal boundary, or exposure-analysis input. "
+            + " ".join(boundary_report["errors"] + geometry_details),
+            icon=":material/warning:",
+        )
+        st.caption(
+            f"Display-only geometry QA: {boundary_display_report['display_geometry_type']} | "
+            f"{boundary_display_report['polygon_component_count']} polygon component(s) | "
+            "valid derived outline; source file unchanged; spatial analysis eligibility: NO."
+        )
+    else:
+        st.warning(
+            "The original provisional boundary is invalid and no valid display-only derivative could be produced. "
+            "The map will use a Kochi centre marker rather than draw invalid geometry. "
+            + " ".join(boundary_report["errors"] + geometry_details),
+            icon=":material/warning:",
+        )
 else:
     st.caption(f"Boundary geometry QA: {boundary_report['feature_count']} feature; no structural geometry errors detected.")
 
@@ -716,13 +738,19 @@ st.caption(
     "No current official ward polygon set is approved for production exposure analysis."
 )
 
-ring = boundary["geometry"]["coordinates"][0]
-longitudes = [coordinate[0] for coordinate in ring]
-latitudes = [coordinate[1] for coordinate in ring]
-min_lon, max_lon = min(longitudes), max(longitudes)
-min_lat, max_lat = min(latitudes), max(latitudes)
+if boundary_display_report.get("display_geometry_valid"):
+    min_lon, min_lat, max_lon, max_lat = boundary_display_report["bounds_wgs84"]
+else:
+    # Use the source extent only to centre the basemap; never draw its invalid outline.
+    source_ring = boundary["geometry"]["coordinates"][0]
+    min_lon = min(coordinate[0] for coordinate in source_ring)
+    max_lon = max(coordinate[0] for coordinate in source_ring)
+    min_lat = min(coordinate[1] for coordinate in source_ring)
+    max_lat = max(coordinate[1] for coordinate in source_ring)
 map_center = ((min_lon + max_lon) / 2, (min_lat + max_lat) / 2)
-coverage_geometry = boundary["geometry"] if not boundary_report["errors"] else None
+# The provisional boundary is never a spatial-validation or exposure mask,
+# even when its display-only derivative passes geometry validity checks.
+coverage_geometry = None
 processed_layers = load_processed_layers(coverage_geometry)
 for issue in load_processed_layer_issues(coverage_geometry):
     st.warning(issue, icon=":material/warning:")
@@ -846,13 +874,30 @@ st.download_button("Download point CSV template", template.to_csv(index=False).e
 st.caption("Optional CSV fields are user-provided points. Required columns: name, layer, latitude, longitude, source, source_date.")
 uploaded = st.file_uploader("Upload source-reviewed point layers", type=["csv"], key="kochi_points")
 
-if show_boundary:
+if show_boundary and boundary_display_report.get("display_geometry_valid") and boundary_display:
     deck_layers.append(pdk.Layer(
-        "GeoJsonLayer", id="kochi-corporation-boundary", data=normalize_geojson_for_tooltip(boundary, "Kochi Corporation boundary (provisional)"),
+        "GeoJsonLayer", id="kochi-corporation-boundary-display-only",
+        data=normalize_geojson_for_tooltip(boundary_display, "Kochi Corporation boundary (display-only provisional outline)"),
         stroked=True, filled=False, get_line_color=[38, 106, 166, 220],
         line_width_min_pixels=2, pickable=True,
     ))
-    legend_rows.append(("Kochi Corporation boundary", "#266AA6 outline", "Administrative boundary"))
+    legend_rows.append((
+        "Kochi Corporation provisional outline",
+        "#266AA6 outline",
+        "Display-only valid derivative; not an analysis boundary",
+    ))
+elif show_boundary:
+    deck_layers.append(pdk.Layer(
+        "ScatterplotLayer",
+        id="kochi-map-centre-anchor",
+        data=[{"longitude": map_center[0], "latitude": map_center[1]}],
+        get_position="[longitude, latitude]",
+        get_fill_color=[38, 106, 166, 210],
+        get_radius=90,
+        radius_min_pixels=5,
+        pickable=False,
+    ))
+    legend_rows.append(("Kochi map centre", "#266AA6 marker", "Orientation marker only"))
 
 if processed_layers:
     st.subheader("Processed spatial layers (validation and exclusions shown per source)")
