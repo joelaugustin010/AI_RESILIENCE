@@ -228,24 +228,24 @@ def audit_daily_extract(data: pd.DataFrame) -> tuple[dict, pd.DataFrame]:
 st.markdown(
     """
     <style>
-    /* Air-quality module: cyan accent and quiet industrial glass panels. */
+    /* Air-quality module: Coastal Intelligence surfaces and readable teal accents. */
     .air-nav {
       display: flex;
       flex-wrap: wrap;
       gap: .45rem;
       padding: .7rem 0 .35rem;
       margin: .1rem 0 1.1rem;
-      border-bottom: 1px solid rgba(130, 190, 199, .14);
+      border-bottom: 1px solid rgba(23, 78, 85, .14);
     }
     .air-nav a {
       display: inline-flex;
       align-items: center;
       min-height: 1.9rem;
       padding: .3rem .7rem;
-      border: 1px solid rgba(92, 200, 232, .20);
+      border: 1px solid rgba(23, 78, 85, .18);
       border-radius: 999px;
-      color: #b9e6f2 !important;
-      background: rgba(9, 33, 48, .62);
+      color: #174E55 !important;
+      background: #FFFFFF;
       text-decoration: none !important;
       font-size: .75rem;
       font-weight: 650;
@@ -253,9 +253,9 @@ st.markdown(
                   color .18s var(--ar-ease), transform .18s var(--ar-ease);
     }
     .air-nav a:hover {
-      background: rgba(92, 200, 232, .12);
-      border-color: rgba(92, 200, 232, .44);
-      color: #e4fbff !important;
+      background: #DCE7E8;
+      border-color: rgba(23, 78, 85, .38);
+      color: #174E55 !important;
       transform: translateY(-1px);
     }
     .disaster-hero {
@@ -264,11 +264,11 @@ st.markdown(
       padding: 1.55rem 1.7rem;
       border-radius: 20px;
       background:
-        radial-gradient(ellipse at 90% -20%, rgba(92, 200, 232, .20), transparent 20rem),
-        linear-gradient(120deg, #071d2c 0%, #0a3446 56%, #0a4b55 100%);
-      border: 1px solid rgba(92, 200, 232, .24);
+        radial-gradient(ellipse at 90% -20%, rgba(41, 155, 145, .13), transparent 20rem),
+        linear-gradient(120deg, #FFFFFF 0%, #DCE7E8 100%);
+      border: 1px solid rgba(23, 78, 85, .18);
       box-shadow: var(--ar-shadow-soft);
-      color: #f2ffff;
+      color: #174E55;
       margin: 1rem 0 1.1rem;
     }
     .disaster-hero:after {
@@ -284,14 +284,14 @@ st.markdown(
       pointer-events: none;
     }
     .disaster-kicker {
-      color: #a8ecf8;
+      color: #299B91;
       font-size: .7rem;
       font-weight: 800;
       letter-spacing: .16em;
       text-transform: uppercase;
     }
     .disaster-title {
-      color: #f4ffff;
+      color: #174E55;
       font-size: clamp(1.7rem, 3.2vw, 2.45rem);
       font-weight: 800;
       letter-spacing: -.035em;
@@ -299,14 +299,14 @@ st.markdown(
       margin: .45rem 0 .45rem;
     }
     .disaster-subtitle {
-      color: #c7e4ea;
+      color: #52666A;
       font-size: .98rem;
       line-height: 1.62;
       max-width: 790px;
       margin: 0;
     }
     .disaster-step {
-      color: #7fdfea;
+      color: #299B91;
       font-size: .69rem;
       font-weight: 800;
       letter-spacing: .14em;
@@ -318,17 +318,17 @@ st.markdown(
       padding: .95rem 1rem;
       border: 1px solid rgba(130, 190, 199, .22);
       border-radius: 16px;
-      background: linear-gradient(150deg, rgba(15, 44, 60, .95), rgba(9, 30, 44, .95));
+      background: linear-gradient(150deg, #FFFFFF, #DCE7E8);
       box-shadow: var(--ar-shadow-soft);
     }
     .disaster-card-title {
-      color: #c8f4f8;
+      color: #174E55;
       font-weight: 750;
       font-size: .9rem;
       margin-bottom: .3rem;
     }
     .disaster-card-copy {
-      color: #9fbec6;
+      color: #52666A;
       font-size: .78rem;
       line-height: 1.5;
     }
@@ -336,21 +336,21 @@ st.markdown(
       padding: 1.25rem 1.4rem;
       border-radius: 18px;
       background:
-        radial-gradient(ellipse at 100% 0%, rgba(92, 200, 232, .12), transparent 18rem),
-        linear-gradient(135deg, rgba(13, 54, 64, .96), rgba(9, 34, 48, .96));
-      border: 1px solid rgba(92, 200, 232, .24);
+        radial-gradient(ellipse at 100% 0%, rgba(41, 155, 145, .10), transparent 18rem),
+        linear-gradient(135deg, #FFFFFF, #DCE7E8);
+      border: 1px solid rgba(23, 78, 85, .18);
       box-shadow: var(--ar-shadow-soft);
       margin: 1rem 0 .8rem;
     }
     .disaster-result-label {
-      color: #9fe6ee;
+      color: #299B91;
       font-size: .69rem;
       font-weight: 800;
       letter-spacing: .13em;
       text-transform: uppercase;
     }
     .disaster-result-value {
-      color: #f3ffff;
+      color: #174E55;
       font-size: clamp(1.8rem, 4vw, 2.7rem);
       font-weight: 800;
       letter-spacing: -.04em;
@@ -358,7 +358,7 @@ st.markdown(
       margin: .3rem 0 .25rem;
     }
     .disaster-result-copy {
-      color: #a9c7cd;
+      color: #52666A;
       font-size: .82rem;
       line-height: 1.55;
     }
@@ -366,9 +366,9 @@ st.markdown(
       display: inline-block;
       padding: .2rem .6rem;
       border-radius: 999px;
-      background: rgba(92, 200, 232, .12);
-      border: 1px solid rgba(92, 200, 232, .24);
-      color: #b7f1fa;
+      background: #DCE7E8;
+      border: 1px solid rgba(23, 78, 85, .18);
+      color: #174E55;
       font-size: .71rem;
       font-weight: 700;
     }
@@ -376,8 +376,8 @@ st.markdown(
       padding: 1.2rem 1.3rem;
       border: 1px dashed rgba(92, 200, 232, .32);
       border-radius: 16px;
-      background: rgba(9, 33, 48, .55);
-      color: #a9c7cd;
+      background: #FFFFFF;
+      color: #52666A;
     }
     @media (max-width: 700px) {
       .disaster-hero { padding: 1.2rem 1.15rem; border-radius: 16px; }
@@ -438,10 +438,10 @@ def render_live_air_quality() -> None:
         st.markdown(
             f'<div style="border:3px solid {category["color"]};border-radius:16px;padding:14px 18px;'
             f'background:linear-gradient(90deg,{category["color"]}18,transparent);">'
-            f'<div style="font-size:.82rem;color:#9fbec6;">{standard} · CAMS/Open-Meteo model estimate</div>'
+            f'<div style="font-size:.82rem;color:#52666A;">{standard} · CAMS/Open-Meteo model estimate</div>'
             f'<div style="font-size:2.7rem;font-weight:750;line-height:1.1;">{selected["value"]:g}</div>'
             f'<div style="font-weight:700;color:{category["color"]};">{category["label"]}</div>'
-            f'<div style="font-size:.82rem;color:#9fbec6;">Kochi model grid · observed {updated_label}</div></div>',
+            f'<div style="font-size:.82rem;color:#52666A;">Kochi model grid · observed {updated_label}</div></div>',
             unsafe_allow_html=True,
         )
     top = st.columns(3)
