@@ -267,8 +267,13 @@ def historical_replay_context(model_id: str) -> dict[str, Any]:
         raise ValueError(f"Historical dataset is missing model-contract columns: {missing}")
 
     frame = dataset.frame.copy()
-    frame[date_column] = pd.to_datetime(frame[date_column], errors="coerce")
-    frame = frame.loc[frame[date_column] >= pd.Timestamp(cutoff)]
+    # Normalize naive and timezone-aware source timestamps to UTC-naive before
+    # applying the card cutoff, so earthquake and weather datasets compare safely.
+    frame[date_column] = pd.to_datetime(
+        frame[date_column], errors="coerce", utc=True
+    ).dt.tz_convert(None)
+    cutoff_timestamp = pd.to_datetime(cutoff, utc=True).tz_convert(None)
+    frame = frame.loc[frame[date_column] >= cutoff_timestamp]
     frame = frame.dropna(subset=required)
     if frame.empty:
         raise ValueError("No complete historical test-period row is available for this model.")
