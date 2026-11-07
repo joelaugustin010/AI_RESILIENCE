@@ -620,7 +620,7 @@ def _render_scenario_visual_report(values: dict, baseline: dict, hourly: pd.Data
         item = values.get(pollutant)
         with cards[index % 3]:
             if not item:
-                st.markdown(f"<div style='border:1px solid rgba(130,190,199,.22);border-radius:14px;padding:13px;margin:5px 0;color:#9fbec6;'><b>{pollutant}</b><br>Unavailable</div>", unsafe_allow_html=True)
+                st.markdown(f"<div style='border:1px solid rgba(130,190,199,.22);border-radius:14px;padding:13px;margin:5px 0;color:#52666A;'><b>{pollutant}</b><br>Unavailable</div>", unsafe_allow_html=True)
                 continue
             base = baseline.get(pollutant)
             comparison = "No compatible baseline"
