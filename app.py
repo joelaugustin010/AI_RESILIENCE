@@ -1139,16 +1139,16 @@ try:  # pragma: no cover - presentation only
             plot_bgcolor="rgba(0,0,0,0)",
             font=dict(
                 family='-apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif',
-                color="#405D54",
+                color="#31545A",
                 size=13,
             ),
-            title=dict(font=dict(color="#1D3030", size=17), x=0.01, xanchor="left"),
-            colorway=["#247A65", "#83B9A5", "#328BCB", "#8064B5", "#D58A36", "#C5A13A", "#C85C5C"],
+            title=dict(font=dict(color="#17383B", size=17), x=0.01, xanchor="left"),
+            colorway=["#174E55", "#299B91", "#77B8B2", "#4F8A76", "#D9A65A", "#76669A", "#B94343"],
             xaxis=dict(
                 gridcolor="rgba(44,105,82,.12)",
                 zerolinecolor="rgba(44,105,82,.18)",
                 linecolor="rgba(44,105,82,.24)",
-                tickfont=dict(color="#71827F"),
+                tickfont=dict(color="#60777A"),
                 title=dict(font=dict(color="#71827F")),
             ),
             yaxis=dict(
@@ -1203,7 +1203,7 @@ try:  # pragma: no cover - presentation only
                 },
                 "title": {"color": "#1D3030", "fontSize": 15, "anchor": "start"},
                 "range": {
-                    "category": ["#247A65", "#83B9A5", "#328BCB", "#8064B5", "#D58A36", "#C5A13A", "#C85C5C"],
+                    "category": ["#174E55", "#299B91", "#77B8B2", "#4F8A76", "#D9A65A", "#76669A", "#B94343"],
                 },
             }
         }
