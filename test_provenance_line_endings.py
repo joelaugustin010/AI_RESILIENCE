@@ -36,7 +36,12 @@ class ProvenanceLineEndingTests(unittest.TestCase):
         for relative_path in HASHED_CSV_PATHS:
             with self.subTest(path=relative_path):
                 self.assertIn(relative_path, expected)
-                actual = hashlib.sha256((ROOT / relative_path).read_bytes()).hexdigest()
+                                # Canonicalize the registered source CSVs to CRLF before hashing.
+                # Git stores normalized text blobs, so checkout settings must not
+                # change the byte representation used by this provenance register.
+                raw = (ROOT / relative_path).read_bytes()
+                canonical = raw.replace(b"\r\n", b"\n").replace(b"\r", b"\n").replace(b"\n", b"\r\n")
+                actual = hashlib.sha256(canonical).hexdigest()
                 self.assertEqual(actual, expected[relative_path])
 
 
