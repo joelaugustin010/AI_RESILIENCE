@@ -20,7 +20,8 @@ held-out Kochi grid point?
   the existing leakage-aware dataset builder. Location identifiers and all
   target-prefixed fields are excluded.
 - Candidate estimators are the existing deployment-compatible scikit-learn
-  regressors. Selection uses validation MAE only.
+  regressors. Selection uses validation MAE only. The held-out test report
+  includes equal-count regression reliability bins and mean prediction bias.
 - Test comparisons include same-day rainfall persistence and a training-only
   calendar-month median climatology baseline. Both are evaluated on the same
   Kochi holdout, with paired seven-day moving-block bootstrap intervals for
@@ -48,4 +49,6 @@ python scripts/train_kerala_cross_location_rainfall.py
 The script writes `model.joblib` and `model_card.json` under
 `models/research/kerala_cross_location_rainfall_nextday/`. CI uploads these
 as a short-lived research artifact; it does not add them to the release model
-registry or promote them into the application.
+registry or promote them into the application. The focused compile/unit-test
+preflight and training job is independent of the full test job and can also be
+manually dispatched on this research branch.
