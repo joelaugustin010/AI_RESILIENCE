@@ -239,6 +239,34 @@ jobs:
           git commit -m "Persist retrained shared ML research models"
           git push origin "HEAD:${{ github.head_ref }}"
 
+  kerala-cross-location-rainfall-research:
+    if: github.event_name == 'pull_request' && github.event.action == 'opened' && startsWith(github.head_ref, 'research/kerala-cross-region-weather-')
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out research branch
+        uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-data.txt
+      - name: Install declared dependencies
+        run: python -m pip install -r requirements.txt -r requirements-data.txt
+      - name: Train spatially held-out Kerala rainfall model
+        run: python scripts/train_kerala_cross_location_rainfall.py
+      - name: Upload research model and evaluation card
+        uses: actions/upload-artifact@v4
+        with:
+          name: kerala-cross-location-rainfall-${{ github.sha }}
+          path: models/research/kerala_cross_location_rainfall_nextday/
+          if-no-files-found: error
+          retention-days: 14
+
   india-flood-inventory-audit:
     if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'feature/shared-ml-intelligence-')
     needs: test
