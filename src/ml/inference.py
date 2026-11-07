@@ -183,9 +183,26 @@ def predict_regression_from_context(model_id: str, context: dict[str, Any]) -> d
     value = float(np.asarray(pipeline.predict(frame), dtype=float)[0])
     if not np.isfinite(value):
         raise ModelNotUsableError(f"Model {model_id!r} produced a non-finite estimate.")
+    constraints = card.get("prediction_constraints", {})
+    if not isinstance(constraints, dict):
+        raise ModelNotUsableError(f"Model {model_id!r} has invalid prediction constraints.")
+    lower_bound = constraints.get("lower_bound")
+    if lower_bound is not None:
+        try:
+            lower_bound = float(lower_bound)
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise ModelNotUsableError(
+                f"Model {model_id!r} has an invalid lower-bound constraint."
+            ) from exc
+        if not np.isfinite(lower_bound):
+            raise ModelNotUsableError(
+                f"Model {model_id!r} has a non-finite lower-bound constraint."
+            )
+        value = max(value, lower_bound)
     return {
         "model_id": model_id, "hazard": card.get("hazard"), "task_type": "regression",
         "status": card.get("status"), "estimate": value, "unit": card.get("prediction_unit"),
+        "prediction_constraints": constraints,
         "target_definition": card.get("target_definition"),
         "limitations": list(card.get("limitations", [])),
         "warnings": ["Research-only continuous estimate; not a calibrated disaster-risk probability or official forecast."],
