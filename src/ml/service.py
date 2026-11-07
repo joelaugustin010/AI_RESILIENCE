@@ -10,6 +10,9 @@ from __future__ import annotations
 
 from typing import Any
 
+import numpy as np
+import pandas as pd
+
 from src.hazard_registry import WORKFLOW_HAZARDS
 from src.ml.coverage import coverage_entry
 from src.ml.data import (
