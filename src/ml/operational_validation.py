@@ -4,7 +4,7 @@ from typing import Any, Mapping, Sequence
 import numpy as np
 from sklearn.isotonic import IsotonicRegression
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import brier_score_loss, log_loss, roc_auc_score
+from sklearn.metrics import brier_score_loss, log_loss, roc_auc_score\nfrom src.ml.validation_gates import binary_calibration_report
 
 FIELDS = ("partition", "region_id", "event_id", "y_true", "model_probability", "baseline_probability")
 
@@ -41,8 +41,8 @@ def _bootstrap(y, p, b, events, iterations=1000, seed=20261107):
     return {"status":"EVENT_CLUSTER_BOOTSTRAP","groups":int(len(groups)),
             "ci95":[float(np.quantile(scores,.025)),float(np.quantile(scores,.975))] if scores else None}
 
-def evaluate_independent_spatial_holdout(rows: Sequence[Mapping[str, Any]], *, bootstrap_iterations: int=1000):
-    cal=[r for r in rows if str(r.get("partition","")).lower()=="calibration"]
+def evaluate_independent_spatial_holdout(rows: Sequence[Mapping[str, Any]], *, bootstrap_iterations: int=1000, threshold: float=0.5):
+    if not 0 < threshold < 1: raise ValueError("threshold must lie strictly between 0 and 1.")\n    cal=[r for r in rows if str(r.get("partition","")).lower()=="calibration"]
     test=[r for r in rows if str(r.get("partition","")).lower()=="test"]
     if not cal or not test: raise ValueError("Both calibration and test partitions are required.")
     yc,pc,_=_vectors(cal); yt,pt,bt=_vectors(test)
@@ -52,15 +52,15 @@ def evaluate_independent_spatial_holdout(rows: Sequence[Mapping[str, Any]], *, b
     if ce & te: raise ValueError(f"Event leakage: {sorted(ce & te)}")
     if any(not x for x in cr|tr|ce|te): raise ValueError("Region and event identifiers must be non-empty.")
     if len(np.unique(yc)) != 2: raise ValueError("Calibration partition needs both classes.")
-    raw=_metrics(yt,pt); base=_metrics(yt,bt); calibrated={}
+    raw=_metrics(yt,pt,threshold); base=_metrics(yt,bt,threshold); calibrated={}
     clipped=np.clip(pc,1e-6,1-1e-6)
     platt=LogisticRegression(random_state=0).fit(np.log(clipped/(1-clipped)).reshape(-1,1),yc)
     z=np.clip(pt,1e-6,1-1e-6)
     pp=platt.predict_proba(np.log(z/(1-z)).reshape(-1,1))[:,1]
-    calibrated["platt"]=_metrics(yt,pp)
+    calibrated["platt"]=_metrics(yt,pp,threshold)\n    calibrated["platt"]["reliability"] = binary_calibration_report(yt, pp)
     if len(yc)>=100:
         iso=IsotonicRegression(y_min=0,y_max=1,out_of_bounds="clip").fit(pc,yc)
-        calibrated["isotonic"]=_metrics(yt,iso.predict(pt))
+        ip=iso.predict(pt)\n        calibrated["isotonic"]=_metrics(yt,ip,threshold)\n        calibrated["isotonic"]["reliability"] = binary_calibration_report(yt,ip)
     else:
         calibrated["isotonic"]={"status":"NOT_FIT","reason":"At least 100 independent calibration rows required."}
     regions=np.asarray([str(r["region_id"]) for r in test])
@@ -73,9 +73,9 @@ def evaluate_independent_spatial_holdout(rows: Sequence[Mapping[str, Any]], *, b
     ci=boot.get("ci95"); positives=len(set(events[yt==1]))
     screen=(len(per_region)>=3 and positives>=30 and skill is not None and skill>0 and ci is not None and ci[0]>0)
     return {"evaluation_type":"FROZEN_PREDICTIONS_SPATIAL_AND_EVENT_HOLDOUT",
-            "calibration_rows":len(cal),"test":raw,"baseline":base,"raw_brier_skill":skill,
+            "calibration_rows":len(cal),"test":raw,"raw_reliability":binary_calibration_report(yt,pt),"baseline":base,"raw_brier_skill":skill,
             "calibration_methods":calibrated,"geographic_groups":len(per_region),
             "independent_positive_events":positives,"per_region":per_region,"worst_brier_region":worst,
             "event_cluster_bootstrap":boot,"candidate_review_screen_passed":bool(screen),
             "operational_clearance":False,
-            "interpretation":"Frozen prediction evaluation only. Prospective shadow testing and hazard-owner approval remain mandatory."}
+            "threshold_policy":"Threshold is an externally pre-registered decision threshold; this script does not optimise it on test data.",\n            "interpretation":"Frozen prediction evaluation only. Reliability bins are descriptive on this holdout; prospective shadow testing and hazard-owner approval remain mandatory."}
