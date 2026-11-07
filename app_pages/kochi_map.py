@@ -1028,10 +1028,31 @@ if uploaded is not None:
     except (UnicodeDecodeError, pd.errors.ParserError, ValueError) as error:
         st.error(f"Could not read the uploaded CSV: {error}")
 
+if not deck_layers:
+    # Always render a geographically centred Kochi map even when optional
+    # hazard/asset layers are unavailable or have all been switched off.
+    # This marker is orientation-only and must never be interpreted as an asset.
+    deck_layers.append(pdk.Layer(
+        "ScatterplotLayer",
+        id="kochi-map-centre-anchor",
+        data=[{"longitude": map_center[0], "latitude": map_center[1]}],
+        get_position="[longitude, latitude]",
+        get_fill_color=[38, 106, 166, 210],
+        get_radius=90,
+        radius_min_pixels=5,
+        pickable=False,
+    ))
+    legend_rows.append((
+        "Kochi map centre",
+        "#266AA6 marker",
+        "Orientation marker only; not a hazard or asset location",
+    ))
+
 if deck_layers:
     deck = pdk.Deck(
         layers=deck_layers,
         initial_view_state=pdk.ViewState(longitude=map_center[0], latitude=map_center[1], zoom=10),
+        map_style=pdk.map_styles.CARTO_LIGHT,
         tooltip={"text": "Bound Name: {display_bound}\nWard Name: {display_ward}\nFeature ID: {display_feature_id}\nFeature: {display_name}\nType: {display_type}\nSource: {display_source}\nOSM updated: {display_timestamp}\nSource URL: {display_url}"},
     )
     map_selection = st.pydeck_chart(
