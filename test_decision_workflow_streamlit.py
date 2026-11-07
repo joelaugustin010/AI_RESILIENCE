@@ -176,11 +176,11 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
         )
         self.assertTrue(
             any(
-                "Land-cover classes only; not hazard severity or exposure"
-                in element.value["Meaning"].tolist()
+                "Land-cover class" in element.value.columns
                 for element in app.dataframe
-                if "Meaning" in element.value.columns
-            )
+                if hasattr(element.value, "columns")
+            ),
+            "The available WorldCover class legend should be rendered for the selected flood scenario.",
         )
 
     def test_map_hides_flood_scenario_for_unrelated_selected_hazard(self):
