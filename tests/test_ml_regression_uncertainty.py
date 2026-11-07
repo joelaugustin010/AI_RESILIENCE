@@ -6,6 +6,7 @@ import pytest
 from src.ml.regression import _paired_mae_improvement_ci
 from src.ml.inference import ModelNotUsableError, _apply_regression_constraints
 from src.ml.evaluation import bootstrap_confidence_intervals
+from src.ml.monitoring import out_of_training_range_features
 
 
 def test_moving_block_bootstrap_is_reproducible_and_finite():
@@ -99,3 +100,27 @@ def test_classification_bootstrap_returns_unavailable_for_one_storm():
     )
 
     assert intervals == {"f1": None, "roc_auc": None, "average_precision": None}
+
+
+
+def test_out_of_training_range_features_identifies_extrapolation():
+    card = {
+        "feature_ranges": {
+            "rain_7d_sum": {"min": 0.0, "max": 250.0},
+            "temperature_2m_max": {"min": 18.0, "max": 39.0},
+        }
+    }
+
+    outside = out_of_training_range_features(
+        card, {"rain_7d_sum": 310.0, "temperature_2m_max": 35.0}
+    )
+
+    assert outside == {
+        "rain_7d_sum": {"value": 310.0, "min": 0.0, "max": 250.0}
+    }
+
+
+def test_out_of_training_range_features_ignores_missing_range_metadata():
+    assert out_of_training_range_features(
+        {}, {"rain_7d_sum": 310.0}
+    ) == {}
