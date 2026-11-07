@@ -74,3 +74,12 @@ def test_both_hero_calls_to_action_navigate():
         app.button(key=key).click().run()
         assert not app.exception
         assert "ar-cine-hero" not in _markup(app)
+
+
+
+def test_home_hero_has_a_1400x900_desktop_first_screen_fit():
+    html = _markup(_home())
+    assert "Desktop first-screen fit" in html
+    assert "calc(100svh - 330px)" in html
+    assert "min-height: clamp(480px, calc(100svh - 330px), 570px)" in html
+    assert "st-key-ar-hero-ctas" in html
