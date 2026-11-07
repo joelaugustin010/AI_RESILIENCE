@@ -1,8 +1,8 @@
 """Input-range and deployment monitoring helpers.
 
-These checks are descriptive.  They cannot detect every form of drift and they
-do not validate a model.  Their purpose is to make out-of-range inference
-visible rather than silently extrapolating.
+Range warnings are descriptive; the shared inference service also uses the
+out-of-training-range detector as a fail-closed applicability gate. Neither
+check detects every form of drift or independently validates a model.
 """
 
 from __future__ import annotations
