@@ -10,6 +10,7 @@ from __future__ import annotations
 from typing import Any, Sequence
 
 import numpy as np
+import pandas as pd
 from sklearn.metrics import (
     accuracy_score,
     average_precision_score,
