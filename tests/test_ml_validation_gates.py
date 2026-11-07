@@ -78,6 +78,25 @@ class ModelCardGateTests(unittest.TestCase):
         }
         self.assertTrue(model_card_validation_gate(card)["operational_eligible"])
 
+    def test_regression_gate_uses_independent_cases_not_positive_event_count(self):
+        card = {
+            "model_id": "temperature-regression",
+            "task_type": "regression",
+            "status": "VALIDATED",
+            "validation_status": "INDEPENDENT_VALIDATION_PASSED",
+            "metrics": {"mae": 0.5},
+            "independent_validation": {
+                "temporal_holdouts_passed": True,
+                "spatial_holdouts_passed": True,
+                "calibration_passed": True,
+                "baseline_skill_passed": True,
+                "provenance_complete": True,
+                "domain_transfer_passed": True,
+                "independent_test_cases": 150,
+            },
+        }
+        self.assertTrue(model_card_validation_gate(card)["operational_eligible"])
+
     def test_registry_summary_does_not_infer_validity_from_artifact_count(self):
         result = registry_validation_summary([
             {"model_id": "a", "status": "WEAK_RESEARCH_SIGNAL"}
