@@ -453,6 +453,11 @@ if isinstance(map_context, dict):
 else:
     st.info("No submitted scenario is attached. Select a disaster in the Decision Workflow and use “Open Kochi map and available hazard evidence” to carry its context here.")
 
+# Reserve an early page position for the interactive map. Its layers are assembled
+# below from the user's selections, then rendered into this slot so the map appears
+# near the top without duplicating or prematurely evaluating the layer controls.
+map_display_slot = st.container()
+
 st.subheader("Official hazard-map and district reference sources")
 reference_items = hazard_map_references(active_hazard)
 if reference_items:
@@ -1248,42 +1253,49 @@ if not deck_layers:
     ))
     legend_rows.append(("Kochi map centre", "#266AA6 marker", "Orientation marker only; not a hazard or asset location"))
 
-if deck_layers:
-    deck = pdk.Deck(
-        layers=deck_layers,
-        initial_view_state=pdk.ViewState(longitude=map_center[0], latitude=map_center[1], zoom=10),
-        map_style=(pdk.map_styles.CARTO_LIGHT if basemap_theme == "Light · Eco" else pdk.map_styles.CARTO_DARK),
-        tooltip={"text": "Bound Name: {display_bound}\nWard Name: {display_ward}\nFeature ID: {display_feature_id}\nFeature: {display_name}\nType: {display_type}\nSource: {display_source}\nOSM updated: {display_timestamp}\nSource URL: {display_url}"},
+with map_display_slot:
+    section_intro(
+        "Interactive map",
+        "Kochi spatial evidence map",
+        "The map is placed near the top for immediate access. Use the layer controls and source notes below to customise what is displayed.",
     )
-    map_selection = st.pydeck_chart(
-        deck,
-        width="stretch",
-        alt="Kochi administrative outline and selected source-documented spatial layers",
-        on_select="rerun",
-        key="kochi_interactive_map",
-    )
-    picked_properties = selected_feature_properties(map_selection)
-    if picked_properties:
-        section_intro(
-            "Inspection",
-            "Selected map feature",
-            "Source attributes are shown exactly as available; they are not ward-level hazard or consequence estimates.",
+    if deck_layers:
+        deck = pdk.Deck(
+            layers=deck_layers,
+            initial_view_state=pdk.ViewState(longitude=map_center[0], latitude=map_center[1], zoom=10),
+            map_style=(pdk.map_styles.CARTO_LIGHT if basemap_theme == "Light · Eco" else pdk.map_styles.CARTO_DARK),
+            tooltip={"text": "Bound Name: {display_bound}\nWard Name: {display_ward}\nFeature ID: {display_feature_id}\nFeature: {display_name}\nType: {display_type}\nSource: {display_source}\nOSM updated: {display_timestamp}\nSource URL: {display_url}"},
         )
-        st.caption(
-            "These are source feature attributes only. They are not ward-level hazard, "
-            "population, infrastructure-exposure, or consequence estimates."
-        )
-        display_dataframe(
-            pd.DataFrame(picked_properties),
-            hide_index=True,
+        map_selection = st.pydeck_chart(
+            deck,
             width="stretch",
-            alt="Attributes of the selected mapped feature",
+            alt="Kochi administrative outline and selected source-documented spatial layers",
+            on_select="rerun",
+            key="kochi_interactive_map",
         )
-else:
-    st.info("Turn on at least one layer to display the map.")
-if legend_rows:
-    section_intro("Map key", "Legend", "Symbols describe displayed source layers and their role in this review.")
-    display_dataframe(pd.DataFrame(legend_rows, columns=["Layer", "Symbol", "Meaning"]), hide_index=True, width="stretch")
+        picked_properties = selected_feature_properties(map_selection)
+        if picked_properties:
+            section_intro(
+                "Inspection",
+                "Selected map feature",
+                "Source attributes are shown exactly as available; they are not ward-level hazard or consequence estimates.",
+            )
+            st.caption(
+                "These are source feature attributes only. They are not ward-level hazard, "
+                "population, infrastructure-exposure, or consequence estimates."
+            )
+            display_dataframe(
+                pd.DataFrame(picked_properties),
+                hide_index=True,
+                width="stretch",
+                alt="Attributes of the selected mapped feature",
+            )
+    else:
+        st.info("Turn on at least one layer to display the map.")
+    if legend_rows:
+        section_intro("Map key", "Legend", "Symbols describe displayed source layers and their role in this review.")
+        display_dataframe(pd.DataFrame(legend_rows, columns=["Layer", "Symbol", "Meaning"]), hide_index=True, width="stretch")
+
 
 st.subheader("Modelled flood-depth screening at mapped assets (provisional)")
 screening_stamp = _file_stamp(EXPOSURE_SCREENING_REPORT)
