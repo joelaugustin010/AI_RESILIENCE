@@ -429,167 +429,188 @@ if final_map_pdf_audit.get("pdf_signature_valid"):
                 "No access restriction was bypassed and no tile geometry was ingested."
             )
 
+# Keep the map workspace readable: summarize source-readiness findings once,
+# then place the auditable evidence and detailed crosswalks in one collapsed panel.
 esri_ward_source_report = load_acquisition_metadata(ESRI_WARD_AUDIT_REPORT) or {}
-if esri_ward_source_report.get("candidate_towns"):
-    esri_candidate = esri_ward_source_report["candidate_towns"][0]
-    esri_geometry_audit = esri_candidate.get("geometry_query", {})
-    esri_topology = esri_geometry_audit.get("topology_and_coverage", {})
-    esri_boundary_comparison = esri_topology.get("configured_boundary_comparison", {})
-    esri_draft_comparison = esri_geometry_audit.get("comparison_with_older_draft_candidate", {})
-    st.warning(
-        "A public Esri India Living Atlas service exposes 76 Kochi ward polygons with unique codes 1–76, "
-        f"{esri_geometry_audit.get('invalid_geometry_count', 'unknown')} invalid geometries, and "
-        f"{esri_topology.get('pairwise_interior_overlap_pairs_over_1m2', 'unknown')} detected interior-overlap pairs. "
-        f"However, only {esri_geometry_audit.get('exact_SEC_name_match_count_by_source_code_number', 'unknown')}/76 "
-        "source-code/name pairs exactly match the current SEC register, and the service's reuse terms and legal boundary currency are unverified. "
-        "This is a promising candidate for review, not the production ward layer.",
-        title="76-polygon candidate found — not approved for production",
-    )
-    with st.expander("Inspect Esri/KSMART-linked candidate audit", expanded=False):
-        st.write({
-            "Source service": esri_ward_source_report.get("service_url"),
-            "Source code numbers exactly 1–76": esri_geometry_audit.get("source_code_numbers_exactly_1_to_76"),
-            "Unique names / codes": f"{esri_geometry_audit.get('source_name_count')} / {esri_geometry_audit.get('unique_source_code_count')}",
-            "Valid polygon geometries": esri_geometry_audit.get("valid_polygon_count"),
-            "Invalid geometries": esri_geometry_audit.get("invalid_geometry_count"),
-            "Interior-overlap pairs over 1 m²": esri_topology.get("pairwise_interior_overlaps_over_1m2"),
-            "Ward union area (km²)": esri_topology.get("ward_union_area_km2"),
-            "Exact SEC name matches by source code": esri_geometry_audit.get("exact_SEC_name_match_count_by_source_code_number"),
-            "Final-PDF label matches by source code": esri_geometry_audit.get("exact_final_PDF_label_match_count_by_source_code_number"),
-            "Candidate vs configured provisional boundary IoU": esri_boundary_comparison.get("intersection_over_union"),
-            "Symmetric difference vs configured boundary (km²)": esri_boundary_comparison.get("symmetric_difference_area_km2"),
-            "Candidate outside configured boundary (km²)": esri_boundary_comparison.get("candidate_outside_boundary_km2"),
-            "Configured boundary not covered by candidate (km²)": esri_boundary_comparison.get("boundary_uncovered_by_candidate_km2"),
-            "Mean per-ward IoU vs older draft (73 valid common wards)": esri_draft_comparison.get("mean_per_ward_iou"),
-            "Reuse licence": "Not confirmed; candidate not integrated",
-            "Decision": "Do not use for production exposure analysis until legal source, licence, and boundary discrepancies are resolved.",
-        })
-        crosswalk_rows = [
-            {
-                "Source code / ward no.": row.get("source_code"),
-                "Esri source name": row.get("source_name"),
-                "Current SEC name at same number": row.get("SEC_name_for_same_number"),
-                "Exact SEC name match": row.get("exact_SEC_name_match_for_same_number"),
-                "Final PDF label": ", ".join(row.get("final_PDF_label_for_same_number", [])) or "Not extracted",
-                "Exact final PDF text match": row.get("exact_final_PDF_label_match_for_same_number"),
-            }
-            for row in esri_geometry_audit.get("source_code_name_crosswalk", [])
-        ]
-        if crosswalk_rows:
-            display_dataframe(pd.DataFrame(crosswalk_rows), hide_index=True, width="stretch")
-        source_names_not_found = esri_geometry_audit.get("source_names_not_exactly_in_SEC_register", [])
-        if source_names_not_found:
-            st.caption(
-                "The source labels below are not exact matches to any name in the current SEC register; "
-                "they are preserved as source data and are not silently corrected."
-            )
-            display_dataframe(pd.DataFrame(source_names_not_found), hide_index=True, width="stretch")
-
+esri_candidate = (esri_ward_source_report.get("candidate_towns") or [{}])[0]
+esri_geometry_audit = esri_candidate.get("geometry_query", {})
+esri_topology = esri_geometry_audit.get("topology_and_coverage", {})
 portal_ward_audit = load_acquisition_metadata(PORTAL_WARD_AUDIT_REPORT) or {}
-portal_ward_metadata = load_acquisition_metadata(PORTAL_WARD_METADATA) or {}
-portal_audit_counts = portal_ward_metadata.get("audit", {})
-portal_alignment = portal_ward_audit.get("current_sec_count_alignment", {})
 portal_geometry_audit = portal_ward_audit.get("geometry_audit", {})
-if portal_ward_audit:
-    st.warning(
-        "A KSMART-linked map file contains 76 ward polygons, matching the current SEC ward count, "
-        f"but its source page is labelled DRAFT NOTIFICATION. The audit found "
-        f"{portal_geometry_audit.get('invalid_geometry_count', 'unknown')} invalid polygon(s) and "
-        f"{portal_ward_audit.get('ward_name_mismatch_count', 'unknown')} ward-name differences versus the current SEC register "
-        "(some may be spelling differences). This candidate is not used as the production boundary.",
-        title="76-ward candidate acquired — not approved for production",
-    )
-    with st.expander("Inspect 76-ward candidate audit", expanded=False):
-        st.write({
-            "Candidate feature count": portal_ward_audit.get("portal_feature_count"),
-            "Current SEC ward count": portal_ward_audit.get("official_sec_ward_count"),
-            "Unique candidate names": portal_ward_audit.get("unique_portal_names"),
-            "Ward-name differences": portal_ward_audit.get("ward_name_mismatch_count"),
-            "Invalid geometries": portal_geometry_audit.get("invalid_geometry_count"),
-            "Invalid feature indices": portal_geometry_audit.get("invalid_feature_indices"),
-            "Promotion decision": portal_ward_audit.get("promotion_decision"),
-        })
-        mismatch_rows = [
-            {
-                "Candidate ward no.": row.get("portal_ward_number"),
-                "Candidate name": row.get("portal_ward_name"),
-                "Current SEC name": row.get("sec_ward_name_for_number"),
-            }
-            for row in portal_ward_audit.get("ward_comparisons", [])
-            if row.get("name_mismatch")
-        ]
-        if mismatch_rows:
-            display_dataframe(pd.DataFrame(mismatch_rows), hide_index=True, width="stretch")
 ward_reconciliation = load_ward_reconciliation_report()
 ward_matches = ward_reconciliation.get("matches", [])
 ward_alignment = ward_reconciliation.get("ward_count_alignment", {})
-if ward_reconciliation.get("status") == "WARD_COUNT_MISMATCH_OFFICIAL_CURRENT_REGISTER" or (
-    ward_alignment and not ward_alignment.get("all_counts_match", False)
-):
-    st.error(
-        "The bundled ward polygons are not aligned with the current official ward register: "
-        f"{ward_alignment.get('source_features', ward_reconciliation.get('source_feature_count', 'unknown'))} source polygons, "
-        f"{ward_alignment.get('candidate_named_wards', ward_reconciliation.get('candidate_named_ward_count', 'unknown'))} "
-        f"candidate polygons, and {ward_alignment.get('official_register_wards', ward_reconciliation.get('official_current_ward_count', 'unknown'))} "
-        "official wards. Current ward names/numbers must not be assigned to these older polygons. "
-        "Acquire the final official current boundary geometry before treating map labels as current.",
-        title="Ward geometry version mismatch — current labels not verified",
-    )
-if ward_matches:
-    st.warning(
-        f"The ward source contains {len(ward_matches)} feature(s) with missing ward attributes. "
-        "A separate 2024 candidate map was compared geometrically; suggestions below are unverified and are not written into the source layer.",
-        title="Ward label reconciliation is still under review",
-    )
-    rows = []
-    for item in ward_matches:
-        best = item.get("best_candidate") or {}
-        second = item.get("second_best_candidate") or {}
-        rows.append({
-            "Source feature": item.get("source_feature_index"),
-            "Missing ward name": item.get("source_ward_name_missing"),
-            "Missing ward number": item.get("source_ward_number_missing"),
-            "Best candidate (unverified)": best.get("candidate_name", "No match"),
-            "Best IoU": best.get("intersection_over_union"),
-            "Second candidate": second.get("candidate_name", ""),
-            "Score gap": item.get("best_minus_second_iou"),
-            "Manual review suggested": item.get("suggested_for_manual_review", False),
-        })
-    with st.expander("Inspect missing ward-label candidates", expanded=False):
-        display_dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
-        st.caption(
-            "IoU is geometric overlap, not legal proof. No automatic names or ward numbers are assigned. "
-            "Only one feature currently meets the report's high-overlap review threshold; official ward-register reconciliation remains required."
-        )
 ward_candidate = next(
     (item for item in catalog["datasets"] if item.get("layer_id") == "kochi_wards_opencity_2024_candidate"),
     None,
 )
-if ward_candidate:
-    geometry_comparison = ward_candidate.get("geometry_comparison", {})
-    if geometry_comparison.get("status") == "COMPLETED_SHAPE_COMPARISON_NOT_LEGAL_APPROVAL":
-        st.warning(
-            "The OpenCity 2024 ward candidate and the configured provisional Kochi Corporation boundary disagree substantially: "
-            f"intersection-over-union {geometry_comparison.get('intersection_over_union', 'unknown')}, "
-            f"symmetric difference {geometry_comparison.get('symmetric_difference_area_km2', 'unknown')} km². "
-            "Neither geometry is promoted by this comparison. The candidate remains excluded from exposure masking until its source and final official notification alignment are resolved.",
-            title="2024 ward boundary candidate is not approved",
-        )
-    else:
-        st.info(
-            "The OpenCity 2024 ward map is recorded as a candidate only. It is not used as the production boundary or exposure mask.",
-            title="2024 ward boundary candidate",
-        )
+geometry_comparison = (ward_candidate or {}).get("geometry_comparison", {})
 air_observation_status = next(
     (item for item in catalog["datasets"] if item.get("layer_id") == "air_observations_spatial_locations"),
     None,
 )
-if air_observation_status:
-    st.warning(
-        f"Spatial air-observation layer: {air_observation_status['validation_status']}. "
-        f"{air_observation_status['blocker']} Dated source reports remain available on the air-pollution page.",
-        title="Air observations are not mapped to validated stations",
+
+st.subheader("Geospatial source validation")
+st.info(
+    "The items below are source-validation findings, not failures of the map renderer. "
+    "The map remains available, but unverified ward boundaries and air-station coordinates "
+    "are deliberately excluded from exposure and spatial AQI analysis."
+)
+readiness_rows = [
+    {
+        "Source": "Esri India ward polygons",
+        "Evidence": (
+            f"{esri_geometry_audit.get('valid_polygon_count', 'unknown')} valid / "
+            f"{esri_geometry_audit.get('feature_count', 'unknown')} polygons; "
+            f"{esri_geometry_audit.get('exact_SEC_name_match_count_by_source_code_number', 'unknown')}/76 "
+            f"SEC code-name matches; "
+            f"{esri_geometry_audit.get('exact_final_PDF_label_match_count_by_source_code_number', 'unknown')}/76 "
+            "final-PDF text matches"
+        ),
+        "Current decision": "Review candidate only; not the production boundary",
+    },
+    {
+        "Source": "KSMART-linked draft candidate",
+        "Evidence": (
+            f"{portal_ward_audit.get('portal_feature_count', 'unknown')} polygons; "
+            f"{portal_geometry_audit.get('invalid_geometry_count', 'unknown')} invalid; "
+            f"{portal_ward_audit.get('ward_name_mismatch_count', 'unknown')} name differences"
+        ),
+        "Current decision": "Excluded: draft-notification source and geometry defects",
+    },
+    {
+        "Source": "Bundled legacy ward geometry",
+        "Evidence": (
+            f"{ward_alignment.get('source_features', 'unknown')} source polygons vs "
+            f"{ward_alignment.get('official_register_wards', 'unknown')} current SEC wards; "
+            f"{len(ward_matches)} features have missing ward attributes"
+        ),
+        "Current decision": "Excluded from current ward labels",
+    },
+    {
+        "Source": "OpenCity 2024 ward candidate",
+        "Evidence": (
+            f"IoU {geometry_comparison.get('intersection_over_union', 'not audited')}; "
+            f"symmetric difference {geometry_comparison.get('symmetric_difference_area_km2', 'not audited')} km²"
+        ),
+        "Current decision": "Excluded: substantial geometry disagreement",
+    },
+    {
+        "Source": "KSPCB/CPCB air observations",
+        "Evidence": "Official station names are published; a verified station-coordinate/time-series join is not",
+        "Current decision": "No spatial AQI points or interpolation",
+    },
+]
+display_dataframe(
+    pd.DataFrame(readiness_rows),
+    hide_index=True,
+    width="stretch",
+    alt="Summary of Kochi ward-boundary and air-station source validation decisions",
+)
+
+with st.expander("Inspect the six source-validation findings and evidence", expanded=False):
+    st.markdown("**1. Esri India 76-polygon candidate**")
+    st.write({
+        "Valid polygons": esri_geometry_audit.get("valid_polygon_count"),
+        "Invalid polygons": esri_geometry_audit.get("invalid_geometry_count"),
+        "Interior-overlap pairs above 1 m²": esri_topology.get("pairwise_interior_overlaps_over_1m2"),
+        "Exact SEC code/name matches": esri_geometry_audit.get("exact_SEC_name_match_count_by_source_code_number"),
+        "Exact final-notification PDF label matches": esri_geometry_audit.get("exact_final_PDF_label_match_count_by_source_code_number"),
+        "Decision": "Do not ingest/export the geometry or assign current ward identities until the exact service licence, legal boundary date, and remaining identity mismatch are resolved.",
+    })
+    st.markdown(
+        "[Esri India ward service](https://livingatlas.esri.in/server1/rest/services/Wards/India_Ward_Boundaries/MapServer/0) · "
+        "[Esri India licensing terms](https://www.esri.in/en-in/legal/overview)"
     )
+    crosswalk_rows = [
+        {
+            "Source code / ward no.": row.get("source_code"),
+            "Esri source name": row.get("source_name"),
+            "Current SEC name": row.get("SEC_name_for_same_number"),
+            "Exact SEC match": row.get("exact_SEC_name_match_for_same_number"),
+            "Final PDF label": ", ".join(row.get("final_PDF_label_for_same_number", [])) or "Not extracted",
+            "Exact PDF text match": row.get("exact_final_PDF_label_match_for_same_number"),
+        }
+        for row in esri_geometry_audit.get("source_code_name_crosswalk", [])
+    ]
+    if crosswalk_rows:
+        display_dataframe(pd.DataFrame(crosswalk_rows), hide_index=True, width="stretch")
+    st.markdown("**2. KSMART-linked candidate**")
+    st.write({
+        "Candidate features": portal_ward_audit.get("portal_feature_count"),
+        "Invalid geometries": portal_geometry_audit.get("invalid_geometry_count"),
+        "Invalid feature indices": portal_geometry_audit.get("invalid_feature_indices"),
+        "Ward-name differences": portal_ward_audit.get("ward_name_mismatch_count"),
+        "Decision": portal_ward_audit.get("promotion_decision"),
+    })
+    st.markdown(
+        "[KSMART final-notification map PDF](" + FINAL_WARD_MAP_PDF + ") · "
+        "[Official SEC ward register](https://sec.kerala.gov.in/public/cnstncy/wd/d0f41644-754b-4b6e-a8dc-97ecbf5fee16)"
+    )
+    mismatch_rows = [
+        {
+            "Ward no.": row.get("portal_ward_number"),
+            "Candidate name": row.get("portal_ward_name"),
+            "SEC name": row.get("sec_ward_name_for_number"),
+        }
+        for row in portal_ward_audit.get("ward_comparisons", [])
+        if row.get("name_mismatch")
+    ]
+    if mismatch_rows:
+        display_dataframe(pd.DataFrame(mismatch_rows), hide_index=True, width="stretch")
+    st.markdown("**3. Legacy 74-polygon layer and six missing labels**")
+    st.write({
+        "Source features": ward_alignment.get("source_features"),
+        "Current SEC wards": ward_alignment.get("official_register_wards"),
+        "Missing-attribute features": len(ward_matches),
+        "Decision": "No ward numbers or names are inferred from geometric similarity. The 74-feature layer cannot represent the current 76-ward register.",
+    })
+    missing_rows = []
+    for item in ward_matches:
+        best = item.get("best_candidate") or {}
+        second = item.get("second_best_candidate") or {}
+        missing_rows.append({
+            "Source feature": item.get("source_feature_index"),
+            "Best geometric candidate (unverified)": best.get("candidate_name", "No match"),
+            "Best IoU": best.get("intersection_over_union"),
+            "Second candidate": second.get("candidate_name", ""),
+            "Second IoU": second.get("intersection_over_union"),
+            "Automatic assignment": item.get("automatic_assignment", False),
+        })
+    if missing_rows:
+        display_dataframe(pd.DataFrame(missing_rows), hide_index=True, width="stretch")
+    st.markdown("**4. OpenCity 2024 geometry comparison**")
+    st.write({
+        "Intersection-over-union": geometry_comparison.get("intersection_over_union"),
+        "Symmetric difference (km²)": geometry_comparison.get("symmetric_difference_area_km2"),
+        "Decision": "Neither geometry is promoted. The 2024 candidate remains excluded from exposure masking.",
+    })
+    st.markdown("**5. Air-quality station evidence**")
+    if air_observation_status:
+        st.write({
+            "Spatial layer status": air_observation_status.get("validation_status"),
+            "Blocker": air_observation_status.get("blocker"),
+            "Decision": "No station markers, spatial interpolation, or ward-level AQI estimates until station identity, coordinates/CRS, observation timestamps, averaging periods, and QA flags are joined.",
+        })
+    st.markdown(
+        "**Official station-name reference:** [KSPCB ambient monitoring network](https://kspcb.kerala.gov.in/activities/ambient-monitoring) "
+        "lists Ernakulam stations including Irumpanam, Eloor, Kalamassery, Udyogamandal, M.G. Road, Vyttila and Ernakulam South. "
+        "The page supplies station names/zones, not a validated coordinate register."
+    )
+    st.markdown(
+        "[CPCB real-time AQI OGD catalogue](https://www.data.gov.in/resource/real-time-air-quality-index-various-locations) "
+        "documents station and latitude/longitude fields, but an authorized, complete and QA-reviewed Kochi extract has not yet been joined."
+    )
+    st.markdown("**6. Current official ward reference**")
+    st.write(
+        "The State Election Commission currently lists Kochi Corporation with 76 wards. "
+        "Its register verifies names/codes, not polygon coordinates. The final-notification PDF is a text/map reference, not a GIS feature layer."
+    )
+    st.markdown(
+        "[SEC Kochi Corporation ward list](https://sec.kerala.gov.in/public/cnstncy/lb/da39a3ee5e6b4b0d3255bfef95601890afd8/U/C) · "
+        "[Final ward-map PDF](" + FINAL_WARD_MAP_PDF + ")"
+    )
+
 for item in catalog["datasets"]:
     with st.expander(item["title"]):
         source_ref = item["source_url"]
