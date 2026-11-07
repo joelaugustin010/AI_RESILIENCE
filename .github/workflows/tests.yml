@@ -13,6 +13,8 @@ on:
       - "tests/**"
       - "test_*.py"
       - "requirements*.txt"
+      - "models/ml/**"
+      - "reports/ml_*.json"
       - ".github/workflows/tests.yml"
   workflow_dispatch:
 
@@ -161,13 +163,18 @@ jobs:
           if-no-files-found: error
           retention-days: 14
   shared-ml-research-training:
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && startsWith(github.head_ref, 'feature/shared-ml-intelligence-'))
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.action == 'opened' && startsWith(github.head_ref, 'feature/persist-trained-ml-models-') && github.actor != 'github-actions[bot]')
     needs: test
     runs-on: windows-latest
+    permissions:
+      contents: write
     timeout-minutes: 45
     steps:
-      - name: Check out repository
+      - name: Check out PR head (not the synthetic merge ref)
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          persist-credentials: true
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
@@ -192,6 +199,19 @@ jobs:
             models/ml/**/model.joblib
           if-no-files-found: error
           retention-days: 14
+      - name: Persist freshly trained research models on the PR branch
+        if: github.event_name == 'pull_request'
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f models/ml reports/ml_model_registry.json reports/ml_validation_report.json reports/ml_disaster_coverage.json
+          if (git diff --cached --quiet) {
+            Write-Host "No regenerated model artifacts changed."
+            exit 0
+          }
+          git commit -m "Persist retrained shared ML research models"
+          git push origin "HEAD:${{ github.head_ref }}"
 
   india-flood-inventory-audit:
     if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'feature/shared-ml-intelligence-')

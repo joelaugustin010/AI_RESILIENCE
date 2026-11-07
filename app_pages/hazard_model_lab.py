@@ -12,6 +12,7 @@ from src.ml.coverage import build_coverage_matrix
 from src.ml.presentation import card_rows, coverage_rows
 from src.ml.registry import list_model_cards
 from src.ml.service import ml_registry_summary
+from src.ml.validation_gates import model_card_validation_gate
 
 from src.hazard_manifest import build_hazard_manifest_frame
 from src.ui_theme import page_header
@@ -183,6 +184,14 @@ else:
     sc1.metric("Registered shared models", shared_summary["n_models"])
     sc2.metric("Workflow hazards represented", coverage["n_hazards"])
     sc3.metric("Hazards without released ML", coverage["n_hazards_without_ml"])
+    gate_results = [model_card_validation_gate(card) for card in shared_cards]
+    operational_count = sum(bool(item["operational_eligible"]) for item in gate_results)
+    st.metric("Models passing independent validation gate", operational_count)
+    st.caption(
+        "The independent gate requires separate temporal and spatial validation, "
+        "calibration, baseline skill, complete provenance and domain-transfer evidence. "
+        "It cannot be passed by a single holdout or synthetic records."
+    )
     st.caption(
         "The registry can contain both event classifiers and continuous regressors. Regression MAE/RMSE are not probabilities. Coverage records evidence roles, not predictive validity. No shared model is "
         "independently validated; missing models remain explicit rather than fabricated."
@@ -212,6 +221,12 @@ else:
             f"({card.get('status', 'Unknown status')})"
         )
         with st.expander(label, expanded=False):
+            gate = model_card_validation_gate(card)
+            st.caption("Operational validation gate: " + gate["readiness"])
+            if gate["blocking_reasons"]:
+                st.write("**Independent validation still required:**")
+                for reason in gate["blocking_reasons"]:
+                    st.write(f"- {reason}")
             st.write("**Status reason:**", card.get("status_reason", "Not recorded"))
             st.write("**Target:**", card.get("target_definition", "Not documented"))
             st.write("**Intended use:**", card.get("intended_use", "Not documented"))

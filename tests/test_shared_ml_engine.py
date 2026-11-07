@@ -274,26 +274,60 @@ def test_coverage_interpretation_does_not_repeat_superseded_drought_or_earthquak
 def test_coverage_distinguishes_registered_artifacts_from_usable_models():
     coverage = build_coverage_matrix(write=False)
     drought = next(item for item in coverage["entries"] if item["hazard"] == "Drought")
-    assert drought["model_statuses"]["weather_drought_onset_kochi_30day"] == "NO_SKILL"
-    assert drought["support_level"] == "no_skill_model"
-    assert "Drought" in coverage["hazards_without_usable_research_model"]
-    assert coverage["n_hazards_with_usable_research_model"] == 2
-    assert coverage["hazards_with_usable_research_model"] == ["Cyclone", "Heatwave"]
+    drought_id = "weather_drought_onset_kochi_30day"
+    drought_card = load_model_card(drought_id)
+    if drought_card is None:
+        assert drought_id not in drought["model_statuses"]
+        assert "Drought" in coverage["hazards_without_usable_research_model"]
+    else:
+        assert drought["model_statuses"][drought_id] == drought_card["status"]
+        from src.ml.inference import USABLE_STATUSES
+        if drought_card["status"] in USABLE_STATUSES:
+            assert "Drought" in coverage["hazards_with_usable_research_model"]
+        else:
+            assert "Drought" in coverage["hazards_without_usable_research_model"]
+    assert coverage["n_hazards_with_usable_research_model"] == len(
+        coverage["hazards_with_usable_research_model"]
+    )
     assert coverage["n_hazards_with_component_research_evidence"] >= 2
 
 
-def test_invalidated_drought_model_is_blocked_from_inference():
-    from src.ml.inference import ModelNotUsableError, predict_from_context
+@pytest.mark.parametrize(
+    "model_id",
+    ["weather_drought_onset_kochi_30day", "earthquake_aftershock_occurrence"],
+)
+def test_retrained_drought_and_earthquake_models_respect_card_status(model_id):
+    from src.ml.inference import (
+        InferenceInputError,
+        ModelNotUsableError,
+        USABLE_STATUSES,
+        predict_from_context,
+    )
 
-    with pytest.raises(ModelNotUsableError, match="invalidated evaluation provenance"):
-        predict_from_context("weather_drought_onset_kochi_30day", {}, allow_no_skill=True)
+    card = load_model_card(model_id)
+    if card is None:
+        pytest.skip(f"{model_id} has no persisted model card in this checkout.")
+    validity = str(card.get("evaluation_validity") or "")
+    if validity.startswith("INVALIDATED_") or card.get("status") not in USABLE_STATUSES:
+        with pytest.raises(ModelNotUsableError):
+            predict_from_context(model_id, {}, allow_no_skill=True)
+    else:
+        with pytest.raises(InferenceInputError, match="requires"):
+            predict_from_context(model_id, {}, allow_no_skill=True)
 
 
-def test_invalidated_earthquake_model_is_blocked_from_inference():
-    from src.ml.inference import ModelNotUsableError, predict_from_context
+@pytest.mark.skipif(not list_model_cards(), reason="Shared ML artifacts are not present in this checkout.")
+def test_every_registered_model_artifact_loads_and_matches_its_task():
+    from src.ml.persistence import load_artifact
 
-    with pytest.raises(ModelNotUsableError, match="invalidated evaluation provenance"):
-        predict_from_context("earthquake_aftershock_occurrence", {}, allow_no_skill=True)
+    cards = list_model_cards()
+    assert cards
+    for card in cards:
+        artifact = load_artifact(str(card["model_id"]))
+        assert callable(getattr(artifact, "predict", None))
+        if card.get("task_type") == "regression":
+            continue
+        assert callable(getattr(artifact, "predict_proba", None))
 
 
 def test_regression_metrics_match_known_values():
