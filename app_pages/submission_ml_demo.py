@@ -76,11 +76,7 @@ if regressors:
         help="Computed against the comparator recorded in this model card; the comparator may be persistence or a no-change baseline.",
     )
     baseline = metrics.get("persistence_baseline") or {}
-    baseline_label = (
-        "No-change baseline MAE"
-        if baseline.get("type") == "constant_no_change"
-        else "Persistence baseline MAE"
-    )
+    baseline_label = f"{regression_baseline_label(best)} MAE"
     st.caption(
         f"Model: {best.get('model_id')} · Held-out MAE: {metrics.get('mae')} "
         f"{best.get('prediction_unit', '')} · {baseline_label}: "
