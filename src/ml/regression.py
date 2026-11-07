@@ -29,19 +29,52 @@ def _paired_mae_improvement_ci(
     model_prediction: np.ndarray,
     baseline_prediction: np.ndarray,
     *,
-    n_bootstrap: int = 500,
+    group_ids: np.ndarray | None = None,
+    block_length: int = 7,
+    n_bootstrap: int = 1000,
     random_state: int = 42,
 ) -> list[float]:
-    """Paired bootstrap CI for baseline absolute error minus model absolute error."""
+    """Paired MAE interval that preserves event or short-range dependence."""
     actual = np.asarray(actual, dtype=float)
     model_prediction = np.asarray(model_prediction, dtype=float)
     baseline_prediction = np.asarray(baseline_prediction, dtype=float)
-    differences = np.abs(actual - baseline_prediction) - np.abs(actual - model_prediction)
-    if differences.size < 2:
+    if not (actual.ndim == model_prediction.ndim == baseline_prediction.ndim == 1):
+        raise ValueError("Bootstrap inputs must be one-dimensional.")
+    if not (len(actual) == len(model_prediction) == len(baseline_prediction)):
+        raise ValueError("Bootstrap inputs must have equal lengths.")
+    if len(actual) < 2 or not (
+        np.isfinite(actual).all()
+        and np.isfinite(model_prediction).all()
+        and np.isfinite(baseline_prediction).all()
+    ):
         return [float("nan"), float("nan")]
+
+    differences = np.abs(actual - baseline_prediction) - np.abs(actual - model_prediction)
     rng = np.random.default_rng(random_state)
-    samples = rng.integers(0, differences.size, size=(n_bootstrap, differences.size))
-    means = differences[samples].mean(axis=1)
+    means = np.empty(n_bootstrap, dtype=float)
+    if group_ids is not None:
+        groups = np.asarray(group_ids).astype(str)
+        if len(groups) != len(differences) or pd.isna(groups).any():
+            raise ValueError("Bootstrap group IDs must be complete and match score rows.")
+        unique_groups = np.unique(groups)
+        if len(unique_groups) < 2:
+            return [float("nan"), float("nan")]
+        members = [np.flatnonzero(groups == group) for group in unique_groups]
+        for draw in range(n_bootstrap):
+            chosen = rng.integers(0, len(members), size=len(members))
+            sampled = np.concatenate([members[index] for index in chosen])
+            means[draw] = differences[sampled].mean()
+    else:
+        if block_length < 1:
+            raise ValueError("block_length must be at least one.")
+        length = min(int(block_length), len(differences))
+        n_blocks = int(np.ceil(len(differences) / length))
+        offsets = np.arange(length)
+        for draw in range(n_bootstrap):
+            starts = rng.integers(0, len(differences), size=n_blocks)
+            sampled = ((starts[:, None] + offsets[None, :]) % len(differences)).ravel()[:len(differences)]
+            means[draw] = differences[sampled].mean()
+
     low, high = np.quantile(means, [0.025, 0.975])
     return [float(low), float(high)]
 
@@ -54,6 +87,7 @@ def train_regression_dataset(
     baseline_constant: float | None = None,
     target_definition: str | None = None,
     extra_limitations: list[str] | None = None,
+    prediction_lower_bound: float | None = None,
 ) -> dict[str, Any]:
     """Select by validation MAE and score once on a future temporal holdout."""
     frame = dataset.frame.copy()
@@ -78,7 +112,10 @@ def train_regression_dataset(
     for name in REGRESSION_CANDIDATES:
         model = build_regressor(name)
         model.fit(X_train, y_train)
-        scores = _regression_metrics(y_val, np.asarray(model.predict(X_val), dtype=float))
+        validation_prediction = np.asarray(model.predict(X_val), dtype=float)
+        if prediction_lower_bound is not None:
+            validation_prediction = np.maximum(validation_prediction, prediction_lower_bound)
+        scores = _regression_metrics(y_val, validation_prediction)
         candidates.append({"model_type": name, **scores})
         fitted[name] = model
     selected = min(candidates, key=lambda row: (row["mae"], row["rmse"]))
@@ -86,11 +123,14 @@ def train_regression_dataset(
     final_model = build_regressor(selected["model_type"])
     final_model.fit(features.loc[final_train.index, feature_columns], final_train["_continuous_target"].to_numpy(dtype=float))
     predicted = np.asarray(final_model.predict(X_test), dtype=float)
+    if prediction_lower_bound is not None:
+        predicted = np.maximum(predicted, prediction_lower_bound)
     metrics = _regression_metrics(y_test, predicted)
     baseline: dict[str, Any] = {"available": False}
     baseline_prediction: np.ndarray | None = None
     comparison_actual = y_test
     comparison_model_prediction = predicted
+    comparison_group_ids: np.ndarray | None = None
     if persistence_column and persistence_column in test.columns:
         persistence = pd.to_numeric(test[persistence_column], errors="coerce").to_numpy(dtype=float)
         mask = np.isfinite(persistence) & np.isfinite(y_test)
@@ -98,17 +138,32 @@ def train_regression_dataset(
             baseline_prediction = persistence[mask]
             comparison_actual = y_test[mask]
             comparison_model_prediction = predicted[mask]
+            if group_column and group_column in test.columns:
+                comparison_group_ids = test.loc[mask, group_column].to_numpy()
             baseline = {"available": True, "type": "persistence", **_regression_metrics(comparison_actual, baseline_prediction)}
     elif baseline_constant is not None:
         baseline_prediction = np.full_like(y_test, baseline_constant, dtype=float)
+        if group_column and group_column in test.columns:
+            comparison_group_ids = test[group_column].to_numpy()
         baseline = {"available": True, "type": "constant_no_change", **_regression_metrics(y_test, baseline_prediction)}
     median = _regression_metrics(y_test, np.full_like(y_test, float(np.median(final_train["_continuous_target"]))))
     baseline["training_median"] = median
     reference_mae = baseline.get("mae", median["mae"])
     skill = 1.0 - metrics["mae"] / max(float(reference_mae), 1e-12)
     paired_ci = (
-        _paired_mae_improvement_ci(comparison_actual, comparison_model_prediction, baseline_prediction)
+        _paired_mae_improvement_ci(
+            comparison_actual,
+            comparison_model_prediction,
+            baseline_prediction,
+            group_ids=comparison_group_ids,
+            block_length=7,
+        )
         if baseline_prediction is not None else [float("nan"), float("nan")]
+    )
+    bootstrap_method = (
+        "cluster_bootstrap_by_" + group_column
+        if comparison_group_ids is not None
+        else "circular_moving_block_bootstrap_7_rows"
     )
     status = "WEAK_RESEARCH_SIGNAL" if paired_ci[0] > 0 else "NO_SKILL"
     card = {
@@ -129,7 +184,14 @@ def train_regression_dataset(
         "candidate_selection": candidates,
         "temporal_split": {"validation_start": validation_start, "test_start": test_start, "purged_rows": purge, "train_rows": len(train), "validation_rows": len(validation), "test_rows": len(test)},
         "feature_columns": feature_columns, "feature_count": len(feature_columns),
-        "metrics": {**metrics, "persistence_baseline": baseline, "mae_skill_over_persistence": float(skill), "paired_mae_improvement_bootstrap_95ci": paired_ci},
+        "metrics": {
+            **metrics,
+            "persistence_baseline": baseline,
+            "mae_skill_over_persistence": float(skill),
+            "paired_mae_improvement_bootstrap_95ci": paired_ci,
+            "paired_bootstrap_method": bootstrap_method,
+            "prediction_lower_bound": prediction_lower_bound,
+        },
         "provenance": dataset.provenance,
         "limitations": [
             "Single temporal holdout is not independent validation.",
@@ -149,7 +211,7 @@ def train_regression_dataset(
 def train_continuous_regression_models() -> list[dict[str, Any]]:
     """Train continuous weather and cyclone-intensity models from real source records."""
     specs = (
-        (build_weather_target_dataset("kochi", lead_days=1, target="extreme_rainfall"), "weather_precipitation_kochi_nextday_regression", "Flood", "mm/day", "precipitation_sum", {}),
+        (build_weather_target_dataset("kochi", lead_days=1, target="extreme_rainfall"), "weather_precipitation_kochi_nextday_regression", "Flood", "mm/day", "precipitation_sum", {"prediction_lower_bound": 0.0}),
         (build_weather_target_dataset("kochi", lead_days=1, target="high_temperature"), "weather_tmax_kochi_nextday_regression", "Heatwave", "degrees Celsius", "temperature_2m_max", {}),
         (build_cyclone_intensification_dataset(), "cyclone_wind_change_24h_regression", "Cyclone", "knots", None, {
             "group_column": "storm_id",
