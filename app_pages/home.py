@@ -909,7 +909,7 @@ st.markdown(
       <div class="ar-cine-foot" aria-hidden="true">
         <span>Scroll to explore</span>
         <span class="ar-scroll-line"></span>
-        <span class="ar-foot-right">Beauty · Threats · Intelligence</span>
+        <span class="ar-foot-right">Assess · Map · Prepare</span>
       </div>
     </section>
     """,
@@ -954,12 +954,109 @@ st.markdown(
 )
 
 # ---------------------------------------------------------------------------
+# Priority decision panel — primary user tasks appear before background content.
+# ---------------------------------------------------------------------------
+st.markdown(
+    """
+    <style>
+    .ar-priority-intro { margin: 2.2rem 0 1rem; max-width: 900px; }
+    .ar-priority-kicker {
+      color: #247a65; font-size: .7rem; font-weight: 850;
+      letter-spacing: .16em; text-transform: uppercase;
+    }
+    .ar-priority-intro h2 {
+      margin: .45rem 0 .5rem; color: #173f39; font-size: clamp(1.8rem,3.2vw,2.7rem);
+      line-height: 1.08; letter-spacing: -.04em;
+    }
+    .ar-priority-intro p { margin: 0; max-width: 760px; color: #5d7068; line-height: 1.65; }
+    .ar-priority-card {
+      height: 100%; min-height: 190px; padding: 1.15rem 1.2rem;
+      border: 1px solid rgba(36,122,101,.20); border-radius: 18px;
+      background: linear-gradient(150deg,rgba(255,255,255,.98),rgba(235,246,239,.94));
+      box-shadow: 0 12px 30px rgba(26,65,49,.065);
+    }
+    .ar-priority-card .ar-priority-index {
+      display:inline-flex; align-items:center; justify-content:center;
+      width:2rem; height:2rem; border-radius:10px; margin-bottom:.8rem;
+      color:#176b54; background:rgba(36,122,101,.10); font-weight:850; font-size:.78rem;
+    }
+    .ar-priority-card h3 { margin:0 0 .45rem; color:#23473b; font-size:1.08rem; letter-spacing:-.02em; }
+    .ar-priority-card p { min-height:3.6rem; margin:0 0 .85rem; color:#63766e; font-size:.84rem; line-height:1.55; }
+    .ar-priority-card [data-testid="stPageLink"] a {
+      width:100%; justify-content:space-between; border-radius:10px;
+      border:1px solid rgba(36,122,101,.20); background:rgba(36,122,101,.07);
+      color:#176b54 !important; font-weight:750; padding:.62rem .75rem;
+    }
+    .ar-priority-card [data-testid="stPageLink"] a:hover {
+      background:rgba(36,122,101,.13); border-color:rgba(36,122,101,.38);
+    }
+    .ar-priority-note {
+      margin:.9rem 0 0; padding:.75rem .9rem; border-left:3px solid #b98a42;
+      border-radius:0 10px 10px 0; background:rgba(248,243,231,.82);
+      color:#6f5a35; font-size:.78rem; line-height:1.55;
+    }
+    @media(max-width:700px) {
+      .ar-priority-card { min-height:0; }
+      .ar-priority-card p { min-height:0; }
+    }
+    </style>
+    <section class="ar-priority-intro" aria-labelledby="ar-priority-title">
+      <span class="ar-priority-kicker">Start here · Priority intelligence</span>
+      <h2 id="ar-priority-title">Assess first. See the place. Plan the response.</h2>
+      <p>Open the three core workspaces first. Review a disaster scenario and its precautions, inspect Kochi's available spatial evidence, or examine what the research models can genuinely support.</p>
+    </section>
+    """,
+    unsafe_allow_html=True,
+)
+
+priority_columns = st.columns(3, gap="medium")
+priority_cards = [
+    (
+        "01",
+        "Scenario assessment & precautions",
+        "Select a hazard or compound event, review evidence and uncertainty, and identify practical preparedness and mitigation priorities.",
+        "app_pages/decision_workflow.py",
+        "Open decision workflow",
+    ),
+    (
+        "02",
+        "Kochi interactive map",
+        "Explore the available Kochi boundary and source-documented spatial layers, with the map's own legend and data-quality notes.",
+        "app_pages/kochi_map.py",
+        "Explore Kochi map",
+    ),
+    (
+        "03",
+        "Prediction & ML evidence",
+        "Inspect trained research models, held-out comparisons, inference readiness and the limits that prevent unsupported warnings.",
+        "app_pages/submission_ml_demo.py",
+        "Review ML evidence",
+    ),
+]
+for column, (number, title, description, path, link_label) in zip(priority_columns, priority_cards):
+    with column:
+        with st.container(key=f"ar-priority-{number}"):
+            st.markdown(
+                f'<div class="ar-priority-card"><span class="ar-priority-index">{number}</span>'
+                f'<h3>{title}</h3><p>{description}</p></div>',
+                unsafe_allow_html=True,
+            )
+            st.page_link(path, label=link_label, icon=":material/arrow_forward:", width="stretch")
+
+st.markdown(
+    '<div class="ar-priority-note"><strong>Prediction integrity:</strong> '
+    'The platform presents numerical estimates only where a registered model and complete input context are available. '
+    'Research outputs are not official forecasts or public warnings; follow IMD, KSDMA and district-administration guidance.</div>',
+    unsafe_allow_html=True,
+)
+
+# ---------------------------------------------------------------------------
 # 01 - Beauty
 # ---------------------------------------------------------------------------
 st.markdown(
     """
     <div class="ar-story">
-      <span class="ar-overline">01 · Kochi and its regional context</span>
+      <span class="ar-overline">02 · Kochi and its regional context</span>
       <h2>A coastal city shaped by water.</h2>
       <p>
         Kochi's resilience is connected to its backwaters, coastal edge, canals, urban drainage
@@ -1018,7 +1115,7 @@ st.markdown(
       <span class="ar-threat-scrim"></span>
       <div class="ar-threat-inner">
         <div class="ar-story">
-          <span class="ar-overline">02 · The threats we face</span>
+          <span class="ar-overline">03 · The threats we face</span>
           <h2 id="ar-threat-title">Beauty under pressure.</h2>
           <p>
             Kochi's waterways, coastal setting and dense urban footprint create connected planning
@@ -1081,7 +1178,7 @@ st.markdown(
     f"""
     <section class="ar-why" aria-labelledby="ar-why-title">
       <div class="ar-story" style="margin-top:0">
-        <span class="ar-overline">03 · Why AI_RESILIENCE matters</span>
+        <span class="ar-overline">04 · Why AI_RESILIENCE matters</span>
         <h2 id="ar-why-title">From observation to action, in one evidence chain.</h2>
         <p>
           Urban preparedness improves when environmental monitoring, hazard review, critical-facility
@@ -1134,7 +1231,7 @@ st.markdown(
 st.markdown(
     """
     <div class="ar-story">
-      <span class="ar-overline">04 · Explore the intelligence platform</span>
+      <span class="ar-overline">05 · Explore the intelligence platform</span>
       <h2>Choose a workspace.</h2>
       <p>
         Move from understanding the landscape to examining a specific question. Every module is
@@ -1241,7 +1338,7 @@ st.markdown(
     </style>
     <section class="ar-sdg-section" aria-labelledby="ar-sdg-title">
       <div class="ar-sdg-intro">
-        <span class="ar-overline">05 · Shared direction</span>
+        <span class="ar-overline">06 · Shared direction</span>
         <h2 id="ar-sdg-title">OUR CONTRIBUTION TO THE UNITED NATIONS SUSTAINABLE DEVELOPMENT GOALS</h2>
         <p>AI RESILIENCE connects environmental evidence, disaster preparedness and infrastructure planning. These are the goals the platform supports through its existing workspaces — not a certification or claim of achievement.</p>
       </div>
