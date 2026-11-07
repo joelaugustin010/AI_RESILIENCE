@@ -5,6 +5,7 @@ import pytest
 
 from src.ml.regression import _paired_mae_improvement_ci
 from src.ml.inference import ModelNotUsableError, _apply_regression_constraints
+from src.ml.evaluation import bootstrap_confidence_intervals
 
 
 def test_moving_block_bootstrap_is_reproducible_and_finite():
@@ -72,3 +73,29 @@ def test_regression_inference_rejects_invalid_physical_constraint():
         _apply_regression_constraints(
             2.0, {"prediction_constraints": {"lower_bound": float("nan")}}, "bad-model"
         )
+
+
+
+def test_classification_bootstrap_uses_whole_storm_groups():
+    actual = np.array([0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1])
+    probabilities = np.array([0.1, 0.9] * 6)
+    groups = np.array(["storm-a"] * 6 + ["storm-b"] * 6)
+
+    intervals = bootstrap_confidence_intervals(
+        actual, probabilities, threshold=0.5, group_ids=groups, n_resamples=100
+    )
+
+    assert intervals["f1"] is not None
+    assert intervals["roc_auc"] is not None
+    assert intervals["average_precision"] is not None
+
+
+def test_classification_bootstrap_returns_unavailable_for_one_storm():
+    actual = np.array([0, 1] * 6)
+    probabilities = np.array([0.2, 0.8] * 6)
+
+    intervals = bootstrap_confidence_intervals(
+        actual, probabilities, threshold=0.5, group_ids=["storm-a"] * len(actual)
+    )
+
+    assert intervals == {"f1": None, "roc_auc": None, "average_precision": None}
