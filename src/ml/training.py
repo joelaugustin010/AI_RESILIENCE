@@ -230,7 +230,8 @@ def train_model(dataset: Dataset, config: TrainingConfig) -> TrainingResult:
         target_values = pd.to_numeric(frame[dataset.target_column], errors="coerce")
         date_series = pd.to_datetime(frame[dataset.date_column])
         training_mask = date_series < _boundary_for_series(date_series, validation_start)
-        training_values = target_values.loc[training_mask].dropna()
+        finite_training = target_values.notna() & np.isfinite(target_values.to_numpy(dtype=float))
+        training_values = target_values.loc[training_mask & finite_training]
         if config.fixed_threshold is not None:
             threshold = float(config.fixed_threshold)
         else:
@@ -245,7 +246,10 @@ def train_model(dataset: Dataset, config: TrainingConfig) -> TrainingResult:
             f"(training-period {config.event_quantile:.3f} quantile)"
         )
 
-    valid_target = target_values.notna().to_numpy()
+    valid_target = (
+        target_values.notna()
+        & np.isfinite(target_values.to_numpy(dtype=float))
+    ).to_numpy()
     frame = frame.loc[valid_target].reset_index(drop=True)
     features = features.loc[valid_target].reset_index(drop=True)
     target_values = target_values.loc[valid_target].reset_index(drop=True)
@@ -351,10 +355,22 @@ def train_model(dataset: Dataset, config: TrainingConfig) -> TrainingResult:
         threshold=probability_threshold,
         train_prevalence=train_prevalence,
     )
+    bootstrap_groups = (
+        test[config.group_column].to_numpy()
+        if config.group_column and config.group_column in test.columns
+        else None
+    )
     metrics["bootstrap_95ci"] = bootstrap_confidence_intervals(
         test_labels,
         test_probabilities,
         threshold=probability_threshold,
+        group_ids=bootstrap_groups,
+        block_length=7,
+    )
+    metrics["bootstrap_method"] = (
+        "cluster_bootstrap_by_" + config.group_column
+        if bootstrap_groups is not None
+        else "circular_moving_block_bootstrap_7_rows"
     )
     # Score validation thresholds with the candidate fitted on train only; the
     # final model has already seen validation rows, so its validation output
