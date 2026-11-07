@@ -168,8 +168,11 @@ jobs:
       contents: write
     timeout-minutes: 45
     steps:
-      - name: Check out repository
+      - name: Check out PR head (not the synthetic merge ref)
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          persist-credentials: true
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
