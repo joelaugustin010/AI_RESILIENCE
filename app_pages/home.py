@@ -869,47 +869,40 @@ st.markdown(
 )
 
 # ---------------------------------------------------------------------------
-# Hero
+# Hero — minimal Kochi aerial introduction
 # ---------------------------------------------------------------------------
+KOCHI_AERIAL_IMAGE = (
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/"
+    "Aerial_view_of_Kochi_-_panoramio.jpg/1280px-Aerial_view_of_Kochi_-_panoramio.jpg"
+)
+
 st.markdown(
     f"""
-    <section class="ar-cine-hero" aria-label="AI RESILIENCE - Kochi environmental and disaster intelligence">
+    <section class="ar-cine-hero ar-home-minimal" aria-label="AI RESILIENCE — Kochi environmental and disaster intelligence">
       <div class="ar-cine-media" aria-hidden="true">
-        <img class="ar-cine-poster ar-cine-slide ar-slide-a" src="{_img('hero-kerala-fallback.jpg')}"
-             alt="" fetchpriority="high" decoding="async">
-        <img class="ar-cine-slide ar-slide-b" src="{_img('hero-kerala-ghats.jpg')}"
-             alt="" decoding="async">
-        <img class="ar-cine-slide ar-slide-c" src="{_img('hero-kerala-landslide.jpg')}"
-             alt="" decoding="async">
-        <img class="ar-cine-slide ar-slide-d" src="{_img('hero-kerala-coast.jpg')}"
-             alt="" decoding="async">{VIDEO_MARKUP}
+        <img class="ar-cine-poster ar-cine-slide ar-slide-a"
+             src="{KOCHI_AERIAL_IMAGE}"
+             alt="Aerial view of Kochi, Kerala"
+             fetchpriority="high" decoding="async">
         <span class="ar-cine-scrim"></span>
-        <span class="ar-cine-vignette"></span>
-        <span class="ar-cine-grain"></span>
       </div>
       <div class="ar-cine-inner">
         <div class="ar-cine-topline">
-          <div class="ar-cine-kicker"><span class="ar-scope-dot" aria-hidden="true"></span>Kochi · Environmental &amp; disaster intelligence</div>
-          <div class="ar-cine-coord">9.9312° N · 76.2673° E · Kochi</div>
+          <div class="ar-cine-kicker"><span class="ar-scope-dot" aria-hidden="true"></span>KOCHI · KERALA · INDIA</div>
+          <div class="ar-cine-coord">9.9312° N · 76.2673° E</div>
         </div>
+        <p class="ar-home-eyebrow">ENVIRONMENTAL &amp; DISASTER INTELLIGENCE</p>
         <h1 class="ar-cine-title">AI <span>RESILIENCE</span></h1>
-        <p class="ar-cine-sub">Understanding Kochi. Preparing for risk. Strengthening urban resilience.</p>
+        <p class="ar-cine-sub">Understanding Kochi. Preparing for Risk. Building a Resilient Future.</p>
         <p class="ar-cine-desc">
-          A Kochi-focused, evidence-first platform for environmental monitoring, multi-hazard
-          review, critical-service resilience and mitigation planning. Explore documented
-          data, understand uncertainty and support better-informed local decisions.
+          An evidence-first platform exploring environmental conditions, multi-hazard context
+          and practical resilience planning for Kochi.
         </p>
-        <div class="ar-cine-chips">
-          <span>Disaster intelligence</span>
-          <span>Environmental monitoring</span>
-          <span>Hospital resilience</span>
-          <span>Smart mitigation</span>
-        </div>
       </div>
       <div class="ar-cine-foot" aria-hidden="true">
-        <span>Scroll to explore</span>
+        <span>Explore the platform</span>
         <span class="ar-scroll-line"></span>
-        <span class="ar-foot-right">Beauty · Threats · Intelligence</span>
+        <span class="ar-foot-right">Evidence · Insight · Preparedness</span>
       </div>
     </section>
     """,
@@ -1417,6 +1410,133 @@ st.markdown(
     }
     @media (prefers-reduced-motion:reduce) {
       .ar-signal > div, [class*="st-key-ar-nav-"] { transition:none !important; }
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+# Minimal aerial homepage refinement — scoped to the opening hero.
+st.markdown(
+    """
+    <style>
+    .ar-home-minimal {
+      min-height: clamp(520px, calc(100svh - 205px), 690px) !important;
+      height: clamp(520px, calc(100svh - 205px), 690px) !important;
+      padding: clamp(1.6rem, 4.5vw, 4rem) !important;
+      padding-bottom: 5rem !important;
+      border: 1px solid rgba(36, 91, 72, .14) !important;
+      border-radius: 24px !important;
+      background: #eaf1eb !important;
+      box-shadow: 0 18px 48px rgba(30, 68, 52, .10) !important;
+    }
+    .ar-home-minimal .ar-cine-slide {
+      opacity: 1 !important;
+      animation: none !important;
+      transform: none !important;
+      filter: saturate(.78) contrast(.96) brightness(1.02) !important;
+      object-position: center 48% !important;
+    }
+    .ar-home-minimal .ar-cine-scrim {
+      background:
+        linear-gradient(90deg, rgba(247, 250, 245, .96) 0%, rgba(247, 250, 245, .91) 34%, rgba(247, 250, 245, .68) 58%, rgba(247, 250, 245, .10) 100%),
+        linear-gradient(180deg, rgba(247, 250, 245, .18), rgba(18, 54, 41, .12)) !important;
+    }
+    .ar-home-minimal .ar-cine-vignette,
+    .ar-home-minimal .ar-cine-grain { display: none !important; }
+    .ar-home-minimal .ar-cine-inner {
+      max-width: 760px !important;
+      justify-content: center !important;
+      padding-top: 0 !important;
+    }
+    .ar-home-minimal .ar-cine-kicker,
+    .ar-home-minimal .ar-cine-coord {
+      color: #426c5b !important;
+      text-shadow: none !important;
+    }
+    .ar-home-minimal .ar-cine-title {
+      color: #173d30 !important;
+      font-size: clamp(2.8rem, 6.4vw, 5.7rem) !important;
+      font-weight: 780 !important;
+      letter-spacing: -.065em !important;
+      line-height: .98 !important;
+      text-shadow: none !important;
+      animation: none !important;
+    }
+    .ar-home-minimal .ar-cine-title span {
+      background: none !important;
+      -webkit-text-fill-color: #247a65 !important;
+      color: #247a65 !important;
+    }
+    .ar-home-eyebrow {
+      margin: 0 0 .8rem !important;
+      color: #247a65 !important;
+      font-size: .72rem !important;
+      font-weight: 800 !important;
+      letter-spacing: .17em !important;
+    }
+    .ar-home-minimal .ar-cine-sub {
+      max-width: 660px !important;
+      margin-top: 1.15rem !important;
+      color: #294c3e !important;
+      font-size: clamp(1.05rem, 1.7vw, 1.34rem) !important;
+      font-weight: 650 !important;
+      line-height: 1.45 !important;
+      text-shadow: none !important;
+      animation: none !important;
+    }
+    .ar-home-minimal .ar-cine-desc {
+      max-width: 610px !important;
+      margin-top: .8rem !important;
+      color: #526b5e !important;
+      font-size: .98rem !important;
+      line-height: 1.7 !important;
+      text-shadow: none !important;
+      animation: none !important;
+    }
+    .ar-home-minimal .ar-cine-foot {
+      color: #527363 !important;
+      letter-spacing: .12em !important;
+    }
+    .ar-home-minimal .ar-scroll-line {
+      background: linear-gradient(90deg, rgba(36, 122, 101, .58), rgba(36, 122, 101, 0)) !important;
+    }
+    .st-key-ar-hero-ctas {
+      margin-top: -3.55rem !important;
+      padding: 0 clamp(1.4rem, 4vw, 3.2rem) !important;
+    }
+    .st-key-ar-hero-ctas [data-testid="stButton"] > button {
+      min-height: 3rem !important;
+      border-radius: 11px !important;
+      font-weight: 650 !important;
+      box-shadow: 0 6px 18px rgba(36, 122, 101, .10) !important;
+    }
+    .st-key-ar-hero-ctas .ar-cta-note {
+      color: #62766b !important;
+    }
+    @media (max-width: 760px) {
+      .ar-home-minimal {
+        min-height: 590px !important;
+        height: auto !important;
+        padding: 1.5rem !important;
+        padding-bottom: 4.5rem !important;
+      }
+      .ar-home-minimal .ar-cine-scrim {
+        background: linear-gradient(90deg, rgba(247,250,245,.95), rgba(247,250,245,.80)) !important;
+      }
+      .ar-home-minimal .ar-cine-coord { white-space: normal !important; }
+      .ar-home-minimal .ar-cine-title { font-size: clamp(2.55rem, 11vw, 4rem) !important; }
+      .st-key-ar-hero-ctas { margin-top: -2.8rem !important; padding: 0 .8rem !important; }
+    }
+    @media (max-height: 760px) and (min-width: 761px) {
+      .ar-home-minimal { min-height: 500px !important; height: 500px !important; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .ar-home-minimal *, .ar-home-minimal *::before, .ar-home-minimal *::after {
+        animation: none !important;
+        transition: none !important;
+      }
     }
     </style>
     """,
