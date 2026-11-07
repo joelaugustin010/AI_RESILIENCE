@@ -982,12 +982,12 @@ st.markdown(
     }
     .ar-priority-card h3 { margin:0 0 .45rem; color:#23473b; font-size:1.08rem; letter-spacing:-.02em; }
     .ar-priority-card p { min-height:3.6rem; margin:0 0 .85rem; color:#63766e; font-size:.84rem; line-height:1.55; }
-    .ar-priority-card [data-testid="stPageLink"] a {
+    [class*="st-key-ar-priority-"] [data-testid="stPageLink"] a {
       width:100%; justify-content:space-between; border-radius:10px;
       border:1px solid rgba(36,122,101,.20); background:rgba(36,122,101,.07);
       color:#176b54 !important; font-weight:750; padding:.62rem .75rem;
     }
-    .ar-priority-card [data-testid="stPageLink"] a:hover {
+    [class*="st-key-ar-priority-"] [data-testid="stPageLink"] a:hover {
       background:rgba(36,122,101,.13); border-color:rgba(36,122,101,.38);
     }
     .ar-priority-note {
