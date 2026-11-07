@@ -16,11 +16,22 @@ def psi(ref,cur,bins=10):
     return float(np.sum((b-a)*np.log(b/a)))
 
 def build_report(reference,current,features,max_age=180,baseline_approved=False):
-    required={"input_age_minutes","latency_ms","source_status","model_status"}
+    required={"issued_at_utc","outcome_observed_at_utc","input_age_minutes","latency_ms","source_status","model_status","prediction_probability"}
     for name,rows in (("reference",reference),("current",current)):
         if not rows: raise ValueError(name+" ledger is empty")
         missing=required-set(rows[0])
         if missing: raise ValueError(name+" ledger missing "+str(sorted(missing)))
+    for row in current:
+        from datetime import datetime
+        issued=datetime.fromisoformat(row["issued_at_utc"].replace("Z","+00:00"))
+        if issued.tzinfo is None: raise ValueError("issued_at_utc must include timezone")
+        outcome=row.get("outcome_observed_at_utc","").strip()
+        if outcome:
+            observed=datetime.fromisoformat(outcome.replace("Z","+00:00"))
+            if observed.tzinfo is None or observed <= issued:
+                raise ValueError("Outcome timestamp must be later than prediction issue time.")
+        probability=float(row["prediction_probability"])
+        if not 0 <= probability <= 1: raise ValueError("prediction_probability must be in [0, 1]")
     drift={}
     for feature in features:
         r=np.asarray([float(x[feature]) for x in reference]); c=np.asarray([float(x[feature]) for x in current])
@@ -30,6 +41,8 @@ def build_report(reference,current,features,max_age=180,baseline_approved=False)
         drift[feature]={"ks_statistic":float(ks.statistic),"ks_p_value":float(ks.pvalue),"psi":psi(r,c)}
     ages=np.asarray([float(x["input_age_minutes"]) for x in current])
     latency=np.asarray([float(x["latency_ms"]) for x in current])
+    if not np.isfinite(ages).all() or (ages < 0).any() or not np.isfinite(latency).all() or (latency < 0).any():
+        raise ValueError("Input age and latency must be finite and non-negative.")
     sf=sum(x["source_status"].upper() not in {"OK","SUCCESS"} for x in current)
     mf=sum(x["model_status"].upper() not in {"OK","SUCCESS"} for x in current)
     stale=int((ages>max_age).sum())
