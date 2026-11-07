@@ -12,6 +12,7 @@ def _card():
         "dataset_name": "weather_extreme_rainfall_kochi",
         "target_column": "target_rain_nextday",
         "target_definition": "Next-day precipitation in mm/day.",
+        "task_type": "regression",
         "feature_columns": ["rain_lag1", "temperature"],
         "feature_ranges": {
             "rain_lag1": {"min": 0.0, "max": 3.0},
@@ -56,6 +57,7 @@ def test_historical_replay_uses_latest_complete_test_row_and_excludes_target(mon
     assert replay["case_date"] == "2020-01-01"
     assert replay["context"] == {"rain_lag1": 3.0, "temperature": 29.0}
     assert replay["observed_target"] == 8.0
+    assert replay["observed_event"] is None
     assert "target_rain_nextday" not in replay["context"]
     assert replay["case_role"].startswith("latest complete in-domain row")
 
@@ -86,3 +88,20 @@ def test_historical_replay_rejects_unregistered_dataset_builder(monkeypatch):
 
     with pytest.raises(ValueError, match="No historical replay builder"):
         service.historical_replay_context("unknown-model")
+
+
+
+def test_historical_replay_derives_observed_class_from_card_threshold(monkeypatch):
+    card = _card()
+    card.update({"task_type": "classification", "target_threshold": 10.0, "target_direction": "high"})
+    monkeypatch.setattr(service, "load_model_card", lambda model_id: card)
+    monkeypatch.setattr(
+        service,
+        "build_weather_target_dataset",
+        lambda location, target: _dataset(),
+    )
+
+    replay = service.historical_replay_context("weather_precipitation_kochi_nextday_regression")
+
+    assert replay["observed_target"] == 8.0
+    assert replay["observed_event"] is False
