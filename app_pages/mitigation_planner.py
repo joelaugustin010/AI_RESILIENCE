@@ -339,7 +339,7 @@ if not chart_data.empty:
         text="Cost INR",
         color="Cost INR",
         color_continuous_scale=["#0b4f5c", "#16a596", "#42e0c1"],
-        template="plotly_dark",
+        template="plotly_white",
     )
 
     fig.update_traces(
@@ -356,7 +356,7 @@ if not chart_data.empty:
             tickprefix="₹",
             tickformat=",.0f",
             showgrid=True,
-            gridcolor="rgba(130,190,199,.13)",
+            gridcolor="rgba(23,78,85,.12)",
             zeroline=False,
         ),
         yaxis=dict(
@@ -371,7 +371,7 @@ if not chart_data.empty:
         font=dict(
             family="Arial, sans-serif",
             size=13,
-            color="#cfe6e8",
+            color="#174E55",
         ),
     )
 
