@@ -895,7 +895,7 @@ st.markdown(
         <img class="ar-cine-poster ar-cine-slide ar-slide-a"
              src="{KOCHI_AERIAL_IMAGE}"
              alt="Aerial view of Kochi, Kerala"
-             fetchpriority="high" decoding="async">
+             fetchpriority="high" decoding="async">{VIDEO_MARKUP}
         <span class="ar-cine-scrim"></span>
       </div>
       <div class="ar-cine-inner">
