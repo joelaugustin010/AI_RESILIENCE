@@ -41,6 +41,31 @@ def range_warnings(card: Mapping[str, Any], context: Mapping[str, Any]) -> list[
     return warnings
 
 
+def out_of_training_range_features(
+    card: Mapping[str, Any], context: Mapping[str, Any]
+) -> dict[str, dict[str, float]]:
+    """Identify supplied numeric features outside the observed training envelope."""
+    ranges = card.get("feature_ranges")
+    if not isinstance(ranges, Mapping):
+        return {}
+    outside: dict[str, dict[str, float]] = {}
+    for name, value in context.items():
+        bounds = ranges.get(name)
+        if not isinstance(bounds, Mapping):
+            continue
+        try:
+            number = float(value)
+            minimum = float(bounds.get("min"))
+            maximum = float(bounds.get("max"))
+        except (TypeError, ValueError, OverflowError):
+            continue
+        if not all(math.isfinite(item) for item in (number, minimum, maximum)):
+            continue
+        if number < minimum or number > maximum:
+            outside[name] = {"value": number, "min": minimum, "max": maximum}
+    return outside
+
+
 def missingness_warnings(card: Mapping[str, Any], context: Mapping[str, Any]) -> list[str]:
     """Report features whose training missingness was high."""
     ranges = card.get("feature_ranges")
@@ -75,4 +100,9 @@ def monitoring_summary(cards: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-__all__ = ["missingness_warnings", "monitoring_summary", "range_warnings"]
+__all__ = [
+    "missingness_warnings",
+    "monitoring_summary",
+    "out_of_training_range_features",
+    "range_warnings",
+]
