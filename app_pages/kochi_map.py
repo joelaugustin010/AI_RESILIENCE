@@ -1209,9 +1209,9 @@ if processed_layers:
     for layer in processed_layers:
         report = layer["report"]
         validation_status = layer["metadata"].get("validation_status", "PROVISIONAL")
-        legend_rows.append((title, color_hex, f"{report['feature_count']} features; {validation_status}; role={role}"))
+        logical_layer_id = layer["metadata"].get("logical_layer_id", "")
         st.caption(
-            f"{title}: {layer['metadata']['publisher']} | {layer['metadata']['license']} | "
+            f"{layer['metadata']['title']}: {layer['metadata']['publisher']} | {layer['metadata']['license']} | "
             f"retrieved {layer['metadata']['retrieved_on']} | {report['feature_count']} feature(s) passed structural checks | "
             f"status {validation_status}. {layer['metadata'].get('analysis_status', 'Source truth and completeness are not independently authenticated.')}"
         )
@@ -1288,24 +1288,24 @@ if processed_layers:
                 else:
                     st.info("This feature has no recorded properties.")
 
-        asset_layers = [layer for layer in processed_layers if layer["metadata"].get("layer_role") == "asset"]
-        hazard_layers = [layer for layer in processed_layers if layer["metadata"].get("layer_role") == "hazard"]
-        st.subheader("Spatial exposure overlay")
-        if not asset_layers:
-            st.info("Unknown / unassessable exposure: no validated asset-location layer is available. OSM healthcare, emergency and road features are provisional community-mapped context, so they cannot support an operational exposure count. The JRC RP100 preview is modelled scenario context, not an observed footprint; KSDMA pixel values remain uninterpreted. NIHFW hospital coordinates are review-only because coordinate order, CRS/datum, and positional accuracy are undocumented. No facility is assumed safe or exposed.")
-        elif not hazard_layers:
-            st.info("Unknown exposure: no compatible processed hazard layer is available. No asset is assumed safe.")
-        else:
-            asset_options = {item["metadata"]["title"]: item for item in asset_layers}
-            hazard_options = {item["metadata"]["title"]: item for item in hazard_layers}
-            selected_assets = st.multiselect("Asset layers", list(asset_options), key="exposure_asset_layers")
-            selected_hazards = st.multiselect("Hazard layers", list(hazard_options), key="exposure_hazard_layers")
-            if selected_assets:
-                asset_features = [feature for label in selected_assets for feature in asset_options[label]["features"]]
-                hazard_features = [feature for label in selected_hazards for feature in hazard_options[label]["features"]]
-                results = classify_exposure(asset_features, hazard_features)
-                display_dataframe(pd.DataFrame(results), hide_index=True, width="stretch", alt="Asset-by-asset geometry intersection results and uncertainty labels")
-                st.caption("Intersection method: planar topological geometry overlay in EPSG:4326; boundary contact counts as intersection. No distance, depth, probability, vulnerability, or safety is inferred. A result with no detected intersection applies only within the selected hazard layer's documented coverage.")
+    asset_layers = [layer for layer in processed_layers if layer["metadata"].get("layer_role") == "asset"]
+    hazard_layers = [layer for layer in processed_layers if layer["metadata"].get("layer_role") == "hazard"]
+    st.subheader("Spatial exposure overlay")
+    if not asset_layers:
+        st.info("Unknown / unassessable exposure: no validated asset-location layer is available. OSM healthcare, emergency and road features are provisional community-mapped context, so they cannot support an operational exposure count. The JRC RP100 preview is modelled scenario context, not an observed footprint; KSDMA pixel values remain uninterpreted. NIHFW hospital coordinates are review-only because coordinate order, CRS/datum, and positional accuracy are undocumented. No facility is assumed safe or exposed.")
+    elif not hazard_layers:
+        st.info("Unknown exposure: no compatible processed hazard layer is available. No asset is assumed safe.")
+    else:
+        asset_options = {item["metadata"]["title"]: item for item in asset_layers}
+        hazard_options = {item["metadata"]["title"]: item for item in hazard_layers}
+        selected_assets = st.multiselect("Asset layers", list(asset_options), key="exposure_asset_layers")
+        selected_hazards = st.multiselect("Hazard layers", list(hazard_options), key="exposure_hazard_layers")
+        if selected_assets:
+            asset_features = [feature for label in selected_assets for feature in asset_options[label]["features"]]
+            hazard_features = [feature for label in selected_hazards for feature in hazard_options[label]["features"]]
+            results = classify_exposure(asset_features, hazard_features)
+            display_dataframe(pd.DataFrame(results), hide_index=True, width="stretch", alt="Asset-by-asset geometry intersection results and uncertainty labels")
+            st.caption("Intersection method: planar topological geometry overlay in EPSG:4326; boundary contact counts as intersection. No distance, depth, probability, vulnerability, or safety is inferred. A result with no detected intersection applies only within the selected hazard layer's documented coverage.")
     else:
         st.info("No processed source-reviewed geometry layers are available yet. The layer-ingestion instructions are in data/reference/SPATIAL_DATA_FOUNDATION.md.")
 
