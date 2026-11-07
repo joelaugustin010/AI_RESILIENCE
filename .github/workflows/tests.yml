@@ -13,6 +13,8 @@ on:
       - "tests/**"
       - "test_*.py"
       - "requirements*.txt"
+      - "models/ml/**"
+      - "reports/ml_*.json"
       - ".github/workflows/tests.yml"
   workflow_dispatch:
 
