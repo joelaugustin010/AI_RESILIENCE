@@ -95,18 +95,57 @@ def _gpkg_diagnostics(path: Path) -> dict[str, Any]:
         },
         "columns": [str(c) for c in frame.columns if c != "geometry"],
     }
-    for column in ("osm_id", "osm_way_id", "object_type"):
+    identifier_columns = (
+        "fid", "osm_id", "osm_way_id", "object_type", "id",
+        "building_id", "osm_type", "osm_version",
+    )
+    result["identifier_diagnostics"] = {}
+    for column in identifier_columns:
         if column in frame:
             values = frame[column]
+            result["identifier_diagnostics"][column] = {
+                "unique_non_null": int(values.nunique(dropna=True)),
+                "null_rows": int(values.isna().sum()),
+                "non_null_rows": int(values.notna().sum()),
+                "duplicate_non_null_rows": int(
+                    values.notna().sum() - values.nunique(dropna=True)
+                ),
+                "top_values": [
+                    {"value": str(k), "rows": int(v)}
+                    for k, v in values.value_counts(dropna=True).head(10).items()
+                ],
+            }
+            # Retain the original top-level fields for compatibility with
+            # earlier report consumers.
             result[f"{column}_unique_non_null"] = int(values.nunique(dropna=True))
             result[f"{column}_null_rows"] = int(values.isna().sum())
             result[f"{column}_duplicate_non_null_rows"] = int(
                 values.notna().sum() - values.nunique(dropna=True)
             )
-            result[f"{column}_top_values"] = [
-                {"value": str(k), "rows": int(v)}
-                for k, v in values.value_counts(dropna=True).head(10).items()
-            ]
+            result[f"{column}_top_values"] = result["identifier_diagnostics"][column]["top_values"]
+
+    geometry = frame.geometry
+    result["geometry_diagnostics"] = {
+        "null_geometries": int(geometry.isna().sum()),
+        "empty_geometries": int(geometry.is_empty.fillna(False).sum()),
+        "invalid_geometries": int((~geometry.is_valid).sum()),
+        "unique_wkb_geometries": int(geometry.to_wkb(hex=True).nunique(dropna=True)),
+        "duplicate_wkb_rows": int(
+            geometry.to_wkb(hex=True).notna().sum()
+            - geometry.to_wkb(hex=True).nunique(dropna=True)
+        ),
+    }
+    if "damages" in frame:
+        damage_values = __import__("pandas").to_numeric(frame["damages"], errors="coerce")
+        for identifier in ("osm_id", "osm_way_id"):
+            if identifier in frame:
+                identified = frame[identifier].notna()
+                result[f"damage_coverage_by_{identifier}"] = {
+                    "identified_rows": int(identified.sum()),
+                    "unidentified_rows": int((~identified).sum()),
+                    "identified_damage_sum": float(damage_values[identified].sum(skipna=True)),
+                    "unidentified_damage_sum": float(damage_values[~identified].sum(skipna=True)),
+                }
     for column in ("damages", "maximum_damage"):
         if column in frame:
             numeric = __import__("pandas").to_numeric(frame[column], errors="coerce")
@@ -280,11 +319,22 @@ def _workbook_overview(zf: zipfile.ZipFile, names: list[str]) -> dict[str, Any]:
             sections[section]["benefits"] = {
                 key: row[index] for key, index in columns.items()
             }
-        elif isinstance(row[1], (int, float)) and row[0] is None:
-            rp = str(int(row[1])) if float(row[1]).is_integer() else str(row[1])
-            sections[section]["return_period_damage"][rp] = {
-                key: row[index] for key, index in columns.items()
-            }
+        elif len(row) > 1:
+            # Workbooks may label the first cell "RP25" or put a numeric
+            # return period in the second cell; support both layouts.
+            rp_label = label[2:] if label.startswith("rp") else None
+            if rp_label and rp_label.replace(".", "", 1).isdigit():
+                rp = rp_label
+            elif isinstance(row[1], (int, float)) and (
+                row[0] is None or label == ""
+            ):
+                rp = str(int(row[1])) if float(row[1]).is_integer() else str(row[1])
+            else:
+                rp = None
+            if rp is not None:
+                sections[section]["return_period_damage"][rp] = {
+                    key: row[index] for key, index in columns.items()
+                }
     for section_data in sections.values():
         baseline = section_data["ead"].get("baseline")
         section_data["ead_reduction_vs_baseline"] = {}
