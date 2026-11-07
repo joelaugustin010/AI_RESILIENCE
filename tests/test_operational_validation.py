@@ -24,7 +24,7 @@ def test_event_leakage_is_rejected():
     with pytest.raises(ValueError,match="Event leakage"): evaluate_independent_spatial_holdout(x,bootstrap_iterations=10)
 
 def test_monitor_abstains_when_sources_fail_or_inputs_stale():
-    base=[{"input_age_minutes":"5","latency_ms":"20","source_status":"OK","model_status":"OK","rain":str(i)} for i in range(25)]
+    base=[{"issued_at_utc":"2026-01-01T00:00:00Z","outcome_observed_at_utc":"","prediction_probability":"0.4","input_age_minutes":"5","latency_ms":"20","source_status":"OK","model_status":"OK","rain":str(i)} for i in range(25)]
     current=[dict(x,input_age_minutes="300",source_status="FAILED") for x in base]
     r=build_report(base,current,["rain"])
     assert r["safe_state"]=="UNAVAILABLE_ABSTAIN"
