@@ -876,172 +876,173 @@ if processed_layers:
             "current conditions, hazard severity, or verified infrastructure coverage."
         )
 
-section_intro(
-    "Map controls",
-    "Map layers",
-    "Toggle only the contextual layers you need. The administrative outline is not a hazard zone, and provisional sources remain labelled as such.",
-)
-show_boundary = st.checkbox("Kochi Corporation administrative boundary", value=True)
-st.caption("Blue outline = administrative boundary only. It must not be interpreted as a hazard zone or as the full Greater Kochi urban area.")
-basemap_theme = st.radio(
-    "Basemap appearance",
-    options=["Light · Eco", "Dark"],
-    horizontal=True,
-    index=0,
-    key="kochi_basemap_theme",
-    help="Choose a basemap that keeps the selected evidence layers readable.",
-)
-deck_layers = []
-legend_rows = []
-active_components = components_for(active_hazard) if active_hazard else []
-if active_hazard is None or "Flood" in active_components:
-    try:
-        jrc_stamps = (
-            _file_stamp(JRC_PREVIEW_PATH),
-            _file_stamp(JRC_PREVIEW_METADATA),
-        )
-        jrc_context = (
-            load_jrc_context(
-                JRC_PREVIEW_PATH, JRC_PREVIEW_METADATA, *jrc_stamps
-            )
-            if jrc_stamps[0][1] and jrc_stamps[1][1]
-            else None
-        )
-        if jrc_context:
-            jrc_metadata = jrc_context["metadata"]
-            jrc_licence = jrc_context["licence"]
-            jrc_preview = jrc_context["preview"]
-            jrc_checkbox_key = f"kochimap_jrc_{active_hazard}"
-            if jrc_checkbox_key not in st.session_state:
-                st.session_state[jrc_checkbox_key] = hazard_has_flood_component(active_hazard)
-            show_jrc = st.checkbox(
-                "JRC GloFAS RP100 modelled river-flood depth (scenario context, not observed flooding)",
-                key=jrc_checkbox_key,
-            )
-            st.caption(JRC_DISPLAY_CAVEAT)
-            st.caption(
-                f"Licence: {jrc_licence['applied_basis']} applied (dataset README); "
-                f"{jrc_licence['copyright_notice_licence']} is also stated in the JRC copyright notice. "
-                "Attribution and change indication are required; ODbL share-alike applies to derived databases."
-            )
-            st.markdown(
-                f"[JRC dataset README]({JRC_LICENCE_SOURCES['readme']}) | "
-                f"[JRC copyright notice]({JRC_LICENCE_SOURCES['copyright']}) | "
-                f"[ODbL 1.0]({JRC_LICENCE_SOURCES['odbl']}) | "
-                f"[CC BY 4.0]({JRC_LICENCE_SOURCES['cc_by']})"
-            )
-            st.caption(f"Attribution: {licence_notice(jrc_metadata)}")
-            if show_jrc:
-                deck_layers.append(
-                    build_jrc_preview_layer(JRC_PREVIEW_PATH, jrc_preview["bounds"])
-                )
-                legend_rows.append((
-                    "JRC GloFAS RP100 modelled flood depth",
-                    "Blue overlay (alpha by modelled depth)",
-                    "Modelled 100-year scenario; not observed flooding; transparent does not mean safe",
-                ))
-        else:
-            st.info(
-                "The JRC modelled flood-context preview or provenance sidecar is missing; the layer is unavailable."
-            )
-    except (JrcContextError, OSError, KeyError, TypeError, ValueError) as error:
-        st.warning(f"The JRC modelled flood context could not be loaded: {error}")
-elif active_hazard is not None:
-    st.info(
-        f"No compatible {active_hazard} hazard layer is currently available. "
-        "No other hazard is substituted for the selected disaster."
+with map_display_slot:
+    section_intro(
+        "Map controls",
+        "Map layers",
+        "Toggle only the contextual layers you need. The administrative outline is not a hazard zone, and provisional sources remain labelled as such.",
     )
-
-landcover_hazards = {
-    row["Hazard"]
-    for row in availability_rows
-    if str(row["Context layer"]).startswith("ESA WorldCover")
-}
-if active_hazard is None or active_hazard in landcover_hazards:
-    try:
-        landcover_stamps = (
-            _file_stamp(WORLDCOVER_PREVIEW_PATH),
-            _file_stamp(WORLDCOVER_PREVIEW_METADATA),
-        )
-        landcover_context = (
-            load_worldcover_context(
-                WORLDCOVER_PREVIEW_PATH,
-                WORLDCOVER_PREVIEW_METADATA,
-                *landcover_stamps,
+    show_boundary = st.checkbox("Kochi Corporation administrative boundary", value=True)
+    st.caption("Blue outline = administrative boundary only. It must not be interpreted as a hazard zone or as the full Greater Kochi urban area.")
+    basemap_theme = st.radio(
+        "Basemap appearance",
+        options=["Light · Eco", "Dark"],
+        horizontal=True,
+        index=0,
+        key="kochi_basemap_theme",
+        help="Choose a basemap that keeps the selected evidence layers readable.",
+    )
+    deck_layers = []
+    legend_rows = []
+    active_components = components_for(active_hazard) if active_hazard else []
+    if active_hazard is None or "Flood" in active_components:
+        try:
+            jrc_stamps = (
+                _file_stamp(JRC_PREVIEW_PATH),
+                _file_stamp(JRC_PREVIEW_METADATA),
             )
-            if landcover_stamps[0][1] and landcover_stamps[1][1]
-            else None
-        )
-        if landcover_context:
-            landcover_metadata = landcover_context["metadata"]
-            landcover_processing = landcover_metadata["processing"]
-            show_landcover = st.checkbox(
-                "ESA WorldCover 2021 land-cover context (not a hazard or exposure layer)",
-                value=True,
-                key=f"kochimap_worldcover_{active_hazard}",
-            )
-            st.caption(
-                "Classified land cover can provide broad environmental context for reviewing this scenario. "
-                "It does not represent present-day land cover, building footprints, impervious fraction, "
-                "hazard susceptibility, population, or consequences."
-            )
-            st.markdown(
-                "[ESA WorldCover source](https://esa-worldcover.org/en/data-access) | "
-                "[CC BY 4.0 attribution and license](https://creativecommons.org/licenses/by/4.0/)"
-            )
-            st.caption(
-                f"Publisher: {landcover_metadata['publisher']} | "
-                f"Observation year: {landcover_metadata['publication_date']} | "
-                f"Source CRS: {landcover_metadata['source_crs']} | "
-                f"Review rectangle: {landcover_processing['review_rectangle_wgs84']} | "
-                f"Rendered source classes: {', '.join(str(code) for code in landcover_processing['rendered_class_codes'])}."
-            )
-            if show_landcover:
-                # Do not pass a data: URI through pydeck's JSON accessor parser:
-                # deck.gl's frontend attempts to parse the URI as a JavaScript
-                # expression ("data:image..." fails at the colon). Render this
-                # optional raster as a normal Streamlit image until it can be
-                # served through a verified URL/asset endpoint.
-                landcover_image = base64.b64decode(landcover_context["image_base64"])
-                st.image(
-                    landcover_image,
-                    caption=(
-                        "ESA WorldCover 2021 preview — shown separately from the interactive map. "
-                        "Its source bounds are recorded above; this preview is not an exposure or hazard layer."
-                    ),
-                    width="stretch",
+            jrc_context = (
+                load_jrc_context(
+                    JRC_PREVIEW_PATH, JRC_PREVIEW_METADATA, *jrc_stamps
                 )
-            class_rows = [
-                {
-                    "Class code": code,
-                    "Land-cover class": definition["label"],
-                    "Map color": "#{:02X}{:02X}{:02X}".format(*definition["rgb"]),
-                }
-                for code, definition in landcover_processing["classes"].items()
-            ]
-            display_dataframe(
-                pd.DataFrame(class_rows),
-                hide_index=True,
-                width="stretch",
-                alt="ESA WorldCover categorical class legend for the displayed context layer",
+                if jrc_stamps[0][1] and jrc_stamps[1][1]
+                else None
             )
-        else:
-            st.warning("The processed ESA WorldCover context image or provenance sidecar is missing; the layer is unavailable.")
-    except (OSError, KeyError, TypeError, ValueError) as error:
-        st.warning(f"The ESA WorldCover context layer could not be loaded: {error}")
+            if jrc_context:
+                jrc_metadata = jrc_context["metadata"]
+                jrc_licence = jrc_context["licence"]
+                jrc_preview = jrc_context["preview"]
+                jrc_checkbox_key = f"kochimap_jrc_{active_hazard}"
+                if jrc_checkbox_key not in st.session_state:
+                    st.session_state[jrc_checkbox_key] = hazard_has_flood_component(active_hazard)
+                show_jrc = st.checkbox(
+                    "JRC GloFAS RP100 modelled river-flood depth (scenario context, not observed flooding)",
+                    key=jrc_checkbox_key,
+                )
+                st.caption(JRC_DISPLAY_CAVEAT)
+                st.caption(
+                    f"Licence: {jrc_licence['applied_basis']} applied (dataset README); "
+                    f"{jrc_licence['copyright_notice_licence']} is also stated in the JRC copyright notice. "
+                    "Attribution and change indication are required; ODbL share-alike applies to derived databases."
+                )
+                st.markdown(
+                    f"[JRC dataset README]({JRC_LICENCE_SOURCES['readme']}) | "
+                    f"[JRC copyright notice]({JRC_LICENCE_SOURCES['copyright']}) | "
+                    f"[ODbL 1.0]({JRC_LICENCE_SOURCES['odbl']}) | "
+                    f"[CC BY 4.0]({JRC_LICENCE_SOURCES['cc_by']})"
+                )
+                st.caption(f"Attribution: {licence_notice(jrc_metadata)}")
+                if show_jrc:
+                    deck_layers.append(
+                        build_jrc_preview_layer(JRC_PREVIEW_PATH, jrc_preview["bounds"])
+                    )
+                    legend_rows.append((
+                        "JRC GloFAS RP100 modelled flood depth",
+                        "Blue overlay (alpha by modelled depth)",
+                        "Modelled 100-year scenario; not observed flooding; transparent does not mean safe",
+                    ))
+            else:
+                st.info(
+                    "The JRC modelled flood-context preview or provenance sidecar is missing; the layer is unavailable."
+                )
+        except (JrcContextError, OSError, KeyError, TypeError, ValueError) as error:
+            st.warning(f"The JRC modelled flood context could not be loaded: {error}")
+    elif active_hazard is not None:
+        st.info(
+            f"No compatible {active_hazard} hazard layer is currently available. "
+            "No other hazard is substituted for the selected disaster."
+        )
 
-template = pd.DataFrame(columns=["name", "layer", "latitude", "longitude", "source", "source_date"])
-st.download_button("Download point CSV template", template.to_csv(index=False).encode("utf-8"), file_name="kochi_reviewed_points_template.csv", mime="text/csv")
-st.caption("Optional CSV fields are user-provided points. Required columns: name, layer, latitude, longitude, source, source_date.")
-uploaded = st.file_uploader("Upload source-reviewed point layers", type=["csv"], key="kochi_points")
+    landcover_hazards = {
+        row["Hazard"]
+        for row in availability_rows
+        if str(row["Context layer"]).startswith("ESA WorldCover")
+    }
+    if active_hazard is None or active_hazard in landcover_hazards:
+        try:
+            landcover_stamps = (
+                _file_stamp(WORLDCOVER_PREVIEW_PATH),
+                _file_stamp(WORLDCOVER_PREVIEW_METADATA),
+            )
+            landcover_context = (
+                load_worldcover_context(
+                    WORLDCOVER_PREVIEW_PATH,
+                    WORLDCOVER_PREVIEW_METADATA,
+                    *landcover_stamps,
+                )
+                if landcover_stamps[0][1] and landcover_stamps[1][1]
+                else None
+            )
+            if landcover_context:
+                landcover_metadata = landcover_context["metadata"]
+                landcover_processing = landcover_metadata["processing"]
+                show_landcover = st.checkbox(
+                    "ESA WorldCover 2021 land-cover context (not a hazard or exposure layer)",
+                    value=True,
+                    key=f"kochimap_worldcover_{active_hazard}",
+                )
+                st.caption(
+                    "Classified land cover can provide broad environmental context for reviewing this scenario. "
+                    "It does not represent present-day land cover, building footprints, impervious fraction, "
+                    "hazard susceptibility, population, or consequences."
+                )
+                st.markdown(
+                    "[ESA WorldCover source](https://esa-worldcover.org/en/data-access) | "
+                    "[CC BY 4.0 attribution and license](https://creativecommons.org/licenses/by/4.0/)"
+                )
+                st.caption(
+                    f"Publisher: {landcover_metadata['publisher']} | "
+                    f"Observation year: {landcover_metadata['publication_date']} | "
+                    f"Source CRS: {landcover_metadata['source_crs']} | "
+                    f"Review rectangle: {landcover_processing['review_rectangle_wgs84']} | "
+                    f"Rendered source classes: {', '.join(str(code) for code in landcover_processing['rendered_class_codes'])}."
+                )
+                if show_landcover:
+                    # Do not pass a data: URI through pydeck's JSON accessor parser:
+                    # deck.gl's frontend attempts to parse the URI as a JavaScript
+                    # expression ("data:image..." fails at the colon). Render this
+                    # optional raster as a normal Streamlit image until it can be
+                    # served through a verified URL/asset endpoint.
+                    landcover_image = base64.b64decode(landcover_context["image_base64"])
+                    st.image(
+                        landcover_image,
+                        caption=(
+                            "ESA WorldCover 2021 preview — shown separately from the interactive map. "
+                            "Its source bounds are recorded above; this preview is not an exposure or hazard layer."
+                        ),
+                        width="stretch",
+                    )
+                class_rows = [
+                    {
+                        "Class code": code,
+                        "Land-cover class": definition["label"],
+                        "Map color": "#{:02X}{:02X}{:02X}".format(*definition["rgb"]),
+                    }
+                    for code, definition in landcover_processing["classes"].items()
+                ]
+                display_dataframe(
+                    pd.DataFrame(class_rows),
+                    hide_index=True,
+                    width="stretch",
+                    alt="ESA WorldCover categorical class legend for the displayed context layer",
+                )
+            else:
+                st.warning("The processed ESA WorldCover context image or provenance sidecar is missing; the layer is unavailable.")
+        except (OSError, KeyError, TypeError, ValueError) as error:
+            st.warning(f"The ESA WorldCover context layer could not be loaded: {error}")
 
-if show_boundary:
-    deck_layers.append(pdk.Layer(
-        "GeoJsonLayer", id="kochi-corporation-boundary", data=normalize_geojson_for_tooltip(boundary, "Kochi Corporation boundary (provisional)"),
-        stroked=True, filled=False, get_line_color=[38, 106, 166, 220],
-        line_width_min_pixels=2, pickable=True,
-    ))
-    legend_rows.append(("Kochi Corporation boundary", "#266AA6 outline", "Administrative boundary"))
+    template = pd.DataFrame(columns=["name", "layer", "latitude", "longitude", "source", "source_date"])
+    st.download_button("Download point CSV template", template.to_csv(index=False).encode("utf-8"), file_name="kochi_reviewed_points_template.csv", mime="text/csv")
+    st.caption("Optional CSV fields are user-provided points. Required columns: name, layer, latitude, longitude, source, source_date.")
+    uploaded = st.file_uploader("Upload source-reviewed point layers", type=["csv"], key="kochi_points")
+
+    if show_boundary:
+        deck_layers.append(pdk.Layer(
+            "GeoJsonLayer", id="kochi-corporation-boundary", data=normalize_geojson_for_tooltip(boundary, "Kochi Corporation boundary (provisional)"),
+            stroked=True, filled=False, get_line_color=[38, 106, 166, 220],
+            line_width_min_pixels=2, pickable=True,
+        ))
+        legend_rows.append(("Kochi Corporation boundary", "#266AA6 outline", "Administrative boundary"))
 
 with map_display_slot:
     if processed_layers:
