@@ -981,10 +981,11 @@ with map_display_slot:
                     value=True,
                     key=f"kochimap_worldcover_{active_hazard}",
                 )
-                st.caption(
-                    "Classified land cover can provide broad environmental context for reviewing this scenario. "
-                    "It does not represent present-day land cover, building footprints, impervious fraction, "
-                    "hazard susceptibility, population, or consequences."
+                st.markdown("**What this map shows**")
+                st.write(
+                    "Each pixel is assigned to a land-cover category from satellite observations made in 2021. "
+                    "The colours identify the type of surface ESA classified; they do not show danger, risk, "
+                    "pollution level, flood depth, or how safe a place is."
                 )
                 st.markdown(
                     "[ESA WorldCover source](https://esa-worldcover.org/en/data-access) | "
@@ -994,37 +995,56 @@ with map_display_slot:
                     f"Publisher: {landcover_metadata['publisher']} | "
                     f"Observation year: {landcover_metadata['publication_date']} | "
                     f"Source CRS: {landcover_metadata['source_crs']} | "
-                    f"Review rectangle: {landcover_processing['review_rectangle_wgs84']} | "
-                    f"Rendered source classes: {', '.join(str(code) for code in landcover_processing['rendered_class_codes'])}."
+                    f"Approximate review rectangle: {landcover_processing['review_rectangle_wgs84']}."
                 )
                 if show_landcover:
-                    # Do not pass a data: URI through pydeck's JSON accessor parser:
-                    # deck.gl's frontend attempts to parse the URI as a JavaScript
-                    # expression ("data:image..." fails at the colon). Render this
-                    # optional raster as a normal Streamlit image until it can be
-                    # served through a verified URL/asset endpoint.
+                    # Keep this raster separate from pydeck: passing a data URI as a
+                    # BitmapLayer image is parsed as JavaScript by deck.gl.
                     landcover_image = base64.b64decode(landcover_context["image_base64"])
                     st.image(
                         landcover_image,
                         caption=(
-                            "ESA WorldCover 2021 preview — shown separately from the interactive map. "
-                            "Its source bounds are recorded above; this preview is not an exposure or hazard layer."
+                            "ESA WorldCover 2021 — land-cover categories only. "
+                            "Red means built-up land, not a danger zone."
                         ),
                         width="stretch",
                     )
-                class_rows = [
-                    {
-                        "Class code": code,
-                        "Land-cover class": definition["label"],
-                        "Map color": "#{:02X}{:02X}{:02X}".format(*definition["rgb"]),
-                    }
-                    for code, definition in landcover_processing["classes"].items()
-                ]
-                display_dataframe(
-                    pd.DataFrame(class_rows),
-                    hide_index=True,
-                    width="stretch",
-                    alt="ESA WorldCover categorical class legend for the displayed context layer",
+                st.markdown("**Colour legend — what each colour represents**")
+                st.caption(
+                    "The swatches below use the ESA class palette. The class number is ESA's category code, "
+                    "not a score or severity rating. Transparent/blank pixels are NoData (no class value in this crop)."
+                )
+                class_explanations = {
+                    "Tree cover": "Areas classified as trees or forest cover.",
+                    "Shrubland": "Areas mainly covered by shrubs.",
+                    "Grassland": "Areas mainly covered by grasses.",
+                    "Cropland": "Agricultural or cultivated land.",
+                    "Built-up": "Buildings, roads and other built-up surfaces; red is not a hazard warning.",
+                    "Bare / sparse vegetation": "Bare ground or land with little vegetation.",
+                    "Permanent water bodies": "Rivers, lakes, reservoirs and other permanent water surfaces; this is not a flood extent.",
+                    "Herbaceous wetland": "Wet areas dominated by non-woody vegetation.",
+                    "Mangroves": "Mangrove vegetation, commonly found in coastal or tidal environments.",
+                }
+                for code, definition in sorted(
+                    landcover_processing["classes"].items(),
+                    key=lambda item: int(item[0]),
+                ):
+                    rgb = definition["rgb"]
+                    swatch = "#{:02X}{:02X}{:02X}".format(*rgb)
+                    label = definition["label"]
+                    cols = st.columns([0.45, 2.0, 4.5])
+                    cols[0].markdown(
+                        f'<div style="width:30px;height:22px;background:{swatch};border:1px solid #777;border-radius:4px"></div>',
+                        unsafe_allow_html=True,
+                    )
+                    cols[1].markdown(f"**{label}**")
+                    cols[2].write(
+                        f"Class {code} · {class_explanations.get(label, 'ESA land-cover category.')}"
+                    )
+                st.caption(
+                    "Important limitation: this is a downsampled 2021 land-cover snapshot for an approximate review rectangle. "
+                    "It is not a current building map, official municipal boundary, hazard-susceptibility map, population map, "
+                    "or exposure calculation. Local classification accuracy has not been assessed."
                 )
             else:
                 st.warning("The processed ESA WorldCover context image or provenance sidecar is missing; the layer is unavailable.")
