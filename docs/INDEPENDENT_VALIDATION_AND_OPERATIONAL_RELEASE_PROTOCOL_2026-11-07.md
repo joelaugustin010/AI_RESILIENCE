@@ -165,3 +165,15 @@ For every candidate model, publish the frozen manifest, source and license regis
 ### Release decision
 
 **Current release class: RESEARCH / DEMONSTRATION ONLY.** Software CI passing and a live app responding are necessary engineering checks, not evidence of predictive operational readiness. The release must remain research-only until independently sourced ground truth, spatial holdouts and prospective shadow evidence are actually acquired and pass the pre-registered hazard-specific criteria.
+
+
+## External source entry points (access checked 2026-11-07)
+
+These are source portals for acquiring candidate observations, not proof that the project has downloaded or adjudicated the data. Record the exact product, version, access conditions, license, checksum and retrieval timestamp in the project provenance register before use.
+
+- **Sentinel-1 SAR:** Copernicus Data Space Ecosystem Sentinel-1 collection, global GRD archive from October 2014 onward: https://dataspace.copernicus.eu/data-collections/copernicus-sentinel-missions/sentinel-1 . Access to some products may require registration or have availability restrictions. SAR-derived water extent is a processed reference with classification and acquisition-time uncertainty, not perfect ground truth.
+- **India rainfall:** National Water Data Portal / NWIC daily IMD rainfall dataset: https://nwdp.nwic.gov.in/dataset/rainfall-daily-imd . It describes observed station rainfall and district/state daily CSV resources. Verify station-level spatial coverage and whether the exact source records overlap any training inputs before calling it an independent holdout.
+- **India historical observations:** IMD Data Service Portal: https://dsp.imdpune.gov.in/ . The portal describes historical observation procurement, station availability and access conditions. Station data access may require registration or a formal request.
+- **Cyclone tracks:** NOAA NCEI IBTrACS v4 documentation and archive: https://www.ncei.noaa.gov/products/international-best-track-archive . Treat as a storm-level retrospective best-track source; check whether the current model already used IBTrACS before using any subset as an independent external holdout.
+
+Do not claim source independence solely because two datasets have different URLs. Compare provider, upstream sensor, processing lineage, station IDs, event IDs, time coverage and derived-feature provenance. If source overlap cannot be ruled out, classify the evaluation as source-correlated rather than independent.
