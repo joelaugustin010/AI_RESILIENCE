@@ -12,6 +12,7 @@ import streamlit as st
 from src.ml.coverage import build_coverage_matrix
 from src.ml.presentation import card_rows
 from src.ml.registry import list_model_cards
+from src.ml.submission_summary import rank_classifier_cards, rank_regression_cards
 from src.ml.validation_gates import model_card_validation_gate
 from src.ui_theme import page_header
 
@@ -40,16 +41,7 @@ except Exception as exc:
     st.stop()
 
 gates = [model_card_validation_gate(card) for card in cards]
-regressors = [
-    card for card in cards
-    if card.get("task_type") == "regression"
-    and isinstance(card.get("metrics"), dict)
-    and isinstance(card.get("metrics", {}).get("mae_skill_over_persistence"), (int, float))
-]
-regressors.sort(
-    key=lambda card: float(card["metrics"]["mae_skill_over_persistence"]),
-    reverse=True,
-)
+regressors = rank_regression_cards(cards)
 operational = sum(bool(gate["operational_eligible"]) for gate in gates)
 hazards_with_models = sum(bool(entry.get("trained_model_ids")) for entry in coverage["entries"])
 
@@ -94,18 +86,7 @@ if regressors:
 else:
     st.info("No regression model card with a recorded persistence-skill metric is available.")
 
-classifiers = [
-    card for card in cards
-    if card.get("task_type") != "regression"
-    and isinstance(card.get("metrics"), dict)
-    and isinstance((card.get("metrics", {}).get("persistence_baseline") or {}).get("f1"), (int, float))
-    and isinstance(card.get("metrics", {}).get("f1"), (int, float))
-]
-classifiers.sort(
-    key=lambda card: float(card["metrics"]["f1"])
-    - float(card["metrics"]["persistence_baseline"]["f1"]),
-    reverse=True,
-)
+classifiers = rank_classifier_cards(cards)
 if classifiers:
     best_classifier = classifiers[0]
     classifier_metrics = best_classifier["metrics"]
