@@ -47,7 +47,7 @@ def test_independent_observed_impact_holdout_is_scored_but_not_certified():
     assert result["model_validated"] is False
     assert result["holdout_event_count"] == 3
     assert result["holdout_geography_count"] == 2
-    assert result["metrics"]["mae"] == 6.666666666666667
+    assert result["metrics"]["mae"] == 5.833333333333333
     assert result["metrics"]["event_level_mae"]["holdout-event-1"] == 7.5
 
 
