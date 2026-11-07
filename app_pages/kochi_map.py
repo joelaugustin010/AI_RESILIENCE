@@ -888,7 +888,7 @@ with map_display_slot:
         "Basemap appearance",
         options=["Light · Eco", "Dark", "Satellite imagery"],
         horizontal=True,
-        index=2,
+        index=0,
         key="kochi_basemap_theme",
         help=(
             "Satellite imagery uses Esri World Imagery tiles. It is interactive, but not live video; "
@@ -1003,7 +1003,7 @@ with map_display_slot:
                 landcover_processing = landcover_metadata["processing"]
                 show_landcover = st.checkbox(
                     "Show historical ESA WorldCover 2021 reference (not a 2026 map)",
-                    value=False,
+                    value=True,
                     key=f"kochimap_worldcover_{active_hazard}",
                 )
                 st.markdown("**What this map shows**")
