@@ -158,3 +158,10 @@ and final prediction because negative precipitation is physically impossible.
 These changes improve the reliability of the *evaluation and output constraints*;
 they do not create new observations, improve the upstream reanalysis itself, or
 turn any of the weather regressors into a flood/heat/drought impact model.
+
+Classification confidence intervals now follow the same dependence-aware rule:
+whole-storm cluster resampling for storm-grouped tasks and seven-row circular
+moving blocks for ordered temporal holdouts. Invalid or missing group IDs fail
+closed, and fewer than two independent groups produce unavailable intervals
+rather than a falsely precise estimate. Training also excludes non-finite target
+values before estimating event thresholds or fitting a model.
