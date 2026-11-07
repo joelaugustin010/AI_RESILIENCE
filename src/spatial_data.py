@@ -763,6 +763,27 @@ def processed_layer_issues(processed_root: Path, coverage_geometry: dict[str, An
             continue
         if report["errors"]:
             issues.append(f"{geojson_path.name}: {' '.join(report['errors'])}; layer not loaded.")
+        elif geojson_path.stem == "kochi_wards_datameet_2022":
+            # Six legacy polygons are retained as contextual shapes but lack both
+            # Ward_No and Ward_Name. Report the affected feature count explicitly;
+            # display labels use feature indices and never infer official identities.
+            _, ward_features = read_geojson(geojson_path)
+            missing_ward_features = 0
+            for feature in ward_features:
+                properties = feature.get("properties") or {}
+                missing_number = properties.get("Ward_No") is None or not str(properties.get("Ward_No")).strip()
+                missing_name = properties.get("Ward_Name") is None or not str(properties.get("Ward_Name")).strip()
+                if missing_number or missing_name:
+                    missing_ward_features += 1
+            if missing_ward_features:
+                issues.append(
+                    f"{geojson_path.name}: {missing_ward_features} of {len(ward_features)} legacy polygons "
+                    f"have missing Ward_No and/or Ward_Name ({report['missing_property_values']} missing/blank "
+                    "values); retained as unlabelled context only, with no inferred ward identities."
+                )
+            for warning in report["warnings"]:
+                if "missing/blank property value" not in warning:
+                    issues.append(f"{geojson_path.name}: {warning}")
         elif report["warnings"]:
             issues.append(f"{geojson_path.name}: {' '.join(report['warnings'])}")
     return issues
