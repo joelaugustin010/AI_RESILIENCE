@@ -28,3 +28,54 @@ No validated Kochi population-grid file or fully authoritative current ward poly
 ## Next validation work
 
 Before presenting an operational estimate, acquire a properly licensed population grid and validated hazard footprint, confirm their dates, CRS, resolution and coverage, inspect cell overlap and missingness, compare aggregate population against an authoritative census/statistical total, and have the spatial methodology reviewed. Hazard-specific footprints need independent model validation and uncertainty estimates.
+
+
+## Raster preparation pipeline
+
+A reproducible raster-to-grid preparation command is now available:
+
+```powershell
+python scripts\prepare_population_grid.py `
+  --raster data\external\population\ghsl_2025_100m.tif `
+  --boundary data\reference\kochi_official_boundary.geojson `
+  --boundary-crs EPSG:4326 `
+  --output data\processed\population\kochi_population_2025.geojson `
+  --population-year 2025 `
+  --source-url "https://human-settlement.emergency.copernicus.eu/download.php?ds=pop" `
+  --source-title "GHSL residential population grid, 2025" `
+  --source-license "CC BY 4.0"
+```
+
+The script clips a single-band population-count GeoTIFF to a supplied boundary,
+prorates boundary-edge cells by equal-area intersection, preserves NoData gaps,
+and writes a GeoJSON FeatureCollection plus a provenance/coverage sidecar.
+It refuses missing CRS, invalid boundaries, negative counts, non-finite raster
+values, unsupported multi-band inputs, and excessive feature counts. The
+boundary CRS must be explicitly supplied. Review the raster's own band
+semantics, epoch, scale/offset, resolution and licence before running it.
+
+## Candidate public sources for Kochi
+
+- **GHSL GHS-POP (European Commission JRC):** public residential population
+  grids from 1975–2030, with 100 m and 1 km products. The 2025 epoch is a
+  modelled/disaggregated estimate, not a new census. GHSL reuse is permitted
+  with acknowledgement; the open-data catalogue describes CC BY 4.0.
+  Sources: https://human-settlement.emergency.copernicus.eu/datasets.php
+  and https://registry.opendata.aws/ghs-pop/
+- **WorldPop Global2:** country grids at approximately 100 m and 1 km for
+  2015–2030. The India 2028 R2025A product page explicitly labels that release
+  alpha; do not silently substitute it for a 2025 reference year. Confirm the
+  exact year-specific file and release statement before ingestion:
+  https://hub.worldpop.org/project/categories?id=3
+- **Census of India 2011 Population Finder/PCA:** official ward/town-level
+  counts can be used as an independent historical aggregate check, not as a
+  current population grid:
+  https://censusindia.gov.in/census.website/en/data/population-finder
+
+For an initial Kochi research baseline, use a documented 2025 GHSL raster
+candidate and compare its aggregate against the closest geographically
+matching official Census 2011 town/ward totals. A mismatch is a review signal,
+not a reason to rescale the grid automatically. The official current Kochi
+boundary and ward polygons must be independently reconciled before claiming
+ward-level estimates. Do not label 2011 counts or 2025 modelled grids as live
+2026 population counts.
