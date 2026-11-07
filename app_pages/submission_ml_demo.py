@@ -159,10 +159,16 @@ if selected_cards:
         )
         try:
             replay = _load_historical_replay(selected_model_id)
-            replay_cols = st.columns(3)
+            replay_cols = st.columns(4)
             replay_cols[0].metric("Historical case date", replay["case_date"])
             replay_cols[1].metric("Input features", len(replay["context"]))
             replay_cols[2].metric("Observed target", f"{replay['observed_target']:g}")
+            observed_class = (
+                "Event" if replay.get("observed_event") is True
+                else "No event" if replay.get("observed_event") is False
+                else "Continuous target"
+            )
+            replay_cols[3].metric("Observed held-out class", observed_class)
             st.caption(
                 f"Target: {replay.get('target_definition') or replay['target_column']} · "
                 f"Source: {replay.get('source') or 'model-card source'} · "
@@ -303,7 +309,8 @@ if selected_cards:
             replay = saved_result["replay"]
             st.caption(
                 f"Retrospective check: {replay['target_column']} observed value was "
-                f"{replay['observed_target']:g} on the held-out case. The target was "
+                f"{replay['observed_target']:g} on the held-out case. "
+                f"Observed class: {replay.get('observed_event')}. The target was "
                 "not supplied as a model input."
             )
         st.caption(
