@@ -13,6 +13,10 @@ def _card():
         "target_column": "target_rain_nextday",
         "target_definition": "Next-day precipitation in mm/day.",
         "feature_columns": ["rain_lag1", "temperature"],
+        "feature_ranges": {
+            "rain_lag1": {"min": 0.0, "max": 3.0},
+            "temperature": {"min": 20.0, "max": 35.0},
+        },
         "temporal_split": {"test_start": "2020-01-01"},
         "provenance": {
             "target": "extreme_rainfall",
@@ -49,11 +53,11 @@ def test_historical_replay_uses_latest_complete_test_row_and_excludes_target(mon
 
     replay = service.historical_replay_context("weather_precipitation_kochi_nextday_regression")
 
-    assert replay["case_date"] == "2020-01-02"
-    assert replay["context"] == {"rain_lag1": 4.0, "temperature": 30.0}
-    assert replay["observed_target"] == 12.0
+    assert replay["case_date"] == "2020-01-01"
+    assert replay["context"] == {"rain_lag1": 3.0, "temperature": 29.0}
+    assert replay["observed_target"] == 8.0
     assert "target_rain_nextday" not in replay["context"]
-    assert replay["case_role"].startswith("latest complete row")
+    assert replay["case_role"].startswith("latest complete in-domain row")
 
 
 def test_historical_replay_rejects_missing_test_period_rows(monkeypatch):
