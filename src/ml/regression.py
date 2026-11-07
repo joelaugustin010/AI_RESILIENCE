@@ -94,7 +94,7 @@ def train_regression_dataset(
     features, feature_columns = feature_frame(dataset)
     assert_no_leakage(feature_columns, dataset.target_column, date_column=dataset.date_column, frame=frame)
     target = pd.to_numeric(frame[dataset.target_column], errors="coerce")
-    valid = target.notna() & pd.to_datetime(frame[dataset.date_column]).notna()
+    valid = target.notna() & np.isfinite(target.to_numpy(dtype=float)) & pd.to_datetime(frame[dataset.date_column]).notna()
     frame, features, target = frame.loc[valid].copy(), features.loc[valid].copy(), target.loc[valid].astype(float)
     order = np.argsort(pd.to_datetime(frame[dataset.date_column]).to_numpy(), kind="mergesort")
     frame, features, target = frame.iloc[order].reset_index(drop=True), features.iloc[order].reset_index(drop=True), target.iloc[order].reset_index(drop=True)
@@ -125,6 +125,8 @@ def train_regression_dataset(
     predicted = np.asarray(final_model.predict(X_test), dtype=float)
     if prediction_lower_bound is not None:
         predicted = np.maximum(predicted, prediction_lower_bound)
+    if not np.isfinite(predicted).all():
+        raise ValueError(f"{model_id}: fitted model produced non-finite test predictions.")
     metrics = _regression_metrics(y_test, predicted)
     baseline: dict[str, Any] = {"available": False}
     baseline_prediction: np.ndarray | None = None
@@ -149,7 +151,12 @@ def train_regression_dataset(
     median = _regression_metrics(y_test, np.full_like(y_test, float(np.median(final_train["_continuous_target"]))))
     baseline["training_median"] = median
     reference_mae = baseline.get("mae", median["mae"])
-    skill = 1.0 - metrics["mae"] / max(float(reference_mae), 1e-12)
+    comparison_model_mae = (
+        _regression_metrics(comparison_actual, comparison_model_prediction)["mae"]
+        if baseline_prediction is not None
+        else metrics["mae"]
+    )
+    skill = 1.0 - comparison_model_mae / max(float(reference_mae), 1e-12)
     paired_ci = (
         _paired_mae_improvement_ci(
             comparison_actual,
@@ -188,6 +195,7 @@ def train_regression_dataset(
             **metrics,
             "persistence_baseline": baseline,
             "mae_skill_over_persistence": float(skill),
+            "mae_skill_comparison_rows": int(len(comparison_actual)) if baseline_prediction is not None else int(len(y_test)),
             "paired_mae_improvement_bootstrap_95ci": paired_ci,
             "paired_bootstrap_method": bootstrap_method,
             "prediction_lower_bound": prediction_lower_bound,
