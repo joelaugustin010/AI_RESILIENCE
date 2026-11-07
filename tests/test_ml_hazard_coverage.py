@@ -78,3 +78,17 @@ def test_not_trained_cards_do_not_count_as_ml_evidence():
     assert coverage["n_hazards_with_ml_evidence"] == 0
     assert coverage["n_hazards_without_ml"] == 10
     assert coverage["n_hazards_with_any_usable_research_model"] == 0
+
+
+
+def test_unrecognized_model_status_fails_closed():
+    cyclone_ids = HAZARD_MODEL_MAP["Cyclone"]
+    cards = _cards({cyclone_ids[0]: "VALIDATED"})
+    with patch("src.ml.coverage.list_model_cards", return_value=cards):
+        coverage = build_coverage_matrix(write=False)
+
+    cyclone = next(row for row in coverage["entries"] if row["hazard"] == "Cyclone")
+    assert cyclone["model_statuses"][cyclone_ids[0]] == "INVALID_STATUS"
+    assert cyclone["trained_model_ids"] == []
+    assert cyclone["support_level"] == "not_trained"
+    assert "Cyclone" not in coverage["hazards_with_ml_evidence"]
