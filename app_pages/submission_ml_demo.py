@@ -12,10 +12,16 @@ import streamlit as st
 from src.ml.coverage import build_coverage_matrix
 from src.ml.presentation import application_rows, card_rows, model_rows
 from src.ml.registry import list_model_cards
-from src.ml.service import ml_evidence_for
+from src.ml.service import historical_replay_context, ml_evidence_for
 from src.ml.submission_summary import rank_classifier_cards, rank_regression_cards, regression_baseline_label
 from src.ml.validation_gates import model_card_validation_gate
 from src.ui_theme import page_header
+
+
+@st.cache_data(show_spinner=False)
+def _load_historical_replay(model_id: str) -> dict:
+    """Cache the deterministic historical holdout row used in the exhibition replay."""
+    return historical_replay_context(model_id)
 
 
 page_header(
@@ -133,109 +139,176 @@ selected_cards = [
 ]
 if selected_cards:
     st.markdown("#### Run a transparent research inference")
-    st.info(
-        "Enter observed or otherwise independently sourced values for the exact "
-        "features below. Leave unknown values blank. The engine will withhold "
-        "inference when required inputs are missing, invalid, or outside the "
-        "recorded training domain. Do not guess values."
+    selected_model_id = st.selectbox(
+        "Choose a registered model",
+        options=[card["model_id"] for card in selected_cards],
+        format_func=lambda value: value.replace("_", " ").title(),
     )
-    feature_names = list(dict.fromkeys(
-        str(feature)
-        for card in selected_cards
-        for feature in card.get("feature_columns", [])
-    ))
-    feature_ranges = {}
-    for card in selected_cards:
-        for feature, bounds in (card.get("feature_ranges") or {}).items():
-            feature_ranges.setdefault(str(feature), bounds)
-    provenance_locations = {
-        str((card.get("provenance") or {}).get("location", "")).strip()
-        for card in selected_cards
-        if isinstance(card.get("provenance"), dict)
-    }
-    location_required = "kochi" in {item.casefold() for item in provenance_locations}
-    with st.form("submission_ml_inference_form", clear_on_submit=False):
-        location_value = ""
-        if location_required:
-            location_value = st.text_input(
-                "Model location (must match its documented geography)",
-                placeholder="Enter Kochi only if these inputs are for Kochi",
-            )
-        st.caption(f"Required model features across this hazard: {len(feature_names)}")
-        input_columns = st.columns(2)
-        supplied_values = {}
-        for index, feature in enumerate(feature_names):
-            with input_columns[index % 2]:
-                bounds = feature_ranges.get(feature, {})
-                if isinstance(bounds, dict) and bounds.get("min") is not None and bounds.get("max") is not None:
-                    range_help = (
-                        f"Recorded training range: {bounds['min']} to {bounds['max']}. "
-                        "This is a domain-check reference, not a suggested or current observation."
-                    )
-                else:
-                    range_help = "No numeric training range is recorded for this feature."
-                supplied_values[feature] = st.text_input(
-                    feature,
-                    value="",
-                    help=range_help,
-                    placeholder="Enter a measured value; leave blank if unknown",
-                    key=f"submission-ml-{selected_hazard}-{feature}",
-                )
-        run_inference = st.form_submit_button(
-            "Check inputs and run registered model(s)",
-            type="primary",
-            use_container_width=True,
+    selected_card = next(card for card in selected_cards if card["model_id"] == selected_model_id)
+    demo_mode = st.radio(
+        "Inference demonstration mode",
+        ["Replay a historical test case", "Enter measured feature values"],
+        horizontal=True,
+    )
+    if demo_mode == "Replay a historical test case":
+        st.info(
+            "Recommended for the exhibition: this loads a real, complete row from "
+            "the model's documented historical test period and runs the persisted "
+            "model on its recorded input features. It is a retrospective replay, "
+            "not a current forecast."
         )
-    if run_inference:
-        explicit_context = {
-            name: value.strip()
-            for name, value in supplied_values.items()
-            if value.strip() != ""
-        }
-        inference_inputs = {"ml_context": explicit_context}
-        if location_required:
-            inference_inputs["location"] = location_value.strip()
         try:
-            st.session_state["submission_ml_inference_result"] = ml_evidence_for(
-                selected_hazard, inference_inputs
+            replay = _load_historical_replay(selected_model_id)
+            replay_cols = st.columns(3)
+            replay_cols[0].metric("Historical case date", replay["case_date"])
+            replay_cols[1].metric("Input features", len(replay["context"]))
+            replay_cols[2].metric("Observed target", f"{replay['observed_target']:g}")
+            st.caption(
+                f"Target: {replay.get('target_definition') or replay['target_column']} · "
+                f"Source: {replay.get('source') or 'model-card source'} · "
+                f"{replay.get('source_type') or 'source type not recorded'}"
             )
-            st.session_state.pop("submission_ml_inference_error", None)
+            st.caption(replay["warning"])
+            if st.button(
+                "Run model on this historical test case",
+                type="primary",
+                use_container_width=True,
+                key=f"run-historical-{selected_model_id}",
+            ):
+                inference_inputs = {"ml_context": replay["context"]}
+                if replay.get("location"):
+                    inference_inputs["location"] = replay["location"]
+                try:
+                    evidence_result = ml_evidence_for(selected_hazard, inference_inputs)
+                    st.session_state["submission_ml_inference_result"] = {
+                        "hazard": selected_hazard,
+                        "model_id": selected_model_id,
+                        "evidence": evidence_result,
+                        "replay": replay,
+                    }
+                    st.session_state.pop("submission_ml_inference_error", None)
+                except Exception as exc:
+                    st.session_state["submission_ml_inference_error"] = (
+                        f"{type(exc).__name__}: {exc}"
+                    )
         except Exception as exc:
-            st.session_state["submission_ml_inference_error"] = (
-                f"{type(exc).__name__}: {exc}"
+            st.error(
+                f"Historical replay is unavailable for this model: {type(exc).__name__}: {exc}"
             )
-            st.session_state.pop("submission_ml_inference_result", None)
+    else:
+        st.info(
+            "Enter independently sourced observations only. Unknown fields remain "
+            "blank; the engine will refuse inference until the selected model's "
+            "complete feature contract is supplied."
+        )
+        feature_names = [str(name) for name in selected_card.get("feature_columns", [])]
+        feature_ranges = selected_card.get("feature_ranges") or {}
+        provenance = selected_card.get("provenance") or {}
+        location_required = str(provenance.get("location") or "").casefold() == "kochi"
+        with st.form("submission_ml_inference_form", clear_on_submit=False):
+            location_value = ""
+            if location_required:
+                location_value = st.text_input(
+                    "Model location (must match its documented geography)",
+                    placeholder="Enter Kochi only if these inputs are for Kochi",
+                )
+            st.caption(f"Required features for this model: {len(feature_names)}")
+            input_columns = st.columns(2)
+            supplied_values = {}
+            for index, feature in enumerate(feature_names):
+                with input_columns[index % 2]:
+                    bounds = feature_ranges.get(feature, {})
+                    if isinstance(bounds, dict) and bounds.get("min") is not None and bounds.get("max") is not None:
+                        range_help = (
+                            f"Recorded training range: {bounds['min']} to {bounds['max']}. "
+                            "This is a domain-check reference, not a suggested or current observation."
+                        )
+                    else:
+                        range_help = "No numeric training range is recorded for this feature."
+                    supplied_values[feature] = st.text_input(
+                        feature,
+                        value="",
+                        help=range_help,
+                        placeholder="Enter a measured value; leave blank if unknown",
+                        key=f"submission-ml-{selected_hazard}-{selected_model_id}-{feature}",
+                    )
+            run_inference = st.form_submit_button(
+                "Check inputs and run model",
+                type="primary",
+                use_container_width=True,
+            )
+        if run_inference:
+            explicit_context = {
+                name: value.strip()
+                for name, value in supplied_values.items()
+                if value.strip() != ""
+            }
+            inference_inputs = {"ml_context": explicit_context}
+            if location_required:
+                inference_inputs["location"] = location_value.strip()
+            try:
+                evidence_result = ml_evidence_for(selected_hazard, inference_inputs)
+                st.session_state["submission_ml_inference_result"] = {
+                    "hazard": selected_hazard,
+                    "model_id": selected_model_id,
+                    "evidence": evidence_result,
+                    "replay": None,
+                }
+                st.session_state.pop("submission_ml_inference_error", None)
+            except Exception as exc:
+                st.session_state["submission_ml_inference_error"] = (
+                    f"{type(exc).__name__}: {exc}"
+                )
     inference_error = st.session_state.get("submission_ml_inference_error")
     if inference_error:
         st.error(f"Inference could not be completed: {inference_error}")
-    inference_result = st.session_state.get("submission_ml_inference_result")
-    if inference_result and inference_result.get("hazard") == selected_hazard:
+    saved_result = st.session_state.get("submission_ml_inference_result")
+    if (
+        isinstance(saved_result, dict)
+        and saved_result.get("hazard") == selected_hazard
+        and saved_result.get("model_id") == selected_model_id
+    ):
+        evidence_result = saved_result["evidence"]
         st.markdown("**Input and model readiness**")
-        model_result_rows = model_rows(inference_result)
+        model_result_rows = model_rows(evidence_result)
         if model_result_rows:
-            st.dataframe(pd.DataFrame(model_result_rows), hide_index=True, use_container_width=True)
-        st.markdown(f"**Engine status:** {inference_result.get('status', 'unknown').replace('_', ' ').title()}")
-        if inference_result.get("applications"):
-            st.markdown("**Model output(s)**")
             st.dataframe(
-                pd.DataFrame(application_rows(inference_result)),
+                pd.DataFrame(model_result_rows),
                 hide_index=True,
                 use_container_width=True,
             )
-            for application in inference_result["applications"]:
+        st.markdown(
+            f"**Engine status:** "
+            f"{evidence_result.get('status', 'unknown').replace('_', ' ').title()}"
+        )
+        if evidence_result.get("applications"):
+            st.markdown("**Model output(s)**")
+            st.dataframe(
+                pd.DataFrame(application_rows(evidence_result)),
+                hide_index=True,
+                use_container_width=True,
+            )
+            for application in evidence_result["applications"]:
                 for warning in application.get("warnings", []):
                     st.warning(warning)
                 for limitation in application.get("limitations", []):
                     st.caption(f"Limitation: {limitation}")
         else:
             st.warning(
-                inference_result.get("note")
+                evidence_result.get("note")
                 or "No output was produced. Review missing features, model status, "
                    "geographic scope, and training-range checks above."
             )
+        if saved_result.get("replay"):
+            replay = saved_result["replay"]
+            st.caption(
+                f"Retrospective check: {replay['target_column']} observed value was "
+                f"{replay['observed_target']:g} on the held-out case. The target was "
+                "not supplied as a model input."
+            )
         st.caption(
-            "These are model outputs for documented historical research targets, "
-            "not calibrated disaster probabilities, a live forecast, or an official warning."
+            "Research output only. It is not a calibrated disaster probability, "
+            "live forecast, official warning, or independently validated prediction."
         )
 else:
     st.info(
