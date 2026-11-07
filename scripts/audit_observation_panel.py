@@ -68,6 +68,9 @@ def audit(rows: list[dict[str, Any]], kind: str, max_offset_hours: float = 6.0) 
 
         try:
             if kind == "flood":
+                for field in ("rain_gauge_id", "river_gauge_id", "tide_station_id", "sar_scene_id"):
+                    if not str(row.get(field, "")).strip():
+                        problems.append({"row": index, "issue": "MISSING_SENSOR_IDENTITY", "field": field})
                 observed_at = _dt(str(row["observation_time_utc"]))
                 key = (str(row["event_id"]), str(row["site_id"]), observed_at.isoformat())
                 if key in duplicate:
