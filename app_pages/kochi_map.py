@@ -1009,7 +1009,7 @@ with map_display_slot:
                 st.markdown("**What this map shows**")
                 st.write(
                     "This optional dataset classifies land cover from observations made in 2021. "
-                    "It is kept off by default so it cannot be mistaken for a current 2026 view. "
+                    "It is a historical reference and must not be mistaken for a current 2026 view. "
                     "Use the interactive Satellite imagery basemap for visual inspection; its image "
                     "capture dates vary by location and are not guaranteed to be from 2026."
                 )
