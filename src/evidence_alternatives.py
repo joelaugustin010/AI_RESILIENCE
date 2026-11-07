@@ -218,6 +218,91 @@ def assign_spatial_block_splits(
     return result
 
 
+
+def audit_intervention_evidence(frame: pd.DataFrame) -> dict[str, Any]:
+    """Audit intervention records while separating empirical and simulated domains.
+
+    This is a schema/evidence-classification gate only. It never estimates a
+    treatment effect and never transfers an effect between intervention types.
+    """
+    required = {
+        "intervention_domain", "evidence_type", "treatment",
+        "assignment_method", "outcome_value", "outcome_unit", "source_url",
+    }
+    missing = sorted(required - set(frame.columns))
+    if missing:
+        return {
+            "schema_version": "intervention-evidence-audit/1.0.0",
+            "status": "BLOCKED_SCHEMA",
+            "missing_columns": missing,
+            "causal_effect_estimated": False,
+            "transferability_claimed": False,
+        }
+    if frame.empty:
+        return {
+            "schema_version": "intervention-evidence-audit/1.0.0",
+            "status": "BLOCKED_EMPTY_DATA",
+            "causal_effect_estimated": False,
+            "transferability_claimed": False,
+        }
+    data = frame.copy()
+    domains = set(data["intervention_domain"].dropna().astype(str).str.strip())
+    evidence = set(data["evidence_type"].dropna().astype(str).str.strip().str.lower())
+    problems: list[str] = []
+    if len(domains) != 1 or "" in domains:
+        problems.append("Do not pool different intervention domains in one evidence table.")
+    if len(evidence) != 1 or "" in evidence:
+        problems.append("Do not mix observed empirical outcomes and simulation outputs.")
+    treatment = pd.to_numeric(data["treatment"], errors="coerce")
+    if treatment.isna().any() or not set(treatment.dropna().unique()).issubset({0, 1}):
+        problems.append("treatment must contain only binary 0/1 values.")
+    elif set(treatment.unique()) != {0, 1}:
+        problems.append("Both treated and comparison observations are required.")
+    outcomes = pd.to_numeric(data["outcome_value"], errors="coerce")
+    if outcomes.isna().any() or not np.isfinite(outcomes.to_numpy(dtype=float)).all():
+        problems.append("outcome_value must contain finite numeric observations.")
+    if data["outcome_unit"].isna().any() or data["outcome_unit"].astype(str).str.strip().eq("").any():
+        problems.append("outcome_unit must be complete.")
+    elif data["outcome_unit"].nunique(dropna=True) != 1:
+        problems.append("Outcome units differ; standardise or split the evidence table.")
+    if not data["source_url"].astype(str).str.match(r"^https://").all():
+        problems.append("Every source_url must be an HTTPS provenance link.")
+    if data["assignment_method"].isna().any() or data["assignment_method"].astype(str).str.strip().eq("").any():
+        problems.append("assignment_method must be documented; use 'not_reported' when unknown.")
+    status = "BLOCKED_EVIDENCE_MIX_OR_QUALITY" if problems else "DESIGN_REVIEW_ONLY"
+    domain = next(iter(domains)) if len(domains) == 1 else "mixed"
+    evidence_type = next(iter(evidence)) if len(evidence) == 1 else "mixed"
+    if not problems:
+        if evidence_type == "simulated" or domain == "simulation":
+            status = "SIMULATION_ONLY_KEEP_SEPARATE_FROM_EMPIRICAL_OUTCOMES"
+        elif domain == "cash_assistance":
+            status = "EMPIRICAL_CASH_ASSISTANCE_CANDIDATE_NOT_TRANSFERABLE_TO_PHYSICAL_WORKS"
+        elif domain == "physical_infrastructure":
+            status = "PHYSICAL_INFRASTRUCTURE_DESIGN_REVIEW_ONLY_NOT_CAUSAL_PROOF"
+        else:
+            status = "UNREGISTERED_INTERVENTION_DOMAIN_REQUIRES_REVIEW"
+    return {
+        "schema_version": "intervention-evidence-audit/1.0.0",
+        "status": status,
+        "row_count": int(len(data)),
+        "intervention_domain": domain,
+        "evidence_type": evidence_type,
+        "assignment_methods": sorted(set(data["assignment_method"].astype(str).str.strip())),
+        "treated_rows": int(treatment.eq(1).sum()) if not treatment.isna().any() else 0,
+        "comparison_rows": int(treatment.eq(0).sum()) if not treatment.isna().any() else 0,
+        "outcome_units": sorted(set(data["outcome_unit"].dropna().astype(str))),
+        "problems": problems,
+        "causal_effect_estimated": False,
+        "transferability_claimed": False,
+        "interpretation": (
+            "Passing this audit only classifies a structurally coherent evidence table. "
+            "It does not establish randomization, exchangeability, parallel trends, "
+            "no spillovers, a causal effect, or transferability to Kochi."
+        ),
+    }
+
+
+
 def audit_satellite_flood_geojson(payload: Mapping[str, Any]) -> dict[str, Any]:
     """Audit event-labelled satellite flood polygons without inferring depth."""
     if payload.get("type") != "FeatureCollection" or not isinstance(payload.get("features"), list):
@@ -302,6 +387,7 @@ __all__ = [
     "HAZARD_ALTERNATIVE_TRACKS",
     "alternative_evidence_for_hazard",
     "assign_spatial_block_splits",
+    "audit_intervention_evidence",
     "audit_satellite_flood_geojson",
     "generate_pseudo_absence_samples",
 ]

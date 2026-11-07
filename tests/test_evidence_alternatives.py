@@ -160,3 +160,44 @@ def test_satellite_flood_audit_requires_timezone_aware_acquisition_time():
         },
     }]}
     assert audit_satellite_flood_geojson(payload)["status"] == "BLOCKED_METADATA_OR_GEOMETRY_ISSUES"
+
+
+def test_intervention_audit_keeps_cash_empirical_evidence_narrowly_scoped():
+    from src.evidence_alternatives import audit_intervention_evidence
+    frame = pd.DataFrame({
+        "intervention_domain": ["cash_assistance", "cash_assistance"],
+        "evidence_type": ["observed_empirical", "observed_empirical"],
+        "treatment": [1, 0], "assignment_method": ["randomized", "randomized"],
+        "outcome_value": [3.2, 2.8], "outcome_unit": ["index", "index"],
+        "source_url": ["https://example.org/a", "https://example.org/a"],
+    })
+    result = audit_intervention_evidence(frame)
+    assert result["status"] == "EMPIRICAL_CASH_ASSISTANCE_CANDIDATE_NOT_TRANSFERABLE_TO_PHYSICAL_WORKS"
+    assert result["causal_effect_estimated"] is False
+    assert result["transferability_claimed"] is False
+
+
+def test_intervention_audit_separates_simulation_from_empirical_evidence():
+    from src.evidence_alternatives import audit_intervention_evidence
+    frame = pd.DataFrame({
+        "intervention_domain": ["physical_infrastructure", "physical_infrastructure"],
+        "evidence_type": ["simulated", "simulated"],
+        "treatment": [1, 0], "assignment_method": ["scenario", "scenario"],
+        "outcome_value": [4.0, 5.0], "outcome_unit": ["depth_m", "depth_m"],
+        "source_url": ["https://example.org/model", "https://example.org/model"],
+    })
+    assert audit_intervention_evidence(frame)["status"] == "SIMULATION_ONLY_KEEP_SEPARATE_FROM_EMPIRICAL_OUTCOMES"
+
+
+def test_intervention_audit_rejects_mixed_domains_and_missing_control_group():
+    from src.evidence_alternatives import audit_intervention_evidence
+    frame = pd.DataFrame({
+        "intervention_domain": ["cash_assistance", "physical_infrastructure"],
+        "evidence_type": ["observed_empirical", "simulated"],
+        "treatment": [1, 1], "assignment_method": ["randomized", "scenario"],
+        "outcome_value": [1.0, 2.0], "outcome_unit": ["index", "depth_m"],
+        "source_url": ["https://example.org/a", "https://example.org/b"],
+    })
+    result = audit_intervention_evidence(frame)
+    assert result["status"] == "BLOCKED_EVIDENCE_MIX_OR_QUALITY"
+    assert result["causal_effect_estimated"] is False

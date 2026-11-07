@@ -19,6 +19,7 @@ import pandas as pd
 
 from src.evidence_alternatives import (
     assign_spatial_block_splits,
+    audit_intervention_evidence,
     audit_satellite_flood_geojson,
     generate_pseudo_absence_samples,
 )
@@ -116,6 +117,21 @@ def prepare_landslide(args: argparse.Namespace) -> int:
     return 0
 
 
+
+def audit_intervention(args: argparse.Namespace) -> int:
+    source = Path(args.input)
+    frame = pd.read_csv(source)
+    result = audit_intervention_evidence(frame)
+    result.update({
+        "input_file": str(source),
+        "input_sha256": sha256(source),
+        "audited_at_utc": datetime.now(timezone.utc).isoformat(),
+    })
+    write_json(Path(args.output_report), result)
+    print(json.dumps(result, indent=2))
+    return 0 if not result.get("problems") else 2
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -134,6 +150,11 @@ def build_parser() -> argparse.ArgumentParser:
     landslide.add_argument("--block-size-km", type=float, default=10.0)
     landslide.add_argument("--seed", type=int, default=42)
     landslide.set_defaults(run=prepare_landslide)
+
+    intervention = sub.add_parser("intervention-csv", help="Audit empirical versus simulated intervention evidence.")
+    intervention.add_argument("--input", required=True)
+    intervention.add_argument("--output-report", required=True)
+    intervention.set_defaults(run=audit_intervention)
     return parser
 
 
