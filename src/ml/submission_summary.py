@@ -15,7 +15,10 @@ def _finite_number(value: Any) -> bool:
 
 
 def rank_regression_cards(cards: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
-    """Return regression cards with a recorded finite MAE-skill score, best first."""
+    """Return regression cards with a recorded finite MAE-skill score, best first.
+
+    The legacy metric key is retained in persisted cards, but the comparator is
+    read from each card and may be persistence or a constant no-change baseline."""
     ranked: list[dict[str, Any]] = []
     for card in cards:
         if card.get("task_type") != "regression":
