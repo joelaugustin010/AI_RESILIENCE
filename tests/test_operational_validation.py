@@ -29,3 +29,10 @@ def test_monitor_abstains_when_sources_fail_or_inputs_stale():
     r=build_report(base,current,["rain"])
     assert r["safe_state"]=="UNAVAILABLE_ABSTAIN"
     assert "SOURCE_FAILURES" in r["reasons"] and "STALE_INPUTS" in r["reasons"]
+
+def test_shadow_monitor_rejects_outcome_known_before_issue():
+    base=[{"issued_at_utc":"2026-01-02T00:00:00Z","outcome_observed_at_utc":"2026-01-01T00:00:00Z",
+           "prediction_probability":"0.3","input_age_minutes":"5","latency_ms":"20",
+           "source_status":"OK","model_status":"OK","rain":str(i)} for i in range(25)]
+    with pytest.raises(ValueError,match="later than prediction issue time"):
+        build_report(base,base,["rain"])
