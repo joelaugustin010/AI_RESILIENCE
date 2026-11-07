@@ -189,6 +189,7 @@ jobs:
             reports/ml_validation_report.json
             reports/ml_disaster_coverage.json
             models/ml/**/model_card.json
+            models/ml/**/model.joblib
           if-no-files-found: error
           retention-days: 14
 
