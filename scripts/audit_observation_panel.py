@@ -45,7 +45,7 @@ def audit(rows,kind,max_offset_hours=6.0):
                 if row["event_observed"]=="": unknown+=1
         except (ValueError,KeyError) as exc:
             problems.append({"row":i,"issue":"INVALID_OR_MISSING_VALUE","detail":str(exc)})
-    blocking=sum(x["issue"] in {"MISSING_SOURCE_PROVENANCE","INVALID_OR_MISSING_VALUE","UNSUPPORTED_NON_EVENT_LABEL","FLOOD_LABEL_NOT_ADJUDICATED"} for x in problems)
+    blocking=sum(x["issue"] in {"MISSING_SOURCE_PROVENANCE","INVALID_OR_MISSING_VALUE","UNSUPPORTED_NON_EVENT_LABEL","FLOOD_LABEL_NOT_ADJUDICATED","TIME_ALIGNMENT_EXCEEDED","DUPLICATE_PANEL_KEY","EVENT_WITHOUT_FOOTPRINT_REFERENCE"} for x in problems)
     return {"panel_kind":kind,"rows":len(rows),"problems":problems,"problem_count":len(problems),
             "unknown_or_unlabelled_rows":unknown,"training_ready":False,
             "status":"BLOCKED_DATA_QUALITY" if blocking else "AUDIT_ONLY_REQUIRES_HUMAN_ADJUDICATION",
