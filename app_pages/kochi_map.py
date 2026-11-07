@@ -1089,7 +1089,7 @@ with map_display_slot:
             stroked=True, filled=False, get_line_color=[38, 106, 166, 220],
             line_width_min_pixels=2, pickable=True,
         ))
-        legend_rows.append(("Kochi Corporation boundary", "#266AA6 outline", "Administrative boundary"))
+        legend_rows.append(("Kochi Corporation boundary", "#266AA6", "Administrative boundary"))
 
 with map_display_slot:
     if processed_layers:
@@ -1203,7 +1203,7 @@ if not deck_layers:
         radius_min_pixels=5,
         pickable=False,
     ))
-    legend_rows.append(("Kochi map centre", "#266AA6 marker", "Orientation marker only; not a hazard or asset location"))
+    legend_rows.append(("Kochi map centre", "#266AA6", "Orientation marker only; not a hazard or asset location"))
 
 with map_display_slot:
     section_intro(
