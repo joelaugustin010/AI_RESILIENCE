@@ -156,8 +156,13 @@ def _model_entry(model_id: str, inputs: dict[str, Any]) -> tuple[dict[str, Any],
     return entry, prediction
 
 
-def ml_evidence_for(hazard: str, inputs: dict[str, Any] | None = None) -> dict[str, Any]:
-    """Return the shared ML evidence contract for one workflow hazard."""
+def ml_evidence_for(
+    hazard: str,
+    inputs: dict[str, Any] | None = None,
+    *,
+    selected_model_id: str | None = None,
+) -> dict[str, Any]:
+    """Return ML evidence for one hazard, optionally restricted to one registered model."""
     if hazard not in WORKFLOW_HAZARDS:
         raise ValueError(f"{hazard!r} is not an authoritative workflow hazard.")
     inputs = inputs or {}
@@ -165,6 +170,12 @@ def ml_evidence_for(hazard: str, inputs: dict[str, Any] | None = None) -> dict[s
         raise ValueError("Assessment inputs must be a mapping.")
     coverage = coverage_entry(hazard)
     model_ids = list(coverage.get("model_ids", []))
+    if selected_model_id is not None:
+        if selected_model_id not in model_ids:
+            raise ValueError(
+                f"Model {selected_model_id!r} is not registered for hazard {hazard!r}."
+            )
+        model_ids = [selected_model_id]
     if not model_ids:
         return {
             "hazard": hazard,
