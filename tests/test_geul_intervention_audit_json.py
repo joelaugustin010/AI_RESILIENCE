@@ -62,3 +62,17 @@ def test_group_damage_diagnostics_handles_no_identifiers():
     assert result["groups"] == 0
     assert result["rows_with_key"] == 0
     assert result["aggregation_is_validated"] is False
+
+
+def test_group_damage_diagnostics_counts_rows_even_when_damage_is_missing():
+    import pandas as pd
+
+    result = _group_damage_diagnostics(
+        pd.Series(["building-a", "building-a", "building-b"]),
+        pd.Series([10.0, None, 7.0]),
+    )
+
+    assert result["rows_with_key"] == 3
+    assert result["rows_with_non_null_damage_and_key"] == 2
+    assert result["duplicate_groups"] == 1
+    assert result["rows_in_duplicate_groups"] == 2
