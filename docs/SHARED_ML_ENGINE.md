@@ -165,3 +165,10 @@ moving blocks for ordered temporal holdouts. Invalid or missing group IDs fail
 closed, and fewer than two independent groups produce unavailable intervals
 rather than a falsely precise estimate. Training also excludes non-finite target
 values before estimating event thresholds or fitting a model.
+
+Location-specific weather models now fail closed when the submitted scenario has
+no explicit location or names a different city. The Kochi reanalysis-grid models
+accept Kochi/Cochin location text only; they are not silently transferred to
+other Kerala districts or other cities. This is a geographic applicability gate,
+not proof of neighborhood-scale accuracy: the underlying source remains one
+reanalysis grid point and does not resolve street-level rainfall or heat.
