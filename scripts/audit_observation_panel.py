@@ -57,6 +57,6 @@ def main():
     p.add_argument("--max-offset-hours",type=float,default=6); a=p.parse_args()
     with Path(a.input).open(encoding="utf-8-sig",newline="") as f: rows=list(csv.DictReader(f))
     report=audit(rows,a.kind,a.max_offset_hours); out=Path(a.output); out.parent.mkdir(parents=True,exist_ok=True)
-    out.write_text(json.dumps(report,indent=2)+"\\n",encoding="utf-8")
+    out.write_text(json.dumps(report,indent=2)+"\n",encoding="utf-8")
     print(json.dumps({"status":report["status"],"rows":report["rows"],"problems":report["problem_count"],"training_ready":False})); return 0
 if __name__=="__main__": raise SystemExit(main())
