@@ -108,6 +108,18 @@ if classifiers:
         "card and limitations before interpreting the score."
     )
 
+st.subheader("Complete registered model-card inventory")
+st.dataframe(
+    pd.DataFrame(card_rows(cards)),
+    hide_index=True,
+    use_container_width=True,
+)
+st.caption(
+    "This inventory reports every registered research card, including weak or "
+    "non-operational results. A row means a model artifact/card exists; it does "
+    "not mean the model is independently validated or suitable for warnings."
+)
+
 st.subheader("Explore a hazard")
 hazard_names = [entry["hazard"] for entry in coverage["entries"]]
 selected_hazard = st.selectbox("Select a hazard or compound scenario", hazard_names)
