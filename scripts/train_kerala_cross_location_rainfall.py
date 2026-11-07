@@ -91,6 +91,16 @@ def _paired_block_ci(
     return [float(low), float(high)]
 
 
+def _monthly_climatology(
+    training_dates: pd.Series, training_targets: pd.Series, test_dates: pd.Series
+) -> np.ndarray:
+    """Predict each test date with the training-only median for its calendar month."""
+    training_months = pd.to_datetime(training_dates).dt.month
+    test_months = pd.to_datetime(test_dates).dt.month
+    seasonal = pd.Series(training_targets.to_numpy(dtype=float)).groupby(training_months.to_numpy()).median()
+    return test_months.map(seasonal).to_numpy(dtype=float)
+
+
 def train(output_dir: Path) -> dict[str, Any]:
     if HELD_OUT_LOCATION in TRAIN_LOCATIONS:
         raise AssertionError("Kochi must never enter the training location list.")
@@ -198,6 +208,7 @@ def train(output_dir: Path) -> dict[str, Any]:
         "status": "RESEARCH_TRANSFER_EXPERIMENT_NOT_INDEPENDENTLY_VALIDATED",
         "promotion_rule": (
             "Do not promote unless the paired MAE-improvement interval is wholly "
+            "persistence and training-only monthly-climatology baselines are wholly " 
             "above zero, calibration/uncertainty is assessed, and an independent "
             "station-observation evaluation is completed."
         ),
@@ -234,7 +245,7 @@ def main() -> None:
         "held_out_kochi_metrics": report["held_out_kochi_metrics"],
         "persistence_baseline_metrics": report["persistence_baseline_metrics"],
         "mae_skill_over_persistence": report["mae_skill_over_persistence"],
-        "paired_mae_improvement_95ci_mm": report["paired_mae_improvement_95ci_mm"],
+        "mae_skill_over_seasonal_climatology": report["mae_skill_over_seasonal_climatology"],\n        "paired_mae_improvement_vs_persistence_95ci_mm": report["paired_mae_improvement_vs_persistence_95ci_mm"],\n        "paired_mae_improvement_vs_climatology_95ci_mm": report["paired_mae_improvement_vs_climatology_95ci_mm"],\n        "baseline_gate_passed": report["baseline_gate_passed"],
         "status": report["status"],
     }, indent=2))
 
