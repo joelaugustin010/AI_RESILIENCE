@@ -1,4 +1,4 @@
-"""Audit paired Geul SFINCS intervention outputs without extracting the full archive.
+""""Audit paired Geul SFINCS intervention outputs without extracting the full archive.
 
 This is a data-quality and descriptive-comparison utility, not a causal model
 or training pipeline. It reads one matched model/event/RP100 slice, diagnoses
@@ -47,6 +47,26 @@ def _member(names: list[str], prefix: str, contains: str) -> str:
             f"under {prefix!r}; found {len(matches)}: {matches[:8]}"
         )
     return matches[0]
+
+
+def _json_safe(value: Any) -> Any:
+    """Convert NumPy values and non-finite floats to strict-JSON-safe values.
+
+    NaN is a legitimate nodata marker in some GeoTIFFs, but JSON has no NaN
+    literal. Preserve the field while representing non-finite numbers as null.
+    """
+    if isinstance(value, dict):
+        return {str(key): _json_safe(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_json_safe(item) for item in value]
+    if isinstance(value, (float, np.floating)):
+        number = float(value)
+        return number if math.isfinite(number) else None
+    if isinstance(value, np.integer):
+        return int(value)
+    if isinstance(value, np.bool_):
+        return bool(value)
+    return value
 
 
 def _finite_stats(values: np.ndarray) -> dict[str, float | int | None]:
@@ -330,7 +350,9 @@ def audit_archive(archive: Path, output: Path) -> dict[str, Any]:
                     ),
                 }
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(report, indent=2, allow_nan=False), encoding="utf-8")
+    output.write_text(
+        json.dumps(_json_safe(report), indent=2, allow_nan=False), encoding="utf-8"
+    )
     return report
 
 
