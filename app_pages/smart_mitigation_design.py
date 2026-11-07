@@ -16,28 +16,28 @@ st.markdown(
     .concept-note {
       background:
         radial-gradient(ellipse at 100% 0%, rgba(240, 197, 106, .12), transparent 18rem),
-        linear-gradient(145deg, rgba(58, 47, 22, .62), rgba(36, 31, 18, .62));
+        linear-gradient(145deg, #FFFFFF, #DCE7E8);
       border: 1px solid rgba(235, 190, 91, .34);
       border-left: 4px solid #e9bd5a;
       border-radius: 15px;
       padding: 1rem 1.15rem;
-      color: #f6e6b8;
+      color: #465C5D;
       line-height: 1.62;
       margin: .4rem 0 1.1rem;
       box-shadow: var(--ar-shadow-soft);
     }
-    .concept-note strong { color: #ffe9b0; letter-spacing: .04em; }
-    .concept-note p { color: #eddaa8; margin: .3rem 0 0; }
+     .concept-note strong { color: #174E55; letter-spacing: .04em; }
+     .concept-note p { color: #52666A; margin: .3rem 0 0; }
     .smart-panel {
       margin: 1.4rem 0 .9rem;
       padding: 1.05rem 1.25rem;
-      background: linear-gradient(120deg, rgba(13,43,60,.98), rgba(10,61,67,.96));
-      border: 1px solid rgba(130,190,199,.28);
+      background: linear-gradient(120deg, #FFFFFF, #DCE7E8);
+      border: 1px solid rgba(23,78,85,.18);
       border-radius: 18px;
       box-shadow: var(--ar-shadow-soft);
     }
-    .smart-panel h3 { margin: 0; color: #e7f5f5; }
-    .smart-panel p { margin: .35rem 0 0; color: #a8c2ca; font-size: .86rem; }
+    .smart-panel h3 { margin: 0; color: #174E55; }
+    .smart-panel p { margin: .35rem 0 0; color: #52666A; font-size: .86rem; }
     </style>
     """,
     unsafe_allow_html=True,
@@ -290,14 +290,14 @@ st.markdown("""
     margin-top: 28px;
     margin-bottom: 18px;
     padding: 16px 20px;
-    background: linear-gradient(120deg, rgba(13,43,60,.98), rgba(10,61,67,.96));
-    border: 1px solid rgba(130,190,199,.28);
+    background: linear-gradient(120deg, #FFFFFF, #DCE7E8);
+    border: 1px solid rgba(23,78,85,.18);
     border-radius: 14px;
 ">
-    <h3 style="margin: 0; color: #e7f5f5;">
+    <h3 style="margin: 0; color: #174E55;">
         📐 Engineering Concept Brief
     </h3>
-    <p style="margin: 5px 0 0 0; color: #a8c2ca; font-size: 13px;">
+    <p style="margin: 5px 0 0 0; color: #52666A; font-size: 13px;">
         Project scope, selected systems and engineering review status.
     </p>
 </div>
@@ -1278,7 +1278,7 @@ st.plotly_chart(
 
 st.markdown("""
 <div class="smart-panel">
-    <h3 style="margin: 0; color: #e7f5f5;">
+    <h3 style="margin: 0; color: #174E55;">
         🧠 Live Design Intelligence
     </h3>
     <p>
@@ -1541,14 +1541,14 @@ st.markdown("""
     margin-top: 30px;
     margin-bottom: 18px;
     padding: 17px 21px;
-    background: linear-gradient(120deg, rgba(13,43,60,.98), rgba(10,61,67,.96));
-    border: 1px solid rgba(130,190,199,.28);
+    background: linear-gradient(120deg, #FFFFFF, #DCE7E8);
+    border: 1px solid rgba(23,78,85,.18);
     border-radius: 14px;
 ">
-    <h3 style="margin: 0; color: #e7f5f5;">
+    <h3 style="margin: 0; color: #174E55;">
         🏗️ Flood-Management Design Overview
     </h3>
-    <p style="margin: 5px 0 0 0; color: #a8c2ca; font-size: 13px;">
+    <p style="margin: 5px 0 0 0; color: #52666A; font-size: 13px;">
         Summary of the mitigation systems included in this concept design.
     </p>
 </div>
@@ -1648,14 +1648,14 @@ st.markdown("""
     margin-top: 32px;
     margin-bottom: 20px;
     padding: 20px 23px;
-    background: linear-gradient(120deg, rgba(13,43,60,.98), rgba(10,61,67,.96));
-    border: 1px solid rgba(130,190,199,.28);
+    background: linear-gradient(120deg, #FFFFFF, #DCE7E8);
+    border: 1px solid rgba(23,78,85,.18);
     border-radius: 16px;
 ">
-    <h2 style="margin: 0; color: #e7f5f5;">
+    <h2 style="margin: 0; color: #174E55;">
         📄 Project Design Report
     </h2>
-    <p style="margin: 6px 0 0 0; color: #a8c2ca; font-size: 13px;">
+    <p style="margin: 6px 0 0 0; color: #52666A; font-size: 13px;">
         Downloadable project configuration, component estimates and engineering limitations.
     </p>
 </div>
