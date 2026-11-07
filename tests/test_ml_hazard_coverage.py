@@ -49,6 +49,7 @@ def test_usable_secondary_model_is_not_hidden_by_failed_primary_model():
     assert cyclone["support_level"] == "screening_model"
     assert cyclone["usable_research_model_ids"] == [cyclone_ids[1]]
     assert "Cyclone" in coverage["hazards_with_any_usable_research_model"]
+    assert "Cyclone" in coverage["hazards_with_usable_research_model"]
 
 
 def test_all_failed_screening_models_are_not_labelled_usable():
@@ -61,3 +62,19 @@ def test_all_failed_screening_models_are_not_labelled_usable():
     assert cyclone["support_level"] == "no_skill_model"
     assert cyclone["usable_research_model_ids"] == []
     assert "Cyclone" not in coverage["hazards_with_usable_research_model"]
+
+
+
+def test_not_trained_cards_do_not_count_as_ml_evidence():
+    all_ids = {
+        model_id: "NOT_TRAINED"
+        for model_ids in HAZARD_MODEL_MAP.values()
+        for model_id in model_ids
+    }
+    with patch("src.ml.coverage.list_model_cards", return_value=_cards(all_ids)):
+        coverage = build_coverage_matrix(write=False)
+
+    assert coverage["n_hazards_with_registered_model_cards"] == 7
+    assert coverage["n_hazards_with_ml_evidence"] == 0
+    assert coverage["n_hazards_without_ml"] == 10
+    assert coverage["n_hazards_with_any_usable_research_model"] == 0
