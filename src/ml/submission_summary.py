@@ -68,4 +68,16 @@ def rank_classifier_cards(cards: Sequence[Mapping[str, Any]]) -> list[dict[str, 
     )
 
 
-__all__ = ["rank_classifier_cards", "rank_regression_cards"]
+def regression_baseline_label(card: Mapping[str, Any]) -> str:
+    """Describe the comparator actually recorded for a regression card."""
+    metrics = card.get("metrics")
+    baseline = metrics.get("persistence_baseline") if isinstance(metrics, Mapping) else None
+    baseline_type = baseline.get("type") if isinstance(baseline, Mapping) else None
+    if baseline_type == "constant_no_change":
+        return "No-change baseline"
+    if baseline_type == "persistence":
+        return "Persistence baseline"
+    return "Recorded baseline"
+
+
+__all__ = ["rank_classifier_cards", "rank_regression_cards", "regression_baseline_label"]
