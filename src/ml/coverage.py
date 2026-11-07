@@ -193,7 +193,7 @@ def build_coverage_matrix(*, write: bool = True) -> dict[str, Any]:
             if usable_ids:
                 support = "screening_model"
             elif not trained_ids:
-                support = "not_trained"
+                support = "invalid_model_card" if "INVALID_STATUS" in statuses.values() else "not_trained"
             elif all(status == "NO_SKILL" for status in trained_statuses):
                 support = "no_skill_model"
             elif all(status == "INSUFFICIENT_TEST_EVENTS" for status in trained_statuses):
@@ -204,7 +204,11 @@ def build_coverage_matrix(*, write: bool = True) -> dict[str, Any]:
             if usable_ids:
                 support = "forcing_evidence_only"
             elif not trained_ids:
-                support = "forcing_model_not_trained"
+                support = (
+                    "forcing_model_invalid_card"
+                    if "INVALID_STATUS" in statuses.values()
+                    else "forcing_model_not_trained"
+                )
             elif all(status == "NO_SKILL" for status in trained_statuses):
                 support = "no_skill_forcing_model"
             else:
