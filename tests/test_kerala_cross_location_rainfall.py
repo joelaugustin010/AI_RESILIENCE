@@ -9,6 +9,8 @@ from scripts.train_kerala_cross_location_rainfall import (
     _paired_block_ci,
     _monthly_climatology,
     _regression_calibration_bins,
+    _seasonal_metrics,
+    _wet_day_metrics,
 )
 
 
@@ -53,3 +55,30 @@ def test_regression_calibration_bins_are_equal_count_and_report_bias() -> None:
     result = _regression_calibration_bins(actual, predicted, bins=3)
     assert [row["n"] for row in result] == [2, 2, 2]
     assert all("bias_observed_minus_predicted_mm" in row for row in result)
+
+
+def test_wet_day_metrics_use_explicit_threshold_and_report_occurrence_skill() -> None:
+    actual = np.array([0.0, 2.0, 0.0, 4.0])
+    predicted = np.array([0.5, 1.5, 2.0, 0.0])
+    result = _wet_day_metrics(actual, predicted, threshold_mm=1.0)
+    assert result["threshold_mm"] == 1.0
+    assert result["actual_wet_days"] == 2
+    assert result["predicted_wet_days"] == 2
+    assert result["precision"] == 0.5
+    assert result["recall"] == 0.5
+    assert result["f1"] == 0.5
+
+
+def test_seasonal_metrics_separate_southwest_monsoon_from_other_months() -> None:
+    import pandas as pd
+
+    actual = np.array([10.0, 20.0, 2.0, 4.0])
+    predicted = np.array([8.0, 18.0, 3.0, 5.0])
+    dates = pd.Series(pd.to_datetime([
+        "2021-06-01", "2021-09-01", "2021-01-01", "2021-12-01"
+    ]))
+    result = _seasonal_metrics(actual, predicted, dates)
+    assert result["southwest_monsoon_jun_sep"]["n"] == 2
+    assert result["other_months"]["n"] == 2
+    assert result["southwest_monsoon_jun_sep"]["mae_mm"] == 2.0
+    assert result["other_months"]["mean_bias_mm"] == -1.0
