@@ -83,8 +83,14 @@ def prepare_landslide(args: argparse.Namespace) -> int:
         "status": "RESEARCH_CANDIDATES_ONLY_NOT_OPERATIONAL_MODEL_DATA",
         "positive_rows": int(len(positive_rows)),
         "pseudo_absence_rows": int(len(pseudo)),
-        "rows_by_split": combined["spatial_split"].value_counts().to_dict(),
-        "blocks_by_split": combined.groupby("spatial_split")["spatial_block_id"].nunique().to_dict(),
+        "rows_by_split": {
+            str(key): int(value)
+            for key, value in combined["spatial_split"].value_counts().items()
+        },
+        "blocks_by_split": {
+            str(key): int(value)
+            for key, value in combined.groupby("spatial_split")["spatial_block_id"].nunique().items()
+        },
         "label_types": combined["label_type"].value_counts().to_dict(),
         "min_distance_km": args.min_distance_km,
         "block_size_km": args.block_size_km,
