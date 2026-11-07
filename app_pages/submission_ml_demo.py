@@ -94,6 +94,39 @@ if regressors:
 else:
     st.info("No regression model card with a recorded persistence-skill metric is available.")
 
+classifiers = [
+    card for card in cards
+    if card.get("task_type") != "regression"
+    and isinstance(card.get("metrics"), dict)
+    and isinstance((card.get("metrics", {}).get("persistence_baseline") or {}).get("f1"), (int, float))
+    and isinstance(card.get("metrics", {}).get("f1"), (int, float))
+]
+classifiers.sort(
+    key=lambda card: float(card["metrics"]["f1"])
+    - float(card["metrics"]["persistence_baseline"]["f1"]),
+    reverse=True,
+)
+if classifiers:
+    best_classifier = classifiers[0]
+    classifier_metrics = best_classifier["metrics"]
+    baseline_f1 = float(classifier_metrics["persistence_baseline"]["f1"])
+    model_f1 = float(classifier_metrics["f1"])
+    st.markdown("#### Strongest classifier F1 comparison")
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Research task", best_classifier.get("hazard", best_classifier.get("model_id", "Classifier")))
+    c2.metric("Model F1", f"{model_f1:.3f}")
+    c3.metric("Persistence F1", f"{baseline_f1:.3f}", f"{(model_f1 - baseline_f1):+.3f} absolute")
+    st.caption(
+        f"{best_classifier.get('model_id')} · ROC-AUC "
+        f"{classifier_metrics.get('roc_auc', 'not recorded')} · "
+        f"average precision {classifier_metrics.get('average_precision', 'not recorded')}."
+    )
+    st.warning(
+        "This is a single-holdout research comparison. It does not establish "
+        "independent validation or calibrated probabilities; inspect the model "
+        "card and limitations before interpreting the score."
+    )
+
 st.subheader("Explore a hazard")
 hazard_names = [entry["hazard"] for entry in coverage["entries"]]
 selected_hazard = st.selectbox("Select a hazard or compound scenario", hazard_names)
