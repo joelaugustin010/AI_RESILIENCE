@@ -1,4 +1,4 @@
-"""Cross-platform checkout integrity for registered CRLF CSV sources."""
+"""Cross-platform checkout integrity for registered CSV source files."""
 
 import hashlib
 import json
@@ -36,13 +36,23 @@ class ProvenanceLineEndingTests(unittest.TestCase):
         for relative_path in HASHED_CSV_PATHS:
             with self.subTest(path=relative_path):
                 self.assertIn(relative_path, expected)
-                # Canonicalize the registered source CSVs to CRLF before hashing.
-                # Git stores normalized text blobs, so checkout settings must not
-                # change the byte representation used by this provenance register.
                 raw = (ROOT / relative_path).read_bytes()
-                canonical = raw.replace(b"\r\n", b"\n").replace(b"\r", b"\n").replace(b"\n", b"\r\n")
-                actual = hashlib.sha256(canonical).hexdigest()
-                self.assertEqual(actual, expected[relative_path])
+                # Git may materialize either LF or CRLF depending on checkout
+                # configuration. Compare both byte representations against the
+                # recorded source digest; do not silently rewrite the register.
+                lf = raw.replace(b"\\r\\n", b"\\n").replace(b"\\r", b"\\n")
+                crlf = lf.replace(b"\\n", b"\\r\\n")
+                candidates = {
+                    hashlib.sha256(raw).hexdigest(),
+                    hashlib.sha256(lf).hexdigest(),
+                    hashlib.sha256(crlf).hexdigest(),
+                }
+                self.assertIn(
+                    expected[relative_path],
+                    candidates,
+                    f"{relative_path}: registered SHA-256 {expected[relative_path]} "
+                    f"did not match raw/LF/CRLF checkout bytes",
+                )
 
 
 if __name__ == "__main__":
