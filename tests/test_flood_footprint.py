@@ -29,7 +29,7 @@ def test_summarizes_supplied_depth_layer_and_area_weighted_depth():
     assert result["flooded_extent_km2"] > 0
 
 
-@pytest.mark.parametrize("depth", [-0.1, float("nan"), 101, "unknown"])
+@pytest.mark.parametrize("depth", [-0.1, 0, float("nan"), 101, "unknown"])
 def test_rejects_invalid_depth(depth):
     with pytest.raises(FloodFootprintError):
         summarize_flood_depth_geojson(collection(feature(polygon(76,9,76.01,9.01), depth)))
