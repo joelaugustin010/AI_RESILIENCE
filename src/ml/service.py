@@ -12,6 +12,12 @@ from typing import Any
 
 from src.hazard_registry import WORKFLOW_HAZARDS
 from src.ml.coverage import coverage_entry
+from src.ml.data import (
+    build_aftershock_dataset,
+    build_compound_cyclone_rainfall_dataset,
+    build_cyclone_intensification_dataset,
+    build_weather_target_dataset,
+)
 from src.ml.features import FeatureContractError, context_from_inputs
 from src.ml.inference import context_gaps, predict_from_context, predict_regression_from_context
 from src.ml.registry import list_model_cards, load_model_card
@@ -216,6 +222,81 @@ def ml_evidence_for(hazard: str, inputs: dict[str, Any] | None = None) -> dict[s
     }
 
 
+
+def historical_replay_context(model_id: str) -> dict[str, Any]:
+    """Build an exact feature row from the model's documented temporal test period.
+
+    This is a retrospective inference demonstration, never a current forecast.
+    The selected row comes from the same traceable source builder used for
+    research training; the future target is returned separately for comparison
+    and is never passed to the model as an input.
+    """
+    card = load_model_card(model_id)
+    if card is None:
+        raise ValueError(f"Model {model_id!r} is not registered.")
+    dataset_name = str(card.get("dataset_name") or "")
+    provenance = card.get("provenance") or {}
+    if dataset_name.startswith("weather_"):
+        target = str(provenance.get("target") or "")
+        location = str(provenance.get("location") or "kochi")
+        if target not in {"extreme_rainfall", "high_temperature", "drought_onset"}:
+            raise ValueError(f"Unsupported weather target for historical replay: {target!r}.")
+        dataset = build_weather_target_dataset(location=location, target=target)
+    elif dataset_name == "cyclone_rapid_intensification_24h":
+        dataset = build_cyclone_intensification_dataset()
+    elif dataset_name == "earthquake_aftershock_occurrence":
+        dataset = build_aftershock_dataset()
+    elif dataset_name == "compound_cyclone_rainfall_interaction":
+        dataset = build_compound_cyclone_rainfall_dataset()
+    else:
+        raise ValueError(f"No historical replay builder is registered for {dataset_name!r}.")
+
+    split = card.get("temporal_split") or {}
+    cutoff = split.get("test_start") or split.get("test_target_dates_from")
+    if not cutoff:
+        raise ValueError("The model card does not document a temporal test-period start.")
+    features = [str(name) for name in card.get("feature_columns", [])]
+    target_column = str(card.get("target_column") or dataset.target_column)
+    date_column = str(dataset.date_column)
+    required = [date_column, target_column, *features]
+    missing = [name for name in required if name not in dataset.frame.columns]
+    if missing:
+        raise ValueError(f"Historical dataset is missing model-contract columns: {missing}")
+
+    frame = dataset.frame.copy()
+    frame[date_column] = pd.to_datetime(frame[date_column], errors="coerce")
+    frame = frame.loc[frame[date_column] >= pd.Timestamp(cutoff)]
+    frame = frame.dropna(subset=required)
+    if frame.empty:
+        raise ValueError("No complete historical test-period row is available for this model.")
+    row = frame.sort_values(date_column).iloc[-1]
+    context: dict[str, float] = {}
+    for name in features:
+        value = float(row[name])
+        if not np.isfinite(value):
+            raise ValueError(f"Historical feature {name!r} is not finite.")
+        context[name] = value
+    observed_target = float(row[target_column])
+    if not np.isfinite(observed_target):
+        raise ValueError("Historical target is not finite.")
+    return {
+        "model_id": model_id,
+        "context": context,
+        "case_date": row[date_column].date().isoformat(),
+        "target_column": target_column,
+        "observed_target": observed_target,
+        "target_definition": card.get("target_definition"),
+        "source": provenance.get("source") or dataset.provenance.get("source"),
+        "source_type": provenance.get("source_type") or dataset.provenance.get("source_type"),
+        "location": provenance.get("location"),
+        "case_role": "latest complete row in the documented temporal test holdout",
+        "warning": (
+            "Retrospective historical replay only. The observed target is shown "
+            "separately and is never supplied to the model."
+        ),
+    }
+
+
 def ml_registry_summary() -> dict[str, Any]:
     """Return a compact status summary for the model-lab UI."""
     cards = list_model_cards()
@@ -238,4 +319,4 @@ def ml_registry_summary() -> dict[str, Any]:
     }
 
 
-__all__ = ["USABLE_STATUSES", "ml_evidence_for", "ml_registry_summary"]
+__all__ = ["USABLE_STATUSES", "historical_replay_context", "ml_evidence_for", "ml_registry_summary"]
