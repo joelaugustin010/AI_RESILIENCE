@@ -13,6 +13,7 @@ from src.dataframe_display import display_dataframe
 from src.ui_theme import page_header
 from src.prevention_intelligence import generate_prevention_actions
 from src.intervention_effectiveness import intervention_effectiveness_for_hazards
+from src.evidence_readiness import evidence_readiness_for_hazards
 
 
 def _render_shared_ml_evidence(selected_hazards: list[str]) -> None:
@@ -311,6 +312,23 @@ if submitted:
             st.caption("No threshold comparison was made. A reference level is never assumed or invented.")
 
         _render_shared_ml_evidence(hazards)
+
+        st.markdown("#### Evidence acquisition and scientific readiness")
+        st.caption(
+            "These source leads improve data discovery, but a public event catalogue, "
+            "aggregate reliability metric or project report is not automatically a "
+            "training dataset. The status below separates what exists from what is "
+            "still required before a defensible prediction or causal estimate."
+        )
+        for track in evidence_readiness_for_hazards(hazards):
+            title = track["title"] + " · " + track["status"].replace("_", " ").lower()
+            with st.expander(title, expanded=False):
+                st.write("**Available evidence:**", track["available"])
+                st.write("**Scientific limitation:**", track["gap"])
+                st.write("**Next evidence required:**", track["next"])
+                st.write("**Source records:**")
+                for source_url in track["sources"]:
+                    st.markdown(f"- [{source_url}]({source_url})")
 
         st.markdown("#### Possible consequences to investigate")
         for item in result["service_reviews"]:
