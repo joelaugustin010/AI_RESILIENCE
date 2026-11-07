@@ -1002,7 +1002,7 @@ with map_display_slot:
                 landcover_metadata = landcover_context["metadata"]
                 landcover_processing = landcover_metadata["processing"]
                 show_landcover = st.checkbox(
-                    "Show historical ESA WorldCover 2021 reference (not a 2026 map)",
+                    "Show WorldCover 2021 land-cover context (historical reference; not a 2026 map)",
                     value=True,
                     key=f"kochimap_worldcover_{active_hazard}",
                 )
