@@ -34,3 +34,8 @@ Compare against persistence, climatology/base rate, matched official forecast pr
 Each mitigation recommendation must include hazard pathway, local observation/source IDs, exposed asset/population, intervention, responsible owner, mechanism, evidence tier, maintenance, measurable outcome, evaluation design and caveat. Do not claim lives/money saved or causal effectiveness without suitable outcome data.
 
 Judge-facing scope: AI_RESILIENCE is an evidence-gated multi-hazard decision-support prototype with deterministic scenario assessment, data/provenance audits, research ML outputs for selected hazards and preparedness guidance. It is not an independently validated Kochi early-warning system, does not issue official warnings, and does not estimate causal intervention effectiveness.
+
+
+## Executable observation-panel audit
+
+Run `python scripts/audit_observation_panel.py --kind flood --input <frozen_event_panel.csv>` or use `--kind landslide` for monitored site-period records. The audit checks required provenance fields, UTC timestamp offsets and monitored non-event requirements. Its output deliberately sets `training_ready=false`; a clean schema audit is not scientific adjudication or permission to train. It cannot validate the truth of a publisher's records or replace field review.
