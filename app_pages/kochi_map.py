@@ -776,7 +776,7 @@ if processed_layers:
 
 st.subheader("Map layers")
 show_boundary = st.checkbox("Kochi Corporation administrative boundary", value=True)
-st.caption("Blue outline = administrative boundary only. It must not be interpreted as a hazard zone or as the full Greater Kochi urban area.")
+st.caption("Blue outline = provisional, display-only Kochi administrative outline. It is not a verified ward boundary, legal boundary, hazard zone, coverage mask, or full Greater Kochi urban area.")
 deck_layers = []
 legend_rows = []
 active_components = components_for(active_hazard) if active_hazard else []
