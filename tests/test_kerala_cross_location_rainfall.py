@@ -8,6 +8,7 @@ from scripts.train_kerala_cross_location_rainfall import (
     TRAIN_LOCATIONS,
     _paired_block_ci,
     _monthly_climatology,
+    _regression_calibration_bins,
 )
 
 
@@ -44,3 +45,11 @@ def test_monthly_climatology_uses_training_targets_only() -> None:
     test_dates = pd.Series(pd.to_datetime(["2024-01-01", "2024-02-01"]))
     result = _monthly_climatology(train_dates, train_targets, test_dates)
     assert result.tolist() == [15.0, 3.0]
+
+
+def test_regression_calibration_bins_are_equal_count_and_report_bias() -> None:
+    actual = np.array([1.0, 2.0, 4.0, 8.0, 10.0, 12.0])
+    predicted = np.array([0.0, 1.0, 3.0, 7.0, 9.0, 11.0])
+    result = _regression_calibration_bins(actual, predicted, bins=3)
+    assert [row["n"] for row in result] == [2, 2, 2]
+    assert all("bias_observed_minus_predicted_mm" in row for row in result)
