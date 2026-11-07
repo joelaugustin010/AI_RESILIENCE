@@ -102,16 +102,6 @@ def train_regression_dataset(
     order = np.argsort(pd.to_datetime(frame[dataset.date_column]).to_numpy(), kind="mergesort")
     frame, features, target = frame.iloc[order].reset_index(drop=True), features.iloc[order].reset_index(drop=True), target.iloc[order].reset_index(drop=True)
     frame["_continuous_target"] = target.to_numpy()
-    feature_ranges: dict[str, dict[str, Any]] = {}
-    for column in feature_columns:
-        values = pd.to_numeric(features[column], errors="coerce")
-        finite = values[np.isfinite(values)]
-        feature_ranges[column] = {
-            "min": float(finite.min()) if len(finite) else None,
-            "max": float(finite.max()) if len(finite) else None,
-            "median": float(finite.median()) if len(finite) else None,
-            "missing_fraction": float(values.isna().mean()),
-        }
     train, validation, test, purge = temporal_split(
         frame, date_column=dataset.date_column,
         validation_start=pd.Timestamp(validation_start), test_start=pd.Timestamp(test_start),
@@ -133,6 +123,19 @@ def train_regression_dataset(
         fitted[name] = model
     selected = min(candidates, key=lambda row: (row["mae"], row["rmse"]))
     final_train = pd.concat([train, validation]).sort_values(dataset.date_column)
+    # Feature applicability ranges are estimated from final training data only;
+    # the untouched test period must not influence inference-domain metadata.
+    final_train_features_for_ranges = features.loc[final_train.index, feature_columns]
+    feature_ranges: dict[str, dict[str, Any]] = {}
+    for column in feature_columns:
+        values = pd.to_numeric(final_train_features_for_ranges[column], errors="coerce")
+        finite = values[np.isfinite(values)]
+        feature_ranges[column] = {
+            "min": float(finite.min()) if len(finite) else None,
+            "max": float(finite.max()) if len(finite) else None,
+            "median": float(finite.median()) if len(finite) else None,
+            "missing_fraction": float(values.isna().mean()),
+        }
     final_model = build_regressor(selected["model_type"])
     final_model.fit(features.loc[final_train.index, feature_columns], final_train["_continuous_target"].to_numpy(dtype=float))
     predicted = np.asarray(final_model.predict(X_test), dtype=float)
