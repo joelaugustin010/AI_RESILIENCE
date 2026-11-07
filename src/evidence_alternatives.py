@@ -51,6 +51,18 @@ ALTERNATIVE_EVIDENCE: dict[str, dict[str, Any]] = {
         "does_not_support": ["facility_specific_incident_probability_from_aggregate_statistics", "source_attribution_from_nearby_AQI"],
         "status": "AGGREGATE_SAFETY_EVIDENCE_AND_ENGINEERING_ALTERNATIVE_AVAILABLE",
     },
+    "intervention_effectiveness": {
+        "title": "Empirical and simulated intervention evidence",
+        "method": "Keep randomized anticipatory-assistance evaluations, observational physical works and hydraulic intervention simulations in separate evidence tracks.",
+        "sources": [
+            {"publisher": "World Bank Microdata Library", "title": "Bangladesh Forecast Based Anticipatory Action Impact Evaluation 2024", "url": "https://microdata.worldbank.org/catalog/8009", "access": "licensed_microdata_human_approval_required"},
+            {"publisher": "World Bank Reproducibility Repository", "title": "Fast Action for Floods reproducibility package", "url": "https://reproducibility.worldbank.org/catalog/374", "access": "code_public_some_microdata_licensed_and_not_included"},
+            {"publisher": "Zenodo", "title": "Geul intervention simulation archive", "url": "https://zenodo.org/records/15488420", "access": "simulation_outputs_not_observed_outcomes"},
+        ],
+        "supports": ["causal_method_reproduction_for_anticipatory_cash_assistance_if_authorized_data_are_obtained", "separate_simulation_surrogate_research_for_engineered_interventions"],
+        "does_not_support": ["transfer_of_cash_assistance_effects_to_drainage_or_embankment_works", "treating_simulated_outcomes_as_observed_effectiveness", "Kochi_physical_intervention_effects_without_local_outcomes"],
+        "status": "EMPIRICAL_CASH_ASSISTANCE_AND_SIMULATION_ALTERNATIVES_IDENTIFIED_KEEP_SEPARATE",
+    },
     "infrastructure_reliability": {
         "title": "Utility reliability indicators",
         "method": "Use KSEB Urjadooth feeder/DTR outage and SAIFI/SAIDI indicators for system-level reliability context; do not infer individual asset failure rates from aggregates.",
@@ -78,13 +90,13 @@ ALTERNATIVE_EVIDENCE: dict[str, dict[str, Any]] = {
 
 
 HAZARD_ALTERNATIVE_TRACKS: dict[str, tuple[str, ...]] = {
-    "Flood": ("flood_satellite", "kochi_intervention_reconstruction"),
+    "Flood": ("flood_satellite", "intervention_effectiveness", "kochi_intervention_reconstruction"),
     "Landslide": ("landslide_inventory",),
     "Industrial incident": ("industrial_process_risk",),
-    "Infrastructure failure": ("infrastructure_reliability",),
-    "Compound: cyclone + flood": ("flood_satellite", "kochi_intervention_reconstruction"),
+    "Infrastructure failure": ("infrastructure_reliability", "intervention_effectiveness"),
+    "Compound: cyclone + flood": ("flood_satellite", "intervention_effectiveness", "kochi_intervention_reconstruction"),
     "Compound: heavy rainfall + drainage failure": (
-        "flood_satellite", "infrastructure_reliability", "kochi_intervention_reconstruction"
+        "flood_satellite", "infrastructure_reliability", "intervention_effectiveness", "kochi_intervention_reconstruction"
     ),
 }
 

@@ -12,7 +12,7 @@ from src.evidence_alternatives import (
 def test_alternative_registry_covers_all_six_evidence_gaps():
     assert set(ALTERNATIVE_EVIDENCE) == {
         "flood_satellite", "landslide_inventory", "industrial_process_risk",
-        "infrastructure_reliability", "kochi_intervention_reconstruction",
+        "infrastructure_reliability", "intervention_effectiveness", "kochi_intervention_reconstruction",
     }
     for item in ALTERNATIVE_EVIDENCE.values():
         assert item["sources"]
@@ -132,7 +132,7 @@ def test_satellite_flood_audit_flags_missing_provenance():
 def test_hazard_specific_alternative_routes_are_available():
     from src.evidence_alternatives import alternative_evidence_for_hazard
     assert {item["track_id"] for item in alternative_evidence_for_hazard("Landslide")} == {"landslide_inventory"}
-    assert {item["track_id"] for item in alternative_evidence_for_hazard("Infrastructure failure")} == {"infrastructure_reliability"}
+    assert {item["track_id"] for item in alternative_evidence_for_hazard("Infrastructure failure")} == {"infrastructure_reliability", "intervention_effectiveness"}
     assert alternative_evidence_for_hazard("Earthquake") == []
 
 

@@ -71,6 +71,24 @@ system-level operational indicators, not a substitute for asset-level failure
 and restoration histories. Use them for reliability context and preparedness,
 not asset-level ML failure probabilities.
 
+### Intervention effectiveness
+
+The World Bank/WFP Bangladesh 2024 Forecast Based Anticipatory Action Impact
+Evaluation randomized the timing of cash transfers across households in
+flood-affected districts. The microdata are licensed and require human
+approval. The public reproducibility package does not include those licensed
+microdata. This is a valid candidate for reproducing a narrowly defined
+anticipatory-cash assistance evaluation after authorization; it is not
+evidence about the effectiveness of physical drainage, canal or embankment
+works in Kochi.
+
+Keep three tracks separate: (1) randomized cash-assistance empirical evidence,
+(2) observational physical-infrastructure intervention panels, and (3)
+hydraulic/simulation counterfactuals such as Geul. Never pool their labels or
+claim transferability between them. A simulation surrogate may approximate
+the simulator within its calibrated domain, but it is not a real-world
+treatment-effect model.
+
 ### Kochi interventions
 
 Reconstruct an evidence timeline from KSDMA's Kochi 2019 record, the Kerala
@@ -101,6 +119,10 @@ sensitivity analysis.
   https://labourbureau.gov.in/reportsonstatisticsoffactories
 - KSEB Urjadooth:
   https://hris.kseb.in/oms/
+- World Bank/WFP Bangladesh anticipatory-action evaluation:
+  https://microdata.worldbank.org/catalog/8009
+- World Bank reproducibility package (licensed microdata are not included):
+  https://reproducibility.worldbank.org/catalog/374
 - KSDMA Kochi 2019:
   https://sdma.kerala.gov.in/kochi-2019/
 - Kerala Irrigation Department Operation Breakthrough:
