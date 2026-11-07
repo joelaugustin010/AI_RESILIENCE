@@ -74,10 +74,16 @@ if regressors:
         f"{skill * 100:.1f}% lower MAE than persistence",
         help="Computed from the persisted model card's held-out MAE skill metric.",
     )
+    baseline = metrics.get("persistence_baseline") or {}
+    baseline_label = (
+        "No-change baseline MAE"
+        if baseline.get("type") == "constant_no_change"
+        else "Persistence baseline MAE"
+    )
     st.caption(
         f"Model: {best.get('model_id')} · Held-out MAE: {metrics.get('mae')} "
-        f"{best.get('prediction_unit', '')} · Persistence MAE: "
-        f"{(metrics.get('persistence_baseline') or {}).get('mae', 'not recorded')}."
+        f"{best.get('prediction_unit', '')} · {baseline_label}: "
+        f"{baseline.get('mae', 'not recorded')}."
     )
     st.info(
         "A better next-day weather estimate can support research and scenario inputs. "
