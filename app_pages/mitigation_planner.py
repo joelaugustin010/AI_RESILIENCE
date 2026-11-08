@@ -241,6 +241,66 @@ else:
 # ============================================================
 # EVIDENCE-GATED MACHINE-LEARNING COST ESTIMATOR
 # ============================================================
+st.markdown(
+    """
+    <style>
+    /* Mitigation ML workspace: local contrast and hierarchy improvements */
+    [data-testid="stMain"] div[data-testid="stDownloadButton"] button {
+        min-height: 3.1rem !important;
+        padding: .65rem 1.1rem !important;
+        background: #174E55 !important;
+        border: 1px solid #174E55 !important;
+        border-radius: 12px !important;
+        color: #FFFFFF !important;
+        font-weight: 700 !important;
+        font-size: .96rem !important;
+        letter-spacing: .01em !important;
+        box-shadow: 0 5px 14px rgba(23,78,85,.16) !important;
+    }
+    [data-testid="stMain"] div[data-testid="stDownloadButton"] button * {
+        color: #FFFFFF !important;
+        -webkit-text-fill-color: #FFFFFF !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+    [data-testid="stMain"] div[data-testid="stDownloadButton"] button:hover {
+        background: #299B91 !important;
+        border-color: #299B91 !important;
+        color: #FFFFFF !important;
+    }
+    [data-testid="stMain"] .mitigation-ml-copy,
+    [data-testid="stMain"] .mitigation-ml-copy p,
+    [data-testid="stMain"] .mitigation-ml-copy li {
+        color: #29484C !important;
+        -webkit-text-fill-color: #29484C !important;
+        font-size: .96rem !important;
+        line-height: 1.65 !important;
+    }
+    [data-testid="stMain"] .mitigation-ml-kicker {
+        color: #176F70 !important;
+        font-size: .76rem !important;
+        font-weight: 800 !important;
+        letter-spacing: .11em !important;
+        text-transform: uppercase !important;
+    }
+    [data-testid="stMain"] [data-testid="stMetricLabel"] p {
+        color: #52666A !important;
+        font-weight: 650 !important;
+    }
+    [data-testid="stMain"] [data-testid="stMetricValue"] {
+        color: #174E55 !important;
+        font-weight: 750 !important;
+    }
+    [data-testid="stMain"] div[data-testid="stFileUploader"] label,
+    [data-testid="stMain"] div[data-testid="stFileUploader"] small {
+        color: #29484C !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+from src.mitigation_cost_ml import CostModelDataError, estimate_cost, train_cost_model
 from src.mitigation_cost_ml import CostModelDataError, estimate_cost, train_cost_model
 
 st.markdown("---")
@@ -252,10 +312,12 @@ section_intro(
 )
 
 with st.container(border=True):
-    st.markdown("#### 01 · Prepare the evidence")
-    st.write(
-        "Upload one row per completed project. Use actual final costs and consistent scope units. "
-        "Each source reference should point to a traceable report, tender, work order, or verified project record."
+    st.markdown('<div class="mitigation-ml-kicker">STEP 01 · DATA FOUNDATION</div>', unsafe_allow_html=True)
+    st.markdown("#### Prepare the evidence")
+    st.markdown(
+        '<div class="mitigation-ml-copy">Upload one row per completed project. Use actual final costs and consistent scope units. '
+        'Each source reference should identify a traceable report, tender, work order, or verified project record.</div>',
+        unsafe_allow_html=True,
     )
     template_columns = [
         "intervention", "area_type", "scope_quantity", "scope_unit",
@@ -265,12 +327,13 @@ with st.container(border=True):
     prep_cols = st.columns([1, 2])
     with prep_cols[0]:
         st.download_button(
-            "Download CSV template",
+            "Download historical-project CSV template  ↓",
             data=template_csv,
             file_name="AI_RESILIENCE_historical_mitigation_costs_template.csv",
             mime="text/csv",
             key="mitigation_ml_template",
             use_container_width=True,
+            type="primary",
         )
     with prep_cols[1]:
         uploaded_cost_data = st.file_uploader(
@@ -280,6 +343,11 @@ with st.container(border=True):
             key="mitigation_ml_upload",
             label_visibility="visible",
         )
+    st.markdown(
+        '<div class="mitigation-ml-copy"><b>Template fields:</b> intervention · area type · scope quantity · '
+        'scope unit · duration in months · actual final cost in INR · source reference.</div>',
+        unsafe_allow_html=True,
+    )
 
 historical_records = None
 if uploaded_cost_data is not None:
@@ -306,7 +374,8 @@ if uploaded_cost_data is not None:
             if "source_reference" in historical_records.columns else 0
         )
         with st.container(border=True):
-            st.markdown("#### 02 · Dataset readiness")
+            st.markdown('<div class="mitigation-ml-kicker">STEP 02 · QUALITY CHECK</div>', unsafe_allow_html=True)
+            st.markdown("#### Dataset readiness")
             readiness_cols = st.columns(3)
             readiness_cols[0].metric("Uploaded records", f"{len(historical_records):,}")
             readiness_cols[1].metric("Rows with required fields", f"{int(candidate_rows):,}")
@@ -346,7 +415,8 @@ if uploaded_cost_data is not None:
 trained_cost_model = st.session_state.get("mitigation_cost_ml_model")
 if trained_cost_model:
     model_metrics = trained_cost_model["metrics"]
-    st.markdown("#### 03 · Model evaluation")
+    st.markdown('<div class="mitigation-ml-kicker">STEP 03 · MODEL VALIDATION</div>', unsafe_allow_html=True)
+    st.markdown("#### Model evaluation")
     with st.container(border=True):
         metric_cols = st.columns(4)
         metric_cols[0].metric("Training records", f"{model_metrics['training_records']:,}")
@@ -367,7 +437,8 @@ if trained_cost_model:
         )
     if model_metrics["beats_baseline"]:
         st.success("Baseline check passed: the model had lower holdout MAE than the median-only baseline.")
-        st.markdown("#### 04 · Estimate a comparable project")
+        st.markdown('<div class="mitigation-ml-kicker">STEP 04 · COST SCENARIO</div>', unsafe_allow_html=True)
+        st.markdown("#### Estimate a comparable project")
         st.caption(
             "Choose categories represented in the uploaded records and enter a scope comparable "
             "to the historical examples. Estimates outside that experience may be unreliable."
