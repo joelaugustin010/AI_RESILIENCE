@@ -25,6 +25,12 @@ pages = {
     ],
     "Explore": [
         st.Page(
+            "app_pages/module_explorer.py",
+            title="Module Explorer",
+            icon=":material/explore:",
+            url_path="module_explorer",
+        ),
+        st.Page(
             "app_pages/decision_workflow.py",
             title="Decision Workflow",
             icon=":material/assignment_turned_in:",
@@ -1390,6 +1396,7 @@ with st.container(key="ar-top-navigation"):
     with explore_col:
         with st.popover("Explore Modules", icon=":material/explore:", use_container_width=True):
             st.caption("Explore the full AI_RESILIENCE workspace")
+            st.page_link("app_pages/module_explorer.py", label="Open module explorer", icon=":material/dashboard:")
             st.page_link("app_pages/kochi_map.py", label="Kochi Map", icon=":material/map:")
             st.page_link("app_pages/air_pollution.py", label="Air Pollution", icon=":material/factory:")
             st.page_link("app_pages/data_readiness.py", label="Data & Model Transparency", icon=":material/fact_check:")
