@@ -2,6 +2,20 @@
 
 AI RESILIENCE is a student-built decision-support prototype for exploring disaster preparedness and urban resilience in Kochi/Ernakulam. It brings scenario exploration, spatial context, historical air-quality summaries, hospital-vulnerability evidence, data-readiness checks and mitigation planning into one Streamlit application.
 
+## Exhibition positioning and seven core capabilities
+
+**AI_RESILIENCE is an evidence-gated research demonstration and decision-support platform, not an operational early-warning system.** It demonstrates:
+
+1. A ten-scenario decision framework covering registered individual and compound hazards.
+2. Compound-hazard reasoning and critical-service dependency pathways.
+3. Source-quality, provenance, integrity and data-readiness auditing.
+4. Interactive inference from persisted research models, with explicit validation gates.
+5. Measurement and summary of a user-supplied flood-depth spatial layer (SUMMARIZED_NOT_FORECAST), not generation of a flood forecast.
+6. Transparent population-exposure screening with the uniform-within-grid-cell allocation assumption; estimates are approximate and not counts of people harmed or displaced.
+7. Explainable mitigation planning and arithmetic cost comparison, without claims of proven damage reduction or optimal intervention effectiveness.
+
+The platform must not be described as providing validated Kochi flood probabilities, predicted inundation depths, verified affected-population counts, proven intervention benefits, or live operational warnings. Source, timestamp, geographic coverage, uncertainty and missing evidence must accompany interpretation. For real emergencies, follow official IMD, CWC, KSDMA and district-authority guidance.
+
 ## Run locally
 
 Python 3.11 is recommended.
@@ -39,6 +53,47 @@ The application entry point is `app.py`; all pages are registered there through 
 5. **Hospital Vulnerability / Cyclone + Flood** — show what evidence is needed before making exposure claims.
 6. **Data Readiness** — review source provenance, integrity checks and unresolved blockers.
 7. **Mitigation Budget / Smart Mitigation Design** — demonstrate practical planning based on clearly stated assumptions.
+
+## Shared ML engine
+
+The repository includes a shared, leakage-aware ML engine under `src/ml/`.
+It is used as supplementary evidence; the deterministic, evidence-gated hazard
+assessments remain authoritative.
+
+```bash
+python scripts/train_shared_ml_models.py
+```
+
+The command rebuilds six event-classification models and three continuous regressors (next-day rainfall, next-day temperature, and cyclone wind change) from repository-held data,
+performs chronological train/validation/test evaluation, and writes:
+
+- `models/ml/<model_id>/model.joblib` and `model_card.json`
+- `reports/ml_model_registry.json`
+- `reports/ml_disaster_coverage.json`
+- `reports/ml_validation_report.json`
+
+The shared workflow now also fits continuous next-day Kochi rainfall and maximum-temperature regressors, plus a storm-grouped 24-hour cyclone wind-change regressor. They are selected on validation MAE, compared with persistence and training-median baselines, and remain blocked from inference unless they beat the persistence reference. These are continuous estimates, not direct flood or heat-health predictions; the cyclone wind-change estimate is a retrospective best-track research model, not an operational intensity forecast.
+
+Current coverage of the ten Decision Workflow hazards:
+
+- **Research screening models:** Cyclone (24-hour rapid intensification) and Heatwave. Neither is independently validated.
+- **Invalidated models:** Drought (the old 30-day target overlapped historical rainfall features) and Earthquake aftershock (the old seven-day outcome windows crossed temporal split boundaries). Their old metrics and inference are blocked pending corrected retraining.
+- **Forcing evidence only:** Flood and Compound rainfall + drainage failure
+  (extreme-rainfall screening; no flood, depth, or impact prediction).
+- **Exploratory association:** Compound cyclone + flood (concurrent
+  cyclone-proximity/rainfall association, including an ablation that tests
+  whether cyclone features add incremental skill).
+- **No defensible supervised model:** Landslide, Industrial incident, and Infrastructure
+  failure, because representative labels or non-event samples are missing.
+
+No shared model is independently validated, calibrated for decision use, or
+suitable for warnings, evacuation, damage estimates, or operational planning.
+The model cards record every threshold, split, holdout metric, calibration
+diagnostic and limitation. See `docs/SHARED_ML_ENGINE.md`.
+
+## Preventive action intelligence
+
+Both the Decision Workflow and Cyclone + Flood workspace include a shared prevention engine. It generates hazard-specific preparedness options with explicit triggers, responsible parties, evidence requirements and safety caveats. It does not issue warnings, rank effectiveness, or claim quantified risk reduction. See `src/prevention_intelligence.py` and `docs/SHARED_ML_ENGINE.md`.
 
 ## Important limitations
 

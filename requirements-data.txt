@@ -2,3 +2,9 @@
 pypdf>=6.0,<7
 shapely>=2.0,<3
 pyproj>=3.6,<4
+
+# Optional inspection support for the Geul intervention simulation archive.
+# These are research/data-inspection dependencies, not required by the Streamlit app.
+openpyxl>=3.1,<4
+geopandas>=1.0,<2
+rasterio>=1.4,<2

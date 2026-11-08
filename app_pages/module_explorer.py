@@ -24,7 +24,7 @@ st.markdown(
 )
 
 render_page_intro(
-    "kochi-map",
+    "module-explorer",
     "Explore AI_RESILIENCE",
     "Choose an existing workspace by the question you want to answer — from environmental signals and spatial context to disaster resilience and practical mitigation planning.",
     eyebrow="AI_RESILIENCE · MODULE EXPLORER",
@@ -43,6 +43,7 @@ MODULE_GROUPS = (
             ("🌬️", "Air Pollution", "Review air-quality evidence, pollutant context and monitoring readiness.", "kochi/coast.jpg", "app_pages/air_pollution.py", "Atmospheric evidence"),
             ("🏥", "Hospital Vulnerability", "Inspect critical-facility context and documented accessibility limitations.", "kochi/water-metro.jpg", "app_pages/hospital_vulnerability.py", "Public health"),
             ("🌿", "Data & Model Transparency", "Review coverage, provenance, validation status and known data limitations.", "kochi/mangalavanam.jpg", "app_pages/data_readiness.py", "Transparency"),
+            ("🧾", "Mitigation Data Intelligence", "Review the evidence quality and readiness behind mitigation planning inputs.", "beauty-ghats.webp", "app_pages/mitigation_data_intelligence.py", "Data governance"),
         ),
     ),
     (
@@ -53,6 +54,7 @@ MODULE_GROUPS = (
             ("⛈️", "Cyclone + Flood", "Explore compound hazard scenario inputs, outputs and uncertainty.", "kochi/maradu.jpg", "app_pages/compound_scenario.py", "Compound hazards"),
             ("📊", "Multi-Hazard Evidence Review", "Inspect available hazard evidence without presenting unsupported certainty.", "kochi/industrial-coast.jpg", "app_pages/disaster_probability.py", "Evidence review"),
             ("🧪", "Hazard Model Lab", "Review model inputs, readiness and limitations across hazard workflows.", "kochi/backwaters.jpg", "app_pages/hazard_model_lab.py", "Model readiness"),
+            ("📈", "ML Evidence & Demonstration", "Replay documented research cases and inspect model limitations without live-warning claims.", "beauty-forest.webp", "app_pages/submission_ml_demo.py", "Research evidence"),
         ),
     ),
     (

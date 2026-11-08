@@ -21,11 +21,66 @@ def _present(value: Any) -> bool:
     return value is not None and str(value).strip() not in {"", "Not supplied", "Unknown"}
 
 
+_NUMERIC_INPUT_RULES: dict[str, tuple[float, float, bool]] = {
+    # Broad plausibility guards, not hazard thresholds or warning criteria.
+    "rainfall_mm": (0.0, 2000.0, False),
+    "wind_speed_kmh": (0.0, 500.0, False),
+    "temperature_c": (-90.0, 65.0, False),
+    "normal_max_temperature_c": (-90.0, 65.0, False),
+    "river_level_m": (-20.0, 100.0, False),
+    "earthquake_magnitude": (0.0, 10.0, False),
+    "earthquake_depth_km": (0.0, 750.0, False),
+    "heatwave_consecutive_days": (0.0, 366.0, True),
+    "heatwave_station_count": (0.0, 100000.0, True),
+}
+
+
+def validate_scenario_inputs(inputs: dict[str, Any]) -> list[dict[str, str]]:
+    """Reject malformed measurements before rule evaluation; bounds are not hazard thresholds."""
+    import math
+    problems: list[dict[str, str]] = []
+    for field, (minimum, maximum, integer_only) in _NUMERIC_INPUT_RULES.items():
+        raw = inputs.get(field)
+        if raw is None or (isinstance(raw, str) and not raw.strip()):
+            continue
+        if isinstance(raw, bool):
+            problems.append({"field": field, "message": "Enter a numeric measurement, not a true/false value."})
+            continue
+        try:
+            value = float(raw)
+        except (TypeError, ValueError, OverflowError):
+            problems.append({"field": field, "message": "Value must be numeric."})
+            continue
+        if not math.isfinite(value):
+            problems.append({"field": field, "message": "Value must be finite; NaN and infinity are not accepted."})
+        elif value < minimum or value > maximum:
+            problems.append({"field": field, "message": f"Value is outside the broad input-quality range [{minimum:g}, {maximum:g}]."})
+        elif integer_only and not value.is_integer():
+            problems.append({"field": field, "message": "Value must be a whole number."})
+    return problems
+
 def predict_scenario_outcome(inputs: dict[str, Any]) -> dict[str, Any]:
     """Produce a transparent, conditional outcome for any supported hazard choice."""
     hazard = str(inputs.get("hazard", ""))
     if hazard not in HAZARDS:
         raise ValueError(f"Unsupported hazard: {hazard!r}")
+
+    input_problems = validate_scenario_inputs(inputs)
+    if input_problems:
+        return {
+            "hazard": hazard,
+            "concern_level": "Input validation required",
+            "conditional_outcome": "Scenario not assessed because supplied measurements failed input validation.",
+            "basis": "Invalid or implausible values must be corrected before hazard-specific interpretation.",
+            "evidence_used": [],
+            "recommended_checks": ["Correct the listed fields and verify units, source, timestamp and measurement period."],
+            "model_type": "Input validation only — no scenario assessment performed",
+            "numerical_probability": None,
+            "is_trained_ml": False,
+            "is_official_warning": False,
+            "input_validation": {"valid": False, "problems": input_problems},
+            "limitations": ["No hazard conclusion was generated from invalid inputs.", "Input-range checks are broad data-quality guards, not hazard thresholds.", "Insufficient or invalid evidence never means safe or zero risk."],
+        }
 
     evidence: list[str] = []
     assumptions: list[str] = []

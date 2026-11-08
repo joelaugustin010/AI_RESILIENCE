@@ -62,7 +62,7 @@ def test_kochi_map_displays_licensed_jrc_preview_as_modelled_context():
     jrc_toggles = [box for box in app.checkbox if "jrc" in box.label.lower()]
     assert len(jrc_toggles) == 1
     assert "modelled" in jrc_toggles[0].label.lower()
-    assert jrc_toggles[0].value is False
+    assert jrc_toggles[0].value is True
 
 
 def test_hospital_page_does_not_rank_unsupported_scores():

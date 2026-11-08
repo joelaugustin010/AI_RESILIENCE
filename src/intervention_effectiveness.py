@@ -1,0 +1,677 @@
+"""Causal-ML research engine for comparing disaster-risk-reduction interventions.
+
+Input rows must be real, linked intervention episodes. Each row represents one
+site/time episode with a binary indicator for whether ONE named intervention
+was implemented, a post-event damage-severity outcome, and covariates
+measured before treatment. Lower outcomes are better.
+
+This is an observational doubly-robust learner, not proof of causality:
+unmeasured confounding, treatment-version differences, spillovers and selection
+bias remain possible. It fails closed when evidence/overlap is inadequate.
+"""
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Any, Iterable
+
+import numpy as np
+import pandas as pd
+from sklearn.ensemble import RandomForestRegressor, ExtraTreesRegressor
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import mean_absolute_error
+from sklearn.model_selection import GroupKFold
+
+
+SCHEMA_VERSION = "intervention-effectiveness/0.2.0"
+REQUIRED_COLUMNS = {
+    "episode_id", "episode_date", "outcome_window_end", "site_id",
+    "hazard", "action_id", "implemented", "damage_outcome",
+}
+MIN_TOTAL_ROWS = 200
+MIN_PER_ARM = 50
+MIN_TEST_PER_ARM = 30
+MIN_TRAIN_CLUSTERS = 10
+MIN_TEST_CLUSTERS = 10
+MIN_OVERLAP_SHARE = 0.80
+MIN_CONTEXT_SUPPORT_SHARE = 0.80
+PROPENSITY_CLIP = 0.05
+FORBIDDEN_FEATURE_TOKENS = (
+    "outcome", "damage_after", "loss_after", "future", "post_",
+    "after_", "_after", "implemented", "treatment", "action_id",
+    "recovery", "repair_cost", "fatalit", "casualt",
+)
+
+
+class InterventionDataError(ValueError):
+    """Input intervention records are not fit for causal-effect estimation."""
+
+
+@dataclass
+class InterventionModel:
+    action_id: str
+    hazard: str
+    feature_columns: list[str]
+    preprocessor: Any
+    effect_model: Any
+    status: str
+    card: dict[str, Any]
+    support_profile: dict[str, Any] | None = None
+
+    def estimate(self, context: dict[str, Any]) -> dict[str, Any]:
+        if self.status != "CAUSAL_RESEARCH_SIGNAL_NOT_VALIDATED":
+            return {
+                "action_id": self.action_id,
+                "status": self.status,
+                "available": False,
+                "reason": "Intervention-effect evidence did not pass the research eligibility gates.",
+            }
+        missing = [name for name in self.feature_columns if name not in context]
+        if missing:
+            return {
+                "action_id": self.action_id,
+                "status": "CONTEXT_INCOMPLETE",
+                "available": False,
+                "missing_features": missing,
+            }
+        if self.support_profile is None:
+            return {
+                "action_id": self.action_id,
+                "status": "CONTEXT_SUPPORT_PROFILE_MISSING",
+                "available": False,
+                "reason": "This model artifact predates the feature-support guard; retrain it before inference.",
+            }
+        support_reason = _context_support_reason(context, self.support_profile)
+        if support_reason:
+            return {
+                "action_id": self.action_id,
+                "status": "CONTEXT_OUTSIDE_TRAINING_SUPPORT",
+                "available": False,
+                "reason": support_reason,
+            }
+        row = pd.DataFrame([{name: context[name] for name in self.feature_columns}])
+        x = self.preprocessor.transform(row)
+        reduction = -float(self.effect_model.predict(x)[0])
+        return {
+            "action_id": self.action_id,
+            "hazard": self.hazard,
+            "status": self.status,
+            "available": True,
+            "estimated_damage_reduction": reduction,
+            "outcome_unit": self.card["outcome_unit"],
+            "context_specific_uncertainty": "NOT_ESTIMATED",
+            "contextual_action_superiority_established": False,
+            "ranking_restriction": (
+                "This context-specific point estimate has no valid confidence interval "
+                "and cannot establish superiority over another precaution."
+            ),
+            "interpretation": (
+                "Positive values indicate lower damage outcome under the intervention "
+                "than under no intervention; this is an observational research estimate, "
+                "not a guaranteed or independently validated effect."
+            ),
+            "model_card": self.card,
+        }
+
+
+def _feature_preprocessor(frame: pd.DataFrame, columns: list[str]) -> ColumnTransformer:
+    numeric = [c for c in columns if pd.api.types.is_numeric_dtype(frame[c])]
+    categorical = [c for c in columns if c not in numeric]
+    transformers = []
+    if numeric:
+        transformers.append(("numeric", SimpleImputer(strategy="median"), numeric))
+    if categorical:
+        transformers.append((
+            "categorical",
+            Pipeline([
+                ("imputer", SimpleImputer(strategy="most_frequent")),
+                ("onehot", OneHotEncoder(handle_unknown="ignore")),
+            ]),
+            categorical,
+        ))
+    return ColumnTransformer(transformers, remainder="drop")
+
+
+
+def _build_support_profile(frame: pd.DataFrame, columns: list[str]) -> dict[str, Any]:
+    """Capture observed training support so inference cannot silently extrapolate."""
+    numeric: dict[str, dict[str, float]] = {}
+    categorical: dict[str, list[str]] = {}
+    for column in columns:
+        series = frame[column]
+        if pd.api.types.is_numeric_dtype(series):
+            values = pd.to_numeric(series, errors="coerce").dropna().to_numpy(dtype=float)
+            if not len(values) or not np.isfinite(values).all():
+                raise InterventionDataError(
+                    f"Cannot establish finite training support for numeric feature {column!r}."
+                )
+            numeric[column] = {"minimum": float(values.min()), "maximum": float(values.max())}
+        else:
+            values = sorted(series.dropna().astype(str).unique().tolist())
+            if not values:
+                raise InterventionDataError(
+                    f"Cannot establish categorical training support for feature {column!r}."
+                )
+            categorical[column] = values
+    return {"numeric_ranges": numeric, "categorical_values": categorical}
+
+
+def _context_support_reason(
+    context: dict[str, Any], profile: dict[str, Any]
+) -> str | None:
+    """Return a reason when any requested context lies outside observed support."""
+    for column, bounds in profile.get("numeric_ranges", {}).items():
+        try:
+            value = float(context[column])
+        except (KeyError, TypeError, ValueError):
+            return f"Feature {column!r} must be a finite numeric value."
+        if not np.isfinite(value):
+            return f"Feature {column!r} must be finite."
+        if value < bounds["minimum"] or value > bounds["maximum"]:
+            return (
+                f"Feature {column!r}={value:g} is outside the observed training range "
+                f"[{bounds['minimum']:g}, {bounds['maximum']:g}]; no extrapolation is allowed."
+            )
+    for column, allowed in profile.get("categorical_values", {}).items():
+        if column not in context or context[column] is None:
+            return f"Categorical feature {column!r} is missing."
+        if str(context[column]) not in allowed:
+            return (
+                f"Category {context[column]!r} for {column!r} was not observed during training; "
+                "no extrapolation is allowed."
+            )
+    return None
+
+
+def _make_outcome_model(seed: int) -> RandomForestRegressor:
+    return RandomForestRegressor(
+        n_estimators=250, min_samples_leaf=8, max_features=0.8,
+        random_state=seed, n_jobs=-1,
+    )
+
+
+def _make_propensity_model(seed: int) -> LogisticRegression:
+    # Covariates have already passed through the shared preprocessor.
+    return LogisticRegression(max_iter=2000, random_state=seed)
+
+
+def _crossfit_dr_score(
+    x: np.ndarray, treatment: np.ndarray, outcome: np.ndarray,
+    groups: np.ndarray, *, seed: int = 42, folds: int = 5,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Group-cross-fit nuisance models so one site cannot leak across folds."""
+    n_groups = len(np.unique(groups))
+    if n_groups < 2:
+        raise InterventionDataError("At least two distinct sites are required for group cross-fitting.")
+    splitter = GroupKFold(n_splits=min(folds, n_groups))
+    splits = list(splitter.split(x, treatment, groups))
+    pseudo = np.full(len(outcome), np.nan, dtype=float)
+    propensities = np.full(len(outcome), np.nan, dtype=float)
+    for fold, (train, held) in enumerate(splits):
+        if len(np.unique(treatment[train])) < 2:
+            raise InterventionDataError("Cross-fitting fold lacks both treated and control episodes.")
+        p_model = _make_propensity_model(seed + fold)
+        p_model.fit(x[train], treatment[train])
+        raw_propensity = p_model.predict_proba(x[held])[:, 1]
+        propensity = np.clip(raw_propensity, PROPENSITY_CLIP, 1 - PROPENSITY_CLIP)
+        m0, m1 = _make_outcome_model(seed + 100 + fold), _make_outcome_model(seed + 200 + fold)
+        m0.fit(x[train][treatment[train] == 0], outcome[train][treatment[train] == 0])
+        m1.fit(x[train][treatment[train] == 1], outcome[train][treatment[train] == 1])
+        mu0, mu1 = m0.predict(x[held]), m1.predict(x[held])
+        t, y = treatment[held], outcome[held]
+        pseudo[held] = (mu1 - mu0) + t * (y - mu1) / propensity - (1 - t) * (y - mu0) / (1 - propensity)
+        propensities[held] = raw_propensity
+    return pseudo, propensities
+
+
+def _bootstrap_mean_ci(
+    values: np.ndarray, clusters: np.ndarray, *, seed: int = 42,
+    n_bootstrap: int = 2000,
+) -> list[float]:
+    """Cluster bootstrap by site to respect repeated episodes within locations."""
+    values = np.asarray(values, dtype=float)
+    clusters = np.asarray(clusters)
+    unique = np.unique(clusters)
+    if len(values) < 2 or len(unique) < 2:
+        return [float("nan"), float("nan")]
+    members = {cluster: np.flatnonzero(clusters == cluster) for cluster in unique}
+    rng = np.random.default_rng(seed)
+    means = []
+    for _ in range(n_bootstrap):
+        sampled = rng.choice(unique, size=len(unique), replace=True)
+        indices = np.concatenate([members[cluster] for cluster in sampled])
+        means.append(float(values[indices].mean()))
+    return [float(v) for v in np.quantile(means, [0.025, 0.975])]
+
+
+def validate_intervention_frame(
+    frame: pd.DataFrame, *, feature_columns: Iterable[str] | None = None,
+) -> list[str]:
+    """Validate the observational episode schema and pre-treatment feature contract."""
+    missing = sorted(REQUIRED_COLUMNS - set(frame.columns))
+    if missing:
+        raise InterventionDataError(f"Missing required columns: {missing}")
+    if frame.empty:
+        raise InterventionDataError("No intervention episodes supplied.")
+    episode_dates = pd.to_datetime(frame["episode_date"], errors="coerce")
+    outcome_ends = pd.to_datetime(frame["outcome_window_end"], errors="coerce")
+    if episode_dates.isna().any():
+        raise InterventionDataError("episode_date must contain valid dates.")
+    if outcome_ends.isna().any():
+        raise InterventionDataError("outcome_window_end must contain valid dates.")
+    if (outcome_ends < episode_dates).any():
+        raise InterventionDataError("outcome_window_end cannot precede episode_date.")
+    for column in ("episode_id", "site_id", "action_id", "hazard"):
+        if frame[column].isna().any() or frame[column].astype(str).str.strip().eq("").any():
+            raise InterventionDataError(f"{column} cannot be blank.")
+    treatment_numeric = pd.to_numeric(frame["implemented"], errors="coerce")
+    if treatment_numeric.isna().any() or not set(treatment_numeric.unique()).issubset({0, 1}):
+        raise InterventionDataError("implemented must contain only binary numeric 0/1 values.")
+    if frame.duplicated(["episode_id", "hazard", "action_id"]).any():
+        raise InterventionDataError("Duplicate episode-hazard-action records are not allowed.")
+    numeric_outcome = pd.to_numeric(frame["damage_outcome"], errors="coerce")
+    if numeric_outcome.isna().any() or not np.isfinite(numeric_outcome.to_numpy(dtype=float)).all():
+        raise InterventionDataError("damage_outcome must be finite, numeric and complete.")
+    excluded = REQUIRED_COLUMNS | {"outcome_unit"}
+    inferred = list(feature_columns) if feature_columns is not None else [
+        c for c in frame.columns if c not in excluded
+    ]
+    if not inferred:
+        raise InterventionDataError("At least one pre-intervention covariate is required.")
+    bad = [
+        c for c in inferred
+        if c in excluded or any(token in c.lower() for token in FORBIDDEN_FEATURE_TOKENS)
+    ]
+    if bad:
+        raise InterventionDataError(f"Post-treatment or treatment-identifying features are forbidden: {bad}")
+    absent = [c for c in inferred if c not in frame.columns]
+    if absent:
+        raise InterventionDataError(f"Feature columns not found: {absent}")
+    if frame[inferred].isna().all(axis=0).any():
+        raise InterventionDataError("An entirely missing covariate column cannot be used.")
+    if frame[inferred].isna().all(axis=1).mean() > 0.20:
+        raise InterventionDataError("More than 20% of episodes have no observed covariates.")
+    return inferred
+
+
+def train_intervention_model(
+    frame: pd.DataFrame, *, action_id: str, hazard: str,
+    feature_columns: Iterable[str] | None = None,
+    outcome_unit: str = "normalised damage-severity units",
+    test_start: str | pd.Timestamp = "2022-01-01",
+    seed: int = 42,
+) -> InterventionModel:
+    """Fit a time-held-out doubly-robust CATE model for one action vs no action.
+
+    Outcome is coded so lower is better. Only pre-intervention covariates may
+    be supplied. A positive reported reduction means lower expected damage.
+    """
+    features = validate_intervention_frame(frame, feature_columns=feature_columns)
+    data = frame.loc[(frame["hazard"].astype(str) == hazard) & (frame["action_id"].astype(str) == action_id)].copy()
+    data["episode_date"] = pd.to_datetime(data["episode_date"])
+    data["outcome_window_end"] = pd.to_datetime(data["outcome_window_end"])
+    data["implemented"] = data["implemented"].astype(int)
+    data["damage_outcome"] = pd.to_numeric(data["damage_outcome"], errors="raise")
+    cutoff = pd.Timestamp(test_start)
+    pre_test = data["episode_date"] < cutoff
+    crosses_boundary = pre_test & (data["outcome_window_end"] >= cutoff)
+    train = data.loc[pre_test & (data["outcome_window_end"] < cutoff)].copy()
+    test = data.loc[data["episode_date"] >= cutoff].copy()
+    purged_rows = int(crosses_boundary.sum())
+
+    counts = {
+        "total": int(len(data)),
+        "purged_outcome_window_rows": purged_rows,
+        "train_treated": int((train["implemented"] == 1).sum()),
+        "train_control": int((train["implemented"] == 0).sum()),
+        "train_clusters": int(train["site_id"].nunique()),
+        "test_treated": int((test["implemented"] == 1).sum()),
+        "test_control": int((test["implemented"] == 0).sum()),
+        "test_clusters": int(test["site_id"].nunique()),
+    }
+    base_card = {
+        "schema_version": SCHEMA_VERSION, "action_id": action_id, "hazard": hazard,
+        "outcome": "damage_outcome (lower is better)", "outcome_unit": outcome_unit,
+        "feature_columns": features, "counts": counts, "test_start": cutoff.date().isoformat(),
+        "causal_estimand": "Conditional average treatment effect: intervention minus no intervention.",
+        "assumptions": [
+            "Consistency and a well-defined intervention version.",
+            "Conditional exchangeability given measured pre-intervention covariates (untestable).",
+            "Positivity / treatment overlap in the target population.",
+            "No interference between site-time episodes (may be violated by networked hazards).",
+            "No material outcome measurement differences by treatment status.",
+        ],
+        "limitations": [
+            "Observational estimates can be confounded by unmeasured factors.",
+            "Intervention delivery, quality, timing and compliance may vary.",
+            "Effects may not transport to a different district, hazard intensity or population.",
+            "A single chronological holdout is preliminary, not independent validation.",
+            "No separate geographic holdout has established transport to unseen locations.",
+        ],
+    }
+
+    def blocked(reason: str, status: str = "INSUFFICIENT_INTERVENTION_EVIDENCE") -> InterventionModel:
+        card = {**base_card, "status": status, "status_reason": reason, "eligible_for_ranking": False}
+        return InterventionModel(action_id, hazard, features, None, None, status, card)
+
+    if (
+        len(train) < MIN_TOTAL_ROWS
+        or counts["train_treated"] < MIN_PER_ARM
+        or counts["train_control"] < MIN_PER_ARM
+        or counts["train_clusters"] < MIN_TRAIN_CLUSTERS
+    ):
+        return blocked(
+            f"Training requires at least {MIN_TOTAL_ROWS} episodes, {MIN_PER_ARM} in each arm "
+            f"and {MIN_TRAIN_CLUSTERS} independent clusters; observed {counts}."
+        )
+    if (
+        counts["test_treated"] < MIN_TEST_PER_ARM
+        or counts["test_control"] < MIN_TEST_PER_ARM
+        or counts["test_clusters"] < MIN_TEST_CLUSTERS
+    ):
+        return blocked(
+            f"Chronological test requires at least {MIN_TEST_PER_ARM} treated/control episodes "
+            f"and {MIN_TEST_CLUSTERS} independent clusters; observed {counts}."
+        )
+
+    preprocessor = _feature_preprocessor(train, features)
+    x_train = preprocessor.fit_transform(train[features])
+    x_test = preprocessor.transform(test[features])
+    t_train = train["implemented"].to_numpy(dtype=int)
+    y_train = train["damage_outcome"].to_numpy(dtype=float)
+    t_test = test["implemented"].to_numpy(dtype=int)
+    y_test = test["damage_outcome"].to_numpy(dtype=float)
+
+    pseudo_train, propensity_train = _crossfit_dr_score(
+        x_train, t_train, y_train, train["site_id"].astype(str).to_numpy(), seed=seed
+    )
+    overlap_train = (propensity_train >= PROPENSITY_CLIP) & (propensity_train <= 1 - PROPENSITY_CLIP)
+    overlap_share = float(overlap_train.mean())
+    if overlap_share < MIN_OVERLAP_SHARE:
+        return blocked(f"Treatment overlap coverage {overlap_share:.3f} is below {MIN_OVERLAP_SHARE:.2f}; do not extrapolate.")
+    effect_model = ExtraTreesRegressor(
+        n_estimators=300, min_samples_leaf=12, max_features=0.8,
+        random_state=seed, n_jobs=-1,
+    )
+    effect_model.fit(x_train, pseudo_train)
+    support_profile = _build_support_profile(train, features)
+
+    # Held-out doubly-robust ATE: nuisance models are trained only on pre-test data.
+    p_model = _make_propensity_model(seed + 500)
+    p_model.fit(x_train, t_train)
+    raw_p_test = p_model.predict_proba(x_test)[:, 1]
+    p_test = np.clip(raw_p_test, PROPENSITY_CLIP, 1 - PROPENSITY_CLIP)
+    m0, m1 = _make_outcome_model(seed + 501), _make_outcome_model(seed + 502)
+    m0.fit(x_train[t_train == 0], y_train[t_train == 0])
+    m1.fit(x_train[t_train == 1], y_train[t_train == 1])
+    mu0, mu1 = m0.predict(x_test), m1.predict(x_test)
+    dr_test = (mu1 - mu0) + t_test * (y_test - mu1) / p_test - (1 - t_test) * (y_test - mu0) / (1 - p_test)
+    test_clusters = test["site_id"].astype(str).to_numpy()
+    ci = _bootstrap_mean_ci(dr_test, test_clusters, seed=seed + 503)
+    mean_effect = float(np.mean(dr_test))
+    # Evaluate the learned CATE policy on untouched test episodes: apply this
+    # intervention only where the predicted treatment effect is beneficial.
+    cate_test = np.asarray(effect_model.predict(x_test), dtype=float)
+    test_support_mask = np.asarray([
+        _context_support_reason(row, support_profile) is None
+        for row in test[features].to_dict(orient="records")
+    ], dtype=bool)
+    test_support_share = float(test_support_mask.mean())
+    policy_treat = (cate_test < 0) & test_support_mask
+    policy_effect_values = np.where(policy_treat, dr_test, 0.0)
+    policy_effect = float(np.mean(policy_effect_values))
+    policy_ci = _bootstrap_mean_ci(
+        policy_effect_values, test_clusters, seed=seed + 504
+    )
+    test_overlap = float(np.mean((raw_p_test >= PROPENSITY_CLIP) & (raw_p_test <= 1 - PROPENSITY_CLIP)))
+    status = "CAUSAL_RESEARCH_SIGNAL_NOT_VALIDATED"
+    eligible = bool(
+        mean_effect < 0
+        and ci[1] < 0
+        and policy_effect < 0
+        and policy_ci[1] < 0
+        and test_overlap >= MIN_OVERLAP_SHARE
+        and test_support_share >= MIN_CONTEXT_SUPPORT_SHARE
+    )
+    if not eligible:
+        status = "NO_CLEAR_HARM_REDUCTION_SIGNAL"
+    card = {
+        **base_card, "status": status,
+        "status_reason": (
+            "Held-out doubly-robust damage effect is below zero and its bootstrap 95% interval excludes zero; "
+            "observational assumptions remain unverified."
+            if eligible else
+            "Held-out data do not establish both an average and CATE-policy damage-reduction effect with adequate overlap."
+        ),
+        "metrics": {
+            "heldout_dr_mean_effect": mean_effect,
+            "heldout_dr_effect_95ci": ci,
+            "heldout_overlap_share": test_overlap,
+            "heldout_context_support_share": test_support_share,
+            "training_overlap_share": overlap_share,
+            "heldout_cate_policy_damage_effect": policy_effect,
+            "heldout_cate_policy_damage_effect_95ci": policy_ci,
+            "heldout_cate_policy_treatment_share": float(np.mean(policy_treat)),
+            "heldout_mae_of_dr_score_vs_cate": float(mean_absolute_error(dr_test, cate_test)),
+            "outcome_mean_treated_test": float(np.mean(y_test[t_test == 1])),
+            "outcome_mean_control_test": float(np.mean(y_test[t_test == 0])),
+        },
+        "eligible_for_ranking": eligible,
+        "context_support_profile": support_profile,
+        "context_support_policy": "Reject any inference feature outside the observed training range or unseen categorical levels; held-out policy evaluation requires at least 80% support coverage.",
+        "ranking_note": "Eligible actions may be ranked by context-specific estimated damage reduction only against actions trained on the same hazard, outcome scale and target population.",
+    }
+    return InterventionModel(action_id, hazard, features, preprocessor, effect_model, status, card, support_profile)
+
+
+def _intervention_comparison_signature(model: InterventionModel) -> tuple[Any, ...] | None:
+    """Return a strict same-study comparability key; None means not comparable."""
+    card = model.card
+    provenance = card.get("data_provenance")
+    if not isinstance(provenance, dict):
+        return None
+    # Each candidate must document its own treatment version, but treatment
+    # descriptions must differ when comparing distinct actions. Comparability
+    # instead requires a shared study, population, outcome, hazard, feature
+    # contract and holdout period.
+    required = (
+        provenance.get("source_title"),
+        provenance.get("source_owner"),
+        provenance.get("collection_period"),
+        provenance.get("outcome_definition"),
+        provenance.get("treatment_definition"),
+        provenance.get("geographic_scope"),
+        card.get("hazard"),
+        card.get("outcome_unit"),
+        card.get("test_start"),
+        tuple(card.get("feature_columns", [])),
+    )
+    if any(value is None or value == "" or value == () for value in required):
+        return None
+    return (
+        provenance.get("source_title"),
+        provenance.get("source_owner"),
+        provenance.get("collection_period"),
+        provenance.get("outcome_definition"),
+        provenance.get("geographic_scope"),
+        card.get("hazard"),
+        card.get("outcome_unit"),
+        card.get("test_start"),
+        tuple(card.get("feature_columns", [])),
+    )
+
+
+def rank_interventions(
+    models: Iterable[InterventionModel], context: dict[str, Any], *,
+    max_actions: int = 5,
+) -> dict[str, Any]:
+    """Rank only eligible interventions with verified same-study comparability."""
+    model_list = list(models)
+    eligible_models = [model for model in model_list if model.card.get("eligible_for_ranking")]
+    signatures = [_intervention_comparison_signature(model) for model in eligible_models]
+    if eligible_models and (
+        any(signature is None for signature in signatures)
+        or len(set(signatures)) != 1
+    ):
+        return {
+            "status": "RANKING_WITHHELD",
+            "ranked_actions": [],
+            "excluded_actions": [
+                {"action_id": model.action_id, "status": "COMPARABILITY_NOT_ESTABLISHED"}
+                for model in eligible_models
+            ],
+            "reason": (
+                "Candidate effects lack complete matching provenance or do not share "
+                "the same study, population, outcome definition, hazard, covariate "
+                "contract and held-out period. Cross-study point estimates are not "
+                "a valid precaution ranking."
+            ),
+        }
+    estimates = []
+    excluded = []
+    for model in model_list:
+        result = model.estimate(context)
+        if (
+            result.get("available")
+            and model.card.get("eligible_for_ranking")
+            and float(result.get("estimated_damage_reduction", 0.0)) > 0
+        ):
+            estimates.append(result)
+        else:
+            excluded.append({
+                "action_id": model.action_id,
+                "status": (
+                    "NO_CONTEXTUAL_DAMAGE_REDUCTION_SIGNAL"
+                    if result.get("available") else result.get("status")
+                ),
+                "reason": (
+                    "The context-specific point estimate does not indicate a positive damage reduction."
+                    if result.get("available") else
+                    result.get("reason", model.card.get("status_reason"))
+                ),
+            })
+    if not estimates:
+        return {
+            "status": "RANKING_WITHHELD",
+            "ranked_actions": [],
+            "excluded_actions": excluded,
+            "reason": "No action has sufficient held-out evidence and complete provenance for a comparative ranking.",
+        }
+    estimates.sort(key=lambda item: item["estimated_damage_reduction"], reverse=True)
+    return {
+        "status": (
+            "PARTIAL_RESEARCH_RANKING_NOT_VALIDATED"
+            if excluded else "RESEARCH_RANKING_NOT_VALIDATED"
+        ),
+        "ranked_actions": estimates[:max_actions],
+        "excluded_actions": excluded,
+        "comparison_basis": "Context-specific point estimates from eligible models trained and tested on the same documented study and outcome scale.",
+        "pairwise_superiority": "NOT_ESTABLISHED",
+        "context_specific_pairwise_intervals": "NOT_AVAILABLE",
+        "top_action_is_proven_best": False,
+        "warning": (
+            "This is a provisional research ordering, not proof that the first action is best. "
+            "Point-estimate ordering does not establish statistically significant differences "
+            "between actions. Unmeasured confounding, model uncertainty, costs, feasibility, "
+            "intervention quality and site-specific engineering constraints may change the decision. "
+            "Official authorities and qualified professionals retain decision authority."
+            + (" Some candidate actions were excluded, so this is not a complete comparison." if excluded else "")
+        ),
+    }
+
+
+def load_intervention_models(registry_path: str = "reports/intervention_effectiveness_registry.json") -> list[InterventionModel]:
+    """Load only persisted eligible action models from a generated registry."""
+    import json
+    from pathlib import Path
+    import joblib
+
+    path = Path(registry_path)
+    if not path.is_file():
+        return []
+    registry = json.loads(path.read_text(encoding="utf-8"))
+    models: list[InterventionModel] = []
+    for card in registry.get("models", []):
+        if card.get("status") != "CAUSAL_RESEARCH_SIGNAL_NOT_VALIDATED":
+            continue
+        artifact_path = card.get("artifact_path")
+        if not artifact_path or not Path(artifact_path).is_file():
+            continue
+        bundle = joblib.load(artifact_path)
+        if not isinstance(bundle, dict) or not isinstance(bundle.get("support_profile"), dict):
+            continue
+        models.append(InterventionModel(
+            action_id=str(card["action_id"]),
+            hazard=str(card["hazard"]),
+            feature_columns=list(card["feature_columns"]),
+            preprocessor=bundle["preprocessor"],
+            effect_model=bundle["effect_model"],
+            status=str(card["status"]),
+            card=card,
+            support_profile=bundle.get("support_profile"),
+        ))
+    return models
+
+
+def intervention_effectiveness_for_context(
+    hazard: str,
+    context: dict[str, Any],
+    *,
+    registry_path: str = "reports/intervention_effectiveness_registry.json",
+) -> dict[str, Any]:
+    """Public app boundary: return a ranking only when eligible trained models exist."""
+    models = [model for model in load_intervention_models(registry_path) if model.hazard == hazard]
+    if not models:
+        return {
+            "status": "RANKING_WITHHELD",
+            "ranked_actions": [],
+            "excluded_actions": [],
+            "reason": "No verified, eligible intervention-effect model is currently registered for this hazard.",
+        }
+    return rank_interventions(models, context)
+
+
+
+def intervention_effectiveness_for_hazards(
+    hazards: Iterable[str],
+    context: dict[str, Any],
+    *,
+    registry_path: str = "reports/intervention_effectiveness_registry.json",
+) -> dict[str, Any]:
+    """Return independent, hazard-specific intervention rankings for a scenario."""
+    from src.hazard_registry import components_for
+
+    models = load_intervention_models(registry_path)
+    expanded_hazards: list[str] = []
+    for selected_hazard in hazards:
+        label = str(selected_hazard)
+        for component in components_for(label):
+            if component not in expanded_hazards:
+                expanded_hazards.append(component)
+        if label not in expanded_hazards:
+            expanded_hazards.append(label)
+    results = {}
+    for hazard in expanded_hazards:
+        selected = [model for model in models if model.hazard == hazard]
+        results[hazard] = (
+            rank_interventions(selected, context)
+            if selected else {
+                "status": "RANKING_WITHHELD",
+                "ranked_actions": [],
+                "excluded_actions": [],
+                "reason": f"No verified, eligible intervention-effect model is currently registered for {hazard}.",
+            }
+        )
+    return {
+        "status": "AVAILABLE" if any(
+            result.get("ranked_actions") for result in results.values()
+        ) else "RANKING_WITHHELD",
+        "by_hazard": results,
+        "warning": (
+            "Rankings are preliminary observational research estimates, not guarantees. "
+            "They must not override official instructions or qualified engineering judgement."
+        ),
+    }

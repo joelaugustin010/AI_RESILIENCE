@@ -180,13 +180,17 @@ st.markdown(
       object-fit: cover !important;
       opacity: 0;
       filter: saturate(.96) contrast(1.04);
-      animation: arSlideCycle 32s cubic-bezier(.45, .05, .55, .95) infinite;
+      animation: arSlideCycle 64s cubic-bezier(.45, .05, .55, .95) infinite;
       will-change: opacity, transform;
     }
     .ar-cine-hero .ar-slide-a { object-position: center 56%; animation-delay: 0s; }
     .ar-cine-hero .ar-slide-b { object-position: center 46%; animation-delay: -8s; }
     .ar-cine-hero .ar-slide-c { object-position: center 52%; animation-delay: -16s; }
     .ar-cine-hero .ar-slide-d { object-position: center 50%; animation-delay: -24s; }
+    .ar-cine-hero .ar-slide-e { object-position: center 50%; animation-delay: -32s; }
+    .ar-cine-hero .ar-slide-f { object-position: center 50%; animation-delay: -40s; }
+    .ar-cine-hero .ar-slide-g { object-position: center 50%; animation-delay: -48s; }
+    .ar-cine-hero .ar-slide-h { object-position: center 50%; animation-delay: -56s; }
     .ar-cine-hero .ar-cine-video {
       z-index: 1;
       object-fit: cover !important;
@@ -691,6 +695,14 @@ st.markdown(
       box-shadow: 0 16px 40px rgba(0, 0, 0, .18);
       transition: transform .2s var(--ar-ease), border-color .2s var(--ar-ease), box-shadow .2s var(--ar-ease);
     }
+    .ar-nav-media {
+      min-height: 106px;
+      margin: -.25rem -.25rem 1rem;
+      border-radius: 14px;
+      background-position: center;
+      background-size: cover;
+      box-shadow: inset 0 -22px 28px rgba(7, 30, 27, .16);
+    }
     [class*="st-key-ar-nav-"]:hover {
       transform: translateY(-2px);
       border-color: rgba(66, 224, 193, .34);
@@ -843,6 +855,7 @@ st.markdown(
       .ar-hazards, .ar-flow { grid-template-columns: 1fr; }
       .ar-threat, .ar-why { border-radius: 20px; }
       .ar-tile figcaption { padding: .85rem .9rem; }
+      .ar-nav-media { min-height: 88px; }
     }
     @media (prefers-reduced-motion: reduce) {
       .ar-cine-slide { animation: none !important; opacity: 0; transform: none !important; }
@@ -875,13 +888,21 @@ st.markdown(
     f"""
     <section class="ar-cine-hero" aria-label="AI RESILIENCE - Kochi environmental and disaster intelligence">
       <div class="ar-cine-media" aria-hidden="true">
-        <img class="ar-cine-poster ar-cine-slide ar-slide-a" src="{_img('hero-kerala-fallback.jpg')}"
+        <img class="ar-cine-poster ar-cine-slide ar-slide-a" src="{_img('kochi/waterfront.jpg')}"
              alt="" fetchpriority="high" decoding="async">
-        <img class="ar-cine-slide ar-slide-b" src="{_img('hero-kerala-ghats.jpg')}"
+        <img class="ar-cine-slide ar-slide-b" src="{_img('kochi/backwaters.jpg')}"
              alt="" decoding="async">
-        <img class="ar-cine-slide ar-slide-c" src="{_img('hero-kerala-landslide.jpg')}"
+        <img class="ar-cine-slide ar-slide-c" src="{_img('kochi/mangalavanam.jpg')}"
              alt="" decoding="async">
-        <img class="ar-cine-slide ar-slide-d" src="{_img('hero-kerala-coast.jpg')}"
+        <img class="ar-cine-slide ar-slide-d" src="{_img('kochi/fishing-nets.jpg')}"
+             alt="" decoding="async">
+        <img class="ar-cine-slide ar-slide-e" src="{_img('kochi/coast.jpg')}"
+             alt="" decoding="async">
+        <img class="ar-cine-slide ar-slide-f" src="{_img('kochi/industrial-coast.jpg')}"
+             alt="" decoding="async">
+        <img class="ar-cine-slide ar-slide-g" src="{_img('kochi/maradu.jpg')}"
+             alt="" decoding="async">
+        <img class="ar-cine-slide ar-slide-h" src="{_img('kochi/water-metro.jpg')}"
              alt="" decoding="async">{VIDEO_MARKUP}
         <span class="ar-cine-scrim"></span>
         <span class="ar-cine-vignette"></span>
@@ -909,7 +930,7 @@ st.markdown(
       <div class="ar-cine-foot" aria-hidden="true">
         <span>Scroll to explore</span>
         <span class="ar-scroll-line"></span>
-        <span class="ar-foot-right">Beauty · Threats · Intelligence</span>
+        <span class="ar-foot-right">Assess · Map · Prepare</span>
       </div>
     </section>
     """,
@@ -941,6 +962,15 @@ with st.container(key="ar-hero-ctas"):
             unsafe_allow_html=True,
         )
 
+st.warning(
+    "RESEARCH-GRADE SCREENING · AI_RESILIENCE is an evidence-gated research "
+    "demonstration and decision-support platform, not an operational early-warning "
+    "service. It does not claim validated Kochi flood probabilities, predicted "
+    "inundation depths, verified affected-population counts, or proven intervention "
+    "benefits. Follow official IMD, CWC, KSDMA and local-authority instructions "
+    "for real safety decisions."
+)
+
 st.markdown(
     """
     <div class="ar-signal" aria-label="Platform principles and scope">
@@ -954,54 +984,151 @@ st.markdown(
 )
 
 # ---------------------------------------------------------------------------
-# 01 - Beauty
+# Priority decision panel — primary user tasks appear before background content.
+# ---------------------------------------------------------------------------
+st.markdown(
+    """
+    <style>
+    .ar-priority-intro { margin: 2.2rem 0 1rem; max-width: 900px; }
+    .ar-priority-kicker {
+      color: #247a65; font-size: .7rem; font-weight: 850;
+      letter-spacing: .16em; text-transform: uppercase;
+    }
+    .ar-priority-intro h2 {
+      margin: .45rem 0 .5rem; color: #173f39; font-size: clamp(1.8rem,3.2vw,2.7rem);
+      line-height: 1.08; letter-spacing: -.04em;
+    }
+    .ar-priority-intro p { margin: 0; max-width: 760px; color: #5d7068; line-height: 1.65; }
+    .ar-priority-card {
+      height: 100%; min-height: 190px; padding: 1.15rem 1.2rem;
+      border: 1px solid rgba(36,122,101,.20); border-radius: 18px;
+      background: linear-gradient(150deg,rgba(255,255,255,.98),rgba(235,246,239,.94));
+      box-shadow: 0 12px 30px rgba(26,65,49,.065);
+    }
+    .ar-priority-card .ar-priority-index {
+      display:inline-flex; align-items:center; justify-content:center;
+      width:2rem; height:2rem; border-radius:10px; margin-bottom:.8rem;
+      color:#176b54; background:rgba(36,122,101,.10); font-weight:850; font-size:.78rem;
+    }
+    .ar-priority-card h3 { margin:0 0 .45rem; color:#23473b; font-size:1.08rem; letter-spacing:-.02em; }
+    .ar-priority-card p { min-height:3.6rem; margin:0 0 .85rem; color:#63766e; font-size:.84rem; line-height:1.55; }
+    [class*="st-key-ar-priority-"] [data-testid="stPageLink"] a {
+      width:100%; justify-content:space-between; border-radius:10px;
+      border:1px solid rgba(36,122,101,.20); background:rgba(36,122,101,.07);
+      color:#176b54 !important; font-weight:750; padding:.62rem .75rem;
+    }
+    [class*="st-key-ar-priority-"] [data-testid="stPageLink"] a:hover {
+      background:rgba(36,122,101,.13); border-color:rgba(36,122,101,.38);
+    }
+    .ar-priority-note {
+      margin:.9rem 0 0; padding:.75rem .9rem; border-left:3px solid #b98a42;
+      border-radius:0 10px 10px 0; background:rgba(248,243,231,.82);
+      color:#6f5a35; font-size:.78rem; line-height:1.55;
+    }
+    @media(max-width:700px) {
+      .ar-priority-card { min-height:0; }
+      .ar-priority-card p { min-height:0; }
+    }
+    </style>
+    <section class="ar-priority-intro" aria-labelledby="ar-priority-title">
+      <span class="ar-priority-kicker">Start here · Priority intelligence</span>
+      <h2 id="ar-priority-title">Assess first. See the place. Plan the response.</h2>
+      <p>Open the three core workspaces first. Review a disaster scenario and its precautions, inspect Kochi's available spatial evidence, or examine what the research models can genuinely support.</p>
+    </section>
+    """,
+    unsafe_allow_html=True,
+)
+
+priority_columns = st.columns(3, gap="medium")
+priority_cards = [
+    (
+        "01",
+        "Scenario assessment & precautions",
+        "Select a hazard or compound event, review evidence and uncertainty, and identify practical preparedness and mitigation priorities.",
+        "app_pages/decision_workflow.py",
+        "Open decision workflow",
+    ),
+    (
+        "02",
+        "Kochi interactive map",
+        "Explore the available Kochi boundary and source-documented spatial layers, with the map's own legend and data-quality notes.",
+        "app_pages/kochi_map.py",
+        "Explore Kochi map",
+    ),
+    (
+        "03",
+        "Prediction & ML evidence",
+        "Inspect trained research models, held-out comparisons, inference readiness and the limits that prevent unsupported warnings.",
+        "app_pages/submission_ml_demo.py",
+        "Review ML evidence",
+    ),
+]
+for column, (number, title, description, path, link_label) in zip(priority_columns, priority_cards):
+    with column:
+        with st.container(key=f"ar-priority-{number}"):
+            st.markdown(
+                f'<div class="ar-priority-card"><span class="ar-priority-index">{number}</span>'
+                f'<h3>{title}</h3><p>{description}</p></div>',
+                unsafe_allow_html=True,
+            )
+            st.page_link(path, label=link_label, icon=":material/arrow_forward:", width="stretch")
+
+st.markdown(
+    '<div class="ar-priority-note"><strong>Prediction integrity:</strong> '
+    'The platform presents numerical estimates only where a registered model and complete input context are available. '
+    'Research outputs are not official forecasts or public warnings; follow IMD, KSDMA and district-administration guidance.</div>',
+    unsafe_allow_html=True,
+)
+
+# ---------------------------------------------------------------------------
+# 01 - Kochi in focus
 # ---------------------------------------------------------------------------
 st.markdown(
     """
     <div class="ar-story">
-      <span class="ar-overline">01 · Kochi and its regional context</span>
-      <h2>A coastal city shaped by water.</h2>
+      <span class="ar-overline">02 · Kochi in focus</span>
+      <h2>Beauty, biodiversity and a city shaped by water.</h2>
       <p>
-        Kochi's resilience is connected to its backwaters, coastal edge, canals, urban drainage
-        and essential services. Understanding the city means looking beyond isolated hazards
-        and making the evidence, geography and uncertainty behind each decision easier to see.
+        Kochi is a living network of islands, backwaters, mangroves, fishing communities and
+        working waterfronts. Its beauty and vulnerability are connected: the same waterways
+        that sustain the city can carry floodwater, pollution and pressure on coastal ecosystems.
       </p>
     </div>
     <div class="ar-gallery">
       <figure class="ar-tile ar-t-backwaters">
-        <img src="app/static/images/beauty-backwaters.webp" alt="Houseboats and palm-lined canals in the Kerala backwaters" loading="lazy" decoding="async">
+        <img src="app/static/images/kochi/backwaters.jpg" alt="Kochi backwaters and palm-lined waterways" loading="lazy" decoding="async">
         <span class="ar-tile-tag">Backwaters</span>
-        <figcaption><strong>Water as a way of life</strong><span>Vembanad and the canal networks that connect village, paddy and city.</span></figcaption>
+        <figcaption><strong>Water as a way of life</strong><span>Backwaters and canals connect neighbourhoods, livelihoods and ecosystems.</span></figcaption>
       </figure>
       <figure class="ar-tile ar-t-ghats">
-        <img src="app/static/images/beauty-ghats.webp" alt="Tea plantations across the high ranges near Munnar" loading="lazy" decoding="async">
-        <span class="ar-tile-tag">High ranges</span>
-        <figcaption><strong>The Western Ghats</strong><span>Cloud-fed tea country and one of the world's great biodiversity hotspots.</span></figcaption>
+        <img src="app/static/images/kochi/fishing-nets.jpg" alt="Chinese fishing nets on the Kochi waterfront" loading="lazy" decoding="async">
+        <span class="ar-tile-tag">Fort Kochi</span>
+        <figcaption><strong>Working waterfronts</strong><span>Fishing heritage, tidal water and livelihoods meet at the city edge.</span></figcaption>
       </figure>
       <figure class="ar-tile ar-t-waterfall">
-        <img src="app/static/images/beauty-waterfall.webp" alt="Athirappilly waterfall surrounded by forest" loading="lazy" decoding="async">
-        <span class="ar-tile-tag">Rivers</span>
-        <figcaption><strong>Athirappilly</strong><span>Where the Chalakudy river drops through the forest edge.</span></figcaption>
+        <img src="app/static/images/kochi/mangalavanam.jpg" alt="Green wetland vegetation at Mangalavanam in Kochi" loading="lazy" decoding="async">
+        <span class="ar-tile-tag">Urban ecology</span>
+        <figcaption><strong>Green breathing spaces</strong><span>Mangalavanam and urban wetlands shelter biodiversity inside a growing city.</span></figcaption>
       </figure>
       <figure class="ar-tile ar-t-coast">
-        <img src="app/static/images/beauty-coast.webp" alt="Cliffs and beach on the Kerala coast at Varkala" loading="lazy" decoding="async">
-        <span class="ar-tile-tag">Coast</span>
-        <figcaption><strong>The Arabian Sea</strong><span>Cliffs, beaches and coastal communities shaped by the monsoon.</span></figcaption>
+        <img src="app/static/images/kochi/coast.jpg" alt="Kochi coastline and Arabian Sea" loading="lazy" decoding="async">
+        <span class="ar-tile-tag">Coastline</span>
+        <figcaption><strong>Where land meets sea</strong><span>Coastal communities face erosion, storms and changing shoreline pressures.</span></figcaption>
       </figure>
       <figure class="ar-tile ar-t-forest">
-        <img src="app/static/images/beauty-forest.webp" alt="Shola forest and grassland in Silent Valley National Park" loading="lazy" decoding="async">
-        <span class="ar-tile-tag">Biodiversity</span>
-        <figcaption><strong>Silent Valley</strong><span>Shola forest, grassland and species found nowhere else on Earth.</span></figcaption>
+        <img src="app/static/images/kochi/waterfront.jpg" alt="Kochi waterfront with water and urban greenery" loading="lazy" decoding="async">
+        <span class="ar-tile-tag">City &amp; water</span>
+        <figcaption><strong>One connected landscape</strong><span>Ports, homes, roads and waterways share the same environmental systems.</span></figcaption>
       </figure>
       <figure class="ar-tile ar-t-city">
-        <img src="app/static/images/beauty-city.webp" alt="Kochi waterfront skyline and Marine Drive" loading="lazy" decoding="async">
-        <span class="ar-tile-tag">Cities</span>
-        <figcaption><strong>Kochi</strong><span>A waterfront city of neighbourhoods, ports and shared infrastructure.</span></figcaption>
+        <img src="app/static/images/kochi/industrial-coast.jpg" alt="Industrial waterfront surroundings near Kochi" loading="lazy" decoding="async">
+        <span class="ar-tile-tag">Pressure points</span>
+        <figcaption><strong>Growth needs care</strong><span>Industry and infrastructure must grow alongside clean air, water and public health.</span></figcaption>
       </figure>
     </div>
     <p class="ar-fineprint">
-      Regional Kerala photography provides visual context only. The platform's analytical
-      focus is Kochi; images are not evidence of current conditions or a specific event.
+      Kochi photography provides visual context only. Images are not evidence of current
+      conditions or a specific event; use the linked workspaces for documented data and sources.
     </p>
     """,
     unsafe_allow_html=True,
@@ -1013,12 +1140,12 @@ st.markdown(
 st.markdown(
     """
     <section class="ar-threat" aria-labelledby="ar-threat-title">
-      <img class="ar-threat-bg" src="app/static/images/threats-monsoon.webp"
+      <img class="ar-threat-bg" src="app/static/images/kochi/industrial-coast.jpg"
            alt="" loading="lazy" decoding="async" aria-hidden="true">
       <span class="ar-threat-scrim"></span>
       <div class="ar-threat-inner">
         <div class="ar-story">
-          <span class="ar-overline">02 · The threats we face</span>
+          <span class="ar-overline">03 · The threats we face</span>
           <h2 id="ar-threat-title">Beauty under pressure.</h2>
           <p>
             Kochi's waterways, coastal setting and dense urban footprint create connected planning
@@ -1081,7 +1208,7 @@ st.markdown(
     f"""
     <section class="ar-why" aria-labelledby="ar-why-title">
       <div class="ar-story" style="margin-top:0">
-        <span class="ar-overline">03 · Why AI_RESILIENCE matters</span>
+        <span class="ar-overline">04 · Why AI_RESILIENCE matters</span>
         <h2 id="ar-why-title">From observation to action, in one evidence chain.</h2>
         <p>
           Urban preparedness improves when environmental monitoring, hazard review, critical-facility
@@ -1134,7 +1261,7 @@ st.markdown(
 st.markdown(
     """
     <div class="ar-story">
-      <span class="ar-overline">04 · Explore the intelligence platform</span>
+      <span class="ar-overline">05 · Explore the intelligence platform</span>
       <h2>Choose a workspace.</h2>
       <p>
         Move from understanding the landscape to examining a specific question. Every module is
@@ -1152,6 +1279,7 @@ navigation_groups = [
         ICON_COMPASS,
         "Risk & readiness",
         "Build a scenario, inspect the evidence and understand what the models can — and cannot — tell you.",
+        "app/static/images/kochi/coast.jpg",
         [
             ("app_pages/decision_workflow.py", "Decision Workflow", ":material/assignment_turned_in:"),
             ("app_pages/disaster_probability.py", "Multi-Hazard Evidence Review", ":material/analytics:"),
@@ -1163,10 +1291,12 @@ navigation_groups = [
         ICON_PLACE,
         "Place & environment",
         "See the geography, monitor environmental pressure and test whether the underlying data is fit for use.",
+        "app/static/images/kochi/backwaters.jpg",
         [
             ("app_pages/kochi_map.py", "Kochi Map", ":material/map:"),
             ("app_pages/air_pollution.py", "Air Pollution", ":material/factory:"),
             ("app_pages/data_readiness.py", "Data Readiness", ":material/fact_check:"),
+            ("app_pages/mitigation_data_intelligence.py", "Mitigation Data Intelligence", ":material/verified:"),
         ],
     ),
     (
@@ -1174,10 +1304,12 @@ navigation_groups = [
         ICON_HOSPITAL,
         "People & critical services",
         "Bring exposure, continuity and preparedness questions closer to the facilities communities rely on.",
+        "app/static/images/kochi/mangalavanam.jpg",
         [
             ("app_pages/hospital_vulnerability.py", "Hospital Vulnerability", ":material/local_hospital:"),
             ("app_pages/disaster_assistant.py", "Disaster Intelligence Assistant", ":material/psychology_alt:"),
             ("app_pages/hazard_model_lab.py", "Hazard Model Lab", ":material/model_training:"),
+            ("app_pages/submission_ml_demo.py", "ML Evidence & Demonstration", ":material/science:"),
         ],
     ),
     (
@@ -1185,6 +1317,7 @@ navigation_groups = [
         ICON_BLUEPRINT,
         "Plan & design",
         "Turn priorities into transparent mitigation options, concept designs and budget checks.",
+        "app/static/images/kochi/fishing-nets.jpg",
         [
             ("app_pages/mitigation_planner.py", "Mitigation Budget", ":material/account_balance_wallet:"),
             ("app_pages/smart_mitigation_design.py", "Smart Mitigation Design", ":material/engineering:"),
@@ -1195,11 +1328,12 @@ navigation_groups = [
 for row_start in range(0, len(navigation_groups), 2):
     columns = st.columns(2, gap="medium")
     for column, group in zip(columns, navigation_groups[row_start:row_start + 2]):
-        key, icon, title, copy, links = group
+        key, icon, title, copy, image, links = group
         with column:
             with st.container(key=key):
                 st.markdown(
                     f"""
+                    <div class="ar-nav-media" style="background-image:linear-gradient(90deg,rgba(8,39,37,.76),rgba(8,39,37,.16)),url('{image}');" role="img" aria-label="{title} workspace environment"></div>
                     <div class="ar-nav-head">
                       <span class="ar-nav-icon">{icon}</span>
                       <div>
@@ -1215,50 +1349,150 @@ for row_start in range(0, len(navigation_groups), 2):
                     st.page_link(path, label=label, icon=page_icon, width="stretch")
 
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 # 05 - Contribution to the Sustainable Development Goals
 # ---------------------------------------------------------------------------
 st.markdown(
     """
     <style>
-      .ar-sdg-section { margin: 4.4rem 0 2.6rem; padding: clamp(1.4rem, 3vw, 2.5rem); border: 1px solid rgba(130,190,199,.18); border-radius: 30px; background: linear-gradient(145deg, rgba(10,35,50,.94), rgba(6,25,38,.94)); box-shadow: 0 24px 70px rgba(0,0,0,.18); }
-      .ar-sdg-intro { max-width: 780px; margin-bottom: 1.35rem; }
-      .ar-sdg-intro .ar-overline { color: #7ff2dc; }
-      .ar-sdg-intro h2 { color: #f2ffff; font-size: clamp(1.7rem, 3vw, 2.65rem); line-height: 1.08; letter-spacing: -.04em; margin: .35rem 0 .65rem; }
-      .ar-sdg-intro p { color: #b9d4d8; line-height: 1.7; margin: 0; }
-      .ar-sdg-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .9rem; }
-      .ar-sdg-card { display: grid; grid-template-columns: 66px 1fr; gap: .85rem; min-height: 170px; padding: 1rem; border: 1px solid rgba(130,190,199,.18); border-radius: 20px; background: rgba(12,48,64,.64); transition: transform .22s var(--ar-ease), border-color .22s var(--ar-ease), background .22s var(--ar-ease); }
-      .ar-sdg-card:hover { transform: translateY(-4px); border-color: rgba(127,245,220,.52); background: rgba(16,67,78,.82); }
-      .ar-sdg-card img { width: 66px; height: 66px; border-radius: 10px; display: block; }
-      .ar-sdg-card h3 { color: #efffff; font-size: 1rem; line-height: 1.25; margin: .08rem 0 .35rem; }
-      .ar-sdg-card h3 span { color: #7ff2dc; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; display: block; margin-bottom: .18rem; }
-      .ar-sdg-card p { color: #b9d4d8; font-size: .82rem; line-height: 1.55; margin: 0; }
-      .ar-sdg-note { margin-top: 1rem; padding-top: .85rem; border-top: 1px solid rgba(130,190,199,.15); color: #8fb8bd; font-size: .73rem; line-height: 1.55; }
-      .ar-sdg-note a { color: #9cf8e6 !important; }
-      @media (max-width: 800px) { .ar-sdg-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-      @media (max-width: 560px) { .ar-sdg-grid { grid-template-columns: 1fr; } .ar-sdg-card { min-height: 0; } }
-      @media (prefers-reduced-motion: reduce) { .ar-sdg-card:hover { transform: none; } }
+.ar-sdg-section {
+  position:relative; overflow:hidden; margin:clamp(3rem,5vw,4.5rem) 0 1.2rem;
+  padding:clamp(1.35rem,3vw,2.6rem); border:1px solid rgba(23,78,85,.14);
+  border-radius:26px; background:linear-gradient(145deg,#fff 0%,#f1f7f5 58%,#e6f0ef 100%);
+  box-shadow:0 22px 56px rgba(23,78,85,.075);
+}
+.ar-sdg-section:before { content:""; position:absolute; width:420px;height:420px;right:-210px;top:-230px;border-radius:50%;background:radial-gradient(circle,rgba(41,155,145,.13),transparent 68%);pointer-events:none; }
+.ar-sdg-kicker { color:#247f77;font-size:.7rem;font-weight:850;letter-spacing:.17em;text-transform:uppercase; }
+.ar-sdg-hero { display:grid;grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);gap:1.2rem;align-items:center; }
+.ar-sdg-title { margin:.65rem 0 .8rem!important;color:#173f43!important;font-size:clamp(2rem,4vw,3.45rem)!important;line-height:1.02!important;letter-spacing:-.05em!important; }
+.ar-sdg-lede { max-width:700px;color:#586f6b;font-size:1rem;line-height:1.75; }
+.ar-sdg-callout { display:inline-flex;gap:.55rem;align-items:center;margin-top:.8rem;padding:.55rem .8rem;border:1px solid rgba(41,155,145,.2);border-radius:999px;background:rgba(220,231,232,.55);color:#285d59;font-size:.76rem;font-weight:700; }
+.ar-sdg-network { position:relative;min-height:270px;display:grid;place-items:center; }
+.ar-sdg-network svg { position:absolute;inset:0;width:100%;height:100%;overflow:visible; }
+.ar-sdg-hub { z-index:1;display:grid;place-items:center;width:126px;height:126px;border:1px solid rgba(41,155,145,.3);border-radius:50%;background:linear-gradient(145deg,#fff,#e1efec);box-shadow:0 12px 35px rgba(23,78,85,.13);text-align:center;color:#174e55; }
+.ar-sdg-hub strong { font-size:1rem;letter-spacing:-.03em; }
+.ar-sdg-hub span { font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:#52716d; }
+.ar-sdg-node { position:absolute;z-index:2;display:grid;place-items:center;width:56px;height:56px;border:3px solid #fff;border-radius:15px;background:#fff;box-shadow:0 8px 20px rgba(23,78,85,.15); }
+.ar-sdg-node img { width:100%;height:100%;object-fit:contain;border-radius:12px; }
+.ar-sdg-node.n3 {top:7%;left:18%}.ar-sdg-node.n6 {top:7%;right:18%}.ar-sdg-node.n9 {top:42%;right:3%}.ar-sdg-node.n11 {bottom:7%;right:18%}.ar-sdg-node.n13 {bottom:7%;left:18%}.ar-sdg-node.n15 {top:42%;left:3%}
+.ar-sdg-section .ar-sdg-divider {height:1px;margin:1.4rem 0;background:linear-gradient(90deg,transparent,rgba(23,78,85,.18),transparent);}
+.ar-sdg-subhead {display:flex;align-items:end;justify-content:space-between;gap:1rem;margin:0 0 1rem;}
+.ar-sdg-subhead h3 {margin:0!important;color:#173f43!important;font-size:1.22rem!important;letter-spacing:-.025em!important;}
+.ar-sdg-subhead p {margin:0;color:#71827b;font-size:.76rem;}
+.ar-sdg-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.85rem;}
+.ar-sdg-card {--sdg-color:#247f77;display:grid;grid-template-columns:62px minmax(0,1fr);gap:.8rem;min-height:150px;padding:1rem;border:1px solid rgba(23,78,85,.13);border-left:4px solid var(--sdg-color);border-radius:17px;background:rgba(255,255,255,.88);box-shadow:0 8px 22px rgba(23,78,85,.045);transition:transform .2s ease,box-shadow .2s ease;}
+.ar-sdg-card:hover {transform:translateY(-3px);box-shadow:0 14px 28px rgba(23,78,85,.1);}
+.ar-sdg-card img {width:62px;height:62px;object-fit:contain;border-radius:8px;}
+.ar-sdg-card h4 {margin:.05rem 0 .35rem!important;color:#173f43!important;font-size:.92rem!important;line-height:1.25!important;}
+.ar-sdg-card h4 span {display:block;margin-bottom:.2rem;color:var(--sdg-color);font-size:.65rem;font-weight:850;letter-spacing:.1em;text-transform:uppercase;}
+.ar-sdg-card p {margin:0;color:#5d716d;font-size:.77rem;line-height:1.55;}
+.ar-sdg-footer {display:flex;gap:.7rem;align-items:flex-start;margin-top:1rem;padding:.9rem 1rem;border:1px solid rgba(41,155,145,.18);border-radius:14px;background:rgba(220,231,232,.55);color:#536d68;font-size:.75rem;line-height:1.6;}
+.ar-sdg-footer strong {color:#174e55;}
+.ar-sdg-note {margin-top:.8rem;color:#71827b;font-size:.67rem;line-height:1.55;}
+.ar-sdg-note a {color:#176b54!important;text-decoration:underline;text-underline-offset:2px;}
+@media(max-width:900px){.ar-sdg-hero{grid-template-columns:1fr}.ar-sdg-network{min-height:230px}.ar-sdg-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.ar-sdg-grid{grid-template-columns:1fr}.ar-sdg-card{min-height:0}.ar-sdg-network{min-height:210px}.ar-sdg-node{width:48px;height:48px}}
+@media(prefers-reduced-motion:reduce){.ar-sdg-card{transition:none}.ar-sdg-card:hover{transform:none}}
+</style>
+<section class="ar-sdg-section" aria-labelledby="ar-sdg-title">
+  <div class="ar-sdg-hero">
+    <div>
+      <span class="ar-sdg-kicker">06 · Shared direction · Kochi to the world</span>
+      <h2 class="ar-sdg-title" id="ar-sdg-title">Local resilience. Global goals.</h2>
+      <p class="ar-sdg-lede">AI RESILIENCE brings environmental evidence, disaster preparedness and infrastructure planning into one Kochi-focused workspace. Its work connects to six Sustainable Development Goals through practical research and planning capabilities.</p>
+      <span class="ar-sdg-callout">Six goals · One evidence-led platform · Kochi pilot</span>
+    </div>
+    <div class="ar-sdg-network" role="img" aria-label="Six Sustainable Development Goal icons connected to the AI RESILIENCE platform hub">
+      <svg viewBox="0 0 420 270" aria-hidden="true"><g fill="none" stroke="#75aaa2" stroke-width="1.5" stroke-dasharray="4 5" opacity=".8"><path d="M210 135 L105 38 M210 135 L315 38 M210 135 L392 135 M210 135 L315 232 M210 135 L105 232 M210 135 L28 135"/></g><g fill="#299b91"><circle cx="105" cy="38" r="3"/><circle cx="315" cy="38" r="3"/><circle cx="392" cy="135" r="3"/><circle cx="315" cy="232" r="3"/><circle cx="105" cy="232" r="3"/><circle cx="28" cy="135" r="3"/></g></svg>
+      <div class="ar-sdg-hub"><div><strong>AI<br>RESILIENCE</strong><br><span>Kochi · Kerala</span></div></div>
+      <div class="ar-sdg-node n3"><img src="app/static/images/sdg/sdg-3.png" alt=""></div>
+      <div class="ar-sdg-node n6"><img src="app/static/images/sdg/sdg-6.png" alt=""></div>
+      <div class="ar-sdg-node n9"><img src="app/static/images/sdg/sdg-9.png" alt=""></div>
+      <div class="ar-sdg-node n11"><img src="app/static/images/sdg/sdg-11.png" alt=""></div>
+      <div class="ar-sdg-node n13"><img src="app/static/images/sdg/sdg-13.png" alt=""></div>
+      <div class="ar-sdg-node n15"><img src="app/static/images/sdg/sdg-15.png" alt=""></div>
+    </div>
+  </div>
+  <div class="ar-sdg-divider"></div>
+  <div class="ar-sdg-subhead"><h3>Six goals. Six contribution pathways.</h3><p>Explore the platform capability behind each connection.</p></div>
+  <div class="ar-sdg-grid">
+    <article class="ar-sdg-card" style="--sdg-color:#4c9f38"><img src="app/static/images/sdg/sdg-3.png" alt="SDG 3 official icon"><div><h4><span>Goal 03 · People</span>Good Health and Well-being</h4><p>Hospital vulnerability and preparedness work examine exposure and continuity questions for critical healthcare services.</p></div></article>
+    <article class="ar-sdg-card" style="--sdg-color:#26bde2"><img src="app/static/images/sdg/sdg-6.png" alt="SDG 6 official icon"><div><h4><span>Goal 06 · Water</span>Clean Water and Sanitation</h4><p>Flood and hydrology evidence helps investigate water-related pressures, drainage context and observation gaps.</p></div></article>
+    <article class="ar-sdg-card" style="--sdg-color:#f36d25"><img src="app/static/images/sdg/sdg-9.png" alt="SDG 9 official icon"><div><h4><span>Goal 09 · Infrastructure</span>Industry, Innovation and Infrastructure</h4><p>Air-quality context and mitigation planning bring documented evidence into infrastructure discussions.</p></div></article>
+    <article class="ar-sdg-card" style="--sdg-color:#f99d26"><img src="app/static/images/sdg/sdg-11.png" alt="SDG 11 official icon"><div><h4><span>Goal 11 · Cities</span>Sustainable Cities and Communities</h4><p>Kochi-focused mapping, hazard evidence review and decision workflows support urban resilience planning.</p></div></article>
+    <article class="ar-sdg-card" style="--sdg-color:#3f7e44"><img src="app/static/images/sdg/sdg-13.png" alt="SDG 13 official icon"><div><h4><span>Goal 13 · Climate</span>Climate Action</h4><p>Rainfall, hazard and scenario evidence help explore climate-related pressures with uncertainty visible.</p></div></article>
+    <article class="ar-sdg-card" style="--sdg-color:#56c02b"><img src="app/static/images/sdg/sdg-15.png" alt="SDG 15 official icon"><div><h4><span>Goal 15 · Nature</span>Life on Land</h4><p>Wetlands, green spaces and connected ecosystems provide environmental context for urban resilience.</p></div></article>
+  </div>
+  <div class="ar-sdg-footer"><span aria-hidden="true">ⓘ</span><div><strong>Evidence before impact claims.</strong> This section describes platform capabilities and contribution pathways. It does not report lives saved, emissions avoided, hectares restored or official SDG indicator progress. Those claims require independently sourced measurements and documented methods.</div></div>
+  <div class="ar-sdg-note">Official SDG icons are used for informational purposes. <a href="https://sdgs.un.org/goals" target="_blank" rel="noopener">Explore the United Nations Sustainable Development Goals</a>. This publication has not been approved by the United Nations and does not reflect the views of the United Nations or its officials or Member States.</div>
+</section>
+    """,
+    unsafe_allow_html=True,
+)
+
+st.markdown("#### Explore the related workspaces")
+sdg_workspace_cols = st.columns(3, gap="medium")
+with sdg_workspace_cols[0]:
+    st.page_link("app_pages/hospital_vulnerability.py", label="SDG 3 · Hospital Vulnerability", icon="🏥")
+with sdg_workspace_cols[1]:
+    st.page_link("app_pages/kochi_map.py", label="SDG 6 · Kochi Map", icon="💧")
+with sdg_workspace_cols[2]:
+    st.page_link("app_pages/air_pollution.py", label="SDG 9 · Air Pollution", icon="🏭")
+sdg_workspace_cols_2 = st.columns(3, gap="medium")
+with sdg_workspace_cols_2[0]:
+    st.page_link("app_pages/decision_workflow.py", label="SDG 11 · Decision Workflow", icon="🏙️")
+with sdg_workspace_cols_2[1]:
+    st.page_link("app_pages/disaster_probability.py", label="SDG 13 · Multi-Hazard Evidence", icon="🌦️")
+with sdg_workspace_cols_2[2]:
+    st.page_link("app_pages/kochi_map.py", label="SDG 15 · Ecological Context", icon="🌿")
+
+# SDGs are presented as practical entry points into the existing platform, not
+# as impact claims. Each pathway opens a real workspace and keeps the evidence
+# and limitations visible there.
+st.markdown(
+    """
+    <style>
+    .ar-sdg-actions {
+      margin: 1.2rem 0 2.4rem;
+      padding: clamp(1.15rem, 2.5vw, 1.8rem);
+      border: 1px solid rgba(36,122,101,.18);
+      border-radius: 22px;
+      background: linear-gradient(135deg, #173f35 0%, #1e6659 58%, #286f79 100%);
+      box-shadow: 0 18px 42px rgba(26,65,49,.14);
+    }
+    .ar-sdg-actions h3 { color:#fff!important; margin:0 0 .35rem!important; font-size:1.35rem!important; }
+    .ar-sdg-actions > p { color:#d7eee1!important; margin:0 0 1rem!important; max-width:780px; line-height:1.6; }
+    .ar-sdg-action-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.7rem; }
+    .ar-sdg-action {
+      display:flex; min-height:92px; flex-direction:column; justify-content:space-between;
+      padding:.9rem 1rem; border:1px solid rgba(225,247,235,.22); border-radius:15px;
+      background:rgba(255,255,255,.1); color:#f0fff5!important; text-decoration:none!important;
+      transition:transform .2s ease, background .2s ease, border-color .2s ease;
+    }
+    .ar-sdg-action:hover { transform:translateY(-3px); background:rgba(255,255,255,.18); border-color:rgba(225,247,235,.5); }
+    .ar-sdg-action strong { color:#fff!important; font-size:.86rem; }
+    .ar-sdg-action span { color:#c5e7d5; font-size:.74rem; line-height:1.45; }
+    .ar-sdg-action em { color:#b7f0d0; font-size:.7rem; font-style:normal; font-weight:750; }
+    @media(max-width:760px){.ar-sdg-action-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:480px){.ar-sdg-action-grid{grid-template-columns:1fr}.ar-sdg-action{min-height:0;gap:.45rem}}
+    @media(prefers-reduced-motion:reduce){.ar-sdg-action{transition:none}.ar-sdg-action:hover{transform:none}}
     </style>
-    <section class="ar-sdg-section" aria-labelledby="ar-sdg-title">
-      <div class="ar-sdg-intro">
-        <span class="ar-overline">05 · Shared direction</span>
-        <h2 id="ar-sdg-title">OUR CONTRIBUTION TO THE UNITED NATIONS SUSTAINABLE DEVELOPMENT GOALS</h2>
-        <p>AI RESILIENCE connects environmental evidence, disaster preparedness and infrastructure planning. These are the goals the platform supports through its existing workspaces — not a certification or claim of achievement.</p>
+    <section class="ar-sdg-actions" aria-labelledby="ar-sdg-action-title">
+      <h3 id="ar-sdg-action-title">Put the goals to work</h3>
+      <p>Use the platform's evidence and planning workspaces to explore a concrete question behind each SDG. The links below are capability pathways, not claims of official SDG progress.</p>
+      <div class="ar-sdg-action-grid">
+        <a class="ar-sdg-action" href="/hospital_vulnerability"><strong>SDG 3 · Protect care</strong><span>Review hospital vulnerability and continuity questions.</span><em>Open hospital workspace →</em></a>
+        <a class="ar-sdg-action" href="/kochi_map"><strong>SDG 6 · Understand water</strong><span>Inspect Kochi's mapped context and source coverage.</span><em>Open Kochi map →</em></a>
+        <a class="ar-sdg-action" href="/air_pollution"><strong>SDG 9 · Monitor air</strong><span>Examine pollutant evidence and monitoring readiness.</span><em>Open air workspace →</em></a>
+        <a class="ar-sdg-action" href="/decision_workflow"><strong>SDG 11 · Assess cities</strong><span>Move from a scenario to an evidence-gated decision review.</span><em>Open decision workflow →</em></a>
+        <a class="ar-sdg-action" href="/disaster_probability"><strong>SDG 13 · Review climate risk</strong><span>Compare hazard evidence without manufactured certainty.</span><em>Open hazard review →</em></a>
+        <a class="ar-sdg-action" href="/smart_mitigation_design"><strong>SDG 15 · Design with nature</strong><span>Explore transparent, nature-based mitigation concepts.</span><em>Open design studio →</em></a>
       </div>
-      <div class="ar-sdg-grid">
-        <article class="ar-sdg-card"><img src="app/static/images/sdg/sdg-3.png" alt="SDG 3: Good Health and Well-being"><div><h3><span>SDG 3</span>Good Health and Well-being</h3><p>Hospital accessibility and disaster-preparedness workspaces help teams think about healthcare continuity during emergencies.</p></div></article>
-        <article class="ar-sdg-card"><img src="app/static/images/sdg/sdg-6.png" alt="SDG 6: Clean Water and Sanitation"><div><h3><span>SDG 6</span>Clean Water and Sanitation</h3><p>Flood intelligence and environmental monitoring support understanding of water-related risks and evidence gaps.</p></div></article>
-        <article class="ar-sdg-card"><img src="app/static/images/sdg/sdg-9.png" alt="SDG 9: Industry, Innovation and Infrastructure"><div><h3><span>SDG 9</span>Industry, Innovation and Infrastructure</h3><p>Industrial pollution intelligence and resilient infrastructure planning bring transparent evidence into design conversations.</p></div></article>
-        <article class="ar-sdg-card"><img src="app/static/images/sdg/sdg-11.png" alt="SDG 11: Sustainable Cities and Communities"><div><h3><span>SDG 11</span>Sustainable Cities and Communities</h3><p>Urban flood analysis, disaster intelligence, hospital resilience and mitigation planning support more prepared communities.</p></div></article>
-        <article class="ar-sdg-card"><img src="app/static/images/sdg/sdg-13.png" alt="SDG 13: Climate Action"><div><h3><span>SDG 13</span>Climate Action</h3><p>Hazard monitoring and scenario work help users understand climate-related pressures and prepare with appropriate caution.</p></div></article>
-        <article class="ar-sdg-card"><img src="app/static/images/sdg/sdg-15.png" alt="SDG 15: Life on Land"><div><h3><span>SDG 15</span>Life on Land</h3><p>Kochi's wetlands, green spaces and connected ecosystems are important context for urban resilience planning.</p></div></article>
-      </div>
-      <div class="ar-sdg-note">Official SDG icons are used without the UN emblem for informational purposes. <a href="https://sdgs.un.org/goals" target="_blank" rel="noopener">Learn about the UN Sustainable Development Goals</a>. The content of this publication has not been approved by the United Nations and does not reflect the views of the United Nations or its officials or Member States.</div>
     </section>
     """,
     unsafe_allow_html=True,
 )
 
-# ---------------------------------------------------------------------------
 # Footer and credits
 # ---------------------------------------------------------------------------
 st.markdown(
@@ -1417,6 +1651,117 @@ st.markdown(
     }
     @media (prefers-reduced-motion:reduce) {
       .ar-signal > div, [class*="st-key-ar-nav-"] { transition:none !important; }
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+# Original cinematic homepage: compact desktop first-screen layout.
+# Keeps the existing Kerala image sequence, optional local video and copy.
+st.markdown(
+    """
+    <style>
+    @media (min-width: 1200px) and (min-height: 820px) {
+      .ar-cine-hero {
+        box-sizing: border-box !important;
+        height: 520px !important;
+        min-height: 520px !important;
+        padding: 2.25rem 3rem 4.15rem !important;
+      }
+      .ar-cine-inner {
+        max-width: 820px !important;
+        padding-top: .4rem !important;
+      }
+      .ar-cine-topline {
+        margin-bottom: 1.35rem !important;
+      }
+      .ar-cine-title {
+        font-size: clamp(3.8rem, 5.5vw, 5.2rem) !important;
+        line-height: .96 !important;
+      }
+      .ar-cine-sub {
+        max-width: 700px !important;
+        margin-top: .85rem !important;
+        font-size: 1.18rem !important;
+        line-height: 1.35 !important;
+      }
+      .ar-cine-desc {
+        max-width: 680px !important;
+        margin-top: .55rem !important;
+        font-size: .91rem !important;
+        line-height: 1.5 !important;
+      }
+      .ar-cine-chips {
+        margin-top: .8rem !important;
+        gap: .4rem !important;
+      }
+      .ar-cine-chips span {
+        padding: .3rem .62rem !important;
+        font-size: .68rem !important;
+      }
+      .ar-cine-foot {
+        bottom: 1.05rem !important;
+      }
+      .st-key-ar-hero-ctas {
+        margin-top: -3.25rem !important;
+      }
+      .st-key-ar-hero-ctas [data-testid="stButton"] > button {
+        min-height: 2.75rem !important;
+      }
+      .ar-signal {
+        margin-top: 1.55rem !important;
+      }
+      .ar-signal > div {
+        padding-top: .8rem !important;
+        padding-bottom: .8rem !important;
+      }
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+# Desktop first-screen fit: tuned for a 1400 × 900 browser viewport.
+# The hero and primary actions fit in the opening viewport; the informational
+# sections below remain available through normal page scrolling.
+st.markdown(
+    """
+    <style>
+    @media (min-width: 1200px) and (min-height: 820px) {
+      .ar-home-minimal {
+        box-sizing: border-box !important;
+        height: clamp(480px, calc(100svh - 330px), 570px) !important;
+        min-height: clamp(480px, calc(100svh - 330px), 570px) !important;
+        padding: 2.6rem 3.2rem 4.4rem !important;
+      }
+      .ar-home-minimal .ar-cine-inner {
+        max-width: 720px !important;
+      }
+      .ar-home-minimal .ar-cine-title {
+        font-size: clamp(3.8rem, 5.8vw, 5.2rem) !important;
+        line-height: .96 !important;
+      }
+      .ar-home-minimal .ar-cine-sub {
+        margin-top: .85rem !important;
+        line-height: 1.32 !important;
+      }
+      .ar-home-minimal .ar-cine-desc {
+        margin-top: .55rem !important;
+        font-size: .93rem !important;
+        line-height: 1.55 !important;
+      }
+      .ar-home-minimal .ar-cine-foot {
+        bottom: 1.35rem !important;
+      }
+      .st-key-ar-hero-ctas {
+        margin-top: -2.8rem !important;
+      }
+      .st-key-ar-hero-ctas [data-testid="stButton"] > button {
+        min-height: 2.8rem !important;
+      }
     }
     </style>
     """,

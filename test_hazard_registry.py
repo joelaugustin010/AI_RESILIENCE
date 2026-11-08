@@ -179,14 +179,14 @@ class ConsumerConsistencyTests(unittest.TestCase):
         for row in rows:
             with self.subTest(hazard=row["Hazard"]):
                 self.assertIn(
-                    row["Validated hazard footprint"],
+                    row["Hazard footprint / modelled context"],
                     ALLOWED_FOOTPRINT_STATUSES,
                 )
                 self.assertEqual(
-                    row["Validated hazard footprint"],
+                    row["Hazard footprint / modelled context"],
                     MODELLED_FOOTPRINT_STATUSES.get(row["Hazard"], "Not available"),
                 )
-                self.assertTrue(row["Why no footprint is shown"])
+                self.assertTrue(row["Footprint scope / limitation"])
                 self.assertEqual(
                     row["Components"], ", ".join(components_for(row["Hazard"]))
                 )
@@ -291,11 +291,11 @@ class UnifiedTenHazardPipelineTests(unittest.TestCase):
                 }[hazard]
                 self.assertTrue(availability["Selected"])
                 self.assertIn(
-                    availability["Validated hazard footprint"],
+                    availability["Hazard footprint / modelled context"],
                     ALLOWED_FOOTPRINT_STATUSES,
                 )
                 self.assertEqual(
-                    availability["Validated hazard footprint"],
+                    availability["Hazard footprint / modelled context"],
                     MODELLED_FOOTPRINT_STATUSES.get(hazard, "Not available"),
                 )
 
