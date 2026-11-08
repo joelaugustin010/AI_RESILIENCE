@@ -401,7 +401,7 @@ if st.button(_save_label, type="primary", use_container_width=True, key="save_st
     try:
         _saved = save_project(
             st.session_state,
-            _payload,
+            {"studio_payload": _payload},
             project_id=_active_id,
             expected_revision=_active_revision if _active_id else None,
         )
