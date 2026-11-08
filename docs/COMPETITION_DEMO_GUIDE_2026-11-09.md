@@ -3,6 +3,20 @@
 **Submission target:** Monday, 9 November 2026  
 **Project focus:** evidence-led multi-hazard resilience for Kochi and Kerala
 
+## Exhibition positioning
+
+**AI_RESILIENCE is an evidence-gated research demonstration and decision-support platform, not an operational early-warning system.** The seven capabilities to demonstrate are:
+
+1. Ten-scenario decision framework.
+2. Compound-hazard reasoning and critical-service dependency pathways.
+3. Source-quality, provenance and data-readiness auditing.
+4. Interactive research-model inference with validation gates.
+5. Supplied flood-footprint measurement labelled SUMMARIZED_NOT_FORECAST.
+6. Approximate population-exposure screening with its uniform-grid-cell assumption stated beside the result.
+7. Explainable mitigation planning and transparent cost comparison, without proven risk-reduction claims.
+
+Never claim validated Kochi flood probabilities, predicted inundation depths, verified affected-population counts, proven intervention benefits or live operational warnings.
+
 ## 1. Recommended live demonstration (5–7 minutes)
 
 1. Start on the AI RESILIENCE homepage and explain the Kochi-focused objective.
@@ -51,6 +65,9 @@ This project is a student research and preparedness prototype. It is not an offi
 ## 5. Final pre-submission verification checklist
 
 - [ ] Open the deployed application and confirm every primary navigation page loads.
+- [ ] Confirm the research-grade screening notice is visible on the homepage and analytical workspaces.
+- [ ] Confirm supplied flood-depth summaries retain SUMMARIZED_NOT_FORECAST and population estimates disclose their uniform-grid-cell assumption.
+- [ ] Confirm uncertainty, provenance and missing-data caveats remain visible beside the relevant outputs.
 - [ ] Confirm the new **ML Evidence & Demonstration** page loads and displays persisted model cards.
 - [ ] Demonstrate one Decision Workflow scenario and its precautions.
 - [ ] Check Kochi map tiles/layers and explain the legend accurately.

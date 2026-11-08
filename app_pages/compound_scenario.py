@@ -139,10 +139,9 @@ page_header(
     key="compound-scenario",
 )
 
-st.warning(
-    "Research and planning prototype only. It does not issue warnings or calculate validated "
-    "hazard probabilities, inundation depths, damage or casualties. Follow official IMD, CWC, "
-    "KSDMA and local-authority instructions for real safety decisions."
+st.caption(
+    "Compound component pathways are structured screening logic, not a calibrated joint "
+    "probability, hydraulic simulation, inundation forecast or quantified impact model."
 )
 
 nav_left, nav_right = st.columns(2)

@@ -61,7 +61,7 @@ from src.hydrology_analytics import (
 )
 from src.infrastructure_dependencies import dependency_review_table
 from src.map_integration import MAP_CONTEXT_KEY, build_map_context, hazard_has_flood_component
-from src.ui_theme import section_intro
+from src.ui_theme import research_status_notice, section_intro
 from src.evidence_alternatives import alternative_evidence_for_hazard
 from src.phase2_data import (
     Phase2DataError,
@@ -877,6 +877,7 @@ st.markdown(
 )
 with st.container(key="wf-semantic-title"):
     st.title("Unified disaster decision workflow")
+research_status_notice("Decision Workflow · ten-scenario evidence review")
 
 section_intro(
     "Start here",
@@ -1713,6 +1714,7 @@ if inputs.get("hazard") == "Flood":
                 "MEASURED / MODEL-SUPPLIED LAYER SUMMARY — not a new flood prediction. "
                 "Do not use this output as an evacuation or route-safety instruction."
             )
+            st.caption("Status: SUMMARIZED_NOT_FORECAST · Supplied depth-layer measurement only; not a forecast or simulated inundation.")
             st.metric("Flood extent in supplied layer", f"{saved_depth['flooded_extent_km2']:.4f} km²")
             st.metric("Area-weighted mean supplied depth", f"{saved_depth['area_weighted_mean_depth_m']:.3f} m")
             st.metric("Maximum supplied polygon depth", f"{saved_depth['maximum_polygon_depth_m']:.3f} m")
@@ -1858,6 +1860,7 @@ with st.expander("Population exposure calculator (GeoJSON evidence inputs)", exp
             "APPROXIMATE POPULATION-EXPOSURE SCREENING — not a count of people harmed, "
             "displaced, injured or killed. Uniform population within each grid cell is assumed."
         )
+        st.caption("Evidence status: screening estimate only · Source grid year, spatial coverage, CRS and population allocation assumption govern interpretation.")
         if exposure_result["population_grid_covers_full_footprint"]:
             st.metric(
                 "Estimated population inside supplied footprint",

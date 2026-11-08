@@ -2,6 +2,20 @@
 
 AI RESILIENCE is a student-built decision-support prototype for exploring disaster preparedness and urban resilience in Kochi/Ernakulam. It brings scenario exploration, spatial context, historical air-quality summaries, hospital-vulnerability evidence, data-readiness checks and mitigation planning into one Streamlit application.
 
+## Exhibition positioning and seven core capabilities
+
+**AI_RESILIENCE is an evidence-gated research demonstration and decision-support platform, not an operational early-warning system.** It demonstrates:
+
+1. A ten-scenario decision framework covering registered individual and compound hazards.
+2. Compound-hazard reasoning and critical-service dependency pathways.
+3. Source-quality, provenance, integrity and data-readiness auditing.
+4. Interactive inference from persisted research models, with explicit validation gates.
+5. Measurement and summary of a user-supplied flood-depth spatial layer (SUMMARIZED_NOT_FORECAST), not generation of a flood forecast.
+6. Transparent population-exposure screening with the uniform-within-grid-cell allocation assumption; estimates are approximate and not counts of people harmed or displaced.
+7. Explainable mitigation planning and arithmetic cost comparison, without claims of proven damage reduction or optimal intervention effectiveness.
+
+The platform must not be described as providing validated Kochi flood probabilities, predicted inundation depths, verified affected-population counts, proven intervention benefits, or live operational warnings. Source, timestamp, geographic coverage, uncertainty and missing evidence must accompany interpretation. For real emergencies, follow official IMD, CWC, KSDMA and district-authority guidance.
+
 ## Run locally
 
 Python 3.11 is recommended.
