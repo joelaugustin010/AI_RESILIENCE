@@ -268,7 +268,7 @@ else:
                 st.rerun()
 
 # ==========================================
-with st.expander("Connected Design Studio review", expanded=false):
+with st.expander("Connected Design Studio review", expanded=False):
     # SHARED DESIGN + PROJECT REGISTER INTELLIGENCE
     # ==========================================
     
@@ -315,7 +315,7 @@ with st.expander("Connected Design Studio review", expanded=false):
             "register remains available independently."
         )
 
-with st.expander("Train and evaluate the ML cost model", expanded=false):
+with st.expander("Train and evaluate the ML cost model", expanded=False):
     # ============================================================
     # EVIDENCE-GATED MACHINE-LEARNING COST ESTIMATOR
     # ============================================================
@@ -585,7 +585,7 @@ with st.expander("Train and evaluate the ML cost model", expanded=false):
             "or illustrative starter rows. Upload sufficient historical records to begin evaluation."
         )
 
-with st.expander("Train and evaluate the ML delivery model", expanded=false):
+with st.expander("Train and evaluate the ML delivery model", expanded=False):
     # ============================================================
     # EVIDENCE-GATED PROJECT DURATION INTELLIGENCE
     # ============================================================
@@ -713,7 +713,7 @@ with st.expander("Train and evaluate the ML delivery model", expanded=false):
             "sufficient traceable completed-project records."
         )
 
-with st.expander("Portfolio analytics, budget scenarios and exports", expanded=false):
+with st.expander("Portfolio analytics, budget scenarios and exports", expanded=False):
     register_review = review_project_register(
         plan.to_dict(orient="records"),
         budget,
