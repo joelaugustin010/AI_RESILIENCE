@@ -235,6 +235,15 @@ def test_openai_compatible_streaming_generates_dynamic_text(monkeypatch, fake_ll
     assert request["body"]["messages"][-1]["content"] == "What causes flooding in Kochi?"
 
 
+def test_streaming_preserves_utf8_punctuation(monkeypatch, fake_llm):
+    _configure_openai(monkeypatch, fake_llm)
+    fake_llm.handler.openai_chunks = ["it’s ", "June–September ", "and “text”"]
+
+    result = chat_once("Return a Unicode sentence.")
+
+    assert result["answer"] == "it’s June–September and “text”"
+
+
 def test_groq_streaming_preserves_rag_and_source_attribution(monkeypatch, fake_llm):
     _configure_groq(monkeypatch, fake_llm)
     result = chat_once("What does the Ernakulam flood probability estimate mean?")
