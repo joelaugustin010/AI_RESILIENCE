@@ -42,6 +42,7 @@ from src.mitigation_intelligence import (
 
 
 from src.ui_theme import page_header, section_intro
+from src.mitigation_project_store import list_projects
 
 page_header(
     "AI RESILIENCE · KOCHI · PLANNING WORKSPACE",
@@ -413,6 +414,46 @@ else:
                 st.rerun()
 
 # ==========================================
+# ============================================================
+# CONNECTED STUDIO PROJECTS
+# ============================================================
+section_intro(
+    "Connected Design Studio",
+    "Saved mitigation designs",
+    "Projects saved from the Smart Mitigation Design Studio appear here. Open any project to continue editing its exact quantities, rates and budget.",
+)
+_studio_projects = list_projects(st.session_state)
+if not _studio_projects:
+    st.info("No saved Studio projects in this session yet. Open Smart Mitigation Design Studio and use “Save design to Mitigation Budget”.")
+else:
+    st.caption(f"{len(_studio_projects)} saved design project(s) · session-scoped workspace")
+    for _project in _studio_projects:
+        _payload = _project.get("studio_payload", {})
+        with st.container(border=True):
+            _top = st.columns([3, 1])
+            _top[0].markdown(f"**{_payload.get('project_name', 'Untitled mitigation concept')}**")
+            _top[0].caption(
+                f"{_payload.get('site_area') or 'Kochi site not specified'} · "
+                f"{_payload.get('area_type', 'Area not specified')} · "
+                f"Revision {_project.get('revision', 1)}"
+            )
+            _top[1].metric("Design estimate", format_inr(_payload.get("total_inr", 0)))
+            _metrics = st.columns(3)
+            _metrics[0].metric("Planning budget", format_inr(_payload.get("budget_inr", 0)))
+            _metrics[1].metric("Budget balance", format_inr(_payload.get("balance_inr", 0)))
+            _metrics[2].metric("Measures", len(_payload.get("line_items", [])))
+            st.caption(
+                f"Project ID: {_project.get('project_id', '')} · "
+                f"Updated: {_project.get('updated_at', 'Not recorded')}"
+            )
+            if st.button(
+                "Open in Smart Mitigation Design Studio",
+                key=f"open_studio_project_{_project.get('project_id')}",
+                use_container_width=True,
+            ):
+                st.session_state["mitigation_open_project_id"] = _project["project_id"]
+                st.switch_page("app_pages/smart_mitigation_design.py")
+
 with st.expander("Connected Design Studio review", expanded=False):
     # SHARED DESIGN + PROJECT REGISTER INTELLIGENCE
     # ==========================================

@@ -18,6 +18,7 @@ from src.smart_mitigation_studio import (
     compare_designs,
 )
 from src.ui_theme import page_header, section_intro
+from src.mitigation_project_store import get_project, save_project
 
 
 page_header(
@@ -35,6 +36,27 @@ st.info(
     "rule-based completeness prompts. It does not run a hydraulic model, predict flood depth, "
     "measure risk reduction, or produce construction-ready engineering drawings."
 )
+
+# Load a project handed off from Mitigation Budget before widgets are created.
+_open_project_id = st.session_state.pop("mitigation_open_project_id", None)
+if _open_project_id:
+    _opened = get_project(st.session_state, _open_project_id)
+    if _opened:
+        _payload = _opened.get("studio_payload", {})
+        _design_state = _payload.get("design_state", {})
+        st.session_state["studio_project_name"] = _payload.get("project_name", "Untitled mitigation concept")
+        st.session_state["studio_site_area"] = _payload.get("site_area", "")
+        st.session_state["studio_area_type"] = _payload.get("area_type", "Low-lying flood-prone area")
+        st.session_state["studio_budget"] = int(_payload.get("budget_inr", 0))
+        st.session_state["studio_rainfall"] = int(_payload.get("rainfall_input_mm_per_hour", 50))
+        for _key in COMPONENT_DETAILS:
+            st.session_state[f"studio_include_{_key}"] = bool(_payload.get("selected", {}).get(_key, False))
+            st.session_state[f"studio_qty_{_key}"] = float(_payload.get("quantities", {}).get(_key, COMPONENT_DETAILS[_key]["default_quantity"]))
+            st.session_state[f"studio_rate_{_key}"] = int(_payload.get("rates_inr", {}).get(_key, COMPONENT_CATALOG[_key]["indicative_cost_inr"]))
+        st.session_state["mitigation_active_project_id"] = _opened["project_id"]
+        st.session_state["mitigation_active_project_revision"] = int(_opened.get("revision", 1))
+        st.session_state["mitigation_design_state"] = _design_state
+        st.success(f"Opened **{_payload.get('project_name', 'mitigation project')}** · revision {_opened.get('revision', 1)}")
 
 # ---------------------------------------------------------------------
 # 01 · Project context
@@ -352,6 +374,49 @@ shared_state = build_studio_state(
     site_area=site_area,
 )
 st.session_state["mitigation_design_state"] = shared_state
+
+# Two-way project hand-off: save the exact editable configuration and its arithmetic.
+st.markdown("#### Connected Mitigation Budget")
+_active_id = st.session_state.get("mitigation_active_project_id")
+_active_revision = st.session_state.get("mitigation_active_project_revision")
+_save_label = "Update saved budget project" if _active_id else "Save design to Mitigation Budget"
+if st.button(_save_label, type="primary", use_container_width=True, key="save_studio_to_mitigation_budget"):
+    _payload = {
+        "project_name": project_name,
+        "site_area": site_area,
+        "area_type": area_type,
+        "budget_inr": float(budget_inr),
+        "rainfall_input_mm_per_hour": float(rainfall_input),
+        "selected": dict(selected),
+        "quantities": dict(quantities),
+        "rates_inr": dict(rates),
+        "design_state": dict(shared_state),
+        "line_items": list(design["line_items"]),
+        "total_inr": float(design["total_inr"]),
+        "balance_inr": float(design["balance_inr"]),
+        "budget_status": design["status"],
+        "engineering_review_items": list(review_items),
+        "engineering_review_completed_count": int(completed),
+    }
+    try:
+        _saved = save_project(
+            st.session_state,
+            {"studio_payload": _payload},
+            project_id=_active_id,
+            expected_revision=_active_revision if _active_id else None,
+        )
+        st.session_state["mitigation_active_project_id"] = _saved["project_id"]
+        st.session_state["mitigation_active_project_revision"] = _saved["revision"]
+        st.success(
+            f"Saved to Mitigation Budget · project ID {_saved['project_id'][:8]} · "
+            f"revision {_saved['revision']}"
+        )
+    except ValueError as exc:
+        st.error(str(exc))
+st.caption(
+    "Projects are shared across these two pages within the current Streamlit session. "
+    "They are not yet stored in a permanent database."
+)
 
 st.markdown("#### Explainable planning prompts")
 st.caption("Rule-based prompts show why they appear and what evidence should be checked. They are not machine-learning predictions.")
