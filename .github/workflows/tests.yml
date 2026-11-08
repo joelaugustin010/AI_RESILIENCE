@@ -20,16 +20,15 @@ on:
 
 concurrency:
   group: ai-resilience-tests-${{ github.ref }}
-  # Keep an active full test + research-training run alive when a newer commit is pushed.
-  # GitHub retains only the newest pending run for this concurrency group.
-  cancel-in-progress: false
+  # Cancel superseded runs on the same branch so only the newest commit consumes runner time.
+  cancel-in-progress: true
 
 permissions:
   contents: read
 
 jobs:
   test:
-    runs-on: windows-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -56,6 +55,8 @@ jobs:
         run: python -m compileall -q app.py app_pages src scripts
       - name: Verify persisted ML release artifacts and research-only status
         run: python scripts/verify_release_artifacts.py
+      - name: Load all persisted model artifacts and verify feature interfaces
+        run: python scripts/verify_model_runtime.py
 
       - name: Run clean-checkout test suite
         run: python -m pytest -q -ra --strict-markers
@@ -85,7 +86,7 @@ jobs:
           retention-days: 30
 
   provenance-hash-linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -99,7 +100,7 @@ jobs:
   rainfall-regression-research:
     if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && (startsWith(github.head_ref, 'research/nextday-rainfall-regression-') || startsWith(github.head_ref, 'research/rainfall-') || startsWith(github.head_ref, 'milestone/kochi-cyclone-flood-resilience-') || startsWith(github.head_ref, 'integration/cyclone-flood-')))
     needs: test
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -191,7 +192,7 @@ jobs:
   shared-ml-research-training:
     if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.action == 'opened' && startsWith(github.head_ref, 'feature/persist-trained-ml-models-') && github.actor != 'github-actions[bot]')
     needs: test
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     permissions:
       contents: write
     timeout-minutes: 45
