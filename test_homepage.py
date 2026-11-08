@@ -79,7 +79,8 @@ def test_both_hero_calls_to_action_navigate():
 
 def test_home_hero_has_a_1400x900_desktop_first_screen_fit():
     html = _markup(_home())
-    assert "Desktop first-screen fit" in html
+    # The implementation note is a Python comment, not rendered HTML.
+    # Assert the actual CSS contract instead of expecting that comment in markup.
     assert "calc(100svh - 330px)" in html
     assert "min-height: clamp(480px, calc(100svh - 330px), 570px)" in html
     assert "st-key-ar-hero-ctas" in html
