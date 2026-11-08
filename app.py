@@ -94,7 +94,9 @@ pages = {
     ],
 }
 
-page = st.navigation(pages, position="sidebar")
+# Keep Streamlit's route registry for deep links and page state, but render the
+# user-facing module chooser below so navigation is part of the product chrome.
+page = st.navigation(pages, position="hidden")
 
 # A lightweight, application-wide design system. Keeping it local means the
 # deployment needs no external asset or build step, and every analytical page
@@ -246,6 +248,115 @@ st.markdown(
       color: #9cf8e6 !important;
     }
 
+    /* ---------- AI_RESILIENCE product navigation ---------- */
+    [class*="st-key-ar-top-navigation"] {
+      position: sticky;
+      top: .45rem;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      gap: .3rem;
+      margin: -.25rem 0 1.1rem;
+      padding: .48rem .62rem;
+      border: 1px solid rgba(130,190,199,.22);
+      border-radius: 18px;
+      background: rgba(6,19,31,.78);
+      box-shadow: 0 14px 34px rgba(0,0,0,.18);
+      backdrop-filter: blur(18px) saturate(1.2);
+    }
+    [class*="st-key-ar-top-navigation"] [data-testid="stHorizontalBlock"] {
+      align-items: center;
+      gap: .35rem;
+    }
+    [class*="st-key-ar-top-navigation"] [data-testid="stPageLink-NavLink"],
+    [class*="st-key-ar-top-navigation"] [data-testid="stPopover"] > button {
+      min-height: 2.15rem;
+      padding: .38rem .72rem !important;
+      border: 1px solid transparent !important;
+      border-radius: 999px !important;
+      color: #e9fbfa !important;
+      background: transparent !important;
+      font-size: .79rem !important;
+      font-weight: 760 !important;
+      white-space: nowrap;
+      transition: background .18s var(--ar-ease), border-color .18s var(--ar-ease), transform .18s var(--ar-ease);
+    }
+    [class*="st-key-ar-top-navigation"] [data-testid="stPageLink-NavLink"]:hover,
+    [class*="st-key-ar-top-navigation"] [data-testid="stPopover"] > button:hover {
+      border-color: rgba(66,224,193,.28) !important;
+      background: rgba(66,224,193,.12) !important;
+      transform: translateY(-1px);
+    }
+    [class*="st-key-ar-top-navigation"] [data-testid="stPopover"] > button[aria-expanded="true"] {
+      border-color: rgba(66,224,193,.36) !important;
+      background: rgba(66,224,193,.16) !important;
+    }
+    [class*="st-key-ar-top-navigation"] [data-testid="stMarkdownContainer"] a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 2.15rem;
+      padding: .38rem .72rem;
+      border-radius: 999px;
+      color: #e9fbfa !important;
+      font-size: .79rem;
+      font-weight: 760;
+      text-decoration: none;
+    }
+    [class*="st-key-ar-top-navigation"] [data-testid="stMarkdownContainer"] a:hover {
+      background: rgba(66,224,193,.12);
+    }
+    [class*="st-key-ar-top-navigation"] [data-testid="stPopoverBody"] {
+      min-width: 250px;
+      padding: .7rem !important;
+      border: 1px solid rgba(130,190,199,.26) !important;
+      border-radius: 16px !important;
+      background: #0b2233 !important;
+      box-shadow: 0 22px 55px rgba(0,0,0,.32) !important;
+    }
+    [class*="st-key-ar-top-navigation"] [data-testid="stPopoverBody"] [data-testid="stPageLink-NavLink"] {
+      width: 100%;
+      justify-content: flex-start;
+      border-radius: 10px !important;
+    }
+    [class*="st-key-ar-brand"] [data-testid="stMarkdownContainer"] p {
+      margin: 0;
+      color: #f4ffff !important;
+      font-size: .92rem;
+      font-weight: 880;
+      letter-spacing: -.02em;
+      white-space: nowrap;
+    }
+    [class*="st-key-ar-brand"] [data-testid="stMarkdownContainer"] span {
+      display: block;
+      margin-top: .08rem;
+      color: #82e7d4 !important;
+      font-size: .56rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+    [class*="st-key-ar-brand"] [data-testid="stMarkdownContainer"] small {
+      display: block;
+      max-width: 170px;
+      overflow: hidden;
+      color: #b8d8d7 !important;
+      font-size: .62rem;
+      font-weight: 650;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    @media(max-width:900px){
+      [class*="st-key-ar-top-navigation"] { overflow-x:auto; scrollbar-width:none; }
+      [class*="st-key-ar-top-navigation"]::-webkit-scrollbar { display:none; }
+      [class*="st-key-ar-brand"] { min-width:145px; }
+    }
+    @media(max-width:560px){
+      [class*="st-key-ar-top-navigation"] { margin-top: -.15rem; padding: .38rem; }
+      [class*="st-key-ar-top-navigation"] [data-testid="stPageLink-NavLink"],
+      [class*="st-key-ar-top-navigation"] [data-testid="stPopover"] > button { font-size: .72rem !important; padding-inline: .55rem !important; }
+    }
+
+    [data-testid="stSidebarNav"] { display: none !important; }
     [data-testid="stSidebar"] {
       background: rgba(7, 23, 36, .98) !important;
       border-right: 1px solid var(--ar-border);
@@ -1164,6 +1275,56 @@ st.markdown(
         transition-duration: .01ms !important;
       }
     }
+    /* Shared module polish: analytical pages retain their existing widgets and
+       calculations while gaining a consistent environmental editorial rhythm. */
+    [data-testid="stMainBlockContainer"] h1 {
+      font-size: clamp(2rem, 4vw, 3.15rem) !important;
+      letter-spacing: -.055em !important;
+      margin-bottom: .45rem !important;
+    }
+    [data-testid="stMainBlockContainer"] h1 + [data-testid="stMarkdownContainer"] p,
+    [data-testid="stMainBlockContainer"] h1 + div p {
+      max-width: 820px;
+      color: #5d756c !important;
+      line-height: 1.7 !important;
+      font-size: 1rem !important;
+    }
+    [data-testid="stMainBlockContainer"] h2,
+    [data-testid="stMainBlockContainer"] h3 {
+      position: relative;
+      color: #203c35 !important;
+      letter-spacing: -.035em !important;
+    }
+    [data-testid="stMainBlockContainer"] h2 { margin-top: 1.7rem !important; }
+    [data-testid="stMainBlockContainer"] h2:after {
+      content: "";
+      display: block;
+      width: 2.6rem;
+      height: 3px;
+      margin-top: .42rem;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #247a65, #83b9a5);
+    }
+    [data-testid="stMainBlockContainer"] [data-testid="stMarkdownContainer"] p,
+    [data-testid="stMainBlockContainer"] [data-testid="stMarkdownContainer"] li {
+      line-height: 1.62;
+    }
+    [data-testid="stMainBlockContainer"] [data-testid="stDataFrame"]:before,
+    [data-testid="stMainBlockContainer"] [data-testid="stPlotlyChart"]:before {
+      content: "Environmental evidence";
+      display: block;
+      padding: .45rem .7rem;
+      color: #5d756c;
+      font-size: .7rem;
+      font-weight: 750;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(33,91,69,.12);
+      background: rgba(234,243,238,.5);
+    }
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h2,
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h3 { color: #f3f8f5 !important; }
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h2:after { display: none; }
     </style>
     """,
     unsafe_allow_html=True,
@@ -1254,6 +1415,49 @@ try:  # pragma: no cover - presentation only
     alt.themes.enable("ai_resilience")
 except Exception:  # pragma: no cover - optional dependency
     pass
+
+
+with st.container(key="ar-top-navigation"):
+    brand, home_col, explore_col, env_col, disaster_col, plan_col, about_col = st.columns(
+        [1.55, .72, 1.18, 1.5, 1.35, 1.5, .9], gap="small"
+    )
+    with brand:
+        with st.container(key="ar-brand"):
+            st.markdown(
+                f"AI_RESILIENCE<span>Environmental intelligence</span><small>Viewing: {html.escape(page.title)}</small>",
+                unsafe_allow_html=True,
+            )
+    with home_col:
+        st.page_link("app_pages/home.py", label="Home", icon=":material/home:")
+    with explore_col:
+        with st.popover("Explore Modules", icon=":material/explore:", use_container_width=True):
+            st.caption("Explore the full AI_RESILIENCE workspace")
+            st.page_link("app_pages/kochi_map.py", label="Kochi Map", icon=":material/map:")
+            st.page_link("app_pages/air_pollution.py", label="Air Pollution", icon=":material/factory:")
+            st.page_link("app_pages/data_readiness.py", label="Data & Model Transparency", icon=":material/fact_check:")
+            st.page_link("app_pages/hazard_model_lab.py", label="Hazard Model Lab", icon=":material/model_training:")
+    with env_col:
+        with st.popover("Environmental Intelligence", icon=":material/eco:", use_container_width=True):
+            st.caption("Observe environmental signals and local context")
+            st.page_link("app_pages/kochi_map.py", label="Kochi spatial intelligence", icon=":material/map:")
+            st.page_link("app_pages/air_pollution.py", label="Air quality evidence", icon=":material/air:")
+            st.page_link("app_pages/disaster_probability.py", label="Multi-hazard evidence review", icon=":material/analytics:")
+            st.page_link("app_pages/hospital_vulnerability.py", label="Public health vulnerability", icon=":material/local_hospital:")
+    with disaster_col:
+        with st.popover("Disaster Resilience", icon=":material/shield:", use_container_width=True):
+            st.caption("Assess hazards, scenarios and critical dependencies")
+            st.page_link("app_pages/disaster_assistant.py", label="Disaster Intelligence Assistant", icon=":material/psychology_alt:")
+            st.page_link("app_pages/decision_workflow.py", label="Decision Workflow", icon=":material/assignment_turned_in:")
+            st.page_link("app_pages/compound_scenario.py", label="Cyclone + Flood", icon=":material/thunderstorm:")
+            st.page_link("app_pages/hazard_model_lab.py", label="Hazard Model Lab", icon=":material/model_training:")
+    with plan_col:
+        with st.popover("Mitigation & Planning", icon=":material/engineering:", use_container_width=True):
+            st.caption("Move from evidence to practical action")
+            st.page_link("app_pages/mitigation_planner.py", label="Mitigation Budget", icon=":material/account_balance_wallet:")
+            st.page_link("app_pages/smart_mitigation_design.py", label="Smart Mitigation Design Studio", icon=":material/design_services:")
+            st.page_link("app_pages/decision_workflow.py", label="Decision Workflow", icon=":material/assignment_turned_in:")
+    with about_col:
+        st.markdown('<a href="/?about=sdgs#designed-for-responsible-environmental-intelligence">About / SDGs</a>', unsafe_allow_html=True)
 
 
 # The homepage carries its own cinematic masthead; the shared breadcrumb strip
