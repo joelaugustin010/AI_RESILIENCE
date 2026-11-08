@@ -129,7 +129,7 @@ def test_run_historical_replay_returns_prediction_and_provenance(monkeypatch):
     assert result["prediction"]["estimate"] == 7.5
     assert result["observed_target"] == 8.0
     assert result["feature_count"] == 2
-    assert result["model_status"] == card["status"] if "status" in card else "UNKNOWN"
+    assert result["model_status"] == "UNKNOWN"
     assert "target_rain_nextday" not in result["context"]
     assert result["input_date"] == "2020-01-01"
     assert result["target_date"] == "2020-01-01"
