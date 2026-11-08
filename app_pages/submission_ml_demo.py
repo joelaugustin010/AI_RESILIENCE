@@ -4,6 +4,7 @@ This page is deliberately evidence-led: it displays persisted model cards and
 validation boundaries, never invents a live forecast or turns a research score
 into a disaster probability.
 """
+from src.dataframe_display import display_dataframe
 from __future__ import annotations
 
 import pandas as pd
@@ -112,7 +113,7 @@ if classifiers:
     )
 
 st.subheader("Complete registered model-card inventory")
-st.dataframe(
+display_dataframe(
     pd.DataFrame(card_rows(cards)),
     hide_index=True,
     use_container_width=True,
@@ -136,7 +137,7 @@ except Exception as exc:
     readiness_rows = []
     st.error(f"Inference-readiness check unavailable: {type(exc).__name__}: {exc}")
 if readiness_rows:
-    st.dataframe(
+    display_dataframe(
         pd.DataFrame(readiness_rows),
         hide_index=True,
         use_container_width=True,
@@ -164,7 +165,7 @@ if entry.get("trained_model_ids"):
         with st.expander(f"{card.get('model_id')} · {card.get('status')}", expanded=True):
             st.caption(f"Independent validation gate: {gate['readiness']}")
             if card.get("task_type") == "regression":
-                st.dataframe(
+                display_dataframe(
                     pd.DataFrame([
                         {"Metric": "Held-out MAE", "Value": metrics.get("mae")},
                         {"Metric": "Recorded baseline MAE", "Value": (metrics.get("persistence_baseline") or {}).get("mae")},
@@ -177,7 +178,7 @@ if entry.get("trained_model_ids"):
                     use_container_width=True,
                 )
             else:
-                st.dataframe(
+                display_dataframe(
                     pd.DataFrame([
                         {"Metric": "ROC-AUC", "Value": metrics.get("roc_auc")},
                         {"Metric": "Average precision", "Value": metrics.get("average_precision")},
@@ -194,7 +195,7 @@ if entry.get("trained_model_ids"):
                 calibration_rows = metrics.get("calibration_table") or []
                 if calibration_rows:
                     st.markdown("**Held-out reliability bins**")
-                    st.dataframe(
+                    display_dataframe(
                         pd.DataFrame(calibration_rows),
                         hide_index=True,
                         use_container_width=True,
@@ -210,7 +211,7 @@ if entry.get("trained_model_ids"):
                         for name, bounds in intervals.items()
                     ]
                     st.markdown("**Recorded holdout uncertainty intervals**")
-                    st.dataframe(
+                    display_dataframe(
                         pd.DataFrame(interval_rows),
                         hide_index=True,
                         use_container_width=True,
@@ -248,7 +249,7 @@ for item in coverage["entries"]:
         "Trained model cards": len(item.get("trained_model_ids", [])),
         "Deterministic workflow retained": "Yes" if item.get("deterministic_model_retained") else "No",
     })
-st.dataframe(pd.DataFrame(coverage_rows), hide_index=True, use_container_width=True)
+display_dataframe(pd.DataFrame(coverage_rows), hide_index=True, use_container_width=True)
 
 st.subheader("How to demonstrate this at the exhibition")
 st.markdown(
