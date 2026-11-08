@@ -695,6 +695,14 @@ st.markdown(
       box-shadow: 0 16px 40px rgba(0, 0, 0, .18);
       transition: transform .2s var(--ar-ease), border-color .2s var(--ar-ease), box-shadow .2s var(--ar-ease);
     }
+    .ar-nav-media {
+      min-height: 106px;
+      margin: -.25rem -.25rem 1rem;
+      border-radius: 14px;
+      background-position: center;
+      background-size: cover;
+      box-shadow: inset 0 -22px 28px rgba(7, 30, 27, .16);
+    }
     [class*="st-key-ar-nav-"]:hover {
       transform: translateY(-2px);
       border-color: rgba(66, 224, 193, .34);
@@ -847,6 +855,7 @@ st.markdown(
       .ar-hazards, .ar-flow { grid-template-columns: 1fr; }
       .ar-threat, .ar-why { border-radius: 20px; }
       .ar-tile figcaption { padding: .85rem .9rem; }
+      .ar-nav-media { min-height: 88px; }
     }
     @media (prefers-reduced-motion: reduce) {
       .ar-cine-slide { animation: none !important; opacity: 0; transform: none !important; }
@@ -1072,54 +1081,54 @@ st.markdown(
 )
 
 # ---------------------------------------------------------------------------
-# 01 - Beauty
+# 01 - Kochi in focus
 # ---------------------------------------------------------------------------
 st.markdown(
     """
     <div class="ar-story">
-      <span class="ar-overline">02 · Kochi and its regional context</span>
-      <h2>A coastal city shaped by water.</h2>
+      <span class="ar-overline">02 · Kochi in focus</span>
+      <h2>Beauty, biodiversity and a city shaped by water.</h2>
       <p>
-        Kochi's resilience is connected to its backwaters, coastal edge, canals, urban drainage
-        and essential services. Understanding the city means looking beyond isolated hazards
-        and making the evidence, geography and uncertainty behind each decision easier to see.
+        Kochi is a living network of islands, backwaters, mangroves, fishing communities and
+        working waterfronts. Its beauty and vulnerability are connected: the same waterways
+        that sustain the city can carry floodwater, pollution and pressure on coastal ecosystems.
       </p>
     </div>
     <div class="ar-gallery">
       <figure class="ar-tile ar-t-backwaters">
-        <img src="app/static/images/beauty-backwaters.webp" alt="Houseboats and palm-lined canals in the Kerala backwaters" loading="lazy" decoding="async">
+        <img src="app/static/images/kochi/backwaters.jpg" alt="Kochi backwaters and palm-lined waterways" loading="lazy" decoding="async">
         <span class="ar-tile-tag">Backwaters</span>
-        <figcaption><strong>Water as a way of life</strong><span>Vembanad and the canal networks that connect village, paddy and city.</span></figcaption>
+        <figcaption><strong>Water as a way of life</strong><span>Backwaters and canals connect neighbourhoods, livelihoods and ecosystems.</span></figcaption>
       </figure>
       <figure class="ar-tile ar-t-ghats">
-        <img src="app/static/images/beauty-ghats.webp" alt="Tea plantations across the high ranges near Munnar" loading="lazy" decoding="async">
-        <span class="ar-tile-tag">High ranges</span>
-        <figcaption><strong>The Western Ghats</strong><span>Cloud-fed tea country and one of the world's great biodiversity hotspots.</span></figcaption>
+        <img src="app/static/images/kochi/fishing-nets.jpg" alt="Chinese fishing nets on the Kochi waterfront" loading="lazy" decoding="async">
+        <span class="ar-tile-tag">Fort Kochi</span>
+        <figcaption><strong>Working waterfronts</strong><span>Fishing heritage, tidal water and livelihoods meet at the city edge.</span></figcaption>
       </figure>
       <figure class="ar-tile ar-t-waterfall">
-        <img src="app/static/images/beauty-waterfall.webp" alt="Athirappilly waterfall surrounded by forest" loading="lazy" decoding="async">
-        <span class="ar-tile-tag">Rivers</span>
-        <figcaption><strong>Athirappilly</strong><span>Where the Chalakudy river drops through the forest edge.</span></figcaption>
+        <img src="app/static/images/kochi/mangalavanam.jpg" alt="Green wetland vegetation at Mangalavanam in Kochi" loading="lazy" decoding="async">
+        <span class="ar-tile-tag">Urban ecology</span>
+        <figcaption><strong>Green breathing spaces</strong><span>Mangalavanam and urban wetlands shelter biodiversity inside a growing city.</span></figcaption>
       </figure>
       <figure class="ar-tile ar-t-coast">
-        <img src="app/static/images/beauty-coast.webp" alt="Cliffs and beach on the Kerala coast at Varkala" loading="lazy" decoding="async">
-        <span class="ar-tile-tag">Coast</span>
-        <figcaption><strong>The Arabian Sea</strong><span>Cliffs, beaches and coastal communities shaped by the monsoon.</span></figcaption>
+        <img src="app/static/images/kochi/coast.jpg" alt="Kochi coastline and Arabian Sea" loading="lazy" decoding="async">
+        <span class="ar-tile-tag">Coastline</span>
+        <figcaption><strong>Where land meets sea</strong><span>Coastal communities face erosion, storms and changing shoreline pressures.</span></figcaption>
       </figure>
       <figure class="ar-tile ar-t-forest">
-        <img src="app/static/images/beauty-forest.webp" alt="Shola forest and grassland in Silent Valley National Park" loading="lazy" decoding="async">
-        <span class="ar-tile-tag">Biodiversity</span>
-        <figcaption><strong>Silent Valley</strong><span>Shola forest, grassland and species found nowhere else on Earth.</span></figcaption>
+        <img src="app/static/images/kochi/waterfront.jpg" alt="Kochi waterfront with water and urban greenery" loading="lazy" decoding="async">
+        <span class="ar-tile-tag">City &amp; water</span>
+        <figcaption><strong>One connected landscape</strong><span>Ports, homes, roads and waterways share the same environmental systems.</span></figcaption>
       </figure>
       <figure class="ar-tile ar-t-city">
-        <img src="app/static/images/beauty-city.webp" alt="Kochi waterfront skyline and Marine Drive" loading="lazy" decoding="async">
-        <span class="ar-tile-tag">Cities</span>
-        <figcaption><strong>Kochi</strong><span>A waterfront city of neighbourhoods, ports and shared infrastructure.</span></figcaption>
+        <img src="app/static/images/kochi/industrial-coast.jpg" alt="Industrial waterfront surroundings near Kochi" loading="lazy" decoding="async">
+        <span class="ar-tile-tag">Pressure points</span>
+        <figcaption><strong>Growth needs care</strong><span>Industry and infrastructure must grow alongside clean air, water and public health.</span></figcaption>
       </figure>
     </div>
     <p class="ar-fineprint">
-      Regional Kerala photography provides visual context only. The platform's analytical
-      focus is Kochi; images are not evidence of current conditions or a specific event.
+      Kochi photography provides visual context only. Images are not evidence of current
+      conditions or a specific event; use the linked workspaces for documented data and sources.
     </p>
     """,
     unsafe_allow_html=True,
@@ -1131,7 +1140,7 @@ st.markdown(
 st.markdown(
     """
     <section class="ar-threat" aria-labelledby="ar-threat-title">
-      <img class="ar-threat-bg" src="app/static/images/threats-monsoon.webp"
+      <img class="ar-threat-bg" src="app/static/images/kochi/industrial-coast.jpg"
            alt="" loading="lazy" decoding="async" aria-hidden="true">
       <span class="ar-threat-scrim"></span>
       <div class="ar-threat-inner">
@@ -1270,6 +1279,7 @@ navigation_groups = [
         ICON_COMPASS,
         "Risk & readiness",
         "Build a scenario, inspect the evidence and understand what the models can — and cannot — tell you.",
+        "app/static/images/kochi/coast.jpg",
         [
             ("app_pages/decision_workflow.py", "Decision Workflow", ":material/assignment_turned_in:"),
             ("app_pages/disaster_probability.py", "Multi-Hazard Evidence Review", ":material/analytics:"),
@@ -1281,6 +1291,7 @@ navigation_groups = [
         ICON_PLACE,
         "Place & environment",
         "See the geography, monitor environmental pressure and test whether the underlying data is fit for use.",
+        "app/static/images/kochi/backwaters.jpg",
         [
             ("app_pages/kochi_map.py", "Kochi Map", ":material/map:"),
             ("app_pages/air_pollution.py", "Air Pollution", ":material/factory:"),
@@ -1293,6 +1304,7 @@ navigation_groups = [
         ICON_HOSPITAL,
         "People & critical services",
         "Bring exposure, continuity and preparedness questions closer to the facilities communities rely on.",
+        "app/static/images/kochi/mangalavanam.jpg",
         [
             ("app_pages/hospital_vulnerability.py", "Hospital Vulnerability", ":material/local_hospital:"),
             ("app_pages/disaster_assistant.py", "Disaster Intelligence Assistant", ":material/psychology_alt:"),
@@ -1305,6 +1317,7 @@ navigation_groups = [
         ICON_BLUEPRINT,
         "Plan & design",
         "Turn priorities into transparent mitigation options, concept designs and budget checks.",
+        "app/static/images/kochi/fishing-nets.jpg",
         [
             ("app_pages/mitigation_planner.py", "Mitigation Budget", ":material/account_balance_wallet:"),
             ("app_pages/smart_mitigation_design.py", "Smart Mitigation Design", ":material/engineering:"),
@@ -1315,11 +1328,12 @@ navigation_groups = [
 for row_start in range(0, len(navigation_groups), 2):
     columns = st.columns(2, gap="medium")
     for column, group in zip(columns, navigation_groups[row_start:row_start + 2]):
-        key, icon, title, copy, links = group
+        key, icon, title, copy, image, links = group
         with column:
             with st.container(key=key):
                 st.markdown(
                     f"""
+                    <div class="ar-nav-media" style="background-image:linear-gradient(90deg,rgba(8,39,37,.76),rgba(8,39,37,.16)),url('{image}');" role="img" aria-label="{title} workspace environment"></div>
                     <div class="ar-nav-head">
                       <span class="ar-nav-icon">{icon}</span>
                       <div>
@@ -1431,6 +1445,53 @@ with sdg_workspace_cols_2[1]:
     st.page_link("app_pages/disaster_probability.py", label="SDG 13 · Multi-Hazard Evidence", icon="🌦️")
 with sdg_workspace_cols_2[2]:
     st.page_link("app_pages/kochi_map.py", label="SDG 15 · Ecological Context", icon="🌿")
+
+# SDGs are presented as practical entry points into the existing platform, not
+# as impact claims. Each pathway opens a real workspace and keeps the evidence
+# and limitations visible there.
+st.markdown(
+    """
+    <style>
+    .ar-sdg-actions {
+      margin: 1.2rem 0 2.4rem;
+      padding: clamp(1.15rem, 2.5vw, 1.8rem);
+      border: 1px solid rgba(36,122,101,.18);
+      border-radius: 22px;
+      background: linear-gradient(135deg, #173f35 0%, #1e6659 58%, #286f79 100%);
+      box-shadow: 0 18px 42px rgba(26,65,49,.14);
+    }
+    .ar-sdg-actions h3 { color:#fff!important; margin:0 0 .35rem!important; font-size:1.35rem!important; }
+    .ar-sdg-actions > p { color:#d7eee1!important; margin:0 0 1rem!important; max-width:780px; line-height:1.6; }
+    .ar-sdg-action-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.7rem; }
+    .ar-sdg-action {
+      display:flex; min-height:92px; flex-direction:column; justify-content:space-between;
+      padding:.9rem 1rem; border:1px solid rgba(225,247,235,.22); border-radius:15px;
+      background:rgba(255,255,255,.1); color:#f0fff5!important; text-decoration:none!important;
+      transition:transform .2s ease, background .2s ease, border-color .2s ease;
+    }
+    .ar-sdg-action:hover { transform:translateY(-3px); background:rgba(255,255,255,.18); border-color:rgba(225,247,235,.5); }
+    .ar-sdg-action strong { color:#fff!important; font-size:.86rem; }
+    .ar-sdg-action span { color:#c5e7d5; font-size:.74rem; line-height:1.45; }
+    .ar-sdg-action em { color:#b7f0d0; font-size:.7rem; font-style:normal; font-weight:750; }
+    @media(max-width:760px){.ar-sdg-action-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:480px){.ar-sdg-action-grid{grid-template-columns:1fr}.ar-sdg-action{min-height:0;gap:.45rem}}
+    @media(prefers-reduced-motion:reduce){.ar-sdg-action{transition:none}.ar-sdg-action:hover{transform:none}}
+    </style>
+    <section class="ar-sdg-actions" aria-labelledby="ar-sdg-action-title">
+      <h3 id="ar-sdg-action-title">Put the goals to work</h3>
+      <p>Use the platform's evidence and planning workspaces to explore a concrete question behind each SDG. The links below are capability pathways, not claims of official SDG progress.</p>
+      <div class="ar-sdg-action-grid">
+        <a class="ar-sdg-action" href="/hospital_vulnerability"><strong>SDG 3 · Protect care</strong><span>Review hospital vulnerability and continuity questions.</span><em>Open hospital workspace →</em></a>
+        <a class="ar-sdg-action" href="/kochi_map"><strong>SDG 6 · Understand water</strong><span>Inspect Kochi's mapped context and source coverage.</span><em>Open Kochi map →</em></a>
+        <a class="ar-sdg-action" href="/air_pollution"><strong>SDG 9 · Monitor air</strong><span>Examine pollutant evidence and monitoring readiness.</span><em>Open air workspace →</em></a>
+        <a class="ar-sdg-action" href="/decision_workflow"><strong>SDG 11 · Assess cities</strong><span>Move from a scenario to an evidence-gated decision review.</span><em>Open decision workflow →</em></a>
+        <a class="ar-sdg-action" href="/disaster_probability"><strong>SDG 13 · Review climate risk</strong><span>Compare hazard evidence without manufactured certainty.</span><em>Open hazard review →</em></a>
+        <a class="ar-sdg-action" href="/smart_mitigation_design"><strong>SDG 15 · Design with nature</strong><span>Explore transparent, nature-based mitigation concepts.</span><em>Open design studio →</em></a>
+      </div>
+    </section>
+    """,
+    unsafe_allow_html=True,
+)
 
 # Footer and credits
 # ---------------------------------------------------------------------------
