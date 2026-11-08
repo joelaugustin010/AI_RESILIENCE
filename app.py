@@ -1749,30 +1749,81 @@ st.markdown(
     [data-testid="stMain"] [class*="st-key-ar-head-"] h1 {
       color: #FFFFFF !important;
     }
-    /* Final header-specific override: Streamlit nested markdown can inherit
-       competing theme colours, so explicitly set every text-bearing child. */
+    /* High-clarity typography for every standard module masthead. */
+    [data-testid="stMain"] [class*="st-key-ar-head-"] {
+      background-image:
+        linear-gradient(112deg, rgba(3, 24, 34, .99) 0%, rgba(7, 45, 53, .97) 100%) !important;
+      border-color: rgba(220, 242, 239, .24) !important;
+    }
     [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-kicker,
     [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-kicker *,
-    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-copy,
-    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-copy *,
     [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-meta,
-    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-meta *,
-    [data-testid="stMain"] [class*="st-key-ar-head-"] [data-testid="stMarkdownContainer"],
-    [data-testid="stMain"] [class*="st-key-ar-head-"] [data-testid="stMarkdownContainer"] * {
-      color: #EAF4F3 !important;
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-meta * {
+      color: #B9F3E8 !important;
+      -webkit-text-fill-color: #B9F3E8 !important;
       opacity: 1 !important;
-      -webkit-text-fill-color: #EAF4F3 !important;
+      font-family: "Inter", "Segoe UI", Arial, sans-serif !important;
+      font-weight: 750 !important;
+      text-shadow: none !important;
     }
     [data-testid="stMain"] [class*="st-key-ar-head-"] h1,
     [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-title {
       color: #FFFFFF !important;
       -webkit-text-fill-color: #FFFFFF !important;
+      font-family: "Inter", "Segoe UI", Arial, sans-serif !important;
+      font-size: clamp(2.2rem, 4.2vw, 3.45rem) !important;
+      font-weight: 800 !important;
+      line-height: 1.12 !important;
+      letter-spacing: -.025em !important;
+      text-shadow: none !important;
+      opacity: 1 !important;
+    }
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-copy,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-copy * {
+      color: #F0F7F6 !important;
+      -webkit-text-fill-color: #F0F7F6 !important;
+      font-family: "Inter", "Segoe UI", Arial, sans-serif !important;
+      font-size: clamp(1.02rem, 1.25vw, 1.12rem) !important;
+      font-weight: 500 !important;
+      line-height: 1.72 !important;
+      opacity: 1 !important;
+      text-shadow: none !important;
     }
     [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-meta span {
-      background: rgba(234, 244, 243, .12) !important;
-      border-color: rgba(234, 244, 243, .28) !important;
+      color: #F3FAF9 !important;
+      -webkit-text-fill-color: #F3FAF9 !important;
+      background: rgba(224, 246, 241, .13) !important;
+      border: 1px solid rgba(224, 246, 241, .34) !important;
+      backdrop-filter: none !important;
+      font-size: .76rem !important;
+      font-weight: 700 !important;
+      letter-spacing: .025em !important;
+      text-transform: none !important;
+      padding: .3rem .72rem !important;
     }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-dot {
+      background: #63D7C2 !important;
+      box-shadow: 0 0 0 4px rgba(99, 215, 194, .18) !important;
+      animation: none !important;
+    }
+
+    /* Dark ink and clear font hierarchy for ordinary page content. */
+    [data-testid="stMain"] {
+      font-family: "Inter", "Segoe UI", Arial, sans-serif !important;
+    }
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > p,
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > ul,
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > ol {
+      color: #29484C !important;
+      font-size: 1rem !important;
+      font-weight: 450 !important;
+      line-height: 1.72 !important;
+      opacity: 1 !important;
+    }
+    [data-testid="stMain"] [data-testid="stCaptionContainer"],
+    [data-testid="stMain"] [data-testid="stCaptionContainer"] * {
+      color: #435D61 !important;
+      font-size: .88rem !important;
+      opacity: 1 !important;
+    }
+        </style>\n    \"\"\",\n    unsafe_allow_html=True,\n)\n
