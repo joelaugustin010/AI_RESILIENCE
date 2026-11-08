@@ -59,7 +59,7 @@ Prioritise additional KWA, LSGD/Sulekha, KIIDC, PWD and Irrigation Department pr
 
 ## Supplemental government and private-sector collection (8 November 2026)
 
-A separate lead register is maintained at `mitigation_project_supplemental_candidates.csv`. It contains nineteen project references identified from official government/audit pages and private-sector project portfolios:
+A separate lead register is maintained at `mitigation_project_supplemental_candidates.csv`. It contains twenty-nine project references identified from official government/audit pages and private-sector project portfolios:
 
 - KIIDC Kuppithodu regulator: official project page reports construction dates, completed status and ₹55.82 crore project cost; the project is multi-component and its scope is not yet suitable for the current single-quantity model.
 - Kochi Elamkulam 5 MLD STP: CAG audit reports physical completion in May 2022 and expenditure of ₹12.06 crore; commissioning followed in October 2024. No verified start date was captured, so duration is blank.
@@ -86,7 +86,7 @@ KIIDC's completed-project listing includes Punnamada post-flood renovation; the 
 
 
 ### Further KWA project leads reviewed (8 November 2026)
-Four additional KWA PASK profiles have been added to the supplemental register, bringing it to **19 source leads** (the separate core training CSV remains at **29 records**):
+Four additional KWA PASK profiles have been added to the supplemental register, bringing it to **29 source leads** (the separate core training CSV remains at **29 records**):
 - Paittukattu lane, Division 36, Kochi Corporation: 63 mm PVC pipeline extension; ₹62,000 AS/TS; profile has no final bill paid or actual completion date, and no pipe length.
 - Honest Byline Road, Kalamassery: ₹80,000 AS/TS; profile shows completed status but no actual completion date, no scope quantity and no final paid expenditure.
 - Nanma One apartment complex, Vyttila/Tripunithura: ₹560,000 AS and ₹490,000 TS; completed 16 July 2026, but bill submitted/paid fields are both zero and scope quantity is absent.
@@ -127,3 +127,19 @@ The supplemental register now contains **19 source leads** (the core training CS
 - KWA Kannur Puzhathi Zone I pipeline project: 9.6 km pipe and 915 household connections reported, total bill paid ₹1,12,37,537 versus ₹1,65,54,275 submitted. Payment is not established as final, and start date is absent.
 
 None of these five leads is marked ML-eligible. Do not convert paid-to-date amounts into final project costs when submitted bills are higher or final accounts are unresolved.
+
+
+### Ten additional KWA PASK project records reviewed (8 November 2026)
+Ten more records have been appended to the supplemental register. They are **source leads, not ML training records**:
+1. Kochi Stadium–Janatha Link Road by-lane: completed 18 August 2026; no final bill or pipe length shown.
+2. Ollur 500 FHTC and pipeline extension: completed 25 February 2025; no final bill or verified pipe length shown.
+3. Kannur Edakkad Zone AMRUT 2.0: completed 29 October 2025; bill fields show zero while status log says final bill submitted.
+4. Kozhikode JJM works across nine panchayats: 463 km laid and 429 km charged in a status update; ₹30,25,47,821 paid against ₹40,89,56,750 submitted; start date absent.
+5. Manimala and four adjoining panchayats WSS: 9 MLD; ₹41,47,000 paid against ₹1,17,74,601 submitted; completion 5 January 2020; start date and comparable network quantity absent.
+6. Keralassery JJM additional distribution works: 12.727 km of 13 km reported laid; PASK paid amount is zero and completion chronology needs review.
+7. Guruvayur Chakkamkandam STP tank cleaning: maintenance work reported completed; bill was still under preparation in September 2026.
+8. Nayattukundu–Mattathur WSS: 0.70 MLD; ₹10,49,974 submitted and paid; completion 24 January 2025; multi-component scope and start date absent.
+9. Karimba–Kongad–Mundur CWSS Phase II: ₹52,56,06,600 paid against ₹64,78,73,250 submitted; completion/status chronology conflicts with an April 2025 progress update reporting remaining work.
+10. Varma Road and adjoining roads, Cheranalloor: PASK shows only ₹1 submitted/paid against ₹10 lakh AS/TS, an obvious data anomaly requiring correction.
+
+All ten are marked not eligible for ML. Missing final expenditure, zero or anomalous bill fields, multi-component scopes, missing start dates, and contradictory completion updates are explicitly retained as quality warnings. No sanctioned estimate, paid-to-date amount or anomalous value has been re-labelled as a verified final project cost.
