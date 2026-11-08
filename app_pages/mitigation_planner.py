@@ -109,6 +109,8 @@ columns = [
     "urgency",
     "evidence_strength",
     "implementation_readiness",
+    "ML priority confidence",
+    "Priority method",
 ]
 
 if "mitigation_project_records" not in st.session_state:
