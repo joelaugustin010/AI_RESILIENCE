@@ -237,14 +237,8 @@ def ml_evidence_for(
 
 
 
-def historical_replay_context(model_id: str) -> dict[str, Any]:
-    """Build an exact feature row from the model's documented temporal test period.
-
-    This is a retrospective inference demonstration, never a current forecast.
-    The selected row comes from the same traceable source builder used for
-    research training; the future target is returned separately for comparison
-    and is never passed to the model as an input.
-    """
+def _historical_replay_frame(model_id: str):
+    """Load complete, in-domain rows from the documented temporal holdout."""
     card = load_model_card(model_id)
     if card is None:
         raise ValueError(f"Model {model_id!r} is not registered.")
@@ -278,8 +272,6 @@ def historical_replay_context(model_id: str) -> dict[str, Any]:
         raise ValueError(f"Historical dataset is missing model-contract columns: {missing}")
 
     frame = dataset.frame.copy()
-    # Normalize naive and timezone-aware source timestamps to UTC-naive before
-    # applying the card cutoff, so earthquake and weather datasets compare safely.
     frame[date_column] = pd.to_datetime(
         frame[date_column], errors="coerce", utc=True
     ).dt.tz_convert(None)
@@ -289,8 +281,6 @@ def historical_replay_context(model_id: str) -> dict[str, Any]:
     for name in [*features, target_column]:
         numeric_values = pd.to_numeric(frame[name], errors="coerce")
         frame = frame.loc[np.isfinite(numeric_values)]
-    # Select a held-out row inside every recorded feature domain so the same
-    # out-of-training-range gate used by inference will not reject the replay.
     for name in features:
         bounds = (card.get("feature_ranges") or {}).get(name, {})
         if isinstance(bounds, dict) and bounds.get("min") is not None and bounds.get("max") is not None:
@@ -302,7 +292,43 @@ def historical_replay_context(model_id: str) -> dict[str, Any]:
         raise ValueError(
             "No complete historical test-period row is available inside the recorded feature domains."
         )
-    row = frame.sort_values(date_column).iloc[-1]
+    return card, dataset, frame.sort_values(date_column), features, target_column, date_column, provenance
+
+
+def historical_replay_dates(model_id: str) -> list[str]:
+    """Return selectable target dates for complete, in-domain held-out cases."""
+    _, _, frame, _, _, date_column, _ = _historical_replay_frame(model_id)
+    return [
+        pd.Timestamp(value).date().isoformat()
+        for value in frame[date_column].drop_duplicates().tolist()
+    ]
+
+
+def historical_replay_context(
+    model_id: str, target_date: str | None = None
+) -> dict[str, Any]:
+    """Build one exact feature row from the documented temporal test period.
+
+    A selected target date is used only to choose a held-out historical row.
+    Its observed target is returned separately and never enters model features.
+    With no date supplied, the latest complete in-domain test row is selected.
+    """
+    card, dataset, frame, features, target_column, date_column, provenance = (
+        _historical_replay_frame(model_id)
+    )
+    if target_date is not None:
+        requested_date = pd.Timestamp(target_date).date().isoformat()
+        matching = frame.loc[
+            frame[date_column].dt.strftime("%Y-%m-%d").eq(requested_date)
+        ]
+        if matching.empty:
+            raise ValueError(
+                f"No complete, in-domain historical replay case exists for {requested_date}."
+            )
+        row = matching.iloc[-1]
+    else:
+        row = frame.iloc[-1]
+
     context: dict[str, float] = {}
     for name in features:
         value = float(row[name])
@@ -321,13 +347,14 @@ def historical_replay_context(model_id: str) -> dict[str, Any]:
             observed_event = bool(observed_target >= threshold_value)
         elif direction == "low":
             observed_event = bool(observed_target <= threshold_value)
+    input_value = row["date"] if "date" in row.index else row["time"] if "time" in row.index else row[date_column]
     return {
         "model_id": model_id,
         "context": context,
         "case_date": row[date_column].date().isoformat(),
-        "input_date": pd.Timestamp(row["date"] if "date" in row.index else row["time"] if "time" in row.index else row[date_column]).date().isoformat(),
+        "input_date": pd.Timestamp(input_value).date().isoformat(),
         "target_date": pd.Timestamp(row[date_column]).date().isoformat(),
-        "input_timestamp": pd.Timestamp(row["date"] if "date" in row.index else row["time"] if "time" in row.index else row[date_column]).isoformat(),
+        "input_timestamp": pd.Timestamp(input_value).isoformat(),
         "target_timestamp": pd.Timestamp(row[date_column]).isoformat(),
         "target_column": target_column,
         "observed_target": observed_target,
@@ -338,7 +365,7 @@ def historical_replay_context(model_id: str) -> dict[str, Any]:
         "source": provenance.get("source") or dataset.provenance.get("source"),
         "source_type": provenance.get("source_type") or dataset.provenance.get("source_type"),
         "location": provenance.get("location"),
-        "case_role": "latest complete in-domain row in the documented temporal test holdout",
+        "case_role": "selected complete in-domain row in the documented temporal test holdout",
         "warning": (
             "Retrospective historical replay only. The observed target is shown "
             "separately and is never supplied to the model."
@@ -368,12 +395,14 @@ def ml_registry_summary() -> dict[str, Any]:
     }
 
 
-__all__ = ["USABLE_STATUSES", "historical_replay_context", "ml_evidence_for", "ml_registry_summary", "run_historical_replay"]
+__all__ = ["USABLE_STATUSES", "historical_replay_context", "historical_replay_dates", "ml_evidence_for", "ml_registry_summary", "run_historical_replay"]
 
 
-def run_historical_replay(model_id: str) -> dict[str, Any]:
+def run_historical_replay(
+    model_id: str, target_date: str | None = None
+) -> dict[str, Any]:
     # Run an offline held-out replay; never describe this as a live forecast.
-    replay = historical_replay_context(model_id)
+    replay = historical_replay_context(model_id, target_date=target_date)
     card = load_model_card(model_id)
     if card is None:
         raise ValueError(f"Model {model_id!r} is not registered.")
