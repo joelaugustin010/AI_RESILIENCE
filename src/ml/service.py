@@ -365,7 +365,7 @@ def historical_replay_context(
         "source": provenance.get("source") or dataset.provenance.get("source"),
         "source_type": provenance.get("source_type") or dataset.provenance.get("source_type"),
         "location": provenance.get("location"),
-        "case_role": "selected complete in-domain row in the documented temporal test holdout",
+        "case_role": ("latest complete in-domain row in the documented temporal test holdout" if target_date is None else "selected complete in-domain row in the documented temporal test holdout"),
         "warning": (
             "Retrospective historical replay only. The observed target is shown "
             "separately and is never supplied to the model."
