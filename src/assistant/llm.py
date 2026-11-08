@@ -210,10 +210,10 @@ def _anthropic_delta(event: dict[str, Any]) -> str:
 
 
 def _iter_sse_events(response: requests.Response) -> Iterator[dict[str, Any]]:
-    for raw_line in response.iter_lines(decode_unicode=True):
+    for raw_line in response.iter_lines(decode_unicode=False):
         if not raw_line:
             continue
-        line = str(raw_line).strip()
+        line = raw_line.decode("utf-8").strip()
         if not line or line.startswith(":"):
             continue
         if not line.startswith("data:"):
