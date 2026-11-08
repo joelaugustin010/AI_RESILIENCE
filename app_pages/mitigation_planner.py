@@ -420,8 +420,8 @@ with st.expander("Train and evaluate the ML cost model", expanded=False):
         st.markdown('<div class="mitigation-ml-kicker">STEP 01 · DATA FOUNDATION</div>', unsafe_allow_html=True)
         st.markdown("#### Prepare the evidence")
         st.markdown(
-            '<div class="mitigation-ml-copy">Upload one row per completed project. Use actual final costs and consistent scope units. '
-            'Each source reference should identify a traceable report, tender, work order, or verified project record.</div>',
+            '<div class="mitigation-ml-copy">Upload one row per completed project. Use source-reported completed-project costs and consistent scope units; prefer final paid bills and document the cost basis in source notes. '
+            'Each source reference should identify a traceable government report or project record.</div>',
             unsafe_allow_html=True,
         )
         template_columns = [
@@ -466,8 +466,8 @@ with st.expander("Train and evaluate the ML cost model", expanded=False):
                 label_visibility="visible",
             )
         st.markdown(
-            '<div class="mitigation-ml-copy"><b>Template fields:</b> intervention · area type · scope quantity · '
-            'scope unit · duration in months · actual final cost in INR · source reference.</div>',
+            '<div class="mitigation-ml-copy"><b>Required for cost ML:</b> intervention · area type · scope quantity · '
+            'scope unit · source-reported completed-project cost · source reference. <b>Duration in months is optional for cost ML and required for delivery ML.</b></div>',
             unsafe_allow_html=True,
         )
     
