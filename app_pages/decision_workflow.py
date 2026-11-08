@@ -583,26 +583,42 @@ def _render_ml_evidence(evidence: dict) -> None:
             "hazard assessment, official warnings, or local verification."
         )
     else:
-        st.info(
-            "No scenario-specific ML output was produced. The submitted scenario does not contain a complete, "
-            "time-matched feature sequence required by the registered model. Partial values are not "
-            "filled from unrelated fields or substituted across different hazards."
+        st.warning(
+            "Scenario-specific ML inference is not available for this submission. "
+            "The registered weather model needs a complete, date-aligned sequence of "
+            "meteorological predictors; the scenario form's rainfall, wind, river, or "
+            "temperature entries are not a substitute for that sequence."
+        )
+        st.markdown(
+            "**What the platform can run now:** the historical weather ML replay below "
+            "automatically builds the registered feature vector from the archived Kochi "
+            "weather series and runs the persisted model on a held-out historical case."
+        )
+        st.caption(
+            "That replay is a genuine model inference, but it is retrospective. It is "
+            "not a prediction for the scenario you just submitted. The archived weather "
+            "record ends in 2025, so it cannot supply a time-matched November 2026 input."
         )
         for model in evidence.get("models", []):
-            missing = (model.get("context") or {}).get("missing_features") or []
-            if not missing:
-                continue
+            context = model.get("context") or {}
+            missing = context.get("missing_features") or []
+            required = context.get("required_features")
+            supplied = context.get("supplied_features", 0)
             with st.expander(
-                f"Required context for {model.get('model_id', 'model')} "
-                f"({len(missing)} missing feature(s))",
+                f"Feature readiness — {model.get('model_id', 'model')} "
+                f"({supplied}/{required or 'unknown'} supplied)",
                 expanded=False,
             ):
                 st.caption(
-                    "Supply every field explicitly through an advanced ML context if "
-                    "you have a complete, time-matched feature vector. Partial values "
-                    "are not filled from unrelated scenario inputs."
+                    "Required features are read from this model's registered feature "
+                    "contract. No missing values are imputed and no fields are borrowed "
+                    "from another hazard or timestamp."
                 )
-                st.code(", ".join(missing), language="text")
+                if missing:
+                    st.write(f"**Missing features:** {len(missing)}")
+                    st.code(", ".join(missing), language="text")
+                else:
+                    st.write("The feature list is complete, but another model gate prevented inference.")
 
     with st.expander("ML limitations and validation boundary"):
         st.write("**Independently validated predictive model available:**", "No")
