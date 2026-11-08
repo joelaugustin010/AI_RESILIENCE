@@ -1309,6 +1309,43 @@ if disaster_assessment is not None:
 else:
     st.warning("The hazard-specific assessment is unavailable because the submitted inputs did not pass its validation.")
 
+st.subheader("Impact and exposure outputs")
+consequence_assessment = build_consequence_assessment(
+    inputs["hazard"],
+    inputs["location"],
+    inputs["input_classification"],
+    inputs,
+)
+st.caption(
+    "This is the required output structure for every selected disaster. Numerical probability and affected-area results "
+    "will appear only after the corresponding validated model and spatial evidence are connected."
+)
+st.write("**Scenario type:**", consequence_assessment["scenario_type"])
+st.write("**Current model status:**", consequence_assessment["model_status"])
+if consequence_assessment["heatwave_screening"] is not None:
+    heat = consequence_assessment["heatwave_screening"]
+    st.markdown("**Heatwave criteria screen (not a forecast or official warning)**")
+    st.write("**Station-level screening:**", heat["station_status"])
+    if heat["departure_from_normal_c"] is not None:
+        st.metric("Supplied maximum-temperature departure from normal", f"{heat['departure_from_normal_c']:.1f} °C")
+    st.write("**Duration and multi-station check:**", heat["declaration_status"])
+    st.caption(heat["source"])
+col_prob, col_area = st.columns(2)
+with col_prob:
+    st.markdown("**Probability of occurrence**")
+    st.info(consequence_assessment["occurrence_probability"])
+with col_area:
+    st.markdown("**Affected-area estimate**")
+    st.info(consequence_assessment["affected_area"])
+st.markdown("**Consequences this assessment must examine**")
+for item in consequence_assessment["consequence_categories"]:
+    st.markdown(f"- {item}")
+st.markdown("**Required evidence for this scenario**")
+for item in consequence_assessment["required_evidence"]:
+    st.markdown(f"- {item}")
+st.warning(consequence_assessment["scientific_guardrail"])
+st.caption(consequence_assessment["probability_semantics"])
+
 st.header("4. Technical evidence and validation details")
 evidence = evidence_inventory(ROOT, st.session_state.get("rainfall_backtest_result"))
 st.caption("The separate historical benchmark uses only the manual rainfall observations. Its results do not enter this qualitative assessment; conflicted CWC rainfall, unverified sample rows, and unresolved river levels remain excluded from model calculations.")
@@ -1618,42 +1655,7 @@ st.info(
     "Your hypothetical scenario has still been assessed qualitatively in the section above."
 )
 
-st.subheader("Consequence assessment: probability, affected areas and impacts")
-consequence_assessment = build_consequence_assessment(
-    inputs["hazard"],
-    inputs["location"],
-    inputs["input_classification"],
-    inputs,
-)
-st.caption(
-    "This is the required output structure for every selected disaster. Numerical probability and affected-area results "
-    "will appear only after the corresponding validated model and spatial evidence are connected."
-)
-st.write("**Scenario type:**", consequence_assessment["scenario_type"])
-st.write("**Current model status:**", consequence_assessment["model_status"])
-if consequence_assessment["heatwave_screening"] is not None:
-    heat = consequence_assessment["heatwave_screening"]
-    st.markdown("**Heatwave criteria screen (not a forecast or official warning)**")
-    st.write("**Station-level screening:**", heat["station_status"])
-    if heat["departure_from_normal_c"] is not None:
-        st.metric("Supplied maximum-temperature departure from normal", f"{heat['departure_from_normal_c']:.1f} °C")
-    st.write("**Duration and multi-station check:**", heat["declaration_status"])
-    st.caption(heat["source"])
-col_prob, col_area = st.columns(2)
-with col_prob:
-    st.markdown("**Probability of occurrence**")
-    st.info(consequence_assessment["occurrence_probability"])
-with col_area:
-    st.markdown("**Affected-area estimate**")
-    st.info(consequence_assessment["affected_area"])
-st.markdown("**Consequences this assessment must examine**")
-for item in consequence_assessment["consequence_categories"]:
-    st.markdown(f"- {item}")
-st.markdown("**Required evidence for this scenario**")
-for item in consequence_assessment["required_evidence"]:
-    st.markdown(f"- {item}")
-st.warning(consequence_assessment["scientific_guardrail"])
-st.caption(consequence_assessment["probability_semantics"])
+
 
 if inputs.get("hazard") == "Flood":
     with st.expander("Flood extent and depth analysis (upload a measured/modelled depth layer)", expanded=False):
