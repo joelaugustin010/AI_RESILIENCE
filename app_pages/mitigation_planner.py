@@ -461,7 +461,7 @@ with st.expander("Train and evaluate the ML cost model", expanded=False):
             uploaded_cost_data = st.file_uploader(
                 "Upload completed-project records",
                 type=["csv"],
-                help="Use verified actual final costs, not the illustrative project-register values.",
+                help="Use source-reported completed-project costs, preferably final paid bills. Record whether each value is a final bill or a reported completion cost.",
                 key="mitigation_ml_upload",
                 label_visibility="visible",
             )
