@@ -7,6 +7,7 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
+from src.dataframe_display import display_dataframe
 from src.mitigation_data_validation import validate_records
 from src.ui_theme import page_header, section_intro
 
@@ -88,7 +89,7 @@ for item in valid:
         "Cost ML eligible": result["cost_ml_eligible"],
         "Duration ML eligible": result["duration_ml_eligible"],
     })
-st.dataframe(pd.DataFrame(summary_rows), use_container_width=True, hide_index=True)
+display_dataframe(pd.DataFrame(summary_rows), use_container_width=True, hide_index=True)
 
 section_intro("RECORD REVIEW", "Inspect evidence and validation reasons",
               "Choose one dataset and filter its row-level findings. Use the source link to perform manual verification.")
@@ -118,7 +119,7 @@ if dataset_labels:
         "cost_ml_eligible", "duration_ml_eligible", "issues", "review_reasons",
         "source_reference"
     ) if column in frame.columns]
-    st.dataframe(frame[display_columns], use_container_width=True, hide_index=True)
+    display_dataframe(frame[display_columns], use_container_width=True, hide_index=True)
 
     export = frame[display_columns].to_csv(index=False).encode("utf-8")
     st.download_button(
