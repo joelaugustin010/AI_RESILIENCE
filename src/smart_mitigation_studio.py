@@ -8,7 +8,7 @@ from __future__ import annotations
 import math
 from typing import Any, Mapping
 
-from src.mitigation_intelligence import COMPONENT_CATALOG
+from src.mitigation_intelligence import COMPONENT_CATALOG, build_design_state
 
 
 COMPONENT_DETAILS = {
@@ -99,6 +99,39 @@ def calculate_design(
         "status": "Over budget" if total > budget else "Within entered budget",
         "utilisation_pct": (total / budget * 100) if budget > 0 else None,
     }
+
+
+def build_studio_state(
+    *,
+    project_name: str,
+    area_type: str,
+    rainfall_mm_per_hour: float,
+    budget_inr: float,
+    selected: Mapping[str, bool],
+    design: Mapping[str, Any],
+    site_area: str = "",
+) -> dict[str, Any]:
+    """Build the shared page hand-off using the exact editable cost calculation."""
+    state = build_design_state(
+        project_name=project_name,
+        area_type=area_type,
+        rainfall_mm_per_hour=rainfall_mm_per_hour,
+        available_budget_inr=budget_inr,
+        selected_components=selected,
+    )
+    total = float(design["total_inr"])
+    budget = float(design["budget_inr"])
+    state.update({
+        "site_area": str(site_area).strip(),
+        "illustrative_component_cost_inr": total,
+        "budget_balance_inr": budget - total,
+        "budget_status": "Over budget" if total > budget else "Within entered budget",
+        "cost_basis": "User-entered editable planning allowances; quotations not verified",
+        "cost_plan_line_items": list(design["line_items"]),
+        "cost_plan_total_inr": total,
+        "cost_plan_status": "Over budget" if total > budget else "Within entered budget",
+    })
+    return state
 
 
 def build_review_items(selected: Mapping[str, bool]) -> list[dict[str, str]]:
