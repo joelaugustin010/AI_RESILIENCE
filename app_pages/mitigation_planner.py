@@ -61,6 +61,9 @@ budget = st.number_input("Available budget (INR)", min_value=0, value=0, step=10
 st.caption("Enter estimates only when you have a source, date, scope, and unit basis. Blank cost means unknown.")
 
 
+# ============================================================
+# AI-FIRST PROJECT INTAKE AND PORTFOLIO
+# ============================================================
 columns = [
     "Intervention",
     "Location",
@@ -71,125 +74,198 @@ columns = [
     "Scope and unit",
     "Potential beneficiaries",
     "Evidence for risk reduction",
+    "ML duration estimate",
+    "Estimation method",
 ]
 
-starter = pd.DataFrame([
-    [
-        "Drainage maintenance / upgrade",
-        "",
-        "Proposed",
-        "Medium",
-        None,
-        "",
-        "",
-        None,
-        "",
-    ],
-    [
-        "Hospital resilience (power / water / access)",
-        "",
-        "Proposed",
-        "Medium",
-        None,
-        "",
-        "",
-        None,
-        "",
-    ],
-    [
-        "Evacuation infrastructure",
-        "",
-        "Proposed",
-        "Medium",
-        None,
-        "",
-        "",
-        None,
-        "",
-    ],
-    [
-        "Building retrofit",
-        "",
-        "Proposed",
-        "Medium",
-        None,
-        "",
-        "",
-        None,
-        "",
-    ],
-], columns=columns)
+if "mitigation_project_records" not in st.session_state:
+    st.session_state["mitigation_project_records"] = []
 
+cost_model = st.session_state.get("mitigation_cost_ml_model")
+duration_model = st.session_state.get("mitigation_duration_ml_model")
+cost_ready = bool(cost_model and cost_model.get("metrics", {}).get("beats_baseline"))
+duration_ready = bool(duration_model and duration_model.get("metrics", {}).get("beats_baseline"))
 
-section_intro("Project register", "Proposed mitigation works")
+section_intro(
+    "AI project intake",
+    "Build a mitigation project profile",
+    "Describe a proposed intervention once. When validated historical models are available, "
+    "AI generates indicative cost and delivery estimates for that project profile.",
+)
+
+status_cols = st.columns(3)
+status_cols[0].metric("Historical cost model", "Ready" if cost_ready else "Awaiting evidence")
+status_cols[1].metric("Delivery model", "Ready" if duration_ready else "Awaiting evidence")
+status_cols[2].metric("Projects in portfolio", len(st.session_state["mitigation_project_records"]))
+
+if not cost_ready:
+    st.info(
+        "AI cost estimates are currently locked. Upload at least 40 complete, traceable "
+        "completed-project records in the ML workspace below, train the model, and pass "
+        "the holdout baseline check. Until then, projects can be saved as drafts without "
+        "invented AI estimates."
+    )
+
+cost_categories = cost_model.get("categories", {}) if cost_ready else {}
+duration_categories = duration_model.get("categories", {}) if duration_ready else {}
+intervention_options = sorted(set(
+    (cost_categories.get("intervention", []) or [])
+    + (duration_categories.get("intervention", []) or [])
+    + ["Drainage maintenance / upgrade", "Hospital resilience", "Evacuation infrastructure", "Building retrofit"]
+))
+area_options = sorted(set(
+    (cost_categories.get("area_type", []) or [])
+    + (duration_categories.get("area_type", []) or [])
+    + ["Low-lying flood-prone area", "Urban road", "Residential neighbourhood", "Commercial area"]
+))
+unit_options = sorted(set(
+    (cost_categories.get("scope_unit", []) or [])
+    + (duration_categories.get("scope_unit", []) or [])
+    + ["metres", "square metres", "units", "sites"]
+))
+
+with st.container(border=True):
+    st.markdown("#### 01 · Define the intervention")
+    with st.form("mitigation_ai_project_intake", clear_on_submit=True):
+        form_cols = st.columns(2)
+        project_name = form_cols[0].selectbox("Intervention type", intervention_options)
+        project_location = form_cols[1].text_input(
+            "Kochi project location",
+            placeholder="e.g. ward, road, neighbourhood or facility",
+        )
+        area_type = form_cols[0].selectbox("Area context", area_options)
+        scope_unit = form_cols[1].selectbox("Scope measurement unit", unit_options)
+        scope_cols = st.columns(3)
+        scope_quantity = scope_cols[0].number_input(
+            "Scope quantity", min_value=0.0, value=100.0, step=10.0
+        )
+        duration_months = scope_cols[1].number_input(
+            "Expected duration input (months)", min_value=0.0, value=6.0, step=1.0,
+            help="Used as a cost-model input. The duration model estimates duration separately."
+        )
+        manual_cost = scope_cols[2].number_input(
+            "Known quotation / manual cost (₹)", min_value=0.0, value=0.0, step=10000.0,
+            help="Optional fallback for a draft. Leave at zero when unknown."
+        )
+        source_reference = st.text_input(
+            "Quotation / survey / source reference",
+            placeholder="Add a traceable reference, if available",
+        )
+        risk_evidence = st.text_area(
+            "Supporting site or risk evidence",
+            placeholder="Describe the site issue or cite a survey, report or assessment.",
+            height=90,
+        )
+        submit_project = st.form_submit_button(
+            "Generate AI project profile",
+            type="primary",
+            use_container_width=True,
+        )
+
+    if submit_project:
+        if not project_location.strip():
+            st.warning("Add the project location before creating the profile.")
+        elif scope_quantity <= 0 or duration_months <= 0:
+            st.warning("Scope quantity and duration must both be greater than zero.")
+        else:
+            estimated_cost = float(manual_cost) if manual_cost > 0 else None
+            estimated_duration = None
+            method_parts = []
+
+            if cost_ready:
+                try:
+                    cost_result = estimate_cost(
+                        cost_model,
+                        intervention=project_name,
+                        area_type=area_type,
+                        scope_quantity=scope_quantity,
+                        scope_unit=scope_unit,
+                        duration_months=duration_months,
+                    )
+                    estimated_cost = float(cost_result["estimated_cost_inr"])
+                    method_parts.append("ML cost estimate")
+                except CostModelDataError as exc:
+                    st.warning(f"Cost model could not estimate this profile: {exc}")
+
+            if duration_ready and estimated_cost is not None:
+                try:
+                    duration_result = estimate_duration(
+                        duration_model,
+                        intervention=project_name,
+                        area_type=area_type,
+                        scope_quantity=scope_quantity,
+                        scope_unit=scope_unit,
+                        estimated_cost_inr=estimated_cost,
+                    )
+                    estimated_duration = float(duration_result["estimated_duration_months"])
+                    method_parts.append("ML duration estimate")
+                except CostModelDataError as exc:
+                    st.warning(f"Duration model could not estimate this profile: {exc}")
+
+            if not method_parts and estimated_cost is None:
+                method_parts.append("Draft · awaiting validated ML models")
+            elif not method_parts:
+                method_parts.append("User-entered quotation · not an ML estimate")
+
+            record = {
+                "Intervention": project_name,
+                "Location": project_location.strip(),
+                "Project Status": "Proposed",
+                "Priority": "Not assessed",
+                "Cost INR": estimated_cost,
+                "Source / estimate date": (
+                    ("ML estimate · validation required" if "ML cost estimate" in method_parts
+                     else source_reference.strip())
+                ),
+                "Scope and unit": f"{scope_quantity:g} {scope_unit} · {duration_months:g} month cost input",
+                "Potential beneficiaries": None,
+                "Evidence for risk reduction": risk_evidence.strip(),
+                "ML duration estimate": estimated_duration,
+                "Estimation method": " + ".join(method_parts),
+            }
+            st.session_state["mitigation_project_records"].append(record)
+            st.success(
+                "Project profile added. "
+                + ("ML estimates were generated where eligible." if any("ML" in x for x in method_parts)
+                   else "No AI prediction was fabricated; this remains a draft.")
+            )
+            st.rerun()
+
+plan = pd.DataFrame(st.session_state["mitigation_project_records"], columns=columns)
+
+section_intro("Project portfolio", "AI-generated project profiles")
 st.caption(
-    "Record proposed mitigation works, estimated expenditure, "
-    "implementation status, beneficiaries, and supporting evidence."
+    "Projects are shown as individual profiles rather than an editable spreadsheet. "
+    "AI estimates are separated from user-entered values and require local verification."
 )
 
-plan = st.data_editor(
-    starter,
-    hide_index=True,
-    width="stretch",
-    num_rows="dynamic",
-    row_height=45,
-    column_config={
-        "Intervention": st.column_config.TextColumn(
-            "Mitigation Project",
-            help="Name of the proposed flood-mitigation intervention.",
-            required=True,
-        ),
-        "Location": st.column_config.TextColumn(
-            "Project Location",
-            help="Specify the relevant area in Kochi.",
-            required=True,
-        ),
-        "Project Status": st.column_config.SelectboxColumn(
-            "Implementation Status",
-            help="Update the current stage of the project.",
-            options=[
-                "Proposed",
-                "Planned",
-                "In Progress",
-                "Completed",
-                "On Hold",
-            ],
-            required=True,
-        ),
-        "Priority": st.column_config.SelectboxColumn(
-            "Priority Level",
-            help="Planning priority; confirm through an appropriate risk assessment.",
-            options=["High", "Medium", "Low"],
-            required=True,
-        ),
-        "Cost INR": st.column_config.NumberColumn(
-            "Estimated Cost (₹)",
-            help="Enter the estimated project cost in Indian rupees.",
-            min_value=0,
-            step=1000,
-            format="₹%.0f",
-        ),
-        "Source / estimate date": st.column_config.TextColumn(
-            "Cost Source / Date",
-            help="Record the source, quotation date, or estimate reference.",
-        ),
-        "Scope and unit": st.column_config.TextColumn(
-            "Scope and Measurement Unit",
-            help="For example, drain cleaning in metres or pumps in units.",
-        ),
-        "Potential beneficiaries": st.column_config.NumberColumn(
-            "Potential Beneficiaries",
-            help="Enter an estimated number of people, where known.",
-            min_value=0,
-            step=1,
-            format="%d",
-        ),
-        "Evidence for risk reduction": st.column_config.TextColumn(
-            "Risk-Reduction Evidence",
-            help="Add a report, study, survey, or other supporting reference.",
-        ),
-    },
-)
+if plan.empty:
+    st.info("No projects have been added yet. Use the project-intake panel above to create the first profile.")
+else:
+    for idx, project in plan.iterrows():
+        with st.container(border=True):
+            top_cols = st.columns([3, 1])
+            top_cols[0].markdown(f"**{project['Intervention']}**")
+            top_cols[0].caption(f"{project['Location']} · {project['Project Status']}")
+            top_cols[1].markdown(f"**{project['Estimation method']}**")
+            metric_cols = st.columns(3)
+            metric_cols[0].metric(
+                "Cost estimate",
+                format_inr(project["Cost INR"]) if pd.notna(project["Cost INR"]) else "Awaiting data",
+            )
+            metric_cols[1].metric(
+                "Delivery estimate",
+                f"{float(project['ML duration estimate']):.1f} months"
+                if pd.notna(project["ML duration estimate"]) else "Awaiting data",
+            )
+            metric_cols[2].metric("Priority", "Not assessed")
+            st.caption(
+                f"Scope: {project['Scope and unit']} · "
+                f"Evidence: {project['Evidence for risk reduction'] or 'Not supplied'}"
+            )
+            if st.button("Remove project", key=f"remove_mitigation_project_{idx}"):
+                st.session_state["mitigation_project_records"].pop(idx)
+                st.rerun()
 
 # ==========================================
 # SHARED DESIGN + PROJECT REGISTER INTELLIGENCE
@@ -300,7 +376,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-from src.mitigation_cost_ml import CostModelDataError, estimate_cost, train_cost_model
 from src.mitigation_cost_ml import CostModelDataError, estimate_cost, train_cost_model
 
 st.markdown("---")
