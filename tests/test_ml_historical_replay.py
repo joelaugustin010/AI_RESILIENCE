@@ -30,6 +30,7 @@ def _card():
 def _dataset():
     frame = pd.DataFrame(
         {
+            "date": pd.to_datetime(["2019-12-30", "2019-12-31", "2020-01-01", "2020-01-02"], utc=True),
             "target_date": pd.to_datetime(["2019-12-31", "2020-01-01", "2020-01-02", "2020-01-03"], utc=True),
             "target_rain_nextday": [1.0, 8.0, 12.0, 15.0],
             "rain_lag1": [2.0, 3.0, 4.0, 2.5],
@@ -131,5 +132,5 @@ def test_run_historical_replay_returns_prediction_and_provenance(monkeypatch):
     assert result["feature_count"] == 2
     assert result["model_status"] == "UNKNOWN"
     assert "target_rain_nextday" not in result["context"]
-    assert result["input_date"] == "2020-01-01"
+    assert result["input_date"] == "2019-12-31"
     assert result["target_date"] == "2020-01-01"
