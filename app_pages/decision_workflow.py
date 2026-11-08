@@ -686,6 +686,7 @@ def _render_weather_ml_replay() -> None:
         metric_cols[2].metric("Replay error", "Unavailable")
     st.write("**Model:**", result.get("model_id"))
     st.write("**Model status:**", result.get("model_status", "Unknown"))
+    st.caption("Confidence is not calibrated for operational use; the selected holdout error is shown instead of an unsupported confidence score.")
     st.write("**Epistemic status:**", "SUMMARIZED_NOT_FORECAST · RETROSPECTIVE RESEARCH REPLAY")
     st.write("**Automatically constructed features:**", f"{result.get('feature_count', 0)} / 46")
     st.write("**Feature observation date:**", result.get("input_date", "Unavailable"))
