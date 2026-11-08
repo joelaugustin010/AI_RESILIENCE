@@ -59,7 +59,7 @@ Prioritise additional KWA, LSGD/Sulekha, KIIDC, PWD and Irrigation Department pr
 
 ## Supplemental government and private-sector collection (8 November 2026)
 
-A separate lead register is maintained at `mitigation_project_supplemental_candidates.csv`. It contains eleven project references identified from official government/audit pages and private-sector project portfolios:
+A separate lead register is maintained at `mitigation_project_supplemental_candidates.csv`. It contains fourteen project references identified from official government/audit pages and private-sector project portfolios:
 
 - KIIDC Kuppithodu regulator: official project page reports construction dates, completed status and ₹55.82 crore project cost; the project is multi-component and its scope is not yet suitable for the current single-quantity model.
 - Kochi Elamkulam 5 MLD STP: CAG audit reports physical completion in May 2022 and expenditure of ₹12.06 crore; commissioning followed in October 2024. No verified start date was captured, so duration is blank.
@@ -86,7 +86,7 @@ KIIDC's completed-project listing includes Punnamada post-flood renovation; the 
 
 
 ### Further KWA project leads reviewed (8 November 2026)
-Four additional KWA PASK profiles have been added to the supplemental register, bringing it to **11 source leads** (the separate core training CSV remains at **29 records**):
+Four additional KWA PASK profiles have been added to the supplemental register, bringing it to **14 source leads** (the separate core training CSV remains at **29 records**):
 - Paittukattu lane, Division 36, Kochi Corporation: 63 mm PVC pipeline extension; ₹62,000 AS/TS; profile has no final bill paid or actual completion date, and no pipe length.
 - Honest Byline Road, Kalamassery: ₹80,000 AS/TS; profile shows completed status but no actual completion date, no scope quantity and no final paid expenditure.
 - Nanma One apartment complex, Vyttila/Tripunithura: ₹560,000 AS and ₹490,000 TS; completed 16 July 2026, but bill submitted/paid fields are both zero and scope quantity is absent.
@@ -97,3 +97,12 @@ These are **discovery leads only**. Sanctioned/technical-sanction amounts and su
 
 ### Additional audited STP evidence (8 November 2026)
 - CAG's AMRUT performance audit reports the 5 MLD sewage treatment plant at Medical College, Thiruvananthapuram commenced in March 2019 and was completed in January 2022, with expenditure of ₹14.65 crore against an approved project cost of ₹19.16 crore. The audit also found that the plant was not functioning properly in February 2024. This is retained as an audited cost-evidence lead with month-level dates only; it is not yet eligible for ML because exact date granularity, cohort comparability and outcome context need review. Source: https://cag.gov.in/uploads/download_audit_report/2025/Print-version-english_AMRUT_Kerala_10.12.25-with-legislature-date-0699d302521f715.11884185.pdf
+
+
+### Three additional Kochi KWA pipeline profiles reviewed (8 November 2026)
+The supplemental register now contains **14 source leads**. Three more KWA PASK profiles report total bill paid and completion information:
+- Kochi Corporation Division 49 multi-road pipeline replacement: total bill paid ₹26,90,968; start 28 October 2024; actual completion 21 June 2025; final bill submitted 18 July 2025. Several pipe diameters and road segments are listed, but total installed length is not reported.
+- Kochi Corporation May 1st Road by-lane and Karolil Lane, Division 45/32: total bill paid ₹5,88,425; start 19 August 2024; reported completion 7 September 2024. The profile's coverage text conflicts with its completion status and dated progress log; pipeline length is not reported.
+- Kochi Corporation Kumbalapilly bye-lane, Division 47/33: total bill paid ₹2,77,439; profile reports completion 3 March 2024, but its coverage field says work ongoing and dated status updates continue into April 2024. The reported start/completion interval also requires source verification; pipeline length is not reported.
+
+Although these profiles contain bill-paid values, all three remain **not ML-eligible** because comparable installed pipe length is absent and the status/date fields require reconciliation. They must not be used as cost-per-metre examples or duration labels until source documents resolve these issues.
