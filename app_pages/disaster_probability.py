@@ -32,19 +32,19 @@ st.markdown(
       padding: .95rem 1.05rem .8rem;
       margin: .55rem 0 .8rem;
       background:
-        radial-gradient(ellipse at 100% 0%, rgba(127, 184, 255, .10), transparent 16rem),
-        linear-gradient(145deg, rgba(15, 42, 62, .96), rgba(9, 28, 43, .96));
+        radial-gradient(ellipse at 100% 0%, rgba(41, 155, 145, .10), transparent 16rem),
+        linear-gradient(145deg, #FFFFFF, #DCE7E8);
       box-shadow: var(--ar-shadow-soft);
     }
     .probability-label {
-      color: #9db9d4;
+      color: #52666A;
       font-size: .72rem;
       font-weight: 750;
       letter-spacing: .08em;
       text-transform: uppercase;
     }
     .probability-value {
-      color: #cfe4ff;
+      color: #174E55;
       font-size: 2.05rem;
       font-weight: 800;
       line-height: 1.1;
@@ -52,7 +52,7 @@ st.markdown(
       font-variant-numeric: tabular-nums;
     }
     .probability-unavailable {
-      color: #f0c56a;
+      color: #9A6A25;
       font-size: 1.12rem;
       font-weight: 750;
       margin: .18rem 0 .35rem;
