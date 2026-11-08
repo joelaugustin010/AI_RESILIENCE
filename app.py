@@ -14,8 +14,9 @@ st.set_page_config(
 )
 
 # Open directly on the Kochi-focused project dashboard.
+# Group workspaces by the user's task, keeping every existing page registered.
 pages = {
-    "Home": [
+    "Overview": [
         st.Page(
             "app_pages/home.py",
             title="Home",
@@ -23,17 +24,7 @@ pages = {
             default=True,
         ),
     ],
-    "Explore": [
-        st.Page(
-            "app_pages/decision_workflow.py",
-            title="Decision Workflow",
-            icon=":material/assignment_turned_in:",
-        ),
-        st.Page(
-            "app_pages/disaster_assistant.py",
-            title="Disaster Intelligence Assistant",
-            icon=":material/psychology_alt:",
-        ),
+    "Monitor": [
         st.Page(
             "app_pages/kochi_map.py",
             title="Kochi Map",
@@ -44,20 +35,12 @@ pages = {
             title="Air Pollution",
             icon=":material/factory:",
         ),
+    ],
+    "Analyse": [
         st.Page(
-            "app_pages/data_readiness.py",
-            title="Data Readiness",
-            icon=":material/fact_check:",
-        ),
-        st.Page(
-            "app_pages/hazard_model_lab.py",
-            title="Hazard Model Lab",
-            icon=":material/model_training:",
-        ),
-        st.Page(
-            "app_pages/submission_ml_demo.py",
-            title="ML Evidence & Demonstration",
-            icon=":material/science:",
+            "app_pages/disaster_probability.py",
+            title="Multi-Hazard Evidence Review",
+            icon=":material/analytics:",
         ),
         st.Page(
             "app_pages/hospital_vulnerability.py",
@@ -70,9 +53,19 @@ pages = {
             icon=":material/thunderstorm:",
         ),
         st.Page(
-            "app_pages/disaster_probability.py",
-            title="Multi-Hazard Evidence Review",
-            icon=":material/analytics:",
+            "app_pages/hazard_model_lab.py",
+            title="Hazard Model Lab",
+            icon=":material/model_training:",
+        ),
+        st.Page(
+            "app_pages/data_readiness.py",
+            title="Data Readiness",
+            icon=":material/fact_check:",
+        ),
+        st.Page(
+            "app_pages/submission_ml_demo.py",
+            title="ML Evidence & Demonstration",
+            icon=":material/science:",
         ),
     ],
     "Plan": [
@@ -87,9 +80,21 @@ pages = {
             icon=":material/engineering:",
         ),
     ],
+    "Respond": [
+        st.Page(
+            "app_pages/disaster_assistant.py",
+            title="Disaster Intelligence Assistant",
+            icon=":material/psychology_alt:",
+        ),
+        st.Page(
+            "app_pages/decision_workflow.py",
+            title="Decision Workflow",
+            icon=":material/assignment_turned_in:",
+        ),
+    ],
 }
 
-page = st.navigation(pages, position="top")
+page = st.navigation(pages, position="sidebar")
 
 # A lightweight, application-wide design system. Keeping it local means the
 # deployment needs no external asset or build step, and every analytical page
@@ -1884,7 +1889,105 @@ st.markdown(
       font-size: .88rem !important;
       opacity: 1 !important;
     }
-        </style>
+    
+    /* Grouped Coastal Intelligence sidebar navigation. */
+    [data-testid="stSidebar"] {
+      background: linear-gradient(180deg, #E7F0EF 0%, #F5F7F5 58%, #FFFFFF 100%) !important;
+      border-right: 1px solid rgba(23,78,85,.15) !important;
+    }
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
+    [data-testid="stSidebar"] [data-testid="stCaptionContainer"] {
+      color: #526B6E !important;
+    }
+    [data-testid="stSidebarNav"] {
+      padding: .75rem .65rem 1.25rem !important;
+    }
+    [data-testid="stSidebarNav"] ul {
+      gap: .22rem !important;
+    }
+    [data-testid="stSidebarNav"] li {
+      margin: .12rem 0 !important;
+    }
+    [data-testid="stSidebarNav"] a,
+    [data-testid="stSidebarNavLink"] {
+      min-height: 2.55rem !important;
+      padding: .58rem .72rem !important;
+      border: 1px solid transparent !important;
+      border-radius: 11px !important;
+      color: #31545A !important;
+      transition: background .16s ease, border-color .16s ease, color .16s ease !important;
+    }
+    [data-testid="stSidebarNav"] a p,
+    [data-testid="stSidebarNavLink"] p,
+    [data-testid="stSidebarNav"] a span {
+      color: inherit !important;
+      font-weight: 560 !important;
+    }
+    [data-testid="stSidebarNav"] a:hover,
+    [data-testid="stSidebarNavLink"]:hover {
+      background: rgba(41,155,145,.09) !important;
+      border-color: rgba(41,155,145,.18) !important;
+      color: #174E55 !important;
+    }
+    [data-testid="stSidebarNav"] a[aria-current="page"],
+    [data-testid="stSidebarNavLink"][aria-current="page"] {
+      background: #DCECE8 !important;
+      border-color: rgba(41,155,145,.30) !important;
+      box-shadow: inset 3px 0 0 #299B91 !important;
+      color: #174E55 !important;
+      font-weight: 750 !important;
+    }
+    [data-testid="stSidebarNav"] a[aria-current="page"] p,
+    [data-testid="stSidebarNavLink"][aria-current="page"] p {
+      color: #174E55 !important;
+      font-weight: 750 !important;
+    }
+    [data-testid="stSidebarNav"] [data-testid="stSidebarNavSeparator"],
+    [data-testid="stSidebarNavSeparator"] {
+      border-color: rgba(23,78,85,.13) !important;
+      margin: .75rem .35rem !important;
+    }
+    [data-testid="stSidebar"] [data-testid="stIconMaterial"] {
+      color: #397B78 !important;
+    }
+    /* Clear hierarchy, keyboard focus and comfortable scrolling for the
+       five navigation groups and their thirteen destinations. */
+    /* Let Streamlit's sidebar own vertical scrolling. A second
+       scroll container here creates a duplicate scrollbar. */
+    [data-testid="stSidebarNav"] {
+      max-height: none !important;
+      overflow: visible !important;
+    }
+    [data-testid="stSidebarNav"] a,
+    [data-testid="stSidebarNavLink"] {
+      display: flex !important;
+      align-items: center !important;
+      gap: .58rem !important;
+      box-sizing: border-box !important;
+    }
+    [data-testid="stSidebarNav"] a p,
+    [data-testid="stSidebarNavLink"] p {
+      font-size: .9rem !important;
+      line-height: 1.32 !important;
+      white-space: normal !important;
+      overflow-wrap: anywhere !important;
+    }
+    [data-testid="stSidebarNav"] a:focus-visible,
+    [data-testid="stSidebarNavLink"]:focus-visible {
+      outline: 3px solid rgba(41,155,145,.55) !important;
+      outline-offset: 2px !important;
+      background: #E4F0ED !important;
+    }
+    [data-testid="stSidebarNav"] a[aria-current="page"] {
+      position: relative;
+    }
+    @media (max-width: 640px) {
+      [data-testid="stSidebarNav"] {
+        padding: .5rem .4rem .9rem !important;
+      }
+    }
+
+    </style>
     """,
     unsafe_allow_html=True,
 )
