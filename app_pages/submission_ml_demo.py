@@ -11,8 +11,6 @@ import streamlit as st
 
 from src.dataframe_display import display_dataframe
 
-from src.dataframe_display import display_dataframe
-
 from src.ml.coverage import build_coverage_matrix
 from src.ml.presentation import application_rows, card_rows, model_rows
 from src.ml.registry import list_model_cards
