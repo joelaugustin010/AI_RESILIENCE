@@ -2023,3 +2023,118 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+# AI RESILIENCE — refined workspace cards and information panels.
+# Presentation-only polish; semantic status colours and page behaviour remain intact.
+st.markdown(
+    """
+    <style>
+    /* Bordered content cards: quieter depth, clearer separation and consistent rhythm. */
+    [data-testid="stMain"] [data-testid="stVerticalBlockBorderWrapper"] {
+      position: relative !important;
+      overflow: hidden !important;
+      border: 1px solid rgba(23, 78, 85, .15) !important;
+      border-radius: 18px !important;
+      background:
+        radial-gradient(ellipse at 100% 0%, rgba(41, 155, 145, .055), transparent 19rem),
+        linear-gradient(145deg, #FFFFFF 0%, #FBFDFC 100%) !important;
+      box-shadow: 0 5px 18px rgba(23, 78, 85, .055),
+                  0 1px 2px rgba(23, 78, 85, .035) !important;
+      transition: border-color .2s ease, box-shadow .2s ease !important;
+    }
+    [data-testid="stMain"] [data-testid="stVerticalBlockBorderWrapper"]:hover {
+      border-color: rgba(41, 155, 145, .30) !important;
+      box-shadow: 0 10px 26px rgba(23, 78, 85, .085),
+                  0 2px 5px rgba(23, 78, 85, .035) !important;
+    }
+    [data-testid="stMain"] [data-testid="stVerticalBlockBorderWrapper"] h2,
+    [data-testid="stMain"] [data-testid="stVerticalBlockBorderWrapper"] h3,
+    [data-testid="stMain"] [data-testid="stVerticalBlockBorderWrapper"] h4 {
+      color: #174E55 !important;
+    }
+    [data-testid="stMain"] [data-testid="stVerticalBlockBorderWrapper"] p,
+    [data-testid="stMain"] [data-testid="stVerticalBlockBorderWrapper"] li {
+      color: #31545A;
+    }
+
+    /* Metrics: stronger value hierarchy without changing risk/status semantics. */
+    [data-testid="stMain"] [data-testid="stMetric"] {
+      border: 1px solid rgba(23, 78, 85, .14) !important;
+      border-radius: 16px !important;
+      background:
+        linear-gradient(135deg, rgba(220, 231, 232, .38), rgba(255, 255, 255, .98) 62%) !important;
+      box-shadow: 0 4px 14px rgba(23, 78, 85, .045) !important;
+      padding: 1rem 1.05rem !important;
+      transition: border-color .2s ease, box-shadow .2s ease !important;
+    }
+    [data-testid="stMain"] [data-testid="stMetric"]:hover {
+      transform: none !important;
+      border-color: rgba(41, 155, 145, .32) !important;
+      box-shadow: 0 8px 20px rgba(23, 78, 85, .075) !important;
+    }
+    [data-testid="stMain"] [data-testid="stMetricLabel"] {
+      color: #526B6E !important;
+      font-size: .82rem !important;
+      font-weight: 650 !important;
+      letter-spacing: .015em;
+    }
+    [data-testid="stMain"] [data-testid="stMetricValue"] {
+      color: #174E55 !important;
+      font-size: clamp(1.35rem, 2vw, 1.8rem) !important;
+      font-weight: 760 !important;
+      line-height: 1.2 !important;
+    }
+
+    /* Expanders and forms read as deliberate information surfaces. */
+    [data-testid="stMain"] [data-testid="stExpander"],
+    [data-testid="stMain"] [data-testid="stForm"] {
+      border: 1px solid rgba(23, 78, 85, .14) !important;
+      border-radius: 15px !important;
+      background: rgba(255, 255, 255, .94) !important;
+      box-shadow: 0 3px 12px rgba(23, 78, 85, .035) !important;
+    }
+    [data-testid="stMain"] [data-testid="stExpander"] summary {
+      padding-top: .72rem !important;
+      padding-bottom: .72rem !important;
+    }
+    [data-testid="stMain"] [data-testid="stExpander"] summary:hover {
+      background: rgba(220, 236, 232, .42) !important;
+    }
+    [data-testid="stMain"] [data-testid="stForm"] {
+      padding: .85rem !important;
+    }
+
+    /* Tabs and alerts: clearer active state and calmer panel edges. */
+    [data-testid="stMain"] [data-testid="stTabs"] [data-baseweb="tab-list"] {
+      border-bottom: 1px solid rgba(23, 78, 85, .14) !important;
+      gap: .35rem !important;
+    }
+    [data-testid="stMain"] [data-testid="stTabs"] button[aria-selected="true"] {
+      border-bottom-color: #299B91 !important;
+      color: #174E55 !important;
+    }
+    [data-testid="stMain"] [data-testid="stAlert"] {
+      border-radius: 14px !important;
+      box-shadow: 0 3px 12px rgba(23, 78, 85, .035) !important;
+    }
+    [data-testid="stMain"] [data-testid="stAlert"] p {
+      line-height: 1.62 !important;
+    }
+
+    /* Avoid hover-dependent effects for touch users and respect reduced motion. */
+    @media (hover: none) {
+      [data-testid="stMain"] [data-testid="stVerticalBlockBorderWrapper"]:hover,
+      [data-testid="stMain"] [data-testid="stMetric"]:hover {
+        box-shadow: 0 5px 18px rgba(23, 78, 85, .055) !important;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      [data-testid="stMain"] [data-testid="stVerticalBlockBorderWrapper"],
+      [data-testid="stMain"] [data-testid="stMetric"] {
+        transition: none !important;
+      }
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
