@@ -50,7 +50,7 @@ Cost and duration evidence gates are now independent:
 - Delivery model: at least 40 such records with an additional valid, source-supported duration.
 - Both models must beat the median baseline on the holdout set before estimates are enabled.
 
-The current 23-row dataset does **not** unlock ML. Cost records without duration may contribute to cost-model training after the minimum is reached; they cannot train the delivery model.
+The current 29-row dataset does **not** unlock ML. Cost records without duration may contribute to cost-model training after the minimum is reached; they cannot train the delivery model.
 
 ## Next collection priorities
 
@@ -59,7 +59,7 @@ Prioritise additional KWA, LSGD/Sulekha, KIIDC, PWD and Irrigation Department pr
 
 ## Supplemental government and private-sector collection (8 November 2026)
 
-A separate lead register is maintained at `mitigation_project_supplemental_candidates.csv`. It contains four additional project references identified from official government/audit pages and private-sector project portfolios:
+A separate lead register is maintained at `mitigation_project_supplemental_candidates.csv`. It contains ten project references identified from official government/audit pages and private-sector project portfolios:
 
 - KIIDC Kuppithodu regulator: official project page reports construction dates, completed status and ₹55.82 crore project cost; the project is multi-component and its scope is not yet suitable for the current single-quantity model.
 - Kochi Elamkulam 5 MLD STP: CAG audit reports physical completion in May 2022 and expenditure of ₹12.06 crore; commissioning followed in October 2024. No verified start date was captured, so duration is blank.
@@ -83,3 +83,13 @@ https://kiidc.kerala.gov.in/category/our-current-projects/completed-projects/
 CAG Performance Audit on AMRUT in Kerala reports 49 Kochi storm-water-drain works with project cost ₹53.86 crore; 48 completed with expenditure ₹34.15 crore. Audit test-checked nine works (project cost ₹28.18 crore), reporting ₹21.47 crore spent and noting that much of the spending related to routine maintenance. This is an aggregate/audit finding, not 49 project-level records. It must not be expanded into synthetic rows. Source: https://cag.gov.in/uploads/download_audit_report/2025/Print-version-english_AMRUT_Kerala_10.12.25-with-legislature-date-0699d302521f715.11884185.pdf
 
 KIIDC's completed-project listing includes Punnamada post-flood renovation; the page states final billing was still in progress, so it is a discovery lead and not treated as a final-cost training record. Source: https://kiidc.kerala.gov.in/category/our-current-projects/completed-projects/
+
+
+### Further KWA project leads reviewed (8 November 2026)
+Four additional KWA PASK profiles have been added to the supplemental register, bringing it to **10 source leads** (the separate core training CSV remains at **29 records**):
+- Paittukattu lane, Division 36, Kochi Corporation: 63 mm PVC pipeline extension; ₹62,000 AS/TS; profile has no final bill paid or actual completion date, and no pipe length.
+- Honest Byline Road, Kalamassery: ₹80,000 AS/TS; profile shows completed status but no actual completion date, no scope quantity and no final paid expenditure.
+- Nanma One apartment complex, Vyttila/Tripunithura: ₹560,000 AS and ₹490,000 TS; completed 16 July 2026, but bill submitted/paid fields are both zero and scope quantity is absent.
+- Ward X pipeline extension, Marady Panchayat: ₹1,266,558 bill submitted; payment is not confirmed, and measurable pipeline quantity and actual completion date were not captured.
+
+These are **discovery leads only**. Sanctioned/technical-sanction amounts and submitted-but-unpaid bills are not actual final expenditure. None of these four is marked ML-eligible. The new leads are retained to guide source follow-up, not to increase the training count.
