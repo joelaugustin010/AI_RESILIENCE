@@ -37,7 +37,7 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
         self.assertIn("Evidence by decision dimension", headings)
         self.assertIn("Uncertainty register", headings)
         self.assertIn("Conceptual infrastructure dependencies", headings)
-        self.assertIn("4. Hazard-specific scientific assessment", [element.value for element in app.header])
+        self.assertIn("3. Key hazard assessment and recommended precautions", [element.value for element in app.header])
         self.assertTrue(
             any("never a validated prediction" in str(element.value).lower() for element in app.caption)
         )
@@ -71,7 +71,7 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
         app.form_submit_button[0].click().run()
         self.assertEqual(len(app.exception), 0)
         self.assertTrue(
-            any("4. Hazard-specific scientific assessment" == element.value for element in app.header)
+            any("3. Key hazard assessment and recommended precautions" == element.value for element in app.header)
         )
         self.assertTrue(
             any("Compound interaction remains unresolved" in str(element.value) for element in app.info)

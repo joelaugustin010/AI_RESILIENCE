@@ -30,6 +30,7 @@ def _card():
 def _dataset():
     frame = pd.DataFrame(
         {
+            "date": pd.to_datetime(["2019-12-30", "2019-12-31", "2020-01-01", "2020-01-02"], utc=True),
             "target_date": pd.to_datetime(["2019-12-31", "2020-01-01", "2020-01-02", "2020-01-03"], utc=True),
             "target_rain_nextday": [1.0, 8.0, 12.0, 15.0],
             "rain_lag1": [2.0, 3.0, 4.0, 2.5],
@@ -105,3 +106,31 @@ def test_historical_replay_derives_observed_class_from_card_threshold(monkeypatc
 
     assert replay["observed_target"] == 8.0
     assert replay["observed_event"] is False
+
+
+
+def test_run_historical_replay_returns_prediction_and_provenance(monkeypatch):
+    card = _card()
+    monkeypatch.setattr(service, "load_model_card", lambda model_id: card)
+    monkeypatch.setattr(
+        service,
+        "build_weather_target_dataset",
+        lambda location, target: _dataset(),
+    )
+    monkeypatch.setattr(
+        service,
+        "predict_regression_from_context",
+        lambda model_id, context: {"estimate": 7.5, "unit": "mm/day"},
+    )
+
+    result = service.run_historical_replay(
+        "weather_precipitation_kochi_nextday_regression"
+    )
+
+    assert result["prediction"]["estimate"] == 7.5
+    assert result["observed_target"] == 8.0
+    assert result["feature_count"] == 2
+    assert result["model_status"] == "UNKNOWN"
+    assert "target_rain_nextday" not in result["context"]
+    assert result["input_date"] == "2019-12-31"
+    assert result["target_date"] == "2020-01-01"

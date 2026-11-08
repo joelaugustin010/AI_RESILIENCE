@@ -48,6 +48,7 @@ from src.disaster_models import assess_disaster
 from src.prevention_intelligence import generate_prevention_actions
 from src.intervention_effectiveness import intervention_effectiveness_for_hazards
 from src.ml.presentation import application_rows, model_rows
+from src.ml.service import run_historical_replay
 from src.compound_hazard_assessment import assess_compound_scenario
 from src.historical_validation import historical_validation_checklist
 from src.disaster_models.drought import parse_monthly_precipitation_csv
@@ -89,6 +90,11 @@ def _cached_hydrology(dataset_id: str):
 def _cached_rainfall_backtest(root: str, source_size: int, source_mtime_ns: int):
     # The file signature is part of the cache key, so a changed source is rechecked.
     return run_manual_rainfall_backtest(root)
+
+
+@st.cache_data(show_spinner="Building the held-out weather feature vector and running the research model…")
+def _cached_weather_ml_replay(model_id: str) -> dict:
+    return run_historical_replay(model_id)
 
 
 def _get_rainfall_backtest():
@@ -578,8 +584,9 @@ def _render_ml_evidence(evidence: dict) -> None:
         )
     else:
         st.info(
-            "No model output was produced. Missing scenario context or a non-usable model "
-            "status prevents a decision output; values are never defaulted or invented."
+            "No scenario-specific ML output was produced. The submitted scenario does not contain a complete, "
+            "time-matched feature sequence required by the registered model. Partial values are not "
+            "filled from unrelated fields or substituted across different hazards."
         )
         for model in evidence.get("models", []):
             missing = (model.get("context") or {}).get("missing_features") or []
@@ -603,6 +610,61 @@ def _render_ml_evidence(evidence: dict) -> None:
         for limitation in evidence.get("limitations", []):
             st.write(f"- {limitation}")
 
+
+def _render_weather_ml_replay() -> None:
+    # Retrospective feature bridge: all predictors are built from the versioned time series.
+    st.markdown("### Historical weather ML replay")
+    st.info(
+        "RETROSPECTIVE EVALUATION — the app automatically constructs the complete model feature vector "
+        "from its traceable historical weather time series and evaluates a held-out case. "
+        "This is not a live forecast and does not describe current conditions."
+    )
+    model_id = "weather_precipitation_kochi_nextday_regression"
+    try:
+        result = _cached_weather_ml_replay(model_id)
+    except Exception as exc:
+        st.warning(
+            "Historical ML replay is unavailable in this deployment. The source dataset, "
+            "model card, feature contract, or trained artifact could not be loaded."
+        )
+        st.caption(f"Diagnostic: {type(exc).__name__}: {exc}")
+        st.caption('Required next: restore the versioned Kochi daily-weather source and matching persisted model artifact; no feature values are fabricated.')
+        return
+    prediction = result["prediction"]
+    estimate = prediction.get("estimate")
+    observed = result.get("observed_target")
+    unit = prediction.get("unit") or result.get("prediction_unit") or "mm/day"
+    if estimate is None:
+        st.warning("The replay completed without a continuous rainfall estimate.")
+        return
+    metric_cols = st.columns(3)
+    metric_cols[0].metric("Estimated next-day rainfall", f"{float(estimate):.2f} {unit}")
+    if observed is not None:
+        metric_cols[1].metric("Observed held-out rainfall", f"{float(observed):.2f} {unit}")
+        metric_cols[2].metric("Absolute replay error", f"{abs(float(estimate) - float(observed)):.2f} {unit}")
+    else:
+        metric_cols[1].metric("Observed held-out rainfall", "Unavailable")
+        metric_cols[2].metric("Replay error", "Unavailable")
+    st.write("**Model:**", result.get("model_id"))
+    st.write("**Model status:**", result.get("model_status", "Unknown"))
+    st.write("**Automatically constructed features:**", f"{result.get('feature_count', 0)} / 46")
+    st.write("**Feature observation date:**", result.get("input_date", "Unavailable"))
+    st.write("**Target / verification date:**", result.get("target_date", "Unavailable"))
+    st.write("**Input timestamp:**", result.get("input_timestamp", "Unavailable"))
+    st.write("**Target timestamp:**", result.get("target_timestamp", "Unavailable"))
+    st.write("**Data source:**", result.get("source") or "Not recorded in model card")
+    st.write("**Source type:**", result.get("source_type") or "Not recorded")
+    st.write("**Geographic scope:**", result.get("location") or "Not recorded")
+    with st.expander("Replay methodology and model limitations", expanded=False):
+        st.write("**Validation status:**", result.get("validation_status") or "Not recorded")
+        st.write("**Target definition:**", result.get("target_definition") or "Not recorded")
+        st.write("**Case selection:**", result.get("case_role") or "Not recorded")
+        st.write("**Intended use:**", result.get("intended_use") or "Not recorded")
+        st.write("**Prohibited use:**", result.get("prohibited_use") or "Not recorded")
+        for limitation in prediction.get("limitations", []):
+            st.markdown(f"- {limitation}")
+        st.caption("The observed target is retained separately for retrospective comparison and is never passed into the model as an input.")
+    st.warning("This is a research estimate of rainfall at a historical reanalysis grid point. It is not a flood probability, flood occurrence prediction, inundation extent, water depth, affected-population estimate, or official warning.")
 
 def _compound_scenario_inputs(inputs: dict) -> dict:
     """Adapt shared workflow inputs to the compound evidence review."""
@@ -1286,7 +1348,7 @@ st.subheader("Conditional scenario output")
 st.metric("Scenario concern", prediction["concern_level"])
 st.markdown("**Potential outcome**")
 st.write(prediction["conditional_outcome"])
-st.caption(f"Scenario engine: {prediction['model_type']}. This immediate conditional outcome is rule-based; it is not the output of a trained ML model. Separate shared-ML inference is displayed below when a registered model's complete feature contract and evidence gates are satisfied. No official warning is produced.")
+st.caption(f"Scenario engine: {prediction['model_type']}. This immediate conditional outcome is rule-based, not a trained-ML output. Any separate ML panel below is supplementary; the rainfall replay is retrospective and is not a forecast of this scenario. No official warning is produced.")
 with st.expander("Why the scenario engine produced this output", expanded=False):
     st.markdown("**Evidence used**")
     for item in prediction["evidence_used"]:
@@ -1306,6 +1368,12 @@ st.header("3. Key hazard assessment and recommended precautions")
 if disaster_assessment is not None:
     _render_disaster_assessment(disaster_assessment)
     _render_ml_evidence(shared_ml_evidence)
+    if inputs["hazard"] in {
+        "Flood",
+        "Compound: cyclone + flood",
+        "Compound: heavy rainfall + drainage failure",
+    }:
+        _render_weather_ml_replay()
 else:
     st.warning("The hazard-specific assessment is unavailable because the submitted inputs did not pass its validation.")
 
