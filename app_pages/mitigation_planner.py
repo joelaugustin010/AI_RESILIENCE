@@ -478,16 +478,17 @@ with st.expander("Train and evaluate the ML cost model", expanded=False):
     )
     if bundled_dataset_path.exists():
         historical_records = pd.read_csv(bundled_dataset_path)
-    if uploaded_cost_data is not None:
+    if uploaded_cost_data is not None or historical_records is not None:
         try:
-            import hashlib
-            upload_signature = hashlib.sha256(uploaded_cost_data.getvalue()).hexdigest()
-            if st.session_state.get("mitigation_ml_upload_signature") != upload_signature:
-                st.session_state.pop("mitigation_cost_ml_model", None)
-                st.session_state.pop("mitigation_duration_ml_model", None)
-                st.session_state["mitigation_ml_upload_signature"] = upload_signature
-            uploaded_cost_data.seek(0)
-            historical_records = pd.read_csv(uploaded_cost_data)
+            if uploaded_cost_data is not None:
+                import hashlib
+                upload_signature = hashlib.sha256(uploaded_cost_data.getvalue()).hexdigest()
+                if st.session_state.get("mitigation_ml_upload_signature") != upload_signature:
+                    st.session_state.pop("mitigation_cost_ml_model", None)
+                    st.session_state.pop("mitigation_duration_ml_model", None)
+                    st.session_state["mitigation_ml_upload_signature"] = upload_signature
+                uploaded_cost_data.seek(0)
+                historical_records = pd.read_csv(uploaded_cost_data)
             expected_columns = [
                 "intervention", "area_type", "scope_quantity", "scope_unit",
                 "actual_cost_inr", "source_reference",
