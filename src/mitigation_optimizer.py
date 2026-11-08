@@ -1,7 +1,8 @@
 """Transparent budget-constrained portfolio scenario optimisation.
 
-The optimiser maximises planner-entered value points. It does not estimate
-hazard reduction, avoided losses, social benefit, or public funding priority.
+The optimiser maximises supplied integer priority points from a transparent,
+human-assessed investment score. It does not estimate hazard reduction,
+avoided losses, social benefit, or public funding priority.
 """
 from __future__ import annotations
 
@@ -12,10 +13,11 @@ from typing import Any
 def optimize_portfolio(
     projects: list[dict[str, Any]], budget_inr: float, max_projects: int = 18
 ) -> dict[str, Any]:
-    """Return the best affordable project subset for supplied value points.
+    """Return the best affordable project subset for supplied priority points.
 
-    Objective: maximise the sum of user-entered integer value points.
-    Tie-break: minimise total cost. Each project can be selected at most once.
+    Objective: maximise the sum of integer priority points from explicit
+    human assessments. Tie-break: minimise total cost. Each project can be
+    selected at most once.
     """
     budget = float(budget_inr)
     if not math.isfinite(budget) or budget < 0:
@@ -61,5 +63,5 @@ def optimize_portfolio(
         "total_cost_inr": best_cost,
         "remaining_budget_inr": budget - best_cost,
         "method": "Exact exhaustive 0/1 subset search",
-        "objective": "Maximise planner-entered value points; minimise spend on ties",
+        "objective": "Maximise human-assessed priority points; minimise cost on ties",
     }
