@@ -1275,6 +1275,45 @@ with st.expander("Portfolio analytics, budget scenarios and exports", expanded=F
         .eq("")
     )
     
+    with st.expander("Verified source register · dataset coverage and limitations", expanded=False):
+        catalog_path = Path(__file__).resolve().parents[1] / "data" / "reference" / "mitigation_dataset_catalog.csv"
+        if catalog_path.is_file():
+            try:
+                source_catalog = pd.read_csv(catalog_path)
+                display_columns = [
+                    "name", "producer", "geography", "period",
+                    "limitations", "ingestion_status",
+                ]
+                source_catalog = source_catalog[
+                    [column for column in display_columns if column in source_catalog.columns]
+                ].copy()
+                status_labels = {
+                    "LOCAL_QA_CONDITIONAL": "Conditional · historical context only",
+                    "LOCAL_QA_CONDITIONAL_DUPLICATES_REVIEW": "Conditional · duplicate review required",
+                    "LOCAL_QA_CONDITIONAL_MISSINGNESS_DUPLICATES": "Conditional · missingness and duplicates",
+                    "LOCAL_QA_REJECTED_FOR_KOCHI_ANALYSIS": "Excluded from Kochi analysis",
+                    "DOWNLOADED_SIGNATURE_ONLY": "File signature checked · contents not reviewed",
+                    "DOWNLOAD_NOT_VERIFIED": "Download not verified · excluded",
+                }
+                if "ingestion_status" in source_catalog.columns:
+                    source_catalog["ingestion_status"] = source_catalog["ingestion_status"].map(
+                        lambda value: status_labels.get(value, str(value))
+                    )
+                display_dataframe(
+                    source_catalog,
+                    hide_index=True,
+                    use_container_width=True,
+                )
+                st.caption(
+                    "Source register only: these entries do not represent a live data feed. "
+                    "See data/reference/mitigation_data_quality_review.md for validation details. "
+                    "No raw observations are loaded into this page and no ML model is trained from this catalogue."
+                )
+            except (OSError, ValueError, pd.errors.ParserError) as exc:
+                st.warning(f"Source catalogue could not be loaded: {exc}")
+        else:
+            st.info("The source catalogue is not available in this checkout.")
+
     section_intro("Evidence", "Evidence and data quality")
     st.caption(
         f"Risk-reduction evidence is missing for "
