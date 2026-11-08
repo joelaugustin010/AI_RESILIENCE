@@ -30,7 +30,7 @@ def _home() -> AppTest:
 
 
 def _markup(app: AppTest) -> str:
-    return "\\n".join(element.value for element in app.markdown)
+    return "\n".join(element.value for element in app.markdown)
 
 
 def test_home_is_the_default_page_with_the_cinematic_hero():
