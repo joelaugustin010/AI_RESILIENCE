@@ -1734,6 +1734,21 @@ st.markdown(
     [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-copy {
       color: #E5F0EF !important;
     }
+    /* Keep every header label readable on the dark coastal masthead. */
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-kicker,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-kicker *,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-meta,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-meta *,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-copy,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-title,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] h1 {
+      color: #E5F0EF !important;
+      opacity: 1 !important;
+    }
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-title,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] h1 {
+      color: #FFFFFF !important;
+    }
     </style>
     """,
     unsafe_allow_html=True,
