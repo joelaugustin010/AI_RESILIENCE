@@ -356,6 +356,7 @@ if uploaded_cost_data is not None:
         upload_signature = hashlib.sha256(uploaded_cost_data.getvalue()).hexdigest()
         if st.session_state.get("mitigation_ml_upload_signature") != upload_signature:
             st.session_state.pop("mitigation_cost_ml_model", None)
+            st.session_state.pop("mitigation_duration_ml_model", None)
             st.session_state["mitigation_ml_upload_signature"] = upload_signature
         uploaded_cost_data.seek(0)
         historical_records = pd.read_csv(uploaded_cost_data)
@@ -505,6 +506,133 @@ else:
     st.info(
         "ML is currently in data-waiting mode. No model is trained from the editable project register "
         "or illustrative starter rows. Upload sufficient historical records to begin evaluation."
+    )
+
+# ============================================================
+# EVIDENCE-GATED PROJECT DURATION INTELLIGENCE
+# ============================================================
+from src.mitigation_duration_ml import estimate_duration, train_duration_model
+
+st.markdown("---")
+section_intro(
+    "Delivery intelligence · ML workspace",
+    "Historical project duration estimator",
+    "Estimates indicative delivery time from comparable completed projects. "
+    "This is a planning aid, not a contractor schedule or guarantee.",
+)
+
+if historical_records is None:
+    st.info("Upload the same sourced completed-project dataset above to evaluate the duration model.")
+else:
+    duration_train_col, duration_info_col = st.columns([1, 2])
+    with duration_train_col:
+        if st.button(
+            "Train duration model",
+            type="primary",
+            key="train_mitigation_duration_model",
+            use_container_width=True,
+        ):
+            try:
+                with st.spinner("Evaluating project-duration patterns on held-out records…"):
+                    st.session_state["mitigation_duration_ml_model"] = train_duration_model(
+                        historical_records
+                    )
+                st.success("Duration model evaluation completed.")
+            except CostModelDataError as exc:
+                st.session_state.pop("mitigation_duration_ml_model", None)
+                st.warning(str(exc))
+    with duration_info_col:
+        st.markdown(
+            '<div class="mitigation-ml-copy">Uses intervention type, area type, '
+            'scope quantity, measurement unit and estimated project cost. '
+            'The model is enabled only when its holdout MAE beats a median-only baseline.</div>',
+            unsafe_allow_html=True,
+        )
+
+duration_model = st.session_state.get("mitigation_duration_ml_model")
+if duration_model:
+    duration_metrics = duration_model["metrics"]
+    with st.container(border=True):
+        st.markdown("#### Delivery model evaluation")
+        duration_metrics_cols = st.columns(4)
+        duration_metrics_cols[0].metric("Training records", f"{duration_metrics['training_records']:,}")
+        duration_metrics_cols[1].metric("Holdout records", f"{duration_metrics['validation_records']:,}")
+        duration_metrics_cols[2].metric("Holdout MAE", f"{duration_metrics['mae_months']:.1f} months")
+        duration_metrics_cols[3].metric("Median baseline MAE", f"{duration_metrics['baseline_mae_months']:.1f} months")
+        st.caption(
+            f"{duration_metrics['validation_method']} · "
+            + (f"R²: {duration_metrics['r2']:.3f}" if pd.notna(duration_metrics["r2"]) else "R² unavailable")
+        )
+        st.caption(
+            "Holdout error is an initial evaluation only. It is not a confidence interval, "
+            "and performance on new locations or unusual projects may differ."
+        )
+    if duration_metrics["beats_baseline"]:
+        st.success("Duration model passed its median-baseline comparison.")
+        duration_categories = duration_model["categories"]
+        with st.form("mitigation_duration_scenario"):
+            duration_cols = st.columns(2)
+            selected_intervention = duration_cols[0].selectbox(
+                "Intervention",
+                duration_categories["intervention"],
+                key="duration_intervention",
+            )
+            selected_area = duration_cols[1].selectbox(
+                "Area type",
+                duration_categories["area_type"],
+                key="duration_area",
+            )
+            selected_unit = duration_cols[0].selectbox(
+                "Scope unit",
+                duration_categories["scope_unit"],
+                key="duration_unit",
+            )
+            selected_quantity = duration_cols[1].number_input(
+                "Scope quantity",
+                min_value=0.1,
+                value=100.0,
+                step=10.0,
+                key="duration_quantity",
+            )
+            selected_cost = st.number_input(
+                "Estimated project cost (₹)",
+                min_value=1.0,
+                value=100000.0,
+                step=10000.0,
+                key="duration_cost",
+            )
+            run_duration = st.form_submit_button("Estimate delivery duration")
+        if run_duration:
+            try:
+                duration_result = estimate_duration(
+                    duration_model,
+                    intervention=selected_intervention,
+                    area_type=selected_area,
+                    scope_quantity=selected_quantity,
+                    scope_unit=selected_unit,
+                    estimated_cost_inr=selected_cost,
+                )
+                st.metric(
+                    "Indicative delivery duration",
+                    f"{duration_result['estimated_duration_months']:.1f} months",
+                )
+                st.caption(
+                    f"Indicative historical-error range: "
+                    f"{duration_result['lower_estimate_months']:.1f}–"
+                    f"{duration_result['upper_estimate_months']:.1f} months "
+                    f"(± holdout MAE; not a confidence interval)."
+                )
+            except CostModelDataError as exc:
+                st.warning(str(exc))
+    else:
+        st.warning(
+            "Duration predictions are disabled because the model did not beat "
+            "the median-only baseline on held-out records."
+        )
+else:
+    st.info(
+        "No duration model is trained yet. Train it only after uploading "
+        "sufficient traceable completed-project records."
     )
 
 register_review = review_project_register(
