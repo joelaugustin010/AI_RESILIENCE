@@ -28,7 +28,7 @@ def prepare_cost_records(records: pd.DataFrame) -> pd.DataFrame:
     missing=[c for c in REQUIRED if c not in records.columns]
     if missing:
         raise CostModelDataError("Missing required columns: "+", ".join(missing))
-    frame=records.loc[:,REQUIRED].copy()
+    frame=records.loc[:,list(REQUIRED)].copy()
     for c in CATS+("source_reference",):
         frame[c]=frame[c].fillna("").astype(str).str.strip()
     for c in NUMS+(TARGET,):
@@ -52,7 +52,7 @@ def prepare_cost_records(records: pd.DataFrame) -> pd.DataFrame:
 
 def train_cost_model(records: pd.DataFrame) -> dict[str,Any]:
     frame=prepare_cost_records(records)
-    X=frame.loc[:,FEATURES]; y=frame[TARGET].astype(float)
+    X=frame.loc[:,list(FEATURES)]; y=frame[TARGET].astype(float)
     n_test=max(8,math.ceil(len(frame)*.2))
     if len(frame)-n_test<20:
         raise CostModelDataError("Not enough records remain for holdout evaluation.")
