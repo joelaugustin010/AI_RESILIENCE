@@ -43,6 +43,17 @@ def _exact_date(value: Any) -> date | None:
         return None
 
 
+def _duration_matches_dates(duration: Any, start: date | None, end: date | None) -> bool:
+    if start is None or end is None or end < start:
+        return False
+    try:
+        reported = Decimal(_text(duration))
+        calculated = Decimal((end - start).days) / Decimal("30.4375")
+        return reported.is_finite() and abs(reported - calculated) <= Decimal("0.15")
+    except (InvalidOperation, ValueError):
+        return False
+
+
 def _valid_source(value: Any) -> bool:
     raw = _text(value)
     try:
