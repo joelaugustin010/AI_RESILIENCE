@@ -454,8 +454,6 @@ def _render_disaster_assessment(result: dict) -> None:
         ]
         display_dataframe(pd.DataFrame(rows), hide_index=True, width="stretch", alt="Hazard-specific physical indicators and their user-supplied values")
 
-    _render_ml_evidence(result.get("ml_evidence", {}))
-
     consequences = result["potential_consequences"]
     st.write("**Potential consequences:**", consequences["status"])
     st.caption(consequences["human_population"]["interpretation"])
@@ -1266,6 +1264,14 @@ if inputs is None:
     st.stop()
 
 st.header("2. Immediate scenario result")
+try:
+    disaster_assessment = assess_disaster(inputs)
+except ValueError as exc:
+    disaster_assessment = None
+    st.error(f"Hazard-specific assessment input error: {exc}")
+else:
+    _render_ml_evidence(disaster_assessment.get("ml_evidence", {}))
+
 st.caption(
     "Your submitted hypothetical values are assessed here first. This output explains conditional consequences and, " 
     "where an official threshold applies, the corresponding screening category. It is not a calibrated flood probability, " 
@@ -1280,7 +1286,7 @@ st.subheader("Conditional scenario output")
 st.metric("Scenario concern", prediction["concern_level"])
 st.markdown("**Potential outcome**")
 st.write(prediction["conditional_outcome"])
-st.caption(f"Output engine: {prediction['model_type']}. Numerical probability: not available. This is not a trained ML forecast or official warning.")
+st.caption(f"Scenario engine: {prediction['model_type']}. This immediate conditional outcome is rule-based; it is not the output of a trained ML model. Separate shared-ML inference is displayed below when a registered model's complete feature contract and evidence gates are satisfied. No official warning is produced.")
 with st.expander("Why the model produced this output", expanded=True):
     st.markdown("**Evidence used**")
     for item in prediction["evidence_used"]:
@@ -1456,12 +1462,7 @@ st.caption("Typing a source name or selecting a classification does not independ
 
 st.header("4. Assessment status")
 assessment = assessment_summary(inputs)
-try:
-    disaster_assessment = assess_disaster(inputs)
-except ValueError as exc:
-    disaster_assessment = None
-    st.error(f"Hazard-specific assessment input error: {exc}")
-else:
+if disaster_assessment is not None:
     _render_disaster_assessment(disaster_assessment)
 compound_assessment = None
 if inputs.get("hazard") == "Compound: cyclone + flood":
