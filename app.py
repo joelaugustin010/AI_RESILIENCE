@@ -33,7 +33,7 @@ pages = {
         st.Page(
             "app_pages/air_pollution.py",
             title="Air Pollution",
-            icon=":material/air:",
+            icon=":material/factory:",
         ),
     ],
     "Analyse": [
@@ -1949,6 +1949,38 @@ st.markdown(
     }
     [data-testid="stSidebar"] [data-testid="stIconMaterial"] {
       color: #397B78 !important;
+    }
+    /* Clear hierarchy, keyboard focus and comfortable scrolling for the
+       five navigation groups and their thirteen destinations. */
+    [data-testid="stSidebarNav"] {
+      max-height: calc(100vh - 1.5rem);
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(41,155,145,.34) transparent;
+    }
+    [data-testid="stSidebarNav"] a,
+    [data-testid="stSidebarNavLink"] {
+      display: flex !important;
+      align-items: center !important;
+      gap: .58rem !important;
+      box-sizing: border-box !important;
+    }
+    [data-testid="stSidebarNav"] a p,
+    [data-testid="stSidebarNavLink"] p {
+      font-size: .9rem !important;
+      line-height: 1.32 !important;
+      white-space: normal !important;
+      overflow-wrap: anywhere !important;
+    }
+    [data-testid="stSidebarNav"] a:focus-visible,
+    [data-testid="stSidebarNavLink"]:focus-visible {
+      outline: 3px solid rgba(41,155,145,.55) !important;
+      outline-offset: 2px !important;
+      background: #E4F0ED !important;
+    }
+    [data-testid="stSidebarNav"] a[aria-current="page"] {
+      position: relative;
     }
     @media (max-width: 640px) {
       [data-testid="stSidebarNav"] {
