@@ -1639,3 +1639,80 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+
+# 1400 × 900 desktop canvas refinement.
+# The viewport is a design target, not a fixed page size: the page continues
+# to scroll naturally and collapses to the existing tablet/mobile layouts.
+st.markdown(
+    """
+    <style>
+    @media (min-width: 1360px) and (min-height: 860px) {
+      .block-container {
+        max-width: 1400px !important;
+        padding-top: 1rem !important;
+        padding-bottom: 2.2rem !important;
+      }
+      .ar-cine-hero {
+        box-sizing: border-box !important;
+        height: 500px !important;
+        min-height: 500px !important;
+        padding: 2rem 2.7rem 3.9rem !important;
+        border-radius: 24px !important;
+      }
+      .ar-cine-inner {
+        max-width: 800px !important;
+        padding-top: .15rem !important;
+      }
+      .ar-cine-topline { margin-bottom: 1.1rem !important; }
+      .ar-cine-title {
+        font-size: clamp(3.65rem, 5.1vw, 4.8rem) !important;
+        line-height: .96 !important;
+      }
+      .ar-cine-sub {
+        max-width: 680px !important;
+        margin-top: .8rem !important;
+        font-size: 1.12rem !important;
+        line-height: 1.36 !important;
+      }
+      .ar-cine-desc {
+        max-width: 650px !important;
+        margin-top: .5rem !important;
+        font-size: .88rem !important;
+        line-height: 1.48 !important;
+      }
+      .ar-cine-chips { margin-top: .72rem !important; gap: .38rem !important; }
+      .ar-cine-chips span { padding: .28rem .58rem !important; font-size: .66rem !important; }
+      .ar-cine-foot { bottom: .9rem !important; }
+      .st-key-ar-hero-ctas {
+        margin-top: -3rem !important;
+        padding-left: 2.7rem !important;
+        padding-right: 2.7rem !important;
+      }
+      .st-key-ar-hero-ctas [data-testid="stButton"] > button {
+        min-height: 2.65rem !important;
+      }
+      .ar-signal {
+        margin-top: 1.35rem !important;
+        gap: .65rem !important;
+      }
+      .ar-signal > div {
+        padding: .72rem .95rem !important;
+      }
+      .ar-signal strong { font-size: 1.48rem !important; }
+      .ar-signal p { font-size: .73rem !important; }
+    }
+    @media (min-width: 1360px) and (max-height: 859px) {
+      .block-container { max-width: 1400px !important; }
+      .ar-cine-hero { min-height: 480px !important; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .ar-cine-title, .ar-cine-sub, .ar-cine-desc, .ar-cine-chips {
+        animation: none !important;
+      }
+      .ar-cine-hero .ar-cine-slide { animation: none !important; }
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
