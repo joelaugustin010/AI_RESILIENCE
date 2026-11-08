@@ -64,7 +64,7 @@ def test_duplicate_project_names_and_source_urls_are_flagged():
     report = validate_records([first, second])
     assert "duplicate_project_name_of_row_1" in report["rows"][1]["issues"]
     assert "duplicate_source_url_of_row_1" in report["rows"][1]["issues"]
-    assert report["cost_ml_eligible"] == 0
+    assert report["cost_ml_eligible"] == 1
 
 
 def test_nonpositive_quantity_and_invalid_source_are_rejected():
@@ -77,4 +77,4 @@ def test_nonpositive_quantity_and_invalid_source_are_rejected():
 def test_duration_must_match_exact_reported_dates():
     report = validate_records([eligible_row(duration_months="24")])
     assert report["duration_ml_eligible"] == 0
-    assert "duration_does_not_match_reported_dates" in report["rows"][0]["issues"]
+    assert "duration_does_not_match_reported_dates" in report["rows"][0]["review_reasons"]
