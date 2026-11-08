@@ -95,7 +95,6 @@ st.caption("Enter estimates only when you have a source, date, scope, and unit b
 columns = [
     "Intervention",
     "Location",
-    "Planner value points",
     "Project Status",
     "Priority",
     "Cost INR",
@@ -169,10 +168,6 @@ with st.container(border=True):
         scope_unit = form_cols[1].selectbox("Scope measurement unit", unit_options)
         scope_quantity = st.number_input(
             "Scope quantity", min_value=0.0, value=100.0, step=10.0
-        )
-        planning_value = st.slider(
-            "Planner-assessed contribution (1–10)", min_value=1, max_value=10, value=5,
-            help="Your documented planning judgement for the portfolio scenario optimiser. This is not measured impact."
         )
         st.markdown("##### Investment assessment · human-reviewed inputs")
         score_cols = st.columns(2)
@@ -260,7 +255,6 @@ with st.container(border=True):
             record = {
                 "Intervention": project_name,
                 "Location": project_location.strip(),
-                "Planner value points": int(planning_value),
                 "Project Status": "Proposed",
                 "Priority": "Not assessed",
                 "Cost INR": estimated_cost,
@@ -349,6 +343,7 @@ else:
             top_cols[0].markdown(f"**{project['Intervention']}**")
             top_cols[0].caption(f"{project['Location']} · {project['Project Status']}")
             top_cols[1].markdown(f"**{project['Estimation method']}**")
+            priority_assessment = score_investment_priority(project.to_dict())
             metric_cols = st.columns(3)
             metric_cols[0].metric(
                 "Cost estimate",
@@ -359,7 +354,11 @@ else:
                 f"{float(project['ML duration estimate']):.1f} months"
                 if pd.notna(project["ML duration estimate"]) else "Awaiting data",
             )
-            metric_cols[2].metric("Priority", "Not assessed")
+            metric_cols[2].metric(
+                "Investment priority",
+                f"{priority_assessment['score']:.1f}/100" if priority_assessment["score"] is not None else "Needs assessment",
+                help=priority_assessment["explanation"],
+            )
             st.caption(
                 f"Scope: {project['Scope and unit']} · "
                 f"Evidence: {project['Evidence for risk reduction'] or 'Not supplied'}"
@@ -1277,13 +1276,13 @@ with st.expander("Portfolio analytics, budget scenarios and exports", expanded=F
             result = optimize_portfolio(scenario_rows, float(budget))
             if result["selected"]:
                 st.success(
-                    f'Best entered-value scenario: {result["total_value_points"]} planner points · '
+                    f'Best assessed-priority scenario: {result["total_value_points"]} priority points · '
                     f'{format_inr(result["total_cost_inr"])} invested · '
                     f'{format_inr(result["remaining_budget_inr"])} remaining.'
                 )
                 scenario_df = pd.DataFrame([
                     {"Selected project": item["name"], "Cost (INR)": item["cost_inr"],
-                     "Planner points": item["value_points"]}
+                     "Priority points": item["value_points"]}
                     for item in result["selected"]
                 ])
                 display_dataframe(scenario_df, hide_index=True, use_container_width=True)
