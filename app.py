@@ -1629,9 +1629,9 @@ st.markdown(
 )
 
 
-// AI RESILIENCE — final text-contrast correction.
-// Scoped to Streamlit's native text and controls; custom cinematic panels,
-// charts, maps, severity colours and page-specific HTML remain untouched.
+# AI RESILIENCE - final text-contrast correction.
+# Scoped to Streamlit's native text and controls; custom cinematic panels,
+# charts, maps, severity colours and page-specific HTML remain untouched.
 st.markdown(
     """
     <style>
