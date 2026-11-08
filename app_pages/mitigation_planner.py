@@ -167,11 +167,7 @@ with st.container(border=True):
             "Planner-assessed contribution (1–10)", min_value=1, max_value=10, value=5,
             help="Your documented planning judgement for comparing scenarios. This is not an AI risk-reduction prediction or measured benefit."
         )
-        with st.expander("Optional details · quotation, schedule and evidence", expanded=False):
-            duration_months = st.number_input(
-                "Expected duration input (months)", min_value=0.0, value=6.0, step=1.0,
-                help="Optional planning context for the cost model; the duration model estimates delivery time separately."
-            )
+        with st.expander("Optional details · quotation and evidence", expanded=False):
             manual_cost = st.number_input(
                 "Known quotation / manual cost (₹)", min_value=0.0, value=0.0, step=10000.0,
                 help="Optional fallback for a draft. Leave at zero when unknown."
@@ -195,8 +191,8 @@ with st.container(border=True):
     if submit_project:
         if not project_location.strip():
             st.warning("Add the project location before creating the profile.")
-        elif scope_quantity <= 0 or duration_months <= 0:
-            st.warning("Scope quantity and duration must both be greater than zero.")
+        elif scope_quantity <= 0:
+            st.warning("Scope quantity must be greater than zero.")
         else:
             estimated_cost = float(manual_cost) if manual_cost > 0 else None
             estimated_duration = None
@@ -210,7 +206,6 @@ with st.container(border=True):
                         area_type=area_type,
                         scope_quantity=scope_quantity,
                         scope_unit=scope_unit,
-                        duration_months=duration_months,
                     )
                     estimated_cost = float(cost_result["estimated_cost_inr"])
                     method_parts.append("ML cost estimate")
@@ -248,7 +243,7 @@ with st.container(border=True):
                     ("ML estimate · validation required" if "ML cost estimate" in method_parts
                      else source_reference.strip())
                 ),
-                "Scope and unit": f"{scope_quantity:g} {scope_unit} · {duration_months:g} month cost input",
+                "Scope and unit": f"{scope_quantity:g} {scope_unit}",
                 "Potential beneficiaries": None,
                 "Evidence for risk reduction": risk_evidence.strip(),
                 "ML duration estimate": estimated_duration,
@@ -568,9 +563,6 @@ with st.expander("Train and evaluate the ML cost model", expanded=False):
                     scope_quantity = prediction_cols[1].number_input(
                         "Scope quantity", min_value=0.0, value=100.0, step=10.0
                     )
-                    duration_months = prediction_cols[0].number_input(
-                        "Estimated duration (months)", min_value=0.0, value=6.0, step=1.0
-                    )
                     predict_cost = st.form_submit_button(
                         "Generate cost estimate", type="primary", use_container_width=True
                     )
@@ -582,7 +574,6 @@ with st.expander("Train and evaluate the ML cost model", expanded=False):
                         area_type=chosen_area,
                         scope_quantity=scope_quantity,
                         scope_unit=chosen_unit,
-                        duration_months=duration_months,
                     )
                     with st.container(border=True):
                         st.caption("MODEL-GENERATED INDICATIVE COST")
