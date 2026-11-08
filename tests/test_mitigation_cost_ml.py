@@ -28,13 +28,15 @@ def test_missing_schema_rejected():
 def test_training_reports_holdout_and_baseline():
     m=train_cost_model(records())["metrics"]
     assert m["records_used"]==80 and m["validation_records"]>=8
+    from src.mitigation_cost_ml import FEATURES
+    assert "duration_months" not in FEATURES
     assert m["mae_inr"]>=0 and m["baseline_mae_inr"]>=0
 
 def test_prediction_validation_and_error_band():
     model=train_cost_model(records())
     if not model["metrics"]["beats_baseline"]: pytest.skip("Fixture did not beat baseline.")
     result=estimate_cost(model,intervention="Drainage",area_type="Urban road",
-        scope_quantity=100,scope_unit="metres",duration_months=6)
+        scope_quantity=100,scope_unit="metres")
     assert result["lower_estimate_inr"]<=result["estimated_cost_inr"]<=result["upper_estimate_inr"]
     with pytest.raises(CostModelDataError):
         estimate_cost(model,intervention="Drainage",area_type="Urban road",
