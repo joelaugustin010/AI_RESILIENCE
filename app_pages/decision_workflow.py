@@ -1270,7 +1270,7 @@ except ValueError as exc:
     disaster_assessment = None
     st.error(f"Hazard-specific assessment input error: {exc}")
 else:
-    _render_ml_evidence(disaster_assessment.get("ml_evidence", {}))
+    shared_ml_evidence = disaster_assessment.get("ml_evidence", {})
 
 st.caption(
     "Your submitted hypothetical values are assessed here first. This output explains conditional consequences and, " 
@@ -1287,6 +1287,8 @@ st.metric("Scenario concern", prediction["concern_level"])
 st.markdown("**Potential outcome**")
 st.write(prediction["conditional_outcome"])
 st.caption(f"Scenario engine: {prediction['model_type']}. This immediate conditional outcome is rule-based; it is not the output of a trained ML model. Separate shared-ML inference is displayed below when a registered model's complete feature contract and evidence gates are satisfied. No official warning is produced.")
+if disaster_assessment is not None:
+    _render_ml_evidence(shared_ml_evidence)
 with st.expander("Why the model produced this output", expanded=True):
     st.markdown("**Evidence used**")
     for item in prediction["evidence_used"]:
