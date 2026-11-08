@@ -21,6 +21,7 @@ EXPECTED_PAGES = {
     "smart_mitigation_design",
     "submission_ml_demo",
     "module_explorer",
+    "mitigation_data_intelligence",
 }
 
 

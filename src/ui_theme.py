@@ -28,6 +28,26 @@ ACCENTS: dict[str, str] = {
     "rose": "#B94343",
 }
 
+# Local, reviewed visual context for each workspace. These are presentation
+# assets only; analytical outputs continue to come from the existing data
+# pipelines and retain their provenance and uncertainty boundaries.
+PAGE_MEDIA: dict[str, str] = {
+    "air-quality": "app/static/images/threats-monsoon.webp",
+    "compound-scenario": "app/static/images/hero-kerala-coast.jpg",
+    "data-readiness": "app/static/images/beauty-forest.webp",
+    "disaster-assistant": "app/static/images/beauty-backwaters.webp",
+    "disaster-probability": "app/static/images/hero-kerala-fallback.jpg",
+    "hazard-model-lab": "app/static/images/beauty-ghats.webp",
+    "hospital-vulnerability": "app/static/images/beauty-city.webp",
+    "kochi-map": "app/static/images/beauty-city.webp",
+    "mitigation-budget": "app/static/images/hero-kerala-flood-road.jpg",
+    "mitigation-data-intelligence": "app/static/images/beauty-forest.webp",
+    "smart-mitigation": "app/static/images/beauty-waterfall.webp",
+    "submission-ml-demo": "app/static/images/beauty-forest.webp",
+    "decision-workflow": "app/static/images/beauty-coast.webp",
+    "module-explorer": "app/static/images/beauty-backwaters.webp",
+}
+
 
 def _slug(value: str) -> str:
     slug = re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
@@ -63,7 +83,8 @@ def page_header(
 
     accent_hex = ACCENTS.get(accent, ACCENTS["teal"])
     container_key = f"ar-head-{_slug(key or title)}"
-    image_css = f"--ar-hero-image:url('{_escape(image)}');" if image else "--ar-hero-image:none;"
+    hero_image = image or PAGE_MEDIA.get(_slug(key or title))
+    image_css = f"--ar-hero-image:url('{_escape(hero_image)}');" if hero_image else "--ar-hero-image:none;"
     st.markdown(
         f"<style>.st-key-{container_key}{{--ar-accent:{accent_hex};{image_css}}}</style>",
         unsafe_allow_html=True,
@@ -85,6 +106,28 @@ def page_header(
         if meta:
             st.markdown(_meta_html(meta), unsafe_allow_html=True)
     research_status_notice(title)
+
+
+def render_page_intro(
+    page_id: str,
+    title: str,
+    description: str,
+    *,
+    eyebrow: str = "AI_RESILIENCE · ENVIRONMENTAL INTELLIGENCE",
+    tags: tuple[str, ...] = (),
+) -> None:
+    """Compatibility wrapper for photo-backed module introductions.
+
+    New and legacy workspaces use the same masthead implementation, so adding
+    a page cannot silently reintroduce the old unstyled title treatment.
+    """
+    page_header(
+        eyebrow,
+        title,
+        description,
+        meta=tags,
+        key=page_id,
+    )
 
 
 def section_intro(overline: str, title: str, description: str = "") -> None:
