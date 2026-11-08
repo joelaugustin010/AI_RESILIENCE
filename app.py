@@ -32,16 +32,6 @@ pages = {
             url_path="module_explorer",
         ),
         st.Page(
-            "app_pages/decision_workflow.py",
-            title="Decision Workflow",
-            icon=":material/assignment_turned_in:",
-        ),
-        st.Page(
-            "app_pages/disaster_assistant.py",
-            title="Disaster Intelligence Assistant",
-            icon=":material/psychology_alt:",
-        ),
-        st.Page(
             "app_pages/kochi_map.py",
             title="Kochi Map",
             icon=":material/map:",
