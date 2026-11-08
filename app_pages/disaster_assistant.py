@@ -32,13 +32,32 @@ st.markdown(
     .stApp { background: radial-gradient(circle at 100% 0%, #e3eee7 0, transparent 32rem), linear-gradient(180deg, #fbfaf5 0%, var(--air-ivory) 100%); color: var(--air-charcoal); }
     .block-container { max-width: 1120px; padding: 2.3rem 2rem 3rem; }
     [data-testid="stHeader"] { background: transparent; }
-    [data-testid="stSidebar"] { background: var(--air-forest); border-right: 0; }
+    /* Keep this page's conversation controls visually aligned with the
+       shared Coastal Intelligence navigation instead of overriding it. */
+    [data-testid="stSidebar"] {
+      background: linear-gradient(180deg, #E7F0EF 0%, #F5F7F5 58%, #FFFFFF 100%);
+      border-right: 1px solid rgba(23,78,85,.15);
+    }
     [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
-    [data-testid="stSidebar"] [data-testid="stCaptionContainer"] { color: #d6e5db; }
-    [data-testid="stSidebar"] h3 { color: #fffefa; font-weight: 700; }
-    [data-testid="stSidebar"] hr { border-color: rgba(255,255,255,.16); }
-    [data-testid="stSidebar"] .stButton > button { background: transparent; border-color: rgba(255,255,255,.18); color: #f3f8f3; text-align: left; }
-    [data-testid="stSidebar"] .stButton > button:hover { background: rgba(255,255,255,.10); border-color: #a9d1bb; }
+    [data-testid="stSidebar"] [data-testid="stCaptionContainer"] {
+      color: #526B6E !important;
+    }
+    [data-testid="stSidebar"] h3 {
+      color: #174E55 !important;
+      font-weight: 750;
+    }
+    [data-testid="stSidebar"] hr { border-color: rgba(23,78,85,.13); }
+    [data-testid="stSidebar"] .stButton > button {
+      background: rgba(255,255,255,.72);
+      border: 1px solid rgba(23,78,85,.16);
+      color: #31545A !important;
+      text-align: left;
+    }
+    [data-testid="stSidebar"] .stButton > button:hover {
+      background: #DCECE8;
+      border-color: rgba(41,155,145,.32);
+      color: #174E55 !important;
+    }
     h1, h2, h3, h4, p, li, label { color: var(--air-charcoal); }
     h1 { letter-spacing: -.035em; font-weight: 800; }
     [data-testid="stChatMessage"] { border: 1px solid var(--air-line); border-radius: 18px; margin: .8rem 0; padding: 1rem 1.1rem; animation: air-rise .32s ease-out both; }
