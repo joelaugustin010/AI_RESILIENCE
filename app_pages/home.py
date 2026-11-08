@@ -941,6 +941,15 @@ with st.container(key="ar-hero-ctas"):
             unsafe_allow_html=True,
         )
 
+st.warning(
+    "RESEARCH-GRADE SCREENING · AI_RESILIENCE is an evidence-gated research "
+    "demonstration and decision-support platform, not an operational early-warning "
+    "service. It does not claim validated Kochi flood probabilities, predicted "
+    "inundation depths, verified affected-population counts, or proven intervention "
+    "benefits. Follow official IMD, CWC, KSDMA and local-authority instructions "
+    "for real safety decisions."
+)
+
 st.markdown(
     """
     <div class="ar-signal" aria-label="Platform principles and scope">
