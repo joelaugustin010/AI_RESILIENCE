@@ -105,10 +105,10 @@ columns = [
     "Evidence for risk reduction",
     "ML duration estimate",
     "Estimation method",
-    "Site risk severity (1–5)",
-    "Urgency (1–5)",
-    "Evidence strength (1–5)",
-    "Implementation readiness (1–5)",
+    "site_risk_severity",
+    "urgency",
+    "evidence_strength",
+    "implementation_readiness",
 ]
 
 if "mitigation_project_records" not in st.session_state:
@@ -1249,7 +1249,7 @@ with st.expander("Portfolio analytics, budget scenarios and exports", expanded=F
     section_intro(
         "Decision intelligence",
         "Budget-constrained investment scenarios",
-        "Explore project combinations that maximize planner-assigned contribution points within the available budget. The optimiser is exact for the entered values; it does not predict flood reduction or decide public funding priorities.",
+        "Explore affordable project combinations using the transparent investment-priority scores above. The optimiser compares entered costs and human-assessed scores; it does not predict flood reduction or approve funding.",
     )
     
     if budget <= 0:
@@ -1259,14 +1259,14 @@ with st.expander("Portfolio analytics, budget scenarios and exports", expanded=F
         for _, project in plan.iterrows():
             try:
                 cost_value = float(project["Cost INR"])
-                value_points = int(project.get("Planner value points", 0))
             except (TypeError, ValueError):
                 continue
-            if pd.notna(cost_value) and cost_value > 0 and value_points > 0:
+            assessment = score_investment_priority(project.to_dict())
+            if pd.notna(cost_value) and cost_value > 0 and assessment["score"] is not None:
                 scenario_rows.append({
                     "name": f'{project["Intervention"]} · {project["Location"]}',
                     "cost_inr": cost_value,
-                    "value_points": value_points,
+                    "value_points": int(round(assessment["score"])),
                 })
         
         if not scenario_rows:
@@ -1291,6 +1291,6 @@ with st.expander("Portfolio analytics, budget scenarios and exports", expanded=F
                 st.info("No candidate project fits within the current budget.")
             st.caption(
                 "Method: exhaustive 0/1 portfolio search over the submitted project set. "
-                "The objective uses planner-entered points, not independently measured impact. "
+                "The objective uses weighted human-assessed priority scores, not independently measured impact. "
                 "Results are scenario comparisons—not engineering advice, risk predictions, or an automatic funding decision."
             )
