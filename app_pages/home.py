@@ -1432,6 +1432,53 @@ with sdg_workspace_cols_2[1]:
 with sdg_workspace_cols_2[2]:
     st.page_link("app_pages/kochi_map.py", label="SDG 15 · Ecological Context", icon="🌿")
 
+# SDGs are presented as practical entry points into the existing platform, not
+# as impact claims. Each pathway opens a real workspace and keeps the evidence
+# and limitations visible there.
+st.markdown(
+    """
+    <style>
+    .ar-sdg-actions {
+      margin: 1.2rem 0 2.4rem;
+      padding: clamp(1.15rem, 2.5vw, 1.8rem);
+      border: 1px solid rgba(36,122,101,.18);
+      border-radius: 22px;
+      background: linear-gradient(135deg, #173f35 0%, #1e6659 58%, #286f79 100%);
+      box-shadow: 0 18px 42px rgba(26,65,49,.14);
+    }
+    .ar-sdg-actions h3 { color:#fff!important; margin:0 0 .35rem!important; font-size:1.35rem!important; }
+    .ar-sdg-actions > p { color:#d7eee1!important; margin:0 0 1rem!important; max-width:780px; line-height:1.6; }
+    .ar-sdg-action-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.7rem; }
+    .ar-sdg-action {
+      display:flex; min-height:92px; flex-direction:column; justify-content:space-between;
+      padding:.9rem 1rem; border:1px solid rgba(225,247,235,.22); border-radius:15px;
+      background:rgba(255,255,255,.1); color:#f0fff5!important; text-decoration:none!important;
+      transition:transform .2s ease, background .2s ease, border-color .2s ease;
+    }
+    .ar-sdg-action:hover { transform:translateY(-3px); background:rgba(255,255,255,.18); border-color:rgba(225,247,235,.5); }
+    .ar-sdg-action strong { color:#fff!important; font-size:.86rem; }
+    .ar-sdg-action span { color:#c5e7d5; font-size:.74rem; line-height:1.45; }
+    .ar-sdg-action em { color:#b7f0d0; font-size:.7rem; font-style:normal; font-weight:750; }
+    @media(max-width:760px){.ar-sdg-action-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:480px){.ar-sdg-action-grid{grid-template-columns:1fr}.ar-sdg-action{min-height:0;gap:.45rem}}
+    @media(prefers-reduced-motion:reduce){.ar-sdg-action{transition:none}.ar-sdg-action:hover{transform:none}}
+    </style>
+    <section class="ar-sdg-actions" aria-labelledby="ar-sdg-action-title">
+      <h3 id="ar-sdg-action-title">Put the goals to work</h3>
+      <p>Use the platform's evidence and planning workspaces to explore a concrete question behind each SDG. The links below are capability pathways, not claims of official SDG progress.</p>
+      <div class="ar-sdg-action-grid">
+        <a class="ar-sdg-action" href="/hospital_vulnerability"><strong>SDG 3 · Protect care</strong><span>Review hospital vulnerability and continuity questions.</span><em>Open hospital workspace →</em></a>
+        <a class="ar-sdg-action" href="/kochi_map"><strong>SDG 6 · Understand water</strong><span>Inspect Kochi's mapped context and source coverage.</span><em>Open Kochi map →</em></a>
+        <a class="ar-sdg-action" href="/air_pollution"><strong>SDG 9 · Monitor air</strong><span>Examine pollutant evidence and monitoring readiness.</span><em>Open air workspace →</em></a>
+        <a class="ar-sdg-action" href="/decision_workflow"><strong>SDG 11 · Assess cities</strong><span>Move from a scenario to an evidence-gated decision review.</span><em>Open decision workflow →</em></a>
+        <a class="ar-sdg-action" href="/disaster_probability"><strong>SDG 13 · Review climate risk</strong><span>Compare hazard evidence without manufactured certainty.</span><em>Open hazard review →</em></a>
+        <a class="ar-sdg-action" href="/smart_mitigation_design"><strong>SDG 15 · Design with nature</strong><span>Explore transparent, nature-based mitigation concepts.</span><em>Open design studio →</em></a>
+      </div>
+    </section>
+    """,
+    unsafe_allow_html=True,
+)
+
 # Footer and credits
 # ---------------------------------------------------------------------------
 st.markdown(
