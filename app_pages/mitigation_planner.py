@@ -57,6 +57,30 @@ st.caption(
     "Budget comparison only; no automatic effectiveness ranking"
 )
 
+# Compact AI-first intake styling
+st.markdown(
+    """
+    <style>
+    div[data-testid="stExpander"] details summary p {
+        font-weight: 650;
+        color: #174E55;
+        font-size: 0.94rem;
+    }
+    div[data-testid="stMetric"] {
+        background: rgba(220, 231, 232, 0.38);
+        border: 1px solid rgba(23, 78, 85, 0.10);
+        border-radius: 12px;
+        padding: 10px 12px;
+    }
+    div[data-testid="stForm"] button[kind="primaryFormSubmit"] {
+        min-height: 2.8rem;
+        font-weight: 700;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 budget = st.number_input("Available budget (INR)", min_value=0, value=0, step=100000)
 st.caption("Enter estimates only when you have a source, date, scope, and unit basis. Blank cost means unknown.")
 
@@ -135,27 +159,28 @@ with st.container(border=True):
         )
         area_type = form_cols[0].selectbox("Area context", area_options)
         scope_unit = form_cols[1].selectbox("Scope measurement unit", unit_options)
-        scope_cols = st.columns(3)
-        scope_quantity = scope_cols[0].number_input(
+        scope_quantity = st.number_input(
             "Scope quantity", min_value=0.0, value=100.0, step=10.0
         )
-        duration_months = scope_cols[1].number_input(
-            "Expected duration input (months)", min_value=0.0, value=6.0, step=1.0,
-            help="Used as a cost-model input. The duration model estimates duration separately."
-        )
-        manual_cost = scope_cols[2].number_input(
-            "Known quotation / manual cost (₹)", min_value=0.0, value=0.0, step=10000.0,
-            help="Optional fallback for a draft. Leave at zero when unknown."
-        )
-        source_reference = st.text_input(
-            "Quotation / survey / source reference",
-            placeholder="Add a traceable reference, if available",
-        )
-        risk_evidence = st.text_area(
-            "Supporting site or risk evidence",
-            placeholder="Describe the site issue or cite a survey, report or assessment.",
-            height=90,
-        )
+        with st.expander("Optional details · quotation, schedule and evidence", expanded=False):
+            duration_months = scope_cols[1].number_input(
+                "Expected duration input (months)", min_value=0.0, value=6.0, step=1.0,
+                help="Used as a cost-model input. The duration model estimates duration separately."
+            )
+            manual_cost = scope_cols[2].number_input(
+                "Known quotation / manual cost (₹)", min_value=0.0, value=0.0, step=10000.0,
+                help="Optional fallback for a draft. Leave at zero when unknown."
+            )
+            source_reference = st.text_input(
+                "Quotation / survey / source reference",
+                placeholder="Add a traceable reference, if available",
+            )
+            risk_evidence = st.text_area(
+                "Supporting site or risk evidence",
+                placeholder="Describe the site issue or cite a survey, report or assessment.",
+                height=90,
+            )
+
         submit_project = st.form_submit_button(
             "Generate AI project profile",
             type="primary",
