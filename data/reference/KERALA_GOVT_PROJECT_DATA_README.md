@@ -55,3 +55,21 @@ The current 23-row dataset does **not** unlock ML. Cost records without duration
 ## Next collection priorities
 
 Prioritise additional KWA, LSGD/Sulekha, KIIDC, PWD and Irrigation Department project profiles where project-level completed status, final paid expenditure or clearly defined cost-of-completion, measurable scope, and traceable references are available. Keep separate source cohorts when their cost basis or scope units differ.
+
+
+## Supplemental government and private-sector collection (8 November 2026)
+
+A separate lead register is maintained at `mitigation_project_supplemental_candidates.csv`. It contains four additional project references identified from official government/audit pages and private-sector project portfolios:
+
+- KIIDC Kuppithodu regulator: official project page reports construction dates, completed status and ₹55.82 crore project cost; the project is multi-component and its scope is not yet suitable for the current single-quantity model.
+- Kochi Elamkulam 5 MLD STP: CAG audit reports physical completion in May 2022 and expenditure of ₹12.06 crore; commissioning followed in October 2024. No verified start date was captured, so duration is blank.
+- Rajagiri institutional STP, Aluva: contractor portfolio lists a ₹4,39,96,403 contract amount, but its additional-work field repeats the same amount and final paid expenditure/completion date are not stated.
+- Hotel Food Magic 6 KLD STP, Kunnamkulam: vendor case study reports a ₹5.9 lakh turnkey value and operational installation, but no completion date or independent final expenditure.
+
+The supplemental file is a **source-lead and audit register**, not an extension of the ML training CSV. All four records are currently marked not eligible for ML; the Elamkulam record is a cost-model review candidate only after feature and cohort comparability checks. Contract values, vendor-reported values and audited expenditure must not be pooled as if they were identical cost targets.
+
+Additional aggregate context (not project-level training rows): AMRUT Kerala's city-wise progress page reports Kochi storm-water drainage (SWD) 49 projects, 48 completed and ₹45.45 crore expenditure as at 31 August 2024. These are aggregate statistics and must not be expanded into 49 fabricated project records:
+https://amrutkerala.org/city-wise-progress/
+
+Other official discovery source: KIIDC completed-projects listing:
+https://kiidc.kerala.gov.in/category/our-current-projects/completed-projects/
