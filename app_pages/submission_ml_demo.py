@@ -4,11 +4,13 @@ This page is deliberately evidence-led: it displays persisted model cards and
 validation boundaries, never invents a live forecast or turns a research score
 into a disaster probability.
 """
-from src.dataframe_display import display_dataframe
 from __future__ import annotations
+
 
 import pandas as pd
 import streamlit as st
+
+from src.dataframe_display import display_dataframe
 
 from src.ml.coverage import build_coverage_matrix
 from src.ml.presentation import card_rows, model_rows
