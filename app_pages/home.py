@@ -180,13 +180,17 @@ st.markdown(
       object-fit: cover !important;
       opacity: 0;
       filter: saturate(.96) contrast(1.04);
-      animation: arSlideCycle 32s cubic-bezier(.45, .05, .55, .95) infinite;
+      animation: arSlideCycle 64s cubic-bezier(.45, .05, .55, .95) infinite;
       will-change: opacity, transform;
     }
     .ar-cine-hero .ar-slide-a { object-position: center 56%; animation-delay: 0s; }
     .ar-cine-hero .ar-slide-b { object-position: center 46%; animation-delay: -8s; }
     .ar-cine-hero .ar-slide-c { object-position: center 52%; animation-delay: -16s; }
     .ar-cine-hero .ar-slide-d { object-position: center 50%; animation-delay: -24s; }
+    .ar-cine-hero .ar-slide-e { object-position: center 50%; animation-delay: -32s; }
+    .ar-cine-hero .ar-slide-f { object-position: center 50%; animation-delay: -40s; }
+    .ar-cine-hero .ar-slide-g { object-position: center 50%; animation-delay: -48s; }
+    .ar-cine-hero .ar-slide-h { object-position: center 50%; animation-delay: -56s; }
     .ar-cine-hero .ar-cine-video {
       z-index: 1;
       object-fit: cover !important;
@@ -875,13 +879,21 @@ st.markdown(
     f"""
     <section class="ar-cine-hero" aria-label="AI RESILIENCE - Kochi environmental and disaster intelligence">
       <div class="ar-cine-media" aria-hidden="true">
-        <img class="ar-cine-poster ar-cine-slide ar-slide-a" src="{_img('hero-kerala-fallback.jpg')}"
+        <img class="ar-cine-poster ar-cine-slide ar-slide-a" src="{_img('kochi/waterfront.jpg')}"
              alt="" fetchpriority="high" decoding="async">
-        <img class="ar-cine-slide ar-slide-b" src="{_img('hero-kerala-ghats.jpg')}"
+        <img class="ar-cine-slide ar-slide-b" src="{_img('kochi/backwaters.jpg')}"
              alt="" decoding="async">
-        <img class="ar-cine-slide ar-slide-c" src="{_img('hero-kerala-landslide.jpg')}"
+        <img class="ar-cine-slide ar-slide-c" src="{_img('kochi/mangalavanam.jpg')}"
              alt="" decoding="async">
-        <img class="ar-cine-slide ar-slide-d" src="{_img('hero-kerala-coast.jpg')}"
+        <img class="ar-cine-slide ar-slide-d" src="{_img('kochi/fishing-nets.jpg')}"
+             alt="" decoding="async">
+        <img class="ar-cine-slide ar-slide-e" src="{_img('kochi/coast.jpg')}"
+             alt="" decoding="async">
+        <img class="ar-cine-slide ar-slide-f" src="{_img('kochi/industrial-coast.jpg')}"
+             alt="" decoding="async">
+        <img class="ar-cine-slide ar-slide-g" src="{_img('kochi/maradu.jpg')}"
+             alt="" decoding="async">
+        <img class="ar-cine-slide ar-slide-h" src="{_img('kochi/water-metro.jpg')}"
              alt="" decoding="async">{VIDEO_MARKUP}
         <span class="ar-cine-scrim"></span>
         <span class="ar-cine-vignette"></span>

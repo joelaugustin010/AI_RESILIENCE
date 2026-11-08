@@ -32,20 +32,20 @@ ACCENTS: dict[str, str] = {
 # assets only; analytical outputs continue to come from the existing data
 # pipelines and retain their provenance and uncertainty boundaries.
 PAGE_MEDIA: dict[str, str] = {
-    "air-quality": "app/static/images/threats-monsoon.webp",
-    "compound-scenario": "app/static/images/hero-kerala-coast.jpg",
-    "data-readiness": "app/static/images/beauty-forest.webp",
-    "disaster-assistant": "app/static/images/beauty-backwaters.webp",
-    "disaster-probability": "app/static/images/hero-kerala-fallback.jpg",
-    "hazard-model-lab": "app/static/images/beauty-ghats.webp",
-    "hospital-vulnerability": "app/static/images/beauty-city.webp",
-    "kochi-map": "app/static/images/beauty-city.webp",
-    "mitigation-budget": "app/static/images/hero-kerala-flood-road.jpg",
-    "mitigation-data-intelligence": "app/static/images/beauty-forest.webp",
-    "smart-mitigation": "app/static/images/beauty-waterfall.webp",
-    "submission-ml-demo": "app/static/images/beauty-forest.webp",
-    "decision-workflow": "app/static/images/beauty-coast.webp",
-    "module-explorer": "app/static/images/beauty-backwaters.webp",
+    "air-quality": "app/static/images/kochi/industrial-coast.jpg",
+    "compound-scenario": "app/static/images/kochi/waterfront.jpg",
+    "data-readiness": "app/static/images/kochi/mangalavanam.jpg",
+    "disaster-assistant": "app/static/images/kochi/backwaters.jpg",
+    "disaster-probability": "app/static/images/kochi/maradu.jpg",
+    "hazard-model-lab": "app/static/images/kochi/coast.jpg",
+    "hospital-vulnerability": "app/static/images/kochi/water-metro.jpg",
+    "kochi-map": "app/static/images/kochi/waterfront.jpg",
+    "mitigation-budget": "app/static/images/kochi/coast.jpg",
+    "mitigation-data-intelligence": "app/static/images/kochi/mangalavanam.jpg",
+    "smart-mitigation": "app/static/images/kochi/mangalavanam.jpg",
+    "submission-ml-demo": "app/static/images/kochi/backwaters.jpg",
+    "decision-workflow": "app/static/images/kochi/water-metro.jpg",
+    "module-explorer": "app/static/images/kochi/fishing-nets.jpg",
 }
 
 
