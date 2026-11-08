@@ -59,7 +59,7 @@ Prioritise additional KWA, LSGD/Sulekha, KIIDC, PWD and Irrigation Department pr
 
 ## Supplemental government and private-sector collection (8 November 2026)
 
-A separate lead register is maintained at `mitigation_project_supplemental_candidates.csv`. It contains fourteen project references identified from official government/audit pages and private-sector project portfolios:
+A separate lead register is maintained at `mitigation_project_supplemental_candidates.csv`. It contains nineteen project references identified from official government/audit pages and private-sector project portfolios:
 
 - KIIDC Kuppithodu regulator: official project page reports construction dates, completed status and ₹55.82 crore project cost; the project is multi-component and its scope is not yet suitable for the current single-quantity model.
 - Kochi Elamkulam 5 MLD STP: CAG audit reports physical completion in May 2022 and expenditure of ₹12.06 crore; commissioning followed in October 2024. No verified start date was captured, so duration is blank.
@@ -86,7 +86,7 @@ KIIDC's completed-project listing includes Punnamada post-flood renovation; the 
 
 
 ### Further KWA project leads reviewed (8 November 2026)
-Four additional KWA PASK profiles have been added to the supplemental register, bringing it to **14 source leads** (the separate core training CSV remains at **29 records**):
+Four additional KWA PASK profiles have been added to the supplemental register, bringing it to **19 source leads** (the separate core training CSV remains at **29 records**):
 - Paittukattu lane, Division 36, Kochi Corporation: 63 mm PVC pipeline extension; ₹62,000 AS/TS; profile has no final bill paid or actual completion date, and no pipe length.
 - Honest Byline Road, Kalamassery: ₹80,000 AS/TS; profile shows completed status but no actual completion date, no scope quantity and no final paid expenditure.
 - Nanma One apartment complex, Vyttila/Tripunithura: ₹560,000 AS and ₹490,000 TS; completed 16 July 2026, but bill submitted/paid fields are both zero and scope quantity is absent.
@@ -106,3 +106,24 @@ The supplemental register now contains **14 source leads**. Three more KWA PASK 
 - Kochi Corporation Kumbalapilly bye-lane, Division 47/33: total bill paid ₹2,77,439; profile reports completion 3 March 2024, but its coverage field says work ongoing and dated status updates continue into April 2024. The reported start/completion interval also requires source verification; pipeline length is not reported.
 
 Although these profiles contain bill-paid values, all three remain **not ML-eligible** because comparable installed pipe length is absent and the status/date fields require reconciliation. They must not be used as cost-per-metre examples or duration labels until source documents resolve these issues.
+
+
+## Additional programme and project evidence (8 November 2026)
+
+### Kerala AMRUT sector aggregate dataset
+A separate aggregate evidence file, `kerala_amrut_sector_aggregates.csv`, has been added from the LSGD Kerala AMRUT programme page:
+https://lsgd.kerala.gov.in/en/centrally-sponsored-schemes/through-lsgd/mohua/amrut/
+
+It contains three state-level sector rows (water supply, sewerage and storm-water drainage), including programme project counts, reported project values, completed counts, expenditure and physical progress metrics. The source page does not state a reporting date; the dataset preserves that as unknown rather than inventing one. These are programme aggregates, **not project-level training records**, and the file marks them ineligible for ML.
+
+Key reported storm-water drainage figures are 536 projects, 502 completed, ₹336.83 crore programme value, ₹289.74 crore expenditure, 324 km of 337 km drainage network achieved, and 1,320 of 1,395 waterlogging points reported eliminated. Sewerage reports 109 of 152 projects completed and 75 km of 103 km sewerage network achieved. Water supply reports 172 of 217 projects completed and 1,806 km of 2,084 km network achieved. These state-level aggregates must not be attributed to Kochi.
+
+### Five additional government source leads
+The supplemental register now contains **19 source leads** (the core training CSV remains at 29 records):
+- Jalanidhi Chakkumkuzhy BG, Parathode: total bill paid ₹4,80,301; start 30 December 2022; completed 22 September 2023. Multi-component scope, so not a comparable unit-cost record.
+- Jalanidhi Pathickal BG, Karoor: total bill paid ₹6,77,662; start 1 July 2022; completed 30 November 2022. Scope quantity lacks a unit and pipe length is absent.
+- Jalanidhi Cherupuzha rainwater-harvesting programme: 200 planned units, total bill paid ₹1,86,83,360, start 1 February 2023, completion 25 April 2024. Latest visible status narrative itemises 171 units, so cost denominator needs reconciliation.
+- KWA Palarivattom–Thammanam pipeline Package II: 1,890 m of 160 mm PVC pipe, completed 2 August 2025; final paid bill and start date are absent.
+- KWA Kannur Puzhathi Zone I pipeline project: 9.6 km pipe and 915 household connections reported, total bill paid ₹1,12,37,537 versus ₹1,65,54,275 submitted. Payment is not established as final, and start date is absent.
+
+None of these five leads is marked ML-eligible. Do not convert paid-to-date amounts into final project costs when submitted bills are higher or final accounts are unresolved.
