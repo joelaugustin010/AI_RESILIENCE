@@ -262,15 +262,15 @@ st.markdown(
     /* ---------- AI_RESILIENCE product navigation ---------- */
     [class*="st-key-ar-top-navigation"] {
       position: sticky;
-      top: .45rem;
+      top: .7rem;
       z-index: 40;
       display: flex;
       align-items: center;
       gap: .3rem;
-      margin: -.25rem 0 1.1rem;
-      padding: .48rem .62rem;
+      margin: -.15rem 0 1.35rem;
+      padding: .68rem .78rem;
       border: 1px solid rgba(130,190,199,.22);
-      border-radius: 18px;
+      border-radius: 28px;
       background: rgba(6,19,31,.78);
       box-shadow: 0 14px 34px rgba(0,0,0,.18);
       backdrop-filter: blur(18px) saturate(1.2);
@@ -281,13 +281,13 @@ st.markdown(
     }
     [class*="st-key-ar-top-navigation"] [data-testid="stPageLink-NavLink"],
     [class*="st-key-ar-top-navigation"] [data-testid="stPopover"] > button {
-      min-height: 2.15rem;
-      padding: .38rem .72rem !important;
+      min-height: 2.55rem;
+      padding: .48rem .84rem !important;
       border: 1px solid transparent !important;
       border-radius: 999px !important;
       color: #e9fbfa !important;
       background: transparent !important;
-      font-size: .79rem !important;
+      font-size: .82rem !important;
       font-weight: 760 !important;
       white-space: nowrap;
       transition: background .18s var(--ar-ease), border-color .18s var(--ar-ease), transform .18s var(--ar-ease);
@@ -305,8 +305,8 @@ st.markdown(
     [class*="st-key-ar-top-navigation"] [data-testid="stMarkdownContainer"] a {
       display: inline-flex;
       align-items: center;
-      min-height: 2.15rem;
-      padding: .38rem .72rem;
+      min-height: 2.55rem;
+      padding: .48rem .84rem;
       border-radius: 999px;
       color: #e9fbfa !important;
       font-size: .79rem;
@@ -332,7 +332,7 @@ st.markdown(
     [class*="st-key-ar-brand"] [data-testid="stMarkdownContainer"] p {
       margin: 0;
       color: #f4ffff !important;
-      font-size: .92rem;
+      font-size: 1.04rem;
       font-weight: 880;
       letter-spacing: -.02em;
       white-space: nowrap;
@@ -341,7 +341,7 @@ st.markdown(
       display: block;
       margin-top: .08rem;
       color: #82e7d4 !important;
-      font-size: .56rem;
+      font-size: .61rem;
       font-weight: 700;
       letter-spacing: .14em;
       text-transform: uppercase;
@@ -362,9 +362,9 @@ st.markdown(
       [class*="st-key-ar-brand"] { min-width:145px; }
     }
     @media(max-width:560px){
-      [class*="st-key-ar-top-navigation"] { margin-top: -.15rem; padding: .38rem; }
+      [class*="st-key-ar-top-navigation"] { margin-top: -.05rem; padding: .5rem; border-radius: 22px; }
       [class*="st-key-ar-top-navigation"] [data-testid="stPageLink-NavLink"],
-      [class*="st-key-ar-top-navigation"] [data-testid="stPopover"] > button { font-size: .72rem !important; padding-inline: .55rem !important; }
+      [class*="st-key-ar-top-navigation"] [data-testid="stPopover"] > button { font-size: .72rem !important; padding-inline: .6rem !important; min-height: 2.25rem; }
     }
 
     [data-testid="stSidebarNav"] { display: none !important; }
