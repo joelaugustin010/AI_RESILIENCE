@@ -24,6 +24,19 @@ FEATURES = CATS + NUMS
 def train_duration_model(records: pd.DataFrame) -> dict[str, Any]:
     """Train an evidence-gated duration model and compare it with a median baseline."""
     frame = prepare_cost_records(records)
+    if "duration_months" not in records.columns:
+        raise CostModelDataError("Missing required duration outcome: duration_months.")
+    durations = pd.to_numeric(records["duration_months"], errors="coerce")
+    frame = frame.join(durations.rename("duration_months"))
+    frame = frame.loc[
+        frame["duration_months"].notna()
+        & frame["duration_months"].map(lambda value: math.isfinite(float(value)) and float(value) > 0)
+    ].reset_index(drop=True)
+    if len(frame) < 40:
+        raise CostModelDataError(
+            f"Only {len(frame)} complete, sourced records include a valid duration. "
+            "At least 40 are required before delivery-model training."
+        )
     X = frame.loc[:, list(FEATURES)]
     y = frame["duration_months"].astype(float)
     n_test = max(8, math.ceil(len(frame) * 0.2))
