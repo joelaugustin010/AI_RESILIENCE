@@ -1287,8 +1287,6 @@ st.metric("Scenario concern", prediction["concern_level"])
 st.markdown("**Potential outcome**")
 st.write(prediction["conditional_outcome"])
 st.caption(f"Scenario engine: {prediction['model_type']}. This immediate conditional outcome is rule-based; it is not the output of a trained ML model. Separate shared-ML inference is displayed below when a registered model's complete feature contract and evidence gates are satisfied. No official warning is produced.")
-if disaster_assessment is not None:
-    _render_ml_evidence(shared_ml_evidence)
 with st.expander("Why the scenario engine produced this output", expanded=False):
     st.markdown("**Evidence used**")
     for item in prediction["evidence_used"]:
@@ -1307,6 +1305,7 @@ display_dataframe(scenario_screen, hide_index=True, width="stretch")
 st.header("3. Key hazard assessment and recommended precautions")
 if disaster_assessment is not None:
     _render_disaster_assessment(disaster_assessment)
+    _render_ml_evidence(shared_ml_evidence)
 else:
     st.warning("The hazard-specific assessment is unavailable because the submitted inputs did not pass its validation.")
 
