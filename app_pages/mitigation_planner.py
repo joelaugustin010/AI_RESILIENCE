@@ -31,6 +31,7 @@ def format_inr(amount):
 from src.decision_workflow import budget_summary
 from src.mitigation_optimizer import optimize_portfolio
 from src.mitigation_investment import score_investment_priority
+from src.mitigation_priority_ml import predict_priority, prepare_priority_records
 from src.mitigation_intelligence import (
     design_recommendations,
     review_project_register,
@@ -113,6 +114,8 @@ columns = [
 if "mitigation_project_records" not in st.session_state:
     st.session_state["mitigation_project_records"] = []
 
+priority_model = st.session_state.get("mitigation_priority_ml_model")
+priority_ml_ready = bool(priority_model and priority_model.get("metrics", {}).get("beats_baseline"))
 cost_model = st.session_state.get("mitigation_cost_ml_model")
 duration_model = st.session_state.get("mitigation_duration_ml_model")
 cost_ready = bool(cost_model and cost_model.get("metrics", {}).get("beats_baseline"))
@@ -124,10 +127,11 @@ section_intro(
     "Create a project record once. Validated historical models may estimate cost and delivery; otherwise the record remains an unpredicted draft.",
 )
 
-status_cols = st.columns(3)
-status_cols[0].metric("Historical cost model", "Ready" if cost_ready else "Awaiting evidence")
-status_cols[1].metric("Delivery model", "Ready" if duration_ready else "Awaiting evidence")
-status_cols[2].metric("Projects in portfolio", len(st.session_state["mitigation_project_records"]))
+status_cols = st.columns(4)
+status_cols[0].metric("Priority ML", "Ready" if priority_ml_ready else "Awaiting labels")
+status_cols[1].metric("Historical cost model", "Ready" if cost_ready else "Awaiting evidence")
+status_cols[2].metric("Delivery model", "Ready" if duration_ready else "Awaiting evidence")
+status_cols[3].metric("Projects in portfolio", len(st.session_state["mitigation_project_records"]))
 
 if not cost_ready:
     st.info(
@@ -258,6 +262,8 @@ with st.container(border=True):
                 "Location": project_location.strip(),
                 "Project Status": "Proposed",
                 "Priority": "Not assessed",
+                "ML priority confidence": None,
+                "Priority method": "Awaiting assessment",
                 "Cost INR": estimated_cost,
                 "Source / estimate date": (
                     ("ML estimate · validation required" if "ML cost estimate" in method_parts
@@ -274,6 +280,16 @@ with st.container(border=True):
                 "implementation_readiness": implementation_readiness,
             }
             record["Priority"] = score_investment_priority(record)["band"]
+            if priority_ml_ready:
+                try:
+                    priority_prediction = predict_priority(priority_model, record)
+                    record["Priority"] = priority_prediction["predicted_priority"]
+                    record["ML priority confidence"] = round(priority_prediction["confidence"], 4)
+                    record["Priority method"] = "Supervised ML · human review required"
+                except Exception:
+                    record["Priority method"] = "Human assessment fallback · ML input not eligible"
+            else:
+                record["Priority method"] = "Human assessment fallback · ML labels not available"
             st.session_state["mitigation_project_records"].append(record)
             st.success(
                 "Project profile added. "
@@ -295,11 +311,19 @@ else:
     ranked_rows = []
     for _, project in plan.iterrows():
         assessment = score_investment_priority(project.to_dict())
+        ml_prediction = None
+        if priority_ml_ready:
+            try:
+                ml_prediction = predict_priority(priority_model, project.to_dict())
+            except Exception:
+                ml_prediction = None
         ranked_rows.append({
             "Project": project.get("Intervention", "Unnamed"),
             "Location": project.get("Location", "Not specified"),
             "Priority score": assessment["score"],
             "Assessment": assessment["band"],
+            "ML predicted priority": ml_prediction["predicted_priority"] if ml_prediction else "Not available",
+            "ML confidence": (str(round(ml_prediction["confidence"] * 100, 1)) + "%") if ml_prediction else "—",
             "Risk (1–5)": assessment["criteria"].get("site_risk_severity", "—"),
             "Urgency (1–5)": assessment["criteria"].get("urgency", "—"),
             "Evidence (1–5)": assessment["criteria"].get("evidence_strength", "—"),
@@ -325,9 +349,7 @@ else:
         with st.expander(f"Projects needing assessment ({len(incomplete_df)})", expanded=False):
             display_dataframe(incomplete_df, hide_index=True, use_container_width=True)
     st.caption(
-        "Method: site risk 35%, urgency 25%, evidence strength 20%, implementation readiness 20%. "
-        "Each input is a human assessment on a 1–5 scale. This is a transparent prioritisation aid, "
-        "not an ML prediction, measured effectiveness score, or funding approval."
+        "The weighted score remains a transparent human-assessment fallback. When a separately trained, labelled priority classifier passes its holdout baseline, its predicted category and confidence appear alongside the score. Neither method measures intervention effectiveness or approves funding."
     )
 
 section_intro("Project portfolio", "Mitigation project portfolio")
@@ -416,6 +438,73 @@ with st.expander("Connected Design Studio review", expanded=False):
             "share its current settings with this planning page. Your project "
             "register remains available independently."
         )
+
+with st.expander("Train and evaluate the ML investment-priority model", expanded=False):
+    from src.mitigation_priority_ml import PriorityModelDataError, train_priority_model
+
+    st.markdown("#### Learn from completed, expert-reviewed projects")
+    st.write(
+        "This supervised classifier learns historical priority labels from the four "
+        "assessment fields. It does not learn from the app's own weighted rule score. "
+        "Use only labels assigned to real completed projects by an accountable reviewer."
+    )
+    priority_template = pd.DataFrame(columns=[
+        "site_risk_severity", "urgency", "evidence_strength",
+        "implementation_readiness", "historical_priority_label", "source_reference"
+    ])
+    template_col, upload_col = st.columns([1, 2])
+    with template_col:
+        st.download_button(
+            "Download priority ML template",
+            data=priority_template.to_csv(index=False).encode("utf-8"),
+            file_name="AI_RESILIENCE_priority_ML_template.csv",
+            mime="text/csv", key="priority_ml_template", use_container_width=True,
+        )
+    with upload_col:
+        priority_upload = st.file_uploader(
+            "Upload labelled historical project CSV", type=["csv"], key="priority_ml_upload",
+            help="Minimum 40 complete records; each priority class needs at least 5 records."
+        )
+    if priority_upload is not None:
+        try:
+            priority_upload.seek(0)
+            priority_records = pd.read_csv(priority_upload)
+            priority_valid = prepare_priority_records(priority_records)
+            count_cols = st.columns(3)
+            count_cols[0].metric("Usable labelled records", len(priority_valid))
+            count_cols[1].metric("Priority classes", priority_valid["historical_priority_label"].nunique())
+            count_cols[2].metric("Unique source references", priority_valid["source_reference"].nunique())
+            st.dataframe(
+                priority_valid["historical_priority_label"].value_counts().rename_axis("Historical label").reset_index(name="Records"),
+                hide_index=True, use_container_width=True
+            )
+            if st.button("Train priority ML model", type="primary", key="train_priority_ml"):
+                try:
+                    st.session_state["mitigation_priority_ml_model"] = train_priority_model(priority_records)
+                    st.success("Priority classifier trained and evaluated.")
+                except PriorityModelDataError as exc:
+                    st.session_state.pop("mitigation_priority_ml_model", None)
+                    st.warning(str(exc))
+        except (PriorityModelDataError, pd.errors.ParserError, UnicodeDecodeError, ValueError) as exc:
+            st.warning(f"Priority dataset is not ready: {exc}")
+    priority_model = st.session_state.get("mitigation_priority_ml_model")
+    if priority_model:
+        metrics = priority_model["metrics"]
+        metric_cols = st.columns(4)
+        metric_cols[0].metric("Training records", metrics["training_records"])
+        metric_cols[1].metric("Holdout records", metrics["validation_records"])
+        metric_cols[2].metric("Model accuracy", f'{metrics["accuracy"]:.1%}')
+        metric_cols[3].metric("Majority baseline", f'{metrics["baseline_accuracy"]:.1%}')
+        st.caption(
+            f'{metrics["validation_method"]} · Balanced accuracy: {metrics["balanced_accuracy"]:.1%}'
+        )
+        if metrics["beats_baseline"]:
+            st.success("Model passed the majority-class baseline check. Predictions can be shown as decision support.")
+        else:
+            st.warning("Model is not approved for predictions because it did not beat the majority-class baseline.")
+        st.caption("The model is session-only and must be retrained after a new app session. Confidence is model probability, not a guarantee. Human review remains required.")
+    else:
+        st.info("Priority ML is waiting for labelled historical data. Existing human assessments remain visible as a fallback; no priority labels are fabricated.")
 
 with st.expander("Train and evaluate the ML cost model", expanded=False):
     # ============================================================
