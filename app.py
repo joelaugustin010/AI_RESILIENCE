@@ -1627,3 +1627,114 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+
+// AI RESILIENCE — final text-contrast correction.
+// Scoped to Streamlit's native text and controls; custom cinematic panels,
+// charts, maps, severity colours and page-specific HTML remain untouched.
+st.markdown(
+    """
+    <style>
+    /* Native page copy: use a consistent dark-ink hierarchy on light surfaces. */
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > p,
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > ul,
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > ol,
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > blockquote,
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > div > p {
+      color: #31545A !important;
+      line-height: 1.68 !important;
+    }
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > h1,
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > h2,
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > h3,
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > h4,
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > div > h1,
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > div > h2,
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > div > h3 {
+      color: #174E55 !important;
+      line-height: 1.28 !important;
+    }
+    [data-testid="stMain"] [data-testid="stCaptionContainer"],
+    [data-testid="stMain"] [data-testid="stCaptionContainer"] *,
+    [data-testid="stMain"] [data-testid="stWidgetLabel"],
+    [data-testid="stMain"] [data-testid="stWidgetLabel"] * {
+      color: #52666A !important;
+      opacity: 1 !important;
+    }
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] a {
+      color: #176F70 !important;
+      text-decoration: underline;
+      text-decoration-thickness: .06em;
+      text-underline-offset: .16em;
+    }
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] a:hover {
+      color: #174E55 !important;
+    }
+
+    /* Make small utility text readable without changing status semantics. */
+    [data-testid="stMain"] small,
+    [data-testid="stMain"] [data-testid="stHelp"],
+    [data-testid="stMain"] [data-testid="stTooltipContent"] {
+      color: #52666A !important;
+    }
+    [data-testid="stMain"] [data-testid="stAlert"] p,
+    [data-testid="stMain"] [data-testid="stAlert"] li {
+      color: #31545A !important;
+      line-height: 1.6 !important;
+    }
+    [data-testid="stMain"] [data-testid="stExpander"] summary,
+    [data-testid="stMain"] [data-testid="stExpander"] summary p {
+      color: #174E55 !important;
+      font-weight: 650 !important;
+    }
+
+    /* Controls, including disabled and placeholder states. */
+    [data-testid="stMain"] input,
+    [data-testid="stMain"] textarea,
+    [data-testid="stMain"] [data-baseweb="select"] *,
+    [data-testid="stMain"] [data-baseweb="input"] *,
+    [data-testid="stMain"] [data-baseweb="textarea"] * {
+      color: #17383B !important;
+    }
+    [data-testid="stMain"] input::placeholder,
+    [data-testid="stMain"] textarea::placeholder {
+      color: #718486 !important;
+      opacity: 1 !important;
+    }
+    [data-testid="stMain"] [data-testid="stRadio"] label,
+    [data-testid="stMain"] [data-testid="stCheckbox"] label,
+    [data-testid="stMain"] [data-testid="stToggle"] label,
+    [data-testid="stMain"] [data-testid="stSlider"] label {
+      color: #31545A !important;
+    }
+    [data-testid="stMain"] [data-testid="stTabs"] button {
+      color: #52666A !important;
+      font-weight: 650 !important;
+    }
+    [data-testid="stMain"] [data-testid="stTabs"] button[aria-selected="true"] {
+      color: #174E55 !important;
+    }
+
+    /* Tables and dataframe headers need enough contrast at small sizes. */
+    [data-testid="stMain"] [data-testid="stDataFrame"] [role="columnheader"],
+    [data-testid="stMain"] [data-testid="stDataFrame"] [role="rowheader"],
+    [data-testid="stMain"] [data-testid="stTable"] th {
+      color: #174E55 !important;
+      font-weight: 700 !important;
+    }
+    [data-testid="stMain"] [data-testid="stTable"] td {
+      color: #31545A !important;
+    }
+
+    /* Preserve white typography inside the intentionally dark photo mastheads. */
+    [data-testid="stMain"] [class*="st-key-ar-head-"] h1,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-title {
+      color: #FFFFFF !important;
+    }
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-copy {
+      color: #E5F0EF !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
