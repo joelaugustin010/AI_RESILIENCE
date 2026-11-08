@@ -163,11 +163,11 @@ with st.container(border=True):
             "Scope quantity", min_value=0.0, value=100.0, step=10.0
         )
         with st.expander("Optional details · quotation, schedule and evidence", expanded=False):
-            duration_months = scope_cols[1].number_input(
+            duration_months = st.number_input(
                 "Expected duration input (months)", min_value=0.0, value=6.0, step=1.0,
-                help="Used as a cost-model input. The duration model estimates duration separately."
+                help="Optional planning context for the cost model; the duration model estimates delivery time separately."
             )
-            manual_cost = scope_cols[2].number_input(
+            manual_cost = st.number_input(
                 "Known quotation / manual cost (₹)", min_value=0.0, value=0.0, step=10000.0,
                 help="Optional fallback for a draft. Leave at zero when unknown."
             )
