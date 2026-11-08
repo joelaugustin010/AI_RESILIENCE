@@ -21,6 +21,11 @@ def test_requires_sourced_records_and_minimum_sample():
     with pytest.raises(CostModelDataError,match="At least 40"):
         prepare_cost_records(records(20))
 
+def test_cost_model_accepts_cost_records_without_duration():
+    data = records(45).drop(columns=["duration_months"])
+    assert len(prepare_cost_records(data)) == 45
+
+
 def test_missing_schema_rejected():
     with pytest.raises(CostModelDataError,match="Missing required columns"):
         prepare_cost_records(pd.DataFrame({"actual_cost_inr":[100]}))
@@ -47,6 +52,15 @@ def test_model_blocked_when_baseline_not_beaten():
     with pytest.raises(CostModelDataError,match="median baseline"):
         estimate_cost(model,intervention="Drainage",area_type="Urban road",
             scope_quantity=100,scope_unit="metres")
+
+
+def test_duration_model_requires_complete_duration_records():
+    from src.mitigation_duration_ml import train_duration_model
+
+    data = records(45)
+    data.loc[:5, "duration_months"] = np.nan
+    with pytest.raises(CostModelDataError, match="At least 40"):
+        train_duration_model(data)
 
 
 def test_duration_model_holdout_and_prediction():
