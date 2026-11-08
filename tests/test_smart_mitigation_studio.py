@@ -110,3 +110,31 @@ def test_compare_designs_reports_cost_delta_only():
     assert result["cost_difference_inr"] == 25000
     assert result["additional_components"] == 1
     assert result["interpretation"] == "Alternative costs more"
+
+
+def test_shared_state_uses_custom_costs_for_budget_and_recommendations():
+    from src.mitigation_intelligence import design_recommendations
+    from src.smart_mitigation_studio import build_studio_state
+
+    design = calculate_design(
+        budget_inr=50000,
+        selected={"drains": True},
+        quantities={"drains": 2},
+        rates_inr={"drains": 40000},
+    )
+    state = build_studio_state(
+        project_name="Kochi test",
+        area_type="Urban road",
+        rainfall_mm_per_hour=50,
+        budget_inr=50000,
+        selected={"drains": True},
+        design=design,
+        site_area="Test road",
+    )
+
+    assert state["illustrative_component_cost_inr"] == 80000
+    assert state["budget_balance_inr"] == -30000
+    assert state["budget_status"] == "Over budget"
+    assert state["site_area"] == "Test road"
+    prompts = design_recommendations(state)
+    assert any(item["Planning recommendation"] == "Review phasing and cost assumptions" for item in prompts)
