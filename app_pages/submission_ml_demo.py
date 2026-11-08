@@ -6,19 +6,24 @@ into a disaster probability.
 """
 from __future__ import annotations
 
-
 import pandas as pd
 import streamlit as st
 
 from src.dataframe_display import display_dataframe
 
 from src.ml.coverage import build_coverage_matrix
-from src.ml.presentation import card_rows, model_rows
+from src.ml.presentation import application_rows, card_rows, model_rows
 from src.ml.registry import list_model_cards
-from src.ml.service import ml_evidence_for
+from src.ml.service import historical_replay_context, ml_evidence_for
 from src.ml.submission_summary import rank_classifier_cards, rank_regression_cards, regression_baseline_label
 from src.ml.validation_gates import model_card_validation_gate
 from src.ui_theme import page_header
+
+
+@st.cache_data(show_spinner=False)
+def _load_historical_replay(model_id: str) -> dict:
+    """Cache the deterministic historical holdout row used in the exhibition replay."""
+    return historical_replay_context(model_id)
 
 
 page_header(
@@ -131,24 +136,207 @@ hazard_names = [entry["hazard"] for entry in coverage["entries"]]
 selected_hazard = st.selectbox("Select a hazard or compound scenario", hazard_names)
 entry = next(item for item in coverage["entries"] if item["hazard"] == selected_hazard)
 st.markdown(f"**Evidence role:** {entry.get('support_level', 'Not recorded').replace('_', ' ').title()}")
-st.markdown("#### Inference readiness — no forecast generated")
-try:
-    readiness = ml_evidence_for(selected_hazard, {})
-    readiness_rows = model_rows(readiness)
-except Exception as exc:
-    readiness_rows = []
-    st.error(f"Inference-readiness check unavailable: {type(exc).__name__}: {exc}")
-if readiness_rows:
-    display_dataframe(
-        pd.DataFrame(readiness_rows),
-        hide_index=True,
-        use_container_width=True,
+selected_cards = [
+    card for card in cards if card.get("model_id") in entry.get("trained_model_ids", [])
+]
+# Put an actually applicable research model first for a smoother evaluator demo.
+# Regression models are preferred because their outputs retain physical units;
+# the model's validation status and scientific limitations remain visible below.
+selected_cards.sort(
+    key=lambda card: (
+        card.get("status") not in {"WEAK_RESEARCH_SIGNAL", "RESEARCH_SIGNAL_NOT_VALIDATED"},
+        card.get("task_type") != "regression",
+        str(card.get("model_id", "")),
     )
-    st.caption(
-        "This check intentionally supplies no feature values. It shows whether the "
-        "registered models have a complete, explicitly supplied input context. "
-        "Incomplete context means inference is withheld; no values are fabricated."
+)
+if selected_cards:
+    st.markdown("#### Run a transparent research inference")
+    selected_model_id = st.selectbox(
+        "Choose a registered model",
+        options=[card["model_id"] for card in selected_cards],
+        format_func=lambda value: value.replace("_", " ").title(),
     )
+    selected_card = next(card for card in selected_cards if card["model_id"] == selected_model_id)
+    demo_mode = st.radio(
+        "Inference demonstration mode",
+        ["Replay a historical test case", "Enter measured feature values"],
+        horizontal=True,
+    )
+    if demo_mode == "Replay a historical test case":
+        st.info(
+            "Recommended for the exhibition: this loads a real, complete row from "
+            "the model's documented historical test period and runs the persisted "
+            "model on its recorded input features. It is a retrospective replay, "
+            "not a current forecast."
+        )
+        try:
+            replay = _load_historical_replay(selected_model_id)
+            replay_cols = st.columns(4)
+            replay_cols[0].metric("Historical case date", replay["case_date"])
+            replay_cols[1].metric("Input features", len(replay["context"]))
+            replay_cols[2].metric("Observed target", f"{replay['observed_target']:g}")
+            observed_class = (
+                "Event" if replay.get("observed_event") is True
+                else "No event" if replay.get("observed_event") is False
+                else "Continuous target"
+            )
+            replay_cols[3].metric("Observed held-out class", observed_class)
+            st.caption(
+                f"Target: {replay.get('target_definition') or replay['target_column']} · "
+                f"Source: {replay.get('source') or 'model-card source'} · "
+                f"{replay.get('source_type') or 'source type not recorded'}"
+            )
+            st.caption(replay["warning"])
+            if st.button(
+                "Run model on this historical test case",
+                type="primary",
+                use_container_width=True,
+                key=f"run-historical-{selected_model_id}",
+            ):
+                inference_inputs = {"ml_context": replay["context"]}
+                if replay.get("location"):
+                    inference_inputs["location"] = replay["location"]
+                try:
+                    evidence_result = ml_evidence_for(
+                        selected_hazard,
+                        inference_inputs,
+                        selected_model_id=selected_model_id,
+                    )
+                    st.session_state["submission_ml_inference_result"] = {
+                        "hazard": selected_hazard,
+                        "model_id": selected_model_id,
+                        "evidence": evidence_result,
+                        "replay": replay,
+                    }
+                    st.session_state.pop("submission_ml_inference_error", None)
+                except Exception as exc:
+                    st.session_state["submission_ml_inference_error"] = (
+                        f"{type(exc).__name__}: {exc}"
+                    )
+        except Exception as exc:
+            st.error(
+                f"Historical replay is unavailable for this model: {type(exc).__name__}: {exc}"
+            )
+    else:
+        st.info(
+            "Enter independently sourced observations only. Unknown fields remain "
+            "blank; the engine will refuse inference until the selected model's "
+            "complete feature contract is supplied."
+        )
+        feature_names = [str(name) for name in selected_card.get("feature_columns", [])]
+        feature_ranges = selected_card.get("feature_ranges") or {}
+        provenance = selected_card.get("provenance") or {}
+        location_required = str(provenance.get("location") or "").casefold() == "kochi"
+        with st.form("submission_ml_inference_form", clear_on_submit=False):
+            location_value = ""
+            if location_required:
+                location_value = st.text_input(
+                    "Model location (must match its documented geography)",
+                    placeholder="Enter Kochi only if these inputs are for Kochi",
+                )
+            st.caption(f"Required features for this model: {len(feature_names)}")
+            input_columns = st.columns(2)
+            supplied_values = {}
+            for index, feature in enumerate(feature_names):
+                with input_columns[index % 2]:
+                    bounds = feature_ranges.get(feature, {})
+                    if isinstance(bounds, dict) and bounds.get("min") is not None and bounds.get("max") is not None:
+                        range_help = (
+                            f"Recorded training range: {bounds['min']} to {bounds['max']}. "
+                            "This is a domain-check reference, not a suggested or current observation."
+                        )
+                    else:
+                        range_help = "No numeric training range is recorded for this feature."
+                    supplied_values[feature] = st.text_input(
+                        feature,
+                        value="",
+                        help=range_help,
+                        placeholder="Enter a measured value; leave blank if unknown",
+                        key=f"submission-ml-{selected_hazard}-{selected_model_id}-{feature}",
+                    )
+            run_inference = st.form_submit_button(
+                "Check inputs and run model",
+                type="primary",
+                use_container_width=True,
+            )
+        if run_inference:
+            explicit_context = {
+                name: value.strip()
+                for name, value in supplied_values.items()
+                if value.strip() != ""
+            }
+            inference_inputs = {"ml_context": explicit_context}
+            if location_required:
+                inference_inputs["location"] = location_value.strip()
+            try:
+                evidence_result = ml_evidence_for(
+                    selected_hazard,
+                    inference_inputs,
+                    selected_model_id=selected_model_id,
+                )
+                st.session_state["submission_ml_inference_result"] = {
+                    "hazard": selected_hazard,
+                    "model_id": selected_model_id,
+                    "evidence": evidence_result,
+                    "replay": None,
+                }
+                st.session_state.pop("submission_ml_inference_error", None)
+            except Exception as exc:
+                st.session_state["submission_ml_inference_error"] = (
+                    f"{type(exc).__name__}: {exc}"
+                )
+    inference_error = st.session_state.get("submission_ml_inference_error")
+    if inference_error:
+        st.error(f"Inference could not be completed: {inference_error}")
+    saved_result = st.session_state.get("submission_ml_inference_result")
+    if (
+        isinstance(saved_result, dict)
+        and saved_result.get("hazard") == selected_hazard
+        and saved_result.get("model_id") == selected_model_id
+    ):
+        evidence_result = saved_result["evidence"]
+        st.markdown("**Input and model readiness**")
+        model_result_rows = model_rows(evidence_result)
+        if model_result_rows:
+            display_dataframe(
+                pd.DataFrame(model_result_rows),
+                hide_index=True,
+                use_container_width=True,
+            )
+        st.markdown(
+            f"**Engine status:** "
+            f"{evidence_result.get('status', 'unknown').replace('_', ' ').title()}"
+        )
+        if evidence_result.get("applications"):
+            st.markdown("**Model output(s)**")
+            display_dataframe(
+                pd.DataFrame(application_rows(evidence_result)),
+                hide_index=True,
+                use_container_width=True,
+            )
+            for application in evidence_result["applications"]:
+                for warning in application.get("warnings", []):
+                    st.warning(warning)
+                for limitation in application.get("limitations", []):
+                    st.caption(f"Limitation: {limitation}")
+        else:
+            st.warning(
+                evidence_result.get("note")
+                or "No output was produced. Review missing features, model status, "
+                   "geographic scope, and training-range checks above."
+            )
+        if saved_result.get("replay"):
+            replay = saved_result["replay"]
+            st.caption(
+                f"Retrospective check: {replay['target_column']} observed value was "
+                f"{replay['observed_target']:g} on the held-out case. "
+                f"Observed class: {replay.get('observed_event')}. The target was "
+                "not supplied as a model input."
+            )
+        st.caption(
+            "Research output only. It is not a calibrated disaster probability, "
+            "live forecast, official warning, or independently validated prediction."
+        )
 else:
     st.info(
         "No supervised model is registered for this hazard. The deterministic "
@@ -156,9 +344,6 @@ else:
     )
 st.write(entry.get("interpretation", "No interpretation recorded."))
 if entry.get("trained_model_ids"):
-    selected_cards = [
-        card for card in cards if card.get("model_id") in entry["trained_model_ids"]
-    ]
     if not selected_cards:
         st.info("The coverage registry references model IDs, but matching model cards are unavailable.")
     for card in selected_cards:
