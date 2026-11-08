@@ -16,9 +16,9 @@ CATS=("intervention","area_type","scope_unit")
 NUMS=("scope_quantity",)
 FEATURES=CATS+NUMS
 TARGET="actual_cost_inr"
-# duration_months remains a required historical outcome for the separate delivery model,
-# but is deliberately excluded from cost-estimator inputs to avoid circular planning inputs.
-REQUIRED=CATS+("scope_quantity","duration_months",TARGET,"source_reference")
+# Cost and delivery outcomes are validated independently: cost-only records need not
+# contain a project duration. Duration training applies its own stricter completeness gate.
+REQUIRED=CATS+("scope_quantity",TARGET,"source_reference")
 MIN_ROWS=40
 
 class CostModelDataError(ValueError):
@@ -33,15 +33,15 @@ def prepare_cost_records(records: pd.DataFrame) -> pd.DataFrame:
     frame=records.loc[:,list(REQUIRED)].copy()
     for c in CATS+("source_reference",):
         frame[c]=frame[c].fillna("").astype(str).str.strip()
-    for c in ("scope_quantity","duration_months",TARGET):
+    for c in ("scope_quantity",TARGET):
         frame[c]=pd.to_numeric(frame[c],errors="coerce")
     valid=(frame[list(CATS)].ne("").all(axis=1)&frame.source_reference.ne("")
-           &frame[["scope_quantity","duration_months",TARGET]].notna().all(axis=1))
+           &frame[["scope_quantity",TARGET]].notna().all(axis=1))
     frame=frame.loc[valid].copy()
-    finite=frame[["scope_quantity","duration_months",TARGET]].apply(
+    finite=frame[["scope_quantity",TARGET]].apply(
         lambda col: col.map(lambda v: math.isfinite(float(v)))
     ).all(axis=1)
-    positive=(frame.scope_quantity>0)&(frame.duration_months>0)&(frame[TARGET]>0)
+    positive=(frame.scope_quantity>0)&(frame[TARGET]>0)
     frame=frame.loc[finite&positive].reset_index(drop=True)
     if len(frame)<MIN_ROWS:
         raise CostModelDataError(
