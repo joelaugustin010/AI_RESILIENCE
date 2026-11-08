@@ -142,7 +142,7 @@ def audit(rows: list[dict[str, Any]], kind: str, max_offset_hours: float = 6.0) 
                     coverage < 0.9 or not str(row.get("inspection_method", "")).strip()
                     or not str(row.get("inspected_by", "")).strip() or not reviewed
                 ):
-                    problems.append({"row": index, "issue": "UNSUPPORTED_NON_EVENT"})
+                    problems.append({"row": index, "issue": "UNSUPPORTED_NON_EVENT_LABEL"})
         except (ValueError, TypeError, KeyError) as exc:
             problems.append({"row": index, "issue": "INVALID_OR_MISSING_VALUE", "detail": str(exc)})
 
