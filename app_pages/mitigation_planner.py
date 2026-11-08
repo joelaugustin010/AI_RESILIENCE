@@ -115,8 +115,7 @@ duration_ready = bool(duration_model and duration_model.get("metrics", {}).get("
 section_intro(
     "AI project intake",
     "Build a mitigation project profile",
-    "Describe a proposed intervention once. When validated historical models are available, "
-    "AI generates indicative cost and delivery estimates for that project profile.",
+    "Create a project record once. Validated historical models may estimate cost and delivery; otherwise the record remains an unpredicted draft.",
 )
 
 status_cols = st.columns(3)
@@ -188,7 +187,7 @@ with st.container(border=True):
             )
 
         submit_project = st.form_submit_button(
-            "Generate AI project profile",
+            "Create project profile",
             type="primary",
             use_container_width=True,
         )
@@ -265,7 +264,7 @@ with st.container(border=True):
 
 plan = pd.DataFrame(st.session_state["mitigation_project_records"], columns=columns)
 
-section_intro("Project portfolio", "AI-generated project profiles")
+section_intro("Project portfolio", "Mitigation project portfolio")
 st.caption(
     "Projects are shown as individual profiles rather than an editable spreadsheet. "
     "AI estimates are separated from user-entered values and require local verification."
