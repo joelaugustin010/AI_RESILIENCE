@@ -39,29 +39,29 @@ MODULE_GROUPS = (
     (
         "Environmental intelligence",
         (
-            ("🌊", "Kochi Map", "Explore spatial layers, infrastructure context and source validation notes.", "beauty-city.webp", "app_pages/kochi_map.py", "Spatial context"),
-            ("🌬️", "Air Pollution", "Review air-quality evidence, pollutant context and monitoring readiness.", "threats-monsoon.webp", "app_pages/air_pollution.py", "Atmospheric evidence"),
-            ("🏥", "Hospital Vulnerability", "Inspect critical-facility context and documented accessibility limitations.", "beauty-backwaters.webp", "app_pages/hospital_vulnerability.py", "Public health"),
-            ("🌿", "Data & Model Transparency", "Review coverage, provenance, validation status and known data limitations.", "beauty-forest.webp", "app_pages/data_readiness.py", "Transparency"),
+            ("🌊", "Kochi Map", "Explore spatial layers, infrastructure context and source validation notes.", "kochi/waterfront.jpg", "app_pages/kochi_map.py", "Spatial context"),
+            ("🌬️", "Air Pollution", "Review air-quality evidence, pollutant context and monitoring readiness.", "kochi/coast.jpg", "app_pages/air_pollution.py", "Atmospheric evidence"),
+            ("🏥", "Hospital Vulnerability", "Inspect critical-facility context and documented accessibility limitations.", "kochi/water-metro.jpg", "app_pages/hospital_vulnerability.py", "Public health"),
+            ("🌿", "Data & Model Transparency", "Review coverage, provenance, validation status and known data limitations.", "kochi/mangalavanam.jpg", "app_pages/data_readiness.py", "Transparency"),
             ("🧾", "Mitigation Data Intelligence", "Review the evidence quality and readiness behind mitigation planning inputs.", "beauty-ghats.webp", "app_pages/mitigation_data_intelligence.py", "Data governance"),
         ),
     ),
     (
         "Disaster resilience",
         (
-            ("🧭", "Decision Workflow", "Move from a scenario question through evidence gates and decision context.", "beauty-backwaters.webp", "app_pages/decision_workflow.py", "Scenario review"),
-            ("🧠", "Disaster Intelligence Assistant", "Ask natural-language questions grounded in reviewed project evidence.", "beauty-coast.webp", "app_pages/disaster_assistant.py", "Grounded assistant"),
-            ("⛈️", "Cyclone + Flood", "Explore compound hazard scenario inputs, outputs and uncertainty.", "hero-kerala-coast.jpg", "app_pages/compound_scenario.py", "Compound hazards"),
-            ("📊", "Multi-Hazard Evidence Review", "Inspect available hazard evidence without presenting unsupported certainty.", "threats-monsoon.webp", "app_pages/disaster_probability.py", "Evidence review"),
-            ("🧪", "Hazard Model Lab", "Review model inputs, readiness and limitations across hazard workflows.", "beauty-ghats.webp", "app_pages/hazard_model_lab.py", "Model readiness"),
+            ("🧭", "Decision Workflow", "Move from a scenario question through evidence gates and decision context.", "kochi/backwaters.jpg", "app_pages/decision_workflow.py", "Scenario review"),
+            ("🧠", "Disaster Intelligence Assistant", "Ask natural-language questions grounded in reviewed project evidence.", "kochi/fishing-nets.jpg", "app_pages/disaster_assistant.py", "Grounded assistant"),
+            ("⛈️", "Cyclone + Flood", "Explore compound hazard scenario inputs, outputs and uncertainty.", "kochi/maradu.jpg", "app_pages/compound_scenario.py", "Compound hazards"),
+            ("📊", "Multi-Hazard Evidence Review", "Inspect available hazard evidence without presenting unsupported certainty.", "kochi/industrial-coast.jpg", "app_pages/disaster_probability.py", "Evidence review"),
+            ("🧪", "Hazard Model Lab", "Review model inputs, readiness and limitations across hazard workflows.", "kochi/backwaters.jpg", "app_pages/hazard_model_lab.py", "Model readiness"),
             ("📈", "ML Evidence & Demonstration", "Replay documented research cases and inspect model limitations without live-warning claims.", "beauty-forest.webp", "app_pages/submission_ml_demo.py", "Research evidence"),
         ),
     ),
     (
         "Mitigation & planning",
         (
-            ("💼", "Mitigation Budget", "Build a transparent planning worksheet using user-supplied assumptions.", "hero-kerala-flood-road.jpg", "app_pages/mitigation_planner.py", "Budget planning"),
-            ("🛠️", "Smart Mitigation Design Studio", "Develop connected mitigation concepts while keeping assumptions visible.", "beauty-waterfall.webp", "app_pages/smart_mitigation_design.py", "Design studio"),
+            ("💼", "Mitigation Budget", "Build a transparent planning worksheet using user-supplied assumptions.", "kochi/industrial-coast.jpg", "app_pages/mitigation_planner.py", "Budget planning"),
+            ("🛠️", "Smart Mitigation Design Studio", "Develop connected mitigation concepts while keeping assumptions visible.", "kochi/mangalavanam.jpg", "app_pages/smart_mitigation_design.py", "Design studio"),
         ),
     ),
 )
