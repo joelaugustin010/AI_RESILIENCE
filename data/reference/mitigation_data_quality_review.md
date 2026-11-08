@@ -29,7 +29,7 @@ Use selected Ernakulam observations as **supporting historical context only**. D
 
 ## Rainfall cadence and geography
 
-The nine Ernakulam stations in the 2021–2025 rainfall file do not provide a continuous, uniform hourly series. Thirty minutes was the most common interval at each of the eight stations included in the user's interval output; other intervals and gaps also occur. Do not convert missing intervals to zero rainfall or calculate rolling/hourly totals until cadence and accumulation semantics are validated.
+The nine Ernakulam stations in the 2021–2025 rainfall file do not provide a continuous, uniform hourly series. Thirty minutes was the most common interval at each of the nine stations in the user's interval output; other intervals and gaps also occur. Do not convert missing intervals to zero rainfall or calculate rolling/hourly totals until cadence and accumulation semantics are validated.
 
 These stations are district-level observations. They must not be labelled as central Kochi urban-core measurements without a geographic check.
 
