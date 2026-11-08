@@ -19,6 +19,7 @@ EXPECTED_PAGES = {
     "disaster_probability",
     "mitigation_planner",
     "smart_mitigation_design",
+    "submission_ml_demo",
 }
 
 
