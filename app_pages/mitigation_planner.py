@@ -270,7 +270,7 @@ with st.container(border=True):
                 "Priority method": "Awaiting assessment",
                 "Cost INR": estimated_cost,
                 "Source / estimate date": (
-                    "Validated historical ML model · verify locally"
+                    "ML estimate · validation required"
                     if "ML cost estimate" in method_parts
                     else source_reference.strip()
                 ),
