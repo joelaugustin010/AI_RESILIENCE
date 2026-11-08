@@ -637,7 +637,7 @@ def _render_weather_ml_replay() -> None:
     st.markdown("### Historical weather ML replay")
     st.info(
         "RETROSPECTIVE EVALUATION — the app automatically constructs the complete model feature vector "
-        "from its traceable historical weather time series and evaluates a held-out case. "
+        "from its traceable, versioned local weather time series and evaluates a held-out case. This offline replay is the demo fallback when live services are unavailable. "
         "This is not a live forecast and does not describe current conditions."
     )
     model_id = "weather_precipitation_kochi_nextday_regression"
