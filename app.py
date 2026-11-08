@@ -1826,4 +1826,7 @@ st.markdown(
       font-size: .88rem !important;
       opacity: 1 !important;
     }
-        </style>\n    \"\"\",\n    unsafe_allow_html=True,\n)\n
+        </style>
+    """,
+    unsafe_allow_html=True,
+)
