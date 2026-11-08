@@ -4,10 +4,10 @@
 
 File: `kerala_soil_conservation_completed_projects.csv`
 
-The CSV contains **23 project records** transcribed from three official Government of Kerala monitoring/reporting sources:
+The CSV contains **29 project records** transcribed from three official Government of Kerala monitoring/reporting sources:
 
 - **13** soil/watershed conservation schemes from the Department of Economics & Statistics evaluation report.
-- **8** cyclone-shelter projects from KSDMA implementation status.
+- **14** cyclone-shelter projects from KSDMA implementation status.
 - **2** KWA PASK project profiles.
 
 ## Sources and fields
@@ -22,7 +22,7 @@ Table 2.1 (report p.16) lists district, scheme, treated area and total project-w
 Implementation status, Cyclone Risk Mitigation Infrastructure:
 https://sdma.kerala.gov.in/implementation-status/
 
-Eight completed shelter records are included where plinth area, commencement date, completion date and reported cost of completion were visible. Rows with date ambiguity or final-bill processing still underway were excluded. The reported cost-of-completion field is preserved in source notes; it is not represented as a final paid bill.
+Fourteen completed shelter records are included where plinth area, commencement date, completion date and reported cost of completion were visible. Rows with date ambiguity or final-bill processing still underway were excluded. The reported cost-of-completion field is preserved in source notes; it is not represented as a final paid bill.
 
 ### 3. Kerala Water Authority PASK
 - AMRUT Kollam Corporation water connections, Phase II: https://pask.kwa.kerala.gov.in/project/profile/reference/d1e96978c6935ec01d995b1b8e4d8c33iIWMeA
@@ -37,7 +37,7 @@ These records use total bill paid as the cost target. The sewerage survey does n
 - `duration_months` is calculated only where exact reported start and completion dates are available, using elapsed days / 30.4375 and rounding to one decimal. It is blank when exact dates are unavailable.
 - Broad `intervention` and `area_type` labels are research categories assigned from the project descriptions, not necessarily verbatim source fields.
 - The Palakkad soil-conservation cost uses Table 2.1; the report graph contains a conflicting value, flagged in the CSV source notes.
-- The dataset is **23 rows**, not 40. It is not sufficient to train either model under the current minimum-record gate.
+- The dataset is **29 rows**, not 40. Cost records with complete scope/cost/source fields are currently below the 40-record threshold; the delivery subset is smaller because some sources do not report exact start dates. It is not sufficient to train either model under the current minimum-record gate.
 - Even after reaching 40 rows, a mixed dataset is not automatically suitable. Check source comparability, intervention families, price year, scope definitions, geographic coverage, duplicate projects/packages, and holdout performance.
 - These records are not all Kochi projects. Do not transfer their unit costs to urban Kochi without local suitability review and price-year adjustment.
 - Do not add sanctioned estimates, tender estimates, unpaid bills, synthetic examples, or ongoing-project values as if they were actual completed-project costs.
