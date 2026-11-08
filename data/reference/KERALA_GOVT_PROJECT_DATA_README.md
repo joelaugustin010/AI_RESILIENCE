@@ -59,7 +59,7 @@ Prioritise additional KWA, LSGD/Sulekha, KIIDC, PWD and Irrigation Department pr
 
 ## Supplemental government and private-sector collection (8 November 2026)
 
-A separate lead register is maintained at `mitigation_project_supplemental_candidates.csv`. It contains ten project references identified from official government/audit pages and private-sector project portfolios:
+A separate lead register is maintained at `mitigation_project_supplemental_candidates.csv`. It contains eleven project references identified from official government/audit pages and private-sector project portfolios:
 
 - KIIDC Kuppithodu regulator: official project page reports construction dates, completed status and ₹55.82 crore project cost; the project is multi-component and its scope is not yet suitable for the current single-quantity model.
 - Kochi Elamkulam 5 MLD STP: CAG audit reports physical completion in May 2022 and expenditure of ₹12.06 crore; commissioning followed in October 2024. No verified start date was captured, so duration is blank.
@@ -86,10 +86,14 @@ KIIDC's completed-project listing includes Punnamada post-flood renovation; the 
 
 
 ### Further KWA project leads reviewed (8 November 2026)
-Four additional KWA PASK profiles have been added to the supplemental register, bringing it to **10 source leads** (the separate core training CSV remains at **29 records**):
+Four additional KWA PASK profiles have been added to the supplemental register, bringing it to **11 source leads** (the separate core training CSV remains at **29 records**):
 - Paittukattu lane, Division 36, Kochi Corporation: 63 mm PVC pipeline extension; ₹62,000 AS/TS; profile has no final bill paid or actual completion date, and no pipe length.
 - Honest Byline Road, Kalamassery: ₹80,000 AS/TS; profile shows completed status but no actual completion date, no scope quantity and no final paid expenditure.
 - Nanma One apartment complex, Vyttila/Tripunithura: ₹560,000 AS and ₹490,000 TS; completed 16 July 2026, but bill submitted/paid fields are both zero and scope quantity is absent.
 - Ward X pipeline extension, Marady Panchayat: ₹1,266,558 bill submitted; payment is not confirmed, and measurable pipeline quantity and actual completion date were not captured.
 
 These are **discovery leads only**. Sanctioned/technical-sanction amounts and submitted-but-unpaid bills are not actual final expenditure. None of these four is marked ML-eligible. The new leads are retained to guide source follow-up, not to increase the training count.
+
+
+### Additional audited STP evidence (8 November 2026)
+- CAG's AMRUT performance audit reports the 5 MLD sewage treatment plant at Medical College, Thiruvananthapuram commenced in March 2019 and was completed in January 2022, with expenditure of ₹14.65 crore against an approved project cost of ₹19.16 crore. The audit also found that the plant was not functioning properly in February 2024. This is retained as an audited cost-evidence lead with month-level dates only; it is not yet eligible for ML because exact date granularity, cohort comparability and outcome context need review. Source: https://cag.gov.in/uploads/download_audit_report/2025/Print-version-english_AMRUT_Kerala_10.12.25-with-legislature-date-0699d302521f715.11884185.pdf
