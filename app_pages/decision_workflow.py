@@ -1348,7 +1348,7 @@ st.subheader("Conditional scenario output")
 st.metric("Scenario concern", prediction["concern_level"])
 st.markdown("**Potential outcome**")
 st.write(prediction["conditional_outcome"])
-st.caption(f"Scenario engine: {prediction['model_type']}. This immediate conditional outcome is rule-based; it is not the output of a trained ML model. Separate shared-ML inference is displayed below when a registered model's complete feature contract and evidence gates are satisfied. No official warning is produced.")
+st.caption(f"Scenario engine: {prediction['model_type']}. This immediate conditional outcome is rule-based, not a trained-ML output. Any separate ML panel below is supplementary; the rainfall replay is retrospective and is not a forecast of this scenario. No official warning is produced.")
 with st.expander("Why the scenario engine produced this output", expanded=False):
     st.markdown("**Evidence used**")
     for item in prediction["evidence_used"]:
