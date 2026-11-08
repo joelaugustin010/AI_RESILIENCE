@@ -27,7 +27,7 @@ st.markdown(
     <style>
     /* Ernakulam risk module: measured blue accent, calm analytical surfaces. */
     .probability-panel {
-      border: 1px solid rgba(127, 184, 255, .26);
+      border: 1px solid rgba(23, 78, 85, .16);
       border-radius: 16px;
       padding: .95rem 1.05rem .8rem;
       margin: .55rem 0 .8rem;

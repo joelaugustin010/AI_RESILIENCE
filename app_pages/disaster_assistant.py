@@ -24,9 +24,9 @@ st.markdown(
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     :root {
-      --air-forest: #173f35; --air-teal: #176b63; --air-sage: #789b85;
-      --air-ivory: #f6f5ef; --air-paper: #fffefa; --air-charcoal: #26332f;
-      --air-muted: #62736b; --air-line: #d9e2da; --air-soft: #eaf1eb;
+      --air-forest: #174E55; --air-teal: #299B91; --air-sage: #77B8B2;
+      --air-ivory: #F5F7F5; --air-paper: #FFFFFF; --air-charcoal: #17383B;
+      --air-muted: #60777A; --air-line: rgba(23,78,85,.16); --air-soft: #DCE7E8;
     }
     html, body, [class*="css"] { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
     .stApp { background: radial-gradient(circle at 100% 0%, #e3eee7 0, transparent 32rem), linear-gradient(180deg, #fbfaf5 0%, var(--air-ivory) 100%); color: var(--air-charcoal); }
