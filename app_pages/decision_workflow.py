@@ -48,7 +48,7 @@ from src.disaster_models import assess_disaster
 from src.prevention_intelligence import generate_prevention_actions
 from src.intervention_effectiveness import intervention_effectiveness_for_hazards
 from src.ml.presentation import application_rows, model_rows
-from src.ml.service import run_historical_replay
+from src.ml.service import historical_replay_dates, run_historical_replay
 from src.compound_hazard_assessment import assess_compound_scenario
 from src.historical_validation import historical_validation_checklist
 from src.disaster_models.drought import parse_monthly_precipitation_csv
@@ -93,8 +93,13 @@ def _cached_rainfall_backtest(root: str, source_size: int, source_mtime_ns: int)
 
 
 @st.cache_data(show_spinner="Building the held-out weather feature vector and running the research model…")
-def _cached_weather_ml_replay(model_id: str) -> dict:
-    return run_historical_replay(model_id)
+def _cached_weather_ml_replay(model_id: str, target_date: str | None = None) -> dict:
+    return run_historical_replay(model_id, target_date=target_date)
+
+
+@st.cache_data(show_spinner="Preparing the held-out historical replay timeline…")
+def _cached_weather_ml_dates(model_id: str) -> list[str]:
+    return historical_replay_dates(model_id)
 
 
 def _get_rainfall_backtest():
@@ -637,14 +642,32 @@ def _render_weather_ml_replay() -> None:
     )
     model_id = "weather_precipitation_kochi_nextday_regression"
     try:
-        result = _cached_weather_ml_replay(model_id)
+        replay_dates = _cached_weather_ml_dates(model_id)
+        if not replay_dates:
+            st.warning("No complete held-out dates are available for this model.")
+            return
+        selected_index = st.slider(
+            "Scrub the historical test timeline",
+            min_value=0,
+            max_value=len(replay_dates) - 1,
+            value=len(replay_dates) - 1,
+            format="%d",
+            key="weather_ml_replay_timeline",
+            help="Each position selects a complete, in-domain historical test case. It does not change the scenario date or create a live forecast.",
+        )
+        selected_date = replay_dates[selected_index]
+        st.caption(
+            f"Historical target date: **{selected_date}** · "
+            f"Case {selected_index + 1:,} of {len(replay_dates):,} eligible held-out dates"
+        )
+        result = _cached_weather_ml_replay(model_id, selected_date)
     except Exception as exc:
         st.warning(
-            "Historical ML replay is unavailable in this deployment. The source dataset, "
-            "model card, feature contract, or trained artifact could not be loaded."
+            "Historical ML replay is unavailable in this deployment. The bundled source "
+            "dataset, model card, feature contract, or trained artifact could not be loaded."
         )
         st.caption(f"Diagnostic: {type(exc).__name__}: {exc}")
-        st.caption('Required next: restore the versioned Kochi daily-weather source and matching persisted model artifact; no feature values are fabricated.')
+        st.caption("The platform will not replace missing history with synthetic inputs.")
         return
     prediction = result["prediction"]
     estimate = prediction.get("estimate")
@@ -654,7 +677,7 @@ def _render_weather_ml_replay() -> None:
         st.warning("The replay completed without a continuous rainfall estimate.")
         return
     metric_cols = st.columns(3)
-    metric_cols[0].metric("Estimated next-day rainfall", f"{float(estimate):.2f} {unit}")
+    metric_cols[0].metric("Historical ML rainfall estimate", f"{float(estimate):.2f} {unit}")
     if observed is not None:
         metric_cols[1].metric("Observed held-out rainfall", f"{float(observed):.2f} {unit}")
         metric_cols[2].metric("Absolute replay error", f"{abs(float(estimate) - float(observed)):.2f} {unit}")
@@ -663,6 +686,7 @@ def _render_weather_ml_replay() -> None:
         metric_cols[2].metric("Replay error", "Unavailable")
     st.write("**Model:**", result.get("model_id"))
     st.write("**Model status:**", result.get("model_status", "Unknown"))
+    st.write("**Epistemic status:**", "SUMMARIZED_NOT_FORECAST · RETROSPECTIVE RESEARCH REPLAY")
     st.write("**Automatically constructed features:**", f"{result.get('feature_count', 0)} / 46")
     st.write("**Feature observation date:**", result.get("input_date", "Unavailable"))
     st.write("**Target / verification date:**", result.get("target_date", "Unavailable"))
@@ -680,7 +704,7 @@ def _render_weather_ml_replay() -> None:
         for limitation in prediction.get("limitations", []):
             st.markdown(f"- {limitation}")
         st.caption("The observed target is retained separately for retrospective comparison and is never passed into the model as an input.")
-    st.warning("This is a research estimate of rainfall at a historical reanalysis grid point. It is not a flood probability, flood occurrence prediction, inundation extent, water depth, affected-population estimate, or official warning.")
+    st.warning("This is a retrospective research estimate of rainfall at a historical reanalysis grid point. It is not a live rainfall forecast, flood probability, flood occurrence prediction, inundation extent, water depth, affected-population estimate, or official warning.")
 
 def _compound_scenario_inputs(inputs: dict) -> dict:
     """Adapt shared workflow inputs to the compound evidence review."""
