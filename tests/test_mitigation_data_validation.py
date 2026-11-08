@@ -72,3 +72,9 @@ def test_nonpositive_quantity_and_invalid_source_are_rejected():
     assert report["rows"][0]["validation_status"] == "REJECTED"
     assert "missing_or_nonpositive_scope_quantity" in report["rows"][0]["issues"]
     assert "missing_or_invalid_source_url" in report["rows"][0]["issues"]
+
+
+def test_duration_must_match_exact_reported_dates():
+    report = validate_records([eligible_row(duration_months="24")])
+    assert report["duration_ml_eligible"] == 0
+    assert "duration_does_not_match_reported_dates" in report["rows"][0]["issues"]
