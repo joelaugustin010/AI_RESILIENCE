@@ -9,7 +9,7 @@ The report states that the study covers 13 schemes completed by the Soil Survey 
 ## File
 `kerala_soil_conservation_completed_projects.csv`
 
-13 district-level completed watershed/soil-conservation scheme records have been transcribed from Table 2.1. The Ernakulam row is a particularly relevant drainage/flood-control project: Thirumarayoor Thodu Drainage & Flood Control Project, recorded cost ₹5,875,151 and treated area 261.82 acres.
+13 district-level completed watershed/soil-conservation scheme records have been transcribed from Table 2.1. The same file now also contains 8 KSDMA cyclone-shelter completion records and 2 KWA PASK records (23 rows total). The Ernakulam row is a particularly relevant drainage/flood-control project: Thirumarayoor Thodu Drainage & Flood Control Project, recorded cost ₹5,875,151 and treated area 261.82 acres.
 
 ## Important data handling
 - `actual_cost_inr` is the report's stated total project-work cost; it is not represented as a final audited bill or inflation-adjusted cost.
