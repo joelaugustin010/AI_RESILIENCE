@@ -1,5 +1,7 @@
 """Budget arithmetic for user-supplied intervention estimates."""
 
+from pathlib import Path
+
 import pandas as pd
 import streamlit as st
 import plotly.express as px
@@ -427,10 +429,17 @@ with st.expander("Train and evaluate the ML cost model", expanded=False):
             "duration_months", "actual_cost_inr", "source_reference",
         ]
         template_csv = pd.DataFrame(columns=template_columns).to_csv(index=False).encode("utf-8")
-        prep_cols = st.columns([1, 2])
+        bundled_dataset_path = (
+            Path(__file__).resolve().parents[1]
+            / "data" / "reference" / "kerala_soil_conservation_completed_projects.csv"
+        )
+        bundled_dataset_bytes = (
+            bundled_dataset_path.read_bytes() if bundled_dataset_path.exists() else None
+        )
+        prep_cols = st.columns([1, 1, 2])
         with prep_cols[0]:
             st.download_button(
-                "Download historical-project CSV template  ↓",
+                "Download CSV template  ↓",
                 data=template_csv,
                 file_name="AI_RESILIENCE_historical_mitigation_costs_template.csv",
                 mime="text/csv",
@@ -439,6 +448,16 @@ with st.expander("Train and evaluate the ML cost model", expanded=False):
                 type="primary",
             )
         with prep_cols[1]:
+            if bundled_dataset_bytes is not None:
+                st.download_button(
+                    "Download Kerala source dataset",
+                    data=bundled_dataset_bytes,
+                    file_name="AI_RESILIENCE_Kerala_Government_Projects.csv",
+                    mime="text/csv",
+                    key="mitigation_ml_kerala_dataset",
+                    use_container_width=True,
+                )
+        with prep_cols[2]:
             uploaded_cost_data = st.file_uploader(
                 "Upload completed-project records",
                 type=["csv"],
@@ -453,6 +472,12 @@ with st.expander("Train and evaluate the ML cost model", expanded=False):
         )
     
     historical_records = None
+    bundled_dataset_path = (
+        Path(__file__).resolve().parents[1]
+        / "data" / "reference" / "kerala_soil_conservation_completed_projects.csv"
+    )
+    if bundled_dataset_path.exists():
+        historical_records = pd.read_csv(bundled_dataset_path)
     if uploaded_cost_data is not None:
         try:
             import hashlib
@@ -465,14 +490,31 @@ with st.expander("Train and evaluate the ML cost model", expanded=False):
             historical_records = pd.read_csv(uploaded_cost_data)
             expected_columns = [
                 "intervention", "area_type", "scope_quantity", "scope_unit",
-                "duration_months", "actual_cost_inr", "source_reference",
+                "actual_cost_inr", "source_reference",
             ]
             missing_columns = [name for name in expected_columns if name not in historical_records.columns]
-            complete_fields = [name for name in expected_columns if name in historical_records.columns]
-            candidate_rows = (
-                historical_records[complete_fields].notna().all(axis=1).sum()
-                if complete_fields else 0
-            )
+            candidate_rows = 0
+            duration_candidate_rows = 0
+            if not missing_columns:
+                candidate = historical_records[expected_columns].copy()
+                candidate["scope_quantity"] = pd.to_numeric(candidate["scope_quantity"], errors="coerce")
+                candidate["actual_cost_inr"] = pd.to_numeric(candidate["actual_cost_inr"], errors="coerce")
+                cost_valid = (
+                    candidate["intervention"].fillna("").astype(str).str.strip().ne("")
+                    & candidate["area_type"].fillna("").astype(str).str.strip().ne("")
+                    & candidate["scope_unit"].fillna("").astype(str).str.strip().ne("")
+                    & candidate["source_reference"].fillna("").astype(str).str.strip().ne("")
+                    & candidate["scope_quantity"].gt(0)
+                    & candidate["actual_cost_inr"].gt(0)
+                    & candidate["scope_quantity"].map(lambda value: pd.notna(value) and float(value) < float("inf"))
+                    & candidate["actual_cost_inr"].map(lambda value: pd.notna(value) and float(value) < float("inf"))
+                )
+                candidate_rows = int(cost_valid.sum())
+                if "duration_months" in historical_records.columns:
+                    durations = pd.to_numeric(historical_records["duration_months"], errors="coerce")
+                    duration_candidate_rows = int((cost_valid & durations.gt(0) & durations.map(
+                        lambda value: pd.notna(value) and float(value) < float("inf")
+                    )).sum())
             source_count = (
                 historical_records["source_reference"].fillna("").astype(str).str.strip().ne("").sum()
                 if "source_reference" in historical_records.columns else 0
@@ -482,14 +524,15 @@ with st.expander("Train and evaluate the ML cost model", expanded=False):
                 st.markdown("#### Dataset readiness")
                 readiness_cols = st.columns(3)
                 readiness_cols[0].metric("Uploaded records", f"{len(historical_records):,}")
-                readiness_cols[1].metric("Rows with required fields", f"{int(candidate_rows):,}")
-                readiness_cols[2].metric("Rows with a source reference", f"{int(source_count):,}")
+                readiness_cols[1].metric("Valid cost records", f"{int(candidate_rows):,}")
+                readiness_cols[2].metric("Valid duration records", f"{int(duration_candidate_rows):,}")
                 if missing_columns:
                     st.warning("Missing columns: " + ", ".join(missing_columns))
-                elif len(historical_records) < 40:
+                elif candidate_rows < 40:
                     st.warning(
-                        f"{len(historical_records)} rows uploaded. At least 40 complete, valid records "
-                        "are required before the model can be evaluated."
+                        f"{candidate_rows} complete, sourced cost records are currently usable. "
+                        "At least 40 are required before cost-model evaluation. Duration training "
+                        f"currently has {duration_candidate_rows} complete records and has its own 40-record gate."
                     )
                 else:
                     st.info(
