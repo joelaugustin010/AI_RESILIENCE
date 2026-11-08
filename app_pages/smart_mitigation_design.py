@@ -7,14 +7,16 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from src.mitigation_intelligence import build_design_state, design_recommendations
+from src.dataframe_display import display_dataframe
+from src.mitigation_intelligence import design_recommendations
 from src.smart_mitigation_studio import (
+    COMPONENT_CATALOG,
     COMPONENT_DETAILS,
     build_review_items,
+    build_studio_state,
     calculate_design,
     compare_designs,
 )
-from src.mitigation_intelligence import COMPONENT_CATALOG
 from src.ui_theme import page_header, section_intro
 
 
@@ -183,7 +185,7 @@ if design["line_items"]:
             "basis": "Cost basis",
         }
     )
-    st.dataframe(display_costs, hide_index=True, use_container_width=True)
+    display_dataframe(display_costs, hide_index=True, use_container_width=True)
 else:
     st.warning("Select at least one intervention to build a cost plan.")
 
@@ -340,18 +342,15 @@ for index, item in enumerate(review_items):
 st.progress(completed / len(review_items) if review_items else 0.0)
 st.caption(f"Review checklist marked complete: {completed}/{len(review_items)}. User-confirmed checklist only; no independent verification.")
 
-shared_state = build_design_state(
+shared_state = build_studio_state(
     project_name=project_name,
     area_type=area_type,
     rainfall_mm_per_hour=rainfall_input,
-    available_budget_inr=budget_inr,
-    selected_components=selected,
+    budget_inr=budget_inr,
+    selected=selected,
+    design=design,
+    site_area=site_area,
 )
-# Preserve the shared session hand-off used by the Mitigation Budget workflow.
-shared_state["site_area"] = site_area
-shared_state["cost_plan_line_items"] = design["line_items"]
-shared_state["cost_plan_total_inr"] = design["total_inr"]
-shared_state["cost_plan_status"] = design["status"]
 st.session_state["mitigation_design_state"] = shared_state
 
 st.markdown("#### Explainable planning prompts")
