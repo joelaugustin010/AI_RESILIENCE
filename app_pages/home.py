@@ -1639,3 +1639,48 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+
+# Desktop first-screen fit: tuned for a 1400 × 900 browser viewport.
+# The hero and primary actions fit in the opening viewport; the informational
+# sections below remain available through normal page scrolling.
+st.markdown(
+    """
+    <style>
+    @media (min-width: 1200px) and (min-height: 820px) {
+      .ar-home-minimal {
+        box-sizing: border-box !important;
+        height: clamp(480px, calc(100svh - 330px), 570px) !important;
+        min-height: clamp(480px, calc(100svh - 330px), 570px) !important;
+        padding: 2.6rem 3.2rem 4.4rem !important;
+      }
+      .ar-home-minimal .ar-cine-inner {
+        max-width: 720px !important;
+      }
+      .ar-home-minimal .ar-cine-title {
+        font-size: clamp(3.8rem, 5.8vw, 5.2rem) !important;
+        line-height: .96 !important;
+      }
+      .ar-home-minimal .ar-cine-sub {
+        margin-top: .85rem !important;
+        line-height: 1.32 !important;
+      }
+      .ar-home-minimal .ar-cine-desc {
+        margin-top: .55rem !important;
+        font-size: .93rem !important;
+        line-height: 1.55 !important;
+      }
+      .ar-home-minimal .ar-cine-foot {
+        bottom: 1.35rem !important;
+      }
+      .st-key-ar-hero-ctas {
+        margin-top: -2.8rem !important;
+      }
+      .st-key-ar-hero-ctas [data-testid="stButton"] > button {
+        min-height: 2.8rem !important;
+      }
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
