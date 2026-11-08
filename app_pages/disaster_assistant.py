@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import streamlit as st
 
+from src.ui_theme import page_header
 from src.disaster_assistant import (
     KnowledgeBaseError,
     LLMConfigurationError,
@@ -60,6 +61,9 @@ st.markdown(
     }
     h1, h2, h3, h4, p, li, label { color: var(--air-charcoal); }
     h1 { letter-spacing: -.035em; font-weight: 800; }
+    /* Shared module hero: preserve high contrast on its dark image-backed surface. */
+    .st-key-ar-head-disaster-assistant h1 { color: #f6ffff !important; }
+    .st-key-ar-head-disaster-assistant .ar-page-copy { color: #c8dfe2 !important; }
     [data-testid="stChatMessage"] { border: 1px solid var(--air-line); border-radius: 18px; margin: .8rem 0; padding: 1rem 1.1rem; animation: air-rise .32s ease-out both; }
     [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) { background: #e6f0e8; border-color: #c9ddd0; margin-left: 12%; }
     [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) { background: var(--air-paper); border-left: 4px solid var(--air-teal); margin-right: 7%; box-shadow: 0 8px 24px rgba(41,68,53,.06); }
@@ -95,9 +99,14 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.markdown('<div class="air-eyebrow">AI_RESILIENCE · DISASTER INTELLIGENCE</div>', unsafe_allow_html=True)
-st.title("Environmental Intelligence Assistant")
-st.caption("Explore environmental risks, understand disaster vulnerability and discover evidence-based resilience strategies for Kerala.")
+page_header(
+    "AI RESILIENCE · DISASTER INTELLIGENCE",
+    "Environmental Intelligence Assistant",
+    "Explore environmental risks, understand disaster vulnerability and discover evidence-based resilience strategies for Kerala.",
+    meta=("Kerala & India", "Evidence-aware", "Live generation when configured"),
+    accent="teal",
+    key="disaster-assistant",
+)
 
 try:
     load_knowledge()
