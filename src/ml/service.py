@@ -325,6 +325,10 @@ def historical_replay_context(model_id: str) -> dict[str, Any]:
         "model_id": model_id,
         "context": context,
         "case_date": row[date_column].date().isoformat(),
+        "input_date": pd.Timestamp(row["date"] if "date" in row.index else row["time"] if "time" in row.index else row[date_column]).date().isoformat(),
+        "target_date": pd.Timestamp(row[date_column]).date().isoformat(),
+        "input_timestamp": pd.Timestamp(row["date"] if "date" in row.index else row["time"] if "time" in row.index else row[date_column]).isoformat(),
+        "target_timestamp": pd.Timestamp(row[date_column]).isoformat(),
         "target_column": target_column,
         "observed_target": observed_target,
         "observed_event": observed_event,
@@ -364,4 +368,28 @@ def ml_registry_summary() -> dict[str, Any]:
     }
 
 
-__all__ = ["USABLE_STATUSES", "historical_replay_context", "ml_evidence_for", "ml_registry_summary"]
+__all__ = ["USABLE_STATUSES", "historical_replay_context", "ml_evidence_for", "ml_registry_summary", "run_historical_replay"]
+
+
+def run_historical_replay(model_id: str) -> dict[str, Any]:
+    # Run an offline held-out replay; never describe this as a live forecast.
+    replay = historical_replay_context(model_id)
+    card = load_model_card(model_id)
+    if card is None:
+        raise ValueError(f"Model {model_id!r} is not registered.")
+    if card.get("task_type") == "regression":
+        prediction = predict_regression_from_context(model_id, replay["context"])
+    else:
+        prediction = predict_from_context(model_id, replay["context"])
+    return {
+        **replay,
+        "prediction": prediction,
+        "task_type": card.get("task_type", "classification"),
+        "model_status": card.get("status", "UNKNOWN"),
+        "feature_count": len(replay["context"]),
+        "prediction_unit": card.get("prediction_unit"),
+        "validation_status": card.get("validation_status"),
+        "intended_use": card.get("intended_use"),
+        "prohibited_use": card.get("prohibited_use"),
+    }
+
