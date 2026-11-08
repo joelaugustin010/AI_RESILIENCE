@@ -347,6 +347,13 @@ shared_state = build_design_state(
     available_budget_inr=budget_inr,
     selected_components=selected,
 )
+# Preserve the shared session hand-off used by the Mitigation Budget workflow.
+shared_state["site_area"] = site_area
+shared_state["cost_plan_line_items"] = design["line_items"]
+shared_state["cost_plan_total_inr"] = design["total_inr"]
+shared_state["cost_plan_status"] = design["status"]
+st.session_state["mitigation_design_state"] = shared_state
+
 st.markdown("#### Explainable planning prompts")
 st.caption("Rule-based prompts show why they appear and what evidence should be checked. They are not machine-learning predictions.")
 for item in design_recommendations(shared_state):
