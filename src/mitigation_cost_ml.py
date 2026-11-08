@@ -13,10 +13,12 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 CATS=("intervention","area_type","scope_unit")
-NUMS=("scope_quantity","duration_months")
+NUMS=("scope_quantity",)
 FEATURES=CATS+NUMS
 TARGET="actual_cost_inr"
-REQUIRED=FEATURES+(TARGET,"source_reference")
+# duration_months remains a required historical outcome for the separate delivery model,
+# but is deliberately excluded from cost-estimator inputs to avoid circular planning inputs.
+REQUIRED=CATS+("scope_quantity","duration_months",TARGET,"source_reference")
 MIN_ROWS=40
 
 class CostModelDataError(ValueError):
@@ -31,12 +33,12 @@ def prepare_cost_records(records: pd.DataFrame) -> pd.DataFrame:
     frame=records.loc[:,list(REQUIRED)].copy()
     for c in CATS+("source_reference",):
         frame[c]=frame[c].fillna("").astype(str).str.strip()
-    for c in NUMS+(TARGET,):
+    for c in ("scope_quantity","duration_months",TARGET):
         frame[c]=pd.to_numeric(frame[c],errors="coerce")
     valid=(frame[list(CATS)].ne("").all(axis=1)&frame.source_reference.ne("")
-           &frame[list(NUMS+(TARGET,))].notna().all(axis=1))
+           &frame[["scope_quantity","duration_months",TARGET]].notna().all(axis=1))
     frame=frame.loc[valid].copy()
-    finite=frame[list(NUMS+(TARGET,))].apply(
+    finite=frame[["scope_quantity","duration_months",TARGET]].apply(
         lambda col: col.map(lambda v: math.isfinite(float(v)))
     ).all(axis=1)
     positive=(frame.scope_quantity>0)&(frame.duration_months>0)&(frame[TARGET]>0)
@@ -83,13 +85,13 @@ def train_cost_model(records: pd.DataFrame) -> dict[str,Any]:
     }
 
 def estimate_cost(trained:dict[str,Any],*,intervention:str,area_type:str,
-                  scope_quantity:float,scope_unit:str,duration_months:float)->dict[str,float]:
+                  scope_quantity:float,scope_unit:str)->dict[str,float]:
     metrics=trained["metrics"]
     if not metrics["beats_baseline"]:
         raise CostModelDataError("Model did not outperform the median baseline on held-out records.")
-    numeric={"scope_quantity":float(scope_quantity),"duration_months":float(duration_months)}
+    numeric={"scope_quantity":float(scope_quantity)}
     if any(not math.isfinite(v) or v<=0 for v in numeric.values()):
-        raise CostModelDataError("Scope quantity and duration must be finite values greater than zero.")
+        raise CostModelDataError("Scope quantity must be a finite value greater than zero.")
     categorical={"intervention":str(intervention).strip(),
                   "area_type":str(area_type).strip(),"scope_unit":str(scope_unit).strip()}
     if any(not v for v in categorical.values()):
