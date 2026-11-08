@@ -64,7 +64,7 @@ def test_duplicate_project_names_and_source_urls_are_flagged():
     report = validate_records([first, second])
     assert "duplicate_project_name_of_row_1" in report["rows"][1]["issues"]
     assert "duplicate_source_url_of_row_1" in report["rows"][1]["issues"]
-    assert report["cost_ml_eligible"] == 1
+    assert report["cost_ml_eligible"] == 0
 
 
 def test_nonpositive_quantity_and_invalid_source_are_rejected():
