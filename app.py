@@ -70,11 +70,6 @@ pages = {
     ],
     "Plan": [
         st.Page(
-            "app_pages/mitigation_data_intelligence.py",
-            title="Dataset Intelligence",
-            icon=":material/database_search:",
-        ),
-        st.Page(
             "app_pages/mitigation_planner.py",
             title="Mitigation Budget",
             icon=":material/account_balance_wallet:",
