@@ -84,6 +84,7 @@ def page_header(
             )
         if meta:
             st.markdown(_meta_html(meta), unsafe_allow_html=True)
+    research_status_notice(title)
 
 
 def section_intro(overline: str, title: str, description: str = "") -> None:
