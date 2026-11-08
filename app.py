@@ -1749,6 +1749,29 @@ st.markdown(
     [data-testid="stMain"] [class*="st-key-ar-head-"] h1 {
       color: #FFFFFF !important;
     }
+    /* Final header-specific override: Streamlit nested markdown can inherit
+       competing theme colours, so explicitly set every text-bearing child. */
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-kicker,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-kicker *,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-copy,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-copy *,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-meta,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-meta *,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] [data-testid="stMarkdownContainer"],
+    [data-testid="stMain"] [class*="st-key-ar-head-"] [data-testid="stMarkdownContainer"] * {
+      color: #EAF4F3 !important;
+      opacity: 1 !important;
+      -webkit-text-fill-color: #EAF4F3 !important;
+    }
+    [data-testid="stMain"] [class*="st-key-ar-head-"] h1,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-title {
+      color: #FFFFFF !important;
+      -webkit-text-fill-color: #FFFFFF !important;
+    }
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-meta span {
+      background: rgba(234, 244, 243, .12) !important;
+      border-color: rgba(234, 244, 243, .28) !important;
+    }
     </style>
     """,
     unsafe_allow_html=True,
