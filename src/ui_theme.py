@@ -63,6 +63,195 @@ def _meta_html(meta: Iterable[str]) -> str:
     return f'<div class="ar-page-meta">{chips}</div>' if chips else ""
 
 
+def _render_workspace_design_system() -> None:
+    """Apply the shared environmental surface treatment to every workspace.
+
+    ``app.py`` owns the application shell, but Streamlit renders page-level
+    widgets after that shell's stylesheet.  Keeping this small, high-specificity
+    contract here means every page that calls :func:`page_header` gets the same
+    readable surfaces, controls, photo masthead, and responsive behaviour.  It
+    changes presentation only; it does not style chart/map internals or alter
+    analytical state.
+    """
+
+    st.markdown(
+        """
+        <style>
+        /* Workspace surface: ivory, forest, water, and earth. */
+        [data-testid="stMain"] {
+          --ar-surface: #fbfaf4;
+          --ar-surface-raised: #ffffff;
+          --ar-ink: #193b35;
+          --ar-muted: #4e6861;
+          --ar-border: rgba(23, 78, 85, .16);
+          color: var(--ar-ink) !important;
+          font-family: Inter, "Segoe UI", Arial, sans-serif !important;
+        }
+        [data-testid="stMain"] > div {
+          background: linear-gradient(180deg, rgba(251,250,244,.98), rgba(247,250,246,.98)) !important;
+        }
+        [data-testid="stMain"] [data-testid="stMarkdownContainer"] p,
+        [data-testid="stMain"] [data-testid="stMarkdownContainer"] li,
+        [data-testid="stMain"] [data-testid="stCaptionContainer"] {
+          color: var(--ar-muted) !important;
+          font-family: Inter, "Segoe UI", Arial, sans-serif !important;
+          font-size: .96rem !important;
+          line-height: 1.68 !important;
+        }
+        [data-testid="stMain"] h1,
+        [data-testid="stMain"] h2,
+        [data-testid="stMain"] h3,
+        [data-testid="stMain"] h4 {
+          color: var(--ar-ink) !important;
+          font-family: Inter, "Segoe UI", Arial, sans-serif !important;
+          letter-spacing: -.025em !important;
+          font-weight: 780 !important;
+        }
+        [data-testid="stMain"] h2 { font-size: clamp(1.35rem, 2.2vw, 2rem) !important; }
+        [data-testid="stMain"] h3 { font-size: clamp(1.08rem, 1.6vw, 1.4rem) !important; }
+
+        /* Module photography: keep the real local image visible behind the copy. */
+        [data-testid="stMain"] [class*="st-key-ar-head-"] {
+          position: relative !important;
+          overflow: hidden !important;
+          isolation: isolate !important;
+          min-height: 245px !important;
+          margin: .2rem 0 1.45rem !important;
+          padding: clamp(1.45rem, 3.2vw, 2.55rem) !important;
+          border: 1px solid rgba(224, 246, 241, .26) !important;
+          border-radius: 26px !important;
+          background-image:
+            linear-gradient(105deg, rgba(3, 27, 24, .94) 0%, rgba(7, 53, 48, .73) 54%, rgba(7, 39, 47, .38) 100%),
+            var(--ar-hero-image),
+            linear-gradient(125deg, #173f35, #1b6670) !important;
+          background-position: center !important;
+          background-size: cover !important;
+          box-shadow: 0 22px 52px rgba(17, 64, 50, .18) !important;
+        }
+        [data-testid="stMain"] [class*="st-key-ar-head-"]::after {
+          content: "" !important;
+          position: absolute !important;
+          inset: 0 !important;
+          z-index: -1 !important;
+          background: linear-gradient(180deg, rgba(5, 28, 25, .05), rgba(5, 28, 25, .5)) !important;
+          pointer-events: none !important;
+        }
+        [data-testid="stMain"] [class*="st-key-ar-head-"] > div {
+          position: relative !important;
+          z-index: 1 !important;
+        }
+        [data-testid="stMain"] [class*="st-key-ar-head-"] h1,
+        [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-title {
+          color: #fff !important;
+          -webkit-text-fill-color: #fff !important;
+          font-size: clamp(2.05rem, 4.2vw, 3.5rem) !important;
+          font-weight: 820 !important;
+          line-height: 1.08 !important;
+          text-shadow: 0 2px 18px rgba(0, 0, 0, .34) !important;
+        }
+        [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-kicker,
+        [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-kicker *,
+        [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-meta,
+        [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-meta * {
+          color: #c8f2df !important;
+          -webkit-text-fill-color: #c8f2df !important;
+          opacity: 1 !important;
+        }
+        [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-copy,
+        [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-copy * {
+          color: #f1faf5 !important;
+          -webkit-text-fill-color: #f1faf5 !important;
+          max-width: 850px !important;
+          font-size: clamp(.98rem, 1.3vw, 1.12rem) !important;
+          line-height: 1.65 !important;
+        }
+        [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-meta span {
+          color: #f1faf5 !important;
+          background: rgba(7, 63, 52, .58) !important;
+          border: 1px solid rgba(220, 247, 228, .38) !important;
+          border-radius: 999px !important;
+        }
+
+        /* Every analytical surface gets the same quiet elevation. */
+        [data-testid="stMain"] [data-testid="stMetric"],
+        [data-testid="stMain"] [data-testid="stExpander"],
+        [data-testid="stMain"] [data-testid="stVerticalBlockBorderWrapper"],
+        [data-testid="stMain"] [data-testid="stAlert"] {
+          border-radius: 18px !important;
+        }
+        [data-testid="stMain"] [data-testid="stMetric"],
+        [data-testid="stMain"] [data-testid="stVerticalBlockBorderWrapper"] {
+          background: rgba(255, 255, 255, .86) !important;
+          border: 1px solid var(--ar-border) !important;
+          box-shadow: 0 10px 26px rgba(23, 78, 85, .06) !important;
+        }
+        [data-testid="stMain"] [data-testid="stExpander"] {
+          background: rgba(255, 255, 255, .72) !important;
+          border: 1px solid var(--ar-border) !important;
+        }
+        [data-testid="stMain"] [data-testid="stExpander"] summary,
+        [data-testid="stMain"] [data-testid="stExpander"] summary p {
+          color: #174e55 !important;
+          font-weight: 720 !important;
+        }
+        [data-testid="stMain"] [data-testid="stMetricLabel"],
+        [data-testid="stMain"] [data-testid="stMetricLabel"] * {
+          color: #54706a !important;
+        }
+        [data-testid="stMain"] [data-testid="stMetricValue"],
+        [data-testid="stMain"] [data-testid="stMetricValue"] * {
+          color: #174e55 !important;
+        }
+
+        /* Inputs and actions remain recognisable and keyboard-friendly. */
+        [data-testid="stMain"] input,
+        [data-testid="stMain"] textarea,
+        [data-testid="stMain"] [data-baseweb="select"] > div {
+          background: #fff !important;
+          border-color: rgba(23, 78, 85, .22) !important;
+          color: #193b35 !important;
+          border-radius: 11px !important;
+        }
+        [data-testid="stMain"] input::placeholder,
+        [data-testid="stMain"] textarea::placeholder { color: #718783 !important; opacity: 1 !important; }
+        [data-testid="stMain"] div.stButton > button,
+        [data-testid="stMain"] button[kind="primary"] {
+          border-radius: 12px !important;
+          border: 1px solid rgba(23, 78, 85, .22) !important;
+          background: #174e55 !important;
+          color: #fff !important;
+          font-weight: 720 !important;
+          min-height: 2.55rem !important;
+          transition: transform .2s ease, box-shadow .2s ease, background .2s ease !important;
+        }
+        [data-testid="stMain"] div.stButton > button:hover,
+        [data-testid="stMain"] button[kind="primary"]:hover {
+          background: #216e68 !important;
+          box-shadow: 0 8px 20px rgba(23, 78, 85, .18) !important;
+          transform: translateY(-1px) !important;
+        }
+        [data-testid="stMain"] [data-testid="stTabs"] button { color: #4e6861 !important; font-weight: 680 !important; }
+        [data-testid="stMain"] [data-testid="stTabs"] button[aria-selected="true"] { color: #174e55 !important; }
+        [data-testid="stMain"] a { color: #176f70 !important; }
+
+        @media (max-width: 760px) {
+          [data-testid="stMain"] [class*="st-key-ar-head-"] { min-height: 220px !important; border-radius: 19px !important; padding: 1.25rem !important; }
+          [data-testid="stMain"] [class*="st-key-ar-head-"] h1 { font-size: clamp(1.8rem, 9vw, 2.55rem) !important; }
+          [data-testid="stMain"] [data-testid="stMarkdownContainer"] p,
+          [data-testid="stMain"] [data-testid="stMarkdownContainer"] li { font-size: .93rem !important; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          [data-testid="stMain"] *, [data-testid="stMain"] *::before, [data-testid="stMain"] *::after {
+            animation-duration: .01ms !important; animation-iteration-count: 1 !important;
+            scroll-behavior: auto !important; transition-duration: .01ms !important;
+          }
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def page_header(
     kicker: str,
     title: str,
@@ -81,6 +270,7 @@ def page_header(
     decorated by the shared stylesheet.
     """
 
+    _render_workspace_design_system()
     accent_hex = ACCENTS.get(accent, ACCENTS["teal"])
     container_key = f"ar-head-{_slug(key or title)}"
     hero_image = image or PAGE_MEDIA.get(_slug(key or title))
