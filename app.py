@@ -1981,9 +1981,81 @@ st.markdown(
     [data-testid="stSidebarNav"] a[aria-current="page"] {
       position: relative;
     }
+    /* Refined navigation micro-interactions: calm motion, clear state,
+       and a soft glass-like active surface without changing page routing. */
+    @keyframes arNavSelect {
+      from { opacity: .72; transform: translateX(-3px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    [data-testid="stSidebarNav"] {
+      scroll-behavior: smooth;
+    }
+    [data-testid="stSidebarNav"] a,
+    [data-testid="stSidebarNavLink"] {
+      position: relative;
+      will-change: background-color, transform;
+      transition:
+        background .22s cubic-bezier(.2,.75,.25,1),
+        border-color .22s cubic-bezier(.2,.75,.25,1),
+        color .18s ease,
+        box-shadow .22s cubic-bezier(.2,.75,.25,1),
+        transform .22s cubic-bezier(.2,.75,.25,1) !important;
+    }
+    [data-testid="stSidebarNav"] a:hover,
+    [data-testid="stSidebarNavLink"]:hover {
+      transform: translateX(2px);
+      background: linear-gradient(105deg, rgba(41,155,145,.13), rgba(255,255,255,.58)) !important;
+      border-color: rgba(41,155,145,.24) !important;
+      box-shadow: 0 3px 10px rgba(23,78,85,.055);
+    }
+    [data-testid="stSidebarNav"] a [data-testid="stIconMaterial"],
+    [data-testid="stSidebarNavLink"] [data-testid="stIconMaterial"] {
+      transition: color .2s ease, transform .22s cubic-bezier(.2,.75,.25,1) !important;
+      transform-origin: center;
+    }
+    [data-testid="stSidebarNav"] a:hover [data-testid="stIconMaterial"],
+    [data-testid="stSidebarNavLink"]:hover [data-testid="stIconMaterial"] {
+      color: #217F78 !important;
+      transform: scale(1.08);
+    }
+    [data-testid="stSidebarNav"] a[aria-current="page"],
+    [data-testid="stSidebarNavLink"][aria-current="page"] {
+      background: linear-gradient(110deg, #E2F0EC 0%, #F4FAF7 100%) !important;
+      border-color: rgba(41,155,145,.34) !important;
+      box-shadow: inset 3px 0 0 #299B91, 0 4px 14px rgba(23,78,85,.07) !important;
+      animation: arNavSelect .24s cubic-bezier(.2,.75,.25,1) both;
+    }
+    [data-testid="stSidebarNav"] a[aria-current="page"] [data-testid="stIconMaterial"],
+    [data-testid="stSidebarNavLink"][aria-current="page"] [data-testid="stIconMaterial"] {
+      color: #217F78 !important;
+    }
+    [data-testid="stSidebarNav"] [data-testid="stSidebarNavSeparator"],
+    [data-testid="stSidebarNavSeparator"] {
+      opacity: .78;
+      transition: opacity .2s ease, margin .2s ease;
+    }
+    [data-testid="stSidebarNav"] a:focus-visible,
+    [data-testid="stSidebarNavLink"]:focus-visible {
+      outline: 3px solid rgba(41,155,145,.62) !important;
+      outline-offset: 2px !important;
+      box-shadow: 0 0 0 5px rgba(41,155,145,.10) !important;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      [data-testid="stSidebarNav"] { scroll-behavior: auto !important; }
+      [data-testid="stSidebarNav"] a,
+      [data-testid="stSidebarNavLink"] {
+        transform: none !important;
+        animation: none !important;
+        transition: none !important;
+      }
+    }
     @media (max-width: 640px) {
       [data-testid="stSidebarNav"] {
         padding: .5rem .4rem .9rem !important;
+      }
+      [data-testid="stSidebarNav"] a:hover,
+      [data-testid="stSidebarNavLink"]:hover {
+        transform: none;
       }
     }
 
