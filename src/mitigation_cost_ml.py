@@ -42,7 +42,7 @@ def prepare_cost_records(records: pd.DataFrame) -> pd.DataFrame:
         lambda col: col.map(lambda v: math.isfinite(float(v)))
     ).all(axis=1)
     positive=(frame.scope_quantity>0)&(frame[TARGET]>0)
-    frame=frame.loc[finite&positive].reset_index(drop=True)
+    frame=frame.loc[finite&positive]
     if len(frame)<MIN_ROWS:
         raise CostModelDataError(
             f"Only {len(frame)} complete, sourced records are usable. "
