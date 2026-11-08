@@ -1586,3 +1586,194 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+# Homepage dashboard hierarchy refinement.
+# CSS-only: preserves the original hero, copy, navigation destinations,
+# photography, evidence scope, and all existing interactions.
+st.markdown(
+    """
+    <style>
+    /* Bring the overview signal strip into a deliberate command-centre rhythm. */
+    [data-testid="stMain"] .ar-signal {
+      align-items: stretch !important;
+      gap: .9rem !important;
+      margin-top: 1.35rem !important;
+    }
+    [data-testid="stMain"] .ar-signal > div {
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      min-height: 116px !important;
+      padding: 1.15rem 1.2rem !important;
+      border: 1px solid rgba(23, 78, 85, .14) !important;
+      border-radius: 17px !important;
+      background: linear-gradient(145deg, #FFFFFF 0%, #F7FAF8 100%) !important;
+      box-shadow: 0 5px 16px rgba(23, 78, 85, .045) !important;
+    }
+    [data-testid="stMain"] .ar-signal strong {
+      color: #174E55 !important;
+      font-size: clamp(1.45rem, 2.2vw, 1.85rem) !important;
+      line-height: 1.08 !important;
+      letter-spacing: -.035em !important;
+    }
+    [data-testid="stMain"] .ar-signal span {
+      margin-top: .48rem !important;
+      color: #24796F !important;
+      font-size: .67rem !important;
+      letter-spacing: .12em !important;
+    }
+    [data-testid="stMain"] .ar-signal p {
+      margin-top: .38rem !important;
+      color: #586F70 !important;
+      font-size: .8rem !important;
+      line-height: 1.48 !important;
+    }
+
+    /* Make each story introduction easier to scan between major sections. */
+    [data-testid="stMain"] .ar-story {
+      max-width: 900px !important;
+      margin-top: clamp(3rem, 5.2vw, 4.5rem) !important;
+      margin-bottom: 1.35rem !important;
+    }
+    [data-testid="stMain"] .ar-story .ar-overline {
+      font-size: .68rem !important;
+      letter-spacing: .15em !important;
+    }
+    [data-testid="stMain"] .ar-story h2 {
+      max-width: 820px !important;
+      margin-top: .55rem !important;
+      margin-bottom: .65rem !important;
+      font-size: clamp(1.8rem, 3.25vw, 2.8rem) !important;
+      line-height: 1.08 !important;
+      letter-spacing: -.035em !important;
+      text-wrap: balance !important;
+    }
+    [data-testid="stMain"] .ar-story p {
+      max-width: 740px !important;
+      font-size: .98rem !important;
+      line-height: 1.72 !important;
+    }
+
+    /* Workspace directory: clear group identity, quieter surfaces, stronger links. */
+    [data-testid="stMain"] [class*="st-key-ar-nav-"] {
+      height: 100% !important;
+      padding: 1.2rem !important;
+      border: 1px solid rgba(23, 78, 85, .15) !important;
+      border-radius: 19px !important;
+      background:
+        radial-gradient(ellipse at 100% 0%, rgba(41, 155, 145, .055), transparent 15rem),
+        linear-gradient(145deg, #FFFFFF 0%, #F8FBF9 100%) !important;
+      box-shadow: 0 6px 19px rgba(23, 78, 85, .05) !important;
+      transition: border-color .2s ease, box-shadow .2s ease !important;
+    }
+    [data-testid="stMain"] [class*="st-key-ar-nav-"]:hover {
+      transform: none !important;
+      border-color: rgba(41, 155, 145, .32) !important;
+      box-shadow: 0 11px 26px rgba(23, 78, 85, .085) !important;
+    }
+    [data-testid="stMain"] .ar-nav-head {
+      align-items: center !important;
+      gap: .85rem !important;
+      margin-bottom: .8rem !important;
+    }
+    [data-testid="stMain"] .ar-nav-icon {
+      flex: 0 0 44px !important;
+      width: 44px !important;
+      height: 44px !important;
+      border-radius: 13px !important;
+      background: #E7F2EF !important;
+      color: #24796F !important;
+    }
+    [data-testid="stMain"] .ar-nav-count {
+      color: #66807B !important;
+      font-size: .66rem !important;
+      font-weight: 750 !important;
+      letter-spacing: .11em !important;
+    }
+    [data-testid="stMain"] .ar-nav-head h3 {
+      margin: .16rem 0 0 !important;
+      color: #174E55 !important;
+      font-size: 1.16rem !important;
+      line-height: 1.25 !important;
+      letter-spacing: -.02em !important;
+    }
+    [data-testid="stMain"] .ar-nav-copy {
+      min-height: 3.1rem !important;
+      margin: .25rem 0 .85rem !important;
+      color: #526B6E !important;
+      font-size: .86rem !important;
+      line-height: 1.58 !important;
+    }
+    [data-testid="stMain"] [class*="st-key-ar-nav-"] [data-testid="stPageLink"] {
+      margin-top: .28rem !important;
+    }
+    [data-testid="stMain"] [class*="st-key-ar-nav-"] [data-testid="stPageLink"] a {
+      min-height: 2.45rem !important;
+      padding: .52rem .68rem !important;
+      border: 1px solid rgba(23, 78, 85, .09) !important;
+      border-radius: 10px !important;
+      background: rgba(255, 255, 255, .72) !important;
+      color: #315C55 !important;
+      font-size: .87rem !important;
+      font-weight: 620 !important;
+      transition: background .16s ease, border-color .16s ease, color .16s ease !important;
+    }
+    [data-testid="stMain"] [class*="st-key-ar-nav-"] [data-testid="stPageLink"] a:hover {
+      border-color: rgba(41, 155, 145, .25) !important;
+      background: #EAF4F1 !important;
+      color: #174E55 !important;
+    }
+
+    /* Evidence workflow: improve step separation without altering its wording. */
+    [data-testid="stMain"] .ar-why {
+      border-radius: 22px !important;
+      border-color: rgba(23, 78, 85, .15) !important;
+      box-shadow: 0 10px 28px rgba(23, 78, 85, .055) !important;
+    }
+    [data-testid="stMain"] .ar-flow-step {
+      border-top-width: 2px !important;
+      border-top-color: rgba(41, 155, 145, .42) !important;
+      border-radius: 0 0 12px 12px !important;
+      padding: .9rem .8rem .75rem !important;
+    }
+    [data-testid="stMain"] .ar-step-no {
+      font-size: .72rem !important;
+      font-weight: 800 !important;
+      letter-spacing: .1em !important;
+    }
+    [data-testid="stMain"] .ar-flow-step h3 {
+      color: #174E55 !important;
+      font-size: 1rem !important;
+      line-height: 1.3 !important;
+    }
+    [data-testid="stMain"] .ar-flow-step p {
+      color: #526B6E !important;
+      font-size: .83rem !important;
+      line-height: 1.58 !important;
+    }
+    [data-testid="stMain"] .ar-transparency {
+      border-radius: 14px !important;
+      background: #EAF3EF !important;
+      border-color: rgba(23, 78, 85, .14) !important;
+    }
+
+    /* Consistent responsive behaviour across tablet and mobile widths. */
+    @media (max-width: 900px) {
+      [data-testid="stMain"] .ar-signal > div { min-height: 104px !important; }
+      [data-testid="stMain"] .ar-nav-copy { min-height: 0 !important; }
+    }
+    @media (max-width: 600px) {
+      [data-testid="stMain"] .ar-story { margin-top: 2.6rem !important; }
+      [data-testid="stMain"] [class*="st-key-ar-nav-"] { padding: 1rem !important; }
+      [data-testid="stMain"] .ar-signal > div { min-height: 0 !important; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      [data-testid="stMain"] [class*="st-key-ar-nav-"],
+      [data-testid="stMain"] [class*="st-key-ar-nav-"] a {
+        transition: none !important;
+      }
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
