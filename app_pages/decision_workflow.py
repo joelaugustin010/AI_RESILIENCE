@@ -585,8 +585,8 @@ def _render_ml_evidence(evidence: dict) -> None:
     else:
         st.info(
             "No scenario-specific ML output was produced. The submitted scenario does not contain a complete, "
-            "time-matched feature sequence. Single rainfall or river entries are not substituted for the "
-            "46-feature weather history required by this research model."
+            "time-matched feature sequence required by the registered model. Partial values are not "
+            "filled from unrelated fields or substituted across different hazards."
         )
         for model in evidence.get("models", []):
             missing = (model.get("context") or {}).get("missing_features") or []
