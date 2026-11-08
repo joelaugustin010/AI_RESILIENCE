@@ -225,7 +225,11 @@ with st.container(border=True):
             estimated_duration = None
             method_parts = []
 
-            if cost_ready:
+            # A traceable quotation is the primary planning input. Never silently
+            # replace a user-entered quote with a model estimate.
+            if estimated_cost is not None:
+                method_parts.append("User-entered quotation · not an ML estimate")
+            elif cost_ready:
                 try:
                     cost_result = estimate_cost(
                         cost_model,
@@ -256,8 +260,6 @@ with st.container(border=True):
 
             if not method_parts and estimated_cost is None:
                 method_parts.append("Draft · awaiting validated ML models")
-            elif not method_parts:
-                method_parts.append("User-entered quotation · not an ML estimate")
 
             record = {
                 "Intervention": project_name,
@@ -268,8 +270,9 @@ with st.container(border=True):
                 "Priority method": "Awaiting assessment",
                 "Cost INR": estimated_cost,
                 "Source / estimate date": (
-                    ("ML estimate · validation required" if "ML cost estimate" in method_parts
-                     else source_reference.strip())
+                    "ML estimate · validation required"
+                    if "ML cost estimate" in method_parts
+                    else source_reference.strip()
                 ),
                 "Scope and unit": f"{scope_quantity:g} {scope_unit}",
                 "Potential beneficiaries": None,
@@ -389,7 +392,23 @@ else:
                 f"Scope: {project['Scope and unit']} · "
                 f"Evidence: {project['Evidence for risk reduction'] or 'Not supplied'}"
             )
-            if st.button("Remove project", key=f"remove_mitigation_project_{idx}"):
+            status_options = ["Proposed", "Planned", "In Progress", "Completed", "On Hold"]
+            current_status = (
+                project["Project Status"]
+                if project["Project Status"] in status_options
+                else "Proposed"
+            )
+            control_cols = st.columns([2, 1])
+            updated_status = control_cols[0].selectbox(
+                "Project delivery status",
+                status_options,
+                index=status_options.index(current_status),
+                key=f"mitigation_project_status_{idx}",
+            )
+            if updated_status != current_status:
+                st.session_state["mitigation_project_records"][idx]["Project Status"] = updated_status
+                st.rerun()
+            if control_cols[1].button("Remove project", key=f"remove_mitigation_project_{idx}"):
                 st.session_state["mitigation_project_records"].pop(idx)
                 st.rerun()
 
