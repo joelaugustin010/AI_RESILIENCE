@@ -411,7 +411,7 @@ def _render_phase2_data_context() -> None:
 
 
 def _render_disaster_assessment(result: dict) -> None:
-    st.header("4. Hazard-specific scientific assessment")
+    st.subheader("Hazard-specific assessment details")
     st.caption(
         "This is an observation review or scenario calculation, never a validated prediction. "
         "Only supplied inputs are used; missing exposure and impact evidence stays unavailable. "
@@ -453,8 +453,6 @@ def _render_disaster_assessment(result: dict) -> None:
             for key, value in indicators.items()
         ]
         display_dataframe(pd.DataFrame(rows), hide_index=True, width="stretch", alt="Hazard-specific physical indicators and their user-supplied values")
-
-    _render_ml_evidence(result.get("ml_evidence", {}))
 
     consequences = result["potential_consequences"]
     st.write("**Potential consequences:**", consequences["status"])
@@ -1266,6 +1264,14 @@ if inputs is None:
     st.stop()
 
 st.header("2. Immediate scenario result")
+try:
+    disaster_assessment = assess_disaster(inputs)
+except ValueError as exc:
+    disaster_assessment = None
+    st.error(f"Hazard-specific assessment input error: {exc}")
+else:
+    shared_ml_evidence = disaster_assessment.get("ml_evidence", {})
+
 st.caption(
     "Your submitted hypothetical values are assessed here first. This output explains conditional consequences and, " 
     "where an official threshold applies, the corresponding screening category. It is not a calibrated flood probability, " 
@@ -1280,8 +1286,8 @@ st.subheader("Conditional scenario output")
 st.metric("Scenario concern", prediction["concern_level"])
 st.markdown("**Potential outcome**")
 st.write(prediction["conditional_outcome"])
-st.caption(f"Output engine: {prediction['model_type']}. Numerical probability: not available. This is not a trained ML forecast or official warning.")
-with st.expander("Why the model produced this output", expanded=True):
+st.caption(f"Scenario engine: {prediction['model_type']}. This immediate conditional outcome is rule-based; it is not the output of a trained ML model. Separate shared-ML inference is displayed below when a registered model's complete feature contract and evidence gates are satisfied. No official warning is produced.")
+with st.expander("Why the scenario engine produced this output", expanded=False):
     st.markdown("**Evidence used**")
     for item in prediction["evidence_used"]:
         st.markdown(f"- {item}")
@@ -1296,12 +1302,56 @@ with st.expander("Why the model produced this output", expanded=True):
 scenario_screen = build_scenario_screening(inputs)
 display_dataframe(scenario_screen, hide_index=True, width="stretch")
 
-st.header("3. Review evidence")
+st.header("3. Key hazard assessment and recommended precautions")
+if disaster_assessment is not None:
+    _render_disaster_assessment(disaster_assessment)
+    _render_ml_evidence(shared_ml_evidence)
+else:
+    st.warning("The hazard-specific assessment is unavailable because the submitted inputs did not pass its validation.")
+
+st.subheader("Impact and exposure outputs")
+consequence_assessment = build_consequence_assessment(
+    inputs["hazard"],
+    inputs["location"],
+    inputs["input_classification"],
+    inputs,
+)
+st.caption(
+    "This is the required output structure for every selected disaster. Numerical probability and affected-area results "
+    "will appear only after the corresponding validated model and spatial evidence are connected."
+)
+st.write("**Scenario type:**", consequence_assessment["scenario_type"])
+st.write("**Current model status:**", consequence_assessment["model_status"])
+if consequence_assessment["heatwave_screening"] is not None:
+    heat = consequence_assessment["heatwave_screening"]
+    st.markdown("**Heatwave criteria screen (not a forecast or official warning)**")
+    st.write("**Station-level screening:**", heat["station_status"])
+    if heat["departure_from_normal_c"] is not None:
+        st.metric("Supplied maximum-temperature departure from normal", f"{heat['departure_from_normal_c']:.1f} °C")
+    st.write("**Duration and multi-station check:**", heat["declaration_status"])
+    st.caption(heat["source"])
+col_prob, col_area = st.columns(2)
+with col_prob:
+    st.markdown("**Probability of occurrence**")
+    st.info(consequence_assessment["occurrence_probability"])
+with col_area:
+    st.markdown("**Affected-area estimate**")
+    st.info(consequence_assessment["affected_area"])
+st.markdown("**Consequences this assessment must examine**")
+for item in consequence_assessment["consequence_categories"]:
+    st.markdown(f"- {item}")
+st.markdown("**Required evidence for this scenario**")
+for item in consequence_assessment["required_evidence"]:
+    st.markdown(f"- {item}")
+st.warning(consequence_assessment["scientific_guardrail"])
+st.caption(consequence_assessment["probability_semantics"])
+
+st.header("4. Technical evidence and validation details")
 evidence = evidence_inventory(ROOT, st.session_state.get("rainfall_backtest_result"))
 st.caption("The separate historical benchmark uses only the manual rainfall observations. Its results do not enter this qualitative assessment; conflicted CWC rainfall, unverified sample rows, and unresolved river levels remain excluded from model calculations.")
 display_dataframe(evidence, hide_index=True, width="stretch")
 
-with st.expander("Dataset provenance and scientific fitness register", expanded=True):
+with st.expander("Dataset provenance and scientific fitness register", expanded=False):
     st.caption(
         "A listed source is not automatically suitable for every claim. Unknown licence, time-zone, "
         "datum, checksum, or spatial metadata stays unresolved; this register does not certify data."
@@ -1332,7 +1382,7 @@ with st.expander("Dataset provenance and scientific fitness register", expanded=
         "Source metadata completeness and scientific validation are different checks."
     )
 
-with st.expander("Kochi multi-hazard data acquisition board", expanded=True):
+with st.expander("Kochi multi-hazard data acquisition board", expanded=False):
     st.caption(
         "This is the parallel acquisition queue. 'Discovered' means a credible source page was identified, "
         "not that its files have been downloaded or validated. Restricted or unclear sources are not scraped."
@@ -1388,7 +1438,7 @@ with st.expander("Kochi multi-hazard data acquisition board", expanded=True):
         "licence/access terms, checksum, schema, spatial coverage and QA results are recorded."
     )
 
-with st.expander("Consequence-model data requirements by disaster", expanded=True):
+with st.expander("Consequence-model data requirements by disaster", expanded=False):
     st.caption(
         "This matrix defines the evidence needed to estimate local consequences—not just whether a hazard exists. "
         "It separates hazard intensity, physical processes, exposure, vulnerability and observed outcomes. "
@@ -1454,15 +1504,8 @@ st.write("**Permitted interpretation:**", provenance["Permitted interpretation"]
 st.write("**Required verification:**", provenance["Verification gate"])
 st.caption("Typing a source name or selecting a classification does not independently verify the source, its freshness, or its fitness for this hazard.")
 
-st.header("4. Assessment status")
+st.header("Assessment diagnostics and uncertainty")
 assessment = assessment_summary(inputs)
-try:
-    disaster_assessment = assess_disaster(inputs)
-except ValueError as exc:
-    disaster_assessment = None
-    st.error(f"Hazard-specific assessment input error: {exc}")
-else:
-    _render_disaster_assessment(disaster_assessment)
 compound_assessment = None
 if inputs.get("hazard") == "Compound: cyclone + flood":
     try:
@@ -1612,42 +1655,7 @@ st.info(
     "Your hypothetical scenario has still been assessed qualitatively in the section above."
 )
 
-st.subheader("Consequence assessment: probability, affected areas and impacts")
-consequence_assessment = build_consequence_assessment(
-    inputs["hazard"],
-    inputs["location"],
-    inputs["input_classification"],
-    inputs,
-)
-st.caption(
-    "This is the required output structure for every selected disaster. Numerical probability and affected-area results "
-    "will appear only after the corresponding validated model and spatial evidence are connected."
-)
-st.write("**Scenario type:**", consequence_assessment["scenario_type"])
-st.write("**Current model status:**", consequence_assessment["model_status"])
-if consequence_assessment["heatwave_screening"] is not None:
-    heat = consequence_assessment["heatwave_screening"]
-    st.markdown("**Heatwave criteria screen (not a forecast or official warning)**")
-    st.write("**Station-level screening:**", heat["station_status"])
-    if heat["departure_from_normal_c"] is not None:
-        st.metric("Supplied maximum-temperature departure from normal", f"{heat['departure_from_normal_c']:.1f} °C")
-    st.write("**Duration and multi-station check:**", heat["declaration_status"])
-    st.caption(heat["source"])
-col_prob, col_area = st.columns(2)
-with col_prob:
-    st.markdown("**Probability of occurrence**")
-    st.info(consequence_assessment["occurrence_probability"])
-with col_area:
-    st.markdown("**Affected-area estimate**")
-    st.info(consequence_assessment["affected_area"])
-st.markdown("**Consequences this assessment must examine**")
-for item in consequence_assessment["consequence_categories"]:
-    st.markdown(f"- {item}")
-st.markdown("**Required evidence for this scenario**")
-for item in consequence_assessment["required_evidence"]:
-    st.markdown(f"- {item}")
-st.warning(consequence_assessment["scientific_guardrail"])
-st.caption(consequence_assessment["probability_semantics"])
+
 
 if inputs.get("hazard") == "Flood":
     with st.expander("Flood extent and depth analysis (upload a measured/modelled depth layer)", expanded=False):
