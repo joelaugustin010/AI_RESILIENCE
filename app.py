@@ -1807,6 +1807,64 @@ st.markdown(
       animation: none !important;
     }
 
+
+    /* AI RESILIENCE — Unified page layout rhythm.
+       Presentation-only: standardise the content canvas and vertical spacing
+       while preserving page-specific hero, map, chart and component styling. */
+    [data-testid="stMainBlockContainer"],
+    .block-container {
+      width: 100% !important;
+      max-width: 1440px !important;
+      padding-top: clamp(1rem, 1.8vw, 1.55rem) !important;
+      padding-right: clamp(1rem, 2.6vw, 2.4rem) !important;
+      padding-bottom: clamp(2rem, 3.2vw, 3rem) !important;
+      padding-left: clamp(1rem, 2.6vw, 2.4rem) !important;
+      box-sizing: border-box !important;
+    }
+    [data-testid="stMain"] [class*="st-key-ar-head-"] {
+      margin-top: .15rem !important;
+      margin-bottom: clamp(1.15rem, 2vw, 1.7rem) !important;
+    }
+    [data-testid="stMain"] .ar-sec-intro {
+      margin-top: clamp(1.25rem, 2.1vw, 1.8rem) !important;
+      margin-bottom: .7rem !important;
+    }
+    [data-testid="stMain"] [data-testid="stHorizontalBlock"] {
+      column-gap: clamp(.75rem, 1.6vw, 1.35rem) !important;
+      row-gap: 1rem !important;
+    }
+    [data-testid="stMain"] [data-testid="stVerticalBlock"] {
+      row-gap: .85rem;
+    }
+    [data-testid="stMain"] [data-testid="stDataFrame"],
+    [data-testid="stMain"] [data-testid="stTable"],
+    [data-testid="stMain"] [data-testid="stPlotlyChart"],
+    [data-testid="stMain"] [data-testid="stVegaLiteChart"],
+    [data-testid="stMain"] [data-testid="stPydeckChart"] {
+      max-width: 100%;
+      min-width: 0;
+    }
+    @media (max-width: 900px) {
+      [data-testid="stMainBlockContainer"],
+      .block-container {
+        padding-right: 1.1rem !important;
+        padding-left: 1.1rem !important;
+      }
+    }
+    @media (max-width: 640px) {
+      [data-testid="stMainBlockContainer"],
+      .block-container {
+        padding-top: .9rem !important;
+        padding-right: .8rem !important;
+        padding-bottom: 2rem !important;
+        padding-left: .8rem !important;
+      }
+      [data-testid="stMain"] [data-testid="stHorizontalBlock"] {
+        column-gap: .6rem !important;
+        row-gap: .8rem !important;
+      }
+    }
+
     /* Dark ink and clear font hierarchy for ordinary page content. */
     [data-testid="stMain"] {
       font-family: "Inter", "Segoe UI", Arial, sans-serif !important;
