@@ -73,3 +73,13 @@ https://amrutkerala.org/city-wise-progress/
 
 Other official discovery source: KIIDC completed-projects listing:
 https://kiidc.kerala.gov.in/category/our-current-projects/completed-projects/
+
+
+### Additional KWA records reviewed (8 November 2026)
+- KWA PASK DEPOSIT-KMC pipeline replacement along Ashan Road, Kochi Division 48: start 19 August 2024; work completed 16 December 2024; total bill paid ₹1,128,549; final bill submitted 18 January 2025. PASK does not expose a comparable pipe-length quantity in the captured profile. Retained in supplemental candidates, excluded from current ML training.
+- KWA PASK Muttathara 107 MLD STP three-year operation-and-maintenance package: reported total bill paid ₹48,618,926; start 1 September 2019; actual completion 31 January 2023; subsequent O&M contract commenced 1 February 2023. Retained as O&M evidence, not mixed with capital construction records.
+
+### Kochi AMRUT audit evidence
+CAG Performance Audit on AMRUT in Kerala reports 49 Kochi storm-water-drain works with project cost ₹53.86 crore; 48 completed with expenditure ₹34.15 crore. Audit test-checked nine works (project cost ₹28.18 crore), reporting ₹21.47 crore spent and noting that much of the spending related to routine maintenance. This is an aggregate/audit finding, not 49 project-level records. It must not be expanded into synthetic rows. Source: https://cag.gov.in/uploads/download_audit_report/2025/Print-version-english_AMRUT_Kerala_10.12.25-with-legislature-date-0699d302521f715.11884185.pdf
+
+KIIDC's completed-project listing includes Punnamada post-flood renovation; the page states final billing was still in progress, so it is a discovery lead and not treated as a final-cost training record. Source: https://kiidc.kerala.gov.in/category/our-current-projects/completed-projects/
