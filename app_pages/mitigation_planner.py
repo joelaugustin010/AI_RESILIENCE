@@ -476,7 +476,7 @@ with st.expander("Train and evaluate the ML investment-priority model", expanded
             count_cols[0].metric("Usable labelled records", len(priority_valid))
             count_cols[1].metric("Priority classes", priority_valid["historical_priority_label"].nunique())
             count_cols[2].metric("Unique source references", priority_valid["source_reference"].nunique())
-            st.dataframe(
+            display_dataframe(
                 priority_valid["historical_priority_label"].value_counts().rename_axis("Historical label").reset_index(name="Records"),
                 hide_index=True, use_container_width=True
             )
@@ -706,7 +706,7 @@ with st.expander("Train and evaluate the ML cost model", expanded=False):
                         "Training will still reject incomplete, invalid, non-positive, or insufficiently varied records."
                     )
                 with st.expander("Inspect uploaded records", expanded=False):
-                    st.dataframe(historical_records.head(12), hide_index=True, use_container_width=True)
+                    display_dataframe(historical_records.head(12), hide_index=True, use_container_width=True)
                     st.caption("Preview only. A non-empty source-reference field is not independently verified by this application.")
             if st.button(
                 "Train and evaluate model",
