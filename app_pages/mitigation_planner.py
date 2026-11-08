@@ -171,20 +171,21 @@ with st.container(border=True):
         )
         st.markdown("##### Investment assessment · human-reviewed inputs")
         score_cols = st.columns(2)
-        site_risk_severity = score_cols[0].select_slider(
-            "Site risk severity (1–5)", options=[1, 2, 3, 4, 5], value=3,
+        assessment_options = ["Not assessed", 1, 2, 3, 4, 5]
+        site_risk_severity = score_cols[0].selectbox(
+            "Site risk severity (1–5)", options=assessment_options, index=0,
             help="Use a documented local risk assessment. 1 = lower assessed severity; 5 = highest assessed severity."
         )
-        urgency = score_cols[1].select_slider(
-            "Urgency (1–5)", options=[1, 2, 3, 4, 5], value=3,
+        urgency = score_cols[1].selectbox(
+            "Urgency (1–5)", options=assessment_options, index=0,
             help="1 = can be scheduled later; 5 = time-critical based on documented conditions."
         )
-        evidence_strength = score_cols[0].select_slider(
-            "Evidence strength (1–5)", options=[1, 2, 3, 4, 5], value=1,
+        evidence_strength = score_cols[0].selectbox(
+            "Evidence strength (1–5)", options=assessment_options, index=0,
             help="1 = preliminary / anecdotal; 5 = strong, traceable site-specific evidence."
         )
-        implementation_readiness = score_cols[1].select_slider(
-            "Implementation readiness (1–5)", options=[1, 2, 3, 4, 5], value=1,
+        implementation_readiness = score_cols[1].selectbox(
+            "Implementation readiness (1–5)", options=assessment_options, index=0,
             help="Consider design, permissions, land, responsible owner and delivery arrangements."
         )
         with st.expander("Optional details · quotation and evidence", expanded=False):
@@ -267,11 +268,12 @@ with st.container(border=True):
                 "Evidence for risk reduction": risk_evidence.strip(),
                 "ML duration estimate": estimated_duration,
                 "Estimation method": " + ".join(method_parts),
-                "site_risk_severity": int(site_risk_severity),
-                "urgency": int(urgency),
-                "evidence_strength": int(evidence_strength),
-                "implementation_readiness": int(implementation_readiness),
+                "site_risk_severity": site_risk_severity,
+                "urgency": urgency,
+                "evidence_strength": evidence_strength,
+                "implementation_readiness": implementation_readiness,
             }
+            record["Priority"] = score_investment_priority(record)["band"]
             st.session_state["mitigation_project_records"].append(record)
             st.success(
                 "Project profile added. "
@@ -1269,7 +1271,7 @@ with st.expander("Portfolio analytics, budget scenarios and exports", expanded=F
                 })
         
         if not scenario_rows:
-            st.warning("Add projects with verified or clearly labelled cost estimates to compare investment scenarios.")
+            st.warning("Add a valid cost estimate and complete all four investment assessments to compare projects in a budget scenario.")
         elif len(scenario_rows) > 18:
             st.warning("The transparent exact optimiser currently supports up to 18 candidate projects per scenario.")
         else:
