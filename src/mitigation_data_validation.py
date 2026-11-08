@@ -54,6 +54,17 @@ def _duration_matches_dates(duration: Any, start: date | None, end: date | None)
         return False
 
 
+def _duration_matches_dates(duration: Any, start: date | None, end: date | None) -> bool:
+    if start is None or end is None or end < start:
+        return False
+    try:
+        reported = Decimal(_text(duration))
+        calculated = Decimal((end - start).days) / Decimal("30.4375")
+        return reported.is_finite() and abs(reported - calculated) <= Decimal("0.15")
+    except (InvalidOperation, ValueError):
+        return False
+
+
 def _valid_source(value: Any) -> bool:
     raw = _text(value)
     try:
@@ -91,6 +102,8 @@ def validate_records(
         source = _text(row.get("source_reference"))
         normalized_source = source.rstrip("/").casefold()
 
+        if not _text(row.get("record_id") or row.get("candidate_id") or row.get("project_id")):
+            issues.append("missing_record_id")
         if not name:
             issues.append("missing_project_name")
         elif normalized_name in seen_names:
@@ -163,6 +176,9 @@ def validate_records(
         duration_ok_value = _positive_decimal(duration_value)
         if not duration_ok_value:
             review.append("missing_or_nonpositive_duration_months")
+        duration_consistent = _duration_matches_dates(duration_value, start, end)
+        if duration_ok_value and start is not None and end is not None and end >= start and not duration_consistent:
+            review.append("duration_does_not_match_reported_dates")
         if not _truthy(row.get("ml_duration_eligible")):
             review.append("ml_duration_eligibility_not_explicitly_approved")
 
@@ -172,6 +188,7 @@ def validate_records(
             and end is not None
             and end >= start
             and duration_ok_value
+            and duration_consistent
             and _truthy(row.get("ml_duration_eligible"))
         )
 
