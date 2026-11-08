@@ -107,3 +107,17 @@ def risk_badge(label: str, level: str = "moderate") -> str:
     allowed = {"safe", "moderate", "high", "critical"}
     tone = level if level in allowed else "moderate"
     return f'<span class="ar-risk ar-risk-{tone}">{_escape(label)}</span>'
+
+
+def research_status_notice(scope: str = "This workspace") -> None:
+    """Display the platform-wide evidence-gated research status in every workspace."""
+    label = str(scope).strip() or "This workspace"
+    st.warning(
+        f"RESEARCH-GRADE SCREENING · {label}. AI_RESILIENCE is a research demonstration "
+        "and decision-support platform, not an operational early-warning service. "
+        "Outputs are conditional on supplied evidence; unvalidated probabilities, "
+        "predicted inundation depths, verified affected-population counts, and proven "
+        "intervention benefits are not claimed. Check source, timestamp, coverage, "
+        "uncertainty and data gaps before interpreting any result. Follow official "
+        "IMD, CWC, KSDMA and local-authority instructions for real safety decisions."
+    )
