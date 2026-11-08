@@ -1295,3 +1295,37 @@ with st.expander("Portfolio analytics, budget scenarios and exports", expanded=F
                 "The objective uses weighted human-assessed priority scores, not independently measured impact. "
                 "Results are scenario comparisons—not engineering advice, risk predictions, or an automatic funding decision."
             )
+
+            st.markdown("#### Budget sensitivity comparison · 75% / 100% / 125%")
+            st.caption(
+                "Compare how the selected portfolio changes when the available funding "
+                "is lower or higher. These are arithmetic scenarios using the same assessed "
+                "project set—not forecasts of outcomes."
+            )
+            sensitivity_rows = []
+            for scenario_label, multiplier in (
+                ("Constrained · 75%", 0.75),
+                ("Current · 100%", 1.00),
+                ("Expanded · 125%", 1.25),
+            ):
+                scenario_budget = float(budget) * multiplier
+                scenario_result = optimize_portfolio(scenario_rows, scenario_budget)
+                sensitivity_rows.append({
+                    "Budget scenario": scenario_label,
+                    "Budget cap": format_inr(scenario_budget),
+                    "Selected projects": len(scenario_result["selected"]),
+                    "Selected portfolio": (
+                        "; ".join(item["name"] for item in scenario_result["selected"])
+                        if scenario_result["selected"] else "No projects fit"
+                    ),
+                    "Priority points": scenario_result["total_value_points"],
+                    "Allocated": format_inr(scenario_result["total_cost_inr"]),
+                    "Unallocated": format_inr(scenario_result["remaining_budget_inr"]),
+                })
+            sensitivity_df = pd.DataFrame(sensitivity_rows)
+            display_dataframe(sensitivity_df, hide_index=True, use_container_width=True)
+            st.caption(
+                "The comparison assumes project costs and assessments remain unchanged "
+                "across scenarios. It does not model inflation, phased delivery, "
+                "dependencies, maintenance, or measured risk reduction."
+            )
