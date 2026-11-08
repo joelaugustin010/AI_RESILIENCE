@@ -134,3 +134,53 @@ def test_run_historical_replay_returns_prediction_and_provenance(monkeypatch):
     assert "target_rain_nextday" not in result["context"]
     assert result["input_date"] == "2019-12-31"
     assert result["target_date"] == "2020-01-01"
+
+
+
+def test_historical_replay_timeline_lists_only_complete_in_domain_test_dates(monkeypatch):
+    monkeypatch.setattr(service, "load_model_card", lambda model_id: _card())
+    monkeypatch.setattr(
+        service,
+        "build_weather_target_dataset",
+        lambda location, target: _dataset(),
+    )
+
+    dates = service.historical_replay_dates(
+        "weather_precipitation_kochi_nextday_regression"
+    )
+
+    assert dates == ["2020-01-01"]
+
+
+def test_historical_replay_can_select_a_specific_held_out_target_date(monkeypatch):
+    monkeypatch.setattr(service, "load_model_card", lambda model_id: _card())
+    monkeypatch.setattr(
+        service,
+        "build_weather_target_dataset",
+        lambda location, target: _dataset(),
+    )
+
+    replay = service.historical_replay_context(
+        "weather_precipitation_kochi_nextday_regression",
+        target_date="2020-01-01",
+    )
+
+    assert replay["target_date"] == "2020-01-01"
+    assert replay["input_date"] == "2019-12-31"
+    assert replay["observed_target"] == 8.0
+    assert "target_rain_nextday" not in replay["context"]
+
+
+def test_historical_replay_rejects_unavailable_timeline_date(monkeypatch):
+    monkeypatch.setattr(service, "load_model_card", lambda model_id: _card())
+    monkeypatch.setattr(
+        service,
+        "build_weather_target_dataset",
+        lambda location, target: _dataset(),
+    )
+
+    with pytest.raises(ValueError, match="No complete, in-domain historical replay case"):
+        service.historical_replay_context(
+            "weather_precipitation_kochi_nextday_regression",
+            target_date="2022-01-01",
+        )
