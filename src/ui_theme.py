@@ -84,8 +84,21 @@ def _render_workspace_design_system() -> None:
           --ar-ink: #193b35;
           --ar-muted: #4e6861;
           --ar-border: rgba(23, 78, 85, .16);
+          --ar-forest: #123f35;
+          --ar-leaf: #2f8068;
+          --ar-coastal: #2b7580;
           color: var(--ar-ink) !important;
           font-family: Inter, "Segoe UI", Arial, sans-serif !important;
+        }
+        [data-testid="stAppViewContainer"] {
+          background:
+            radial-gradient(circle at 12% 0%, rgba(92, 168, 132, .10), transparent 28rem),
+            linear-gradient(180deg, #f4f8f3 0%, #fbfaf4 42%, #f5f8f4 100%) !important;
+        }
+        [data-testid="stMainBlockContainer"] {
+          max-width: 1280px !important;
+          padding-top: clamp(1rem, 2.8vw, 2.4rem) !important;
+          padding-bottom: 3rem !important;
         }
         [data-testid="stMain"] > div {
           background: linear-gradient(180deg, rgba(251,250,244,.98), rgba(247,250,246,.98)) !important;
@@ -109,6 +122,11 @@ def _render_workspace_design_system() -> None:
         }
         [data-testid="stMain"] h2 { font-size: clamp(1.35rem, 2.2vw, 2rem) !important; }
         [data-testid="stMain"] h3 { font-size: clamp(1.08rem, 1.6vw, 1.4rem) !important; }
+        [data-testid="stMain"] label,
+        [data-testid="stMain"] [data-testid="stWidgetLabel"] p {
+          color: #355e52 !important;
+          font-weight: 680 !important;
+        }
 
         /* Module photography: keep the real local image visible behind the copy. */
         [data-testid="stMain"] [class*="st-key-ar-head-"] {
@@ -229,6 +247,14 @@ def _render_workspace_design_system() -> None:
           background: #216e68 !important;
           box-shadow: 0 8px 20px rgba(23, 78, 85, .18) !important;
           transform: translateY(-1px) !important;
+        }
+        [data-testid="stMain"] div.stButton > button[kind="secondary"] {
+          background: rgba(255,255,255,.82) !important;
+          color: #174e55 !important;
+        }
+        [data-testid="stMain"] div.stButton > button[kind="secondary"]:hover {
+          background: #e8f3ed !important;
+          border-color: rgba(47,128,104,.45) !important;
         }
         [data-testid="stMain"] [data-testid="stTabs"] button { color: #4e6861 !important; font-weight: 680 !important; }
         [data-testid="stMain"] [data-testid="stTabs"] button[aria-selected="true"] { color: #174e55 !important; }

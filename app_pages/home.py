@@ -1562,6 +1562,14 @@ st.markdown(
       border-radius:50%; background:#8ce0b6; box-shadow:0 0 0 4px rgba(140,224,182,.16);
       vertical-align:middle;
     }
+    [data-testid="stMainBlockContainer"] { max-width: 1360px !important; }
+    .ar-cine-hero { box-shadow: 0 30px 80px rgba(18,63,53,.24); }
+    .ar-cine-hero::after { background: linear-gradient(180deg,rgba(5,26,23,.16),rgba(5,26,23,.52) 76%,rgba(5,26,23,.78)) !important; }
+    .ar-story { max-width: 920px; }
+    .ar-nav-media { filter: saturate(.88) contrast(1.04); transition: filter .25s ease, transform .25s ease; }
+    [class*="st-key-ar-nav-"]:hover .ar-nav-media { filter: saturate(1.05) contrast(1.06); transform: scale(1.015); }
+    .ar-sdg-action { transition: transform .2s ease, box-shadow .2s ease, background .2s ease !important; }
+    .ar-sdg-action:hover { transform: translateY(-3px); box-shadow: 0 14px 28px rgba(30,87,68,.12); }
     .ar-signal { grid-template-columns:repeat(4,minmax(0,1fr)); gap:.8rem; border:0; margin:1.5rem 0 0; }
     .ar-signal > div {
       min-width:0; padding:1.15rem 1.2rem; border:1px solid rgba(44,105,82,.16);
