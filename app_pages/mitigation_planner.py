@@ -323,7 +323,7 @@ else:
             "Project": project.get("Intervention", "Unnamed"),
             "Location": project.get("Location", "Not specified"),
             "Priority score": assessment["score"],
-            "Assessment": assessment["band"],
+            "Assessment": ml_prediction["predicted_priority"] if ml_prediction else assessment["band"],
             "ML predicted priority": ml_prediction["predicted_priority"] if ml_prediction else "Not available",
             "ML confidence": (str(round(ml_prediction["confidence"] * 100, 1)) + "%") if ml_prediction else "—",
             "Risk (1–5)": assessment["criteria"].get("site_risk_severity", "—"),
@@ -1354,11 +1354,25 @@ with st.expander("Portfolio analytics, budget scenarios and exports", expanded=F
             except (TypeError, ValueError):
                 continue
             assessment = score_investment_priority(project.to_dict())
-            if pd.notna(cost_value) and cost_value > 0 and assessment["score"] is not None:
+            value_points = None
+            if priority_ml_ready:
+                try:
+                    ml_result = predict_priority(priority_model, project.to_dict())
+                    probabilities = ml_result["probabilities"]
+                    value_points = max(1, int(round(
+                        100 * probabilities.get("Higher assessed priority", 0.0)
+                        + 50 * probabilities.get("Moderate", 0.0)
+                        + probabilities.get("Further review", 0.0)
+                    )))
+                except Exception:
+                    value_points = None
+            if value_points is None and assessment["score"] is not None:
+                value_points = int(round(assessment["score"]))
+            if pd.notna(cost_value) and cost_value > 0 and value_points is not None:
                 scenario_rows.append({
                     "name": f'{project["Intervention"]} · {project["Location"]}',
                     "cost_inr": cost_value,
-                    "value_points": int(round(assessment["score"])),
+                    "value_points": value_points,
                 })
         
         if not scenario_rows:
@@ -1383,7 +1397,7 @@ with st.expander("Portfolio analytics, budget scenarios and exports", expanded=F
                 st.info("No candidate project fits within the current budget.")
             st.caption(
                 "Method: exhaustive 0/1 portfolio search over the submitted project set. "
-                "The objective uses weighted human-assessed priority scores, not independently measured impact. "
+                "When a validated priority classifier is available, the objective uses its class probabilities; otherwise it falls back to the transparent human-assessed score. Neither is independently measured impact. "
                 "Results are scenario comparisons—not engineering advice, risk predictions, or an automatic funding decision."
             )
 
