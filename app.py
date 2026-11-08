@@ -1627,3 +1627,206 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+
+# AI RESILIENCE - final text-contrast correction.
+# Scoped to Streamlit's native text and controls; custom cinematic panels,
+# charts, maps, severity colours and page-specific HTML remain untouched.
+st.markdown(
+    """
+    <style>
+    /* Native page copy: use a consistent dark-ink hierarchy on light surfaces. */
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > p,
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > ul,
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > ol,
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > blockquote,
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > div > p {
+      color: #31545A !important;
+      line-height: 1.68 !important;
+    }
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > h1,
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > h2,
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > h3,
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > h4,
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > div > h1,
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > div > h2,
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > div > h3 {
+      color: #174E55 !important;
+      line-height: 1.28 !important;
+    }
+    [data-testid="stMain"] [data-testid="stCaptionContainer"],
+    [data-testid="stMain"] [data-testid="stCaptionContainer"] *,
+    [data-testid="stMain"] [data-testid="stWidgetLabel"],
+    [data-testid="stMain"] [data-testid="stWidgetLabel"] * {
+      color: #52666A !important;
+      opacity: 1 !important;
+    }
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] a {
+      color: #176F70 !important;
+      text-decoration: underline;
+      text-decoration-thickness: .06em;
+      text-underline-offset: .16em;
+    }
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] a:hover {
+      color: #174E55 !important;
+    }
+
+    /* Make small utility text readable without changing status semantics. */
+    [data-testid="stMain"] small,
+    [data-testid="stMain"] [data-testid="stHelp"],
+    [data-testid="stMain"] [data-testid="stTooltipContent"] {
+      color: #52666A !important;
+    }
+    [data-testid="stMain"] [data-testid="stAlert"] p,
+    [data-testid="stMain"] [data-testid="stAlert"] li {
+      color: #31545A !important;
+      line-height: 1.6 !important;
+    }
+    [data-testid="stMain"] [data-testid="stExpander"] summary,
+    [data-testid="stMain"] [data-testid="stExpander"] summary p {
+      color: #174E55 !important;
+      font-weight: 650 !important;
+    }
+
+    /* Controls, including disabled and placeholder states. */
+    [data-testid="stMain"] input,
+    [data-testid="stMain"] textarea,
+    [data-testid="stMain"] [data-baseweb="select"] *,
+    [data-testid="stMain"] [data-baseweb="input"] *,
+    [data-testid="stMain"] [data-baseweb="textarea"] * {
+      color: #17383B !important;
+    }
+    [data-testid="stMain"] input::placeholder,
+    [data-testid="stMain"] textarea::placeholder {
+      color: #718486 !important;
+      opacity: 1 !important;
+    }
+    [data-testid="stMain"] [data-testid="stRadio"] label,
+    [data-testid="stMain"] [data-testid="stCheckbox"] label,
+    [data-testid="stMain"] [data-testid="stToggle"] label,
+    [data-testid="stMain"] [data-testid="stSlider"] label {
+      color: #31545A !important;
+    }
+    [data-testid="stMain"] [data-testid="stTabs"] button {
+      color: #52666A !important;
+      font-weight: 650 !important;
+    }
+    [data-testid="stMain"] [data-testid="stTabs"] button[aria-selected="true"] {
+      color: #174E55 !important;
+    }
+
+    /* Tables and dataframe headers need enough contrast at small sizes. */
+    [data-testid="stMain"] [data-testid="stDataFrame"] [role="columnheader"],
+    [data-testid="stMain"] [data-testid="stDataFrame"] [role="rowheader"],
+    [data-testid="stMain"] [data-testid="stTable"] th {
+      color: #174E55 !important;
+      font-weight: 700 !important;
+    }
+    [data-testid="stMain"] [data-testid="stTable"] td {
+      color: #31545A !important;
+    }
+
+    /* Preserve white typography inside the intentionally dark photo mastheads. */
+    [data-testid="stMain"] [class*="st-key-ar-head-"] h1,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-title {
+      color: #FFFFFF !important;
+    }
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-copy {
+      color: #E5F0EF !important;
+    }
+    /* Keep every header label readable on the dark coastal masthead. */
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-kicker,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-kicker *,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-meta,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-meta *,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-copy,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-title,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] h1 {
+      color: #E5F0EF !important;
+      opacity: 1 !important;
+    }
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-title,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] h1 {
+      color: #FFFFFF !important;
+    }
+    /* High-clarity typography for every standard module masthead. */
+    [data-testid="stMain"] [class*="st-key-ar-head-"] {
+      background-image:
+        linear-gradient(112deg, rgba(3, 24, 34, .99) 0%, rgba(7, 45, 53, .97) 100%) !important;
+      border-color: rgba(220, 242, 239, .24) !important;
+    }
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-kicker,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-kicker *,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-meta,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-meta * {
+      color: #B9F3E8 !important;
+      -webkit-text-fill-color: #B9F3E8 !important;
+      opacity: 1 !important;
+      font-family: "Inter", "Segoe UI", Arial, sans-serif !important;
+      font-weight: 750 !important;
+      text-shadow: none !important;
+    }
+    [data-testid="stMain"] [class*="st-key-ar-head-"] h1,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-title {
+      color: #FFFFFF !important;
+      -webkit-text-fill-color: #FFFFFF !important;
+      font-family: "Inter", "Segoe UI", Arial, sans-serif !important;
+      font-size: clamp(2.2rem, 4.2vw, 3.45rem) !important;
+      font-weight: 800 !important;
+      line-height: 1.12 !important;
+      letter-spacing: -.025em !important;
+      text-shadow: none !important;
+      opacity: 1 !important;
+    }
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-copy,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-copy * {
+      color: #F0F7F6 !important;
+      -webkit-text-fill-color: #F0F7F6 !important;
+      font-family: "Inter", "Segoe UI", Arial, sans-serif !important;
+      font-size: clamp(1.02rem, 1.25vw, 1.12rem) !important;
+      font-weight: 500 !important;
+      line-height: 1.72 !important;
+      opacity: 1 !important;
+      text-shadow: none !important;
+    }
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-meta span {
+      color: #F3FAF9 !important;
+      -webkit-text-fill-color: #F3FAF9 !important;
+      background: rgba(224, 246, 241, .13) !important;
+      border: 1px solid rgba(224, 246, 241, .34) !important;
+      backdrop-filter: none !important;
+      font-size: .76rem !important;
+      font-weight: 700 !important;
+      letter-spacing: .025em !important;
+      text-transform: none !important;
+      padding: .3rem .72rem !important;
+    }
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-dot {
+      background: #63D7C2 !important;
+      box-shadow: 0 0 0 4px rgba(99, 215, 194, .18) !important;
+      animation: none !important;
+    }
+
+    /* Dark ink and clear font hierarchy for ordinary page content. */
+    [data-testid="stMain"] {
+      font-family: "Inter", "Segoe UI", Arial, sans-serif !important;
+    }
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > p,
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > ul,
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > ol {
+      color: #29484C !important;
+      font-size: 1rem !important;
+      font-weight: 450 !important;
+      line-height: 1.72 !important;
+      opacity: 1 !important;
+    }
+    [data-testid="stMain"] [data-testid="stCaptionContainer"],
+    [data-testid="stMain"] [data-testid="stCaptionContainer"] * {
+      color: #435D61 !important;
+      font-size: .88rem !important;
+      opacity: 1 !important;
+    }
+        </style>
+    """,
+    unsafe_allow_html=True,
+)
