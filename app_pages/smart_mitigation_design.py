@@ -21,6 +21,39 @@ from src.ui_theme import page_header, section_intro
 from src.mitigation_project_store import get_project, save_project
 
 
+# Page-scoped styling: restore the earlier light glass / mint presentation.
+st.markdown(
+    """
+    <style>
+    .concept-note {
+      background: radial-gradient(ellipse at 100% 0%, rgba(240, 197, 106, .12), transparent 18rem),
+                  linear-gradient(145deg, #FFFFFF, #DCE7E8);
+      border: 1px solid rgba(235, 190, 91, .34);
+      border-left: 4px solid #e9bd5a;
+      border-radius: 15px;
+      padding: 1rem 1.15rem;
+      color: #465C5D;
+      line-height: 1.62;
+      margin: .4rem 0 1.1rem;
+      box-shadow: var(--ar-shadow-soft);
+    }
+    .concept-note strong { color: #174E55; letter-spacing: .04em; }
+    .concept-note p { color: #52666A; margin: .3rem 0 0; }
+    .smart-panel {
+      margin: 1.4rem 0 .9rem;
+      padding: 1.05rem 1.25rem;
+      background: linear-gradient(120deg, #FFFFFF, #DCE7E8);
+      border: 1px solid rgba(23,78,85,.18);
+      border-radius: 18px;
+      box-shadow: var(--ar-shadow-soft);
+    }
+    .smart-panel h3 { margin: 0; color: #174E55; }
+    .smart-panel p { margin: .35rem 0 0; color: #52666A; font-size: .86rem; }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 page_header(
     "AI RESILIENCE · KOCHI · ENGINEERING & PLANNING",
     "Smart Mitigation Design Studio",
@@ -31,10 +64,18 @@ page_header(
     key="smart-mitigation",
 )
 
-st.info(
-    "**Concept planning only.** This workspace performs transparent cost arithmetic and "
-    "rule-based completeness prompts. It does not run a hydraulic model, predict flood depth, "
-    "measure risk reduction, or produce construction-ready engineering drawings."
+st.markdown(
+    """
+    <div class="concept-note">
+      <strong>CONCEPT ONLY</strong>
+      <p>
+        This visualisation is not a construction-ready engineering design. A qualified
+        civil or drainage engineer must verify site conditions, hydraulic calculations,
+        dimensions, costs and local requirements.
+      </p>
+    </div>
+    """,
+    unsafe_allow_html=True,
 )
 
 # Load a project handed off from Mitigation Budget before widgets are created.
@@ -250,98 +291,841 @@ st.caption(
 )
 
 # ---------------------------------------------------------------------
-# 05 · Conceptual 3D site schematic
+# 05 · Restored earlier interactive 3D concept model
 # ---------------------------------------------------------------------
+# Compatibility aliases for the original 3D layout.
+use_drains = bool(selected.get("drains"))
+use_inlets = bool(selected.get("inlets"))
+use_storage = bool(selected.get("storage"))
+use_garden = bool(selected.get("garden"))
+use_sensors = bool(selected.get("sensors"))
+use_maintenance = bool(selected.get("maintenance"))
+
 section_intro(
-    "05 · Conceptual site schematic",
-    "Explore the proposed arrangement",
-    "Schematic geometry only — not a surveyed Kochi map, terrain model, drainage network or hydraulic simulation.",
+    "05 · Interactive 3D visualisation",
+    "Kochi urban flood-resilience concept model",
+    "Restore of the earlier detailed 3D layout. Geometry and rainfall-responsive water surfaces remain illustrative, not surveyed or hydraulically simulated.",
+)
+st.caption("Drag to rotate, scroll to zoom, and hover over the conceptual components.")
+
+# ==================================================
+# INTERACTIVE 3D ENGINEERING VISUALIZATION - V2
+# ==================================================
+
+st.markdown("---")
+section_intro("Visualisation", "Interactive 3D flood-resilience site")
+st.caption(
+    "Conceptual site visualization for engineering review. "
+    "Drag to rotate, scroll to zoom, and hover over components."
+)
+# Illustrative visual parameter only — not a predicted flood depth.
+# Rainfall-responsive visual parameters.
+# These are display effects, NOT hydraulic predictions.
+
+rainfall_fraction = max(
+    0.0,
+    min(float(rainfall_input) / 150.0, 1.0)
 )
 
-fig = go.Figure()
-fig.add_trace(go.Surface(
+illustrative_water_level = (
+    0.42 + rainfall_fraction * 0.40
+)
+
+illustrative_pond_level = (
+    0.42 + rainfall_fraction * 0.30
+)
+fig3d = go.Figure()
+
+# 1. Site ground
+fig3d.add_trace(go.Surface(
     x=[[0, 100], [0, 100]],
     y=[[0, 0], [70, 70]],
     z=[[0, 0], [0, 0]],
-    colorscale=[[0, "#dcefe2"], [1, "#dcefe2"]],
+    surfacecolor=[[0, 0], [0, 0]],
+    colorscale=[[0, "#b7d7a8"], [1, "#b7d7a8"]],
     showscale=False,
-    opacity=1,
-    name="Concept site",
     hoverinfo="skip",
+    name="Site ground"
 ))
-fig.add_trace(go.Surface(
+
+# 2. Main road
+fig3d.add_trace(go.Surface(
     x=[[5, 95], [5, 95]],
     y=[[30, 30], [43, 43]],
-    z=[[0.2, 0.2], [0.2, 0.2]],
-    colorscale=[[0, "#64748b"], [1, "#64748b"]],
+    z=[[0.25, 0.25], [0.25, 0.25]],
+    colorscale=[[0, "#475569"], [1, "#475569"]],
     showscale=False,
-    name="Road corridor",
-    hovertemplate="Illustrative road corridor<extra></extra>",
+    hovertemplate="Road corridor<extra></extra>",
+    name="Road"
 ))
-# Generic blocks are intentionally not positioned from real building footprints.
-for x, y, label in [(12, 8, "Block A"), (34, 8, "Block B"), (72, 8, "Block C"), (12, 52, "Block D"), (72, 52, "Block E")]:
-    fig.add_trace(go.Mesh3d(
-        x=[x, x + 12, x + 12, x, x, x + 12, x + 12, x],
-        y=[y, y, y + 9, y + 9, y, y, y + 9, y + 9],
-        z=[0.2, 0.2, 0.2, 0.2, 5, 5, 5, 5],
-        i=[0, 0, 0, 1, 1, 2, 4, 4, 5, 6],
-        j=[1, 2, 3, 2, 5, 3, 5, 6, 6, 7],
-        k=[2, 3, 7, 5, 6, 7, 6, 7, 7, 4],
-        color="#9fb7c4",
-        opacity=0.92,
+
+# Road centre line
+fig3d.add_trace(go.Scatter3d(
+    x=list(range(5, 96, 3)),
+    y=[36.5 if i % 2 == 0 else None for i in range(len(range(5, 96, 3)))],
+    z=[0.4] * len(range(5, 96, 3)),
+    mode="lines",
+    line=dict(color="white", width=4, dash="dash"),
+    name="Road centre marking",
+    hoverinfo="skip"
+))
+
+# 3. Solid building volumes
+def add_plotly_building(x0, y0, length, width, height, label):
+    vertices = [
+        (x0, y0, 0.2),
+        (x0 + length, y0, 0.2),
+        (x0 + length, y0 + width, 0.2),
+        (x0, y0 + width, 0.2),
+        (x0, y0, height),
+        (x0 + length, y0, height),
+        (x0 + length, y0 + width, height),
+        (x0, y0 + width, height)
+    ]
+
+    faces = [
+        (0, 1, 5), (0, 5, 4),
+        (1, 2, 6), (1, 6, 5),
+        (2, 3, 7), (2, 7, 6),
+        (3, 0, 4), (3, 4, 7),
+        (4, 5, 6), (4, 6, 7)
+    ]
+
+    fig3d.add_trace(go.Mesh3d(
+        x=[v[0] for v in vertices],
+        y=[v[1] for v in vertices],
+        z=[v[2] for v in vertices],
+        i=[f[0] for f in faces],
+        j=[f[1] for f in faces],
+        k=[f[2] for f in faces],
+        color="#9fb4c4",
+        opacity=1,
+        flatshading=True,
         name=label,
-        showlegend=False,
-        hovertemplate=f"{label} · illustrative block<extra></extra>",
+        hovertemplate=f"{label}<br>Concept height: {height}<extra></extra>"
     ))
 
-if selected.get("drains"):
-    fig.add_trace(go.Scatter3d(
-        x=[8, 92], y=[25, 25], z=[0.45, 0.45],
-        mode="lines", line=dict(color="#0284c7", width=8),
-        name="Concept drainage corridor",
-        hovertemplate="Concept corridor — alignment unverified<extra></extra>",
-    ))
-if selected.get("inlets"):
-    fig.add_trace(go.Scatter3d(
-        x=[18, 38, 58, 78], y=[29, 29, 29, 29], z=[0.5] * 4,
-        mode="markers", marker=dict(color="#334155", size=6, symbol="square"),
-        name="Indicative inlet markers",
-    ))
-if selected.get("garden"):
-    fig.add_trace(go.Scatter3d(
-        x=[54, 64], y=[53, 60], z=[0.35, 0.35],
-        mode="markers", marker=dict(color="#16a34a", size=12, symbol="square"),
-        name="Green infrastructure concept",
-    ))
-if selected.get("storage"):
-    fig.add_trace(go.Mesh3d(
-        x=[70, 86, 86, 70], y=[48, 48, 62, 62], z=[0.2, 0.2, 0.2, 0.2],
-        i=[0, 0], j=[1, 2], k=[2, 3],
-        color="#38bdf8", opacity=0.8, name="Indicative storage footprint",
-    ))
-if selected.get("sensors"):
-    fig.add_trace(go.Scatter3d(
-        x=[20, 50, 82], y=[24, 24, 24], z=[1.2, 1.2, 1.2],
-        mode="markers", marker=dict(color="#ef4444", size=7),
-        name="Indicative sensor markers",
-    ))
 
-fig.update_layout(
-    height=590,
-    margin=dict(l=0, r=0, t=35, b=0),
-    paper_bgcolor="rgba(0,0,0,0)",
-    scene=dict(
-        bgcolor="#f5faf7",
-        xaxis=dict(title="Schematic X", range=[0, 100], backgroundcolor="#edf5ef"),
-        yaxis=dict(title="Schematic Y", range=[0, 70], backgroundcolor="#edf5ef"),
-        zaxis=dict(title="Illustrative height", range=[0, 10], backgroundcolor="#edf5ef"),
-        aspectmode="manual",
-        aspectratio=dict(x=1.6, y=1.1, z=0.45),
-        camera=dict(eye=dict(x=1.6, y=-1.7, z=1.1)),
-    ),
-    legend=dict(orientation="h", y=-0.08),
+# Area-specific conceptual 3D building layouts
+
+building_layouts = {
+    "Low-lying flood-prone area": [
+        (12, 5, 12, 10, 3, "Low-rise Block A"),
+        (31, 5, 14, 10, 3, "Low-rise Block B"),
+        (55, 5, 13, 10, 4, "Low-rise Block C"),
+        (76, 5, 12, 10, 3, "Low-rise Block D"),
+        (12, 51, 13, 10, 3, "Low-rise Block E"),
+        (34, 53, 14, 9, 4, "Low-rise Block F"),
+        (76, 53, 13, 10, 3, "Low-rise Block G")
+    ],
+
+    "Urban road": [
+        (12, 5, 12, 10, 5, "Roadside Building A"),
+        (31, 5, 14, 10, 7, "Roadside Building B"),
+        (55, 5, 13, 10, 6, "Roadside Building C"),
+        (76, 5, 12, 10, 8, "Roadside Building D"),
+        (12, 51, 13, 10, 5, "Roadside Building E"),
+        (34, 53, 14, 9, 7, "Roadside Building F"),
+        (76, 53, 13, 10, 6, "Roadside Building G")
+    ],
+
+    "Residential neighbourhood": [
+        (12, 5, 12, 10, 4, "Residential Block A"),
+        (31, 5, 14, 10, 6, "Residential Block B"),
+        (55, 5, 13, 10, 5, "Residential Block C"),
+        (76, 5, 12, 10, 7, "Residential Block D"),
+        (12, 51, 13, 10, 5, "Residential Block E"),
+        (34, 53, 14, 9, 7, "Residential Block F"),
+        (76, 53, 13, 10, 6, "Residential Block G")
+    ],
+
+    "Commercial area": [
+        (12, 5, 12, 10, 8, "Commercial Building A"),
+        (31, 5, 14, 10, 9, "Commercial Building B"),
+        (55, 5, 13, 10, 8, "Commercial Building C"),
+        (76, 5, 12, 10, 9, "Commercial Building D"),
+        (12, 51, 13, 10, 7, "Commercial Building E"),
+        (34, 53, 14, 9, 9, "Commercial Building F"),
+        (76, 53, 13, 10, 8, "Commercial Building G")
+    ]
+}
+
+building_layout_3d = building_layouts.get(
+    area_type,
+    building_layouts["Residential neighbourhood"]
 )
-st.plotly_chart(fig, use_container_width=True, config={"displaylogo": False, "scrollZoom": True})
+
+
+for building in building_layout_3d:
+    add_plotly_building(*building)
+
+    # ==========================================
+# AREA-RESPONSIVE COMPONENT POSITIONING
+# ==========================================
+
+component_layouts = {
+    "Low-lying flood-prone area": {
+        "garden": (50, 61, 48, 56),
+        "pond": (63, 74, 48, 64)
+    },
+
+    "Urban road": {
+        "garden": (50, 61, 49, 57),
+        "pond": (63, 74, 49, 65)
+    },
+
+    "Residential neighbourhood": {
+        "garden": (50, 61, 50, 58),
+        "pond": (63, 74, 48, 64)
+    },
+
+    "Commercial area": {
+        "garden": (50, 61, 48, 56),
+        "pond": (63, 74, 50, 66)
+    }
+}
+
+active_layout = component_layouts[area_type]
+
+garden_x0, garden_x1, garden_y0, garden_y1 = (
+    active_layout["garden"]
+)
+
+pond_x0, pond_x1, pond_y0, pond_y1 = (
+    active_layout["pond"]
+)
+
+
+# Drainage corridor — 3D channel with banks and flowing water
+if use_drains:
+    # Concrete channel bed
+    fig3d.add_trace(go.Mesh3d(
+        x=[8, 92, 92, 8],
+        y=[24, 24, 30, 30],
+        z=[0.35, 0.35, 0.35, 0.35],
+        i=[0, 0],
+        j=[1, 2],
+        k=[2, 3],
+        color="#94a3b8",
+        opacity=1,
+        name="Concrete channel bed",
+        hovertemplate="Conceptual channel bed<extra></extra>"
+    ))
+
+    # Water surface
+    fig3d.add_trace(go.Mesh3d(
+        x=[8, 92, 92, 8],
+        y=[25, 25, 29, 29],
+        z=[illustrative_pond_level] * 4,
+        i=[0, 0],
+        j=[1, 2],
+        k=[2, 3],
+        color="#0284c7",
+        opacity=0.88,
+        name="Stormwater",
+        hovertemplate="Conceptual stormwater surface<extra></extra>"
+    ))
+
+        # Subtle water-surface highlights
+    for highlight_y in [26.0, 28.0]:
+        fig3d.add_trace(go.Scatter3d(
+            x=[12, 88],
+            y=[highlight_y, highlight_y],
+            z=[
+                illustrative_water_level + 0.015,
+                illustrative_water_level + 0.015
+            ],
+            mode="lines",
+            line=dict(color="#bae6fd", width=2),
+            showlegend=False,
+            hoverinfo="skip"
+        ))
+
+    # Water-surface edge indicator
+    fig3d.add_trace(go.Scatter3d(
+        x=[8, 92],
+        y=[25, 25],
+        z=[
+            illustrative_water_level + 0.01,
+            illustrative_water_level + 0.01
+        ],
+        mode="lines",
+        line=dict(color="#7dd3fc", width=2),
+        showlegend=False,
+        hoverinfo="skip"
+    ))
+    # Proper 3D concrete drainage channel walls
+    for bank_y in [24, 30]:
+
+        fig3d.add_trace(go.Mesh3d(
+            x=[8, 92, 92, 8],
+            y=[bank_y, bank_y, bank_y, bank_y],
+            z=[0.35, 0.35, 0.90, 0.90],
+            i=[0, 0],
+            j=[1, 2],
+            k=[2, 3],
+            color="#94a3b8",
+            opacity=1,
+            flatshading=True,
+            name="Concrete channel wall",
+            showlegend=(bank_y == 24),
+            hovertemplate=(
+                "Concrete drainage channel wall"
+                "<br>Conceptual height: 0.55 units"
+                "<extra></extra>"
+            )
+        ))
+
+        # Upper wall edge
+        fig3d.add_trace(go.Scatter3d(
+            x=[8, 92],
+            y=[bank_y, bank_y],
+            z=[0.90, 0.90],
+            mode="lines",
+            line=dict(
+                color="#cbd5e1",
+                width=5
+            ),
+            showlegend=False,
+            hoverinfo="skip"
+        ))
+
+
+    
+    # Compact drainage flow-direction indicators
+    flow_z = illustrative_water_level + 0.10
+
+    fig3d.add_trace(go.Scatter3d(
+        x=[
+            25, 27, None,
+            48, 50, None,
+            71, 73
+        ],
+        y=[
+            27, 27, None,
+            27, 27, None,
+            27, 27
+        ],
+        z=[
+            flow_z, flow_z, None,
+            flow_z, flow_z, None,
+            flow_z, flow_z
+        ],
+        mode="lines+markers",
+        line=dict(
+            color="#e0f7ff",
+            width=5
+        ),
+        marker=dict(
+            size=3,
+            color="#e0f7ff",
+            symbol="circle"
+        ),
+        name="Illustrative water-flow direction",
+        hovertemplate=(
+            "Conceptual flow direction"
+            "<extra></extra>"
+        )
+    ))
+
+
+
+# 5. Rain garden
+if use_garden:
+    fig3d.add_trace(go.Mesh3d(
+        x=[garden_x0, garden_x1, garden_x1, garden_x0],
+        y=[garden_y0, garden_y0, garden_y1, garden_y1],
+        z=[0.35, 0.35, 0.35, 0.35],
+        i=[0, 0], j=[1, 2], k=[2, 3],
+        color="#239b68",
+        opacity=0.9,
+        name="Rain garden",
+        hovertemplate="Green infrastructure<extra></extra>"
+    ))
+    
+    # Rain garden — conceptual raised edging
+    fig3d.add_trace(go.Scatter3d(
+        x=[
+            garden_x0, garden_x1, garden_x1,
+            garden_x0, garden_x0
+        ],
+        y=[
+            garden_y0, garden_y0, garden_y1,
+            garden_y1, garden_y0
+        ],
+        z=[[0.80] * 5, 0.65, 0.65, 0.65, 0.65],
+        mode="lines",
+        line=dict(color="#475569", width=6),
+        name="Rain-garden edging",
+        hovertemplate="Conceptual garden edging<extra></extra>"
+    ))
+        # Rain garden — 3D vegetation clusters
+    fig3d.add_trace(go.Scatter3d(
+                x=[
+            garden_x0 + 1, garden_x0 + 2,
+            garden_x0 + 3, garden_x0 + 5,
+            garden_x0 + 7, garden_x0 + 9,
+            garden_x0 + 2, garden_x0 + 4,
+            garden_x0 + 6, garden_x0 + 8
+        ],
+        y=[
+            garden_y0 + 1, garden_y0 + 4,
+            garden_y0 + 2, garden_y0 + 6,
+            garden_y0 + 1, garden_y0 + 4,
+            garden_y0 + 7, garden_y0 + 6,
+            garden_y0 + 1, garden_y0 + 3
+        ],
+        z=[
+            0.65, 0.72, 0.68, 0.75, 0.66, 0.72,
+            0.68, 0.74, 0.70, 0.67
+        ],
+        mode="markers",
+        marker=dict(
+            size=11,
+            color=[
+                "#166534", "#15803d", "#22c55e",
+                "#166534", "#15803d", "#22c55e",
+                "#166534", "#15803d", "#22c55e",
+                "#166534"
+            ],
+            symbol="circle",
+            line=dict(
+                color="#bbf7d0",
+                width=1
+            )
+        ),
+        name="Rain-garden vegetation",
+        hovertemplate="Conceptual vegetation<extra></extra>"
+    ))
+    # Shallow infiltration zone
+    fig3d.add_trace(go.Mesh3d(
+                x=[
+            garden_x0 + 2,
+            garden_x1 - 2,
+            garden_x1 - 2,
+            garden_x0 + 2
+        ],
+        y=[
+            garden_y0 + 2,
+            garden_y0 + 2,
+            garden_y1 - 2,
+            garden_y1 - 2
+        ],
+        z=[0.42, 0.42, 0.42, 0.42],
+        i=[0, 0],
+        j=[1, 2],
+        k=[2, 3],
+        color="#0f766e",
+        opacity=0.65,
+        name="Infiltration zone concept",
+        hovertemplate="Illustrative shallow infiltration zone<extra></extra>"
+    ))
+
+
+
+
+    # Conceptual vegetation clusters
+    vegetation_positions = [
+        (garden_x0 + 2, garden_y0 + 3),
+        (garden_x0 + 4, garden_y0 + 6),
+        (garden_x0 + 6, garden_y0 + 3),
+        (garden_x0 + 8, garden_y0 + 6),
+        (garden_x0 + 9, garden_y0 + 2),
+        (garden_x0 + 5, garden_y0 + 8)
+    ]
+
+    for plant_index, (px, py) in enumerate(vegetation_positions):
+        fig3d.add_trace(go.Scatter3d(
+            x=[px, px],
+            y=[py, py],
+            z=[0.45, 1.15],
+            mode="lines",
+            line=dict(
+                color="#166534",
+                width=5
+            ),
+            showlegend=(plant_index == 0),
+            name="Conceptual vegetation"
+        ))
+
+        fig3d.add_trace(go.Scatter3d(
+            x=[px],
+            y=[py],
+            z=[1.15],
+            mode="markers",
+            marker=dict(
+                size=8,
+                color="#4ade80",
+                symbol="circle",
+                line=dict(color="#14532d", width=1)
+            ),
+            showlegend=False,
+            hovertemplate="Illustrative vegetation cluster<extra></extra>"
+        ))
+
+# 6. Stormwater storage pond
+if use_storage:
+    pond_x = [pond_x0, pond_x1, pond_x1, pond_x0]
+    pond_y = [pond_y0, pond_y0, pond_y1, pond_y1]
+
+    fig3d.add_trace(go.Mesh3d(
+        x=pond_x,
+        y=pond_y,
+        z=[illustrative_water_level] * 4,
+        i=[0, 0],
+        j=[1, 2],
+        k=[2, 3],
+        color="#38bdf8",
+        opacity=0.9,
+        name="Concept detention pond",
+        hovertemplate="Stormwater storage concept<extra></extra>"
+    ))
+    
+    # Conceptual pond perimeter
+    fig3d.add_trace(go.Scatter3d(
+        x=[pond_x0, pond_x1, pond_x1, pond_x0, pond_x0],
+        y=[pond_y0, pond_y0, pond_y1, pond_y1, pond_y0], 
+        z=[0.65, 0.65, 0.65, 0.65, 0.65],
+        mode="lines",
+        line=dict(
+            color="#a16207",
+            width=9
+        ),
+        name="Pond perimeter",
+        hovertemplate="Conceptual pond boundary<extra></extra>"
+    ))
+
+    # Landscape buffer around pond
+    fig3d.add_trace(go.Scatter3d(
+        x=[
+    pond_x0 + 2,
+    pond_x1 - 2,
+    pond_x1 - 2,
+    pond_x0 + 2,
+    pond_x0 + 2
+],
+        y=[
+    pond_y0 - 2,
+    pond_y0 - 2,
+    pond_y1 + 2,
+    pond_y1 + 2,
+    pond_y0 - 2
+],
+        z=[0.40, 0.40, 0.40, 0.40, 0.40],
+        mode="lines",
+        line=dict(
+            color="#4ade80",
+            width=5,
+            dash="dot"
+        ),
+        name="Pond landscape buffer",
+        hovertemplate="Illustrative landscape buffer<extra></extra>"
+    ))
+
+
+# 7. Roadside inlets — conceptual 3D grates
+if use_inlets:
+    inlet_positions = list(range(15, 90, 15))
+
+    for inlet_x in inlet_positions:
+        # Dark rectangular grate frame
+        fig3d.add_trace(go.Mesh3d(
+            x=[
+                inlet_x - 2, inlet_x + 2,
+                inlet_x + 2, inlet_x - 2
+            ],
+            y=[28.5, 28.5, 29.5, 29.5],
+            z=[0.72, 0.72, 0.72, 0.72],
+            i=[0, 0],
+            j=[1, 2],
+            k=[2, 3],
+            color="#1f2937",
+            opacity=1,
+            name="Inlet frame",
+            showlegend=(inlet_x == inlet_positions[0]),
+            hovertemplate="Conceptual inlet frame<extra></extra>"
+        ))
+
+        # Parallel grate bars
+        for bar_y in [28.65, 28.85, 29.05, 29.25, 29.45]:
+            fig3d.add_trace(go.Scatter3d(
+                x=[inlet_x - 1.7, inlet_x + 1.7],
+                y=[bar_y, bar_y],
+                z=[0.76, 0.76],
+                mode="lines",
+                line=dict(color="#cbd5e1", width=3),
+                showlegend=False,
+                hovertemplate="Conceptual grate bar<extra></extra>"
+            ))
+    
+# 8. Conceptual connections from road inlets to drainage
+if use_inlets and use_drains:
+    for inlet_x in range(15, 90, 15):
+        fig3d.add_trace(go.Scatter3d(
+            x=[inlet_x, inlet_x],
+            y=[29, 27],
+            z=[0.68, 0.58],
+            mode="lines",
+            line=dict(color="#38bdf8", width=5),
+            showlegend=(inlet_x == 15),
+            name="Inlet-to-drain connection",
+            hovertemplate=(
+                "Illustrative stormwater connection"
+                "<extra></extra>"
+            )
+        ))
+
+
+
+# 8. Water-level monitoring stations
+if use_sensors:
+    for sensor_index, (sx, sy) in enumerate(
+        [(12, 25), (50, 25), (88, 25)]
+    ):
+        # Vertical monitoring pole
+        fig3d.add_trace(go.Scatter3d(
+            x=[sx, sx],
+            y=[sy, sy],
+            z=[0.3, 4.0],
+            mode="lines",
+            line=dict(color="#64748b", width=8),
+            name="Sensor pole",
+            showlegend=(sensor_index == 0),
+            hovertemplate="Conceptual sensor pole<extra></extra>"
+        ))
+
+        # Sensor housing
+        fig3d.add_trace(go.Scatter3d(
+            x=[sx],
+            y=[sy],
+            z=[4.0],
+            mode="markers",
+            marker=dict(
+                size=9,
+                color="#ef4444",
+                symbol="square",
+                line=dict(color="#ffffff", width=1)
+            ),
+            name="Water-level sensor",
+            showlegend=(sensor_index == 0),
+            hovertemplate="Conceptual water-level sensor<extra></extra>"
+        ))
+
+        # Small warning indicator
+        fig3d.add_trace(go.Scatter3d(
+            x=[sx],
+            y=[sy],
+            z=[4.4],
+            mode="markers",
+            marker=dict(size=5, color="#fbbf24"),
+            showlegend=False,
+            hovertemplate="Illustrative warning indicator<extra></extra>"
+        ))
+
+
+# 9. Conceptual flood-warning indicator
+if use_sensors:
+    fig3d.add_trace(go.Scatter3d(
+        x=[50],
+        y=[26],
+        z=[1.2],
+        mode="markers+text",
+        marker=dict(
+            size=8,
+            color="#f59e0b",
+            symbol="diamond",
+            line=dict(color="#ffffff", width=2)
+        ),
+        text=["FLOOD ALERT"],
+        textposition="top center",
+        textfont=dict(
+            color="#b45309",
+            size=12
+        ),
+        name="Conceptual flood warning",
+        hovertemplate=(
+            "Illustrative flood-warning marker"
+            "<extra></extra>"
+        )
+    ))
+
+# 9. Project labels
+fig3d.add_trace(go.Scatter3d(
+    x=[20, pond_x0 + 3, garden_x0 + 2],
+    y=[27, pond_y0 + 3, garden_y0 + 1],
+    z=[3, 3, 4],
+    mode="text",
+    text=[
+        "01 DRAINAGE",
+        "02 STORAGE",
+        "03 GREEN BUFFER"
+    ],
+    textfont=dict(size=10, color="#083344"),
+    name="Engineering labels",
+    hoverinfo="skip"
+))
+
+
+
+# ==========================================
+# PROFESSIONAL 3D PRESENTATION LAYOUT
+# ==========================================
+
+fig3d.update_layout(
+    title=dict(
+        text=(
+            "KOCHI | URBAN FLOOD RESILIENCE"
+            "<br><sup>INTERACTIVE 3D SITE MODEL · CONCEPT DESIGN</sup>"
+        ),
+        x=0.5,
+        xanchor="center",
+        y=0.97,
+        font=dict(
+            family="Arial",
+            size=22,
+            color="#1D3030"
+        )
+    ),
+    height=760,
+    margin=dict(l=15, r=15, t=100, b=75),
+
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(0,0,0,0)",
+
+    scene=dict(
+    bgcolor="#F4F8F5",
+
+        xaxis=dict(
+            title="",
+            range=[0, 100],
+            showbackground=True,
+            backgroundcolor="#EAF3EE",
+            gridcolor="rgba(44,105,82,.18)",
+            zerolinecolor="rgba(44,105,82,.30)",
+            showspikes=False,
+            color="#587267",
+            tickfont=dict(size=10),
+            nticks=6
+        ),
+
+        yaxis=dict(
+            title="",
+            range=[0, 70],
+            showbackground=True,
+            backgroundcolor="#EAF3EE",
+            gridcolor="rgba(44,105,82,.18)",
+            zerolinecolor="rgba(44,105,82,.30)",
+            showspikes=False,
+            color="#587267",
+            tickfont=dict(size=10),
+            nticks=5
+        ),
+
+        zaxis=dict(
+            title="",
+            range=[0, 10],
+            showbackground=True,
+            backgroundcolor="#EAF3EE",
+            gridcolor="rgba(44,105,82,.18)",
+            zerolinecolor="rgba(44,105,82,.30)",
+            showspikes=False,
+            color="#587267",
+            tickfont=dict(size=10),
+            nticks=5
+        ),
+
+        # Reduce vertical exaggeration
+        aspectmode="manual",
+        aspectratio=dict(
+            x=1.8,
+            y=1.25,
+            z=0.55
+        ),
+
+        # More balanced engineering perspective
+        camera=dict(
+            eye=dict(
+                x=1.65,
+                y=-1.85,
+                z=1.25
+            ),
+            center=dict(
+                x=0,
+                y=0,
+                z=0
+            ),
+            up=dict(
+                x=0,
+                y=0,
+                z=1
+            ),
+            projection=dict(type="orthographic")
+        ),
+
+        dragmode="turntable"
+    ),
+
+    legend=dict(
+        title=dict(
+            text="DESIGN COMPONENTS",
+            font=dict(
+                color="#1D3030",
+                size=11
+            )
+        ),
+        orientation="h",
+        yanchor="bottom",
+        y=-0.16,
+        xanchor="center",
+        x=0.5,
+        font=dict(
+            color="#1D3030",
+            size=10
+        ),
+        bgcolor="rgba(255,255,255,0.96)",
+        bordercolor="rgba(44,105,82,0.22)",
+        borderwidth=1,
+        itemsizing="constant"
+    ),
+
+    font=dict(
+        family="Arial",
+        color="#1D3030"
+    ),
+
+    hoverlabel=dict(
+        bgcolor="#ffffff",
+        bordercolor="rgba(44,105,82,.25)",
+        font=dict(
+            color="#1D3030",
+            size=12
+        )
+    ),
+
+    uirevision="kochi-engineering-model"
+)
+
+# ==========================================
+# RENDER PRESENTATION MODEL
+# ==========================================
+
+st.plotly_chart(
+    fig3d,
+    use_container_width=True,
+    config={
+        "displaylogo": False,
+        "scrollZoom": True,
+        "responsive": True,
+        "displayModeBar": True,
+        "modeBarButtonsToRemove": [
+            "lasso3d",
+            "select3d"
+        ]
+    },
+    key="kochi_flood_resilience_3d"
+)
+
+
 
 # ---------------------------------------------------------------------
 # 06 · Engineering review checklist and transparent adviser
