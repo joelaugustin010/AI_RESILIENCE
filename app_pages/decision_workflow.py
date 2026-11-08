@@ -61,7 +61,7 @@ from src.hydrology_analytics import (
 )
 from src.infrastructure_dependencies import dependency_review_table
 from src.map_integration import MAP_CONTEXT_KEY, build_map_context, hazard_has_flood_component
-from src.ui_theme import section_intro
+from src.ui_theme import research_status_notice, section_intro
 from src.evidence_alternatives import alternative_evidence_for_hazard
 from src.phase2_data import (
     Phase2DataError,
@@ -877,6 +877,7 @@ st.markdown(
 )
 with st.container(key="wf-semantic-title"):
     st.title("Unified disaster decision workflow")
+research_status_notice("Decision Workflow · ten-scenario evidence review")
 
 section_intro(
     "Start here",
