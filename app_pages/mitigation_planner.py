@@ -30,6 +30,7 @@ def format_inr(amount):
 
 from src.decision_workflow import budget_summary
 from src.mitigation_optimizer import optimize_portfolio
+from src.mitigation_investment import score_investment_priority
 from src.mitigation_intelligence import (
     design_recommendations,
     review_project_register,
@@ -104,6 +105,10 @@ columns = [
     "Evidence for risk reduction",
     "ML duration estimate",
     "Estimation method",
+    "Site risk severity (1–5)",
+    "Urgency (1–5)",
+    "Evidence strength (1–5)",
+    "Implementation readiness (1–5)",
 ]
 
 if "mitigation_project_records" not in st.session_state:
@@ -167,7 +172,25 @@ with st.container(border=True):
         )
         planning_value = st.slider(
             "Planner-assessed contribution (1–10)", min_value=1, max_value=10, value=5,
-            help="Your documented planning judgement for comparing scenarios. This is not an AI risk-reduction prediction or measured benefit."
+            help="Your documented planning judgement for the portfolio scenario optimiser. This is not measured impact."
+        )
+        st.markdown("##### Investment assessment · human-reviewed inputs")
+        score_cols = st.columns(2)
+        site_risk_severity = score_cols[0].select_slider(
+            "Site risk severity (1–5)", options=[1, 2, 3, 4, 5], value=3,
+            help="Use a documented local risk assessment. 1 = lower assessed severity; 5 = highest assessed severity."
+        )
+        urgency = score_cols[1].select_slider(
+            "Urgency (1–5)", options=[1, 2, 3, 4, 5], value=3,
+            help="1 = can be scheduled later; 5 = time-critical based on documented conditions."
+        )
+        evidence_strength = score_cols[0].select_slider(
+            "Evidence strength (1–5)", options=[1, 2, 3, 4, 5], value=1,
+            help="1 = preliminary / anecdotal; 5 = strong, traceable site-specific evidence."
+        )
+        implementation_readiness = score_cols[1].select_slider(
+            "Implementation readiness (1–5)", options=[1, 2, 3, 4, 5], value=1,
+            help="Consider design, permissions, land, responsible owner and delivery arrangements."
         )
         with st.expander("Optional details · quotation and evidence", expanded=False):
             manual_cost = st.number_input(
@@ -250,6 +273,10 @@ with st.container(border=True):
                 "Evidence for risk reduction": risk_evidence.strip(),
                 "ML duration estimate": estimated_duration,
                 "Estimation method": " + ".join(method_parts),
+                "site_risk_severity": int(site_risk_severity),
+                "urgency": int(urgency),
+                "evidence_strength": int(evidence_strength),
+                "implementation_readiness": int(implementation_readiness),
             }
             st.session_state["mitigation_project_records"].append(record)
             st.success(
@@ -260,6 +287,52 @@ with st.container(border=True):
             st.rerun()
 
 plan = pd.DataFrame(st.session_state["mitigation_project_records"], columns=columns)
+
+section_intro(
+    "Investment intelligence",
+    "Evidence-aware project prioritisation",
+    "Compare projects using explicit human assessments of site risk, urgency, evidence and implementation readiness. Incomplete assessments are not scored.",
+)
+if plan.empty:
+    st.info("Add project profiles to build an investment shortlist.")
+else:
+    ranked_rows = []
+    for _, project in plan.iterrows():
+        assessment = score_investment_priority(project.to_dict())
+        ranked_rows.append({
+            "Project": project.get("Intervention", "Unnamed"),
+            "Location": project.get("Location", "Not specified"),
+            "Priority score": assessment["score"],
+            "Assessment": assessment["band"],
+            "Risk (1–5)": assessment["criteria"].get("site_risk_severity", "—"),
+            "Urgency (1–5)": assessment["criteria"].get("urgency", "—"),
+            "Evidence (1–5)": assessment["criteria"].get("evidence_strength", "—"),
+            "Readiness (1–5)": assessment["criteria"].get("implementation_readiness", "—"),
+            "Missing assessments": "; ".join(assessment["missing"]) or "None",
+        })
+    ranked_df = pd.DataFrame(ranked_rows)
+    scored_df = ranked_df[ranked_df["Priority score"].notna()].sort_values(
+        "Priority score", ascending=False
+    )
+    score_cols = st.columns(3)
+    score_cols[0].metric("Projects assessed", len(scored_df))
+    score_cols[1].metric("Awaiting assessment", len(ranked_df) - len(scored_df))
+    score_cols[2].metric(
+        "Highest assessed score",
+        f"{scored_df['Priority score'].max():.1f}/100" if not scored_df.empty else "—",
+    )
+    if not scored_df.empty:
+        st.markdown("#### Ranked investment shortlist")
+        display_dataframe(scored_df, hide_index=True, use_container_width=True)
+    incomplete_df = ranked_df[ranked_df["Priority score"].isna()]
+    if not incomplete_df.empty:
+        with st.expander(f"Projects needing assessment ({len(incomplete_df)})", expanded=False):
+            display_dataframe(incomplete_df, hide_index=True, use_container_width=True)
+    st.caption(
+        "Method: site risk 35%, urgency 25%, evidence strength 20%, implementation readiness 20%. "
+        "Each input is a human assessment on a 1–5 scale. This is a transparent prioritisation aid, "
+        "not an ML prediction, measured effectiveness score, or funding approval."
+    )
 
 section_intro("Project portfolio", "Mitigation project portfolio")
 st.caption(
