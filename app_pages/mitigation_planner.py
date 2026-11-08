@@ -274,6 +274,12 @@ uploaded_cost_data = st.file_uploader(
 )
 if uploaded_cost_data is not None:
     try:
+        import hashlib
+        upload_signature = hashlib.sha256(uploaded_cost_data.getvalue()).hexdigest()
+        if st.session_state.get("mitigation_ml_upload_signature") != upload_signature:
+            st.session_state.pop("mitigation_cost_ml_model", None)
+            st.session_state["mitigation_ml_upload_signature"] = upload_signature
+        uploaded_cost_data.seek(0)
         historical_records = pd.read_csv(uploaded_cost_data)
         st.caption(f"Uploaded rows: {len(historical_records):,}")
         if st.button("Train and validate cost model", type="primary", key="train_mitigation_cost_model"):
