@@ -411,7 +411,7 @@ def _render_phase2_data_context() -> None:
 
 
 def _render_disaster_assessment(result: dict) -> None:
-    st.header("4. Hazard-specific scientific assessment")
+    st.subheader("Hazard-specific assessment details")
     st.caption(
         "This is an observation review or scenario calculation, never a validated prediction. "
         "Only supplied inputs are used; missing exposure and impact evidence stays unavailable. "
@@ -1311,165 +1311,164 @@ else:
     st.warning("The hazard-specific assessment is unavailable because the submitted inputs did not pass its validation.")
 
 st.header("4. Technical evidence and validation details")
-with st.expander("Evidence register, data provenance, acquisition board and readiness checks", expanded=False):
-    evidence = evidence_inventory(ROOT, st.session_state.get("rainfall_backtest_result"))
-    st.caption("The separate historical benchmark uses only the manual rainfall observations. Its results do not enter this qualitative assessment; conflicted CWC rainfall, unverified sample rows, and unresolved river levels remain excluded from model calculations.")
-    display_dataframe(evidence, hide_index=True, width="stretch")
+evidence = evidence_inventory(ROOT, st.session_state.get("rainfall_backtest_result"))
+st.caption("The separate historical benchmark uses only the manual rainfall observations. Its results do not enter this qualitative assessment; conflicted CWC rainfall, unverified sample rows, and unresolved river levels remain excluded from model calculations.")
+display_dataframe(evidence, hide_index=True, width="stretch")
 
-    with st.expander("Dataset provenance and scientific fitness register", expanded=False):
-        st.caption(
-            "A listed source is not automatically suitable for every claim. Unknown licence, time-zone, "
-            "datum, checksum, or spatial metadata stays unresolved; this register does not certify data."
-        )
-        registry = build_source_registry()
-        registry_view = []
-        for record in registry:
-            fitness = source_fitness_summary(record)
-            registry_view.append({
-                "Dataset": record["name"],
-                "Publisher / source attribution": record["publisher"],
-                "Observation type": record["data_type"],
-                "Unit": record["unit"],
-                "Retrieval date": record["retrieval_date"],
-                "Licence status": record["license_status"],
-                "Checksum match": record["checksum_match"],
-                "Time zone": record["time_zone"],
-                "Spatial reference / datum": record["spatial_reference"],
-                "Validation status": record["validation_status"],
-                "Scientific fitness": fitness["scientific_fitness"],
-                "Permitted use": record["permitted_use"],
-                "Known limitation": record["known_limitation"],
-                "Source URL": record["source_url"],
-            })
-        display_dataframe(pd.DataFrame(registry_view), hide_index=True, width="stretch")
-        st.warning(
-            "No dataset in this registry is approved by this app for numerical disaster prediction or official warnings. "
-            "Source metadata completeness and scientific validation are different checks."
-        )
-
-    with st.expander("Kochi multi-hazard data acquisition board", expanded=False):
-        st.caption(
-            "This is the parallel acquisition queue. 'Discovered' means a credible source page was identified, "
-            "not that its files have been downloaded or validated. Restricted or unclear sources are not scraped."
-        )
-        catalog_records = get_catalog()
-        catalog_issues = {
-            row["id"]: validate_catalog_record(row)
-            for row in catalog_records
-            if validate_catalog_record(row)
-        }
-        if catalog_issues:
-            st.error(f"Data catalog metadata structure needs review for {len(catalog_issues)} record(s).")
-            st.json(catalog_issues)
-        selected_hazards = set(expand_hazards(inputs["hazard"])) | {inputs["hazard"]}
-        # Show highest-priority data relevant to the selected hazard while keeping
-        # all other disaster sources available for project planning.
-        relevant_records = [
-            row for row in catalog_records
-            if selected_hazards.intersection(row["hazards"])
-        ]
-        all_records = relevant_records + [
-            row for row in catalog_records if row not in relevant_records
-        ]
-        st.markdown("**Priority order:** P0 = core baseline evidence; P1 = important supporting evidence; P2 = later extension.")
-        display_dataframe(pd.DataFrame([{
-            "Priority": row["priority"],
-            "Hazard(s)": ", ".join(row["hazards"]),
-            "Theme": row["theme"],
-            "Dataset": row["dataset"],
-            "Publisher": row["publisher"],
-            "Acquisition status": row["status"],
-            "Access conditions": row["access"],
-            "Required QA before use": row["required_checks"],
-            "Known limitations": row["limitations"],
-            "Official source": row["url"],
-            "Direct resource URLs": "; ".join(row.get("resource_urls", [])) or "No direct file link confirmed",
-        } for row in all_records]), hide_index=True, width="stretch")
-        for row in relevant_records:
-            with st.expander(f"{row['priority']} · {row['dataset']}"):
-                st.markdown(f"**Publisher:** {row['publisher']}")
-                st.markdown(f"**Source:** [{row['url']}]({row['url']})")
-                if row.get("resource_urls"):
-                    st.markdown("**Direct source files:**")
-                    for resource_url in row["resource_urls"]:
-                        st.markdown(f"- [{resource_url.rsplit('/', 1)[-1]}]({resource_url})")
-                st.markdown(f"**Current status:** {row['status']}")
-                st.markdown(f"**Access:** {row['access']}")
-                st.markdown(f"**Required checks:** {row['required_checks']}")
-                st.markdown(f"**Limitations:** {row['limitations']}")
-        st.info(
-            "The catalog is a verified-source discovery queue, not a downloaded-data inventory. "
-            "A dataset moves to 'acquired' only after its file, publisher metadata, retrieval date, "
-            "licence/access terms, checksum, schema, spatial coverage and QA results are recorded."
-        )
-
-    with st.expander("Consequence-model data requirements by disaster", expanded=False):
-        st.caption(
-            "This matrix defines the evidence needed to estimate local consequences—not just whether a hazard exists. "
-            "It separates hazard intensity, physical processes, exposure, vulnerability and observed outcomes. "
-            "It is a requirements plan, not a working consequence predictor."
-        )
-        requirement_hazard = st.selectbox(
-            "Inspect data requirements for",
-            list(HAZARD_REQUIREMENTS),
-            index=list(HAZARD_REQUIREMENTS).index(inputs["hazard"]) if inputs["hazard"] in HAZARD_REQUIREMENTS else 0,
-            key="consequence_requirements_hazard",
-        )
-        req = requirements_for_hazard(requirement_hazard)
-        st.markdown(f"**Candidate model family:** {req['model_family']}")
-        display_dataframe(pd.DataFrame(requirements_table(requirement_hazard)), hide_index=True, width="stretch")
-        st.markdown("**Specific blockers before consequence estimates:**")
-        st.warning(req["current_blockers"])
-        st.markdown("**Potential authoritative starting sources:**")
-        st.write(req["starter_sources"])
-        st.markdown("**Validation rule:** every hazard needs independent event/outcome evidence, a baseline comparison, event- or time-separated evaluation, uncertainty reporting, and a documented intended-use boundary.")
-        with st.expander("Shared minimum requirements across every hazard"):
-            display_dataframe(pd.DataFrame(req["common_requirements"]), hide_index=True, width="stretch")
-
-    st.subheader("Evidence readiness checklist for this hazard")
+with st.expander("Dataset provenance and scientific fitness register", expanded=False):
     st.caption(
-        "This checklist identifies evidence needed before stronger conclusions are justified. "
-        "A file/path being present does not prove its contents are suitable, current, licensed for reuse, or independently verified."
+        "A listed source is not automatically suitable for every claim. Unknown licence, time-zone, "
+        "datum, checksum, or spatial metadata stays unresolved; this register does not certify data."
     )
-    evidence_checklist = hazard_evidence_checklist(inputs, ROOT)
-    display_dataframe(evidence_checklist, hide_index=True, width="stretch")
+    registry = build_source_registry()
+    registry_view = []
+    for record in registry:
+        fitness = source_fitness_summary(record)
+        registry_view.append({
+            "Dataset": record["name"],
+            "Publisher / source attribution": record["publisher"],
+            "Observation type": record["data_type"],
+            "Unit": record["unit"],
+            "Retrieval date": record["retrieval_date"],
+            "Licence status": record["license_status"],
+            "Checksum match": record["checksum_match"],
+            "Time zone": record["time_zone"],
+            "Spatial reference / datum": record["spatial_reference"],
+            "Validation status": record["validation_status"],
+            "Scientific fitness": fitness["scientific_fitness"],
+            "Permitted use": record["permitted_use"],
+            "Known limitation": record["known_limitation"],
+            "Source URL": record["source_url"],
+        })
+    display_dataframe(pd.DataFrame(registry_view), hide_index=True, width="stretch")
+    st.warning(
+        "No dataset in this registry is approved by this app for numerical disaster prediction or official warnings. "
+        "Source metadata completeness and scientific validation are different checks."
+    )
+
+with st.expander("Kochi multi-hazard data acquisition board", expanded=False):
+    st.caption(
+        "This is the parallel acquisition queue. 'Discovered' means a credible source page was identified, "
+        "not that its files have been downloaded or validated. Restricted or unclear sources are not scraped."
+    )
+    catalog_records = get_catalog()
+    catalog_issues = {
+        row["id"]: validate_catalog_record(row)
+        for row in catalog_records
+        if validate_catalog_record(row)
+    }
+    if catalog_issues:
+        st.error(f"Data catalog metadata structure needs review for {len(catalog_issues)} record(s).")
+        st.json(catalog_issues)
+    selected_hazards = set(expand_hazards(inputs["hazard"])) | {inputs["hazard"]}
+    # Show highest-priority data relevant to the selected hazard while keeping
+    # all other disaster sources available for project planning.
+    relevant_records = [
+        row for row in catalog_records
+        if selected_hazards.intersection(row["hazards"])
+    ]
+    all_records = relevant_records + [
+        row for row in catalog_records if row not in relevant_records
+    ]
+    st.markdown("**Priority order:** P0 = core baseline evidence; P1 = important supporting evidence; P2 = later extension.")
+    display_dataframe(pd.DataFrame([{
+        "Priority": row["priority"],
+        "Hazard(s)": ", ".join(row["hazards"]),
+        "Theme": row["theme"],
+        "Dataset": row["dataset"],
+        "Publisher": row["publisher"],
+        "Acquisition status": row["status"],
+        "Access conditions": row["access"],
+        "Required QA before use": row["required_checks"],
+        "Known limitations": row["limitations"],
+        "Official source": row["url"],
+        "Direct resource URLs": "; ".join(row.get("resource_urls", [])) or "No direct file link confirmed",
+    } for row in all_records]), hide_index=True, width="stretch")
+    for row in relevant_records:
+        with st.expander(f"{row['priority']} · {row['dataset']}"):
+            st.markdown(f"**Publisher:** {row['publisher']}")
+            st.markdown(f"**Source:** [{row['url']}]({row['url']})")
+            if row.get("resource_urls"):
+                st.markdown("**Direct source files:**")
+                for resource_url in row["resource_urls"]:
+                    st.markdown(f"- [{resource_url.rsplit('/', 1)[-1]}]({resource_url})")
+            st.markdown(f"**Current status:** {row['status']}")
+            st.markdown(f"**Access:** {row['access']}")
+            st.markdown(f"**Required checks:** {row['required_checks']}")
+            st.markdown(f"**Limitations:** {row['limitations']}")
     st.info(
-        "Readiness status is descriptive, not a numerical risk score. Items marked not connected or unverified "
-        "must not be treated as evidence that the hazard or exposure is absent."
+        "The catalog is a verified-source discovery queue, not a downloaded-data inventory. "
+        "A dataset moves to 'acquired' only after its file, publisher metadata, retrieval date, "
+        "licence/access terms, checksum, schema, spatial coverage and QA results are recorded."
     )
 
+with st.expander("Consequence-model data requirements by disaster", expanded=False):
+    st.caption(
+        "This matrix defines the evidence needed to estimate local consequences—not just whether a hazard exists. "
+        "It separates hazard intensity, physical processes, exposure, vulnerability and observed outcomes. "
+        "It is a requirements plan, not a working consequence predictor."
+    )
+    requirement_hazard = st.selectbox(
+        "Inspect data requirements for",
+        list(HAZARD_REQUIREMENTS),
+        index=list(HAZARD_REQUIREMENTS).index(inputs["hazard"]) if inputs["hazard"] in HAZARD_REQUIREMENTS else 0,
+        key="consequence_requirements_hazard",
+    )
+    req = requirements_for_hazard(requirement_hazard)
+    st.markdown(f"**Candidate model family:** {req['model_family']}")
+    display_dataframe(pd.DataFrame(requirements_table(requirement_hazard)), hide_index=True, width="stretch")
+    st.markdown("**Specific blockers before consequence estimates:**")
+    st.warning(req["current_blockers"])
+    st.markdown("**Potential authoritative starting sources:**")
+    st.write(req["starter_sources"])
+    st.markdown("**Validation rule:** every hazard needs independent event/outcome evidence, a baseline comparison, event- or time-separated evaluation, uncertainty reporting, and a documented intended-use boundary.")
+    with st.expander("Shared minimum requirements across every hazard"):
+        display_dataframe(pd.DataFrame(req["common_requirements"]), hide_index=True, width="stretch")
 
-    st.subheader("Alternative evidence routes for this hazard")
-    alternative_routes = alternative_evidence_for_hazard(inputs["hazard"])
-    if alternative_routes:
-        st.caption(
-            "These are practical additional evidence routes. They do not automatically "
-            "make a dataset training-ready; access, coverage, metadata and validation remain required."
-        )
-        for route in alternative_routes:
-            with st.expander(route["title"]):
-                st.write(route["method"])
-                st.markdown("**Useful for**")
-                for capability in route["supports"]:
-                    st.write(f"- {capability.replace('_', ' ')}")
-                st.markdown("**Not sufficient for**")
-                for limitation in route["does_not_support"]:
-                    st.write(f"- {limitation.replace('_', ' ')}")
-                st.caption(route["status"])
-                for source in route["sources"]:
-                    st.markdown(f"- [{source['publisher']} — {source['title']}]({source['url']})")
-    else:
-        st.caption("No additional alternative-evidence route is registered for this hazard yet.")
+st.subheader("Evidence readiness checklist for this hazard")
+st.caption(
+    "This checklist identifies evidence needed before stronger conclusions are justified. "
+    "A file/path being present does not prove its contents are suitable, current, licensed for reuse, or independently verified."
+)
+evidence_checklist = hazard_evidence_checklist(inputs, ROOT)
+display_dataframe(evidence_checklist, hide_index=True, width="stretch")
+st.info(
+    "Readiness status is descriptive, not a numerical risk score. Items marked not connected or unverified "
+    "must not be treated as evidence that the hazard or exposure is absent."
+)
 
-    st.subheader("Evidence provenance gate")
-    provenance = evidence_provenance_summary(inputs)
-    st.warning(f"**{provenance['Provenance status']}**")
-    st.write("**Source/time notes:**", provenance["Source/time notes"])
-    st.write("**Permitted interpretation:**", provenance["Permitted interpretation"])
-    st.write("**Required verification:**", provenance["Verification gate"])
-    st.caption("Typing a source name or selecting a classification does not independently verify the source, its freshness, or its fitness for this hazard.")
 
-    st.header("5. Assessment diagnostics and uncertainty")
+st.subheader("Alternative evidence routes for this hazard")
+alternative_routes = alternative_evidence_for_hazard(inputs["hazard"])
+if alternative_routes:
+    st.caption(
+        "These are practical additional evidence routes. They do not automatically "
+        "make a dataset training-ready; access, coverage, metadata and validation remain required."
+    )
+    for route in alternative_routes:
+        with st.expander(route["title"]):
+            st.write(route["method"])
+            st.markdown("**Useful for**")
+            for capability in route["supports"]:
+                st.write(f"- {capability.replace('_', ' ')}")
+            st.markdown("**Not sufficient for**")
+            for limitation in route["does_not_support"]:
+                st.write(f"- {limitation.replace('_', ' ')}")
+            st.caption(route["status"])
+            for source in route["sources"]:
+                st.markdown(f"- [{source['publisher']} — {source['title']}]({source['url']})")
+else:
+    st.caption("No additional alternative-evidence route is registered for this hazard yet.")
+
+st.subheader("Evidence provenance gate")
+provenance = evidence_provenance_summary(inputs)
+st.warning(f"**{provenance['Provenance status']}**")
+st.write("**Source/time notes:**", provenance["Source/time notes"])
+st.write("**Permitted interpretation:**", provenance["Permitted interpretation"])
+st.write("**Required verification:**", provenance["Verification gate"])
+st.caption("Typing a source name or selecting a classification does not independently verify the source, its freshness, or its fitness for this hazard.")
+
+st.header("Assessment diagnostics and uncertainty")
 assessment = assessment_summary(inputs)
 compound_assessment = None
 if inputs.get("hazard") == "Compound: cyclone + flood":
