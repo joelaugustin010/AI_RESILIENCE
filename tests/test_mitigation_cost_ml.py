@@ -40,7 +40,7 @@ def test_prediction_validation_and_error_band():
     assert result["lower_estimate_inr"]<=result["estimated_cost_inr"]<=result["upper_estimate_inr"]
     with pytest.raises(CostModelDataError):
         estimate_cost(model,intervention="Drainage",area_type="Urban road",
-            scope_quantity=0,scope_unit="metres",duration_months=6)
+            scope_quantity=0,scope_unit="metres")
 
 def test_model_blocked_when_baseline_not_beaten():
     model=train_cost_model(records()); model["metrics"]["beats_baseline"]=False
