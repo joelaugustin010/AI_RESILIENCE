@@ -259,26 +259,58 @@ st.markdown(
     [data-testid="stSidebarNavLink"]:hover { background: rgba(66, 224, 193, .08); }
     [data-testid="stAppViewContainer"] > .main, [data-testid="stMain"] { background: transparent !important; }
 
-    /* ---------- Typography ---------- */
+    /* ---------- Typography: consistent hierarchy and readable supporting text ---------- */
     h1, h2, h3, h4, h5, h6 {
       color: #f1fbfb !important;
       letter-spacing: -.028em;
       text-wrap: balance;
+      font-weight: 760;
     }
-    h2 { line-height: 1.22; }
-    h3 { line-height: 1.3; }
-    p, li, label, .stMarkdown, .stCaption, [data-testid="stWidgetLabel"] { color: #c5dadd; }
-    [data-testid="stCaptionContainer"], .stCaption { color: #94b0b8 !important; }
+    h1 { font-size: clamp(1.9rem, 3.2vw, 2.65rem) !important; line-height: 1.08 !important; }
+    h2 { font-size: clamp(1.42rem, 2.25vw, 1.85rem) !important; line-height: 1.2 !important; }
+    h3 { font-size: clamp(1.12rem, 1.6vw, 1.32rem) !important; line-height: 1.3 !important; }
+    h4, h5, h6 { line-height: 1.35 !important; }
+    p, li, label, .stMarkdown, .stCaption, [data-testid="stWidgetLabel"] {
+      color: #d0e0e2;
+      font-size: .94rem;
+      line-height: 1.62;
+    }
+    [data-testid="stMarkdownContainer"] > p { margin-bottom: .72rem; }
+    [data-testid="stMarkdownContainer"] li { margin: .16rem 0; }
+    [data-testid="stWidgetLabel"] p,
+    [data-testid="stWidgetLabel"] label {
+      color: #dce9ea !important;
+      font-size: .88rem !important;
+      font-weight: 620 !important;
+      line-height: 1.45 !important;
+    }
+    [data-testid="stCaptionContainer"],
+    [data-testid="stCaptionContainer"] p,
+    .stCaption {
+      color: #b4cbd0 !important;
+      font-size: .82rem !important;
+      line-height: 1.55 !important;
+    }
+    [data-testid="stTooltipContent"] { color: #e0eeee !important; }
+    [data-testid="stAlert"] p { color: #e0eeee !important; line-height: 1.58 !important; }
+    [data-testid="stDataFrame"] [role="gridcell"],
+    [data-testid="stDataFrame"] [role="columnheader"],
+    [data-testid="stTable"] { font-size: .86rem !important; }
     a { color: #62dfd0 !important; text-underline-offset: 2px; }
     a:hover { color: #9cf8e6 !important; }
     hr { border-color: rgba(130, 190, 199, .18) !important; margin: 1.5rem 0; }
-    strong { color: #f0fbfb; }
+    strong { color: #f0fbfb; font-weight: 720; }
     code {
       color: #b7f7ea !important;
       background: rgba(66, 224, 193, .08) !important;
       border: 1px solid rgba(66, 224, 193, .14);
       border-radius: 6px;
       padding: .08rem .3rem;
+    }
+    @media (max-width: 720px) {
+      h1 { font-size: clamp(1.65rem, 7vw, 2.15rem) !important; }
+      h2 { font-size: clamp(1.28rem, 5vw, 1.55rem) !important; }
+      p, li { font-size: .92rem; }
     }
 
     /* ---------- Standard module header ---------- */
