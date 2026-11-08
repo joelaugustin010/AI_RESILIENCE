@@ -27,6 +27,7 @@ def format_inr(amount):
     return f"₹{sign}{number}"
 
 from src.decision_workflow import budget_summary
+from src.mitigation_optimizer import optimize_portfolio
 from src.mitigation_intelligence import (
     design_recommendations,
     review_project_register,
@@ -40,11 +41,11 @@ from src.ui_theme import page_header, section_intro
 
 page_header(
     "AI RESILIENCE · KOCHI · PLANNING WORKSPACE",
-    "Urban Flood Mitigation Budget & Project Planning",
-    "A public infrastructure planning worksheet for assessing proposed flood-mitigation "
-    "investments, monitoring implementation, and keeping budget allocation transparent "
-    "across Kochi, Kerala.",
-    meta=("Kochi · Kerala · India", "User-supplied estimates", "Arithmetic comparison only"),
+    "AI Mitigation Decision & Investment Platform",
+    "An evidence-aware planning workspace combining historical-project ML estimates, "
+    "budget-constrained portfolio scenarios, and transparent implementation tracking "
+    "for flood-resilience investments across Kochi, Kerala.",
+    meta=("Kochi · Kerala · India", "ML estimates when validated", "Human-reviewed scenarios"),
     accent="amber",
     key="mitigation-budget",
 )
@@ -91,6 +92,7 @@ st.caption("Enter estimates only when you have a source, date, scope, and unit b
 columns = [
     "Intervention",
     "Location",
+    "Planner value points",
     "Project Status",
     "Priority",
     "Cost INR",
@@ -161,6 +163,10 @@ with st.container(border=True):
         scope_unit = form_cols[1].selectbox("Scope measurement unit", unit_options)
         scope_quantity = st.number_input(
             "Scope quantity", min_value=0.0, value=100.0, step=10.0
+        )
+        planning_value = st.slider(
+            "Planner-assessed contribution (1–10)", min_value=1, max_value=10, value=5,
+            help="Your documented planning judgement for comparing scenarios. This is not an AI risk-reduction prediction or measured benefit."
         )
         with st.expander("Optional details · quotation, schedule and evidence", expanded=False):
             duration_months = st.number_input(
@@ -235,6 +241,7 @@ with st.container(border=True):
             record = {
                 "Intervention": project_name,
                 "Location": project_location.strip(),
+                "Planner value points": int(planning_value),
                 "Project Status": "Proposed",
                 "Priority": "Not assessed",
                 "Cost INR": estimated_cost,
@@ -1132,67 +1139,51 @@ with st.expander("Portfolio analytics, budget scenarios and exports", expanded=F
             "it is the most effective choice."
         )
     
-    from itertools import combinations
-    
-    section_intro("Screen", "Affordable project combinations")
+    section_intro(
+        "Decision intelligence",
+        "Budget-constrained investment scenarios",
+        "Explore project combinations that maximize planner-assigned contribution points within the available budget. The optimiser is exact for the entered values; it does not predict flood reduction or decide public funding priorities.",
+    )
     
     if budget <= 0:
-        st.info("Enter a budget greater than ₹0 to compare combinations.")
+        st.info("Enter an available budget above ₹0 to run an investment scenario.")
     else:
-        combo_projects = plan.copy()
-        combo_projects["_cost"] = pd.to_numeric(
-            combo_projects["Cost INR"], errors="coerce"
-        )
-    
-        # Exclude missing, zero, and invalid cost estimates.
-        combo_projects = combo_projects[
-            combo_projects["_cost"].notna()
-            & (combo_projects["_cost"] > 0)
-            & (combo_projects["_cost"] <= budget)
-        ]
-    
-        combo_projects = combo_projects.reset_index(drop=True)
-    
-        if combo_projects.empty:
-            st.info("Enter positive project cost estimates to compare combinations.")
-        elif len(combo_projects) > 15:
-            st.warning(
-                "For this first version, the combination planner supports "
-                "up to 15 projects. Reduce the list to compare combinations."
-            )
+        scenario_rows = []
+        for _, project in plan.iterrows():
+            try:
+                cost_value = float(project["Cost INR"])
+                value_points = int(project.get("Planner value points", 0))
+            except (TypeError, ValueError):
+                continue
+            if pd.notna(cost_value) and cost_value > 0 and value_points > 0:
+                scenario_rows.append({
+                    "name": f'{project["Intervention"]} · {project["Location"]}',
+                    "cost_inr": cost_value,
+                    "value_points": value_points,
+                })
+        
+        if not scenario_rows:
+            st.warning("Add projects with verified or clearly labelled cost estimates to compare investment scenarios.")
+        elif len(scenario_rows) > 18:
+            st.warning("The transparent exact optimiser currently supports up to 18 candidate projects per scenario.")
         else:
-            affordable_combinations = []
-    
-            for size in range(1, len(combo_projects) + 1):
-                for indexes in combinations(range(len(combo_projects)), size):
-                    chosen = combo_projects.iloc[list(indexes)]
-                    total_cost = float(chosen["_cost"].sum())
-    
-                    if total_cost <= budget:
-                        affordable_combinations.append(
-                            (total_cost, chosen["Intervention"].tolist())
-                        )
-    
-            affordable_combinations.sort(
-                key=lambda item: item[0], reverse=True
-            )
-    
-            if affordable_combinations:
-                best_total, best_names = affordable_combinations[0]
-    
+            result = optimize_portfolio(scenario_rows, float(budget))
+            if result["selected"]:
                 st.success(
-                    f"An affordable combination totals "
-                    f"{format_inr(best_total)}, leaving "
-                    f"{format_inr(budget - best_total)}."
+                    f'Best entered-value scenario: {result["total_value_points"]} planner points · '
+                    f'{format_inr(result["total_cost_inr"])} invested · '
+                    f'{format_inr(result["remaining_budget_inr"])} remaining.'
                 )
-    
-                st.markdown("**Projects in this combination:**")
-                for name in best_names:
-                    st.markdown(f"- {name}")
-    
-                st.caption(
-                    "This combination maximizes the amount of budget used "
-                    "among the entered projects. It does not rank safety "
-                    "benefits or determine the best real-world investment."
-                )
-
+                scenario_df = pd.DataFrame([
+                    {"Selected project": item["name"], "Cost (INR)": item["cost_inr"],
+                     "Planner points": item["value_points"]}
+                    for item in result["selected"]
+                ])
+                display_dataframe(scenario_df, hide_index=True, use_container_width=True)
+            else:
+                st.info("No candidate project fits within the current budget.")
+            st.caption(
+                "Method: exhaustive 0/1 portfolio search over the submitted project set. "
+                "The objective uses planner-entered points, not independently measured impact. "
+                "Results are scenario comparisons—not engineering advice, risk predictions, or an automatic funding decision."
+            )
