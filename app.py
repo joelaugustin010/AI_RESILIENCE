@@ -1952,12 +1952,11 @@ st.markdown(
     }
     /* Clear hierarchy, keyboard focus and comfortable scrolling for the
        five navigation groups and their thirteen destinations. */
+    /* Let Streamlit's sidebar own vertical scrolling. A second
+       scroll container here creates a duplicate scrollbar. */
     [data-testid="stSidebarNav"] {
-      max-height: calc(100vh - 1.5rem);
-      overflow-y: auto !important;
-      overflow-x: hidden !important;
-      scrollbar-width: thin;
-      scrollbar-color: rgba(41,155,145,.34) transparent;
+      max-height: none !important;
+      overflow: visible !important;
     }
     [data-testid="stSidebarNav"] a,
     [data-testid="stSidebarNavLink"] {
