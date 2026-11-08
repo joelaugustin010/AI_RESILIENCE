@@ -238,6 +238,113 @@ else:
         "register remains available independently."
     )
 
+# ============================================================
+# EVIDENCE-GATED MACHINE-LEARNING COST ESTIMATOR
+# ============================================================
+from src.mitigation_cost_ml import CostModelDataError, estimate_cost, train_cost_model
+
+st.markdown("---")
+section_intro(
+    "Machine learning",
+    "Historical project cost estimator",
+    "Train a supervised model from sourced, completed mitigation projects. "
+    "It estimates project cost only; it does not estimate flood-risk reduction or project effectiveness.",
+)
+st.markdown(
+    "**Training data required:** one row per completed project, with actual final cost, "
+    "intervention type, area type, measured scope quantity and unit, duration, and a source reference."
+)
+template_columns = [
+    "intervention", "area_type", "scope_quantity", "scope_unit",
+    "duration_months", "actual_cost_inr", "source_reference",
+]
+template_csv = pd.DataFrame(columns=template_columns).to_csv(index=False).encode("utf-8")
+st.download_button(
+    "Download historical-project CSV template",
+    data=template_csv,
+    file_name="AI_RESILIENCE_historical_mitigation_costs_template.csv",
+    mime="text/csv",
+    key="mitigation_ml_template",
+)
+uploaded_cost_data = st.file_uploader(
+    "Upload sourced completed-project records (CSV)",
+    type=["csv"],
+    help="Use actual final project costs, not the illustrative starter values in this page.",
+    key="mitigation_ml_upload",
+)
+if uploaded_cost_data is not None:
+    try:
+        historical_records = pd.read_csv(uploaded_cost_data)
+        st.caption(f"Uploaded rows: {len(historical_records):,}")
+        if st.button("Train and validate cost model", type="primary", key="train_mitigation_cost_model"):
+            try:
+                trained_cost_model = train_cost_model(historical_records)
+                st.session_state["mitigation_cost_ml_model"] = trained_cost_model
+                st.success("Model training and holdout evaluation completed.")
+            except CostModelDataError as exc:
+                st.session_state.pop("mitigation_cost_ml_model", None)
+                st.warning(str(exc))
+    except (pd.errors.ParserError, UnicodeDecodeError, ValueError) as exc:
+        st.error(f"Could not read this CSV: {exc}")
+
+trained_cost_model = st.session_state.get("mitigation_cost_ml_model")
+if trained_cost_model:
+    model_metrics = trained_cost_model["metrics"]
+    metric_cols = st.columns(4)
+    metric_cols[0].metric("Records used", f"{model_metrics['records_used']:,}")
+    metric_cols[1].metric("Holdout MAE", format_inr(model_metrics["mae_inr"]))
+    metric_cols[2].metric("Median baseline MAE", format_inr(model_metrics["baseline_mae_inr"]))
+    metric_cols[3].metric("Holdout R²", f"{model_metrics['r2']:.3f}" if pd.notna(model_metrics["r2"]) else "N/A")
+    st.caption(
+        model_metrics["validation_method"]
+        + ". MAE is the average absolute cost error on held-out records."
+    )
+    if model_metrics["beats_baseline"]:
+        st.success("The model outperformed the median-only baseline on held-out records. Cost estimates are enabled.")
+        with st.form("mitigation_ml_prediction_form"):
+            prediction_cols = st.columns(2)
+            categories = trained_cost_model["categories"]
+            chosen_intervention = prediction_cols[0].selectbox("Intervention", categories["intervention"])
+            chosen_area = prediction_cols[1].selectbox("Area type", categories["area_type"])
+            chosen_unit = prediction_cols[0].selectbox("Scope unit", categories["scope_unit"])
+            scope_quantity = prediction_cols[1].number_input("Scope quantity", min_value=0.0, value=100.0, step=10.0)
+            duration_months = prediction_cols[0].number_input("Duration (months)", min_value=0.0, value=6.0, step=1.0)
+            predict_cost = st.form_submit_button("Estimate project cost")
+        if predict_cost:
+            try:
+                cost_result = estimate_cost(
+                    trained_cost_model,
+                    intervention=chosen_intervention,
+                    area_type=chosen_area,
+                    scope_quantity=scope_quantity,
+                    scope_unit=chosen_unit,
+                    duration_months=duration_months,
+                )
+                st.metric("ML estimated project cost", format_inr(cost_result["estimated_cost_inr"]))
+                st.caption(
+                    "Indicative validation-error band: "
+                    + format_inr(cost_result["lower_estimate_inr"])
+                    + " to "
+                    + format_inr(cost_result["upper_estimate_inr"])
+                    + ". This is prediction ± holdout MAE, not a statistical confidence interval."
+                )
+                st.warning(
+                    "Use this as an early planning estimate only. Confirm current local quotations, "
+                    "taxes, land, design, procurement and lifecycle costs before funding decisions."
+                )
+            except CostModelDataError as exc:
+                st.error(str(exc))
+    else:
+        st.warning(
+            "The model did not beat the median-only baseline on held-out records. "
+            "Predictions are disabled; add more representative, sourced completed projects."
+        )
+else:
+    st.info(
+        "ML status: waiting for historical data. The project catalogue and current editable "
+        "register are not labelled training data, so no model is trained from them."
+    )
+
 register_review = review_project_register(
     plan.to_dict(orient="records"),
     budget,
