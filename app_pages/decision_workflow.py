@@ -62,7 +62,7 @@ from src.hydrology_analytics import (
 )
 from src.infrastructure_dependencies import dependency_review_table
 from src.map_integration import MAP_CONTEXT_KEY, build_map_context, hazard_has_flood_component
-from src.ui_theme import research_status_notice, section_intro
+from src.ui_theme import page_header, research_status_notice, section_intro
 from src.evidence_alternatives import alternative_evidence_for_hazard
 from src.phase2_data import (
     Phase2DataError,
@@ -79,6 +79,15 @@ from src.flood_footprint import FloodFootprintError, summarize_flood_depth_geojs
 
 
 ROOT = Path(__file__).resolve().parents[1]
+
+page_header(
+    "AI RESILIENCE · KOCHI · PLANNING WORKSPACE",
+    "Disaster decision workflow",
+    "Turn a clearly described scenario into an evidence checklist, compare preparedness actions, review budget arithmetic and export a traceable report.",
+    meta=("Scenario review", "Evidence gates", "Planning context"),
+    accent="teal",
+    key="decision-workflow",
+)
 
 
 @st.cache_data(show_spinner="Loading hydrology observations…")
