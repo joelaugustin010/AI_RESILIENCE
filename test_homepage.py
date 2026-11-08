@@ -20,6 +20,7 @@ EXPECTED_PAGES = {
     "mitigation_planner",
     "smart_mitigation_design",
     "submission_ml_demo",
+    "module_explorer",
 }
 
 
@@ -51,7 +52,7 @@ def test_home_is_the_default_page_with_the_cinematic_hero():
 
 def test_home_links_every_registered_workspace():
     app = _home()
-    linked = {link.page for link in app.page_link}
+    linked = {link.page for link in app.page_link if link.page}
     assert linked == EXPECTED_PAGES
 
 
