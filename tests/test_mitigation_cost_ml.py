@@ -45,3 +45,43 @@ def test_model_blocked_when_baseline_not_beaten():
     with pytest.raises(CostModelDataError,match="median baseline"):
         estimate_cost(model,intervention="Drainage",area_type="Urban road",
             scope_quantity=100,scope_unit="metres",duration_months=6)
+
+
+def test_duration_model_holdout_and_prediction():
+    from src.mitigation_duration_ml import estimate_duration, train_duration_model
+
+    data = records(100)
+    model = train_duration_model(data)
+    metrics = model["metrics"]
+    assert metrics["records_used"] == 100
+    assert metrics["validation_records"] >= 8
+    assert metrics["mae_months"] >= 0
+    assert metrics["baseline_mae_months"] >= 0
+    if metrics["beats_baseline"]:
+        result = estimate_duration(
+            model,
+            intervention="Drainage",
+            area_type="Urban road",
+            scope_quantity=100,
+            scope_unit="metres",
+            estimated_cost_inr=150000,
+        )
+        assert result["lower_estimate_months"] <= result["estimated_duration_months"]
+        assert result["estimated_duration_months"] <= result["upper_estimate_months"]
+
+
+def test_duration_prediction_rejects_invalid_scope():
+    from src.mitigation_duration_ml import estimate_duration, train_duration_model
+
+    model = train_duration_model(records(100))
+    if not model["metrics"]["beats_baseline"]:
+        pytest.skip("Fixture did not beat duration baseline.")
+    with pytest.raises(CostModelDataError):
+        estimate_duration(
+            model,
+            intervention="Drainage",
+            area_type="Urban road",
+            scope_quantity=0,
+            scope_unit="metres",
+            estimated_cost_inr=150000,
+        )
