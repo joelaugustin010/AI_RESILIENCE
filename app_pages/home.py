@@ -1,1424 +1,169 @@
-"""Kochi-focused environmental and disaster-intelligence homepage for AI RESILIENCE.
+"""Environmental intelligence landing page for AI_RESILIENCE."""
 
-The page introduces Kochi's urban resilience context, explains the evidence-first
-workflow, and routes users into the existing analytical workspaces. Regional
-photography is illustrative context; analytical scope remains Kochi-focused.
-
-Hero film
----------
-Drop your own footage at ``assets/videos/kerala_hero.mp4``. On the next rerun
-the file is made available through Streamlit's static file route and used as a
-muted, looping, cover-fit background. Until then - or if the file is removed -
-the optimised local photograph in ``static/images/`` is shown instead. No
-remote video URL and no placeholder video file is referenced.
-"""
-
-from pathlib import Path
-import shutil
+from __future__ import annotations
 
 import streamlit as st
 
 
-ROOT = Path(__file__).resolve().parents[1]
-STATIC_IMAGES = "app/static/images"
-ASSETS_VIDEO = ROOT / "assets" / "videos" / "kerala_hero.mp4"
-STATIC_VIDEO = ROOT / "static" / "videos" / "kerala_hero.mp4"
-STATIC_VIDEO_URL = "app/static/videos/kerala_hero.mp4"
-
-
-def _img(filename: str) -> str:
-    return f"{STATIC_IMAGES}/{filename}"
-
-
-def _sync_hero_video() -> str | None:
-    """Return a servable hero-video URL only when a real local file exists.
-
-    ``assets/videos/kerala_hero.mp4`` is the documented drop-in location. The
-    copy into ``static/videos`` is what Streamlit can serve; it happens only
-    when the source file is new or has changed. Nothing is fabricated here.
-    """
-
-    try:
-        if ASSETS_VIDEO.is_file() and ASSETS_VIDEO.stat().st_size > 0:
-            needs_copy = True
-            if STATIC_VIDEO.is_file() and STATIC_VIDEO.stat().st_size > 0:
-                same_size = STATIC_VIDEO.stat().st_size == ASSETS_VIDEO.stat().st_size
-                same_time = int(STATIC_VIDEO.stat().st_mtime) >= int(ASSETS_VIDEO.stat().st_mtime)
-                needs_copy = not (same_size and same_time)
-            if needs_copy:
-                STATIC_VIDEO.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(ASSETS_VIDEO, STATIC_VIDEO)
-    except OSError:
-        # A read-only deployment can still use a pre-placed file in static/.
-        pass
-
-    if STATIC_VIDEO.is_file() and STATIC_VIDEO.stat().st_size > 0:
-        return STATIC_VIDEO_URL
-    return None
-
-
-def _svg(paths: str, size: int = 20) -> str:
-    return (
-        f'<svg viewBox="0 0 24 24" width="{size}" height="{size}" fill="none" '
-        'stroke="currentColor" stroke-width="1.7" stroke-linecap="round" '
-        f'stroke-linejoin="round" aria-hidden="true">{paths}</svg>'
-    )
-
-
-ICON_COMPASS = _svg(
-    '<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5 5-2Z"/>'
-)
-ICON_PLACE = _svg(
-    '<path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>'
-)
-ICON_HOSPITAL = _svg(
-    '<path d="M4 21V7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14"/><path d="M2 21h20"/>'
-    '<path d="M9 21v-5h6v5"/><path d="M12 8v5M9.5 10.5h5"/>'
-)
-ICON_BLUEPRINT = _svg(
-    '<path d="M3 21h18"/><path d="M5 21V8l7-4 7 4v13"/>'
-    '<path d="M9 21v-6h6v6"/><path d="M9 11h6"/>'
-)
-ICON_SHIELD = _svg(
-    '<path d="M12 22s8-3.6 8-10V5l-8-3-8 3v7c0 6.4 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/>'
-)
-ICON_FLOOD = _svg(
-    '<path d="M2 7c.7.7 1.5 1.2 2.6 1.2 2.4 0 2.4-2.2 4.9-2.2s2.4 2.2 4.9 2.2S17 6 19.4 6c1.1 0 1.9.5 2.6 1.2"/>'
-    '<path d="M2 13c.7.7 1.5 1.2 2.6 1.2 2.4 0 2.4-2.2 4.9-2.2s2.4 2.2 4.9 2.2S17 12 19.4 12c1.1 0 1.9.5 2.6 1.2"/>'
-    '<path d="M2 19c.7.7 1.5 1.2 2.6 1.2 2.4 0 2.4-2.2 4.9-2.2s2.4 2.2 4.9 2.2S17 18 19.4 18c1.1 0 1.9.5 2.6 1.2"/>'
-)
-ICON_LANDSLIDE = _svg(
-    '<path d="m3 20 5.5-9 3 4 3-6L21 20H3Z"/><path d="m8.5 11 .8-4 2.2 2"/>'
-    '<path d="M15.5 4.5v1M18.5 6.5l-.7.7M13 7l.7.7"/>'
-)
-ICON_CYCLONE = _svg(
-    '<path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6a6 6 0 1 0 6 6"/>'
-    '<path d="M12 10a2 2 0 1 0 2 2"/>'
-)
-ICON_FACTORY = _svg(
-    '<path d="M2 21h20"/><path d="M4 21V9l6 4V9l6 4V4h4v17"/>'
-    '<path d="M7 17h1M12 17h1M17 17h1"/>'
-)
-ICON_RAIN = _svg(
-    '<path d="M4.5 14.5A4.5 4.5 0 0 1 5.6 5.7 5.7 5.7 0 0 1 16.6 5a4.2 4.2 0 0 1 2.2 8"/>'
-    '<path d="M8 17.5v2M12 16.5v3M16 17.5v2"/>'
-)
-ICON_LEAF = _svg(
-    '<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.5 19 2c1 2 2 4.2 2 8 0 5.5-4.8 10-10 10Z"/>'
-    '<path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.5 12 13 13 12"/>'
-)
-
-VIDEO_URL = _sync_hero_video()
-VIDEO_MARKUP = ""
-if VIDEO_URL:
-    # Keep the video tag on one line. A blank line inside the surrounding raw
-    # HTML block makes Markdown start a new block, which can turn the following
-    # nested spans into a visible code fragment.
-    VIDEO_MARKUP = (
-        f'<video class="ar-cine-video" autoplay muted loop playsinline preload="metadata" '
-        f'poster="{_img("hero-kerala-fallback.jpg")}" tabindex="-1" aria-hidden="true">'
-        f'<source src="{VIDEO_URL}" type="video/mp4">'
-        "</video>"
-    )
-
-
 st.markdown(
     """
     <style>
-    /* ============================================================
-       AI RESILIENCE - Kerala homepage
-       Scoped below the shared design system defined in app.py.
-       ============================================================ */
-    .ar-home-copy { max-width: 860px; }
-
-    /* A slow documentary sequence: flooded road, Western Ghats monsoon,
-       landslide scar and the coast before heavy rain. Each frame holds for
-       roughly eight seconds, with a long crossfade and a restrained push-in. */
-    @keyframes arSlideCycle {
-      0%   { opacity: 1; transform: scale(1.02) translate3d(0, 0, 0); }
-      21%  { opacity: 1; transform: scale(1.055) translate3d(-.6%, -.4%, 0); }
-      28%  { opacity: 0; transform: scale(1.075) translate3d(-.9%, -.6%, 0); }
-      100% { opacity: 0; transform: scale(1.075) translate3d(-.9%, -.6%, 0); }
-    }
-    @keyframes arRise {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: none; }
-    }
-    @keyframes arPulse {
-      0%   { box-shadow: 0 0 0 0 rgba(66, 224, 193, .45); }
-      70%  { box-shadow: 0 0 0 8px rgba(66, 224, 193, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(66, 224, 193, 0); }
-    }
-
-    /* ---------- Cinematic hero ---------- */
-    .ar-cine-hero {
-      position: relative;
-      isolation: isolate;
-      display: flex;
-      flex-direction: column;
-      min-height: clamp(540px, 72vh, 760px);
-      margin: .15rem 0 0;
-      padding: clamp(1.5rem, 4vw, 3.2rem);
-      padding-bottom: clamp(8.2rem, 12vw, 10.2rem);
-      overflow: hidden;
-      border: 1px solid rgba(126, 208, 202, .26);
-      border-radius: 28px;
-      background: #071c2a;
-      box-shadow: 0 30px 80px rgba(0, 0, 0, .38);
-    }
-    .ar-cine-media, .ar-cine-slide, .ar-cine-poster, .ar-cine-video {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-    }
-    /* Streamlit's markdown image rule (`… img { object-fit: scale-down }`)
-       outranks a single class selector, so both media layers are scoped and
-       pinned to cover explicitly. */
-    .ar-cine-hero .ar-cine-slide {
-      z-index: 0;
-      object-fit: cover !important;
-      opacity: 0;
-      filter: saturate(.96) contrast(1.04);
-      animation: arSlideCycle 32s cubic-bezier(.45, .05, .55, .95) infinite;
-      will-change: opacity, transform;
-    }
-    .ar-cine-hero .ar-slide-a { object-position: center 56%; animation-delay: 0s; }
-    .ar-cine-hero .ar-slide-b { object-position: center 46%; animation-delay: -8s; }
-    .ar-cine-hero .ar-slide-c { object-position: center 52%; animation-delay: -16s; }
-    .ar-cine-hero .ar-slide-d { object-position: center 50%; animation-delay: -24s; }
-    .ar-cine-hero .ar-cine-video {
-      z-index: 1;
-      object-fit: cover !important;
-      object-position: center;
-    }
-    .ar-cine-scrim {
-      position: absolute;
-      inset: 0;
-      z-index: 2;
-      background:
-        linear-gradient(90deg, rgba(3, 15, 23, .95) 0%, rgba(4, 22, 32, .82) 40%, rgba(4, 26, 36, .30) 68%, rgba(4, 22, 32, .56) 100%),
-        linear-gradient(180deg, rgba(4, 17, 26, .40) 0%, rgba(4, 17, 26, .02) 30%, rgba(3, 14, 21, .90) 100%),
-        radial-gradient(ellipse at 50% 45%, transparent 18%, rgba(3, 14, 21, .22) 100%);
-    }
-    .ar-cine-vignette {
-      position: absolute;
-      inset: 0;
-      z-index: 3;
-      pointer-events: none;
-      box-shadow: inset 0 0 150px 34px rgba(0, 0, 0, .48);
-    }
-    .ar-cine-grain {
-      position: absolute;
-      inset: 0;
-      z-index: 4;
-      pointer-events: none;
-      opacity: .05;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.9'/%3E%3C/svg%3E");
-    }
-    .ar-cine-inner {
-      position: relative;
-      z-index: 5;
-      display: flex;
-      flex: 1;
-      flex-direction: column;
-      justify-content: center;
-      width: 100%;
-      max-width: 960px;
-      padding: clamp(1rem, 3vw, 2rem) 0 0;
-    }
-    .ar-cine-topline {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: .8rem 1.4rem;
-      margin-bottom: clamp(1.4rem, 3vw, 2.4rem);
-    }
-    .ar-cine-kicker {
-      display: inline-flex;
-      align-items: center;
-      gap: .6rem;
-      color: #b9f7ec;
-      font-size: .72rem;
-      font-weight: 800;
-      letter-spacing: .17em;
-      text-transform: uppercase;
-    }
-    .ar-live-dot {
-      display: inline-block;
-      width: .55rem;
-      height: .55rem;
-      border-radius: 50%;
-      background: #42e0c1;
-      animation: arPulse 2.8s ease-out infinite;
-    }
-    .ar-cine-coord {
-      color: #9fc3c8;
-      font-size: .68rem;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-    .ar-cine-title {
-      margin: 0 !important;
-      color: #fff !important;
-      font-size: clamp(2.85rem, 7.1vw, 6.35rem) !important;
-      font-weight: 850 !important;
-      line-height: .92 !important;
-      letter-spacing: -.055em !important;
-      text-shadow: 0 8px 34px rgba(0, 0, 0, .38);
-      animation: arRise .7s var(--ar-ease) both;
-    }
-    .ar-cine-title span {
-      background: linear-gradient(100deg, #ffffff 4%, #c8fff3 42%, #42e0c1 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .ar-cine-sub {
-      max-width: 760px;
-      margin: clamp(1.1rem, 2.4vw, 1.7rem) 0 0;
-      color: #f0fffc;
-      font-size: clamp(1.1rem, 1.75vw, 1.42rem);
-      font-weight: 550;
-      line-height: 1.45;
-      letter-spacing: -.012em;
-      text-shadow: 0 2px 16px rgba(0, 0, 0, .58);
-      animation: arRise .7s .08s var(--ar-ease) both;
-    }
-    .ar-cine-desc {
-      max-width: 720px;
-      margin: .9rem 0 0;
-      color: #c3dde1;
-      font-size: clamp(.92rem, 1.1vw, 1rem);
-      line-height: 1.7;
-      text-shadow: 0 1px 12px rgba(0, 0, 0, .52);
-      animation: arRise .7s .16s var(--ar-ease) both;
-    }
-    .ar-cine-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: .45rem;
-      margin-top: 1.25rem;
-      animation: arRise .7s .24s var(--ar-ease) both;
-    }
-    .ar-cine-chips span {
-      border: 1px solid rgba(255, 255, 255, .20);
-      border-radius: 999px;
-      background: rgba(8, 36, 47, .38);
-      backdrop-filter: blur(8px);
-      color: #e7fffa;
-      padding: .36rem .72rem;
-      font-size: .73rem;
-      letter-spacing: .015em;
-    }
-    .ar-cine-foot {
-      position: absolute;
-      z-index: 5;
-      left: clamp(1.5rem, 4vw, 3.2rem);
-      right: clamp(1.5rem, 4vw, 3.2rem);
-      bottom: 1.25rem;
-      display: flex;
-      align-items: center;
-      gap: .8rem;
-      color: #a7c6cb;
-      font-size: .66rem;
-      font-weight: 650;
-      letter-spacing: .16em;
-      text-transform: uppercase;
-    }
-    .ar-scroll-line {
-      flex: 1;
-      height: 1px;
-      max-width: 130px;
-      background: linear-gradient(90deg, rgba(66, 224, 193, .7), rgba(66, 224, 193, 0));
-    }
-    .ar-cine-foot .ar-foot-right { margin-left: auto; }
-
-    /* Two primary actions sit in a glass dock overlapping the hero edge. */
-    .st-key-ar-hero-ctas {
-      position: relative;
-      z-index: 6;
-      margin-top: clamp(-5.6rem, -6vw, -4.2rem);
-      padding: 0 clamp(1.4rem, 4vw, 3.2rem);
-    }
-    .st-key-ar-hero-ctas [data-testid="stButton"] > button {
-      min-height: 3.15rem;
-      border-radius: 12px;
-      font-size: .94rem;
-      letter-spacing: .01em;
-    }
-    .st-key-ar-hero-ctas [data-testid="stButton"] > button[kind="primary"] {
-      box-shadow: 0 14px 34px rgba(66, 224, 193, .20);
-    }
-    .st-key-ar-hero-ctas [data-testid="stButton"] > button[kind="secondary"] {
-      background: rgba(5, 21, 32, .72) !important;
-      border-color: rgba(255, 255, 255, .30) !important;
-      color: #f4ffff !important;
-      backdrop-filter: blur(12px);
-    }
-    .ar-cta-note {
-      display: flex;
-      align-items: center;
-      min-height: 3.15rem;
-      color: #a9c5ca;
-      font-size: .8rem;
-      line-height: 1.5;
-    }
-    .ar-cta-note strong { color: #e7fffa; }
-
-    /* ---------- Signal strip ---------- */
-    .ar-signal {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      margin: clamp(2rem, 4vw, 3.2rem) 0 0;
-      border-top: 1px solid var(--ar-border);
-      border-bottom: 1px solid var(--ar-border);
-    }
-    .ar-signal > div {
-      padding: 1.05rem 1.2rem 1.1rem;
-      border-left: 1px solid rgba(130, 190, 199, .14);
-    }
-    .ar-signal > div:first-child { border-left: 0; padding-left: 0; }
-    .ar-signal strong {
-      display: block;
-      color: #f0ffff;
-      font-size: clamp(1.35rem, 2.2vw, 1.72rem);
-      font-weight: 800;
-      letter-spacing: -.035em;
-      line-height: 1;
-    }
-    .ar-signal span {
-      display: block;
-      margin-top: .35rem;
-      color: #42e0c1;
-      font-size: .66rem;
-      font-weight: 800;
-      letter-spacing: .15em;
-      text-transform: uppercase;
-    }
-    .ar-signal p {
-      margin: .35rem 0 0;
-      color: #91adb5;
-      font-size: .78rem;
-      line-height: 1.5;
-    }
-
-    /* ---------- Story headers ---------- */
-    .ar-story {
-      max-width: 860px;
-      margin: clamp(3.4rem, 6vw, 5rem) 0 1.3rem;
-    }
-    .ar-overline {
-      display: inline-flex;
-      align-items: center;
-      gap: .55rem;
-      color: var(--ar-sand);
-      font-size: .7rem;
-      font-weight: 800;
-      letter-spacing: .18em;
-      text-transform: uppercase;
-    }
-    .ar-overline:before {
-      content: "";
-      width: 1.7rem;
-      height: 1px;
-      background: currentColor;
-      opacity: .7;
-    }
-    .ar-story h2 {
-      margin: .65rem 0 .75rem !important;
-      color: #f2ffff !important;
-      font-size: clamp(2rem, 3.7vw, 3.25rem) !important;
-      line-height: 1.04 !important;
-      letter-spacing: -.04em !important;
-    }
-    .ar-story p {
-      max-width: 700px;
-      margin: 0;
-      color: #b4cdd2;
-      font-size: 1rem;
-      line-height: 1.7;
-    }
-    .ar-fineprint {
-      margin: 1rem 0 0;
-      color: #8fa9b0;
-      font-size: .72rem;
-      line-height: 1.55;
-      letter-spacing: .01em;
-    }
-
-    /* ---------- Beauty gallery ---------- */
-    .ar-gallery {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      grid-auto-rows: 215px;
-      gap: .85rem;
-      margin-top: 1.5rem;
-    }
-    .ar-tile {
-      position: relative;
-      overflow: hidden;
-      margin: 0;
-      border: 1px solid rgba(130, 190, 199, .20);
-      border-radius: 18px;
-      background: #0a2030;
-      box-shadow: 0 14px 34px rgba(0, 0, 0, .20);
-    }
-    .ar-tile img {
-      width: 100%;
-      height: 100%;
-      display: block;
-      object-fit: cover;
-      filter: saturate(.96) contrast(1.03);
-      transition: transform .75s var(--ar-ease), filter .75s var(--ar-ease);
-    }
-    .ar-tile:after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, rgba(3, 14, 21, 0) 34%, rgba(3, 14, 21, .12) 52%, rgba(3, 14, 21, .88) 100%);
-      pointer-events: none;
-    }
-    .ar-tile:hover img { transform: scale(1.045); filter: saturate(1.08) contrast(1.05); }
-    .ar-tile figcaption {
-      position: absolute;
-      z-index: 2;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      padding: 1rem 1.05rem;
-    }
-    .ar-tile figcaption strong {
-      display: block;
-      color: #fff;
-      font-size: 1rem;
-      font-weight: 760;
-      letter-spacing: -.012em;
-    }
-    .ar-tile figcaption span {
-      display: block;
-      margin-top: .16rem;
-      color: #c5dde1;
-      font-size: .74rem;
-      line-height: 1.45;
-    }
-    .ar-tile-tag {
-      position: absolute;
-      z-index: 2;
-      top: .8rem;
-      left: .8rem;
-      border: 1px solid rgba(255, 255, 255, .22);
-      border-radius: 999px;
-      background: rgba(3, 18, 27, .46);
-      backdrop-filter: blur(7px);
-      color: #eafffb;
-      padding: .2rem .55rem;
-      font-size: .62rem;
-      font-weight: 700;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-    }
-    .ar-t-backwaters { grid-column: span 2; grid-row: span 2; }
-    .ar-t-ghats { grid-column: span 2; }
-    .ar-t-forest { grid-column: span 2; }
-    .ar-t-city { grid-column: span 2; }
-
-    /* ---------- Threats ---------- */
-    .ar-threat {
-      position: relative;
-      isolation: isolate;
-      overflow: hidden;
-      margin: clamp(3.4rem, 6vw, 5rem) 0 0;
-      border: 1px solid rgba(130, 190, 199, .24);
-      border-radius: 26px;
-      box-shadow: 0 26px 66px rgba(0, 0, 0, .30);
-    }
-    .ar-threat .ar-threat-bg {
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover !important;
-      object-position: center;
-      filter: saturate(.72) contrast(1.06) brightness(.78);
-    }
-    .ar-threat-scrim {
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-      background:
-        linear-gradient(115deg, rgba(3, 14, 21, .96) 0%, rgba(4, 22, 32, .88) 48%, rgba(6, 35, 44, .72) 100%),
-        linear-gradient(0deg, rgba(3, 14, 21, .72), rgba(3, 14, 21, 0) 60%);
-    }
-    .ar-threat-inner {
-      position: relative;
-      z-index: 2;
-      padding: clamp(1.6rem, 4vw, 3.2rem);
-    }
-    .ar-threat .ar-story { margin-top: 0; }
-    .ar-threat .ar-story p { color: #bdd5d9; }
-    .ar-hazards {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: .8rem;
-      margin-top: 1.6rem;
-    }
-    .ar-hazard {
-      padding: 1.05rem 1.08rem;
-      border: 1px solid rgba(255, 255, 255, .11);
-      border-radius: 16px;
-      background: rgba(255, 255, 255, .045);
-      backdrop-filter: blur(8px);
-      transition: transform .2s var(--ar-ease), background .2s var(--ar-ease), border-color .2s var(--ar-ease);
-    }
-    .ar-hazard:hover {
-      transform: translateY(-3px);
-      border-color: rgba(66, 224, 193, .32);
-      background: rgba(255, 255, 255, .07);
-    }
-    .ar-hazard-icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 38px;
-      height: 38px;
-      margin-bottom: .7rem;
-      border: 1px solid rgba(66, 224, 193, .20);
-      border-radius: 11px;
-      background: rgba(66, 224, 193, .10);
-      color: #7ef1da;
-    }
-    .ar-hazard h3 {
-      margin: 0 0 .3rem !important;
-      color: #f2ffff !important;
-      font-size: .98rem !important;
-      letter-spacing: -.015em !important;
-    }
-    .ar-hazard p {
-      margin: 0;
-      color: #b8d0d5;
-      font-size: .81rem;
-      line-height: 1.55;
-    }
-
-    /* ---------- Why it matters ---------- */
-    .ar-why {
-      margin-top: clamp(3.4rem, 6vw, 5rem);
-      padding: clamp(1.5rem, 3.6vw, 3rem);
-      border: 1px solid rgba(130, 190, 199, .22);
-      border-radius: 26px;
-      background:
-        radial-gradient(ellipse at 88% 8%, rgba(66, 224, 193, .10), transparent 22rem),
-        linear-gradient(155deg, rgba(14, 45, 64, .88), rgba(7, 26, 40, .94));
-      box-shadow: 0 24px 60px rgba(0, 0, 0, .24);
-    }
-    .ar-flow {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: .9rem;
-      margin: 2rem 0 0;
-      padding: 0;
-      list-style: none;
-    }
-    .ar-flow-step {
-      padding: 1rem .95rem 1.1rem;
-      border-top: 1px solid rgba(66, 224, 193, .52);
-      border-radius: 0 0 12px 12px;
-      background: linear-gradient(180deg, rgba(66, 224, 193, .055), rgba(66, 224, 193, 0));
-      transition: background .2s var(--ar-ease), transform .2s var(--ar-ease);
-    }
-    .ar-flow-step:hover {
-      transform: translateY(-2px);
-      background: linear-gradient(180deg, rgba(66, 224, 193, .10), rgba(66, 224, 193, 0));
-    }
-    .ar-step-no {
-      display: block;
-      color: #4be5c8;
-      font-size: .66rem;
-      font-weight: 800;
-      letter-spacing: .18em;
-    }
-    .ar-flow-step h3 {
-      margin: .5rem 0 .3rem !important;
-      color: #f0ffff !important;
-      font-size: 1rem !important;
-    }
-    .ar-flow-step p {
-      margin: 0;
-      color: #a9c2c8;
-      font-size: .81rem;
-      line-height: 1.55;
-    }
-    .ar-transparency {
-      display: flex;
-      align-items: flex-start;
-      gap: .85rem;
-      margin-top: 1.4rem;
-      padding: 1rem 1.1rem;
-      border: 1px solid rgba(66, 224, 193, .20);
-      border-radius: 14px;
-      background: rgba(66, 224, 193, .055);
-    }
-    .ar-transparency-icon {
-      flex: 0 0 auto;
-      color: #66e9d1;
-      margin-top: .1rem;
-    }
-    .ar-transparency strong {
-      display: block;
-      color: #e5fff9;
-      font-size: .88rem;
-    }
-    .ar-transparency p {
-      margin: .25rem 0 0;
-      color: #a9c7cd;
-      font-size: .81rem;
-      line-height: 1.6;
-    }
-
-    /* ---------- Workspace navigation ---------- */
-    [class*="st-key-ar-nav-"] {
-      height: 100%;
-      padding: 1.25rem 1.2rem 1rem;
-      border: 1px solid var(--ar-border);
-      border-radius: 20px;
-      background:
-        radial-gradient(ellipse at 100% 0%, rgba(66, 224, 193, .07), transparent 14rem),
-        linear-gradient(155deg, rgba(15, 48, 66, .82), rgba(8, 29, 43, .92));
-      box-shadow: 0 16px 40px rgba(0, 0, 0, .18);
-      transition: transform .2s var(--ar-ease), border-color .2s var(--ar-ease), box-shadow .2s var(--ar-ease);
-    }
-    [class*="st-key-ar-nav-"]:hover {
-      transform: translateY(-2px);
-      border-color: rgba(66, 224, 193, .34);
-      box-shadow: 0 22px 50px rgba(0, 0, 0, .24);
-    }
-    .ar-nav-head {
-      display: flex;
-      align-items: center;
-      gap: .75rem;
-      margin-bottom: .6rem;
-    }
-    .ar-nav-icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex: 0 0 auto;
-      width: 42px;
-      height: 42px;
-      border: 1px solid rgba(66, 224, 193, .22);
-      border-radius: 12px;
-      background: rgba(66, 224, 193, .09);
-      color: #72efd8;
-    }
-    .ar-nav-count {
-      display: block;
-      color: #88a9b0;
-      font-size: .62rem;
-      font-weight: 800;
-      letter-spacing: .16em;
-      text-transform: uppercase;
-    }
-    .ar-nav-head h3 {
-      margin: .12rem 0 0 !important;
-      color: #f2ffff !important;
-      font-size: 1.06rem !important;
-      letter-spacing: -.02em !important;
-    }
-    .ar-nav-copy {
-      margin: 0 0 .55rem;
-      color: #a6c0c6;
-      font-size: .8rem;
-      line-height: 1.55;
-    }
-    [class*="st-key-ar-nav-"] [data-testid="stPageLink"] a {
-      justify-content: flex-start;
-      color: #d8eef0 !important;
-      font-size: .86rem;
-    }
-    [class*="st-key-ar-nav-"] [data-testid="stPageLink"] a:hover {
-      background: rgba(66, 224, 193, .09);
-      color: #8cf3df !important;
-    }
-
-    /* ---------- Footer ---------- */
-    .ar-footer {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 1rem 2rem;
-      margin-top: clamp(3rem, 5vw, 4.5rem);
-      padding-top: 1.3rem;
-      border-top: 1px solid var(--ar-border);
-      color: #89a5ac;
-      font-size: .76rem;
-      line-height: 1.6;
-    }
-    .ar-footer strong {
-      display: block;
-      color: #e7f5f5;
-      font-size: .86rem;
-      letter-spacing: .02em;
-    }
-    .ar-footer .ar-foot-right { text-align: right; }
-
-    /* ---------- Subtle scroll-linked parallax ---------- */
-    /*
-       Progressive enhancement: browsers with CSS scroll-driven animations get
-       gentle depth while scrolling. Older browsers keep the existing layout.
-       No JavaScript listeners, fake map data or extra network requests.
-    */
-    @keyframes arHeroParallax {
-      from { transform: translate3d(0, 0, 0) scale(1); }
-      to   { transform: translate3d(0, 7%, 0) scale(1.08); }
-    }
-    @keyframes arThreatParallax {
-      from { transform: translate3d(0, -4%, 0) scale(1.08); }
-      to   { transform: translate3d(0, 4%, 0) scale(1.08); }
-    }
-    @supports (animation-timeline: view()) {
-      .ar-cine-hero {
-        view-timeline-name: --ar-hero-view;
-        view-timeline-axis: block;
-      }
-      .ar-cine-media {
-        animation: arHeroParallax 1s linear both;
-        animation-timeline: --ar-hero-view;
-        animation-range: exit 0% exit 100%;
-        will-change: transform;
-      }
-      .ar-threat {
-        view-timeline-name: --ar-threat-view;
-        view-timeline-axis: block;
-      }
-      .ar-threat .ar-threat-bg {
-        animation: arThreatParallax 1s linear both;
-        animation-timeline: --ar-threat-view;
-        animation-range: entry 0% exit 100%;
-        will-change: transform;
-      }
-    }
-
-    /* ---------- Responsive ---------- */
-    @media (max-width: 1050px) {
-      .ar-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 200px; }
-      .ar-t-backwaters { grid-column: span 2; grid-row: span 2; }
-      .ar-t-ghats { grid-column: span 2; }
-      .ar-t-forest, .ar-t-city { grid-column: span 1; }
-      .ar-hazards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .ar-flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-    @media (max-width: 760px) {
-      .ar-cine-hero {
-        min-height: 560px;
-        padding-bottom: clamp(2rem, 6vw, 3rem);
-        border-radius: 20px;
-      }
-      .ar-cine-inner { padding-top: 1.2rem; }
-      .ar-cine-coord { display: none; }
-      .ar-cine-foot { display: none; }
-      .st-key-ar-hero-ctas {
-        margin-top: .7rem;
-        padding: 0;
-      }
-      .ar-cta-note { min-height: 0; margin-top: .35rem; }
-      .ar-signal { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .ar-signal > div { border-left: 0; padding: .9rem .9rem .95rem 0; }
-      .ar-signal > div:nth-child(odd) { border-right: 1px solid rgba(130, 190, 199, .14); padding-right: 1rem; }
-      .ar-signal > div:nth-child(n + 3) { border-top: 1px solid rgba(130, 190, 199, .14); }
-      .ar-footer .ar-foot-right { text-align: left; }
-    }
-    @media (max-width: 600px) {
-      .ar-cine-title { font-size: clamp(2.5rem, 12.4vw, 3.4rem) !important; }
-      .ar-cine-title span { display: block; }
-      /* Keep the phone experience calm and light on battery: one still frame. */
-      .ar-cine-slide { animation: none !important; opacity: 0; }
-      .ar-slide-a { opacity: 1; }
-      .ar-gallery { grid-template-columns: 1fr; grid-auto-rows: 225px; }
-      .ar-t-backwaters, .ar-t-ghats, .ar-t-forest, .ar-t-city { grid-column: span 1; grid-row: span 1; }
-      .ar-hazards, .ar-flow { grid-template-columns: 1fr; }
-      .ar-threat, .ar-why { border-radius: 20px; }
-      .ar-tile figcaption { padding: .85rem .9rem; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .ar-cine-slide { animation: none !important; opacity: 0; transform: none !important; }
-      .ar-cine-media, .ar-threat .ar-threat-bg { animation: none !important; transform: none !important; }
-      .ar-slide-a { opacity: 1; }
-      .ar-cine-video { display: none !important; }
-      .ar-live-dot { animation: none !important; }
-      .ar-cine-title, .ar-cine-sub, .ar-cine-desc, .ar-cine-chips { animation: none !important; }
-      .ar-tile:hover img { transform: none; }
-      .ar-hazard:hover, .ar-flow-step:hover,
-      [class*="st-key-ar-nav-"]:hover { transform: none; }
-    }
-    @media (forced-colors: active) {
-      /* Keep the gradient headline visible when the OS forces a palette. */
-      .ar-cine-title span {
-        background: none !important;
-        -webkit-text-fill-color: currentColor !important;
-        color: CanvasText !important;
-      }
-    }
+    .ar-home-hero { position:relative; isolation:isolate; overflow:hidden; min-height:clamp(560px,66vh,760px); display:flex; align-items:flex-end; padding:clamp(1.5rem,5vw,4.3rem); margin:.2rem 0 2rem; border-radius:30px; color:#fff; background:linear-gradient(90deg,rgba(8,30,27,.94),rgba(8,35,34,.55) 58%,rgba(8,35,34,.18)),url('app/static/videos/kochi-hero-poster.jpg') center/cover; box-shadow:0 26px 70px rgba(21,70,53,.22); }
+    .ar-home-hero:before { content:""; position:absolute; inset:0; z-index:-1; background:linear-gradient(90deg,rgba(5,24,22,.9),rgba(5,24,22,.36) 62%,rgba(5,24,22,.55)),linear-gradient(180deg,transparent 38%,rgba(5,24,22,.72)); }
+    .ar-home-hero-content { position:relative; z-index:3; max-width:780px; animation:home-rise .6s ease-out both; }
+    .ar-home-video { position:absolute; inset:0; z-index:-3; width:100%; height:100%; object-fit:cover; object-position:center; filter:saturate(.9) contrast(1.04); transition:opacity 1.4s ease-in-out; }
+    .ar-home-video-caption { position:absolute; right:1.4rem; bottom:1.3rem; z-index:3; color:rgba(235,250,241,.78); font-size:.68rem; letter-spacing:.11em; text-transform:uppercase; }
+    .ar-home-kicker,.ar-home-overline { text-transform:uppercase; letter-spacing:.16em; font-size:.71rem; font-weight:800; }
+    .ar-home-kicker { color:#b9e8d2; margin-bottom:1rem; }
+    .ar-home-photo { position:absolute; inset:0; z-index:-2; background-position:center; background-size:cover; opacity:0; transform:scale(1.045); animation:ar-photo-cycle 40s linear infinite; will-change:opacity,transform; }
+    .ar-home-photo:nth-of-type(2) { animation-delay:-5s; }
+    .ar-home-photo:nth-of-type(3) { animation-delay:-10s; }
+    .ar-home-photo:nth-of-type(4) { animation-delay:-15s; }
+    .ar-home-photo:nth-of-type(5) { animation-delay:-20s; }
+    .ar-home-photo:nth-of-type(6) { animation-delay:-25s; }
+    .ar-home-photo:nth-of-type(7) { animation-delay:-30s; }
+    .ar-home-photo:nth-of-type(8) { animation-delay:-35s; }
+    .ar-home-photo.is-active { opacity:1; }
+    .ar-home-hero .ar-home-title { color:#fff!important; font-size:clamp(52px,10vw,118px)!important; font-weight:900!important; letter-spacing:-.075em!important; line-height:.88!important; text-shadow:0 5px 28px rgba(0,0,0,.32); margin:0 0 1rem!important; }
+    .ar-home-lede { color:#e5f2e9; max-width:650px; font-size:clamp(1rem,1.8vw,1.23rem); line-height:1.7; margin:0 0 1.4rem; }
+    .ar-home-support { color:rgba(239,251,243,.9); max-width:620px; font-size:clamp(.92rem,1.35vw,1.08rem); line-height:1.65; margin:-.65rem 0 1.5rem; }
+    .ar-home-pills { display:flex; flex-wrap:wrap; gap:.5rem; }
+    .ar-home-pill { padding:.42rem .72rem; border-radius:999px; color:#edfff5; border:1px solid rgba(212,247,227,.28); background:rgba(13,55,45,.45); backdrop-filter:blur(8px); font-size:.78rem; }
+    .ar-home-section { margin:2.2rem 0; }
+    .ar-home-overline { color:#247a65; margin-bottom:.35rem; }
+    .ar-home-section h2 { color:#203c35!important; margin:0 0 .45rem!important; font-size:clamp(1.45rem,3vw,2.15rem)!important; letter-spacing:-.04em!important; }
+    .ar-home-section-copy { color:#5d756c; max-width:760px; line-height:1.65; margin:0 0 1.1rem; }
+    .ar-domain-card { min-height:248px; overflow:hidden; position:relative; display:flex; flex-direction:column; justify-content:flex-end; padding:1.15rem; border-radius:19px; color:#fff; background:linear-gradient(180deg,rgba(7,24,22,.02),rgba(7,25,23,.88)),var(--domain-image) center/cover; box-shadow:0 12px 30px rgba(24,73,55,.12); transition:transform .2s ease,box-shadow .2s ease; }
+    .ar-domain-card:hover { transform:translateY(-4px); box-shadow:0 20px 40px rgba(24,73,55,.2); }
+    .ar-domain-card h3 { color:#fff!important; font-size:1.08rem; margin:0 0 .25rem; }
+    .ar-domain-card p { color:#e4f4ea!important; font-size:.82rem; line-height:1.45; margin:0; }
+    .ar-domain-icon { font-size:1.45rem; margin-bottom:auto; }
+    .ar-domain-link { margin-top:.7rem; color:#c8f2dc!important; font-weight:750; font-size:.78rem; }
+    .ar-spotlight { display:grid; grid-template-columns:1.2fr .8fr; gap:1rem; }
+    .ar-spotlight-card { border:1px solid rgba(33,91,69,.16); border-radius:20px; padding:1.25rem; background:rgba(255,255,255,.78); box-shadow:0 9px 26px rgba(24,73,55,.06); }
+    .ar-spotlight-card h3 { color:#173f35!important; margin:0 0 .45rem; }
+    .ar-spotlight-card p,.ar-spotlight-card li { color:#5d756c; line-height:1.6; }
+    .ar-action { border-radius:23px; padding:clamp(1.2rem,3vw,2rem); color:#eefaf1; background:linear-gradient(125deg,#173f35,#247a65 62%,#3b8d7a); }
+    .ar-action h2 { color:#fff!important; margin-top:0!important; }
+    .ar-action p { color:#d8eee0; line-height:1.65; max-width:760px; }
+    .ar-transparency { display:flex; align-items:center; justify-content:space-between; gap:1rem; border:1px solid rgba(33,91,69,.16); border-radius:16px; padding:1rem 1.1rem; background:rgba(255,255,255,.55); }
+    .ar-transparency strong { color:#173f35; }
+    .ar-transparency span { color:#5d756c; font-size:.84rem; }
+    .ar-sdg-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.85rem; margin-top:1rem; }
+    .ar-sdg-card { position:relative; overflow:hidden; min-height:150px; padding:1.05rem 1.1rem 1rem; border-radius:20px; color:#fff; background:linear-gradient(135deg,var(--sdg-deep),var(--sdg-light)); box-shadow:0 12px 28px rgba(24,73,55,.12); transition:transform .2s ease,box-shadow .2s ease; }
+    .ar-sdg-card:hover { transform:translateY(-4px); box-shadow:0 18px 36px rgba(24,73,55,.2); }
+    .ar-sdg-card:after { content:""; position:absolute; width:130px; height:130px; right:-35px; top:-52px; border-radius:50%; background:rgba(255,255,255,.16); }
+    .ar-sdg-number { position:relative; z-index:1; font-size:1.65rem; font-weight:900; letter-spacing:-.06em; }
+    .ar-sdg-label { position:relative; z-index:1; display:block; margin-top:.18rem; font-size:.82rem; font-weight:850; letter-spacing:.03em; }
+    .ar-sdg-copy { position:relative; z-index:1; margin:.55rem 0 0; color:rgba(255,255,255,.88); font-size:.78rem; line-height:1.45; }
+    .ar-sdg-note { margin:.9rem 0 0; color:#5d756c; font-size:.78rem; line-height:1.55; }
+    .ar-module-note { margin:0 0 1rem; padding:.78rem 1rem; border-left:4px solid #299b91; border-radius:0 14px 14px 0; color:#365b50; background:linear-gradient(90deg,rgba(41,155,145,.1),rgba(255,255,255,.45)); line-height:1.55; }
+    @keyframes home-rise { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:none} }
+    @keyframes ar-photo-cycle { 0%,12%{opacity:1;transform:scale(1)} 20%,100%{opacity:0;transform:scale(1.045)} }
+    @media(max-width:760px){.ar-home-hero{min-height:560px;border-radius:22px}.ar-home-video-caption{right:1rem;bottom:1rem}.ar-spotlight{grid-template-columns:1fr}.ar-transparency{align-items:flex-start;flex-direction:column}.ar-sdg-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:480px){.ar-sdg-grid{grid-template-columns:1fr}}
+    @media(prefers-reduced-motion:reduce){.ar-home-video{display:none}.ar-home-photo{animation:none!important;opacity:0!important;transform:none!important}.ar-home-photo:first-of-type{opacity:1!important}.ar-home-hero-content,.ar-domain-card{animation:none;transition:none}}
     </style>
+    <link rel="preload" as="image" href="app/static/images/kochi/waterfront.jpg">
+    <div class="ar-home">
     """,
     unsafe_allow_html=True,
 )
 
-# ---------------------------------------------------------------------------
-# Hero
-# ---------------------------------------------------------------------------
 st.markdown(
-    f"""
-    <section class="ar-cine-hero" aria-label="AI RESILIENCE - Kochi environmental and disaster intelligence">
-      <div class="ar-cine-media" aria-hidden="true">
-        <img class="ar-cine-poster ar-cine-slide ar-slide-a" src="{_img('hero-kerala-fallback.jpg')}"
-             alt="" fetchpriority="high" decoding="async">
-        <img class="ar-cine-slide ar-slide-b" src="{_img('hero-kerala-ghats.jpg')}"
-             alt="" decoding="async">
-        <img class="ar-cine-slide ar-slide-c" src="{_img('hero-kerala-landslide.jpg')}"
-             alt="" decoding="async">
-        <img class="ar-cine-slide ar-slide-d" src="{_img('hero-kerala-coast.jpg')}"
-             alt="" decoding="async">{VIDEO_MARKUP}
-        <span class="ar-cine-scrim"></span>
-        <span class="ar-cine-vignette"></span>
-        <span class="ar-cine-grain"></span>
+    """
+    <section class="ar-home-hero" aria-label="AI RESILIENCE environmental intelligence">
+      <div class="ar-home-photo is-active" style="background-image:url('app/static/images/kochi/waterfront.jpg')" aria-hidden="true"></div>
+      <div class="ar-home-photo" style="background-image:url('app/static/images/kochi/backwaters.jpg')" aria-hidden="true"></div>
+      <div class="ar-home-photo" style="background-image:url('app/static/images/kochi/mangalavanam.jpg')" aria-hidden="true"></div>
+      <div class="ar-home-photo" style="background-image:url('app/static/images/kochi/fishing-nets.jpg')" aria-hidden="true"></div>
+      <div class="ar-home-photo" style="background-image:url('app/static/images/kochi/coast.jpg')" aria-hidden="true"></div>
+      <div class="ar-home-photo" style="background-image:url('app/static/images/kochi/water-metro.jpg')" aria-hidden="true"></div>
+      <div class="ar-home-photo" style="background-image:url('app/static/images/kochi/industrial-coast.jpg')" aria-hidden="true"></div>
+      <div class="ar-home-photo" style="background-image:url('app/static/images/kochi/maradu.jpg')" aria-hidden="true"></div>
+      <video class="ar-home-video" id="ar-hero-video" autoplay muted playsinline preload="metadata" poster="app/static/videos/kochi-hero-poster.jpg" aria-hidden="true">
+        <source src="app/static/videos/kochi-chinese-fishing-nets-480p.webm" type="video/webm">
+      </video>
+      <div class="ar-home-hero-content">
+        <div class="ar-home-kicker">Kerala · Kochi · Evidence-led resilience</div>
+        <h1 class="ar-home-title">AI<br>RESILIENCE</h1>
+        <p class="ar-home-lede">Understanding our environment. Protecting our future.</p>
+        <p class="ar-home-support">Explore environmental signals, understand disaster vulnerability and turn trusted evidence into practical resilience decisions for Kerala.</p>
+        <div class="ar-home-pills"><span class="ar-home-pill">Environmental intelligence</span><span class="ar-home-pill">Multi-hazard context</span><span class="ar-home-pill">Transparent evidence</span></div>
       </div>
-      <div class="ar-cine-inner">
-        <div class="ar-cine-topline">
-          <div class="ar-cine-kicker"><span class="ar-scope-dot" aria-hidden="true"></span>Kochi · Environmental &amp; disaster intelligence</div>
-          <div class="ar-cine-coord">9.9312° N · 76.2673° E · Kochi</div>
-        </div>
-        <h1 class="ar-cine-title">AI <span>RESILIENCE</span></h1>
-        <p class="ar-cine-sub">Understanding Kochi. Preparing for risk. Strengthening urban resilience.</p>
-        <p class="ar-cine-desc">
-          A Kochi-focused, evidence-first platform for environmental monitoring, multi-hazard
-          review, critical-service resilience and mitigation planning. Explore documented
-          data, understand uncertainty and support better-informed local decisions.
-        </p>
-        <div class="ar-cine-chips">
-          <span>Disaster intelligence</span>
-          <span>Environmental monitoring</span>
-          <span>Hospital resilience</span>
-          <span>Smart mitigation</span>
-        </div>
-      </div>
-      <div class="ar-cine-foot" aria-hidden="true">
-        <span>Scroll to explore</span>
-        <span class="ar-scroll-line"></span>
-        <span class="ar-foot-right">Beauty · Threats · Intelligence</span>
-      </div>
+      <div class="ar-home-video-caption" id="ar-hero-caption">Fort Kochi · Chinese fishing nets · CC BY 3.0</div>
     </section>
+    <script>
+    (() => {
+      const video = document.getElementById('ar-hero-video');
+      const caption = document.getElementById('ar-hero-caption');
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      if (!video) return;
+      const sequence = [
+        ['app/static/videos/kochi-chinese-fishing-nets-480p.webm', 'Fort Kochi · Chinese fishing nets · CC BY 3.0'],
+        ['app/static/videos/vembanad-boat-480p.webm', 'Vembanad Lake · Kerala backwaters · CC BY-SA 3.0'],
+        ['app/static/videos/kerala-flood-2018-480p.webm', 'Kerala flood context · Angamaly · CC BY-SA 4.0']
+      ];
+      let index = 0;
+      const advance = () => {
+        index = (index + 1) % sequence.length;
+        video.style.opacity = '0';
+        window.setTimeout(() => {
+          video.src = sequence[index][0];
+          caption.textContent = sequence[index][1];
+          video.load();
+          video.play().catch(() => {});
+          video.style.opacity = '1';
+        }, 1400);
+      };
+      video.addEventListener('ended', advance);
+      video.addEventListener('error', () => { video.style.opacity = '0'; });
+    })();
+    </script>
     """,
     unsafe_allow_html=True,
 )
 
-with st.container(key="ar-hero-ctas"):
-    cta_primary, cta_secondary, cta_note = st.columns([1.05, 1.28, 1.55], gap="small")
-    with cta_primary:
-        if st.button(
-            "Explore Intelligence",
-            type="primary",
-            width="stretch",
-            key="home_explore_intelligence",
-        ):
-            st.switch_page("app_pages/decision_workflow.py")
-    with cta_secondary:
-        if st.button(
-            "Explore Kochi's Risk Context",
-            type="secondary",
-            width="stretch",
-            key="home_explore_risks",
-        ):
-            st.switch_page("app_pages/kochi_map.py")
-    with cta_note:
-        st.markdown(
-            '<div class="ar-cta-note"><span><strong>Start with the evidence.</strong> '
-            "Every workspace shows its sources, coverage and uncertainty.</span></div>",
-            unsafe_allow_html=True,
-        )
+st.markdown('<section class="ar-home-section"><div class="ar-home-overline">Explore the intelligence platform</div><h2>One landscape. Many ways to understand it.</h2><p class="ar-home-section-copy">Move from environmental observation to scenario assessment, evidence review and practical planning through the existing AI_RESILIENCE workspaces.</p><div class="ar-module-note"><strong>Choose your starting point:</strong> monitor a signal, inspect a place, ask the assistant, or test a documented hazard workflow.</div></section>', unsafe_allow_html=True)
 
-st.markdown(
-    """
-    <div class="ar-signal" aria-label="Platform principles and scope">
-      <div><strong>Kochi</strong><span>pilot geography</span><p>City-focused spatial and environmental intelligence.</p></div>
-      <div><strong>Evidence</strong><span>first approach</span><p>Source coverage, provenance and uncertainty stay visible.</p></div>
-      <div><strong>11</strong><span>workspaces</span><p>Monitoring, risk review, critical services and mitigation planning.</p></div>
-      <div><strong>Human</strong><span>led decisions</span><p>Research support — not an official warning or emergency service.</p></div>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
-# ---------------------------------------------------------------------------
-# 01 - Beauty
-# ---------------------------------------------------------------------------
-st.markdown(
-    """
-    <div class="ar-story">
-      <span class="ar-overline">01 · Kochi and its regional context</span>
-      <h2>A coastal city shaped by water.</h2>
-      <p>
-        Kochi's resilience is connected to its backwaters, coastal edge, canals, urban drainage
-        and essential services. Understanding the city means looking beyond isolated hazards
-        and making the evidence, geography and uncertainty behind each decision easier to see.
-      </p>
-    </div>
-    <div class="ar-gallery">
-      <figure class="ar-tile ar-t-backwaters">
-        <img src="app/static/images/beauty-backwaters.webp" alt="Houseboats and palm-lined canals in the Kerala backwaters" loading="lazy" decoding="async">
-        <span class="ar-tile-tag">Backwaters</span>
-        <figcaption><strong>Water as a way of life</strong><span>Vembanad and the canal networks that connect village, paddy and city.</span></figcaption>
-      </figure>
-      <figure class="ar-tile ar-t-ghats">
-        <img src="app/static/images/beauty-ghats.webp" alt="Tea plantations across the high ranges near Munnar" loading="lazy" decoding="async">
-        <span class="ar-tile-tag">High ranges</span>
-        <figcaption><strong>The Western Ghats</strong><span>Cloud-fed tea country and one of the world's great biodiversity hotspots.</span></figcaption>
-      </figure>
-      <figure class="ar-tile ar-t-waterfall">
-        <img src="app/static/images/beauty-waterfall.webp" alt="Athirappilly waterfall surrounded by forest" loading="lazy" decoding="async">
-        <span class="ar-tile-tag">Rivers</span>
-        <figcaption><strong>Athirappilly</strong><span>Where the Chalakudy river drops through the forest edge.</span></figcaption>
-      </figure>
-      <figure class="ar-tile ar-t-coast">
-        <img src="app/static/images/beauty-coast.webp" alt="Cliffs and beach on the Kerala coast at Varkala" loading="lazy" decoding="async">
-        <span class="ar-tile-tag">Coast</span>
-        <figcaption><strong>The Arabian Sea</strong><span>Cliffs, beaches and coastal communities shaped by the monsoon.</span></figcaption>
-      </figure>
-      <figure class="ar-tile ar-t-forest">
-        <img src="app/static/images/beauty-forest.webp" alt="Shola forest and grassland in Silent Valley National Park" loading="lazy" decoding="async">
-        <span class="ar-tile-tag">Biodiversity</span>
-        <figcaption><strong>Silent Valley</strong><span>Shola forest, grassland and species found nowhere else on Earth.</span></figcaption>
-      </figure>
-      <figure class="ar-tile ar-t-city">
-        <img src="app/static/images/beauty-city.webp" alt="Kochi waterfront skyline and Marine Drive" loading="lazy" decoding="async">
-        <span class="ar-tile-tag">Cities</span>
-        <figcaption><strong>Kochi</strong><span>A waterfront city of neighbourhoods, ports and shared infrastructure.</span></figcaption>
-      </figure>
-    </div>
-    <p class="ar-fineprint">
-      Regional Kerala photography provides visual context only. The platform's analytical
-      focus is Kochi; images are not evidence of current conditions or a specific event.
-    </p>
-    """,
-    unsafe_allow_html=True,
-)
-
-# ---------------------------------------------------------------------------
-# 02 - Threats
-# ---------------------------------------------------------------------------
-st.markdown(
-    """
-    <section class="ar-threat" aria-labelledby="ar-threat-title">
-      <img class="ar-threat-bg" src="app/static/images/threats-monsoon.webp"
-           alt="" loading="lazy" decoding="async" aria-hidden="true">
-      <span class="ar-threat-scrim"></span>
-      <div class="ar-threat-inner">
-        <div class="ar-story">
-          <span class="ar-overline">02 · The threats we face</span>
-          <h2 id="ar-threat-title">Beauty under pressure.</h2>
-          <p>
-            Kochi's waterways, coastal setting and dense urban footprint create connected planning
-            questions. Heavy rainfall, drainage constraints, coastal pressures and environmental
-            change can affect neighbourhoods and essential services in different ways.
-          </p>
-        </div>
-        <div class="ar-hazards">
-          <article class="ar-hazard">
-            <span class="ar-hazard-icon">__FLOOD__</span>
-            <h3>Floods &amp; urban waterlogging</h3>
-            <p>Monsoon surges and drainage failure can overwhelm neighbourhoods, roads and essential services.</p>
-          </article>
-          <article class="ar-hazard">
-            <span class="ar-hazard-icon">__LANDSLIDE__</span>
-            <h3>Landslides</h3>
-            <p>Steep, rain-soaked slopes in the Western Ghats put settlements, hill roads and livelihoods at risk.</p>
-          </article>
-          <article class="ar-hazard">
-            <span class="ar-hazard-icon">__CYCLONE__</span>
-            <h3>Cyclones &amp; coastal hazards</h3>
-            <p>Storm surge, wind and coastal erosion threaten lives, homes and critical infrastructure.</p>
-          </article>
-          <article class="ar-hazard">
-            <span class="ar-hazard-icon">__FACTORY__</span>
-            <h3>Air &amp; industrial pollution</h3>
-            <p>Industrial corridors and urban emissions affect air quality, public health and the wider environment.</p>
-          </article>
-          <article class="ar-hazard">
-            <span class="ar-hazard-icon">__RAIN__</span>
-            <h3>Extreme rainfall</h3>
-            <p>Shorter, more intense spells stress rivers, reservoirs, soils and drainage systems.</p>
-          </article>
-          <article class="ar-hazard">
-            <span class="ar-hazard-icon">__LEAF__</span>
-            <h3>Environmental degradation</h3>
-            <p>Loss of wetlands, forests and natural buffers reduces the landscape's capacity to absorb shocks.</p>
-          </article>
-        </div>
-        <p class="ar-fineprint">
-          Atmospheric context imagery, not a photograph of a specific disaster event. Hazard
-          statements are general context; any site-specific conclusion must be supported by the
-          data and validation shown in the relevant workspace.
-        </p>
-      </div>
-    </section>
-    """.replace("__FLOOD__", ICON_FLOOD)
-    .replace("__LANDSLIDE__", ICON_LANDSLIDE)
-    .replace("__CYCLONE__", ICON_CYCLONE)
-    .replace("__FACTORY__", ICON_FACTORY)
-    .replace("__RAIN__", ICON_RAIN)
-    .replace("__LEAF__", ICON_LEAF),
-    unsafe_allow_html=True,
-)
-
-# ---------------------------------------------------------------------------
-# 03 - Why it matters
-# ---------------------------------------------------------------------------
-st.markdown(
-    f"""
-    <section class="ar-why" aria-labelledby="ar-why-title">
-      <div class="ar-story" style="margin-top:0">
-        <span class="ar-overline">03 · Why AI_RESILIENCE matters</span>
-        <h2 id="ar-why-title">From observation to action, in one evidence chain.</h2>
-        <p>
-          Urban preparedness improves when environmental monitoring, hazard review, critical-facility
-          context and mitigation planning speak the same language. AI RESILIENCE connects those
-          steps while keeping evidence gaps and uncertainty visible.
-        </p>
-      </div>
-      <ol class="ar-flow">
-        <li class="ar-flow-step">
-          <span class="ar-step-no">01 · Monitor</span>
-          <h3>See the environment</h3>
-          <p>Bring rainfall, hydrology, air quality and spatial context into a shared view of what is changing.</p>
-        </li>
-        <li class="ar-flow-step">
-          <span class="ar-step-no">02 · Assess</span>
-          <h3>Understand the risk</h3>
-          <p>Explore multi-hazard scenarios with explicit assumptions, evidence quality and uncertainty.</p>
-        </li>
-        <li class="ar-flow-step">
-          <span class="ar-step-no">03 · Protect</span>
-          <h3>Guard critical care</h3>
-          <p>Examine hospital exposure and continuity questions before an emergency tests them.</p>
-        </li>
-        <li class="ar-flow-step">
-          <span class="ar-step-no">04 · Prepare</span>
-          <h3>Plan smart mitigation</h3>
-          <p>Compare interventions, structure concept designs and check the arithmetic behind budgets.</p>
-        </li>
-      </ol>
-      <div class="ar-transparency">
-        <span class="ar-transparency-icon">{ICON_SHIELD}</span>
-        <div>
-          <strong>Evidence-first, not certainty-first.</strong>
-          <p>
-            This is a Kochi-focused research prototype, not an official warning service. Scenario outputs are
-            not automatically validated probabilities, and historical observations do not prove
-            current conditions or identify a pollution source. In an emergency, follow the Kerala
-            State Disaster Management Authority, IMD and district-administration guidance.
-          </p>
-        </div>
-      </div>
-    </section>
-    """,
-    unsafe_allow_html=True,
-)
-
-# ---------------------------------------------------------------------------
-# 04 - Explore the workspaces
-# ---------------------------------------------------------------------------
-st.markdown(
-    """
-    <div class="ar-story">
-      <span class="ar-overline">04 · Explore the intelligence platform</span>
-      <h2>Choose a workspace.</h2>
-      <p>
-        Move from understanding the landscape to examining a specific question. Every module is
-        part of the same evidence-first system, and every result should be read alongside its
-        source, coverage and validation status.
-      </p>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
-navigation_groups = [
-    (
-        "ar-nav-risk",
-        ICON_COMPASS,
-        "Risk & readiness",
-        "Build a scenario, inspect the evidence and understand what the models can — and cannot — tell you.",
-        [
-            ("app_pages/decision_workflow.py", "Decision Workflow", ":material/assignment_turned_in:"),
-            ("app_pages/disaster_probability.py", "Multi-Hazard Evidence Review", ":material/analytics:"),
-            ("app_pages/compound_scenario.py", "Cyclone + Flood", ":material/thunderstorm:"),
-        ],
-    ),
-    (
-        "ar-nav-place",
-        ICON_PLACE,
-        "Place & environment",
-        "See the geography, monitor environmental pressure and test whether the underlying data is fit for use.",
-        [
-            ("app_pages/kochi_map.py", "Kochi Map", ":material/map:"),
-            ("app_pages/air_pollution.py", "Air Pollution", ":material/factory:"),
-            ("app_pages/data_readiness.py", "Data Readiness", ":material/fact_check:"),
-        ],
-    ),
-    (
-        "ar-nav-people",
-        ICON_HOSPITAL,
-        "People & critical services",
-        "Bring exposure, continuity and preparedness questions closer to the facilities communities rely on.",
-        [
-            ("app_pages/hospital_vulnerability.py", "Hospital Vulnerability", ":material/local_hospital:"),
-            ("app_pages/disaster_assistant.py", "Disaster Intelligence Assistant", ":material/psychology_alt:"),
-            ("app_pages/hazard_model_lab.py", "Hazard Model Lab", ":material/model_training:"),
-        ],
-    ),
-    (
-        "ar-nav-plan",
-        ICON_BLUEPRINT,
-        "Plan & design",
-        "Turn priorities into transparent mitigation options, concept designs and budget checks.",
-        [
-            ("app_pages/mitigation_planner.py", "Mitigation Budget", ":material/account_balance_wallet:"),
-            ("app_pages/smart_mitigation_design.py", "Smart Mitigation Design", ":material/engineering:"),
-        ],
-    ),
+domains = [
+    ("🌬️", "Air & atmosphere", "Review monitored air-quality evidence, pollutant context and research readiness.", "kochi/coast.jpg", "app_pages/air_pollution.py", ":material/air:"),
+    ("🌊", "Water & flood risk", "Explore Kochi layers, flood context and the evidence behind water-related risk.", "kochi/backwaters.jpg", "app_pages/kochi_map.py", ":material/water:"),
+    ("🌿", "Climate & ecosystems", "Connect climate context, land, biodiversity and resilience planning questions.", "kochi/mangalavanam.jpg", "app_pages/disaster_probability.py", ":material/eco:"),
+    ("🏥", "Public health", "Review hospital vulnerability and accessibility evidence for critical facilities.", "kochi/water-metro.jpg", "app_pages/hospital_vulnerability.py", ":material/local_hospital:"),
+    ("⛰️", "Hazards & scenarios", "Assess hazards transparently and inspect uncertainty before interpreting outputs.", "kochi/maradu.jpg", "app_pages/decision_workflow.py", ":material/landslide:"),
+    ("🛠️", "Mitigation & action", "Turn evidence into budget-aware mitigation concepts and planning workflows.", "kochi/industrial-coast.jpg", "app_pages/mitigation_planner.py", ":material/engineering:"),
+    ("🧠", "AI disaster assistant", "Ask natural-language questions grounded in reviewed project evidence and visible sources.", "kochi/fishing-nets.jpg", "app_pages/disaster_assistant.py", ":material/psychology_alt:"),
+    ("🧪", "Hazard model lab", "Inspect model inputs, readiness gates and limitations across the available hazard workflows.", "kochi/industrial-coast.jpg", "app_pages/hazard_model_lab.py", ":material/model_training:"),
+    ("🌧️", "Compound hazards", "Explore cyclone and flood scenario context while keeping assumptions and uncertainty visible.", "kochi/waterfront.jpg", "app_pages/compound_scenario.py", ":material/thunderstorm:"),
 ]
-
-for row_start in range(0, len(navigation_groups), 2):
-    columns = st.columns(2, gap="medium")
-    for column, group in zip(columns, navigation_groups[row_start:row_start + 2]):
-        key, icon, title, copy, links = group
+for start in range(0, len(domains), 3):
+    columns = st.columns(3, gap="medium")
+    for column, (icon, title, copy, image, route, page_icon) in zip(columns, domains[start:start + 3]):
         with column:
-            with st.container(key=key):
-                st.markdown(
-                    f"""
-                    <div class="ar-nav-head">
-                      <span class="ar-nav-icon">{icon}</span>
-                      <div>
-                        <span class="ar-nav-count">{len(links)} workspace{"s" if len(links) != 1 else ""}</span>
-                        <h3>{title}</h3>
-                      </div>
-                    </div>
-                    <p class="ar-nav-copy">{copy}</p>
-                    """,
-                    unsafe_allow_html=True,
-                )
-                for path, label, page_icon in links:
-                    st.page_link(path, label=label, icon=page_icon, width="stretch")
+            route_name = route.rsplit("/", 1)[-1].removesuffix(".py")
+            st.markdown(f'<article class="ar-domain-card" style="--domain-image:url(\'app/static/images/{image}\')"><div class="ar-domain-icon">{icon}</div><h3>{title}</h3><p>{copy}</p><a class="ar-domain-link" href="/{route_name}">Explore workspace →</a></article>', unsafe_allow_html=True)
+            st.page_link(route, label=f"Open {title}", icon=page_icon, use_container_width=True)
 
-# ---------------------------------------------------------------------------
-# 05 - Contribution to the Sustainable Development Goals
-# ---------------------------------------------------------------------------
-st.markdown(
-    """
-    <style>
-      .ar-sdg-section { margin: 4.4rem 0 2.6rem; padding: clamp(1.4rem, 3vw, 2.5rem); border: 1px solid rgba(130,190,199,.18); border-radius: 30px; background: linear-gradient(145deg, rgba(10,35,50,.94), rgba(6,25,38,.94)); box-shadow: 0 24px 70px rgba(0,0,0,.18); }
-      .ar-sdg-intro { max-width: 780px; margin-bottom: 1.35rem; }
-      .ar-sdg-intro .ar-overline { color: #7ff2dc; }
-      .ar-sdg-intro h2 { color: #f2ffff; font-size: clamp(1.7rem, 3vw, 2.65rem); line-height: 1.08; letter-spacing: -.04em; margin: .35rem 0 .65rem; }
-      .ar-sdg-intro p { color: #b9d4d8; line-height: 1.7; margin: 0; }
-      .ar-sdg-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .9rem; }
-      .ar-sdg-card { display: grid; grid-template-columns: 66px 1fr; gap: .85rem; min-height: 170px; padding: 1rem; border: 1px solid rgba(130,190,199,.18); border-radius: 20px; background: rgba(12,48,64,.64); transition: transform .22s var(--ar-ease), border-color .22s var(--ar-ease), background .22s var(--ar-ease); }
-      .ar-sdg-card:hover { transform: translateY(-4px); border-color: rgba(127,245,220,.52); background: rgba(16,67,78,.82); }
-      .ar-sdg-card img { width: 66px; height: 66px; border-radius: 10px; display: block; }
-      .ar-sdg-card h3 { color: #efffff; font-size: 1rem; line-height: 1.25; margin: .08rem 0 .35rem; }
-      .ar-sdg-card h3 span { color: #7ff2dc; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; display: block; margin-bottom: .18rem; }
-      .ar-sdg-card p { color: #b9d4d8; font-size: .82rem; line-height: 1.55; margin: 0; }
-      .ar-sdg-note { margin-top: 1rem; padding-top: .85rem; border-top: 1px solid rgba(130,190,199,.15); color: #8fb8bd; font-size: .73rem; line-height: 1.55; }
-      .ar-sdg-note a { color: #9cf8e6 !important; }
-      @media (max-width: 800px) { .ar-sdg-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-      @media (max-width: 560px) { .ar-sdg-grid { grid-template-columns: 1fr; } .ar-sdg-card { min-height: 0; } }
-      @media (prefers-reduced-motion: reduce) { .ar-sdg-card:hover { transform: none; } }
-    </style>
-    <section class="ar-sdg-section" aria-labelledby="ar-sdg-title">
-      <div class="ar-sdg-intro">
-        <span class="ar-overline">05 · Shared direction</span>
-        <h2 id="ar-sdg-title">OUR CONTRIBUTION TO THE UNITED NATIONS SUSTAINABLE DEVELOPMENT GOALS</h2>
-        <p>AI RESILIENCE connects environmental evidence, disaster preparedness and infrastructure planning. These are the goals the platform supports through its existing workspaces — not a certification or claim of achievement.</p>
-      </div>
-      <div class="ar-sdg-grid">
-        <article class="ar-sdg-card"><img src="app/static/images/sdg/sdg-3.png" alt="SDG 3: Good Health and Well-being"><div><h3><span>SDG 3</span>Good Health and Well-being</h3><p>Hospital accessibility and disaster-preparedness workspaces help teams think about healthcare continuity during emergencies.</p></div></article>
-        <article class="ar-sdg-card"><img src="app/static/images/sdg/sdg-6.png" alt="SDG 6: Clean Water and Sanitation"><div><h3><span>SDG 6</span>Clean Water and Sanitation</h3><p>Flood intelligence and environmental monitoring support understanding of water-related risks and evidence gaps.</p></div></article>
-        <article class="ar-sdg-card"><img src="app/static/images/sdg/sdg-9.png" alt="SDG 9: Industry, Innovation and Infrastructure"><div><h3><span>SDG 9</span>Industry, Innovation and Infrastructure</h3><p>Industrial pollution intelligence and resilient infrastructure planning bring transparent evidence into design conversations.</p></div></article>
-        <article class="ar-sdg-card"><img src="app/static/images/sdg/sdg-11.png" alt="SDG 11: Sustainable Cities and Communities"><div><h3><span>SDG 11</span>Sustainable Cities and Communities</h3><p>Urban flood analysis, disaster intelligence, hospital resilience and mitigation planning support more prepared communities.</p></div></article>
-        <article class="ar-sdg-card"><img src="app/static/images/sdg/sdg-13.png" alt="SDG 13: Climate Action"><div><h3><span>SDG 13</span>Climate Action</h3><p>Hazard monitoring and scenario work help users understand climate-related pressures and prepare with appropriate caution.</p></div></article>
-        <article class="ar-sdg-card"><img src="app/static/images/sdg/sdg-15.png" alt="SDG 15: Life on Land"><div><h3><span>SDG 15</span>Life on Land</h3><p>Kochi's wetlands, green spaces and connected ecosystems are important context for urban resilience planning.</p></div></article>
-      </div>
-      <div class="ar-sdg-note">Official SDG icons are used without the UN emblem for informational purposes. <a href="https://sdgs.un.org/goals" target="_blank" rel="noopener">Learn about the UN Sustainable Development Goals</a>. The content of this publication has not been approved by the United Nations and does not reflect the views of the United Nations or its officials or Member States.</div>
-    </section>
-    """,
-    unsafe_allow_html=True,
-)
+st.markdown('<section class="ar-home-section"><div class="ar-home-overline">Kerala environmental spotlight</div><h2>Start with place, context and evidence.</h2></section>', unsafe_allow_html=True)
+left, right = st.columns((1.15, .85), gap="large")
+with left:
+    st.markdown('<div class="ar-spotlight-card"><h3>Ernakulam and Kochi</h3><p>The application brings together local maps, hazard scenarios, air-quality evidence, hospital context and mitigation planning. Use each module to understand what is known, what is estimated and where evidence is still missing.</p><ul><li>Explore spatial layers and their validation notes.</li><li>Review source-backed hazard and air-quality context.</li><li>Use the assistant for natural-language questions grounded in reviewed project records.</li></ul></div>', unsafe_allow_html=True)
+with right:
+    st.markdown('<div class="ar-spotlight-card"><h3>Evidence before certainty</h3><p>Historical observations, research baselines and scenario outputs are not official warnings or live measurements. The platform keeps provenance, limitations and validation status visible alongside the analysis.</p></div>', unsafe_allow_html=True)
 
-# ---------------------------------------------------------------------------
-# Footer and credits
-# ---------------------------------------------------------------------------
-st.markdown(
-    """
-    <div class="ar-footer">
-      <div>
-        <strong>AI RESILIENCE</strong>
-        Kochi environmental &amp; disaster intelligence · Evidence-first, human-centred.
-      </div>
-      <div class="ar-foot-right">
-        Built around open, documented data sources.<br>
-        SDG 11 · Sustainable cities and communities &nbsp;|&nbsp; SDG 13 · Climate action
-      </div>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+st.markdown('<section class="ar-home-section"><div class="ar-action"><div class="ar-home-overline" style="color:#b9e8d2">From insight to action</div><h2>Plan for a more resilient tomorrow.</h2><p>Build a scenario, inspect its evidence gate, compare mitigation options and record the assumptions behind a decision. For active emergencies, follow current official guidance from KSDMA, IMD and local authorities.</p></div></section>', unsafe_allow_html=True)
+st.markdown('<section class="ar-home-section"><div class="ar-home-overline">Sustainable development</div><h2>Six goals. Six practical pathways.</h2><p class="ar-home-section-copy">The platform connects local environmental evidence with themes that matter for healthier communities, resilient infrastructure, climate action and protected ecosystems. These are thematic contributions—not official certification, partnerships or impact claims.</p></section>', unsafe_allow_html=True)
+sdgs = [
+    ("SDG 3", "Good Health & Well-being", "Hospital vulnerability and preparedness context", "#b73543", "#e76f51"),
+    ("SDG 6", "Clean Water & Sanitation", "Flood, drainage and water-related evidence", "#146c94", "#2aa7c9"),
+    ("SDG 9", "Industry & Infrastructure", "Infrastructure context and mitigation planning", "#a65d16", "#d68b2d"),
+    ("SDG 11", "Sustainable Cities", "Kochi mapping and urban resilience workflows", "#b64b25", "#db7b3d"),
+    ("SDG 13", "Climate Action", "Climate and hazard questions with uncertainty visible", "#4f7d38", "#79a94b"),
+    ("SDG 15", "Life on Land", "Wetlands, green spaces and ecosystem context", "#3a6b3d", "#72a85b"),
+]
+st.markdown('<div class="ar-sdg-grid">' + ''.join(f'<article class="ar-sdg-card" style="--sdg-deep:{deep};--sdg-light:{light}"><div class="ar-sdg-number">{number}</div><span class="ar-sdg-label">{label}</span><p class="ar-sdg-copy">{copy}</p></article>' for number, label, copy, deep, light in sdgs) + '</div><p class="ar-sdg-note">AI_RESILIENCE does not report official SDG indicator progress. Any impact claim requires independently sourced measurements and documented methods.</p>', unsafe_allow_html=True)
 
-with st.expander("Photography credits and licensing", expanded=False):
-    st.markdown(
-        """
-        Landscape photography is used for illustrative context only and is not presented as
-        evidence of a specific event or current condition. Images were cropped, resized and
-        colour-balanced for this interface.
-
-        - **Flooded NH544, Companypady (hero fallback)** — Dil Shad Roshan,
-          [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0),
-          [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Flooded-nh544-companypady-2018-kerala-floods.jpg).
-        - **Monsoon over the Western Ghats (hero)** — Planemad,
-          [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/),
-          [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Monsoon_view_of_the_Sengottai_Gap_in_the_Western_Ghats.jpg).
-        - **Wayanad landslide aftermath (hero)** — Vis M,
-          [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0),
-          [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Wayanad_landslides_aftermath.jpg).
-        - **Kerala coast before heavy rain (hero)** — Midhundas1010,
-          [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0),
-          [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:The_sea_before_rain.jpg).
-        - **Kerala backwaters** — Thursdaynext,
-          [CC BY 2.0](https://creativecommons.org/licenses/by/2.0),
-          [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Kerala_backwater_scene.jpg).
-        - **Munnar tea plantations** — Ingo Mehling,
-          [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0),
-          [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Munnar_-_Lockhart_tea_plantation.jpg).
-        - **Athirappilly Falls** — Vis M, [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/),
-          [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Athirappilly_Falls_2024.jpg).
-        - **Varkala coast** — BinoBose,
-          [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0),
-          [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Varkala_Beach_01.jpg).
-        - **Silent Valley forest** — Davidvraju, [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/),
-          [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Shola_Forest_Silent_valley_NP_(2).jpg).
-        - **Kochi waterfront** — Galib Tufan,
-          [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0),
-          [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Marine_Drive_skyline_with_High_Court_Water_Metro_Terminal_Kochi_2026-09-06_05491.jpg).
-        - **Monsoon clouds** — Nagesh Jayaraman,
-          [CC BY 2.0](https://creativecommons.org/licenses/by/2.0),
-          [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Kerala_Monsoon_clouds_over_Western_Ghats_India.jpg).
-        """
-    )
-
-
-# Kochi homepage — UX refinement layer
-st.markdown(
-    """
-    <style>
-    .ar-scope-dot {
-      display:inline-block; width:8px; height:8px; margin-right:.5rem;
-      border-radius:50%; background:#8ce0b6; box-shadow:0 0 0 4px rgba(140,224,182,.16);
-      vertical-align:middle;
-    }
-    .ar-signal { grid-template-columns:repeat(4,minmax(0,1fr)); gap:.8rem; border:0; margin:1.5rem 0 0; }
-    .ar-signal > div {
-      min-width:0; padding:1.15rem 1.2rem; border:1px solid rgba(44,105,82,.16);
-      border-radius:18px; background:rgba(255,255,255,.82); box-shadow:0 8px 24px rgba(26,65,49,.06);
-    }
-    .ar-signal > div:first-child { padding-left:1.2rem; }
-    .ar-signal strong { color:#1d5e4b; }
-    .ar-signal span { color:#247a65; letter-spacing:.11em; }
-    .ar-signal p { color:#63766e; }
-    .ar-story h2 { color:#1d3030 !important; }
-    .ar-story p { color:#5d7068; }
-    .ar-overline { color:#247a65 !important; }
-    .ar-fineprint { color:#71827b; }
-    .ar-gallery { gap:1rem; }
-    .ar-tile { border-color:rgba(44,105,82,.16); box-shadow:0 12px 28px rgba(26,65,49,.08); }
-    .ar-threat { border-color:rgba(44,105,82,.16); background:rgba(255,255,255,.76); box-shadow:0 18px 42px rgba(26,65,49,.08); }
-    .ar-threat .ar-threat-bg { filter:saturate(.72) contrast(.96) brightness(1.12); }
-    .ar-threat-scrim { background:linear-gradient(115deg,rgba(246,251,247,.97),rgba(239,247,241,.91) 58%,rgba(232,244,237,.82)); }
-    .ar-threat .ar-story h2 { color:#1d3030 !important; }
-    .ar-threat .ar-story p { color:#5d7068 !important; }
-    .ar-hazard {
-      border:1px solid rgba(44,105,82,.15); background:rgba(255,255,255,.82);
-      box-shadow:0 8px 22px rgba(26,65,49,.045); backdrop-filter:blur(12px);
-    }
-    .ar-hazard:hover { border-color:rgba(36,122,101,.34); background:#fff; }
-    .ar-hazard h3 { color:#23473b !important; }
-    .ar-hazard p { color:#667970; }
-    .ar-hazard-icon { color:#247a65; }
-    .ar-why {
-      border-color:rgba(44,105,82,.16);
-      background:linear-gradient(145deg,rgba(255,255,255,.94),rgba(237,246,240,.92));
-      box-shadow:0 18px 42px rgba(26,65,49,.075);
-    }
-    .ar-why .ar-story h2 { color:#1d3030 !important; }
-    .ar-why .ar-story p { color:#5d7068; }
-    .ar-flow-step { border-top-color:rgba(36,122,101,.42); background:linear-gradient(180deg,rgba(36,122,101,.065),rgba(36,122,101,0)); }
-    .ar-step-no { color:#247a65; }
-    .ar-flow-step h3 { color:#24473b !important; }
-    .ar-flow-step p { color:#64766e; }
-    .ar-transparency { border-color:rgba(36,122,101,.18); background:rgba(231,243,235,.78); }
-    .ar-transparency strong { color:#23473b; }
-    .ar-transparency p { color:#5d7068; }
-    [class*="st-key-ar-nav-"] {
-      border-color:rgba(44,105,82,.16);
-      background:linear-gradient(145deg,rgba(255,255,255,.92),rgba(239,247,241,.9));
-      box-shadow:0 12px 28px rgba(26,65,49,.06);
-      transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;
-    }
-    [class*="st-key-ar-nav-"]:hover { border-color:rgba(36,122,101,.34); box-shadow:0 16px 34px rgba(26,65,49,.09); }
-    .ar-nav-icon { border-color:rgba(36,122,101,.18); background:rgba(36,122,101,.08); color:#247a65; }
-    .ar-nav-count { color:#71827b; }
-    .ar-nav-head h3 { color:#23473b !important; }
-    .ar-nav-copy { color:#63766e; }
-    [class*="st-key-ar-nav-"] [data-testid="stPageLink"] a { color:#315c4c !important; border-radius:10px; }
-    [class*="st-key-ar-nav-"] [data-testid="stPageLink"] a:hover { color:#176b54 !important; background:rgba(36,122,101,.08); }
-    .ar-sdg-section {
-      border-color:rgba(44,105,82,.16);
-      background:linear-gradient(145deg,rgba(255,255,255,.94),rgba(237,246,240,.94));
-      box-shadow:0 18px 42px rgba(26,65,49,.07);
-    }
-    .ar-sdg-intro .ar-overline { color:#247a65 !important; }
-    .ar-sdg-intro h2 { color:#1d3030 !important; }
-    .ar-sdg-intro p { color:#5d7068 !important; }
-    .ar-sdg-card { border-color:rgba(44,105,82,.14); background:rgba(255,255,255,.88); }
-    .ar-sdg-card:hover { border-color:rgba(36,122,101,.32); background:#fff; }
-    .ar-sdg-card h3 { color:#23473b !important; }
-    .ar-sdg-card h3 span { color:#247a65 !important; }
-    .ar-sdg-card p { color:#63766e !important; }
-    .ar-sdg-note { color:#71827b !important; border-top-color:rgba(44,105,82,.14) !important; }
-    .ar-sdg-note a { color:#176b54 !important; }
-    .ar-footer { color:#71827b; }
-    .ar-footer strong { color:#23473b; }
-    .ar-footer .ar-foot-right { color:#71827b; }
-    .ar-cine-hero :focus-visible, .ar-sdg-section a:focus-visible,
-    [class*="st-key-ar-nav-"] a:focus-visible {
-      outline:3px solid #e1a83a !important; outline-offset:3px !important;
-    }
-    @media (max-width:900px) {
-      .ar-signal { grid-template-columns:repeat(2,minmax(0,1fr)); }
-      .ar-flow { grid-template-columns:repeat(2,minmax(0,1fr)); }
-    }
-    @media (max-width:600px) {
-      .ar-signal { grid-template-columns:1fr; }
-      .ar-signal > div { padding:1rem; }
-      .ar-flow, .ar-hazards { grid-template-columns:1fr; }
-      .ar-footer .ar-foot-right { text-align:left; }
-    }
-    @media (prefers-reduced-motion:reduce) {
-      .ar-signal > div, [class*="st-key-ar-nav-"] { transition:none !important; }
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+st.markdown('<section class="ar-home-section"><div class="ar-transparency"><div><strong>Data &amp; Model Transparency</strong><br><span>Inspect dataset quality, provenance, coverage, validation and known limitations.</span></div></div></section>', unsafe_allow_html=True)
+st.page_link("app_pages/data_readiness.py", label="Explore data quality and model readiness", icon=":material/fact_check:", use_container_width=False)
+st.markdown('</div>', unsafe_allow_html=True)
