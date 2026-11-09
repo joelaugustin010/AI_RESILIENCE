@@ -276,7 +276,64 @@ def page_header(
     hero_image = image or PAGE_MEDIA.get(_slug(key or title))
     image_css = f"--ar-hero-image:url('{_escape(hero_image)}');" if hero_image else "--ar-hero-image:none;"
     st.markdown(
-        f"<style>.st-key-{container_key}{{--ar-accent:{accent_hex};{image_css}}}</style>",
+        f"<style>.st-key-{container_key}{{--ar-accent:{accent_hex};{image_css}}}
+        /* Digital Earth palette: shared standard workspace surfaces. */
+        [data-testid="stMain"] {
+          --ar-surface: #EAF0F7;
+          --ar-surface-raised: #FFFFFF;
+          --ar-ink: #293449;
+          --ar-muted: #58677F;
+          --ar-border: rgba(67, 88, 125, .18);
+          color: #293449 !important;
+          background: #EAF0F7 !important;
+          font-family: Inter, "Segoe UI", Arial, sans-serif !important;
+        }
+        [data-testid="stMain"] > div {
+          background: linear-gradient(180deg, #EAF0F7 0%, #F3F6FA 100%) !important;
+        }
+        [data-testid="stMain"] [data-testid="stMarkdownContainer"] p,
+        [data-testid="stMain"] [data-testid="stMarkdownContainer"] li,
+        [data-testid="stMain"] [data-testid="stCaptionContainer"] {
+          color: #58677F !important;
+        }
+        [data-testid="stMain"] h1, [data-testid="stMain"] h2,
+        [data-testid="stMain"] h3, [data-testid="stMain"] h4 {
+          color: #252D48 !important;
+        }
+        [data-testid="stMain"] [data-testid="stMetric"],
+        [data-testid="stMain"] [data-testid="stVerticalBlockBorderWrapper"] {
+          background: rgba(255,255,255,.94) !important;
+          border-color: rgba(67,88,125,.16) !important;
+          box-shadow: 0 8px 24px rgba(37,45,72,.055) !important;
+        }
+        [data-testid="stMain"] [data-testid="stMetricValue"],
+        [data-testid="stMain"] [data-testid="stMetricValue"] * {
+          color: #465F9B !important;
+        }
+        [data-testid="stMain"] input,
+        [data-testid="stMain"] textarea,
+        [data-testid="stMain"] [data-baseweb="select"] > div {
+          color: #293449 !important;
+          background: #FFFFFF !important;
+          border-color: rgba(67,88,125,.25) !important;
+        }
+        [data-testid="stMain"] div.stButton > button,
+        [data-testid="stMain"] button[kind="primary"] {
+          background: #6478B8 !important;
+          border-color: #6478B8 !important;
+          color: #FFFFFF !important;
+        }
+        [data-testid="stMain"] [class*="st-key-ar-head-"] {
+          background-image: linear-gradient(112deg, #252D48 0%, #39496F 100%) !important;
+          border-color: rgba(154,181,207,.28) !important;
+        }
+        [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-kicker,
+        [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-meta,
+        [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-copy {
+          color: #E3EAF5 !important;
+          -webkit-text-fill-color: #E3EAF5 !important;
+        }
+</style>",
         unsafe_allow_html=True,
     )
     with st.container(key=container_key):
