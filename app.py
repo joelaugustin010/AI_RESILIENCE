@@ -19,6 +19,7 @@ pages = {
     "Overview": [
         st.Page(
             "app_pages/home.py",
+            url_path="home",
             title="Home",
             icon=":material/home:",
             default=True,
@@ -27,17 +28,20 @@ pages = {
     "Monitor": [
         st.Page(
             "app_pages/module_explorer.py",
+            url_path="module_explorer",
             title="Module Explorer",
             icon=":material/explore:",
             url_path="module_explorer",
         ),
         st.Page(
             "app_pages/kochi_map.py",
+            url_path="kochi_map",
             title="Kochi Map",
             icon=":material/map:",
         ),
         st.Page(
             "app_pages/air_pollution.py",
+            url_path="air_pollution",
             title="Air Pollution",
             icon=":material/factory:",
         ),
@@ -45,31 +49,37 @@ pages = {
     "Analyse": [
         st.Page(
             "app_pages/disaster_probability.py",
+            url_path="disaster_probability",
             title="Multi-Hazard Evidence Review",
             icon=":material/analytics:",
         ),
         st.Page(
             "app_pages/hospital_vulnerability.py",
+            url_path="hospital_vulnerability",
             title="Hospital Vulnerability",
             icon=":material/local_hospital:",
         ),
         st.Page(
             "app_pages/compound_scenario.py",
+            url_path="compound_scenario",
             title="Cyclone + Flood",
             icon=":material/thunderstorm:",
         ),
         st.Page(
             "app_pages/hazard_model_lab.py",
+            url_path="hazard_model_lab",
             title="Hazard Model Lab",
             icon=":material/model_training:",
         ),
         st.Page(
             "app_pages/data_readiness.py",
+            url_path="data_readiness",
             title="Data Readiness",
             icon=":material/fact_check:",
         ),
         st.Page(
             "app_pages/submission_ml_demo.py",
+            url_path="submission_ml_demo",
             title="ML Evidence & Demonstration",
             icon=":material/science:",
         ),
@@ -77,11 +87,13 @@ pages = {
     "Plan": [
         st.Page(
             "app_pages/mitigation_planner.py",
+            url_path="mitigation_planner",
             title="Mitigation Budget",
             icon=":material/account_balance_wallet:",
         ),
         st.Page(
             "app_pages/smart_mitigation_design.py",
+            url_path="smart_mitigation_design",
             title="Smart Mitigation Design Studio",
             icon=":material/engineering:",
         ),
@@ -89,11 +101,13 @@ pages = {
     "Respond": [
         st.Page(
             "app_pages/disaster_assistant.py",
+            url_path="disaster_assistant",
             title="Disaster Intelligence Assistant",
             icon=":material/psychology_alt:",
         ),
         st.Page(
             "app_pages/decision_workflow.py",
+            url_path="decision_workflow",
             title="Decision Workflow",
             icon=":material/assignment_turned_in:",
         ),
