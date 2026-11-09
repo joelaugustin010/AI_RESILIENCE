@@ -2498,3 +2498,217 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+
+
+
+# Final, authoritative homepage contrast layer.
+# Keep text color paired with its actual surface; avoid broad selectors that
+# force white text onto light sections or dark text onto dark cards.
+st.markdown(
+    """
+    <style>
+    .main .block-container { color: #263F35 !important; }
+
+    /* Photographic hero: bright image, restrained left-side wash, clear white type. */
+    .main .ar-cine-hero .ar-cine-scrim {
+      background: linear-gradient(90deg, rgba(4,18,13,.42) 0%, rgba(4,18,13,.24) 52%, rgba(4,18,13,.06) 100%),
+                  linear-gradient(0deg, rgba(4,18,13,.20), rgba(4,18,13,.02)) !important;
+      opacity: 1 !important;
+    }
+    .main .ar-cine-hero .ar-cine-inner,
+    .main .ar-cine-hero .ar-cine-inner * {
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    .main .ar-cine-hero .ar-cine-title,
+    .main .ar-cine-hero .ar-cine-title span {
+      color: #FFFFFF !important;
+      -webkit-text-fill-color: #FFFFFF !important;
+      text-shadow: 0 2px 12px rgba(0,0,0,.72) !important;
+    }
+    .main .ar-cine-hero .ar-cine-kicker,
+    .main .ar-cine-hero .ar-cine-coord,
+    .main .ar-cine-hero .ar-cine-sub,
+    .main .ar-cine-hero .ar-cine-desc,
+    .main .ar-cine-hero .ar-cine-foot {
+      color: #F7FCF9 !important;
+      -webkit-text-fill-color: #F7FCF9 !important;
+      text-shadow: 0 1px 7px rgba(0,0,0,.78) !important;
+    }
+    .main .ar-cine-hero .ar-cine-chips span {
+      color: #FFFFFF !important;
+      -webkit-text-fill-color: #FFFFFF !important;
+      background: rgba(13,43,33,.88) !important;
+      border-color: rgba(255,255,255,.48) !important;
+    }
+
+    /* Light canvas sections: forest-green headings and readable body copy. */
+    .main .ar-story:not(.ar-why .ar-story):not(.ar-threat .ar-story) h2,
+    .main .ar-priority-intro h2 {
+      color: #173D31 !important;
+      -webkit-text-fill-color: #173D31 !important;
+      opacity: 1 !important;
+      text-shadow: none !important;
+    }
+    .main .ar-story:not(.ar-why .ar-story):not(.ar-threat .ar-story) p,
+    .main .ar-priority-intro p,
+    .main .ar-priority-card p {
+      color: #304A40 !important;
+      -webkit-text-fill-color: #304A40 !important;
+      opacity: 1 !important;
+      text-shadow: none !important;
+    }
+    .main .ar-story:not(.ar-why .ar-story):not(.ar-threat .ar-story) .ar-overline,
+    .main .ar-priority-intro .ar-overline {
+      color: #176B54 !important;
+      -webkit-text-fill-color: #176B54 !important;
+      opacity: 1 !important;
+    }
+    .main .ar-fineprint:not(.ar-threat .ar-fineprint) {
+      color: #52685D !important;
+      -webkit-text-fill-color: #52685D !important;
+      opacity: 1 !important;
+    }
+
+    /* Threats panel is intentionally light sage in the final design. */
+    .main .ar-threat {
+      background: #F2F7F2 !important;
+      color: #263F35 !important;
+    }
+    .main .ar-threat .ar-threat-scrim {
+      background: linear-gradient(115deg, rgba(243,248,244,.97), rgba(239,247,241,.95) 58%, rgba(232,244,237,.93)) !important;
+      opacity: 1 !important;
+    }
+    .main .ar-threat .ar-threat-inner,
+    .main .ar-threat .ar-threat-inner * {
+      opacity: 1 !important;
+      visibility: visible !important;
+      text-shadow: none !important;
+    }
+    .main .ar-threat .ar-story h2,
+    .main .ar-threat .ar-hazard h3 {
+      color: #173D31 !important;
+      -webkit-text-fill-color: #173D31 !important;
+    }
+    .main .ar-threat .ar-story .ar-overline,
+    .main .ar-threat .ar-hazard-icon {
+      color: #287653 !important;
+      -webkit-text-fill-color: #287653 !important;
+    }
+    .main .ar-threat .ar-threat-description,
+    .main .ar-threat .ar-hazard p,
+    .main .ar-threat .ar-fineprint {
+      color: #40594C !important;
+      -webkit-text-fill-color: #40594C !important;
+    }
+    .main .ar-threat .ar-hazard {
+      background: #FFFFFF !important;
+      border-color: #C6DCCB !important;
+    }
+
+    /* Dark evidence-chain panel and dark workspace cards retain light text. */
+    .main .ar-why .ar-story h2,
+    .main .ar-why .ar-flow-step h3 {
+      color: #FFFFFF !important;
+      -webkit-text-fill-color: #FFFFFF !important;
+      opacity: 1 !important;
+    }
+    .main .ar-why .ar-story p,
+    .main .ar-why .ar-flow-step p,
+    .main .ar-why .ar-transparency p {
+      color: #EAF3EE !important;
+      -webkit-text-fill-color: #EAF3EE !important;
+      opacity: 1 !important;
+    }
+    .main [class*="st-key-ar-nav-"] .ar-nav-head h3,
+    .main [class*="st-key-ar-nav-"] .ar-nav-copy,
+    .main [class*="st-key-ar-nav-"] .ar-nav-count,
+    .main [class*="st-key-ar-nav-"] [data-testid="stPageLink"] a {
+      color: #F4FAF6 !important;
+      -webkit-text-fill-color: #F4FAF6 !important;
+      opacity: 1 !important;
+    }
+
+    /* SDG and priority cards are light surfaces. */
+    .main .ar-sdg-section,
+    .main .ar-sdg-section * {
+      opacity: 1 !important;
+      text-shadow: none !important;
+    }
+    .main .ar-sdg-section h1,
+    .main .ar-sdg-section h2,
+    .main .ar-sdg-section h3,
+    .main .ar-sdg-section h4,
+    .main .ar-sdg-section strong {
+      color: #173D31 !important;
+      -webkit-text-fill-color: #173D31 !important;
+    }
+    .main .ar-sdg-section p,
+    .main .ar-sdg-section li,
+    .main .ar-sdg-section span,
+    .main .ar-sdg-section a {
+      color: #304A40 !important;
+      -webkit-text-fill-color: #304A40 !important;
+    }
+    .main .ar-priority-card h3 {
+      color: #173D31 !important;
+      -webkit-text-fill-color: #173D31 !important;
+    }
+    .main .ar-priority-note {
+      color: #59451F !important;
+      -webkit-text-fill-color: #59451F !important;
+    }
+
+    /* White workspace-link cards and light footer use dark ink. */
+    .main .ar-workspace-link-label {
+      color: #173D31 !important;
+      -webkit-text-fill-color: #173D31 !important;
+    }
+    .main .ar-workspace-link-action {
+      color: #176B54 !important;
+      -webkit-text-fill-color: #176B54 !important;
+    }
+    .main .ar-footer,
+    .main .ar-footer *,
+    .main .ar-footer .ar-foot-right {
+      color: #40564F !important;
+      -webkit-text-fill-color: #40564F !important;
+      opacity: 1 !important;
+    }
+    .main .ar-footer strong {
+      color: #173D31 !important;
+      -webkit-text-fill-color: #173D31 !important;
+    }
+
+    /* Ensure small labels are not faded by inherited opacity or transparent text fill. */
+    .main .ar-signal *,
+    .main .ar-gallery figcaption,
+    .main .ar-gallery figcaption *,
+    .main .ar-gallery .ar-tile-tag {
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    .main .ar-signal strong {
+      color: #173D31 !important;
+      -webkit-text-fill-color: #173D31 !important;
+    }
+    .main .ar-signal span {
+      color: #176B54 !important;
+      -webkit-text-fill-color: #176B54 !important;
+    }
+    .main .ar-signal p {
+      color: #52685D !important;
+      -webkit-text-fill-color: #52685D !important;
+    }
+    .main .ar-gallery figcaption,
+    .main .ar-gallery figcaption *,
+    .main .ar-gallery .ar-tile-tag {
+      color: #FFFFFF !important;
+      -webkit-text-fill-color: #FFFFFF !important;
+      text-shadow: 0 2px 7px rgba(0,0,0,.88) !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
