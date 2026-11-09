@@ -1,6 +1,8 @@
 """Kochi map showing licensed reference geometry and user-reviewed points."""
 
+import html
 import json
+import re
 from pathlib import Path
 
 import pandas as pd
@@ -367,10 +369,12 @@ with map_column:
     st.subheader("Kochi hazard & infrastructure map")
     st.caption("Administrative outline and selected source-reviewed vector/context layers. No hazard footprint is inferred.")
     map_slot = st.empty()
+    main_legend_slot = st.empty()
     st.divider()
     st.subheader("Land-cover context · independent map")
     st.caption("ESA WorldCover 2021 is shown separately so its categorical land-cover colors cannot be mistaken for flood severity.")
     context_map_slot = st.empty()
+    context_legend_slot = st.empty()
 
 map_context = st.session_state.get(MAP_CONTEXT_KEY)
 active_hazard = None
@@ -1279,8 +1283,25 @@ if deck_layers:
 else:
     map_slot.info("No eligible layer is selected. Turn on the administrative outline or another available context layer to display the map.")
 if legend_rows:
-    section_intro("Hazard & infrastructure map key", "Map legend", "Symbols describe only the displayed source layers and their documented role.")
-    display_dataframe(pd.DataFrame(legend_rows, columns=["Layer", "Symbol", "Meaning"]), hide_index=True, width="stretch")
+    with main_legend_slot.container():
+        st.markdown("**Map colour key · hazard & infrastructure**")
+        st.caption("Each swatch identifies the displayed layer; colour does not imply severity unless the source explicitly defines it.")
+        legend_html = ['<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;">']
+        for label, symbol, meaning in legend_rows:
+            match = re.search(r"#[0-9A-Fa-f]{6}", str(symbol))
+            swatch = match.group(0) if match else "#237FB7"
+            style = "width:18px;height:18px;display:inline-block;border-radius:4px;border:1px solid #64748b;vertical-align:middle;flex:0 0 18px;"
+            if "outline" in str(symbol).casefold():
+                style += f"background:transparent;border:3px solid {swatch};"
+            else:
+                style += f"background:{swatch};"
+            legend_html.append(
+                '<div style="display:flex;align-items:flex-start;gap:9px;padding:9px;border:1px solid rgba(128,128,128,.35);border-radius:8px;">'
+                f'<span style="{style}"></span><div><strong>{html.escape(str(label))}</strong>'
+                f'<div style="font-size:.88em;opacity:.85;">{html.escape(str(meaning))}</div></div></div>'
+            )
+        legend_html.append("</div>")
+        main_legend_slot.markdown("".join(legend_html), unsafe_allow_html=True)
 
 if context_deck_layers:
     context_deck = pdk.Deck(
@@ -1297,9 +1318,20 @@ if context_deck_layers:
         key="kochi_worldcover_context_map",
     )
     if context_legend_rows:
-        section_intro("Land-cover map key", "WorldCover legend", "Categorical land-cover classes; colors do not represent hazard severity.")
-        display_dataframe(pd.DataFrame(worldcover_class_rows), hide_index=True, width="stretch", alt="ESA WorldCover class codes, names and colors")
-        display_dataframe(pd.DataFrame(context_legend_rows, columns=["Layer", "Symbol", "Meaning"]), hide_index=True, width="stretch")
+        with context_legend_slot.container():
+            st.markdown("**Land-cover colour key · ESA WorldCover 2021**")
+            st.caption("These are categorical land-cover classes, not flood depth, hazard severity, risk, or exposure.")
+            class_html = ['<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;">']
+            for item in worldcover_class_rows:
+                color = item["Map color"]
+                class_html.append(
+                    '<div style="display:flex;align-items:center;gap:9px;padding:8px;border:1px solid rgba(128,128,128,.35);border-radius:8px;">'
+                    f'<span style="width:18px;height:18px;display:inline-block;flex:0 0 18px;border-radius:4px;background:{html.escape(color)};border:1px solid #64748b;"></span>'
+                    f'<span><strong>{html.escape(str(item["Land-cover class"]))}</strong><br>'
+                    f'<small>Class {html.escape(str(item["Class code"]))} · {html.escape(color)}</small></span></div>'
+                )
+            class_html.append("</div>")
+            context_legend_slot.markdown("".join(class_html), unsafe_allow_html=True)
 else:
     context_map_slot.info("The ESA WorldCover context map is unavailable or switched off. The main hazard/infrastructure map remains independent.")
 
