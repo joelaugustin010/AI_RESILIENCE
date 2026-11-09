@@ -366,7 +366,7 @@ st.markdown(
       [class*="st-key-ar-top-navigation"] [data-testid="stPopover"] > button { font-size: .72rem !important; padding-inline: .6rem !important; min-height: 2.25rem; }
     }
 
-    [data-testid="stSidebarNav"] { display: none !important; }
+    /* Sidebar page navigation must remain visible; themed below. */
     [data-testid="stSidebar"] {
       background: rgba(7, 23, 36, .98) !important;
       border-right: 1px solid var(--ar-border);
