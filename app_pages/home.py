@@ -2302,3 +2302,78 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+# Final targeted readability pass for the 03 · The threats we face copy.
+# Keep this section independent from broad homepage typography rules above.
+st.markdown(
+    """
+    <style>
+    .main .ar-threat .ar-threat-inner .ar-story {
+      max-width: 980px !important;
+      margin: 0 0 1.1rem !important;
+    }
+    .main .ar-threat .ar-threat-inner .ar-story .ar-overline {
+      display: inline-block !important;
+      color: #C9F2D9 !important;
+      -webkit-text-fill-color: #C9F2D9 !important;
+      font-size: .9rem !important;
+      line-height: 1.5 !important;
+      font-weight: 850 !important;
+      letter-spacing: .13em !important;
+      opacity: 1 !important;
+    }
+    .main .ar-threat .ar-threat-inner .ar-story h2 {
+      color: #FFFFFF !important;
+      -webkit-text-fill-color: #FFFFFF !important;
+      font-size: clamp(2.15rem, 4vw, 3.15rem) !important;
+      line-height: 1.16 !important;
+      font-weight: 850 !important;
+      margin: .55rem 0 .9rem !important;
+      opacity: 1 !important;
+      text-shadow: 0 2px 10px rgba(0,0,0,.55) !important;
+    }
+    .main .ar-threat .ar-threat-inner .ar-story p {
+      display: block !important;
+      max-width: 880px !important;
+      margin: 0 !important;
+      color: #FFFFFF !important;
+      -webkit-text-fill-color: #FFFFFF !important;
+      font-size: clamp(1.05rem, 1.35vw, 1.16rem) !important;
+      line-height: 1.9 !important;
+      font-weight: 600 !important;
+      letter-spacing: .01em !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      text-shadow: 0 1px 5px rgba(0,0,0,.65) !important;
+    }
+    .main .ar-threat .ar-threat-scrim {
+      background: linear-gradient(110deg,
+        rgba(5, 24, 19, .995) 0%,
+        rgba(7, 29, 23, .985) 62%,
+        rgba(9, 34, 27, .96) 100%) !important;
+    }
+    .main .ar-threat .ar-threat-inner .ar-hazard h3 {
+      color: #FFFFFF !important;
+      -webkit-text-fill-color: #FFFFFF !important;
+      font-size: 1.08rem !important;
+      line-height: 1.4 !important;
+      font-weight: 850 !important;
+    }
+    .main .ar-threat .ar-threat-inner .ar-hazard p {
+      color: #F2F7F3 !important;
+      -webkit-text-fill-color: #F2F7F3 !important;
+      font-size: .98rem !important;
+      line-height: 1.78 !important;
+      font-weight: 550 !important;
+    }
+    .main .ar-threat .ar-threat-inner .ar-fineprint {
+      color: #E2F0E7 !important;
+      -webkit-text-fill-color: #E2F0E7 !important;
+      font-size: .88rem !important;
+      line-height: 1.72 !important;
+      opacity: 1 !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
