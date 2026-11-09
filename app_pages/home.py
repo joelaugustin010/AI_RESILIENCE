@@ -1822,8 +1822,10 @@ st.markdown(
     """
     <style>
     .ar-cine-hero, .ar-home-minimal { position:relative !important; isolation:isolate !important; }
-    .ar-cine-hero::before, .ar-home-minimal::before {
-      background:linear-gradient(90deg,rgba(8,25,20,.90) 0%,rgba(8,25,20,.76) 58%,rgba(8,25,20,.42) 100%) !important;
+     .ar-cine-hero .ar-cine-scrim {
+      background:
+        linear-gradient(90deg,rgba(3,15,12,.98) 0%,rgba(4,22,16,.90) 48%,rgba(4,26,18,.62) 76%,rgba(4,22,16,.72) 100%),
+        linear-gradient(180deg,rgba(4,17,12,.55) 0%,rgba(4,17,12,.16) 30%,rgba(3,14,10,.94) 100%) !important;
       opacity:1 !important;
     }
     .ar-cine-hero .ar-cine-title, .ar-home-minimal .ar-cine-title {
