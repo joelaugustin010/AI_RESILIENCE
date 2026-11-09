@@ -870,6 +870,12 @@ basemap_theme = st.radio(
     key="kochi_basemap_theme",
     help="Choose a basemap that keeps the selected evidence layers readable.",
 )
+
+# Reserve the map's position beside its controls. The layer data is assembled
+# below, but the chart is populated into this slot after all eligible layers
+# have been reviewed, so the map does not get pushed to the bottom of the page.
+st.subheader("Interactive Kochi map")
+map_slot = st.empty()
 deck_layers = []
 legend_rows = []
 active_components = components_for(active_hazard) if active_hazard else []
@@ -1231,9 +1237,10 @@ if deck_layers:
         map_style=(pdk.map_styles.CARTO_LIGHT if basemap_theme == "Light · Eco" else pdk.map_styles.CARTO_DARK),
         tooltip={"text": "Bound Name: {display_bound}\nWard Name: {display_ward}\nFeature ID: {display_feature_id}\nFeature: {display_name}\nType: {display_type}\nSource: {display_source}\nOSM updated: {display_timestamp}\nSource URL: {display_url}"},
     )
-    map_selection = st.pydeck_chart(
+    map_selection = map_slot.pydeck_chart(
         deck,
         width="stretch",
+        height=620,
         alt="Kochi administrative outline and selected source-documented spatial layers",
         on_select="rerun",
         key="kochi_interactive_map",
@@ -1256,7 +1263,7 @@ if deck_layers:
             alt="Attributes of the selected mapped feature",
         )
 else:
-    st.info("Turn on at least one layer to display the map.")
+    map_slot.info("No eligible layer is selected. Turn on the administrative outline or another available context layer to display the map.")
 if legend_rows:
     section_intro("Map key", "Legend", "Symbols describe displayed source layers and their role in this review.")
     display_dataframe(pd.DataFrame(legend_rows, columns=["Layer", "Symbol", "Meaning"]), hide_index=True, width="stretch")
