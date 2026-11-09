@@ -23,7 +23,9 @@ def test_worldcover_is_not_added_to_the_hazard_infrastructure_map():
 
 def test_jrc_flood_context_remains_on_the_hazard_map_only():
     assert 'deck_layers.append(\n                    build_jrc_preview_layer(' in SOURCE
-    assert 'id="worldcover-2021-context"' not in SOURCE.split('if deck_layers:', 1)[0].split('deck_layers = []', 1)[1].split('if context_deck_layers:', 1)[0]
+    worldcover_block = SOURCE.split('if show_landcover:', 1)[1].split('worldcover_class_rows =', 1)[0]
+    assert 'context_deck_layers.append(' in worldcover_block
+    assert 'deck_layers.append(' not in worldcover_block
 
 
 def test_worldcover_preview_is_validated_without_base64_expression_payloads():
