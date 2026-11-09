@@ -2574,3 +2574,130 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+# AI_RESILIENCE — final sidebar legibility pass (Coastal Sage).
+# Keep this block last so older page-level theme rules cannot wash out navigation text.
+st.markdown(
+    """
+    <style>
+    /* Stable dark sidebar with high-contrast text */
+    [data-testid="stSidebar"],
+    [data-testid="stSidebar"] > div,
+    [data-testid="stSidebar"] [data-testid="stSidebarContent"] {
+      background: #163D36 !important;
+      color: #F7FAF7 !important;
+    }
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"],
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] li,
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] span,
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] strong,
+    [data-testid="stSidebar"] [data-testid="stCaptionContainer"],
+    [data-testid="stSidebar"] [data-testid="stCaptionContainer"] *,
+    [data-testid="stSidebar"] label,
+    [data-testid="stSidebar"] [data-testid="stWidgetLabel"] *,
+    [data-testid="stSidebar"] [data-testid="stText"],
+    [data-testid="stSidebar"] .stRadio label,
+    [data-testid="stSidebar"] .stCheckbox label {
+      color: #F1F7F2 !important;
+      -webkit-text-fill-color: #F1F7F2 !important;
+      opacity: 1 !important;
+    }
+    [data-testid="stSidebar"] [data-testid="stWidgetLabel"] p,
+    [data-testid="stSidebar"] [data-testid="stCaptionContainer"] {
+      color: #C8DCCF !important;
+      -webkit-text-fill-color: #C8DCCF !important;
+      font-size: .84rem !important;
+      line-height: 1.45 !important;
+    }
+
+    /* Navigation labels: larger, heavier, and consistently visible */
+    [data-testid="stSidebarNav"] a,
+    [data-testid="stSidebarNavLink"],
+    [data-testid="stSidebarNav"] a p,
+    [data-testid="stSidebarNavLink"] p,
+    [data-testid="stSidebarNav"] a span,
+    [data-testid="stSidebarNavLink"] span {
+      color: #F7FAF7 !important;
+      -webkit-text-fill-color: #F7FAF7 !important;
+      opacity: 1 !important;
+      font-size: .94rem !important;
+      font-weight: 600 !important;
+      line-height: 1.35 !important;
+      letter-spacing: .005em !important;
+      text-shadow: none !important;
+    }
+    [data-testid="stSidebarNav"] a,
+    [data-testid="stSidebarNavLink"] {
+      min-height: 2.55rem !important;
+      padding: .58rem .72rem !important;
+      margin: .12rem .25rem !important;
+      border: 1px solid transparent !important;
+      border-radius: 10px !important;
+      background: transparent !important;
+    }
+    [data-testid="stSidebarNav"] a:hover,
+    [data-testid="stSidebarNavLink"]:hover {
+      background: rgba(169,199,183,.18) !important;
+      border-color: rgba(210,231,218,.28) !important;
+    }
+    [data-testid="stSidebarNav"] a[aria-current="page"],
+    [data-testid="stSidebarNavLink"][aria-current="page"] {
+      background: #4F8F83 !important;
+      border-color: rgba(255,255,255,.42) !important;
+      box-shadow: inset 3px 0 0 #E5F0E6, 0 2px 8px rgba(0,0,0,.12) !important;
+    }
+    [data-testid="stSidebarNav"] a[aria-current="page"] *,
+    [data-testid="stSidebarNavLink"][aria-current="page"] * {
+      color: #FFFFFF !important;
+      -webkit-text-fill-color: #FFFFFF !important;
+      font-weight: 750 !important;
+      opacity: 1 !important;
+    }
+    [data-testid="stSidebarNav"] [data-testid="stSidebarNavSeparator"],
+    [data-testid="stSidebarNavSeparator"] {
+      border-color: rgba(221,237,226,.24) !important;
+    }
+    [data-testid="stSidebar"] [data-testid="stIconMaterial"],
+    [data-testid="stSidebar"] svg {
+      color: #D2E5D8 !important;
+      opacity: 1 !important;
+    }
+
+    /* Sidebar buttons and expand/collapse controls */
+    [data-testid="stSidebar"] .stButton > button,
+    [data-testid="stSidebar"] button {
+      color: #F7FAF7 !important;
+      -webkit-text-fill-color: #F7FAF7 !important;
+      font-weight: 650 !important;
+      opacity: 1 !important;
+    }
+    [data-testid="stSidebar"] .stButton > button {
+      background: rgba(169,199,183,.15) !important;
+      border: 1px solid rgba(210,231,218,.34) !important;
+    }
+    [data-testid="stSidebar"] .stButton > button:hover {
+      background: rgba(169,199,183,.25) !important;
+      border-color: rgba(230,243,233,.55) !important;
+    }
+    [data-testid="stSidebar"] input,
+    [data-testid="stSidebar"] textarea,
+    [data-testid="stSidebar"] [data-baseweb="select"] * {
+      color: #F7FAF7 !important;
+      -webkit-text-fill-color: #F7FAF7 !important;
+    }
+    [data-testid="stSidebar"] [data-baseweb="select"] > div {
+      background: rgba(255,255,255,.10) !important;
+      border-color: rgba(210,231,218,.35) !important;
+    }
+    @media (max-width: 640px) {
+      [data-testid="stSidebarNav"] a,
+      [data-testid="stSidebarNavLink"] {
+        min-height: 2.7rem !important;
+        font-size: .96rem !important;
+      }
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
