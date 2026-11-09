@@ -1435,6 +1435,7 @@ if page.title != "Home":
         unsafe_allow_html=True,
     )
 
+
 page.run()
 
 # Final application-wide polish is injected after the selected page renders so
@@ -2189,3 +2190,201 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+# AI_RESILIENCE — Digital Earth global visual identity.
+# Presentation-only overrides: preserve routes, state, data, charts and calculations.
+st.markdown(
+    """
+    <style>
+    :root {
+      --ar-bg: #EAF0F7;
+      --ar-bg-deep: #E2EAF3;
+      --ar-panel: #FFFFFF;
+      --ar-panel-2: #F3F6FA;
+      --ar-panel-3: #E4EBF4;
+      --ar-ink: #293449;
+      --ar-ink-soft: #46546D;
+      --ar-muted: #58677F;
+      --ar-faint: #71809A;
+      --ar-teal: #6478B8;
+      --ar-teal-soft: #9AB5CF;
+      --ar-cyan: #7896BC;
+      --ar-emerald: #789783;
+      --ar-amber: #B68D55;
+      --ar-orange: #B97857;
+      --ar-red: #B85F68;
+      --ar-violet: #817FAE;
+      --ar-border: rgba(67, 88, 125, .18);
+      --ar-border-strong: rgba(67, 88, 125, .32);
+      --ar-shadow: 0 20px 48px rgba(37, 45, 72, .10);
+      --ar-shadow-soft: 0 10px 28px rgba(37, 45, 72, .07);
+      --ar-accent: #6478B8;
+    }
+    html, body, [data-testid="stAppViewContainer"], .stApp {
+      background: #EAF0F7 !important;
+      color: #293449 !important;
+      font-family: Inter, "Segoe UI", Arial, sans-serif !important;
+    }
+    [data-testid="stMain"], [data-testid="stMainBlockContainer"] {
+      color: #293449 !important;
+      font-family: Inter, "Segoe UI", Arial, sans-serif !important;
+    }
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] p,
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] li,
+    [data-testid="stMain"] [data-testid="stCaptionContainer"],
+    [data-testid="stMain"] [data-testid="stWidgetLabel"] {
+      color: #58677F !important;
+    }
+    [data-testid="stMain"] h1, [data-testid="stMain"] h2,
+    [data-testid="stMain"] h3, [data-testid="stMain"] h4,
+    [data-testid="stMain"] [data-testid="stHeading"] {
+      color: #252D48 !important;
+      font-family: Inter, "Segoe UI", Arial, sans-serif !important;
+      letter-spacing: -.02em !important;
+    }
+    [data-testid="stSidebar"] {
+      background: linear-gradient(180deg, #252D48 0%, #303C5D 100%) !important;
+      border-right: 1px solid rgba(255,255,255,.12) !important;
+    }
+    [data-testid="stSidebar"] *,
+    [data-testid="stSidebar"] p,
+    [data-testid="stSidebar"] label,
+    [data-testid="stSidebar"] [data-testid="stCaptionContainer"] {
+      color: #E9EEF7 !important;
+    }
+    [data-testid="stSidebarNav"] a,
+    [data-testid="stSidebarNavLink"] {
+      color: #E9EEF7 !important;
+      border-color: transparent !important;
+      border-radius: 10px !important;
+    }
+    [data-testid="stSidebarNav"] a p,
+    [data-testid="stSidebarNavLink"] p { color: inherit !important; }
+    [data-testid="stSidebarNav"] a:hover,
+    [data-testid="stSidebarNavLink"]:hover {
+      background: rgba(154,181,207,.16) !important;
+      border-color: rgba(154,181,207,.24) !important;
+      color: #FFFFFF !important;
+    }
+    [data-testid="stSidebarNav"] a[aria-current="page"],
+    [data-testid="stSidebarNavLink"][aria-current="page"] {
+      background: #6478B8 !important;
+      border-color: rgba(255,255,255,.22) !important;
+      box-shadow: inset 3px 0 0 #B9CBBE !important;
+      color: #FFFFFF !important;
+    }
+    [data-testid="stSidebarNav"] a[aria-current="page"] p,
+    [data-testid="stSidebarNavLink"][aria-current="page"] p {
+      color: #FFFFFF !important;
+    }
+    [data-testid="stSidebarNavSeparator"],
+    [data-testid="stSidebarNav"] [data-testid="stSidebarNavSeparator"] {
+      border-color: rgba(233,238,247,.18) !important;
+    }
+    [data-testid="stSidebar"] [data-testid="stIconMaterial"] {
+      color: #B9CBBE !important;
+    }
+    [data-testid="stMain"] [data-testid="stMetric"],
+    [data-testid="stMain"] [data-testid="stVerticalBlockBorderWrapper"],
+    [data-testid="stMain"] [data-testid="stExpander"],
+    [data-testid="stMain"] [data-testid="stForm"] {
+      background: rgba(255,255,255,.94) !important;
+      border: 1px solid rgba(67,88,125,.16) !important;
+      border-radius: 15px !important;
+      box-shadow: 0 8px 24px rgba(37,45,72,.055) !important;
+      color: #293449 !important;
+    }
+    [data-testid="stMain"] [data-testid="stMetricLabel"],
+    [data-testid="stMain"] [data-testid="stMetricLabel"] *,
+    [data-testid="stMain"] [data-testid="stMetricDelta"] {
+      color: #58677F !important;
+    }
+    [data-testid="stMain"] [data-testid="stMetricValue"],
+    [data-testid="stMain"] [data-testid="stMetricValue"] * {
+      color: #465F9B !important;
+    }
+    [data-testid="stMain"] input,
+    [data-testid="stMain"] textarea,
+    [data-testid="stMain"] [data-baseweb="select"] > div,
+    [data-testid="stMain"] [data-baseweb="input"] > div,
+    [data-testid="stMain"] [data-baseweb="textarea"] > div {
+      color: #293449 !important;
+      background: #FFFFFF !important;
+      border-color: rgba(67,88,125,.25) !important;
+      border-radius: 10px !important;
+    }
+    [data-testid="stMain"] input::placeholder,
+    [data-testid="stMain"] textarea::placeholder {
+      color: #71809A !important;
+      opacity: 1 !important;
+    }
+    [data-testid="stMain"] div.stButton > button,
+    [data-testid="stMain"] div.stDownloadButton > button,
+    [data-testid="stMain"] [data-testid="stFormSubmitButton"] > button,
+    [data-testid="stMain"] button[kind="primary"] {
+      background: #6478B8 !important;
+      color: #FFFFFF !important;
+      border: 1px solid #6478B8 !important;
+      border-radius: 10px !important;
+      font-weight: 650 !important;
+      box-shadow: 0 5px 14px rgba(37,45,72,.12) !important;
+    }
+    [data-testid="stMain"] div.stButton > button:hover,
+    [data-testid="stMain"] div.stDownloadButton > button:hover,
+    [data-testid="stMain"] [data-testid="stFormSubmitButton"] > button:hover,
+    [data-testid="stMain"] button[kind="primary"]:hover {
+      background: #52679F !important;
+      border-color: #52679F !important;
+    }
+    [data-testid="stMain"] [data-testid="stTabs"] button { color: #58677F !important; }
+    [data-testid="stMain"] [data-testid="stTabs"] button[aria-selected="true"] { color: #465F9B !important; }
+    [data-testid="stMain"] a { color: #52679F !important; }
+    [data-testid="stMain"] [data-testid="stProgress"] { background: #DCE4EF !important; }
+    [data-testid="stMain"] [data-testid="stProgress"] > div > div {
+      background: linear-gradient(90deg, #6478B8, #9AB5CF) !important;
+    }
+    [data-testid="stMain"] [data-testid="stAlert"] {
+      background: #FFFFFF !important;
+      border: 1px solid rgba(67,88,125,.18) !important;
+      border-radius: 12px !important;
+    }
+    [data-testid="stMain"] [class*="st-key-ar-head-"] {
+      background-image: linear-gradient(112deg, #252D48 0%, #39496F 100%) !important;
+      border: 1px solid rgba(154,181,207,.28) !important;
+      box-shadow: 0 16px 36px rgba(37,45,72,.14) !important;
+    }
+    [data-testid="stMain"] [class*="st-key-ar-head-"] h1,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-title {
+      color: #FFFFFF !important;
+      -webkit-text-fill-color: #FFFFFF !important;
+    }
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-copy {
+      color: #E3EAF5 !important;
+      -webkit-text-fill-color: #E3EAF5 !important;
+    }
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-kicker,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-kicker *,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-meta,
+    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-meta * {
+      color: #C7D5E8 !important;
+      -webkit-text-fill-color: #C7D5E8 !important;
+    }
+    [data-testid="stMain"] .ar-page-dot { background: #B9CBBE !important; }
+    [data-testid="stMain"] .ar-sec-overline { color: #6478B8 !important; }
+    [data-testid="stMain"] [data-testid="stDataFrame"],
+    [data-testid="stMain"] [data-testid="stTable"],
+    [data-testid="stMain"] [data-testid="stPlotlyChart"],
+    [data-testid="stMain"] [data-testid="stVegaLiteChart"],
+    [data-testid="stMain"] [data-testid="stPydeckChart"] {
+      border-color: rgba(67,88,125,.16) !important;
+      border-radius: 13px !important;
+    }
+    :focus-visible { outline: 2px solid #9AB5CF !important; outline-offset: 2px !important; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
