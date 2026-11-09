@@ -75,6 +75,16 @@ pages = {
             title="Multi-Hazard Evidence Review",
             icon=":material/analytics:",
         ),
+        st.Page(
+            "app_pages/mitigation_data_intelligence.py",
+            title="Mitigation Dataset Intelligence",
+            icon=":material/verified:",
+        ),
+        st.Page(
+            "app_pages/submission_ml_demo.py",
+            title="ML Evidence & Demonstration",
+            icon=":material/science:",
+        ),
     ],
     "Plan": [
         st.Page(
@@ -1401,6 +1411,7 @@ with st.container(key="ar-top-navigation"):
             st.page_link("app_pages/air_pollution.py", label="Air Pollution", icon=":material/factory:")
             st.page_link("app_pages/data_readiness.py", label="Data & Model Transparency", icon=":material/fact_check:")
             st.page_link("app_pages/hazard_model_lab.py", label="Hazard Model Lab", icon=":material/model_training:")
+            st.page_link("app_pages/submission_ml_demo.py", label="ML Evidence & Demonstration", icon=":material/science:")
     with env_col:
         with st.popover("Environmental Intelligence", icon=":material/eco:", use_container_width=True):
             st.caption("Observe environmental signals and local context")
@@ -1421,6 +1432,7 @@ with st.container(key="ar-top-navigation"):
             st.page_link("app_pages/mitigation_planner.py", label="Mitigation Budget", icon=":material/account_balance_wallet:")
             st.page_link("app_pages/smart_mitigation_design.py", label="Smart Mitigation Design Studio", icon=":material/design_services:")
             st.page_link("app_pages/decision_workflow.py", label="Decision Workflow", icon=":material/assignment_turned_in:")
+            st.page_link("app_pages/mitigation_data_intelligence.py", label="Mitigation Dataset Intelligence", icon=":material/verified:")
     with about_col:
         st.markdown('<a href="/?about=sdgs#designed-for-responsible-environmental-intelligence">About / SDGs</a>', unsafe_allow_html=True)
 
