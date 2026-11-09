@@ -1,6 +1,5 @@
 """Kochi map showing licensed reference geometry and user-reviewed points."""
 
-import base64
 import json
 from pathlib import Path
 
@@ -284,10 +283,7 @@ def load_worldcover_context(
         return None
     image_bytes = image_path.read_bytes()
     validate_worldcover_preview(image_bytes, metadata)
-    return {
-        "metadata": metadata,
-        "image_base64": base64.b64encode(image_bytes).decode("ascii"),
-    }
+    return {"metadata": metadata}
 
 
 @st.cache_data
@@ -854,30 +850,38 @@ if processed_layers:
             "current conditions, hazard severity, or verified infrastructure coverage."
         )
 
-section_intro(
-    "Map controls",
-    "Map layers",
-    "Toggle only the contextual layers you need. The administrative outline is not a hazard zone, and provisional sources remain labelled as such.",
-)
-show_boundary = st.checkbox("Kochi Corporation administrative boundary", value=True)
-st.caption("Blue outline = administrative boundary only. It must not be interpreted as a hazard zone or as the full Greater Kochi urban area.")
+controls_column, map_column = st.columns([0.34, 0.66], gap="large")
+with controls_column:
+    section_intro(
+        "Map controls",
+        "Map layers",
+        "Choose source-reviewed layers. Administrative boundaries are orientation only; provisional data stays labelled.",
+    )
+    show_boundary = st.checkbox("Kochi Corporation administrative boundary", value=True)
+    st.caption("Blue outline = provisional administrative outline only; not a hazard zone or the full Greater Kochi urban area.")
+    basemap_theme = st.radio(
+        "Basemap appearance",
+        options=["Light · Eco", "Dark"],
+        horizontal=True,
+        index=0,
+        key="kochi_basemap_theme",
+        help="Choose a basemap that keeps the selected evidence layers readable.",
+    )
 
-basemap_theme = st.radio(
-    "Basemap appearance",
-    options=["Light · Eco", "Dark"],
-    horizontal=True,
-    index=0,
-    key="kochi_basemap_theme",
-    help="Choose a basemap that keeps the selected evidence layers readable.",
-)
+with map_column:
+    st.subheader("Kochi hazard & infrastructure map")
+    st.caption("Administrative outline and selected source-reviewed vector/context layers. No hazard footprint is inferred.")
+    map_slot = st.empty()
+    st.divider()
+    st.subheader("Land-cover context · independent map")
+    st.caption("ESA WorldCover 2021 is shown separately so its categorical land-cover colors cannot be mistaken for flood severity.")
+    context_map_slot = st.empty()
 
-# Reserve the map's position beside its controls. The layer data is assembled
-# below, but the chart is populated into this slot after all eligible layers
-# have been reviewed, so the map does not get pushed to the bottom of the page.
-st.subheader("Interactive Kochi map")
-map_slot = st.empty()
 deck_layers = []
 legend_rows = []
+context_deck_layers = []
+context_legend_rows = []
+worldcover_class_rows = []
 active_components = components_for(active_hazard) if active_hazard else []
 if active_hazard is None or "Flood" in active_components:
     try:
@@ -981,15 +985,12 @@ if active_hazard is None or active_hazard in landcover_hazards:
             )
             if show_landcover:
                 landcover_bounds = landcover_processing["bounds_epsg4326"]
-                deck_layers.append(
+                context_deck_layers.append(
                     pdk.Layer(
                         "BitmapLayer",
                         id="worldcover-2021-context",
-                        # PyDeck treats image strings as JavaScript expressions. A
-                        # data:image URI therefore reaches Deck.gl's expression
-                        # parser (which fails at the colon in "data:image"). Pass
-                        # the local asset path; PyDeck safely serializes it as a
-                        # literal data URL, as the JRC bitmap layer already does.
+                        # Local paths are serialized safely by PyDeck. Keep this
+                        # categorical raster out of the hazard/infrastructure map.
                         image=str(WORLDCOVER_PREVIEW_PATH),
                         bounds=[
                             landcover_bounds[0],
@@ -997,17 +998,17 @@ if active_hazard is None or active_hazard in landcover_hazards:
                             landcover_bounds[2],
                             landcover_bounds[3],
                         ],
-                        opacity=0.58,
+                        opacity=0.78,
                     )
                 )
-                legend_rows.append(
+                context_legend_rows.append(
                     (
                         "ESA WorldCover 2021 categorical context",
                         "ESA WorldCover class colors",
                         "Land-cover classes only; not hazard severity or exposure",
                     )
                 )
-            class_rows = [
+            worldcover_class_rows = [
                 {
                     "Class code": code,
                     "Land-cover class": definition["label"],
@@ -1015,12 +1016,6 @@ if active_hazard is None or active_hazard in landcover_hazards:
                 }
                 for code, definition in landcover_processing["classes"].items()
             ]
-            display_dataframe(
-                pd.DataFrame(class_rows),
-                hide_index=True,
-                width="stretch",
-                alt="ESA WorldCover categorical class legend for the displayed context layer",
-            )
         else:
             st.warning("The processed ESA WorldCover context image or provenance sidecar is missing; the layer is unavailable.")
     except (OSError, KeyError, TypeError, ValueError) as error:
@@ -1269,8 +1264,29 @@ if deck_layers:
 else:
     map_slot.info("No eligible layer is selected. Turn on the administrative outline or another available context layer to display the map.")
 if legend_rows:
-    section_intro("Map key", "Legend", "Symbols describe displayed source layers and their role in this review.")
+    section_intro("Hazard & infrastructure map key", "Map legend", "Symbols describe only the displayed source layers and their documented role.")
     display_dataframe(pd.DataFrame(legend_rows, columns=["Layer", "Symbol", "Meaning"]), hide_index=True, width="stretch")
+
+if context_deck_layers:
+    context_deck = pdk.Deck(
+        layers=context_deck_layers,
+        initial_view_state=pdk.ViewState(longitude=map_center[0], latitude=map_center[1], zoom=10),
+        map_style=(pdk.map_styles.CARTO_LIGHT if basemap_theme == "Light · Eco" else pdk.map_styles.CARTO_DARK),
+        tooltip={"text": "ESA WorldCover 2021 categorical land-cover context"},
+    )
+    context_map_slot.pydeck_chart(
+        context_deck,
+        width="stretch",
+        height=520,
+        alt="Separate ESA WorldCover 2021 land-cover context map for Kochi",
+        key="kochi_worldcover_context_map",
+    )
+    if context_legend_rows:
+        section_intro("Land-cover map key", "WorldCover legend", "Categorical land-cover classes; colors do not represent hazard severity.")
+        display_dataframe(pd.DataFrame(worldcover_class_rows), hide_index=True, width="stretch", alt="ESA WorldCover class codes, names and colors")
+        display_dataframe(pd.DataFrame(context_legend_rows, columns=["Layer", "Symbol", "Meaning"]), hide_index=True, width="stretch")
+else:
+    context_map_slot.info("The ESA WorldCover context map is unavailable or switched off. The main hazard/infrastructure map remains independent.")
 
 st.subheader("Modelled flood-depth screening at mapped assets (provisional)")
 screening_stamp = _file_stamp(EXPOSURE_SCREENING_REPORT)
