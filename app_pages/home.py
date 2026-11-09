@@ -2126,3 +2126,179 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+
+# Final section-by-section Home typography pass.
+st.markdown(
+    """
+    <style>
+    /* 02 · Kochi in focus and 05 · workspace intro sit on the light page canvas.
+       Earlier broad .ar-story rules incorrectly made these paragraphs white. */
+    .main .ar-story:not(.ar-threat .ar-story):not(.ar-why .ar-story) h2 {
+      color: #173D31 !important;
+      -webkit-text-fill-color: #173D31 !important;
+      font-size: clamp(1.9rem, 3.5vw, 2.8rem) !important;
+      line-height: 1.2 !important;
+      font-weight: 850 !important;
+      opacity: 1 !important;
+      text-shadow: none !important;
+    }
+    .main .ar-story:not(.ar-threat .ar-story):not(.ar-why .ar-story) p {
+      color: #263F35 !important;
+      -webkit-text-fill-color: #263F35 !important;
+      font-size: 1.04rem !important;
+      line-height: 1.82 !important;
+      font-weight: 500 !important;
+      opacity: 1 !important;
+      text-shadow: none !important;
+    }
+    .main .ar-story:not(.ar-threat .ar-story):not(.ar-why .ar-story) .ar-overline {
+      color: #176B54 !important;
+      -webkit-text-fill-color: #176B54 !important;
+      font-size: .82rem !important;
+      font-weight: 850 !important;
+      opacity: 1 !important;
+    }
+    /* Fine print occurs both on the light canvas and inside the dark threats panel. */
+    .main .ar-fineprint {
+      color: #40564F !important;
+      -webkit-text-fill-color: #40564F !important;
+      font-size: .88rem !important;
+      line-height: 1.72 !important;
+      opacity: 1 !important;
+      text-shadow: none !important;
+    }
+    .main .ar-threat .ar-fineprint {
+      color: #E4F0E8 !important;
+      -webkit-text-fill-color: #E4F0E8 !important;
+    }
+    /* Priority-intro and the three first-step cards. */
+    .main .ar-priority-intro h2 {
+      color: #173D31 !important;
+      -webkit-text-fill-color: #173D31 !important;
+      font-size: clamp(1.8rem, 3.2vw, 2.65rem) !important;
+      line-height: 1.2 !important;
+      font-weight: 850 !important;
+    }
+    .main .ar-priority-intro p {
+      color: #304A40 !important;
+      -webkit-text-fill-color: #304A40 !important;
+      font-size: 1rem !important;
+      line-height: 1.75 !important;
+    }
+    .main .ar-priority-card h3 {
+      color: #173D31 !important;
+      -webkit-text-fill-color: #173D31 !important;
+      font-size: 1.06rem !important;
+      font-weight: 850 !important;
+    }
+    .main .ar-priority-card p {
+      color: #304A40 !important;
+      -webkit-text-fill-color: #304A40 !important;
+      font-size: .94rem !important;
+      line-height: 1.68 !important;
+      opacity: 1 !important;
+    }
+    .main .ar-priority-note {
+      color: #59451F !important;
+      -webkit-text-fill-color: #59451F !important;
+      font-size: .88rem !important;
+      line-height: 1.7 !important;
+    }
+    /* Dark workspace navigation cards: use light text on their dark image panels. */
+    .main [class*="st-key-ar-nav-"] .ar-nav-count {
+      color: #C6DDD1 !important;
+      -webkit-text-fill-color: #C6DDD1 !important;
+      font-size: .76rem !important;
+      font-weight: 800 !important;
+    }
+    .main [class*="st-key-ar-nav-"] .ar-nav-head h3 {
+      color: #FFFFFF !important;
+      -webkit-text-fill-color: #FFFFFF !important;
+      font-size: 1.12rem !important;
+      font-weight: 850 !important;
+    }
+    .main [class*="st-key-ar-nav-"] .ar-nav-copy {
+      color: #F0F6F2 !important;
+      -webkit-text-fill-color: #F0F6F2 !important;
+      font-size: .96rem !important;
+      line-height: 1.72 !important;
+      opacity: 1 !important;
+    }
+    .main [class*="st-key-ar-nav-"] [data-testid="stPageLink"] a {
+      color: #FFFFFF !important;
+      -webkit-text-fill-color: #FFFFFF !important;
+      font-size: .94rem !important;
+      font-weight: 750 !important;
+    }
+    /* Dark evidence-chain panel retains white text, with larger readable copy. */
+    .main .ar-why .ar-story h2,
+    .main .ar-why .ar-flow-step h3 {
+      color: #FFFFFF !important;
+      -webkit-text-fill-color: #FFFFFF !important;
+      opacity: 1 !important;
+    }
+    .main .ar-why .ar-story p,
+    .main .ar-why .ar-flow-step p,
+    .main .ar-why .ar-transparency p {
+      color: #EAF3EE !important;
+      -webkit-text-fill-color: #EAF3EE !important;
+      font-size: .96rem !important;
+      line-height: 1.72 !important;
+      opacity: 1 !important;
+    }
+    .main .ar-why .ar-step-no,
+    .main .ar-why .ar-transparency strong {
+      color: #BDEBD4 !important;
+      -webkit-text-fill-color: #BDEBD4 !important;
+      opacity: 1 !important;
+    }
+    /* SDG action panel: increase the small link descriptions and action labels. */
+    .main .ar-sdg-actions h3,
+    .main .ar-sdg-actions p,
+    .main .ar-sdg-actions .ar-sdg-action strong,
+    .main .ar-sdg-actions .ar-sdg-action span,
+    .main .ar-sdg-actions .ar-sdg-action em {
+      opacity: 1 !important;
+      text-shadow: none !important;
+    }
+    .main .ar-sdg-actions > p {
+      color: #F0F8F3 !important;
+      -webkit-text-fill-color: #F0F8F3 !important;
+      font-size: .98rem !important;
+      line-height: 1.72 !important;
+    }
+    .main .ar-sdg-actions .ar-sdg-action strong {
+      color: #FFFFFF !important;
+      -webkit-text-fill-color: #FFFFFF !important;
+      font-size: .94rem !important;
+    }
+    .main .ar-sdg-actions .ar-sdg-action span {
+      color: #F0F8F3 !important;
+      -webkit-text-fill-color: #F0F8F3 !important;
+      font-size: .88rem !important;
+      line-height: 1.6 !important;
+    }
+    .main .ar-sdg-actions .ar-sdg-action em {
+      color: #D5F4E1 !important;
+      -webkit-text-fill-color: #D5F4E1 !important;
+      font-size: .82rem !important;
+      font-weight: 800 !important;
+    }
+    /* Keep the footer legible on the light page background. */
+    .main .ar-footer,
+    .main .ar-footer .ar-foot-right {
+      color: #40564F !important;
+      -webkit-text-fill-color: #40564F !important;
+      font-size: .88rem !important;
+      line-height: 1.7 !important;
+      opacity: 1 !important;
+    }
+    .main .ar-footer strong {
+      color: #173D31 !important;
+      -webkit-text-fill-color: #173D31 !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
