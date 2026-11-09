@@ -403,7 +403,7 @@ def _render_phase2_data_context() -> None:
 
 
 def _render_disaster_assessment(result: dict) -> None:
-    st.header("4. Hazard-specific scientific assessment")
+    st.header("3. Key hazard assessment and recommended precautions")
     st.caption(
         "This is an observation review or scenario calculation, never a validated prediction. "
         "Only supplied inputs are used; missing exposure and impact evidence stays unavailable. "
@@ -1355,7 +1355,7 @@ if inputs.get("hazard") == "Compound: cyclone + flood":
         _render_compound_assessment(compound_assessment)
 
 if st.button(
-    "View prone areas on the Kochi map",
+    "Open Kochi map and available hazard evidence",
     icon=":material/map:",
     key="wf_open_kochi_map",
     help="Opens the existing map with this submitted scenario. Available map evidence may not support the selected hazard.",
