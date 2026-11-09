@@ -2497,3 +2497,91 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+
+# Final hero correction: give the brand title room and let the Kochi photography read.
+# Kept last in the stylesheet so earlier responsive/contrast passes cannot override it.
+st.markdown(
+    """
+    <style>
+    .ar-cine-hero .ar-cine-inner {
+      width: 100% !important;
+      max-width: 1160px !important;
+      padding: clamp(.6rem, 1.8vw, 1.25rem) 0 0 !important;
+    }
+    .ar-cine-hero .ar-cine-feature-panel {
+      box-sizing: border-box !important;
+      width: min(100%, 1080px) !important;
+      max-width: 1080px !important;
+      margin: .65rem 0 0 !important;
+      padding: clamp(1.4rem, 3vw, 2.65rem) !important;
+      background: linear-gradient(125deg,
+        rgba(7, 29, 39, .56),
+        rgba(8, 43, 48, .38)) !important;
+      border: 1px solid rgba(231, 255, 248, .42) !important;
+      box-shadow: 0 18px 48px rgba(0,0,0,.18),
+        inset 0 1px 0 rgba(255,255,255,.16) !important;
+      -webkit-backdrop-filter: blur(9px) saturate(1.12) !important;
+      backdrop-filter: blur(9px) saturate(1.12) !important;
+    }
+    .ar-cine-hero .ar-cine-feature-panel .ar-cine-title {
+      display: block !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      margin: 0 !important;
+      font-size: clamp(3.15rem, 6.2vw, 5.7rem) !important;
+      line-height: 1.08 !important;
+      letter-spacing: -.045em !important;
+      white-space: normal !important;
+      overflow-wrap: normal !important;
+      word-break: normal !important;
+      hyphens: none !important;
+    }
+    .ar-cine-hero .ar-cine-feature-panel .ar-cine-title span {
+      display: inline !important;
+      white-space: nowrap !important;
+      background: linear-gradient(100deg, #FFFFFF 0%, #D8FFF4 58%, #8BEBD6 100%) !important;
+      -webkit-background-clip: text !important;
+      background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+      color: transparent !important;
+    }
+    .ar-cine-hero .ar-cine-scrim {
+      background:
+        linear-gradient(90deg,
+          rgba(3, 15, 23, .62) 0%,
+          rgba(4, 22, 30, .42) 46%,
+          rgba(4, 26, 36, .12) 76%,
+          rgba(4, 22, 32, .26) 100%),
+        linear-gradient(180deg,
+          rgba(4, 17, 26, .12) 0%,
+          rgba(4, 17, 26, .02) 42%,
+          rgba(3, 14, 21, .48) 100%) !important;
+      opacity: 1 !important;
+    }
+    .ar-cine-hero .ar-cine-vignette {
+      box-shadow: inset 0 0 110px 12px rgba(0, 0, 0, .16) !important;
+    }
+    @media (max-width: 700px) {
+      .ar-cine-hero .ar-cine-inner { max-width: 100% !important; }
+      .ar-cine-hero .ar-cine-feature-panel {
+        width: 100% !important;
+        padding: 1.35rem 1.15rem !important;
+        border-radius: 20px !important;
+      }
+      .ar-cine-hero .ar-cine-feature-panel .ar-cine-title {
+        font-size: clamp(2.45rem, 10.5vw, 4rem) !important;
+        line-height: 1.08 !important;
+        letter-spacing: -.04em !important;
+      }
+      .ar-cine-hero .ar-cine-feature-panel .ar-cine-title span {
+        white-space: normal !important;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .ar-cine-hero .ar-cine-feature-panel { animation: none !important; }
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
