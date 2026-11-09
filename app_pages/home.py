@@ -1296,7 +1296,6 @@ navigation_groups = [
             ("app_pages/kochi_map.py", "Kochi Map", ":material/map:"),
             ("app_pages/air_pollution.py", "Air Pollution", ":material/factory:"),
             ("app_pages/data_readiness.py", "Data Readiness", ":material/fact_check:"),
-            ("app_pages/mitigation_data_intelligence.py", "Mitigation Data Intelligence", ":material/verified:"),
         ],
     ),
     (
