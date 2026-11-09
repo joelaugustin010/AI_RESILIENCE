@@ -14,6 +14,7 @@ remote video URL and no placeholder video file is referenced.
 """
 
 from pathlib import Path
+import html
 import shutil
 
 import streamlit as st
@@ -25,6 +26,19 @@ ASSETS_VIDEO = ROOT / "assets" / "videos" / "kerala_hero.mp4"
 STATIC_VIDEO = ROOT / "static" / "videos" / "kerala_hero.mp4"
 STATIC_VIDEO_URL = "app/static/videos/kerala_hero.mp4"
 
+
+
+def _workspace_link(path: str, label: str, page_icon: str = "") -> None:
+    """Render a stable URL link to a page registered by app.py."""
+    route = Path(path).stem
+    safe_label = html.escape(label)
+    st.markdown(
+        f'<a class="ar-workspace-link" href="/{route}">'
+        f'<span class="ar-workspace-link-label">{safe_label}</span>'
+        f'<span class="ar-workspace-link-action">Open workspace <span aria-hidden="true">&#8594;</span></span>'
+        f'</a>',
+        unsafe_allow_html=True,
+    )
 
 def _img(filename: str) -> str:
     return f"{STATIC_IMAGES}/{filename}"
@@ -1071,7 +1085,7 @@ for column, (number, title, description, path, link_label) in zip(priority_colum
                 f'<h3>{title}</h3><p>{description}</p></div>',
                 unsafe_allow_html=True,
             )
-            st.page_link(path, label=link_label, icon=":material/arrow_forward:", width="stretch")
+            _workspace_link(path, link_label)
 
 st.markdown(
     '<div class="ar-priority-note"><strong>Prediction integrity:</strong> '
@@ -1345,7 +1359,7 @@ for row_start in range(0, len(navigation_groups), 2):
                     unsafe_allow_html=True,
                 )
                 for path, label, page_icon in links:
-                    st.page_link(path, label=label, icon=page_icon, width="stretch")
+                    _workspace_link(path, label, page_icon)
 
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -1432,18 +1446,18 @@ st.markdown(
 st.markdown("#### Explore the related workspaces")
 sdg_workspace_cols = st.columns(3, gap="medium")
 with sdg_workspace_cols[0]:
-    st.page_link("app_pages/hospital_vulnerability.py", label="SDG 3 · Hospital Vulnerability", icon="🏥")
+    _workspace_link("app_pages/hospital_vulnerability.py", "SDG 3 · Hospital Vulnerability")
 with sdg_workspace_cols[1]:
-    st.page_link("app_pages/kochi_map.py", label="SDG 6 · Kochi Map", icon="💧")
+    _workspace_link("app_pages/kochi_map.py", "SDG 6 · Kochi Map")
 with sdg_workspace_cols[2]:
-    st.page_link("app_pages/air_pollution.py", label="SDG 9 · Air Pollution", icon="🏭")
+    _workspace_link("app_pages/air_pollution.py", "SDG 9 · Air Pollution")
 sdg_workspace_cols_2 = st.columns(3, gap="medium")
 with sdg_workspace_cols_2[0]:
-    st.page_link("app_pages/decision_workflow.py", label="SDG 11 · Decision Workflow", icon="🏙️")
+    _workspace_link("app_pages/decision_workflow.py", "SDG 11 · Decision Workflow")
 with sdg_workspace_cols_2[1]:
-    st.page_link("app_pages/disaster_probability.py", label="SDG 13 · Multi-Hazard Evidence", icon="🌦️")
+    _workspace_link("app_pages/disaster_probability.py", "SDG 13 · Multi-Hazard Evidence")
 with sdg_workspace_cols_2[2]:
-    st.page_link("app_pages/kochi_map.py", label="SDG 15 · Ecological Context", icon="🌿")
+    _workspace_link("app_pages/kochi_map.py", "SDG 15 · Ecological Context")
 
 # SDGs are presented as practical entry points into the existing platform, not
 # as impact claims. Each pathway opens a real workspace and keeps the evidence
@@ -1762,6 +1776,41 @@ st.markdown(
         min-height: 2.8rem !important;
       }
     }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+# Home-page typography, contrast and SDG pathway refinements.
+st.markdown(
+    """
+    <style>
+    .ar-story { max-width:940px; margin:2.2rem 0 1.25rem; }
+    .ar-story h2 { color:#f3f8f3 !important; font-size:clamp(1.8rem,3vw,2.55rem) !important; line-height:1.14 !important; letter-spacing:-.035em !important; font-weight:780 !important; }
+    .ar-story p { color:#d2e1da !important; font-size:1.02rem !important; line-height:1.78 !important; max-width:850px; }
+    .ar-overline { color:#a9c7b7 !important; font-size:.76rem !important; font-weight:800 !important; letter-spacing:.13em !important; }
+    .ar-hazard h3,.ar-flow-step h3 { color:#f1f7f2 !important; font-size:1.08rem !important; line-height:1.3 !important; }
+    .ar-hazard p,.ar-flow-step p,.ar-transparency p { color:#d0dfd7 !important; font-size:.91rem !important; line-height:1.7 !important; }
+    .ar-fineprint { color:#c1d2c9 !important; font-size:.8rem !important; line-height:1.6 !important; }
+    .ar-workspace-link { display:flex; align-items:center; justify-content:space-between; gap:.8rem; width:100%; box-sizing:border-box; margin:.42rem 0; padding:.82rem 1rem; border:1px solid rgba(169,199,183,.32); border-radius:13px; background:rgba(242,247,242,.09); color:#f3f8f3 !important; text-decoration:none !important; transition:background .18s ease,border-color .18s ease,transform .18s ease; }
+    .ar-workspace-link:hover { background:rgba(169,199,183,.18); border-color:rgba(196,222,205,.7); transform:translateY(-1px); }
+    .ar-workspace-link-label { color:#f3f8f3 !important; font-size:.94rem; line-height:1.4; font-weight:730; }
+    .ar-workspace-link-action { color:#b9d8c6 !important; white-space:nowrap; font-size:.76rem; font-weight:750; }
+    .ar-sdg-section { color:#263a35 !important; }
+    .ar-sdg-kicker { font-size:.78rem !important; }
+    .ar-sdg-lede { color:#40564f !important; font-size:1.04rem !important; line-height:1.8 !important; }
+    .ar-sdg-callout { color:#244d43 !important; font-size:.82rem !important; }
+    .ar-sdg-subhead h3 { font-size:1.3rem !important; }
+    .ar-sdg-subhead p { color:#526a61 !important; font-size:.82rem !important; }
+    .ar-sdg-card { min-height:164px; padding:1.05rem; }
+    .ar-sdg-card h4 { font-size:1rem !important; line-height:1.38 !important; }
+    .ar-sdg-card p { color:#40564f !important; font-size:.86rem !important; line-height:1.68 !important; }
+    .ar-sdg-footer { color:#40564f !important; font-size:.82rem !important; line-height:1.7 !important; }
+    .ar-sdg-footer strong { color:#203d36 !important; }
+    .ar-sdg-note { color:#526a61 !important; font-size:.74rem !important; line-height:1.65 !important; }
+    @media(max-width:700px) { .ar-workspace-link { align-items:flex-start; flex-direction:column; gap:.25rem; } .ar-workspace-link-action { white-space:normal; } }
+    @media(prefers-reduced-motion:reduce) { .ar-workspace-link { transition:none; } .ar-workspace-link:hover { transform:none; } }
     </style>
     """,
     unsafe_allow_html=True,
