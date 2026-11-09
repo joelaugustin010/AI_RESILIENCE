@@ -2055,3 +2055,74 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+
+# Targeted contrast correction for the Threats section.
+st.markdown(
+    """
+    <style>
+    /* Keep the whole threats panel dark enough for consistently readable white copy. */
+    .main .ar-threat {
+      position: relative !important;
+      isolation: isolate !important;
+      background: #102D26 !important;
+    }
+    .main .ar-threat .ar-threat-scrim {
+      background: linear-gradient(110deg,
+        rgba(8, 31, 25, .99) 0%,
+        rgba(10, 39, 31, .97) 58%,
+        rgba(12, 43, 34, .94) 100%) !important;
+      opacity: 1 !important;
+    }
+    .main .ar-threat .ar-threat-inner {
+      position: relative !important;
+      z-index: 2 !important;
+    }
+    .main .ar-threat .ar-threat-inner .ar-story .ar-overline {
+      color: #BFE8D0 !important;
+      -webkit-text-fill-color: #BFE8D0 !important;
+      font-size: .86rem !important;
+      font-weight: 850 !important;
+      letter-spacing: .14em !important;
+      opacity: 1 !important;
+    }
+    .main .ar-threat .ar-threat-inner .ar-story h2 {
+      color: #FFFFFF !important;
+      -webkit-text-fill-color: #FFFFFF !important;
+      font-size: clamp(2rem, 3.8vw, 3rem) !important;
+      font-weight: 850 !important;
+      line-height: 1.18 !important;
+      opacity: 1 !important;
+      text-shadow: 0 2px 8px rgba(0,0,0,.45) !important;
+    }
+    .main .ar-threat .ar-threat-inner .ar-story p {
+      color: #F2F7F3 !important;
+      -webkit-text-fill-color: #F2F7F3 !important;
+      font-size: 1.08rem !important;
+      font-weight: 550 !important;
+      line-height: 1.85 !important;
+      max-width: 850px !important;
+      opacity: 1 !important;
+      text-shadow: none !important;
+    }
+    .main .ar-threat .ar-threat-inner .ar-hazard h3,
+    .main .ar-threat .ar-threat-inner .ar-hazard p {
+      color: #FFFFFF !important;
+      -webkit-text-fill-color: #FFFFFF !important;
+      opacity: 1 !important;
+    }
+    .main .ar-threat .ar-threat-inner .ar-hazard p {
+      font-size: .98rem !important;
+      line-height: 1.75 !important;
+    }
+    .main .ar-threat .ar-threat-inner .ar-fineprint {
+      color: #DCEBE1 !important;
+      -webkit-text-fill-color: #DCEBE1 !important;
+      font-size: .88rem !important;
+      line-height: 1.7 !important;
+      opacity: 1 !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
