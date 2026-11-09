@@ -1103,28 +1103,48 @@ st.markdown(
       background: #eaf6f4 !important;
       border-color: rgba(36,122,101,.16) !important;
     }
+    /* Photographic module headers: preserve each page's own image and keep all
+       header copy readable over both bright and dark parts of the photograph. */
     [class*="st-key-ar-head-"] {
-      border: 1px solid rgba(44,105,82,.20) !important;
+      position: relative !important;
+      overflow: hidden !important;
+      border: 1px solid rgba(255,255,255,.34) !important;
       border-radius: 24px !important;
       background:
-        radial-gradient(ellipse at 94% 0%, rgba(75,174,163,.12), transparent 23rem),
-        linear-gradient(120deg, rgba(255,255,255,.97), rgba(239,248,249,.94)) !important;
-      box-shadow: 0 14px 38px rgba(32,73,97,.09) !important;
+        linear-gradient(90deg, rgba(5,22,30,.70) 0%, rgba(6,31,39,.48) 58%, rgba(6,29,38,.32) 100%),
+        linear-gradient(180deg, rgba(4,18,26,.12) 0%, rgba(4,18,26,.06) 48%, rgba(4,18,26,.48) 100%),
+        var(--ar-hero-image, none) center / cover no-repeat,
+        linear-gradient(120deg, #173c43 0%, #245b5b 56%, #326c68 100%) !important;
+      box-shadow: 0 14px 38px rgba(16,45,54,.16) !important;
+      isolation: isolate !important;
     }
     [class*="st-key-ar-head-"] h1,
     [class*="st-key-ar-head-"] .ar-page-title {
-      color: #1D3030 !important;
+      color: #FFFFFF !important;
+      -webkit-text-fill-color: #FFFFFF !important;
+      text-shadow: 0 2px 12px rgba(0,0,0,.46) !important;
     }
-    .ar-page-kicker, .ar-sec-overline { color: #247A65 !important; }
-    .ar-page-dot {
-      background: #247A65 !important;
-      box-shadow: 0 0 0 4px rgba(36,122,101,.13) !important;
+    [class*="st-key-ar-head-"] .ar-page-kicker {
+      color: #D5FFF3 !important;
+      text-shadow: 0 1px 7px rgba(0,0,0,.65) !important;
     }
-    .ar-page-copy, .ar-sec-intro p { color: #71827F !important; }
-    .ar-page-meta span {
-      color: #48685B !important;
-      background: rgba(255,255,255,.72) !important;
-      border-color: rgba(44,105,82,.20) !important;
+    [class*="st-key-ar-head-"] .ar-page-copy {
+      color: #F4FBF8 !important;
+      -webkit-text-fill-color: #F4FBF8 !important;
+      text-shadow: 0 1px 7px rgba(0,0,0,.72) !important;
+      font-weight: 550 !important;
+    }
+    [class*="st-key-ar-head-"] .ar-page-dot {
+      background: #7EF0D3 !important;
+      box-shadow: 0 0 0 4px rgba(126,240,211,.20) !important;
+    }
+    [class*="st-key-ar-head-"] .ar-page-meta span {
+      color: #FFFFFF !important;
+      -webkit-text-fill-color: #FFFFFF !important;
+      background: rgba(5,30,37,.58) !important;
+      border: 1px solid rgba(235,255,249,.38) !important;
+      text-shadow: 0 1px 5px rgba(0,0,0,.45) !important;
+      backdrop-filter: blur(7px);
     }
     [data-testid="stVerticalBlockBorderWrapper"] {
       border: 1px solid rgba(44,105,82,.18) !important;
