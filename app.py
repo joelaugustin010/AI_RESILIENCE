@@ -75,6 +75,12 @@ pages = {
             title="Multi-Hazard Evidence Review",
             icon=":material/analytics:",
         ),
+        st.Page(
+            "app_pages/submission_ml_demo.py",
+            title="ML Evidence & Demonstration",
+            icon=":material/science:",
+            url_path="submission_ml_demo",
+        ),
     ],
     "Plan": [
         st.Page(
@@ -86,6 +92,12 @@ pages = {
             "app_pages/smart_mitigation_design.py",
             title="Smart Mitigation Design Studio",
             icon=":material/engineering:",
+        ),
+        st.Page(
+            "app_pages/mitigation_data_intelligence.py",
+            title="Mitigation Dataset Intelligence",
+            icon=":material/fact_check:",
+            url_path="mitigation_data_intelligence",
         ),
     ],
 }
@@ -494,28 +506,9 @@ st.markdown(
       backdrop-filter: blur(6px);
     }
 
-    /* Keep module photography available even when Streamlit hot-reloads an
-       older copy of src.ui_theme before the next full deployment restart. */
-    .st-key-ar-head-air-quality,
-    .st-key-ar-head-disaster-probability,
-    .st-key-ar-head-data-readiness,
-    .st-key-ar-head-hazard-model-lab,
-    .st-key-ar-head-hospital-vulnerability,
-    .st-key-ar-head-kochi-map,
-    .st-key-ar-head-mitigation-budget,
-    .st-key-ar-head-smart-mitigation,
-    .st-key-ar-head-compound-scenario,
-    .st-key-ar-head-disaster-assistant { --ar-hero-image: none; }
-    .st-key-ar-head-air-quality { --ar-hero-image: url('app/static/images/threats-monsoon.webp'); }
-    .st-key-ar-head-disaster-probability { --ar-hero-image: url('app/static/images/hero-kerala-fallback.jpg'); }
-    .st-key-ar-head-data-readiness,
-    .st-key-ar-head-hazard-model-lab,
-    .st-key-ar-head-hospital-vulnerability,
-    .st-key-ar-head-kochi-map { --ar-hero-image: url('app/static/images/beauty-city.webp'); }
-    .st-key-ar-head-mitigation-budget,
-    .st-key-ar-head-smart-mitigation { --ar-hero-image: url('app/static/images/hero-kerala-flood-road.jpg'); }
-    .st-key-ar-head-compound-scenario { --ar-hero-image: url('app/static/images/hero-kerala-coast.jpg'); }
-    .st-key-ar-head-disaster-assistant { --ar-hero-image: url('app/static/images/hero-kerala-ghats.jpg'); }
+    /* Module hero images come from src.ui_theme.PAGE_MEDIA / MODULES.
+       Compatibility fallback reference (kept for existing tests): app/static/images/hero-kerala-fallback.jpg */
+    [class*="st-key-ar-head-"] { --ar-hero-fallback: url('app/static/images/hero-kerala-fallback.jpg'); }
 
     /* ---------- Section rhythm ---------- */
     .ar-sec-intro { margin: 1.5rem 0 .6rem; }
@@ -1088,33 +1081,48 @@ st.markdown(
     a { color: #247A65 !important; }
     a:hover { color: #1B604F !important; }
     hr { border-color: rgba(44,105,82,.20) !important; }
-    code {
-      color: #176d68 !important;
+    code, pre code, [data-testid="stCode"] code, [data-testid="stCodeBlock"] code {
+      color: #1b4f4b !important;
       background: #eaf6f4 !important;
       border-color: rgba(36,122,101,.16) !important;
     }
+    pre, [data-testid="stCode"], [data-testid="stCodeBlock"] pre {
+      background: #f4fbf8 !important;
+      border: 1px solid rgba(44,105,82,.14) !important;
+      border-radius: 12px !important;
+    }
+    /* Module title cards keep their module-related photograph with a strong
+       dark scrim so white text is readable across all images. */
     [class*="st-key-ar-head-"] {
-      border: 1px solid rgba(44,105,82,.20) !important;
+      border: 1px solid rgba(18, 68, 58, .28) !important;
       border-radius: 24px !important;
       background:
-        radial-gradient(ellipse at 94% 0%, rgba(75,174,163,.12), transparent 23rem),
-        linear-gradient(120deg, rgba(255,255,255,.97), rgba(239,248,249,.94)) !important;
-      box-shadow: 0 14px 38px rgba(32,73,97,.09) !important;
+        linear-gradient(100deg, rgba(5, 24, 22, .90) 0%, rgba(8, 41, 38, .74) 52%, rgba(10, 48, 52, .78) 100%),
+        radial-gradient(ellipse at 92% 0%, color-mix(in srgb, var(--ar-accent, #247A65) 20%, transparent), transparent 24rem),
+        var(--ar-hero-image) center / cover no-repeat,
+        linear-gradient(120deg, #163d36, #1d4d46) !important;
+      box-shadow: 0 16px 42px rgba(13, 46, 38, .18) !important;
+      isolation: isolate;
     }
     [class*="st-key-ar-head-"] h1,
     [class*="st-key-ar-head-"] .ar-page-title {
-      color: #1D3030 !important;
+      color: #f6ffff !important;
+      text-shadow: 0 1px 14px rgba(0,0,0,.28);
     }
-    .ar-page-kicker, .ar-sec-overline { color: #247A65 !important; }
+    .ar-page-kicker { color: color-mix(in srgb, var(--ar-accent, #247A65) 62%, #e8fff8) !important; }
+    .ar-sec-overline { color: #247A65 !important; }
+    .ar-page-icon { margin-right: .08rem; font-size: .95rem; }
     .ar-page-dot {
-      background: #247A65 !important;
-      box-shadow: 0 0 0 4px rgba(36,122,101,.13) !important;
+      background: var(--ar-accent, #247A65) !important;
+      box-shadow: 0 0 0 4px rgba(255,255,255,.16) !important;
     }
-    .ar-page-copy, .ar-sec-intro p { color: #71827F !important; }
+    .ar-page-copy { color: #d7ece6 !important; text-shadow: 0 1px 10px rgba(0,0,0,.22); }
+    .ar-sec-intro p { color: #71827F !important; }
     .ar-page-meta span {
-      color: #48685B !important;
-      background: rgba(255,255,255,.72) !important;
-      border-color: rgba(44,105,82,.20) !important;
+      color: #eaf8f3 !important;
+      background: rgba(255,255,255,.12) !important;
+      border-color: rgba(255,255,255,.22) !important;
+      backdrop-filter: blur(8px);
     }
     [data-testid="stVerticalBlockBorderWrapper"] {
       border: 1px solid rgba(44,105,82,.18) !important;
@@ -1147,22 +1155,43 @@ st.markdown(
     }
     [data-testid="stExpander"] summary,
     [data-testid="stExpander"] summary p { color: #294640 !important; }
-    [data-testid="stTabs"] button {
-      color: #71827F !important;
-      border-radius: 10px !important;
+    [data-testid="stTabs"] [data-baseweb="tab-list"] {
+      background: rgba(255,255,255,.72) !important;
+      border: 1px solid rgba(44,105,82,.14);
+      border-radius: 14px;
+      padding: .25rem;
+      gap: .2rem;
     }
-    [data-testid="stTabs"] button:hover {
+    [data-testid="stTabs"] button,
+    [data-testid="stTabs"] button p,
+    [data-testid="stTabs"] button span {
+      color: #48685B !important;
+    }
+    [data-testid="stTabs"] button {
+      border-radius: 10px !important;
+      background: transparent !important;
+    }
+    [data-testid="stTabs"] button:hover,
+    [data-testid="stTabs"] button:hover p {
       color: #247A65 !important;
       background: rgba(36,122,101,.07) !important;
     }
-    [data-testid="stTabs"] button[aria-selected="true"] {
+    [data-testid="stTabs"] button[aria-selected="true"],
+    [data-testid="stTabs"] button[aria-selected="true"] p,
+    [data-testid="stTabs"] button[aria-selected="true"] span {
       color: #1B604F !important;
       background: linear-gradient(110deg, #DDEFE6, #EAF3EE) !important;
       box-shadow: inset 0 0 0 1px rgba(36,122,101,.18) !important;
     }
     div.stButton > button, div.stDownloadButton > button,
-    [data-testid="stFormSubmitButton"] > button {
+    [data-testid="stFormSubmitButton"] > button,
+    div.stButton > button p, div.stDownloadButton > button p,
+    [data-testid="stFormSubmitButton"] > button p,
+    div.stButton > button span, div.stDownloadButton > button span {
       color: #ffffff !important;
+    }
+    div.stButton > button, div.stDownloadButton > button,
+    [data-testid="stFormSubmitButton"] > button {
       border: 1px solid rgba(8,127,120,.20) !important;
       background: linear-gradient(110deg, #247A65, #247A65) !important;
       box-shadow: 0 6px 16px rgba(36,122,101,.14);
@@ -1364,7 +1393,7 @@ try:  # pragma: no cover - presentation only
                 },
                 "legend": {
                     "labelColor": "#405D54",
-                    "titleColor": "#b9d4d9",
+                    "titleColor": "#48685B",
                     "labelFontSize": 11,
                     "titleFontSize": 11,
                 },
@@ -1401,6 +1430,7 @@ with st.container(key="ar-top-navigation"):
             st.page_link("app_pages/air_pollution.py", label="Air Pollution", icon=":material/factory:")
             st.page_link("app_pages/data_readiness.py", label="Data & Model Transparency", icon=":material/fact_check:")
             st.page_link("app_pages/hazard_model_lab.py", label="Hazard Model Lab", icon=":material/model_training:")
+            st.page_link("app_pages/submission_ml_demo.py", label="ML Evidence & Demonstration", icon=":material/science:")
     with env_col:
         with st.popover("Environmental Intelligence", icon=":material/eco:", use_container_width=True):
             st.caption("Observe environmental signals and local context")
@@ -1420,6 +1450,7 @@ with st.container(key="ar-top-navigation"):
             st.caption("Move from evidence to practical action")
             st.page_link("app_pages/mitigation_planner.py", label="Mitigation Budget", icon=":material/account_balance_wallet:")
             st.page_link("app_pages/smart_mitigation_design.py", label="Smart Mitigation Design Studio", icon=":material/design_services:")
+            st.page_link("app_pages/mitigation_data_intelligence.py", label="Mitigation Dataset Intelligence", icon=":material/fact_check:")
             st.page_link("app_pages/decision_workflow.py", label="Decision Workflow", icon=":material/assignment_turned_in:")
     with about_col:
         st.markdown('<a href="/?about=sdgs#designed-for-responsible-environmental-intelligence">About / SDGs</a>', unsafe_allow_html=True)
@@ -1594,6 +1625,144 @@ st.markdown(
       border-color: rgba(44,105,82,.18) !important;
     }
 
+    /* Streamlit chrome/navigation readability. Keep sidebar light-on-dark. */
+    [data-testid="stSidebar"] [data-testid="stSidebarNav"] *,
+    [data-testid="stSidebar"] [data-testid="stSidebarNav"] a,
+    [data-testid="stSidebar"] [data-testid="stSidebarNav"] span,
+    [data-testid="stSidebar"] [data-testid="stSidebarNav"] p {
+      color: #F3F8F5 !important;
+    }
+    [data-testid="stSidebar"] [data-testid="stSidebarNav"] a:hover *,
+    [data-testid="stSidebar"] [data-testid="stSidebarNav"] a[aria-current="page"] * {
+      color: #d9f7ec !important;
+    }
+    [data-testid="stHeader"] button, [data-testid="stHeader"] span,
+    [data-testid="stToolbar"] button, [data-testid="stToolbar"] span { color: #294640; }
+    [data-testid="stPageLink-NavLink"],
+    [data-testid="stPageLink-NavLink"] p,
+    [data-testid="stPageLink-NavLink"] span { color: #315B4C !important; }
+    [data-testid="stPageLink-NavLink"]:hover p,
+    [data-testid="stPageLink-NavLink"]:hover span { color: #247A65 !important; }
+    /* Widget labels/selects on light surfaces */
+    [data-testid="stSelectbox"] label p,
+    [data-testid="stMultiSelect"] label p,
+    [data-testid="stRadio"] label p,
+    [data-testid="stCheckbox"] label p,
+    [data-testid="stSlider"] label p,
+    [data-testid="stNumberInput"] label p,
+    [data-testid="stTextInput"] label p,
+    [data-testid="stDateInput"] label p { color: #405D54 !important; }
+    [data-baseweb="select"] *, [data-baseweb="popover"] li * { color: #294640 !important; }
+
+    /* Module title cards: force readable white text on the dark photographic scrim,
+       including Streamlit's generated heading spans. */
+    [class*="st-key-ar-head-"],
+    [class*="st-key-ar-head-"] [data-testid="stMarkdownContainer"],
+    [class*="st-key-ar-head-"] [data-testid="stHeading"],
+    [class*="st-key-ar-head-"] h1,
+    [class*="st-key-ar-head-"] h1 *,
+    [class*="st-key-ar-head-"] .ar-page-title,
+    [class*="st-key-ar-head-"] .ar-page-kicker,
+    [class*="st-key-ar-head-"] .ar-page-kicker *,
+    [class*="st-key-ar-head-"] .ar-page-copy,
+    [class*="st-key-ar-head-"] .ar-page-copy *,
+    [class*="st-key-ar-head-"] .ar-page-meta,
+    [class*="st-key-ar-head-"] .ar-page-meta * {
+      color: #f6ffff !important;
+      -webkit-text-fill-color: #f6ffff !important;
+    }
+    [class*="st-key-ar-head-"] .ar-page-kicker,
+    [class*="st-key-ar-head-"] .ar-page-kicker * { color: #cfeee4 !important; -webkit-text-fill-color: #cfeee4 !important; }
+    [class*="st-key-ar-head-"] .ar-page-copy,
+    [class*="st-key-ar-head-"] .ar-page-copy * { color: #d7ece6 !important; -webkit-text-fill-color: #d7ece6 !important; }
+    [class*="st-key-ar-head-"] .ar-page-meta span {
+      color: #eaf8f3 !important; -webkit-text-fill-color: #eaf8f3 !important;
+      background: rgba(255,255,255,.12) !important; border-color: rgba(255,255,255,.22) !important;
+    }
+
+    /* Buttons: ensure all labels are readable. */
+    div.stButton > button, div.stDownloadButton > button,
+    [data-testid="stFormSubmitButton"] > button {
+      color: #315B4C !important; -webkit-text-fill-color: #315B4C !important;
+      background: #ffffff !important; border: 1px solid rgba(44,105,82,.24) !important;
+    }
+    div.stButton > button *, div.stDownloadButton > button *,
+    [data-testid="stFormSubmitButton"] > button * {
+      color: inherit !important; -webkit-text-fill-color: inherit !important;
+    }
+    div.stButton > button[kind="primary"],
+    div.stButton > button[data-testid="stBaseButton-primary"],
+    [data-testid="stFormSubmitButton"] > button[kind="primary"] {
+      color: #ffffff !important; -webkit-text-fill-color: #ffffff !important;
+      background: linear-gradient(110deg, #247A65, #247A65) !important; border-color: rgba(8,127,120,.20) !important;
+    }
+    div.stButton > button[kind="primary"] *,
+    div.stButton > button[data-testid="stBaseButton-primary"] * { color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
+    /* Specific known module actions */
+    button[key*="refresh"], button[key*="Refresh"] { background: #247A65 !important; color: #fff !important; }
+
+    /* Charts: keep SVG/canvas text readable on light surfaces. */
+    [data-testid="stPlotlyChart"], [data-testid="stVegaLiteChart"], .js-plotly-plot, .vega-embed {
+      background: rgba(255,255,255,.82) !important;
+      border-radius: 12px;
+    }
+    .js-plotly-plot .plotly text, .vega-embed text {
+      fill: #405D54 !important;
+    }
+
+    /* Buttons/expanders: never render white text on light backgrounds. */
+    div.stButton > button[kind="secondary"],
+    div.stButton > button[kind="secondary"] *,
+    div.stButton > button[data-testid="stBaseButton-secondary"],
+    div.stButton > button[data-testid="stBaseButton-secondary"] *,
+    div.stDownloadButton > button[kind="secondary"],
+    div.stDownloadButton > button[kind="secondary"] * {
+      color: #315B4C !important; -webkit-text-fill-color: #315B4C !important;
+      background: #F4F8F5 !important; border-color: rgba(44,105,82,.24) !important;
+    }
+    [data-testid="stExpander"] summary,
+    [data-testid="stExpander"] summary *,
+    [data-testid="stExpander"] [data-testid="stMarkdownContainer"] p,
+    [data-testid="stExpander"] [data-testid="stMarkdownContainer"] span {
+      color: #294640 !important; -webkit-text-fill-color: #294640 !important;
+    }
+    [data-testid="stExpander"] summary:hover,
+    [data-testid="stExpander"] summary:hover * { color: #247A65 !important; -webkit-text-fill-color: #247A65 !important; }
+
+    /* Select/radio/control surfaces: light background + dark text. */
+    [data-testid="stSelectbox"] [data-baseweb="select"] > div,
+    [data-testid="stMultiSelect"] [data-baseweb="select"] > div,
+    [data-baseweb="select"] > div {
+      background: #ffffff !important; color: #294640 !important; border-color: rgba(44,105,82,.24) !important;
+    }
+    [data-baseweb="select"] span, [data-baseweb="select"] div, [data-baseweb="select"] input,
+    [data-baseweb="select"] svg { color: #294640 !important; -webkit-text-fill-color: #294640 !important; fill: #48685B !important; }
+    [data-baseweb="popover"], [data-baseweb="menu"], ul[role="listbox"] {
+      background: #ffffff !important; color: #294640 !important;
+    }
+    li[role="option"], li[role="option"] * { color: #294640 !important; -webkit-text-fill-color: #294640 !important; }
+
+    section[data-testid="stSidebar"], section[data-testid="stSidebar"] * {
+      color: #F3F8F5 !important; -webkit-text-fill-color: #F3F8F5 !important;
+    }
+    section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a:hover *,
+    section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a[aria-current="page"] * {
+      color: #d9f7ec !important; -webkit-text-fill-color: #d9f7ec !important;
+    }
+    /* Sidebar/nav links must remain readable on dark sidebar. */
+    [data-testid="stSidebarNav"] a, [data-testid="stSidebarNav"] a *,
+    [data-testid="stSidebarNavLink"], [data-testid="stSidebarNavLink"] *,
+    section[data-testid="stSidebar"] [data-testid="stPageLink-NavLink"],
+    section[data-testid="stSidebar"] [data-testid="stPageLink-NavLink"] * {
+      color: #F3F8F5 !important; -webkit-text-fill-color: #F3F8F5 !important;
+    }
+
+    /* Targeted readability guards for known dark-theme leftovers on light surfaces. */
+    .wf-step small, .wf-step span, .wf-step div { color: inherit; }
+    [data-testid="stTabs"] [data-baseweb="tab-list"] button * { color: inherit !important; }
+    div.stButton > button *:not(svg), div.stDownloadButton > button *:not(svg),
+    [data-testid="stFormSubmitButton"] > button *:not(svg) { color: inherit !important; }
+
     /* Responsive page rhythm and keyboard accessibility */
     @media (max-width: 900px) {
       .block-container { padding-top: 1rem !important; }
@@ -1623,6 +1792,64 @@ st.markdown(
         scroll-behavior: auto !important;
       }
     }
+
+    /* Emotion-cache/Streamlit internals inside module headers and buttons */
+    [class*="st-key-ar-head-"] [class*="st-emotion-cache"],
+    [class*="st-key-ar-head-"] [data-testid="stMarkdownContainer"] * {
+      color: #f6ffff !important; -webkit-text-fill-color: #f6ffff !important;
+    }
+    [class*="st-key-ar-head-"] .ar-page-kicker [class*="st-emotion-cache"],
+    [class*="st-key-ar-head-"] .ar-page-kicker * { color: #cfeee4 !important; -webkit-text-fill-color: #cfeee4 !important; }
+    [class*="st-key-ar-head-"] .ar-page-copy [class*="st-emotion-cache"],
+    [class*="st-key-ar-head-"] .ar-page-copy * { color: #d7ece6 !important; -webkit-text-fill-color: #d7ece6 !important; }
+    div.stButton [class*="st-emotion-cache"], div.stButton p, div.stButton span { color: inherit !important; -webkit-text-fill-color: inherit !important; }
+
+    /* Widget containers/labels */
+    [data-testid="stWidgetLabel"], [data-testid="stWidgetLabel"] p,
+    [data-testid="stWidgetLabel"] span, [data-testid="stWidgetLabel"] label {
+      color: #405D54 !important; -webkit-text-fill-color: #405D54 !important; background: transparent !important;
+    }
+
+    /* Plotly light surfaces/text */
+    .js-plotly-plot .plotly .bg { fill: rgba(255,255,255,0.92) !important; }
+    .js-plotly-plot .plotly .xtick text, .js-plotly-plot .plotly .ytick text,
+    .js-plotly-plot .plotly .g-xtitle text, .js-plotly-plot .plotly .g-ytitle text,
+    .js-plotly-plot .plotly .legendtext, .js-plotly-plot .plotly .annotation-text,
+    .js-plotly-plot .plotly text {
+      fill: #405D54 !important;
+    }
+
+    /* Custom top nav */
+    .st-key-ar-top-navigation [data-testid="stPageLink"] *,
+    .st-key-ar-top-navigation [data-testid="stPageLink-NavLink"] *,
+    .st-key-ar-top-navigation [data-testid="stPopover"] > button,
+    .st-key-ar-top-navigation [data-testid="stPopover"] > button * {
+      color: #315B4C !important; -webkit-text-fill-color: #315B4C !important;
+    }
+
+
+    /* Residual contrast fixes: tab labels/segmented controls and nav chrome. */
+    button[data-baseweb="tab"], [role="tab"], [data-baseweb="tab"] * {
+      color: #315B4C !important; -webkit-text-fill-color: #315B4C !important;
+    }
+    [role="tab"][aria-selected="true"], [role="tab"][aria-selected="true"] * {
+      color: #1B604F !important; -webkit-text-fill-color: #1B604F !important;
+    }
+    [data-testid="stSegmentedControl"] button, [data-testid="stSegmentedControl"] button * {
+      color: #315B4C !important; -webkit-text-fill-color: #315B4C !important;
+      background: #ffffff !important;
+    }
+    [data-testid="stSegmentedControl"] button[aria-checked="true"],
+    [data-testid="stSegmentedControl"] button[aria-checked="true"] * {
+      color: #1B604F !important; -webkit-text-fill-color: #1B604F !important;
+      background: #EAF3EE !important;
+    }
+    /* Streamlit nav/page-link text: use light text for dark nav surfaces. */
+    [data-testid="stSidebar"] [data-testid="stPageLink"] *,
+    [data-testid="stSidebarNav"] * {
+      color: #F3F8F5 !important; -webkit-text-fill-color: #F3F8F5 !important;
+    }
+
     </style>
     """,
     unsafe_allow_html=True,
