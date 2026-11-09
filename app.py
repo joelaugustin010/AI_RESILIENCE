@@ -397,7 +397,7 @@ st.markdown(
       border: 1px solid var(--ar-border);
       border-radius: 26px;
       background:
-        linear-gradient(90deg, rgba(4, 18, 28, .95) 0%, rgba(7, 35, 47, .76) 58%, rgba(7, 34, 43, .86) 100%),
+        linear-gradient(90deg, rgba(4, 18, 28, .78) 0%, rgba(7, 35, 47, .56) 58%, rgba(7, 34, 43, .70) 100%),
         radial-gradient(ellipse at 90% -10%, color-mix(in srgb, var(--ar-accent) 22%, transparent), transparent 24rem),
         radial-gradient(ellipse at 8% 120%, rgba(20, 90, 110, .28), transparent 26rem),
         var(--ar-hero-image) center / cover no-repeat,
