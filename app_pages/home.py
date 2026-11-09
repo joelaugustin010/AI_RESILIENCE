@@ -1815,3 +1815,74 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+
+# Final homepage contrast pass: force readable foregrounds on every home section.
+st.markdown(
+    """
+    <style>
+    .ar-cine-hero, .ar-home-minimal { position:relative !important; isolation:isolate !important; }
+    .ar-cine-hero::before, .ar-home-minimal::before {
+      background:linear-gradient(90deg,rgba(8,25,20,.90) 0%,rgba(8,25,20,.76) 58%,rgba(8,25,20,.42) 100%) !important;
+      opacity:1 !important;
+    }
+    .ar-cine-hero .ar-cine-title, .ar-home-minimal .ar-cine-title {
+      color:#FFFFFF !important; -webkit-text-fill-color:#FFFFFF !important;
+      text-shadow:0 2px 12px rgba(0,0,0,.65) !important; font-weight:850 !important;
+    }
+    .ar-cine-hero .ar-cine-sub, .ar-home-minimal .ar-cine-sub {
+      color:#F5FAF6 !important; -webkit-text-fill-color:#F5FAF6 !important;
+      text-shadow:0 1px 7px rgba(0,0,0,.75) !important; font-weight:750 !important;
+    }
+    .ar-cine-hero .ar-cine-desc, .ar-home-minimal .ar-cine-desc,
+    .ar-cine-hero .ar-cine-topline, .ar-cine-hero .ar-cine-foot,
+    .ar-home-minimal .ar-cine-topline, .ar-home-minimal .ar-cine-foot {
+      color:#EDF5EF !important; -webkit-text-fill-color:#EDF5EF !important;
+      text-shadow:0 1px 6px rgba(0,0,0,.8) !important; font-weight:650 !important;
+    }
+    .ar-cine-hero .ar-cine-chips span, .ar-home-minimal .ar-cine-chips span {
+      color:#FFFFFF !important; -webkit-text-fill-color:#FFFFFF !important;
+      background:rgba(12,35,27,.90) !important; border:1px solid rgba(255,255,255,.52) !important; font-weight:750 !important;
+    }
+    .ar-story h2, .ar-hazard h3, .ar-flow-step h3 {
+      color:#FFFFFF !important; -webkit-text-fill-color:#FFFFFF !important; opacity:1 !important; font-weight:800 !important;
+    }
+    .ar-story p, .ar-hazard p, .ar-flow-step p, .ar-transparency p, .ar-fineprint {
+      color:#F0F5F1 !important; -webkit-text-fill-color:#F0F5F1 !important; opacity:1 !important; font-weight:550 !important;
+    }
+    .ar-overline { color:#D5EBDD !important; -webkit-text-fill-color:#D5EBDD !important; opacity:1 !important; font-weight:800 !important; }
+    .ar-sdg-section {
+      background:#F5F8F3 !important; color:#203D36 !important;
+      border:1px solid #D6E2D8 !important; border-radius:20px !important;
+    }
+    .ar-sdg-section h1, .ar-sdg-section h2, .ar-sdg-section h3,
+    .ar-sdg-section h4, .ar-sdg-section strong {
+      color:#183A30 !important; -webkit-text-fill-color:#183A30 !important; opacity:1 !important; font-weight:800 !important;
+    }
+    .ar-sdg-section p, .ar-sdg-section li, .ar-sdg-section span,
+    .ar-sdg-section .ar-sdg-lede, .ar-sdg-section .ar-sdg-footer,
+    .ar-sdg-section .ar-sdg-note {
+      color:#304A40 !important; -webkit-text-fill-color:#304A40 !important; opacity:1 !important; font-weight:550 !important;
+    }
+    .ar-sdg-section .ar-sdg-card {
+      background:#FFFFFF !important; border:1px solid #C8D9CD !important;
+      box-shadow:0 5px 16px rgba(24,58,48,.08) !important;
+    }
+    .ar-sdg-section .ar-sdg-card h3, .ar-sdg-section .ar-sdg-card h4 {
+      color:#173D31 !important; -webkit-text-fill-color:#173D31 !important;
+    }
+    .ar-sdg-section .ar-sdg-card p {
+      color:#344E43 !important; -webkit-text-fill-color:#344E43 !important;
+    }
+    .ar-sdg-section .ar-sdg-note a {
+      color:#075B43 !important; -webkit-text-fill-color:#075B43 !important;
+      text-decoration:underline !important; font-weight:750 !important;
+    }
+    .ar-workspace-link-label { color:#FFFFFF !important; -webkit-text-fill-color:#FFFFFF !important; font-weight:800 !important; }
+    .ar-workspace-link-action { color:#D7EBDD !important; -webkit-text-fill-color:#D7EBDD !important; font-weight:750 !important; }
+    .ar-footer, .ar-footer .ar-foot-right { color:#E2ECE5 !important; -webkit-text-fill-color:#E2ECE5 !important; }
+    .ar-footer strong { color:#FFFFFF !important; -webkit-text-fill-color:#FFFFFF !important; }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
