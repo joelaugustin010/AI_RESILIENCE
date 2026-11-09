@@ -1161,7 +1161,7 @@ st.markdown(
         <div class="ar-story">
           <span class="ar-overline">03 · The threats we face</span>
           <h2 id="ar-threat-title">Beauty under pressure.</h2>
-          <div role="paragraph" class="ar-threat-description" style="display:block !important; visibility:visible !important; opacity:1 !important; color:#FFFFFF !important; -webkit-text-fill-color:#FFFFFF !important; font-family:Inter, 'Segoe UI', Arial, sans-serif !important; font-size:18px !important; font-weight:600 !important; line-height:1.9 !important; letter-spacing:.01em !important; max-width:880px !important; margin:0 !important; text-shadow:0 1px 5px rgba(0,0,0,.65) !important;">Kochi's waterways, coastal setting and dense urban footprint create connected planning questions. Heavy rainfall, drainage constraints, coastal pressures and environmental change can affect neighbourhoods and essential services in different ways.</div>
+          <div role="paragraph" class="ar-threat-description" style="display:block !important; visibility:visible !important; opacity:1 !important; color:#BFE8D0 !important; -webkit-text-fill-color:#BFE8D0 !important; font-family:Inter, 'Segoe UI', Arial, sans-serif !important; font-size:18px !important; font-weight:600 !important; line-height:1.9 !important; letter-spacing:.01em !important; max-width:880px !important; margin:0 !important; text-shadow:0 1px 5px rgba(0,0,0,.65) !important;">Kochi's waterways, coastal setting and dense urban footprint create connected planning questions. Heavy rainfall, drainage constraints, coastal pressures and environmental change can affect neighbourhoods and essential services in different ways.</div>
         </div>
         <div class="ar-hazards">
           <article class="ar-hazard">
@@ -2384,8 +2384,8 @@ st.markdown(
       display: block !important;
       visibility: visible !important;
       opacity: 1 !important;
-      color: #FFFFFF !important;
-      -webkit-text-fill-color: #FFFFFF !important;
+      color: #BFE8D0 !important;
+      -webkit-text-fill-color: #BFE8D0 !important;
       font-family: Inter, "Segoe UI", Arial, sans-serif !important;
       font-size: 18px !important;
       font-weight: 600 !important;
