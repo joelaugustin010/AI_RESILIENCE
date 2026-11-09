@@ -337,6 +337,41 @@ st.page_link(
     icon=":material/assignment_turned_in:",
 )
 
+# Keep the command centre immediately below the page header. Data QA and evidence
+# registers are rendered afterwards into the reserved map slots, so they cannot
+# push the maps down the page.
+controls_column, map_column = st.columns([0.34, 0.66], gap="large")
+with controls_column:
+    section_intro(
+        "Map controls",
+        "Map layers",
+        "Choose source-reviewed layers. Administrative boundaries are orientation only; provisional data stays labelled.",
+    )
+    show_boundary = st.checkbox("Kochi Corporation administrative boundary", value=True)
+    st.caption("Blue outline = provisional administrative outline only; not a hazard zone or the full Greater Kochi urban area.")
+    basemap_theme = st.radio(
+        "Basemap appearance",
+        options=["Light · Eco", "Dark"],
+        horizontal=True,
+        index=0,
+        key="kochi_basemap_theme",
+        help="Choose a basemap that keeps the selected evidence layers readable.",
+    )
+    st.markdown("**Overlay and data controls**")
+    jrc_control_slot = st.empty()
+    worldcover_control_slot = st.empty()
+    processed_layer_control_slot = st.empty()
+    point_upload_control_slot = st.empty()
+
+with map_column:
+    st.subheader("Kochi hazard & infrastructure map")
+    st.caption("Administrative outline and selected source-reviewed vector/context layers. No hazard footprint is inferred.")
+    map_slot = st.empty()
+    st.divider()
+    st.subheader("Land-cover context · independent map")
+    st.caption("ESA WorldCover 2021 is shown separately so its categorical land-cover colors cannot be mistaken for flood severity.")
+    context_map_slot = st.empty()
+
 map_context = st.session_state.get(MAP_CONTEXT_KEY)
 active_hazard = None
 if map_context is not None:
@@ -850,37 +885,6 @@ if processed_layers:
             "current conditions, hazard severity, or verified infrastructure coverage."
         )
 
-controls_column, map_column = st.columns([0.34, 0.66], gap="large")
-with controls_column:
-    section_intro(
-        "Map controls",
-        "Map layers",
-        "Choose source-reviewed layers. Administrative boundaries are orientation only; provisional data stays labelled.",
-    )
-    show_boundary = st.checkbox("Kochi Corporation administrative boundary", value=True)
-    st.caption("Blue outline = provisional administrative outline only; not a hazard zone or the full Greater Kochi urban area.")
-    basemap_theme = st.radio(
-        "Basemap appearance",
-        options=["Light · Eco", "Dark"],
-        horizontal=True,
-        index=0,
-        key="kochi_basemap_theme",
-        help="Choose a basemap that keeps the selected evidence layers readable.",
-    )
-    st.markdown("**Overlay and data controls**")
-    jrc_control_slot = st.empty()
-    worldcover_control_slot = st.empty()
-    processed_layer_control_slot = st.empty()
-    point_upload_control_slot = st.empty()
-
-with map_column:
-    st.subheader("Kochi hazard & infrastructure map")
-    st.caption("Administrative outline and selected source-reviewed vector/context layers. No hazard footprint is inferred.")
-    map_slot = st.empty()
-    st.divider()
-    st.subheader("Land-cover context · independent map")
-    st.caption("ESA WorldCover 2021 is shown separately so its categorical land-cover colors cannot be mistaken for flood severity.")
-    context_map_slot = st.empty()
 
 deck_layers = []
 legend_rows = []

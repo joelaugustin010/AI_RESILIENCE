@@ -38,3 +38,12 @@ def test_map_keeps_unknown_hazard_and_boundary_limitations_explicit():
     assert "No validated, licence-cleared hazard footprint is currently available" in SOURCE
     assert "No current official ward polygon set is approved for production exposure analysis." in SOURCE
     assert "not a hazard zone" in SOURCE
+
+
+def test_command_centre_is_rendered_before_scenario_and_evidence_sections():
+    header = SOURCE.index('page_header(')
+    shell = SOURCE.index('controls_column, map_column = st.columns([0.34, 0.66]')
+    scenario = SOURCE.index('map_context = st.session_state.get(MAP_CONTEXT_KEY)')
+    availability = SOURCE.index('st.subheader("Hazard layer availability")')
+    evidence = SOURCE.index('"Source and layer catalog"')
+    assert header < shell < scenario < availability < evidence
