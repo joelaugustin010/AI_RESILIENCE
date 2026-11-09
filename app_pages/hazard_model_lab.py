@@ -10,6 +10,8 @@ import streamlit as st
 from src.dataframe_display import display_dataframe
 
 from src.hazard_manifest import build_hazard_manifest_frame
+from src.ml.registry import list_model_cards
+from src.ml.validation_gates import registry_validation_summary
 from src.ui_theme import page_header
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -52,6 +54,21 @@ c1, c2, c3 = st.columns(3)
 c1.metric("Research baselines trained", len(trained))
 c2.metric("Additional hazards not trained", len(training.get("not_trained", [])))
 c3.metric("Acquisition manifest entries", len(acquisition.get("downloads", [])))
+
+# Evaluate persisted model cards; artifact presence is not operational clearance.
+try:
+    validation_summary = registry_validation_summary(list_model_cards())
+except Exception:
+    validation_summary = {"operational_eligible_count": 0, "model_count": 0}
+st.metric(
+    "Models passing independent validation gate",
+    validation_summary["operational_eligible_count"],
+)
+st.markdown(
+    "**Independent validation gate:** models remain research-only unless their "
+    "model cards document independent temporal and spatial holdouts, calibration, "
+    "baseline skill, provenance and domain-transfer evidence."
+)
 
 st.subheader("Trained research baselines")
 if not models:
