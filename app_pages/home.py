@@ -1457,7 +1457,7 @@ with sdg_workspace_cols_2[0]:
 with sdg_workspace_cols_2[1]:
     _workspace_link("app_pages/disaster_probability.py", "SDG 13 · Multi-Hazard Evidence")
 with sdg_workspace_cols_2[2]:
-    _workspace_link("app_pages/kochi_map.py", "SDG 15 · Ecological Context")
+    _workspace_link("app_pages/smart_mitigation_design.py", "SDG 15 · Nature-based Design Studio")
 
 # SDGs are presented as practical entry points into the existing platform, not
 # as impact claims. Each pathway opens a real workspace and keeps the evidence
