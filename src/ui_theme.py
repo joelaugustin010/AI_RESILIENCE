@@ -17,19 +17,19 @@ import streamlit as st
 # One accent per module family. The values are also exposed as CSS variables so
 # page headers keep their own character while sharing typography and spacing.
 HEADER_IMAGES: dict[str, str] = {
-    "module-explorer": "app/static/images/kochi/water-metro.jpg",
-    "air-quality": "app/static/images/threats-monsoon.webp",
-    "data-readiness": "app/static/images/kochi/mangalavanam.jpg",
-    "hazard-model-lab": "app/static/images/kochi/backwaters.jpg",
-    "hospital-vulnerability": "app/static/images/kochi/water-metro.jpg",
-    "compound-scenario": "app/static/images/kochi/maradu.jpg",
-    "disaster-probability": "app/static/images/kochi/coast.jpg",
-    "mitigation-budget": "app/static/images/kochi/backwaters.jpg",
-    "smart-mitigation": "app/static/images/kochi/mangalavanam.jpg",
-    "mitigation-data-intelligence": "app/static/images/kochi/industrial-coast.jpg",
-    "submission-ml-demo": "app/static/images/kochi/waterfront.jpg",
-    "kochi-map": "app/static/images/kochi/waterfront.jpg",
-    "disaster-assistant": "app/static/images/kochi/fishing-nets.jpg",
+    "module-explorer": "static/images/kochi/water-metro.jpg",
+    "air-quality": "static/images/threats-monsoon.webp",
+    "data-readiness": "static/images/kochi/mangalavanam.jpg",
+    "hazard-model-lab": "static/images/kochi/backwaters.jpg",
+    "hospital-vulnerability": "static/images/kochi/water-metro.jpg",
+    "compound-scenario": "static/images/kochi/maradu.jpg",
+    "disaster-probability": "static/images/kochi/coast.jpg",
+    "mitigation-budget": "static/images/kochi/backwaters.jpg",
+    "smart-mitigation": "static/images/kochi/mangalavanam.jpg",
+    "mitigation-data-intelligence": "static/images/kochi/industrial-coast.jpg",
+    "submission-ml-demo": "static/images/kochi/waterfront.jpg",
+    "kochi-map": "static/images/kochi/waterfront.jpg",
+    "disaster-assistant": "static/images/kochi/fishing-nets.jpg",
 }
 
 ACCENTS: dict[str, str] = {
