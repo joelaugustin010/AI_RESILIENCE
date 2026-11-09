@@ -867,6 +867,11 @@ with controls_column:
         key="kochi_basemap_theme",
         help="Choose a basemap that keeps the selected evidence layers readable.",
     )
+    st.markdown("**Overlay and data controls**")
+    jrc_control_slot = st.empty()
+    worldcover_control_slot = st.empty()
+    processed_layer_control_slot = st.empty()
+    point_upload_control_slot = st.empty()
 
 with map_column:
     st.subheader("Kochi hazard & infrastructure map")
@@ -900,11 +905,13 @@ if active_hazard is None or "Flood" in active_components:
             jrc_metadata = jrc_context["metadata"]
             jrc_licence = jrc_context["licence"]
             jrc_preview = jrc_context["preview"]
-            show_jrc = st.checkbox(
-                "JRC GloFAS RP100 modelled river-flood depth (scenario context, not observed flooding)",
-                value=False,
-                key=f"kochimap_jrc_{active_hazard}",
-            )
+            with jrc_control_slot:
+                show_jrc = st.checkbox(
+                    "JRC GloFAS RP100 modelled flood context",
+                    value=False,
+                    key=f"kochimap_jrc_{active_hazard}",
+                    help="Modelled 100-year river-flood scenario context; not observed flooding or an official warning.",
+                )
             st.caption(JRC_DISPLAY_CAVEAT)
             st.caption(
                 f"Licence: {jrc_licence['applied_basis']} applied (dataset README); "
@@ -962,11 +969,13 @@ if active_hazard is None or active_hazard in landcover_hazards:
         if landcover_context:
             landcover_metadata = landcover_context["metadata"]
             landcover_processing = landcover_metadata["processing"]
-            show_landcover = st.checkbox(
-                "ESA WorldCover 2021 land-cover context (not a hazard or exposure layer)",
-                value=True,
-                key=f"kochimap_worldcover_{active_hazard}",
-            )
+            with worldcover_control_slot:
+                show_landcover = st.checkbox(
+                    "ESA WorldCover 2021 land-cover context",
+                    value=True,
+                    key=f"kochimap_worldcover_{active_hazard}",
+                    help="Categorical land cover only; not hazard severity, exposure, or live land cover.",
+                )
             st.caption(
                 "Classified land cover can provide broad environmental context for reviewing this scenario. "
                 "It does not represent present-day land cover, building footprints, impervious fraction, "
@@ -1022,9 +1031,10 @@ if active_hazard is None or active_hazard in landcover_hazards:
         st.warning(f"The ESA WorldCover context layer could not be loaded: {error}")
 
 template = pd.DataFrame(columns=["name", "layer", "latitude", "longitude", "source", "source_date"])
-st.download_button("Download point CSV template", template.to_csv(index=False).encode("utf-8"), file_name="kochi_reviewed_points_template.csv", mime="text/csv")
-st.caption("Optional CSV fields are user-provided points. Required columns: name, layer, latitude, longitude, source, source_date.")
-uploaded = st.file_uploader("Upload source-reviewed point layers", type=["csv"], key="kochi_points")
+with point_upload_control_slot:
+    st.download_button("Download point CSV template", template.to_csv(index=False).encode("utf-8"), file_name="kochi_reviewed_points_template.csv", mime="text/csv")
+    st.caption("Optional CSV fields are user-provided points. Required columns: name, layer, latitude, longitude, source, source_date.")
+    uploaded = st.file_uploader("Upload source-reviewed point layers", type=["csv"], key="kochi_points")
 
 if show_boundary:
     deck_layers.append(pdk.Layer(
@@ -1045,12 +1055,13 @@ if processed_layers:
         for title, layer in processed_titles.items()
         if active_hazard is None or layer["metadata"].get("layer_role") == "context"
     ]
-    selected_titles = st.multiselect(
-        "Layers to show",
-        list(processed_titles),
-        default=contextual_default,
-        key="kochisp_validated_layers",
-    )
+    with processed_layer_control_slot:
+        selected_titles = st.multiselect(
+            "Processed layers to show",
+            list(processed_titles),
+            default=contextual_default,
+            key="kochisp_validated_layers",
+        )
     st.caption("Select each OSM context layer independently. Large community-mapped layers start hidden for map responsiveness.")
     colors = {
         "asset": ([42, 150, 115, 190], "#2A9673"),
