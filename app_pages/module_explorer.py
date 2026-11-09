@@ -206,7 +206,7 @@ for group_title, modules in MODULE_GROUPS:
     matches = [
         module for module in modules
         if not search_term
-        or search_term in " ".join((module[1], module[2], module[5], group_title)).casefold()
+        or search_term in " ".join((module[0], module[1], module[4], group_title)).casefold()
     ]
     if matches:
         filtered_groups.append((group_title, matches))
