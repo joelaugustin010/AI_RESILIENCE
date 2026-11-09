@@ -276,8 +276,7 @@ def page_header(
     hero_image = image or PAGE_MEDIA.get(_slug(key or title))
     image_css = f"--ar-hero-image:url('{_escape(hero_image)}');" if hero_image else "--ar-hero-image:none;"
     st.markdown(
-        f"<style>.st-key-{container_key}{{--ar-accent:{accent_hex};{image_css}}}
-</style>",
+        f"<style>.st-key-{container_key}{{--ar-accent:{accent_hex};{image_css}}}</style>",
         unsafe_allow_html=True,
     )
     with st.container(key=container_key):
