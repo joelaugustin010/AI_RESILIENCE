@@ -734,7 +734,7 @@ def _render_hydrology_explorer() -> None:
 
 st.markdown("""
 <style>
-.wf-hero{position:relative;overflow:hidden;padding:clamp(1.6rem,3vw,2.4rem) clamp(1.4rem,3vw,2.6rem);border-radius:26px;color:#f8fafc;background:linear-gradient(90deg,rgba(4,18,28,.95),rgba(7,35,47,.70) 58%,rgba(7,34,43,.84)),radial-gradient(ellipse at 92% -10%,rgba(66,224,193,.18),transparent 24rem),url('app/static/images/hero-kerala-flood-road.jpg') center/cover no-repeat;border:1px solid rgba(120,220,208,.24);box-shadow:0 24px 60px rgba(2,12,20,.34);margin:.2rem 0 1.1rem;isolation:isolate}
+.wf-hero{position:relative;overflow:hidden;padding:clamp(1.6rem,3vw,2.4rem) clamp(1.4rem,3vw,2.6rem);border-radius:26px;color:#f8fafc;background:linear-gradient(90deg,rgba(4,18,28,.78),rgba(7,35,47,.56) 58%,rgba(7,34,43,.70)),radial-gradient(ellipse at 92% -10%,rgba(66,224,193,.18),transparent 24rem),url('app/static/images/hero-kerala-flood-road.jpg') center/cover no-repeat;border:1px solid rgba(120,220,208,.24);box-shadow:0 24px 60px rgba(2,12,20,.34);margin:.2rem 0 1.1rem;isolation:isolate}
 .wf-hero:before{content:"";position:absolute;z-index:-1;width:280px;height:280px;right:-100px;top:-160px;border-radius:50%;border:1px solid rgba(66,224,193,.30);box-shadow:0 0 0 28px rgba(66,224,193,.05),0 0 0 58px rgba(66,224,193,.03);pointer-events:none}
 .wf-hero:after{content:"";position:absolute;inset:0 auto auto 0;width:100%;height:3px;background:linear-gradient(90deg,#42e0c1,transparent 62%);opacity:.85}
 .wf-kicker{display:inline-flex;align-items:center;gap:.55rem;font-size:.71rem;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:#8cf3df;margin-bottom:.7rem}
