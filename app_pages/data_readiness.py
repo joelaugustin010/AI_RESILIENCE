@@ -8,7 +8,6 @@ import streamlit as st
 from src.dataframe_display import display_dataframe
 
 from src.ingestion_audit import DATA_STATUS_DEFINITIONS, build_ingestion_report
-from src.evidence_alternatives import ALTERNATIVE_EVIDENCE
 from src.ui_theme import page_header
 
 
@@ -163,28 +162,6 @@ st.caption(
     "The Air Pollution page remains the descriptive station-summary view. "
     "This readiness page does not create a second scoring or decision workflow."
 )
-
-st.subheader("Alternative evidence routes")
-st.caption(
-    "These public catalogues and operational summaries offer additional evidence "
-    "routes when complete local event panels are unavailable. A catalogue listing "
-    "does not mean its underlying data have been downloaded, licensed, or validated."
-)
-for track_id, item in ALTERNATIVE_EVIDENCE.items():
-    with st.expander(item["title"]):
-        st.write(item["method"])
-        st.markdown("**Can support**")
-        for capability in item["supports"]:
-            st.write(f"- {capability.replace('_', ' ')}")
-        st.markdown("**Cannot establish by itself**")
-        for limitation in item["does_not_support"]:
-            st.write(f"- {limitation.replace('_', ' ')}")
-        st.caption(f"Readiness: {item['status']}")
-        for source in item["sources"]:
-            st.markdown(
-                f"- [{source['publisher']} — {source['title']}]({source['url']}) "
-                f"· {source['access']}"
-            )
 
 st.subheader("Descriptive climate benchmarks: Kochi")
 st.caption(

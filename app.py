@@ -14,107 +14,85 @@ st.set_page_config(
 )
 
 # Open directly on the Kochi-focused project dashboard.
-# Group workspaces by the user's task, keeping every existing page registered.
 pages = {
-    "Overview": [
+    "Home": [
         st.Page(
             "app_pages/home.py",
-            url_path="home",
             title="Home",
             icon=":material/home:",
             default=True,
         ),
     ],
-    "Monitor": [
+    "Explore": [
         st.Page(
             "app_pages/module_explorer.py",
-            url_path="module_explorer",
             title="Module Explorer",
             icon=":material/explore:",
+            url_path="module_explorer",
+        ),
+        st.Page(
+            "app_pages/decision_workflow.py",
+            title="Decision Workflow",
+            icon=":material/assignment_turned_in:",
+        ),
+        st.Page(
+            "app_pages/disaster_assistant.py",
+            title="Disaster Intelligence Assistant",
+            icon=":material/psychology_alt:",
         ),
         st.Page(
             "app_pages/kochi_map.py",
-            url_path="kochi_map",
             title="Kochi Map",
             icon=":material/map:",
         ),
         st.Page(
             "app_pages/air_pollution.py",
-            url_path="air_pollution",
             title="Air Pollution",
             icon=":material/factory:",
         ),
-    ],
-    "Analyse": [
         st.Page(
-            "app_pages/disaster_probability.py",
-            url_path="disaster_probability",
-            title="Multi-Hazard Evidence Review",
-            icon=":material/analytics:",
+            "app_pages/data_readiness.py",
+            title="Data Readiness",
+            icon=":material/fact_check:",
+        ),
+        st.Page(
+            "app_pages/hazard_model_lab.py",
+            title="Hazard Model Lab",
+            icon=":material/model_training:",
         ),
         st.Page(
             "app_pages/hospital_vulnerability.py",
-            url_path="hospital_vulnerability",
             title="Hospital Vulnerability",
             icon=":material/local_hospital:",
         ),
         st.Page(
             "app_pages/compound_scenario.py",
-            url_path="compound_scenario",
             title="Cyclone + Flood",
             icon=":material/thunderstorm:",
         ),
         st.Page(
-            "app_pages/hazard_model_lab.py",
-            url_path="hazard_model_lab",
-            title="Hazard Model Lab",
-            icon=":material/model_training:",
-        ),
-        st.Page(
-            "app_pages/data_readiness.py",
-            url_path="data_readiness",
-            title="Data Readiness",
-            icon=":material/fact_check:",
-        ),
-        st.Page(
-            "app_pages/submission_ml_demo.py",
-            url_path="submission_ml_demo",
-            title="ML Evidence & Demonstration",
-            icon=":material/science:",
+            "app_pages/disaster_probability.py",
+            title="Multi-Hazard Evidence Review",
+            icon=":material/analytics:",
         ),
     ],
     "Plan": [
         st.Page(
             "app_pages/mitigation_planner.py",
-            url_path="mitigation_planner",
             title="Mitigation Budget",
             icon=":material/account_balance_wallet:",
         ),
         st.Page(
             "app_pages/smart_mitigation_design.py",
-            url_path="smart_mitigation_design",
             title="Smart Mitigation Design Studio",
             icon=":material/engineering:",
         ),
     ],
-    "Respond": [
-        st.Page(
-            "app_pages/disaster_assistant.py",
-            url_path="disaster_assistant",
-            title="Disaster Intelligence Assistant",
-            icon=":material/psychology_alt:",
-        ),
-        st.Page(
-            "app_pages/decision_workflow.py",
-            url_path="decision_workflow",
-            title="Decision Workflow",
-            icon=":material/assignment_turned_in:",
-        ),
-    ],
 }
 
-# Render the grouped Streamlit page registry directly in the left sidebar.
-page = st.navigation(pages, position="sidebar")
+# Keep Streamlit's route registry for deep links and page state, but render the
+# user-facing module chooser below so navigation is part of the product chrome.
+page = st.navigation(pages, position="hidden")
 
 # A lightweight, application-wide design system. Keeping it local means the
 # deployment needs no external asset or build step, and every analytical page
@@ -374,7 +352,7 @@ st.markdown(
       [class*="st-key-ar-top-navigation"] [data-testid="stPopover"] > button { font-size: .72rem !important; padding-inline: .6rem !important; min-height: 2.25rem; }
     }
 
-    /* Sidebar page navigation must remain visible; themed below. */
+    [data-testid="stSidebarNav"] { display: none !important; }
     [data-testid="stSidebar"] {
       background: rgba(7, 23, 36, .98) !important;
       border-right: 1px solid var(--ar-border);
@@ -388,58 +366,26 @@ st.markdown(
     [data-testid="stSidebarNavLink"]:hover { background: rgba(66, 224, 193, .08); }
     [data-testid="stAppViewContainer"] > .main, [data-testid="stMain"] { background: transparent !important; }
 
-    /* ---------- Typography: consistent hierarchy and readable supporting text ---------- */
+    /* ---------- Typography ---------- */
     h1, h2, h3, h4, h5, h6 {
       color: #f1fbfb !important;
       letter-spacing: -.028em;
       text-wrap: balance;
-      font-weight: 760;
     }
-    h1 { font-size: clamp(1.9rem, 3.2vw, 2.65rem) !important; line-height: 1.08 !important; }
-    h2 { font-size: clamp(1.42rem, 2.25vw, 1.85rem) !important; line-height: 1.2 !important; }
-    h3 { font-size: clamp(1.12rem, 1.6vw, 1.32rem) !important; line-height: 1.3 !important; }
-    h4, h5, h6 { line-height: 1.35 !important; }
-    p, li, label, .stMarkdown, .stCaption, [data-testid="stWidgetLabel"] {
-      color: #d0e0e2;
-      font-size: .94rem;
-      line-height: 1.62;
-    }
-    [data-testid="stMarkdownContainer"] > p { margin-bottom: .72rem; }
-    [data-testid="stMarkdownContainer"] li { margin: .16rem 0; }
-    [data-testid="stWidgetLabel"] p,
-    [data-testid="stWidgetLabel"] label {
-      color: #dce9ea !important;
-      font-size: .88rem !important;
-      font-weight: 620 !important;
-      line-height: 1.45 !important;
-    }
-    [data-testid="stCaptionContainer"],
-    [data-testid="stCaptionContainer"] p,
-    .stCaption {
-      color: #b4cbd0 !important;
-      font-size: .82rem !important;
-      line-height: 1.55 !important;
-    }
-    [data-testid="stTooltipContent"] { color: #e0eeee !important; }
-    [data-testid="stAlert"] p { color: #e0eeee !important; line-height: 1.58 !important; }
-    [data-testid="stDataFrame"] [role="gridcell"],
-    [data-testid="stDataFrame"] [role="columnheader"],
-    [data-testid="stTable"] { font-size: .86rem !important; }
+    h2 { line-height: 1.22; }
+    h3 { line-height: 1.3; }
+    p, li, label, .stMarkdown, .stCaption, [data-testid="stWidgetLabel"] { color: #c5dadd; }
+    [data-testid="stCaptionContainer"], .stCaption { color: #94b0b8 !important; }
     a { color: #62dfd0 !important; text-underline-offset: 2px; }
     a:hover { color: #9cf8e6 !important; }
     hr { border-color: rgba(130, 190, 199, .18) !important; margin: 1.5rem 0; }
-    strong { color: #f0fbfb; font-weight: 720; }
+    strong { color: #f0fbfb; }
     code {
       color: #b7f7ea !important;
       background: rgba(66, 224, 193, .08) !important;
       border: 1px solid rgba(66, 224, 193, .14);
       border-radius: 6px;
       padding: .08rem .3rem;
-    }
-    @media (max-width: 720px) {
-      h1 { font-size: clamp(1.65rem, 7vw, 2.15rem) !important; }
-      h2 { font-size: clamp(1.28rem, 5vw, 1.55rem) !important; }
-      p, li { font-size: .92rem; }
     }
 
     /* ---------- Standard module header ---------- */
@@ -1360,16 +1306,16 @@ try:  # pragma: no cover - presentation only
             plot_bgcolor="rgba(0,0,0,0)",
             font=dict(
                 family='-apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif',
-                color="#31545A",
+                color="#405D54",
                 size=13,
             ),
-            title=dict(font=dict(color="#17383B", size=17), x=0.01, xanchor="left"),
-            colorway=["#174E55", "#299B91", "#77B8B2", "#4F8A76", "#D9A65A", "#76669A", "#B94343"],
+            title=dict(font=dict(color="#1D3030", size=17), x=0.01, xanchor="left"),
+            colorway=["#247A65", "#83B9A5", "#328BCB", "#8064B5", "#D58A36", "#C5A13A", "#C85C5C"],
             xaxis=dict(
                 gridcolor="rgba(44,105,82,.12)",
                 zerolinecolor="rgba(44,105,82,.18)",
                 linecolor="rgba(44,105,82,.24)",
-                tickfont=dict(color="#60777A"),
+                tickfont=dict(color="#71827F"),
                 title=dict(font=dict(color="#71827F")),
             ),
             yaxis=dict(
@@ -1424,7 +1370,7 @@ try:  # pragma: no cover - presentation only
                 },
                 "title": {"color": "#1D3030", "fontSize": 15, "anchor": "start"},
                 "range": {
-                    "category": ["#174E55", "#299B91", "#77B8B2", "#4F8A76", "#D9A65A", "#76669A", "#B94343"],
+                    "category": ["#247A65", "#83B9A5", "#328BCB", "#8064B5", "#D58A36", "#C5A13A", "#C85C5C"],
                 },
             }
         }
@@ -1433,6 +1379,50 @@ try:  # pragma: no cover - presentation only
     alt.themes.enable("ai_resilience")
 except Exception:  # pragma: no cover - optional dependency
     pass
+
+
+with st.container(key="ar-top-navigation"):
+    brand, home_col, explore_col, env_col, disaster_col, plan_col, about_col = st.columns(
+        [1.55, .72, 1.18, 1.5, 1.35, 1.5, .9], gap="small"
+    )
+    with brand:
+        with st.container(key="ar-brand"):
+            st.markdown(
+                f"AI_RESILIENCE<span>Environmental intelligence</span><small>Viewing: {html.escape(page.title)}</small>",
+                unsafe_allow_html=True,
+            )
+    with home_col:
+        st.page_link("app_pages/home.py", label="Home", icon=":material/home:")
+    with explore_col:
+        with st.popover("Explore Modules", icon=":material/explore:", use_container_width=True):
+            st.caption("Explore the full AI_RESILIENCE workspace")
+            st.page_link("app_pages/module_explorer.py", label="Open module explorer", icon=":material/dashboard:")
+            st.page_link("app_pages/kochi_map.py", label="Kochi Map", icon=":material/map:")
+            st.page_link("app_pages/air_pollution.py", label="Air Pollution", icon=":material/factory:")
+            st.page_link("app_pages/data_readiness.py", label="Data & Model Transparency", icon=":material/fact_check:")
+            st.page_link("app_pages/hazard_model_lab.py", label="Hazard Model Lab", icon=":material/model_training:")
+    with env_col:
+        with st.popover("Environmental Intelligence", icon=":material/eco:", use_container_width=True):
+            st.caption("Observe environmental signals and local context")
+            st.page_link("app_pages/kochi_map.py", label="Kochi spatial intelligence", icon=":material/map:")
+            st.page_link("app_pages/air_pollution.py", label="Air quality evidence", icon=":material/air:")
+            st.page_link("app_pages/disaster_probability.py", label="Multi-hazard evidence review", icon=":material/analytics:")
+            st.page_link("app_pages/hospital_vulnerability.py", label="Public health vulnerability", icon=":material/local_hospital:")
+    with disaster_col:
+        with st.popover("Disaster Resilience", icon=":material/shield:", use_container_width=True):
+            st.caption("Assess hazards, scenarios and critical dependencies")
+            st.page_link("app_pages/disaster_assistant.py", label="Disaster Intelligence Assistant", icon=":material/psychology_alt:")
+            st.page_link("app_pages/decision_workflow.py", label="Decision Workflow", icon=":material/assignment_turned_in:")
+            st.page_link("app_pages/compound_scenario.py", label="Cyclone + Flood", icon=":material/thunderstorm:")
+            st.page_link("app_pages/hazard_model_lab.py", label="Hazard Model Lab", icon=":material/model_training:")
+    with plan_col:
+        with st.popover("Mitigation & Planning", icon=":material/engineering:", use_container_width=True):
+            st.caption("Move from evidence to practical action")
+            st.page_link("app_pages/mitigation_planner.py", label="Mitigation Budget", icon=":material/account_balance_wallet:")
+            st.page_link("app_pages/smart_mitigation_design.py", label="Smart Mitigation Design Studio", icon=":material/design_services:")
+            st.page_link("app_pages/decision_workflow.py", label="Decision Workflow", icon=":material/assignment_turned_in:")
+    with about_col:
+        st.markdown('<a href="/?about=sdgs#designed-for-responsible-environmental-intelligence">About / SDGs</a>', unsafe_allow_html=True)
 
 
 # The homepage carries its own cinematic masthead; the shared breadcrumb strip
@@ -1447,7 +1437,6 @@ if page.title != "Home":
         """,
         unsafe_allow_html=True,
     )
-
 
 page.run()
 
@@ -1649,1068 +1638,3 @@ if page.title != "Home":
         """,
         unsafe_allow_html=True,
     )
-
-
-# AI RESILIENCE — Coastal Intelligence shared palette (60–30–10).
-# This final layer is presentation-only; it does not change page logic or data.
-st.markdown(
-    """
-    <style>
-    :root {
-      color-scheme: light;
-      --ar-bg: #F5F7F5;
-      --ar-bg-deep: #EAF0EF;
-      --ar-panel: rgba(255,255,255,.88);
-      --ar-panel-2: #FFFFFF;
-      --ar-panel-3: #DCE7E8;
-      --ar-ink: #17383B;
-      --ar-ink-soft: #31545A;
-      --ar-muted: #60777A;
-      --ar-faint: #7C9091;
-      --ar-teal: #174E55;
-      --ar-teal-soft: #299B91;
-      --ar-cyan: #77B8B2;
-      --ar-emerald: #4F8A76;
-      --ar-amber: #9A6A25;
-      --ar-orange: #B97845;
-      --ar-red: #B94343;
-      --ar-violet: #76669A;
-      --ar-border: rgba(23,78,85,.15);
-      --ar-border-strong: rgba(23,78,85,.30);
-      --ar-shadow: 0 18px 48px rgba(23,78,85,.09);
-      --ar-shadow-soft: 0 8px 24px rgba(23,78,85,.06);
-    }
-    html, body, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
-      background: #F5F7F5 !important;
-      color: #17383B !important;
-    }
-    .stApp {
-      color: #17383B !important;
-      background:
-        radial-gradient(ellipse at 4% 0%, rgba(119,184,178,.16), transparent 32rem),
-        radial-gradient(ellipse at 96% 8%, rgba(220,231,232,.72), transparent 34rem),
-        linear-gradient(145deg, #F5F7F5 0%, #EFF4F2 58%, #F5F7F5 100%) !important;
-      background-attachment: fixed !important;
-    }
-    [data-testid="stHeader"], [data-testid="stToolbar"] {
-      background: rgba(245,247,245,.88) !important;
-      backdrop-filter: blur(18px);
-    }
-    [data-testid="stTopNav"] {
-      background: rgba(255,255,255,.76) !important;
-      border: 1px solid rgba(23,78,85,.12) !important;
-      border-radius: 18px !important;
-      box-shadow: 0 8px 26px rgba(23,78,85,.06) !important;
-    }
-    [data-testid="stTopNavSection"], [data-testid="stTopNavLink"],
-    [data-testid="stTopNavSection"] p, [data-testid="stTopNavLink"] p {
-      color: #31545A !important;
-      text-shadow: none !important;
-    }
-    [data-testid="stTopNavSection"]:hover, [data-testid="stTopNavLink"]:hover {
-      color: #174E55 !important;
-      background: rgba(41,155,145,.09) !important;
-    }
-    [data-testid="stTopNavLink"][aria-current="page"],
-    [data-testid="stTopNavLink"][data-active="true"],
-    [data-testid="stTopNavSection"][aria-expanded="true"] {
-      color: #174E55 !important;
-      background: rgba(41,155,145,.13) !important;
-      box-shadow: inset 0 0 0 1px rgba(41,155,145,.22) !important;
-    }
-    [data-testid="stTopNavPopover"], [data-testid="stTopNavPopoverBody"] {
-      background: #FFFFFF !important;
-      border: 1px solid rgba(23,78,85,.16) !important;
-      box-shadow: 0 14px 34px rgba(23,78,85,.13) !important;
-    }
-    [data-testid="stTopNavDropdownLink"], [data-testid="stTopNavDropdownLink"] p {
-      color: #31545A !important;
-    }
-    [data-testid="stSidebar"] {
-      background: linear-gradient(180deg, #DCE7E8, #F5F7F5) !important;
-      border-right: 1px solid rgba(23,78,85,.13) !important;
-    }
-    [data-testid="stSidebar"] *, [data-testid="stSidebar"] p,
-    [data-testid="stSidebar"] label { color: #31545A !important; }
-    h1, h2, h3, h4, h5, h6,
-    [data-testid="stHeading"] *, .stMarkdown, p, li, label, strong {
-      color: #17383B;
-    }
-    h1, h2, h3, h4, h5, h6 { color: #174E55 !important; }
-    p, li, [data-testid="stWidgetLabel"], [data-testid="stCaptionContainer"] {
-      color: #60777A !important;
-    }
-    a { color: #176F70 !important; }
-    a:hover { color: #174E55 !important; }
-    hr { border-color: rgba(23,78,85,.15) !important; }
-    [class*="st-key-ar-head-"] {
-      border-color: rgba(23,78,85,.15) !important;
-      box-shadow: 0 16px 38px rgba(23,78,85,.08) !important;
-    }
-    [class*="st-key-ar-head-"] h1, [class*="st-key-ar-head-"] .ar-page-title {
-      color: #FFFFFF !important;
-    }
-    .ar-page-copy { color: #E5F0EF !important; }
-    .ar-page-kicker, .ar-sec-overline { color: #299B91 !important; }
-    [data-testid="stMetric"], [data-testid="stVerticalBlockBorderWrapper"],
-    [data-testid="stExpander"], [data-testid="stForm"] {
-      background: rgba(255,255,255,.86) !important;
-      border: 1px solid rgba(23,78,85,.14) !important;
-      box-shadow: 0 8px 24px rgba(23,78,85,.06) !important;
-      color: #17383B !important;
-    }
-    [data-testid="stMetricLabel"], [data-testid="stMetricLabel"] p,
-    [data-testid="stMetricValue"], [data-testid="stMetricDelta"],
-    [data-testid="stExpander"] summary, [data-testid="stExpander"] summary p {
-      color: #174E55 !important;
-    }
-    [data-testid="stTextInput"] input, [data-testid="stNumberInput"] input,
-    [data-testid="stDateInput"] input, [data-testid="stTimeInput"] input,
-    [data-testid="stTextArea"] textarea,
-    [data-baseweb="select"] > div, [data-baseweb="input"] > div,
-    [data-baseweb="textarea"] > div {
-      color: #17383B !important;
-      background: #FFFFFF !important;
-      border-color: rgba(23,78,85,.22) !important;
-      border-radius: 11px !important;
-    }
-    [data-testid="stCheckbox"] label, [data-testid="stRadio"] label,
-    [data-testid="stToggle"] label, [data-testid="stSlider"] label {
-      color: #31545A !important;
-    }
-    [data-testid="stCheckbox"] input, [data-testid="stRadio"] input {
-      accent-color: #299B91 !important;
-    }
-    div.stButton > button, div.stDownloadButton > button,
-    [data-testid="stFormSubmitButton"] > button {
-      color: #FFFFFF !important;
-      background: #174E55 !important;
-      border: 1px solid #174E55 !important;
-      border-radius: 11px !important;
-      box-shadow: 0 6px 16px rgba(23,78,85,.13) !important;
-    }
-    div.stButton > button:hover, div.stDownloadButton > button:hover,
-    [data-testid="stFormSubmitButton"] > button:hover {
-      color: #FFFFFF !important;
-      background: #299B91 !important;
-      border-color: #299B91 !important;
-      box-shadow: 0 9px 22px rgba(41,155,145,.18) !important;
-    }
-    div.stButton > button[kind="secondary"],
-    button[data-testid="stBaseButton-secondary"] {
-      color: #174E55 !important;
-      background: #DCE7E8 !important;
-      border-color: rgba(23,78,85,.20) !important;
-    }
-    [data-testid="stDataFrame"], [data-testid="stTable"],
-    [data-testid="stPlotlyChart"], [data-testid="stVegaLiteChart"],
-    [data-testid="stPydeckChart"] {
-      border: 1px solid rgba(23,78,85,.14) !important;
-      border-radius: 14px !important;
-      background: rgba(255,255,255,.78) !important;
-      box-shadow: 0 6px 20px rgba(23,78,85,.045) !important;
-    }
-    [data-testid="stAlert"] {
-      border-radius: 13px !important;
-      border-color: rgba(23,78,85,.16) !important;
-      background: rgba(255,255,255,.92) !important;
-    }
-    .ar-risk-safe { color:#176348 !important; background:#E8F4ED !important; border-color:#B9D9C7 !important; }
-    .ar-risk-moderate { color:#805A19 !important; background:#FBF2DF !important; border-color:#E9D5A5 !important; }
-    .ar-risk-high { color:#965021 !important; background:#FAEDE3 !important; border-color:#E8C2A6 !important; }
-    .ar-risk-critical { color:#9F3030 !important; background:#FBEAEA !important; border-color:#E8B6B6 !important; }
-    .ar-global-foot { color:#718486 !important; border-top-color:rgba(23,78,85,.14) !important; }
-    .ar-global-foot strong { color:#174E55 !important; }
-    .ar-global-foot .ar-foot-module {
-      color:#31545A !important; border-color:rgba(23,78,85,.16) !important;
-      background:rgba(255,255,255,.72) !important;
-    }
-    [data-testid="stProgress"] { background:#DCE7E8 !important; }
-    [data-testid="stProgress"] > div > div {
-      background:linear-gradient(90deg,#174E55,#299B91) !important;
-    }
-    [data-testid="stSpinner"] { color:#174E55 !important; }
-    :focus-visible { outline:2px solid #D9A65A !important; outline-offset:2px !important; }
-    ::-webkit-scrollbar-track { background:#F5F7F5 !important; }
-    ::-webkit-scrollbar-thumb { background:rgba(23,78,85,.25) !important; border-color:#F5F7F5 !important; }
-    @media (max-width: 640px) {
-      .block-container { padding-left:.85rem !important; padding-right:.85rem !important; }
-      [class*="st-key-ar-head-"] { border-radius:18px !important; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-
-# AI RESILIENCE - final text-contrast correction.
-# Scoped to Streamlit's native text and controls; custom cinematic panels,
-# charts, maps, severity colours and page-specific HTML remain untouched.
-st.markdown(
-    """
-    <style>
-    /* Native page copy: use a consistent dark-ink hierarchy on light surfaces. */
-    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > p,
-    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > ul,
-    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > ol,
-    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > blockquote,
-    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > div > p {
-      color: #31545A !important;
-      line-height: 1.68 !important;
-    }
-    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > h1,
-    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > h2,
-    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > h3,
-    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > h4,
-    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > div > h1,
-    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > div > h2,
-    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > div > h3 {
-      color: #174E55 !important;
-      line-height: 1.28 !important;
-    }
-    [data-testid="stMain"] [data-testid="stCaptionContainer"],
-    [data-testid="stMain"] [data-testid="stCaptionContainer"] *,
-    [data-testid="stMain"] [data-testid="stWidgetLabel"],
-    [data-testid="stMain"] [data-testid="stWidgetLabel"] * {
-      color: #52666A !important;
-      opacity: 1 !important;
-    }
-    [data-testid="stMain"] [data-testid="stMarkdownContainer"] a {
-      color: #176F70 !important;
-      text-decoration: underline;
-      text-decoration-thickness: .06em;
-      text-underline-offset: .16em;
-    }
-    [data-testid="stMain"] [data-testid="stMarkdownContainer"] a:hover {
-      color: #174E55 !important;
-    }
-
-    /* Make small utility text readable without changing status semantics. */
-    [data-testid="stMain"] small,
-    [data-testid="stMain"] [data-testid="stHelp"],
-    [data-testid="stMain"] [data-testid="stTooltipContent"] {
-      color: #52666A !important;
-    }
-    [data-testid="stMain"] [data-testid="stAlert"] p,
-    [data-testid="stMain"] [data-testid="stAlert"] li {
-      color: #31545A !important;
-      line-height: 1.6 !important;
-    }
-    [data-testid="stMain"] [data-testid="stExpander"] summary,
-    [data-testid="stMain"] [data-testid="stExpander"] summary p {
-      color: #174E55 !important;
-      font-weight: 650 !important;
-    }
-
-    /* Controls, including disabled and placeholder states. */
-    [data-testid="stMain"] input,
-    [data-testid="stMain"] textarea,
-    [data-testid="stMain"] [data-baseweb="select"] *,
-    [data-testid="stMain"] [data-baseweb="input"] *,
-    [data-testid="stMain"] [data-baseweb="textarea"] * {
-      color: #17383B !important;
-    }
-    [data-testid="stMain"] input::placeholder,
-    [data-testid="stMain"] textarea::placeholder {
-      color: #718486 !important;
-      opacity: 1 !important;
-    }
-    [data-testid="stMain"] [data-testid="stRadio"] label,
-    [data-testid="stMain"] [data-testid="stCheckbox"] label,
-    [data-testid="stMain"] [data-testid="stToggle"] label,
-    [data-testid="stMain"] [data-testid="stSlider"] label {
-      color: #31545A !important;
-    }
-    [data-testid="stMain"] [data-testid="stTabs"] button {
-      color: #52666A !important;
-      font-weight: 650 !important;
-    }
-    [data-testid="stMain"] [data-testid="stTabs"] button[aria-selected="true"] {
-      color: #174E55 !important;
-    }
-
-    /* Tables and dataframe headers need enough contrast at small sizes. */
-    [data-testid="stMain"] [data-testid="stDataFrame"] [role="columnheader"],
-    [data-testid="stMain"] [data-testid="stDataFrame"] [role="rowheader"],
-    [data-testid="stMain"] [data-testid="stTable"] th {
-      color: #174E55 !important;
-      font-weight: 700 !important;
-    }
-    [data-testid="stMain"] [data-testid="stTable"] td {
-      color: #31545A !important;
-    }
-
-    /* Preserve white typography inside the intentionally dark photo mastheads. */
-    [data-testid="stMain"] [class*="st-key-ar-head-"] h1,
-    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-title {
-      color: #FFFFFF !important;
-    }
-    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-copy {
-      color: #E5F0EF !important;
-    }
-    /* Keep every header label readable on the dark coastal masthead. */
-    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-kicker,
-    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-kicker *,
-    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-meta,
-    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-meta *,
-    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-copy,
-    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-title,
-    [data-testid="stMain"] [class*="st-key-ar-head-"] h1 {
-      color: #E5F0EF !important;
-      opacity: 1 !important;
-    }
-    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-title,
-    [data-testid="stMain"] [class*="st-key-ar-head-"] h1 {
-      color: #FFFFFF !important;
-    }
-    /* High-clarity typography for every standard module masthead. */
-    [data-testid="stMain"] [class*="st-key-ar-head-"] {
-      background-image:
-        linear-gradient(112deg, rgba(3, 24, 34, .99) 0%, rgba(7, 45, 53, .97) 100%) !important;
-      border-color: rgba(220, 242, 239, .24) !important;
-    }
-    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-kicker,
-    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-kicker *,
-    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-meta,
-    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-meta * {
-      color: #B9F3E8 !important;
-      -webkit-text-fill-color: #B9F3E8 !important;
-      opacity: 1 !important;
-      font-family: "Inter", "Segoe UI", Arial, sans-serif !important;
-      font-weight: 750 !important;
-      text-shadow: none !important;
-    }
-    [data-testid="stMain"] [class*="st-key-ar-head-"] h1,
-    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-title {
-      color: #FFFFFF !important;
-      -webkit-text-fill-color: #FFFFFF !important;
-      font-family: "Inter", "Segoe UI", Arial, sans-serif !important;
-      font-size: clamp(2.2rem, 4.2vw, 3.45rem) !important;
-      font-weight: 800 !important;
-      line-height: 1.12 !important;
-      letter-spacing: -.025em !important;
-      text-shadow: none !important;
-      opacity: 1 !important;
-    }
-    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-copy,
-    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-copy * {
-      color: #F0F7F6 !important;
-      -webkit-text-fill-color: #F0F7F6 !important;
-      font-family: "Inter", "Segoe UI", Arial, sans-serif !important;
-      font-size: clamp(1.02rem, 1.25vw, 1.12rem) !important;
-      font-weight: 500 !important;
-      line-height: 1.72 !important;
-      opacity: 1 !important;
-      text-shadow: none !important;
-    }
-    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-meta span {
-      color: #F3FAF9 !important;
-      -webkit-text-fill-color: #F3FAF9 !important;
-      background: rgba(224, 246, 241, .13) !important;
-      border: 1px solid rgba(224, 246, 241, .34) !important;
-      backdrop-filter: none !important;
-      font-size: .76rem !important;
-      font-weight: 700 !important;
-      letter-spacing: .025em !important;
-      text-transform: none !important;
-      padding: .3rem .72rem !important;
-    }
-    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-dot {
-      background: #63D7C2 !important;
-      box-shadow: 0 0 0 4px rgba(99, 215, 194, .18) !important;
-      animation: none !important;
-    }
-
-
-    /* AI RESILIENCE — Unified page layout rhythm.
-       Presentation-only: standardise the content canvas and vertical spacing
-       while preserving page-specific hero, map, chart and component styling. */
-    [data-testid="stMainBlockContainer"],
-    .block-container {
-      width: 100% !important;
-      max-width: 1440px !important;
-      padding-top: clamp(1rem, 1.8vw, 1.55rem) !important;
-      padding-right: clamp(1rem, 2.6vw, 2.4rem) !important;
-      padding-bottom: clamp(2rem, 3.2vw, 3rem) !important;
-      padding-left: clamp(1rem, 2.6vw, 2.4rem) !important;
-      box-sizing: border-box !important;
-    }
-    [data-testid="stMain"] [class*="st-key-ar-head-"] {
-      margin-top: .15rem !important;
-      margin-bottom: clamp(1.15rem, 2vw, 1.7rem) !important;
-    }
-    [data-testid="stMain"] .ar-sec-intro {
-      margin-top: clamp(1.25rem, 2.1vw, 1.8rem) !important;
-      margin-bottom: .7rem !important;
-    }
-    [data-testid="stMain"] [data-testid="stHorizontalBlock"] {
-      column-gap: clamp(.75rem, 1.6vw, 1.35rem) !important;
-      row-gap: 1rem !important;
-    }
-    [data-testid="stMain"] [data-testid="stVerticalBlock"] {
-      row-gap: .85rem;
-    }
-    [data-testid="stMain"] [data-testid="stDataFrame"],
-    [data-testid="stMain"] [data-testid="stTable"],
-    [data-testid="stMain"] [data-testid="stPlotlyChart"],
-    [data-testid="stMain"] [data-testid="stVegaLiteChart"],
-    [data-testid="stMain"] [data-testid="stPydeckChart"] {
-      max-width: 100%;
-      min-width: 0;
-    }
-    @media (max-width: 900px) {
-      [data-testid="stMainBlockContainer"],
-      .block-container {
-        padding-right: 1.1rem !important;
-        padding-left: 1.1rem !important;
-      }
-    }
-    @media (max-width: 640px) {
-      [data-testid="stMainBlockContainer"],
-      .block-container {
-        padding-top: .9rem !important;
-        padding-right: .8rem !important;
-        padding-bottom: 2rem !important;
-        padding-left: .8rem !important;
-      }
-      [data-testid="stMain"] [data-testid="stHorizontalBlock"] {
-        column-gap: .6rem !important;
-        row-gap: .8rem !important;
-      }
-    }
-
-    /* Dark ink and clear font hierarchy for ordinary page content. */
-    [data-testid="stMain"] {
-      font-family: "Inter", "Segoe UI", Arial, sans-serif !important;
-    }
-    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > p,
-    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > ul,
-    [data-testid="stMain"] [data-testid="stMarkdownContainer"] > ol {
-      color: #29484C !important;
-      font-size: 1rem !important;
-      font-weight: 450 !important;
-      line-height: 1.72 !important;
-      opacity: 1 !important;
-    }
-    [data-testid="stMain"] [data-testid="stCaptionContainer"],
-    [data-testid="stMain"] [data-testid="stCaptionContainer"] * {
-      color: #435D61 !important;
-      font-size: .88rem !important;
-      opacity: 1 !important;
-    }
-    
-    /* Grouped Coastal Intelligence sidebar navigation. */
-    [data-testid="stSidebar"] {
-      background: linear-gradient(180deg, #E7F0EF 0%, #F5F7F5 58%, #FFFFFF 100%) !important;
-      border-right: 1px solid rgba(23,78,85,.15) !important;
-    }
-    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
-    [data-testid="stSidebar"] [data-testid="stCaptionContainer"] {
-      color: #526B6E !important;
-    }
-    [data-testid="stSidebarNav"] {
-      padding: .75rem .65rem 1.25rem !important;
-    }
-    [data-testid="stSidebarNav"] ul {
-      gap: .22rem !important;
-    }
-    [data-testid="stSidebarNav"] li {
-      margin: .12rem 0 !important;
-    }
-    [data-testid="stSidebarNav"] a,
-    [data-testid="stSidebarNavLink"] {
-      min-height: 2.55rem !important;
-      padding: .58rem .72rem !important;
-      border: 1px solid transparent !important;
-      border-radius: 11px !important;
-      color: #31545A !important;
-      transition: background .16s ease, border-color .16s ease, color .16s ease !important;
-    }
-    [data-testid="stSidebarNav"] a p,
-    [data-testid="stSidebarNavLink"] p,
-    [data-testid="stSidebarNav"] a span {
-      color: inherit !important;
-      font-weight: 560 !important;
-    }
-    [data-testid="stSidebarNav"] a:hover,
-    [data-testid="stSidebarNavLink"]:hover {
-      background: rgba(41,155,145,.09) !important;
-      border-color: rgba(41,155,145,.18) !important;
-      color: #174E55 !important;
-    }
-    [data-testid="stSidebarNav"] a[aria-current="page"],
-    [data-testid="stSidebarNavLink"][aria-current="page"] {
-      background: #DCECE8 !important;
-      border-color: rgba(41,155,145,.30) !important;
-      box-shadow: inset 3px 0 0 #299B91 !important;
-      color: #174E55 !important;
-      font-weight: 750 !important;
-    }
-    [data-testid="stSidebarNav"] a[aria-current="page"] p,
-    [data-testid="stSidebarNavLink"][aria-current="page"] p {
-      color: #174E55 !important;
-      font-weight: 750 !important;
-    }
-    [data-testid="stSidebarNav"] [data-testid="stSidebarNavSeparator"],
-    [data-testid="stSidebarNavSeparator"] {
-      border-color: rgba(23,78,85,.13) !important;
-      margin: .75rem .35rem !important;
-    }
-    [data-testid="stSidebar"] [data-testid="stIconMaterial"] {
-      color: #397B78 !important;
-    }
-    /* Clear hierarchy, keyboard focus and comfortable scrolling for the
-       five navigation groups and their thirteen destinations. */
-    /* Let Streamlit's sidebar own vertical scrolling. A second
-       scroll container here creates a duplicate scrollbar. */
-    [data-testid="stSidebarNav"] {
-      max-height: none !important;
-      overflow: visible !important;
-    }
-    [data-testid="stSidebarNav"] a,
-    [data-testid="stSidebarNavLink"] {
-      display: flex !important;
-      align-items: center !important;
-      gap: .58rem !important;
-      box-sizing: border-box !important;
-    }
-    [data-testid="stSidebarNav"] a p,
-    [data-testid="stSidebarNavLink"] p {
-      font-size: .9rem !important;
-      line-height: 1.32 !important;
-      white-space: normal !important;
-      overflow-wrap: anywhere !important;
-    }
-    [data-testid="stSidebarNav"] a:focus-visible,
-    [data-testid="stSidebarNavLink"]:focus-visible {
-      outline: 3px solid rgba(41,155,145,.55) !important;
-      outline-offset: 2px !important;
-      background: #E4F0ED !important;
-    }
-    [data-testid="stSidebarNav"] a[aria-current="page"] {
-      position: relative;
-    }
-    @media (max-width: 640px) {
-      [data-testid="stSidebarNav"] {
-        padding: .5rem .4rem .9rem !important;
-      }
-    }
-
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-
-# AI_RESILIENCE — Coastal Sage global visual identity.
-# Presentation-only overrides: preserve routes, state, data, charts and calculations.
-st.markdown(
-    """
-    <style>
-    :root {
-      --ar-bg: #F2F5F0;
-      --ar-bg-deep: #E8EEE7;
-      --ar-panel: #FFFFFF;
-      --ar-panel-2: #F7F9F5;
-      --ar-panel-3: #E7EEE7;
-      --ar-ink: #263A35;
-      --ar-ink-soft: #40564F;
-      --ar-muted: #5D7068;
-      --ar-faint: #788981;
-      --ar-teal: #4F8F83;
-      --ar-teal-soft: #A9C7B7;
-      --ar-cyan: #6D9F9A;
-      --ar-emerald: #668B70;
-      --ar-amber: #A9824F;
-      --ar-orange: #B97857;
-      --ar-red: #B85F68;
-      --ar-violet: #827F9F;
-      --ar-border: rgba(48, 82, 69, .17);
-      --ar-border-strong: rgba(48, 82, 69, .30);
-      --ar-shadow: 0 20px 48px rgba(35, 61, 49, .09);
-      --ar-shadow-soft: 0 10px 28px rgba(35, 61, 49, .06);
-      --ar-accent: #4F8F83;
-    }
-    html, body, [data-testid="stAppViewContainer"], .stApp {
-      background: #F2F5F0 !important;
-      color: #263A35 !important;
-      font-family: Inter, "Segoe UI", Arial, sans-serif !important;
-    }
-    [data-testid="stMain"], [data-testid="stMainBlockContainer"] {
-      color: #263A35 !important;
-      font-family: Inter, "Segoe UI", Arial, sans-serif !important;
-    }
-    [data-testid="stMain"] [data-testid="stMarkdownContainer"] p,
-    [data-testid="stMain"] [data-testid="stMarkdownContainer"] li,
-    [data-testid="stMain"] [data-testid="stCaptionContainer"],
-    [data-testid="stMain"] [data-testid="stWidgetLabel"] {
-      color: #5D7068 !important;
-    }
-    [data-testid="stMain"] h1, [data-testid="stMain"] h2,
-    [data-testid="stMain"] h3, [data-testid="stMain"] h4,
-    [data-testid="stMain"] [data-testid="stHeading"] {
-      color: #263A35 !important;
-      font-family: Inter, "Segoe UI", Arial, sans-serif !important;
-      letter-spacing: -.02em !important;
-    }
-    [data-testid="stSidebar"] {
-      background: linear-gradient(180deg, #203D36 0%, #294B41 100%) !important;
-      border-right: 1px solid rgba(255,255,255,.12) !important;
-    }
-    [data-testid="stSidebar"] *,
-    [data-testid="stSidebar"] p,
-    [data-testid="stSidebar"] label,
-    [data-testid="stSidebar"] [data-testid="stCaptionContainer"] {
-      color: #EAF1E9 !important;
-    }
-    [data-testid="stSidebarNav"] a,
-    [data-testid="stSidebarNavLink"] {
-      color: #EAF1E9 !important;
-      border-color: transparent !important;
-      border-radius: 10px !important;
-    }
-    [data-testid="stSidebarNav"] a p,
-    [data-testid="stSidebarNavLink"] p { color: inherit !important; }
-    [data-testid="stSidebarNav"] a:hover,
-    [data-testid="stSidebarNavLink"]:hover {
-      background: rgba(169,199,183,.15) !important;
-      border-color: rgba(169,199,183,.24) !important;
-      color: #FFFFFF !important;
-    }
-    [data-testid="stSidebarNav"] a[aria-current="page"],
-    [data-testid="stSidebarNavLink"][aria-current="page"] {
-      background: #4F8F83 !important;
-      border-color: rgba(255,255,255,.22) !important;
-      box-shadow: inset 3px 0 0 #D1DDC9 !important;
-      color: #FFFFFF !important;
-    }
-    [data-testid="stSidebarNav"] a[aria-current="page"] p,
-    [data-testid="stSidebarNavLink"][aria-current="page"] p { color: #FFFFFF !important; }
-    [data-testid="stSidebarNavSeparator"],
-    [data-testid="stSidebarNav"] [data-testid="stSidebarNavSeparator"] {
-      border-color: rgba(234,241,233,.18) !important;
-    }
-    [data-testid="stSidebar"] [data-testid="stIconMaterial"] { color: #BBD4C4 !important; }
-    [data-testid="stMain"] [data-testid="stMetric"],
-    [data-testid="stMain"] [data-testid="stVerticalBlockBorderWrapper"],
-    [data-testid="stMain"] [data-testid="stExpander"],
-    [data-testid="stMain"] [data-testid="stForm"] {
-      background: rgba(255,255,255,.96) !important;
-      border: 1px solid rgba(48,82,69,.15) !important;
-      border-radius: 15px !important;
-      box-shadow: 0 8px 24px rgba(35,61,49,.05) !important;
-      color: #263A35 !important;
-    }
-    [data-testid="stMain"] [data-testid="stMetricLabel"],
-    [data-testid="stMain"] [data-testid="stMetricLabel"] *,
-    [data-testid="stMain"] [data-testid="stMetricDelta"] { color: #5D7068 !important; }
-    [data-testid="stMain"] [data-testid="stMetricValue"],
-    [data-testid="stMain"] [data-testid="stMetricValue"] * { color: #356F63 !important; }
-    [data-testid="stMain"] input,
-    [data-testid="stMain"] textarea,
-    [data-testid="stMain"] [data-baseweb="select"] > div,
-    [data-testid="stMain"] [data-baseweb="input"] > div,
-    [data-testid="stMain"] [data-baseweb="textarea"] > div {
-      color: #263A35 !important;
-      background: #FFFFFF !important;
-      border-color: rgba(48,82,69,.24) !important;
-      border-radius: 10px !important;
-    }
-    [data-testid="stMain"] input::placeholder,
-    [data-testid="stMain"] textarea::placeholder { color: #788981 !important; opacity: 1 !important; }
-    [data-testid="stMain"] div.stButton > button,
-    [data-testid="stMain"] div.stDownloadButton > button,
-    [data-testid="stMain"] [data-testid="stFormSubmitButton"] > button,
-    [data-testid="stMain"] button[kind="primary"] {
-      background: #3F7F72 !important;
-      color: #FFFFFF !important;
-      border: 1px solid #3F7F72 !important;
-      border-radius: 10px !important;
-      font-weight: 650 !important;
-      box-shadow: 0 5px 14px rgba(35,61,49,.11) !important;
-    }
-    [data-testid="stMain"] div.stButton > button:hover,
-    [data-testid="stMain"] div.stDownloadButton > button:hover,
-    [data-testid="stMain"] [data-testid="stFormSubmitButton"] > button:hover,
-    [data-testid="stMain"] button[kind="primary"]:hover {
-      background: #32695F !important;
-      border-color: #32695F !important;
-    }
-    [data-testid="stMain"] [data-testid="stTabs"] button { color: #5D7068 !important; }
-    [data-testid="stMain"] [data-testid="stTabs"] button[aria-selected="true"] { color: #356F63 !important; }
-    [data-testid="stMain"] a { color: #356F63 !important; }
-    [data-testid="stMain"] [data-testid="stProgress"] { background: #DFE8DF !important; }
-    [data-testid="stMain"] [data-testid="stProgress"] > div > div {
-      background: linear-gradient(90deg, #4F8F83, #A9C7B7) !important;
-    }
-    [data-testid="stMain"] [data-testid="stAlert"] {
-      background: #FFFFFF !important;
-      border: 1px solid rgba(48,82,69,.17) !important;
-      border-radius: 12px !important;
-    }
-    [data-testid="stMain"] [class*="st-key-ar-head-"] {
-      background-image: linear-gradient(112deg, #203D36 0%, #35665A 100%) !important;
-      border: 1px solid rgba(169,199,183,.30) !important;
-      box-shadow: 0 16px 36px rgba(35,61,49,.13) !important;
-    }
-    [data-testid="stMain"] [class*="st-key-ar-head-"] h1,
-    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-title {
-      color: #FFFFFF !important;
-      -webkit-text-fill-color: #FFFFFF !important;
-    }
-    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-copy {
-      color: #E6F0E9 !important;
-      -webkit-text-fill-color: #E6F0E9 !important;
-    }
-    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-kicker,
-    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-kicker *,
-    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-meta,
-    [data-testid="stMain"] [class*="st-key-ar-head-"] .ar-page-meta * {
-      color: #C8E0D1 !important;
-      -webkit-text-fill-color: #C8E0D1 !important;
-    }
-    [data-testid="stMain"] .ar-page-dot { background: #D1DDC9 !important; }
-    [data-testid="stMain"] .ar-sec-overline { color: #3F7F72 !important; }
-    [data-testid="stMain"] [data-testid="stDataFrame"],
-    [data-testid="stMain"] [data-testid="stTable"],
-    [data-testid="stMain"] [data-testid="stPlotlyChart"],
-    [data-testid="stMain"] [data-testid="stVegaLiteChart"],
-    [data-testid="stMain"] [data-testid="stPydeckChart"] {
-      border-color: rgba(48,82,69,.15) !important;
-      border-radius: 13px !important;
-    }
-    :focus-visible { outline: 2px solid #8BB9A5 !important; outline-offset: 2px !important; }
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-
-# AI_RESILIENCE — Coastal Sage component harmonisation.
-# These final selectors cover page-specific HTML components as well as native
-# Streamlit widgets, so the visual identity remains consistent across every route.
-st.markdown(
-    """
-    <style>
-    /* Shared custom cards and information panels */
-    [data-testid="stMain"] .ar-explorer-card,
-    [data-testid="stMain"] .disaster-card,
-    [data-testid="stMain"] .disaster-result,
-    [data-testid="stMain"] .probability-panel,
-    [data-testid="stMain"] .concept-note,
-    [data-testid="stMain"] .smart-panel,
-    [data-testid="stMain"] .wf-step,
-    [data-testid="stMain"] .ar-signal > div,
-    [data-testid="stMain"] .ar-threat,
-    [data-testid="stMain"] .ar-tile {
-      border-color: rgba(48,82,69,.20) !important;
-      box-shadow: 0 8px 24px rgba(35,61,49,.06) !important;
-    }
-    [data-testid="stMain"] .ar-explorer-card,
-    [data-testid="stMain"] .disaster-card,
-    [data-testid="stMain"] .disaster-result,
-    [data-testid="stMain"] .probability-panel,
-    [data-testid="stMain"] .concept-note,
-    [data-testid="stMain"] .smart-panel,
-    [data-testid="stMain"] .wf-step {
-      background: #FFFFFF !important;
-      color: #263A35 !important;
-    }
-    [data-testid="stMain"] .ar-explorer-card h1,
-    [data-testid="stMain"] .ar-explorer-card h2,
-    [data-testid="stMain"] .ar-explorer-card h3,
-    [data-testid="stMain"] .disaster-card-title,
-    [data-testid="stMain"] .smart-panel h3,
-    [data-testid="stMain"] .wf-step strong {
-      color: #263A35 !important;
-    }
-    [data-testid="stMain"] .ar-explorer-card p,
-    [data-testid="stMain"] .ar-explorer-lede,
-    [data-testid="stMain"] .disaster-card-copy,
-    [data-testid="stMain"] .disaster-result-copy,
-    [data-testid="stMain"] .concept-note p,
-    [data-testid="stMain"] .smart-panel p,
-    [data-testid="stMain"] .mitigation-ml-copy,
-    [data-testid="stMain"] .mitigation-ml-copy p,
-    [data-testid="stMain"] .mitigation-ml-copy li {
-      color: #5D7068 !important;
-    }
-    [data-testid="stMain"] .ar-explorer-group,
-    [data-testid="stMain"] .ar-overline,
-    [data-testid="stMain"] .disaster-kicker,
-    [data-testid="stMain"] .probability-label,
-    [data-testid="stMain"] .mitigation-ml-kicker,
-    [data-testid="stMain"] .wf-kicker {
-      color: #3F7F72 !important;
-    }
-    [data-testid="stMain"] .disaster-result-label,
-    [data-testid="stMain"] .disaster-result-value,
-    [data-testid="stMain"] .probability-value {
-      color: #356F63 !important;
-    }
-    [data-testid="stMain"] .disaster-pill,
-    [data-testid="stMain"] .ar-explorer-meta,
-    [data-testid="stMain"] .ar-cine-chips span {
-      background: #E7EEE7 !important;
-      border-color: rgba(48,82,69,.18) !important;
-      color: #40564F !important;
-    }
-    [data-testid="stMain"] .disaster-empty,
-    [data-testid="stMain"] .probability-unavailable {
-      background: #F7F9F5 !important;
-      border-color: rgba(48,82,69,.18) !important;
-      color: #5D7068 !important;
-    }
-
-    /* Custom module mastheads: one consistent forest/sage treatment */
-    [data-testid="stMain"] .disaster-hero,
-    [data-testid="stMain"] .wf-hero,
-    [data-testid="stMain"] .air-hero {
-      background-color: #203D36 !important;
-      border-color: rgba(169,199,183,.30) !important;
-      box-shadow: 0 16px 36px rgba(35,61,49,.12) !important;
-    }
-    [data-testid="stMain"] .disaster-title,
-    [data-testid="stMain"] .wf-title,
-    [data-testid="stMain"] .air-hero h2 {
-      color: #FFFFFF !important;
-    }
-    [data-testid="stMain"] .disaster-subtitle,
-    [data-testid="stMain"] .wf-copy,
-    [data-testid="stMain"] .air-hero p {
-      color: #E6F0E9 !important;
-    }
-    [data-testid="stMain"] .disaster-step,
-    [data-testid="stMain"] .wf-steps {
-      border-color: rgba(169,199,183,.24) !important;
-    }
-    [data-testid="stMain"] .disaster-step,
-    [data-testid="stMain"] .wf-step:hover {
-      background: #E7EEE7 !important;
-      color: #263A35 !important;
-    }
-
-    /* Homepage: preserve cinematic photography, harmonise its supporting UI */
-    [data-testid="stMain"] .ar-cine-scrim {
-      background: linear-gradient(90deg, rgba(21,48,39,.82), rgba(24,58,48,.34) 62%, rgba(24,58,48,.18)) !important;
-    }
-    [data-testid="stMain"] .ar-cine-kicker,
-    [data-testid="stMain"] .ar-cine-coord,
-    [data-testid="stMain"] .ar-cine-foot,
-    [data-testid="stMain"] .ar-cine-sub,
-    [data-testid="stMain"] .ar-cine-desc {
-      color: #F1F6EF !important;
-    }
-    [data-testid="stMain"] .ar-live-dot { background: #A9C7B7 !important; }
-    [data-testid="stMain"] .ar-scroll-line { background: #A9C7B7 !important; }
-    [data-testid="stMain"] .ar-story h2 { color: #263A35 !important; }
-    [data-testid="stMain"] .ar-story p,
-    [data-testid="stMain"] .ar-fineprint { color: #5D7068 !important; }
-    [data-testid="stMain"] .ar-signal {
-      background: #FFFFFF !important;
-      border-color: rgba(48,82,69,.18) !important;
-    }
-    [data-testid="stMain"] .ar-signal strong { color: #356F63 !important; }
-    [data-testid="stMain"] .ar-signal span,
-    [data-testid="stMain"] .ar-signal p { color: #5D7068 !important; }
-    [data-testid="stMain"] .st-key-ar-hero-ctas [data-testid="stButton"] > button[kind="secondary"] {
-      background: #FFFFFF !important;
-      color: #356F63 !important;
-      border-color: #A9C7B7 !important;
-    }
-
-    /* Sidebar-specific widgets and assistant chat remain legible */
-    [data-testid="stSidebar"] .stButton > button {
-      background: rgba(169,199,183,.14) !important;
-      color: #F4F7F2 !important;
-      border: 1px solid rgba(169,199,183,.30) !important;
-    }
-    [data-testid="stSidebar"] .stButton > button:hover {
-      background: rgba(169,199,183,.24) !important;
-    }
-    [data-testid="stMain"] [data-testid="stChatMessage"] {
-      background: #FFFFFF !important;
-      border: 1px solid rgba(48,82,69,.16) !important;
-      border-radius: 14px !important;
-      color: #263A35 !important;
-    }
-    [data-testid="stMain"] [data-testid="stChatMessage"] [data-testid="stMarkdownContainer"],
-    [data-testid="stMain"] [data-testid="stChatMessage"] p,
-    [data-testid="stMain"] [data-testid="stChatMessage"] li {
-      color: #40564F !important;
-    }
-    [data-testid="stMain"] [data-testid="stChatInput"] {
-      background: #FFFFFF !important;
-      border-color: rgba(48,82,69,.24) !important;
-    }
-    [data-testid="stMain"] [data-testid="stChatInput"] textarea {
-      color: #263A35 !important;
-      background: #FFFFFF !important;
-    }
-
-    /* Tables, file uploaders, select menus and secondary buttons */
-    [data-testid="stMain"] [data-testid="stFileUploader"] section {
-      background: #F7F9F5 !important;
-      border-color: rgba(48,82,69,.24) !important;
-    }
-    [data-testid="stMain"] [data-testid="stFileUploader"] label,
-    [data-testid="stMain"] [data-testid="stFileUploader"] small {
-      color: #5D7068 !important;
-    }
-    [data-testid="stMain"] [data-baseweb="popover"] [role="listbox"],
-    [data-testid="stMain"] [data-baseweb="menu"] {
-      background: #FFFFFF !important;
-      border: 1px solid rgba(48,82,69,.18) !important;
-    }
-    [data-testid="stMain"] [role="option"] { color: #263A35 !important; }
-    [data-testid="stMain"] [role="option"]:hover,
-    [data-testid="stMain"] [aria-selected="true"][role="option"] {
-      background: #E7EEE7 !important;
-      color: #263A35 !important;
-    }
-    [data-testid="stMain"] button[kind="secondary"] {
-      background: #FFFFFF !important;
-      color: #356F63 !important;
-      border: 1px solid #A9C7B7 !important;
-    }
-    [data-testid="stMain"] button[kind="secondary"]:hover {
-      background: #E7EEE7 !important;
-      border-color: #4F8F83 !important;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-# AI_RESILIENCE — final sidebar legibility pass (Coastal Sage).
-# Keep this block last so older page-level theme rules cannot wash out navigation text.
-st.markdown(
-    """
-    <style>
-    /* Stable dark sidebar with high-contrast text */
-    [data-testid="stSidebar"],
-    [data-testid="stSidebar"] > div,
-    [data-testid="stSidebar"] [data-testid="stSidebarContent"] {
-      background: #163D36 !important;
-      color: #F7FAF7 !important;
-    }
-    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"],
-    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
-    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] li,
-    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] span,
-    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] strong,
-    [data-testid="stSidebar"] [data-testid="stCaptionContainer"],
-    [data-testid="stSidebar"] [data-testid="stCaptionContainer"] *,
-    [data-testid="stSidebar"] label,
-    [data-testid="stSidebar"] [data-testid="stWidgetLabel"] *,
-    [data-testid="stSidebar"] [data-testid="stText"],
-    [data-testid="stSidebar"] .stRadio label,
-    [data-testid="stSidebar"] .stCheckbox label {
-      color: #F1F7F2 !important;
-      -webkit-text-fill-color: #F1F7F2 !important;
-      opacity: 1 !important;
-    }
-    [data-testid="stSidebar"] [data-testid="stWidgetLabel"] p,
-    [data-testid="stSidebar"] [data-testid="stCaptionContainer"] {
-      color: #C8DCCF !important;
-      -webkit-text-fill-color: #C8DCCF !important;
-      font-size: .84rem !important;
-      line-height: 1.45 !important;
-    }
-
-    /* Navigation labels: larger, heavier, and consistently visible */
-    [data-testid="stSidebarNav"] a,
-    [data-testid="stSidebarNavLink"],
-    [data-testid="stSidebarNav"] a p,
-    [data-testid="stSidebarNavLink"] p,
-    [data-testid="stSidebarNav"] a span,
-    [data-testid="stSidebarNavLink"] span {
-      color: #F7FAF7 !important;
-      -webkit-text-fill-color: #F7FAF7 !important;
-      opacity: 1 !important;
-      font-size: .94rem !important;
-      font-weight: 600 !important;
-      line-height: 1.35 !important;
-      letter-spacing: .005em !important;
-      text-shadow: none !important;
-    }
-    [data-testid="stSidebarNav"] a,
-    [data-testid="stSidebarNavLink"] {
-      min-height: 2.55rem !important;
-      padding: .58rem .72rem !important;
-      margin: .12rem .25rem !important;
-      border: 1px solid transparent !important;
-      border-radius: 10px !important;
-      background: transparent !important;
-    }
-    [data-testid="stSidebarNav"] a:hover,
-    [data-testid="stSidebarNavLink"]:hover {
-      background: rgba(169,199,183,.18) !important;
-      border-color: rgba(210,231,218,.28) !important;
-    }
-    [data-testid="stSidebarNav"] a[aria-current="page"],
-    [data-testid="stSidebarNavLink"][aria-current="page"] {
-      background: #4F8F83 !important;
-      border-color: rgba(255,255,255,.42) !important;
-      box-shadow: inset 3px 0 0 #E5F0E6, 0 2px 8px rgba(0,0,0,.12) !important;
-    }
-    [data-testid="stSidebarNav"] a[aria-current="page"] *,
-    [data-testid="stSidebarNavLink"][aria-current="page"] * {
-      color: #FFFFFF !important;
-      -webkit-text-fill-color: #FFFFFF !important;
-      font-weight: 750 !important;
-      opacity: 1 !important;
-    }
-    [data-testid="stSidebarNav"] [data-testid="stSidebarNavSeparator"],
-    [data-testid="stSidebarNavSeparator"] {
-      border-color: rgba(221,237,226,.24) !important;
-    }
-    [data-testid="stSidebar"] [data-testid="stIconMaterial"],
-    [data-testid="stSidebar"] svg {
-      color: #D2E5D8 !important;
-      opacity: 1 !important;
-    }
-
-    /* Sidebar buttons and expand/collapse controls */
-    [data-testid="stSidebar"] .stButton > button,
-    [data-testid="stSidebar"] button {
-      color: #F7FAF7 !important;
-      -webkit-text-fill-color: #F7FAF7 !important;
-      font-weight: 650 !important;
-      opacity: 1 !important;
-    }
-    [data-testid="stSidebar"] .stButton > button {
-      background: rgba(169,199,183,.15) !important;
-      border: 1px solid rgba(210,231,218,.34) !important;
-    }
-    [data-testid="stSidebar"] .stButton > button:hover {
-      background: rgba(169,199,183,.25) !important;
-      border-color: rgba(230,243,233,.55) !important;
-    }
-    [data-testid="stSidebar"] input,
-    [data-testid="stSidebar"] textarea,
-    [data-testid="stSidebar"] [data-baseweb="select"] * {
-      color: #F7FAF7 !important;
-      -webkit-text-fill-color: #F7FAF7 !important;
-    }
-    [data-testid="stSidebar"] [data-baseweb="select"] > div {
-      background: rgba(255,255,255,.10) !important;
-      border-color: rgba(210,231,218,.35) !important;
-    }
-    @media (max-width: 640px) {
-      [data-testid="stSidebarNav"] a,
-      [data-testid="stSidebarNavLink"] {
-        min-height: 2.7rem !important;
-        font-size: .96rem !important;
-      }
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
