@@ -172,22 +172,16 @@ with st.expander("Model, retrieval and safety notes"):
         "substitute a pre-written answer."
     )
 
-# ---------------------------------------------------------------------------
-# Sidebar controls
-# ---------------------------------------------------------------------------
-with st.sidebar:
-    st.subheader("Conversation")
-    if st.button("New conversation", use_container_width=True):
+# Conversation actions stay in the page content so the global navigation
+# remains identical while moving between workspaces.
+conversation_col, action_col = st.columns([3, 1], gap="medium")
+with conversation_col:
+    st.caption(f"{len(st.session_state.assistant_messages)} messages in this conversation")
+with action_col:
+    if st.button("New conversation", key="assistant_new_conversation", use_container_width=True):
         st.session_state.assistant_messages = []
         st.session_state.assistant_pending = None
         st.rerun()
-    st.caption(f"{len(st.session_state.assistant_messages)} messages in this conversation")
-    st.divider()
-    st.caption("Suggested prompts")
-    for index, suggestion in enumerate(SUGGESTIONS):
-        if st.button(suggestion, key=f"assistant_suggestion_{index}", use_container_width=True):
-            st.session_state.assistant_pending = suggestion
-            st.rerun()
 
 if not st.session_state.assistant_messages:
     st.markdown(
