@@ -449,13 +449,21 @@ availability_rows = sorted(
     hazard_layer_availability(active_hazard),
     key=lambda row: (not row["Selected"], row["Hazard"]),
 )
+availability_columns = [
+    "Hazard",
+    "Selected",
+    "Hazard footprint / modelled context",
+    "Context layer",
+    "Footprint scope / limitation",
+]
+# Keep the table stable when no hazards are returned and align its columns
+# with the authoritative schema produced by hazard_layer_availability().
+availability_frame = pd.DataFrame(availability_rows).reindex(columns=availability_columns)
 display_dataframe(
-    pd.DataFrame(availability_rows)[
-        ["Hazard", "Selected", "Validated hazard footprint", "Context layer", "Why no footprint is shown"]
-    ],
+    availability_frame,
     hide_index=True,
     width="stretch",
-    alt="Availability of validated hazard footprints and context layers for all ten workflow hazards",
+    alt="Availability of hazard footprints, modelled context, and context layers for all workflow hazards",
 )
 st.caption(
     "No validated, licence-cleared hazard footprint is currently available for any of the ten workflow hazards. "
