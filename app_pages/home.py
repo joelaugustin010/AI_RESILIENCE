@@ -150,9 +150,9 @@ st.markdown(
        roughly eight seconds, with a long crossfade and a restrained push-in. */
     @keyframes arSlideCycle {
       0%   { opacity: 1; transform: scale(1.02) translate3d(0, 0, 0); }
-      21%  { opacity: 1; transform: scale(1.055) translate3d(-.6%, -.4%, 0); }
-      28%  { opacity: 0; transform: scale(1.075) translate3d(-.9%, -.6%, 0); }
-      100% { opacity: 0; transform: scale(1.075) translate3d(-.9%, -.6%, 0); }
+      10%  { opacity: 1; transform: scale(1.045) translate3d(-.35%, -.2%, 0); }
+      14%  { opacity: 0; transform: scale(1.06) translate3d(-.55%, -.35%, 0); }
+      100% { opacity: 0; transform: scale(1.06) translate3d(-.55%, -.35%, 0); }
     }
     @keyframes arRise {
       from { opacity: 0; transform: translateY(16px); }
@@ -190,7 +190,7 @@ st.markdown(
        outranks a single class selector, so both media layers are scoped and
        pinned to cover explicitly. */
     .ar-cine-hero .ar-cine-slide {
-      z-index: 0;
+      z-index: 1;
       object-fit: cover !important;
       opacity: 0;
       filter: saturate(.96) contrast(1.04);
@@ -206,7 +206,7 @@ st.markdown(
     .ar-cine-hero .ar-slide-g { object-position: center 50%; animation-delay: -16s; }
     .ar-cine-hero .ar-slide-h { object-position: center 50%; animation-delay: -8s; }
     .ar-cine-hero .ar-cine-video {
-      z-index: 1;
+      z-index: 0;
       object-fit: cover !important;
       object-position: center;
     }
