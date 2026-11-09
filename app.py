@@ -105,8 +105,7 @@ pages = {
     ],
 }
 
-# Keep Streamlit's route registry for deep links and page state, but render the
-# user-facing module chooser below so navigation is part of the product chrome.
+# Render the grouped Streamlit page registry directly in the left sidebar.
 page = st.navigation(pages, position="sidebar")
 
 # A lightweight, application-wide design system. Keeping it local means the
