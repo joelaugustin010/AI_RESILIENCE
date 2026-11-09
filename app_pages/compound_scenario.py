@@ -7,15 +7,17 @@ from datetime import date
 import streamlit as st
 
 from src.compound_hazard_assessment import assess_compound_scenario
+from src.hazard_registry import WORKFLOW_HAZARDS
+from src.evidence_readiness import evidence_readiness_for_hazards
 from src.ui_theme import page_header
 
 
 page_header(
     "AI RESILIENCE · COMPOUND HAZARD WORKSPACE",
-    "Kochi Cyclone + Flood Resilience Workspace",
-    "One integrated workspace for rainfall, river flooding, cyclone exposure, compound "
-    "pathways and service continuity.",
-    meta=("Kochi · Ernakulam", "Cyclone + flood", "Research prototype"),
+    "Kochi Multi-Hazard Resilience Workspace",
+    "Select any registered disaster or scientifically appropriate combination, review "
+    "evidence readiness, and identify the data needed for safer resilience planning.",
+    meta=("Kochi · Ernakulam", "10 registered hazards", "Research prototype"),
     accent="violet",
     key="compound-scenario",
 )
@@ -38,7 +40,16 @@ st.markdown(
 with st.form("compound_scenario_form"):
     st.subheader("1. Define the event")
     area = st.text_input("Study area", value="Kochi / Ernakulam")
-    hazards = st.multiselect("Hazards in this scenario", ["Flood", "Cyclone"], default=["Flood", "Cyclone"])
+    hazards = st.multiselect(
+        "Hazards in this scenario",
+        options=list(WORKFLOW_HAZARDS),
+        default=["Flood", "Cyclone"],
+        help="Choose one registered hazard or a combination. Compound interaction is reviewed only where the registry defines the components.",
+    )
+    custom_disaster = st.text_input(
+        "Additional disaster description (optional)",
+        placeholder="Describe a disaster not covered by the registered list",
+    )
     evidence_type = st.selectbox(
         "Evidence type",
         ["Hypothetical scenario", "Historical event", "Current sourced observations", "Official forecast product"],
@@ -106,6 +117,7 @@ if submitted:
         result = assess_compound_scenario({
             "area": area,
             "hazards": hazards,
+            "custom_disaster": custom_disaster,
             "evidence_type": evidence_type,
             "period_start": period_start,
             "period_end": period_end,
@@ -134,6 +146,20 @@ if submitted:
         st.error(str(exc))
     else:
         st.divider()
+        st.info(
+            "ML action-effect ranking is currently withheld because no independently "
+            "validated, provenance-complete intervention outcome panel is available. "
+            "This workspace does not rank precautions by claimed damage reduction."
+        )
+        st.subheader("Evidence readiness by disaster")
+        for track in evidence_readiness_for_hazards(hazards):
+            with st.expander(track["title"], expanded=False):
+                st.caption(f"Evidence status: {track['status']}")
+                st.write("**Available evidence:** " + track["available"])
+                st.write("**Current gap:** " + track["gap"])
+                st.write("**Next evidence needed:** " + track["next"])
+                for source in track["sources"]:
+                    st.markdown(f"- {source}")
         st.subheader("Integrated assessment")
         st.info("Status: scenario review only — not a validated forecast.")
         if result["compound"]:
