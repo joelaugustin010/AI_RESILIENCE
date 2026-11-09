@@ -105,9 +105,8 @@ pages = {
     ],
 }
 
-# Keep Streamlit's route registry for deep links and page state, but render the
-# user-facing module chooser below so navigation is part of the product chrome.
-page = st.navigation(pages, position="hidden")
+# Render the grouped Streamlit page registry directly in the left sidebar.
+page = st.navigation(pages, position="sidebar")
 
 # A lightweight, application-wide design system. Keeping it local means the
 # deployment needs no external asset or build step, and every analytical page
@@ -1426,50 +1425,6 @@ try:  # pragma: no cover - presentation only
     alt.themes.enable("ai_resilience")
 except Exception:  # pragma: no cover - optional dependency
     pass
-
-
-with st.container(key="ar-top-navigation"):
-    brand, home_col, explore_col, env_col, disaster_col, plan_col, about_col = st.columns(
-        [1.55, .72, 1.18, 1.5, 1.35, 1.5, .9], gap="small"
-    )
-    with brand:
-        with st.container(key="ar-brand"):
-            st.markdown(
-                f"AI_RESILIENCE<span>Environmental intelligence</span><small>Viewing: {html.escape(page.title)}</small>",
-                unsafe_allow_html=True,
-            )
-    with home_col:
-        st.page_link("app_pages/home.py", label="Home", icon=":material/home:")
-    with explore_col:
-        with st.popover("Explore Modules", icon=":material/explore:", use_container_width=True):
-            st.caption("Explore the full AI_RESILIENCE workspace")
-            st.page_link("app_pages/module_explorer.py", label="Open module explorer", icon=":material/dashboard:")
-            st.page_link("app_pages/kochi_map.py", label="Kochi Map", icon=":material/map:")
-            st.page_link("app_pages/air_pollution.py", label="Air Pollution", icon=":material/factory:")
-            st.page_link("app_pages/data_readiness.py", label="Data & Model Transparency", icon=":material/fact_check:")
-            st.page_link("app_pages/hazard_model_lab.py", label="Hazard Model Lab", icon=":material/model_training:")
-    with env_col:
-        with st.popover("Environmental Intelligence", icon=":material/eco:", use_container_width=True):
-            st.caption("Observe environmental signals and local context")
-            st.page_link("app_pages/kochi_map.py", label="Kochi spatial intelligence", icon=":material/map:")
-            st.page_link("app_pages/air_pollution.py", label="Air quality evidence", icon=":material/air:")
-            st.page_link("app_pages/disaster_probability.py", label="Multi-hazard evidence review", icon=":material/analytics:")
-            st.page_link("app_pages/hospital_vulnerability.py", label="Public health vulnerability", icon=":material/local_hospital:")
-    with disaster_col:
-        with st.popover("Disaster Resilience", icon=":material/shield:", use_container_width=True):
-            st.caption("Assess hazards, scenarios and critical dependencies")
-            st.page_link("app_pages/disaster_assistant.py", label="Disaster Intelligence Assistant", icon=":material/psychology_alt:")
-            st.page_link("app_pages/decision_workflow.py", label="Decision Workflow", icon=":material/assignment_turned_in:")
-            st.page_link("app_pages/compound_scenario.py", label="Cyclone + Flood", icon=":material/thunderstorm:")
-            st.page_link("app_pages/hazard_model_lab.py", label="Hazard Model Lab", icon=":material/model_training:")
-    with plan_col:
-        with st.popover("Mitigation & Planning", icon=":material/engineering:", use_container_width=True):
-            st.caption("Move from evidence to practical action")
-            st.page_link("app_pages/mitigation_planner.py", label="Mitigation Budget", icon=":material/account_balance_wallet:")
-            st.page_link("app_pages/smart_mitigation_design.py", label="Smart Mitigation Design Studio", icon=":material/design_services:")
-            st.page_link("app_pages/decision_workflow.py", label="Decision Workflow", icon=":material/assignment_turned_in:")
-    with about_col:
-        st.markdown('<a href="/?about=sdgs#designed-for-responsible-environmental-intelligence">About / SDGs</a>', unsafe_allow_html=True)
 
 
 # The homepage carries its own cinematic masthead; the shared breadcrumb strip
