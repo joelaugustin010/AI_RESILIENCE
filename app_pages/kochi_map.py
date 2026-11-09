@@ -980,13 +980,17 @@ if active_hazard is None or active_hazard in landcover_hazards:
                 f"Rendered source classes: {', '.join(str(code) for code in landcover_processing['rendered_class_codes'])}."
             )
             if show_landcover:
-                landcover_image = landcover_context["image_base64"]
                 landcover_bounds = landcover_processing["bounds_epsg4326"]
                 deck_layers.append(
                     pdk.Layer(
                         "BitmapLayer",
                         id="worldcover-2021-context",
-                        image=f"data:image/png;base64,{landcover_image}",
+                        # PyDeck treats image strings as JavaScript expressions. A
+                        # data:image URI therefore reaches Deck.gl's expression
+                        # parser (which fails at the colon in "data:image"). Pass
+                        # the local asset path; PyDeck safely serializes it as a
+                        # literal data URL, as the JRC bitmap layer already does.
+                        image=str(WORLDCOVER_PREVIEW_PATH),
                         bounds=[
                             landcover_bounds[0],
                             landcover_bounds[1],
