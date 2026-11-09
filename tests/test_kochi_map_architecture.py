@@ -1,5 +1,6 @@
 """Regression checks for the two-map Kochi command-centre architecture."""
 from pathlib import Path
+import re
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = (ROOT / "app_pages" / "kochi_map.py").read_text(encoding="utf-8")
@@ -15,7 +16,7 @@ def test_map_page_uses_a_split_command_centre_layout():
 
 def test_worldcover_is_not_added_to_the_hazard_infrastructure_map():
     assert 'context_deck_layers.append(' in SOURCE
-    assert 'deck_layers.append(\n                    pdk.Layer(\n                        "BitmapLayer"' not in SOURCE
+    assert not re.search(r'(?<!context_)deck_layers\.append\(\s*pdk\.Layer\(\s*"BitmapLayer"', SOURCE)
     assert 'id="worldcover-2021-context"' in SOURCE
     assert 'context_map_slot.pydeck_chart(' in SOURCE
     assert 'key="kochi_worldcover_context_map"' in SOURCE
@@ -25,7 +26,7 @@ def test_jrc_flood_context_remains_on_the_hazard_map_only():
     assert 'deck_layers.append(\n                    build_jrc_preview_layer(' in SOURCE
     worldcover_block = SOURCE.split('if show_landcover:', 1)[1].split('worldcover_class_rows =', 1)[0]
     assert 'context_deck_layers.append(' in worldcover_block
-    assert 'deck_layers.append(' not in worldcover_block
+    assert not re.search(r'(?<!context_)deck_layers\.append\(', worldcover_block)
 
 
 def test_worldcover_preview_is_validated_without_base64_expression_payloads():

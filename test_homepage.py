@@ -41,10 +41,24 @@ def test_home_is_the_default_page_with_the_cinematic_hero():
 
     # Assert the current homepage contract rather than obsolete aerial-hero copy.
     assert 'class="ar-cine-hero"' in html
-    assert "AI <span>RESILIENCE</span>" in html
+    assert 'class="ar-cine-feature-panel"' in html
+    assert "AI<span>_RESILIENCE</span>" in html
+    assert "Environmental intelligence · Kochi, Kerala" in html
     assert "Understanding Kochi. Preparing for risk. Strengthening urban resilience." in html
     assert "hero-kerala-fallback.jpg" in html
     assert "Kochi · Environmental &amp; disaster intelligence" in html
+    for photo in (
+        "kochi/waterfront.jpg",
+        "kochi/backwaters.jpg",
+        "kochi/mangalavanam.jpg",
+        "kochi/fishing-nets.jpg",
+        "kochi/coast.jpg",
+        "kochi/industrial-coast.jpg",
+        "kochi/maradu.jpg",
+        "kochi/water-metro.jpg",
+    ):
+        assert f"app/static/images/{photo}" in html
+    assert "animation-delay: -56s" in html
 
     labels = [button.label for button in app.button]
     assert "Explore Intelligence" in labels
