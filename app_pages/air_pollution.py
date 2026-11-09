@@ -228,24 +228,24 @@ def audit_daily_extract(data: pd.DataFrame) -> tuple[dict, pd.DataFrame]:
 st.markdown(
     """
     <style>
-    /* Air-quality module: Coastal Intelligence surfaces and readable teal accents. */
+    /* Air-quality module: cyan accent and quiet industrial glass panels. */
     .air-nav {
       display: flex;
       flex-wrap: wrap;
       gap: .45rem;
       padding: .7rem 0 .35rem;
       margin: .1rem 0 1.1rem;
-      border-bottom: 1px solid rgba(23, 78, 85, .14);
+      border-bottom: 1px solid rgba(130, 190, 199, .14);
     }
     .air-nav a {
       display: inline-flex;
       align-items: center;
       min-height: 1.9rem;
       padding: .3rem .7rem;
-      border: 1px solid rgba(23, 78, 85, .18);
+      border: 1px solid rgba(92, 200, 232, .20);
       border-radius: 999px;
-      color: #174E55 !important;
-      background: #FFFFFF;
+      color: #b9e6f2 !important;
+      background: rgba(9, 33, 48, .62);
       text-decoration: none !important;
       font-size: .75rem;
       font-weight: 650;
@@ -253,9 +253,9 @@ st.markdown(
                   color .18s var(--ar-ease), transform .18s var(--ar-ease);
     }
     .air-nav a:hover {
-      background: #DCE7E8;
-      border-color: rgba(23, 78, 85, .38);
-      color: #174E55 !important;
+      background: rgba(92, 200, 232, .12);
+      border-color: rgba(92, 200, 232, .44);
+      color: #e4fbff !important;
       transform: translateY(-1px);
     }
     .disaster-hero {
@@ -264,11 +264,11 @@ st.markdown(
       padding: 1.55rem 1.7rem;
       border-radius: 20px;
       background:
-        radial-gradient(ellipse at 90% -20%, rgba(41, 155, 145, .13), transparent 20rem),
-        linear-gradient(120deg, #FFFFFF 0%, #DCE7E8 100%);
-      border: 1px solid rgba(23, 78, 85, .18);
+        radial-gradient(ellipse at 90% -20%, rgba(92, 200, 232, .20), transparent 20rem),
+        linear-gradient(120deg, #071d2c 0%, #0a3446 56%, #0a4b55 100%);
+      border: 1px solid rgba(92, 200, 232, .24);
       box-shadow: var(--ar-shadow-soft);
-      color: #174E55;
+      color: #f2ffff;
       margin: 1rem 0 1.1rem;
     }
     .disaster-hero:after {
@@ -284,14 +284,14 @@ st.markdown(
       pointer-events: none;
     }
     .disaster-kicker {
-      color: #299B91;
+      color: #a8ecf8;
       font-size: .7rem;
       font-weight: 800;
       letter-spacing: .16em;
       text-transform: uppercase;
     }
     .disaster-title {
-      color: #174E55;
+      color: #f4ffff;
       font-size: clamp(1.7rem, 3.2vw, 2.45rem);
       font-weight: 800;
       letter-spacing: -.035em;
@@ -299,14 +299,14 @@ st.markdown(
       margin: .45rem 0 .45rem;
     }
     .disaster-subtitle {
-      color: #52666A;
+      color: #c7e4ea;
       font-size: .98rem;
       line-height: 1.62;
       max-width: 790px;
       margin: 0;
     }
     .disaster-step {
-      color: #299B91;
+      color: #7fdfea;
       font-size: .69rem;
       font-weight: 800;
       letter-spacing: .14em;
@@ -318,17 +318,17 @@ st.markdown(
       padding: .95rem 1rem;
       border: 1px solid rgba(130, 190, 199, .22);
       border-radius: 16px;
-      background: linear-gradient(150deg, #FFFFFF, #DCE7E8);
+      background: linear-gradient(150deg, rgba(15, 44, 60, .95), rgba(9, 30, 44, .95));
       box-shadow: var(--ar-shadow-soft);
     }
     .disaster-card-title {
-      color: #174E55;
+      color: #c8f4f8;
       font-weight: 750;
       font-size: .9rem;
       margin-bottom: .3rem;
     }
     .disaster-card-copy {
-      color: #52666A;
+      color: #9fbec6;
       font-size: .78rem;
       line-height: 1.5;
     }
@@ -336,21 +336,21 @@ st.markdown(
       padding: 1.25rem 1.4rem;
       border-radius: 18px;
       background:
-        radial-gradient(ellipse at 100% 0%, rgba(41, 155, 145, .10), transparent 18rem),
-        linear-gradient(135deg, #FFFFFF, #DCE7E8);
-      border: 1px solid rgba(23, 78, 85, .18);
+        radial-gradient(ellipse at 100% 0%, rgba(92, 200, 232, .12), transparent 18rem),
+        linear-gradient(135deg, rgba(13, 54, 64, .96), rgba(9, 34, 48, .96));
+      border: 1px solid rgba(92, 200, 232, .24);
       box-shadow: var(--ar-shadow-soft);
       margin: 1rem 0 .8rem;
     }
     .disaster-result-label {
-      color: #299B91;
+      color: #9fe6ee;
       font-size: .69rem;
       font-weight: 800;
       letter-spacing: .13em;
       text-transform: uppercase;
     }
     .disaster-result-value {
-      color: #174E55;
+      color: #f3ffff;
       font-size: clamp(1.8rem, 4vw, 2.7rem);
       font-weight: 800;
       letter-spacing: -.04em;
@@ -358,7 +358,7 @@ st.markdown(
       margin: .3rem 0 .25rem;
     }
     .disaster-result-copy {
-      color: #52666A;
+      color: #a9c7cd;
       font-size: .82rem;
       line-height: 1.55;
     }
@@ -366,9 +366,9 @@ st.markdown(
       display: inline-block;
       padding: .2rem .6rem;
       border-radius: 999px;
-      background: #DCE7E8;
-      border: 1px solid rgba(23, 78, 85, .18);
-      color: #174E55;
+      background: rgba(92, 200, 232, .12);
+      border: 1px solid rgba(92, 200, 232, .24);
+      color: #b7f1fa;
       font-size: .71rem;
       font-weight: 700;
     }
@@ -376,8 +376,8 @@ st.markdown(
       padding: 1.2rem 1.3rem;
       border: 1px dashed rgba(92, 200, 232, .32);
       border-radius: 16px;
-      background: #FFFFFF;
-      color: #52666A;
+      background: rgba(9, 33, 48, .55);
+      color: #a9c7cd;
     }
     @media (max-width: 700px) {
       .disaster-hero { padding: 1.2rem 1.15rem; border-radius: 16px; }
@@ -438,10 +438,10 @@ def render_live_air_quality() -> None:
         st.markdown(
             f'<div style="border:3px solid {category["color"]};border-radius:16px;padding:14px 18px;'
             f'background:linear-gradient(90deg,{category["color"]}18,transparent);">'
-            f'<div style="font-size:.82rem;color:#52666A;">{standard} · CAMS/Open-Meteo model estimate</div>'
+            f'<div style="font-size:.82rem;color:#9fbec6;">{standard} · CAMS/Open-Meteo model estimate</div>'
             f'<div style="font-size:2.7rem;font-weight:750;line-height:1.1;">{selected["value"]:g}</div>'
             f'<div style="font-weight:700;color:{category["color"]};">{category["label"]}</div>'
-            f'<div style="font-size:.82rem;color:#52666A;">Kochi model grid · observed {updated_label}</div></div>',
+            f'<div style="font-size:.82rem;color:#9fbec6;">Kochi model grid · observed {updated_label}</div></div>',
             unsafe_allow_html=True,
         )
     top = st.columns(3)
@@ -602,14 +602,14 @@ def _render_scenario_visual_report(values: dict, baseline: dict, hourly: pd.Data
     precaution = HEALTH_INFORMATION.get(concern, {}).get("precautions", "Use official local guidance and avoid treating this scenario as an alert.")
     st.markdown(
         f'<div style="border:1px solid rgba(130,190,199,.28);border-radius:18px;padding:22px;margin:12px 0;'
-        f'background:linear-gradient(135deg,#FFFFFF,#DCE7E8);">'
-        f'<div style="color:#174E55;font-size:.78rem;font-weight:750;letter-spacing:.08em;text-transform:uppercase;">{status}</div>'
-        f'<div style="font-size:1.7rem;font-weight:800;color:#174E55;margin:.25rem 0;">Air-quality scenario report</div>'
-        f'<div style="color:#52666A;"><b>Scenario name:</b> {mode} · <b>Location:</b> {location}</div>'
+        f'background:linear-gradient(135deg,#0b2333,#0b2333);">'
+        f'<div style="color:#5cc8e8;font-size:.78rem;font-weight:750;letter-spacing:.08em;text-transform:uppercase;">{status}</div>'
+        f'<div style="font-size:1.7rem;font-weight:800;color:#f1fbfb;margin:.25rem 0;">Air-quality scenario report</div>'
+        f'<div style="color:#a9c7cd;"><b>Scenario name:</b> {mode} · <b>Location:</b> {location}</div>'
         f'<div style="display:flex;gap:24px;flex-wrap:wrap;margin-top:14px;">'
-        f'<div><div style="color:#52666A;font-size:.78rem;">OVERALL ASSESSMENT</div><div style="font-size:1.25rem;font-weight:750;">{overall}</div></div>'
-        f'<div><div style="color:#52666A;font-size:.78rem;">MAIN POLLUTANT OF CONCERN</div><div style="font-size:1.25rem;font-weight:750;">{concern}</div></div>'
-        f'<div><div style="color:#52666A;font-size:.78rem;">RESULT STATUS</div><div style="font-size:1.25rem;font-weight:750;color:#174E55;">{status}</div></div>'
+        f'<div><div style="color:#9fbec6;font-size:.78rem;">OVERALL ASSESSMENT</div><div style="font-size:1.25rem;font-weight:750;">{overall}</div></div>'
+        f'<div><div style="color:#9fbec6;font-size:.78rem;">MAIN POLLUTANT OF CONCERN</div><div style="font-size:1.25rem;font-weight:750;">{concern}</div></div>'
+        f'<div><div style="color:#9fbec6;font-size:.78rem;">RESULT STATUS</div><div style="font-size:1.25rem;font-weight:750;color:#5cc8e8;">{status}</div></div>'
         f'</div></div>', unsafe_allow_html=True,
     )
 
@@ -620,7 +620,7 @@ def _render_scenario_visual_report(values: dict, baseline: dict, hourly: pd.Data
         item = values.get(pollutant)
         with cards[index % 3]:
             if not item:
-                st.markdown(f"<div style='border:1px solid rgba(130,190,199,.22);border-radius:14px;padding:13px;margin:5px 0;color:#52666A;'><b>{pollutant}</b><br>Unavailable</div>", unsafe_allow_html=True)
+                st.markdown(f"<div style='border:1px solid rgba(130,190,199,.22);border-radius:14px;padding:13px;margin:5px 0;color:#9fbec6;'><b>{pollutant}</b><br>Unavailable</div>", unsafe_allow_html=True)
                 continue
             base = baseline.get(pollutant)
             comparison = "No compatible baseline"
@@ -629,11 +629,11 @@ def _render_scenario_visual_report(values: dict, baseline: dict, hourly: pd.Data
                 comparison = f"{delta:+.1f} vs baseline"
             meaning = "CO₂ is context only; it is not an AQI pollutant." if pollutant == "CO2" else (subindices.get(pollutant, {}).get("category") or "Concentration available")
             st.markdown(
-                f"<div style='border:1px solid rgba(130,190,199,.28);border-radius:14px;padding:13px;margin:5px 0;background:#FFFFFF;'>"
-                f"<div style='font-weight:750;color:#174E55;'>{pollutant}</div>"
+                f"<div style='border:1px solid rgba(130,190,199,.28);border-radius:14px;padding:13px;margin:5px 0;background:#0b2333;'>"
+                f"<div style='font-weight:750;color:#d8fbf5;'>{pollutant}</div>"
                 f"<div style='font-size:1.45rem;font-weight:800;'>{float(item['value']):.1f} <span style='font-size:.82rem;font-weight:500;'>{item['unit']}</span></div>"
-                f"<div style='font-size:.78rem;color:#299B91;'>{item['source']}</div>"
-                f"<div style='font-size:.78rem;color:#52666A;'>{comparison} · {meaning}</div></div>", unsafe_allow_html=True,
+                f"<div style='font-size:.78rem;color:#5cc8e8;'>{item['source']}</div>"
+                f"<div style='font-size:.78rem;color:#a9c7cd;'>{comparison} · {meaning}</div></div>", unsafe_allow_html=True,
             )
 
     st.markdown("**AQI indicators supplied by the external feed**")
@@ -645,7 +645,7 @@ def _render_scenario_visual_report(values: dict, baseline: dict, hourly: pd.Data
                 category = aqi_category("EAQI" if label == "European AQI" else "US AQI", supplied["value"])
                 colour = category["color"] if category else "#5cc8e8"
                 category_label = category["label"] if category else "Category unavailable"
-                st.markdown(f"<div style='border:3px solid {colour};border-radius:16px;padding:17px;background:linear-gradient(135deg,{colour}16,transparent);'><div style='color:#52666A;font-size:.78rem;font-weight:700;'>{title} · external forecast</div><div style='font-size:2.4rem;font-weight:850;'>{supplied['value']:.0f}</div><div style='font-weight:750;color:{colour};'>{category_label}</div></div>", unsafe_allow_html=True)
+                st.markdown(f"<div style='border:3px solid {colour};border-radius:16px;padding:17px;background:linear-gradient(135deg,{colour}16,transparent);'><div style='color:#9fbec6;font-size:.78rem;font-weight:700;'>{title} · external forecast</div><div style='font-size:2.4rem;font-weight:850;'>{supplied['value']:.0f}</div><div style='font-weight:750;color:{colour};'>{category_label}</div></div>", unsafe_allow_html=True)
             else:
                 st.info(f"{title} unavailable for this scenario. No unsupported AQI is calculated.")
 
@@ -1095,10 +1095,10 @@ def _render_co2_intelligence(live: dict) -> None:
             st.markdown(
                 f'<div style="border:3px solid {context["color"]};border-radius:18px;padding:16px 20px;'
                 f'background:linear-gradient(100deg,{context["color"]}18,transparent);">'
-                f'<div style="font-size:.86rem;color:#52666A;">Modelled outdoor CO₂ estimate · {context["status"]}</div>'
+                f'<div style="font-size:.86rem;color:#a9c7cd;">Modelled outdoor CO₂ estimate · {context["status"]}</div>'
                 f'<div style="font-size:3rem;font-weight:800;line-height:1.1;">{co2_item["value"]:g} <span style="font-size:1.1rem;font-weight:600;">{co2_item["unit"]}</span></div>'
                 f'<div style="font-weight:700;color:{context["color"]};">Kochi model grid · model timestamp {observed_label}</div>'
-                f'<div style="font-size:.82rem;color:#52666A;">Source: CAMS via Open-Meteo · near-real-time modelled · cached up to 15 minutes</div></div>',
+                f'<div style="font-size:.82rem;color:#a9c7cd;">Source: CAMS via Open-Meteo · near-real-time modelled · cached up to 15 minutes</div></div>',
                 unsafe_allow_html=True,
             )
             st.warning("Verified local ambient CO₂: Unavailable. The value above is a model estimate, not a validated station observation; it must not be treated as a measured Kochi concentration or an AQI input.")
@@ -1157,7 +1157,7 @@ def _render_co2_intelligence(live: dict) -> None:
         source_columns = st.columns(2)
         for index, (title, description) in enumerate(source_types.items()):
             with source_columns[index % 2]:
-                st.markdown(f'<div style="border:1px solid rgba(130,190,199,.32);border-radius:11px;padding:10px;margin:5px 0;"><b>{title}</b><br><span style="font-size:.83rem;color:#52666A;">{description}</span></div>', unsafe_allow_html=True)
+                st.markdown(f'<div style="border:1px solid rgba(130,190,199,.32);border-radius:11px;padding:10px;margin:5px 0;"><b>{title}</b><br><span style="font-size:.83rem;color:#a9c7cd;">{description}</span></div>', unsafe_allow_html=True)
 
         st.markdown("**Documented Edayar fuel-use evidence**")
         candidates = read_csv(INDUSTRIAL / "edayar_candidate_facilities.csv")
@@ -1333,12 +1333,7 @@ def _render_co2_intelligence(live: dict) -> None:
                     "Monthly CO₂ (kg)": round(amount, 2),
                     "Share of included total (%)": round(amount / total_monthly * 100, 1) if total_monthly else 0.0,
                 })
-            display_dataframe(
-                pd.DataFrame(share_rows),
-                hide_index=True,
-                use_container_width=True,
-                alt="Household monthly emissions by included source",
-            )
+            display_dataframe(pd.DataFrame(share_rows), hide_index=True, use_container_width=True)
 
         with st.container(border=True):
             st.markdown("#### 04 · Practical reduction ideas")
@@ -1521,7 +1516,7 @@ def _render_compact_dashboard() -> None:
                     st.markdown(
                         f'<div style="border:1px solid {evidence_color};border-left:5px solid {evidence_color};border-radius:12px;padding:11px 14px;margin:8px 0;">'
                         f'<div style="font-weight:750;font-size:1.02rem;">{match["Facility"]}</div>'
-                        f'<div style="font-size:.84rem;color:#52666A;">{match["Location"]} · {match["Industry type"]}</div>'
+                        f'<div style="font-size:.84rem;color:#a9c7cd;">{match["Location"]} · {match["Industry type"]}</div>'
                         f'<div style="margin-top:5px;"><span style="color:{evidence_color};font-weight:700;">{match["Evidence category"]}</span> · {match["Pollutant"]} · associated: {match["Associated pollutants"]}</div></div>',
                         unsafe_allow_html=True,
                     )
@@ -1562,7 +1557,7 @@ def _render_compact_dashboard() -> None:
                 f'<div style="border:1px solid rgba(130,190,199,.32);border-radius:11px;padding:10px 13px;margin:7px 0;">'
                 f'<div style="font-weight:750;">{source["name"]}</div>'
                 f'<div style="font-size:.85rem;">[{source["station"]}]({source["link"]}) · {source["type"]}</div>'
-                f'<div style="font-size:.8rem;color:#52666A;">Last observed: {source["timestamp"]} · {source["limit"]}</div></div>',
+                f'<div style="font-size:.8rem;color:#a9c7cd;">Last observed: {source["timestamp"]} · {source["limit"]}</div></div>',
                 unsafe_allow_html=True,
             )
         st.markdown("**Limitations**")
