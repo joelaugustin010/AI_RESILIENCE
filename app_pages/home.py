@@ -9,7 +9,7 @@ Hero film
 Drop your own footage at ``assets/videos/kerala_hero.mp4``. On the next rerun
 the file is made available through Streamlit's static file route and used as a
 muted, looping, cover-fit background. Until then - or if the file is removed -
-the optimised local photograph in ``static/images/`` is shown instead. No
+the optimised local photograph in ``/app/static/images/`` is shown instead. No
 remote video URL and no placeholder video file is referenced.
 """
 
@@ -1151,32 +1151,32 @@ st.markdown(
     </div>
     <div class="ar-gallery">
       <figure class="ar-tile ar-t-backwaters">
-        <img src="static/images/kochi/backwaters.jpg" alt="Kochi backwaters and palm-lined waterways" loading="lazy" decoding="async">
+        <img src="/app/static/images/kochi/backwaters.jpg" alt="Kochi backwaters and palm-lined waterways" loading="lazy" decoding="async">
         <span class="ar-tile-tag">Backwaters</span>
         <figcaption><strong>Water as a way of life</strong><span>Backwaters and canals connect neighbourhoods, livelihoods and ecosystems.</span></figcaption>
       </figure>
       <figure class="ar-tile ar-t-ghats">
-        <img src="static/images/kochi/fishing-nets.jpg" alt="Chinese fishing nets on the Kochi waterfront" loading="lazy" decoding="async">
+        <img src="/app/static/images/kochi/fishing-nets.jpg" alt="Chinese fishing nets on the Kochi waterfront" loading="lazy" decoding="async">
         <span class="ar-tile-tag">Fort Kochi</span>
         <figcaption><strong>Working waterfronts</strong><span>Fishing heritage, tidal water and livelihoods meet at the city edge.</span></figcaption>
       </figure>
       <figure class="ar-tile ar-t-waterfall">
-        <img src="static/images/kochi/mangalavanam.jpg" alt="Green wetland vegetation at Mangalavanam in Kochi" loading="lazy" decoding="async">
+        <img src="/app/static/images/kochi/mangalavanam.jpg" alt="Green wetland vegetation at Mangalavanam in Kochi" loading="lazy" decoding="async">
         <span class="ar-tile-tag">Urban ecology</span>
         <figcaption><strong>Green breathing spaces</strong><span>Mangalavanam and urban wetlands shelter biodiversity inside a growing city.</span></figcaption>
       </figure>
       <figure class="ar-tile ar-t-coast">
-        <img src="static/images/kochi/coast.jpg" alt="Kochi coastline and Arabian Sea" loading="lazy" decoding="async">
+        <img src="/app/static/images/kochi/coast.jpg" alt="Kochi coastline and Arabian Sea" loading="lazy" decoding="async">
         <span class="ar-tile-tag">Coastline</span>
         <figcaption><strong>Where land meets sea</strong><span>Coastal communities face erosion, storms and changing shoreline pressures.</span></figcaption>
       </figure>
       <figure class="ar-tile ar-t-forest">
-        <img src="static/images/kochi/waterfront.jpg" alt="Kochi waterfront with water and urban greenery" loading="lazy" decoding="async">
+        <img src="/app/static/images/kochi/waterfront.jpg" alt="Kochi waterfront with water and urban greenery" loading="lazy" decoding="async">
         <span class="ar-tile-tag">City &amp; water</span>
         <figcaption><strong>One connected landscape</strong><span>Ports, homes, roads and waterways share the same environmental systems.</span></figcaption>
       </figure>
       <figure class="ar-tile ar-t-city">
-        <img src="static/images/kochi/industrial-coast.jpg" alt="Industrial waterfront surroundings near Kochi" loading="lazy" decoding="async">
+        <img src="/app/static/images/kochi/industrial-coast.jpg" alt="Industrial waterfront surroundings near Kochi" loading="lazy" decoding="async">
         <span class="ar-tile-tag">Pressure points</span>
         <figcaption><strong>Growth needs care</strong><span>Industry and infrastructure must grow alongside clean air, water and public health.</span></figcaption>
       </figure>
@@ -1195,7 +1195,7 @@ st.markdown(
 st.markdown(
     """
     <section class="ar-threat" aria-labelledby="ar-threat-title">
-      <img class="ar-threat-bg" src="static/images/kochi/industrial-coast.jpg"
+      <img class="ar-threat-bg" src="/app/static/images/kochi/industrial-coast.jpg"
            alt="" loading="lazy" decoding="async" aria-hidden="true">
       <span class="ar-threat-scrim"></span>
       <div class="ar-threat-inner">
@@ -1330,7 +1330,7 @@ navigation_groups = [
         ICON_COMPASS,
         "Risk & readiness",
         "Build a scenario, inspect the evidence and understand what the models can — and cannot — tell you.",
-        "static/images/kochi/coast.jpg",
+        "/app/static/images/kochi/coast.jpg",
         [
             ("app_pages/decision_workflow.py", "Decision Workflow", ":material/assignment_turned_in:"),
             ("app_pages/disaster_probability.py", "Multi-Hazard Evidence Review", ":material/analytics:"),
@@ -1342,7 +1342,7 @@ navigation_groups = [
         ICON_PLACE,
         "Place & environment",
         "See the geography, monitor environmental pressure and test whether the underlying data is fit for use.",
-        "static/images/kochi/backwaters.jpg",
+        "/app/static/images/kochi/backwaters.jpg",
         [
             ("app_pages/kochi_map.py", "Kochi Map", ":material/map:"),
             ("app_pages/air_pollution.py", "Air Pollution", ":material/factory:"),
@@ -1354,7 +1354,7 @@ navigation_groups = [
         ICON_HOSPITAL,
         "People & critical services",
         "Bring exposure, continuity and preparedness questions closer to the facilities communities rely on.",
-        "static/images/kochi/mangalavanam.jpg",
+        "/app/static/images/kochi/mangalavanam.jpg",
         [
             ("app_pages/hospital_vulnerability.py", "Hospital Vulnerability", ":material/local_hospital:"),
             ("app_pages/disaster_assistant.py", "Disaster Intelligence Assistant", ":material/psychology_alt:"),
@@ -1367,7 +1367,7 @@ navigation_groups = [
         ICON_BLUEPRINT,
         "Plan & design",
         "Turn priorities into transparent mitigation options, concept designs and budget checks.",
-        "static/images/kochi/fishing-nets.jpg",
+        "/app/static/images/kochi/fishing-nets.jpg",
         [
             ("app_pages/mitigation_planner.py", "Mitigation Budget", ":material/account_balance_wallet:"),
             ("app_pages/smart_mitigation_design.py", "Smart Mitigation Design", ":material/engineering:"),
@@ -1455,23 +1455,23 @@ st.markdown(
     <div class="ar-sdg-network" role="img" aria-label="Six Sustainable Development Goal icons connected to the AI RESILIENCE platform hub">
       <svg viewBox="0 0 420 270" aria-hidden="true"><g fill="none" stroke="#75aaa2" stroke-width="1.5" stroke-dasharray="4 5" opacity=".8"><path d="M210 135 L105 38 M210 135 L315 38 M210 135 L392 135 M210 135 L315 232 M210 135 L105 232 M210 135 L28 135"/></g><g fill="#299b91"><circle cx="105" cy="38" r="3"/><circle cx="315" cy="38" r="3"/><circle cx="392" cy="135" r="3"/><circle cx="315" cy="232" r="3"/><circle cx="105" cy="232" r="3"/><circle cx="28" cy="135" r="3"/></g></svg>
       <div class="ar-sdg-hub"><div><strong>AI<br>RESILIENCE</strong><br><span>Kochi · Kerala</span></div></div>
-      <div class="ar-sdg-node n3"><img src="static/images/sdg/sdg-3.png" alt=""></div>
-      <div class="ar-sdg-node n6"><img src="static/images/sdg/sdg-6.png" alt=""></div>
-      <div class="ar-sdg-node n9"><img src="static/images/sdg/sdg-9.png" alt=""></div>
-      <div class="ar-sdg-node n11"><img src="static/images/sdg/sdg-11.png" alt=""></div>
-      <div class="ar-sdg-node n13"><img src="static/images/sdg/sdg-13.png" alt=""></div>
-      <div class="ar-sdg-node n15"><img src="static/images/sdg/sdg-15.png" alt=""></div>
+      <div class="ar-sdg-node n3"><img src="/app/static/images/sdg/sdg-3.png" alt=""></div>
+      <div class="ar-sdg-node n6"><img src="/app/static/images/sdg/sdg-6.png" alt=""></div>
+      <div class="ar-sdg-node n9"><img src="/app/static/images/sdg/sdg-9.png" alt=""></div>
+      <div class="ar-sdg-node n11"><img src="/app/static/images/sdg/sdg-11.png" alt=""></div>
+      <div class="ar-sdg-node n13"><img src="/app/static/images/sdg/sdg-13.png" alt=""></div>
+      <div class="ar-sdg-node n15"><img src="/app/static/images/sdg/sdg-15.png" alt=""></div>
     </div>
   </div>
   <div class="ar-sdg-divider"></div>
   <div class="ar-sdg-subhead"><h3>Six goals. Six contribution pathways.</h3><p>Explore the platform capability behind each connection.</p></div>
   <div class="ar-sdg-grid">
-    <article class="ar-sdg-card" style="--sdg-color:#4c9f38"><img src="static/images/sdg/sdg-3.png" alt="SDG 3 official icon"><div><h4><span>Goal 03 · People</span>Good Health and Well-being</h4><p>Hospital vulnerability and preparedness work examine exposure and continuity questions for critical healthcare services.</p></div></article>
-    <article class="ar-sdg-card" style="--sdg-color:#26bde2"><img src="static/images/sdg/sdg-6.png" alt="SDG 6 official icon"><div><h4><span>Goal 06 · Water</span>Clean Water and Sanitation</h4><p>Flood and hydrology evidence helps investigate water-related pressures, drainage context and observation gaps.</p></div></article>
-    <article class="ar-sdg-card" style="--sdg-color:#f36d25"><img src="static/images/sdg/sdg-9.png" alt="SDG 9 official icon"><div><h4><span>Goal 09 · Infrastructure</span>Industry, Innovation and Infrastructure</h4><p>Air-quality context and mitigation planning bring documented evidence into infrastructure discussions.</p></div></article>
-    <article class="ar-sdg-card" style="--sdg-color:#f99d26"><img src="static/images/sdg/sdg-11.png" alt="SDG 11 official icon"><div><h4><span>Goal 11 · Cities</span>Sustainable Cities and Communities</h4><p>Kochi-focused mapping, hazard evidence review and decision workflows support urban resilience planning.</p></div></article>
-    <article class="ar-sdg-card" style="--sdg-color:#3f7e44"><img src="static/images/sdg/sdg-13.png" alt="SDG 13 official icon"><div><h4><span>Goal 13 · Climate</span>Climate Action</h4><p>Rainfall, hazard and scenario evidence help explore climate-related pressures with uncertainty visible.</p></div></article>
-    <article class="ar-sdg-card" style="--sdg-color:#56c02b"><img src="static/images/sdg/sdg-15.png" alt="SDG 15 official icon"><div><h4><span>Goal 15 · Nature</span>Life on Land</h4><p>Wetlands, green spaces and connected ecosystems provide environmental context for urban resilience.</p></div></article>
+    <article class="ar-sdg-card" style="--sdg-color:#4c9f38"><img src="/app/static/images/sdg/sdg-3.png" alt="SDG 3 official icon"><div><h4><span>Goal 03 · People</span>Good Health and Well-being</h4><p>Hospital vulnerability and preparedness work examine exposure and continuity questions for critical healthcare services.</p></div></article>
+    <article class="ar-sdg-card" style="--sdg-color:#26bde2"><img src="/app/static/images/sdg/sdg-6.png" alt="SDG 6 official icon"><div><h4><span>Goal 06 · Water</span>Clean Water and Sanitation</h4><p>Flood and hydrology evidence helps investigate water-related pressures, drainage context and observation gaps.</p></div></article>
+    <article class="ar-sdg-card" style="--sdg-color:#f36d25"><img src="/app/static/images/sdg/sdg-9.png" alt="SDG 9 official icon"><div><h4><span>Goal 09 · Infrastructure</span>Industry, Innovation and Infrastructure</h4><p>Air-quality context and mitigation planning bring documented evidence into infrastructure discussions.</p></div></article>
+    <article class="ar-sdg-card" style="--sdg-color:#f99d26"><img src="/app/static/images/sdg/sdg-11.png" alt="SDG 11 official icon"><div><h4><span>Goal 11 · Cities</span>Sustainable Cities and Communities</h4><p>Kochi-focused mapping, hazard evidence review and decision workflows support urban resilience planning.</p></div></article>
+    <article class="ar-sdg-card" style="--sdg-color:#3f7e44"><img src="/app/static/images/sdg/sdg-13.png" alt="SDG 13 official icon"><div><h4><span>Goal 13 · Climate</span>Climate Action</h4><p>Rainfall, hazard and scenario evidence help explore climate-related pressures with uncertainty visible.</p></div></article>
+    <article class="ar-sdg-card" style="--sdg-color:#56c02b"><img src="/app/static/images/sdg/sdg-15.png" alt="SDG 15 official icon"><div><h4><span>Goal 15 · Nature</span>Life on Land</h4><p>Wetlands, green spaces and connected ecosystems provide environmental context for urban resilience.</p></div></article>
   </div>
   <div class="ar-sdg-footer"><span aria-hidden="true">ⓘ</span><div><strong>Evidence before impact claims.</strong> This section describes platform capabilities and contribution pathways. It does not report lives saved, emissions avoided, hectares restored or official SDG indicator progress. Those claims require independently sourced measurements and documented methods.</div></div>
   <div class="ar-sdg-note">Official SDG icons are used for informational purposes. <a href="https://sdgs.un.org/goals" target="_blank" rel="noopener">Explore the United Nations Sustainable Development Goals</a>. This publication has not been approved by the United Nations and does not reflect the views of the United Nations or its officials or Member States.</div>
