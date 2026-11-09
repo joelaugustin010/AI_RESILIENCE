@@ -198,13 +198,13 @@ st.markdown(
       will-change: opacity, transform;
     }
     .ar-cine-hero .ar-slide-a { object-position: center 56%; animation-delay: 0s; }
-    .ar-cine-hero .ar-slide-b { object-position: center 46%; animation-delay: -8s; }
-    .ar-cine-hero .ar-slide-c { object-position: center 52%; animation-delay: -16s; }
-    .ar-cine-hero .ar-slide-d { object-position: center 50%; animation-delay: -24s; }
+    .ar-cine-hero .ar-slide-b { object-position: center 46%; animation-delay: -56s; }
+    .ar-cine-hero .ar-slide-c { object-position: center 52%; animation-delay: -48s; }
+    .ar-cine-hero .ar-slide-d { object-position: center 50%; animation-delay: -40s; }
     .ar-cine-hero .ar-slide-e { object-position: center 50%; animation-delay: -32s; }
-    .ar-cine-hero .ar-slide-f { object-position: center 50%; animation-delay: -40s; }
-    .ar-cine-hero .ar-slide-g { object-position: center 50%; animation-delay: -48s; }
-    .ar-cine-hero .ar-slide-h { object-position: center 50%; animation-delay: -56s; }
+    .ar-cine-hero .ar-slide-f { object-position: center 50%; animation-delay: -24s; }
+    .ar-cine-hero .ar-slide-g { object-position: center 50%; animation-delay: -16s; }
+    .ar-cine-hero .ar-slide-h { object-position: center 50%; animation-delay: -8s; }
     .ar-cine-hero .ar-cine-video {
       z-index: 1;
       object-fit: cover !important;
@@ -245,6 +245,44 @@ st.markdown(
       max-width: 960px;
       padding: clamp(1rem, 3vw, 2rem) 0 0;
     }
+    .ar-cine-feature-panel {
+      width: min(100%, 900px);
+      margin-top: clamp(.8rem, 2vw, 1.35rem);
+      padding: clamp(1.35rem, 3.2vw, 2.5rem);
+      border: 1px solid rgba(224, 255, 249, .30);
+      border-radius: 26px;
+      background: linear-gradient(135deg, rgba(4,20,30,.82), rgba(5,36,45,.62));
+      box-shadow: 0 24px 64px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.12);
+      -webkit-backdrop-filter: blur(16px) saturate(1.15);
+      backdrop-filter: blur(16px) saturate(1.15);
+      animation: arRise .72s .04s var(--ar-ease) both;
+    }
+    .ar-cine-brandline {
+      display: inline-flex; align-items: center; gap: .55rem;
+      margin: 0 0 .85rem; color: #a8f3e5; font-size: .67rem;
+      font-weight: 850; letter-spacing: .19em; text-transform: uppercase;
+    }
+    .ar-cine-brandline:before {
+      content: ""; width: 1.45rem; height: 2px; border-radius: 2px;
+      background: linear-gradient(90deg, #42e0c1, #9cf8e6);
+    }
+    .ar-cine-title {
+      font-size: clamp(2.8rem, 7.4vw, 6.4rem) !important;
+      line-height: .96 !important; letter-spacing: -.065em !important;
+      overflow-wrap: anywhere;
+    }
+    .ar-cine-title span {
+      background: linear-gradient(100deg, #fff 2%, #c8fff3 42%, #42e0c1 100%);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .ar-cine-sub { max-width: 720px; }
+    @media(max-width:640px) {
+      .ar-cine-feature-panel { padding: 1.25rem 1.1rem; border-radius: 20px; }
+      .ar-cine-title { font-size: clamp(2.55rem, 12vw, 4.2rem) !important; }
+    }
+    @media(prefers-reduced-motion:reduce) { .ar-cine-feature-panel { animation: none; } }
+
     .ar-cine-topline {
       display: flex;
       flex-wrap: wrap;
@@ -927,18 +965,21 @@ st.markdown(
           <div class="ar-cine-kicker"><span class="ar-scope-dot" aria-hidden="true"></span>Kochi · Environmental &amp; disaster intelligence</div>
           <div class="ar-cine-coord">9.9312° N · 76.2673° E · Kochi</div>
         </div>
-        <h1 class="ar-cine-title">AI <span>RESILIENCE</span></h1>
-        <p class="ar-cine-sub">Understanding Kochi. Preparing for risk. Strengthening urban resilience.</p>
-        <p class="ar-cine-desc">
-          A Kochi-focused, evidence-first platform for environmental monitoring, multi-hazard
-          review, critical-service resilience and mitigation planning. Explore documented
-          data, understand uncertainty and support better-informed local decisions.
-        </p>
-        <div class="ar-cine-chips">
-          <span>Disaster intelligence</span>
-          <span>Environmental monitoring</span>
-          <span>Hospital resilience</span>
-          <span>Smart mitigation</span>
+        <div class="ar-cine-feature-panel">
+          <div class="ar-cine-brandline">Environmental intelligence · Kochi, Kerala</div>
+          <h1 class="ar-cine-title">AI<span>_RESILIENCE</span></h1>
+          <p class="ar-cine-sub">Understanding Kochi. Preparing for risk. Strengthening urban resilience.</p>
+          <p class="ar-cine-desc">
+            A Kochi-focused, evidence-first platform for environmental monitoring, multi-hazard
+            review, critical-service resilience and mitigation planning. Explore documented
+            data, understand uncertainty and support better-informed local decisions.
+          </p>
+          <div class="ar-cine-chips">
+            <span>Disaster intelligence</span>
+            <span>Environmental monitoring</span>
+            <span>Hospital resilience</span>
+            <span>Smart mitigation</span>
+          </div>
         </div>
       </div>
       <div class="ar-cine-foot" aria-hidden="true">
