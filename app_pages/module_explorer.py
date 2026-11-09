@@ -26,12 +26,12 @@ st.markdown(
 render_page_intro(
     "module-explorer",
     "Explore AI_RESILIENCE",
-    "Choose an existing workspace by the question you want to answer — from environmental signals and spatial context to disaster resilience and practical mitigation planning.",
+    "Find the right workspace for the question you want to investigate — from Kochi's environmental evidence to multi-hazard review and practical mitigation planning.",
     eyebrow="AI_RESILIENCE · MODULE EXPLORER",
-    tags=("Existing modules", "Evidence first", "Kochi and Kerala"),
+    tags=("12 workspaces", "Evidence first", "Kochi pilot"),
 )
 st.markdown(
-    '<p class="ar-explorer-lede">Every card below opens a registered application module. Outputs retain their existing provenance, uncertainty notes, calculations and data-quality safeguards.</p>',
+    '<p class="ar-explorer-lede">Choose a workspace below. Each card opens an existing application page; evidence quality, assumptions and known limitations remain visible within the relevant workflow.</p>',
     unsafe_allow_html=True,
 )
 
@@ -43,7 +43,6 @@ MODULE_GROUPS = (
             ("🌬️", "Air Pollution", "Review air-quality evidence, pollutant context and monitoring readiness.", "kochi/coast.jpg", "app_pages/air_pollution.py", "Atmospheric evidence"),
             ("🏥", "Hospital Vulnerability", "Inspect critical-facility context and documented accessibility limitations.", "kochi/water-metro.jpg", "app_pages/hospital_vulnerability.py", "Public health"),
             ("🌿", "Data & Model Transparency", "Review coverage, provenance, validation status and known data limitations.", "kochi/mangalavanam.jpg", "app_pages/data_readiness.py", "Transparency"),
-            ("🧾", "Mitigation Data Intelligence", "Review the evidence quality and readiness behind mitigation planning inputs.", "beauty-ghats.webp", "app_pages/mitigation_data_intelligence.py", "Data governance"),
         ),
     ),
     (
@@ -66,14 +65,60 @@ MODULE_GROUPS = (
     ),
 )
 
+all_modules = [
+    (group_title, module)
+    for group_title, modules in MODULE_GROUPS
+    for module in modules
+]
+
+search_col, group_col = st.columns([2, 1], gap="medium")
+with search_col:
+    search_term = st.text_input(
+        "Search workspaces",
+        placeholder="Try air quality, flood, budget, hospital…",
+        key="explorer_search",
+    ).strip().casefold()
+with group_col:
+    selected_group = st.selectbox(
+        "Workspace category",
+        ["All categories", *(group_title for group_title, _ in MODULE_GROUPS)],
+        key="explorer_category",
+    )
+
+filtered_groups = []
 for group_title, modules in MODULE_GROUPS:
-    st.markdown(f'<div class="ar-explorer-group">{group_title}</div>', unsafe_allow_html=True)
-    for start in range(0, len(modules), 3):
-        columns = st.columns(3, gap="medium")
-        for column, (icon, title, description, image, route, meta) in zip(columns, modules[start:start + 3]):
-            with column:
-                st.markdown(
-                    f'<article class="ar-explorer-card" style="--explorer-image:url(\'app/static/images/{image}\')"><div class="ar-explorer-icon">{icon}</div><h3>{title}</h3><p>{description}</p><div class="ar-explorer-meta">{meta} · Open workspace →</div></article>',
-                    unsafe_allow_html=True,
-                )
-                st.page_link(route, label=f"Open {title}", icon=":material/arrow_forward:", use_container_width=True)
+    if selected_group != "All categories" and group_title != selected_group:
+        continue
+    matches = [
+        module for module in modules
+        if not search_term
+        or search_term in " ".join((module[1], module[2], module[5], group_title)).casefold()
+    ]
+    if matches:
+        filtered_groups.append((group_title, matches))
+
+visible_count = sum(len(modules) for _, modules in filtered_groups)
+metric_cols = st.columns(3)
+metric_cols[0].metric("Available workspaces", len(all_modules))
+metric_cols[1].metric("Categories", len(MODULE_GROUPS))
+metric_cols[2].metric("Matching results", visible_count)
+
+if not visible_count:
+    st.info("No workspace matches that search. Try a broader keyword or choose All categories.")
+else:
+    for group_title, modules in filtered_groups:
+        st.markdown(f'<div class="ar-explorer-group">{group_title}</div>', unsafe_allow_html=True)
+        for start in range(0, len(modules), 3):
+            columns = st.columns(3, gap="medium")
+            for column, (icon, title, description, image, route, meta) in zip(columns, modules[start:start + 3]):
+                with column:
+                    st.markdown(
+                        f'<article class="ar-explorer-card" style="--explorer-image:url(\'app/static/images/{image}\')"><div class="ar-explorer-icon">{icon}</div><h3>{title}</h3><p>{description}</p><div class="ar-explorer-meta">{meta} · Open workspace →</div></article>',
+                        unsafe_allow_html=True,
+                    )
+                    st.page_link(
+                        route,
+                        label=f"Open {title}",
+                        icon=":material/arrow_forward:",
+                        use_container_width=True,
+                    )
