@@ -1,0 +1,300 @@
+"""Scientific and fail-closed tests for intervention-effect ML."""
+from __future__ import annotations
+
+import pandas as pd
+import pytest
+
+from src.intervention_effectiveness import (
+    InterventionDataError,
+    rank_interventions,
+    train_intervention_model,
+    validate_intervention_frame,
+)
+
+
+def _small_frame(n: int = 80) -> pd.DataFrame:
+    dates = pd.date_range("2010-01-01", periods=n, freq="D")
+    return pd.DataFrame({
+        "episode_id": [f"household-season-{i}" for i in range(n)],
+        "episode_date": dates,
+        "outcome_window_end": dates + pd.Timedelta(days=1),
+        "site_id": [f"site-{i % 8}" for i in range(n)],
+        "hazard": ["Flood"] * n,
+        "action_id": ["drain_maintenance"] * n,
+        "implemented": [i % 2 for i in range(n)],
+        "damage_outcome": [float(i % 7) for i in range(n)],
+        "rainfall_before": [float(i % 15) for i in range(n)],
+        "exposure_before": [float((i % 5) + 1) for i in range(n)],
+    })
+
+
+def test_intervention_schema_accepts_pre_treatment_covariates():
+    features = validate_intervention_frame(_small_frame())
+    assert features == ["rainfall_before", "exposure_before"]
+
+
+@pytest.mark.parametrize("bad_column", [
+    "damage_after", "future_rainfall", "post_treatment_repair_cost",
+    "treatment_assignment_source",
+])
+def test_intervention_schema_rejects_post_treatment_or_treatment_leakage(bad_column):
+    frame = _small_frame()
+    frame[bad_column] = 1.0
+    with pytest.raises(InterventionDataError):
+        validate_intervention_frame(frame)
+
+
+def test_intervention_training_fails_closed_when_sample_is_too_small():
+    model = train_intervention_model(
+        _small_frame(), action_id="drain_maintenance", hazard="Flood",
+        test_start="2012-01-01",
+    )
+    assert model.status == "INSUFFICIENT_INTERVENTION_EVIDENCE"
+    assert model.card["eligible_for_ranking"] is False
+    assert model.estimate({"rainfall_before": 2, "exposure_before": 1})["available"] is False
+
+
+def test_ranking_withholds_when_no_action_model_is_eligible():
+    model = train_intervention_model(
+        _small_frame(), action_id="drain_maintenance", hazard="Flood",
+        test_start="2012-01-01",
+    )
+    result = rank_interventions([model], {"rainfall_before": 2, "exposure_before": 1})
+    assert result["status"] == "RANKING_WITHHELD"
+    assert result["ranked_actions"] == []
+
+
+def test_prevention_catalogue_emits_stable_action_identifiers():
+    from src.prevention_intelligence import generate_prevention_actions
+
+    first = generate_prevention_actions(["Flood"])
+    second = generate_prevention_actions(["Flood"])
+    assert first and all(item.get("action_id") for item in first)
+    assert [item["action_id"] for item in first] == [item["action_id"] for item in second]
+    assert len({item["action_id"] for item in first}) == len(first)
+
+
+def test_intervention_schema_rejects_duplicate_site_time_action_episodes():
+    frame = _small_frame()
+    frame = pd.concat([frame, frame.iloc[[0]]], ignore_index=True)
+    with pytest.raises(InterventionDataError, match="Duplicate"):
+        validate_intervention_frame(frame)
+
+
+def test_ranking_withholds_when_eligible_models_lack_complete_provenance():
+    class EligibleStub:
+        def __init__(self, action_id):
+            self.action_id = action_id
+            self.hazard = "Flood"
+            self.status = "CAUSAL_RESEARCH_SIGNAL_NOT_VALIDATED"
+            self.card = {
+                "eligible_for_ranking": True,
+                "hazard": "Flood",
+                "outcome_unit": "damage units",
+                "feature_columns": ["rainfall_before"],
+                "test_start": "2022-01-01",
+            }
+
+        def estimate(self, context):
+            return {
+                "available": True,
+                "estimated_damage_reduction": 2.0,
+                "action_id": self.action_id,
+            }
+
+    result = rank_interventions(
+        [EligibleStub("drainage"), EligibleStub("barrier")],
+        {"rainfall_before": 100},
+    )
+    assert result["status"] == "RANKING_WITHHELD"
+    assert result["ranked_actions"] == []
+    assert "provenance" in result["reason"]
+
+
+def test_ranking_withholds_when_candidate_actions_come_from_different_studies():
+    class EligibleStub:
+        def __init__(self, action_id, source):
+            self.action_id = action_id
+            self.hazard = "Flood"
+            self.status = "CAUSAL_RESEARCH_SIGNAL_NOT_VALIDATED"
+            self.card = {
+                "eligible_for_ranking": True,
+                "hazard": "Flood",
+                "outcome_unit": "damage units",
+                "feature_columns": ["rainfall_before"],
+                "test_start": "2022-01-01",
+                "data_provenance": {
+                    "source_title": source,
+                    "source_owner": "Research group",
+                    "collection_period": "2020-2023",
+                    "outcome_definition": "household flood damage",
+                    "treatment_definition": "standardised flood-preparedness package",
+                    "geographic_scope": "Study catchment",
+                },
+            }
+
+        def estimate(self, context):
+            return {
+                "available": True,
+                "estimated_damage_reduction": 2.0,
+                "action_id": self.action_id,
+            }
+
+    result = rank_interventions(
+        [EligibleStub("drainage", "Study A"), EligibleStub("barrier", "Study B")],
+        {"rainfall_before": 100},
+    )
+    assert result["status"] == "RANKING_WITHHELD"
+    assert result["ranked_actions"] == []
+    assert "same study" in result["reason"]
+
+
+
+def test_comparable_point_estimates_do_not_claim_pairwise_superiority():
+    class EligibleStub:
+        def __init__(self, action_id, reduction):
+            self.action_id = action_id
+            self.hazard = "Flood"
+            self.status = "CAUSAL_RESEARCH_SIGNAL_NOT_VALIDATED"
+            self.card = {
+                "eligible_for_ranking": True,
+                "hazard": "Flood",
+                "outcome_unit": "damage units",
+                "feature_columns": ["rainfall_before"],
+                "test_start": "2022-01-01",
+                "data_provenance": {
+                    "source_title": "Same study",
+                    "source_owner": "Research group",
+                    "collection_period": "2020-2023",
+                    "outcome_definition": "household flood damage",
+                    "treatment_definition": "standardised flood-preparedness package",
+                    "geographic_scope": "Study catchment",
+                },
+            }
+            self.reduction = reduction
+
+        def estimate(self, context):
+            return {
+                "available": True,
+                "estimated_damage_reduction": self.reduction,
+                "action_id": self.action_id,
+            }
+
+    result = rank_interventions(
+        [EligibleStub("drainage", 2.0), EligibleStub("barrier", 1.0)],
+        {"rainfall_before": 100},
+    )
+    assert result["ranked_actions"][0]["action_id"] == "drainage"
+    assert result["pairwise_superiority"] == "NOT_ESTABLISHED"
+    assert result["context_specific_pairwise_intervals"] == "NOT_AVAILABLE"
+    assert result["top_action_is_proven_best"] is False
+
+
+
+def test_distinct_treatment_definitions_can_be_compared_within_same_study():
+    class EligibleStub:
+        def __init__(self, action_id, treatment_definition, reduction):
+            self.action_id = action_id
+            self.hazard = "Flood"
+            self.status = "CAUSAL_RESEARCH_SIGNAL_NOT_VALIDATED"
+            self.card = {
+                "eligible_for_ranking": True,
+                "hazard": "Flood",
+                "outcome_unit": "damage units",
+                "feature_columns": ["rainfall_before"],
+                "test_start": "2022-01-01",
+                "data_provenance": {
+                    "source_title": "Same study",
+                    "source_owner": "Research group",
+                    "collection_period": "2020-2023",
+                    "outcome_definition": "household flood damage",
+                    "treatment_definition": treatment_definition,
+                    "geographic_scope": "Study catchment",
+                },
+            }
+            self.reduction = reduction
+
+        def estimate(self, context):
+            return {
+                "available": True,
+                "estimated_damage_reduction": self.reduction,
+                "action_id": self.action_id,
+            }
+
+    result = rank_interventions(
+        [
+            EligibleStub("drain_maintenance", "monthly drain clearing", 2.0),
+            EligibleStub("household_barrier", "door-level flood barrier installation", 1.0),
+        ],
+        {"rainfall_before": 100},
+    )
+    assert result["status"] == "RESEARCH_RANKING_NOT_VALIDATED"
+    assert [item["action_id"] for item in result["ranked_actions"]] == [
+        "drain_maintenance", "household_barrier"
+    ]
+    assert result["top_action_is_proven_best"] is False
+
+def test_context_support_guard_rejects_numeric_extrapolation_and_unseen_categories():
+    from src.intervention_effectiveness import _context_support_reason
+
+    profile = {
+        "numeric_ranges": {"rainfall_before": {"minimum": 0.0, "maximum": 250.0}},
+        "categorical_values": {"building_type": ["concrete", "timber"]},
+    }
+    assert _context_support_reason(
+        {"rainfall_before": 251, "building_type": "concrete"}, profile
+    ) is not None
+    assert _context_support_reason(
+        {"rainfall_before": 100, "building_type": "unknown"}, profile
+    ) is not None
+    assert _context_support_reason(
+        {"rainfall_before": 100, "building_type": "timber"}, profile
+    ) is None
+
+
+def test_eligible_legacy_model_without_support_profile_fails_closed():
+    from src.intervention_effectiveness import InterventionModel
+
+    class IdentityPreprocessor:
+        def transform(self, frame):
+            return frame.to_numpy()
+
+    class ConstantEffect:
+        def predict(self, values):
+            return [1.0]
+
+    model = InterventionModel(
+        "drain_maintenance", "Flood", ["rainfall_before"],
+        IdentityPreprocessor(), ConstantEffect(),
+        "CAUSAL_RESEARCH_SIGNAL_NOT_VALIDATED",
+        {"outcome_unit": "damage units", "eligible_for_ranking": True},
+    )
+    result = model.estimate({"rainfall_before": 100})
+    assert result["available"] is False
+    assert result["status"] == "CONTEXT_SUPPORT_PROFILE_MISSING"
+
+def test_intervention_training_requires_explicit_outcome_unit_and_direction():
+    from scripts.train_intervention_effectiveness import PROVENANCE_FIELDS
+
+    assert "outcome_unit" in PROVENANCE_FIELDS
+    assert "outcome_direction" in PROVENANCE_FIELDS
+
+
+def test_training_provenance_rejects_invalid_metadata_and_feature_contracts():
+    from scripts.train_intervention_effectiveness import (
+        PROVENANCE_FIELDS, validate_training_provenance,
+    )
+    valid = {
+        key: "documented"
+        for key in PROVENANCE_FIELDS
+        if key != "pre_treatment_features"
+    }
+    valid["outcome_direction"] = "lower_is_better"
+    valid["pre_treatment_features"] = ["rainfall_before", "exposure_before"]
+    assert validate_training_provenance(valid)["outcome_unit"] == "documented"
+    with pytest.raises(ValueError, match="lower_is_better"):
+        validate_training_provenance({**valid, "outcome_direction": "higher_is_better"})
+    with pytest.raises(ValueError, match="unique"):
+        validate_training_provenance({**valid, "pre_treatment_features": ["rainfall_before", "rainfall_before"]})
+    with pytest.raises(ValueError, match="JSON object"):
+        validate_training_provenance(["not", "an", "object"])

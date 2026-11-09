@@ -42,14 +42,42 @@ MODEL_DISPATCH: dict[str, Callable[[dict[str, Any]], dict[str, Any]]] = {
 
 
 def assess_disaster(inputs: dict[str, Any]) -> dict[str, Any]:
-    """Run the exact selected model; never substitute a generic or default hazard."""
+    """Run the exact selected model; never substitute a generic or default hazard.
+
+    Shared ML evidence is attached as a supplementary block.  A failure to load
+    the ML engine or its artifacts must not change or block the deterministic
+    hazard assessment, and it must never be presented as a prediction.
+    """
     if not isinstance(inputs, dict):
         raise ValueError("Assessment inputs must be a mapping.")
     hazard = inputs.get("hazard")
     model = MODEL_DISPATCH.get(hazard)
     if model is None:
         raise ValueError(f"No disaster model is registered for {hazard!r}.")
-    return model(inputs)
+    assessment = model(inputs)
+    try:
+        from src.ml.service import ml_evidence_for
+
+        assessment["ml_evidence"] = ml_evidence_for(hazard, inputs)
+    except Exception as exc:  # keep the deterministic assessment available
+        assessment["ml_evidence"] = {
+            "hazard": hazard,
+            "status": "ml_engine_unavailable",
+            "support_level": "unknown",
+            "models": [],
+            "applications": [],
+            "interpretation": (
+                "The shared ML evidence block could not be loaded. This does not "
+                "change the deterministic hazard assessment."
+            ),
+            "limitations": [f"{type(exc).__name__}: {exc}"],
+            "validated_prediction_available": False,
+            "note": (
+                "ML evidence is optional and supplementary. Its absence is not "
+                "evidence that a hazard or exposure is absent."
+            ),
+        }
+    return assessment
 
 
 def disaster_model_mapping() -> list[dict[str, str]]:

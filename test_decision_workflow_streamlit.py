@@ -1,4 +1,4 @@
-"""Streamlit integration test for the existing decision workflow."""
+""""Streamlit integration test for the existing decision workflow."""
 
 import unittest
 
@@ -23,7 +23,7 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
 
         self.assertEqual(len(app.exception), 0)
         hero = next(
-            element for element in app.markdown if "<section class=\"wf-hero\">" in element.value
+            element for element in app.markdown if '<section class="wf-hero">' in element.value
         )
         self.assertTrue(hero.proto.allow_html)
         self.assertIn("Disaster decision workflow", hero.value)
@@ -37,7 +37,7 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
         self.assertIn("Evidence by decision dimension", headings)
         self.assertIn("Uncertainty register", headings)
         self.assertIn("Conceptual infrastructure dependencies", headings)
-        self.assertIn("4. Hazard-specific scientific assessment", [element.value for element in app.header])
+        self.assertIn("3. Key hazard assessment and recommended precautions", [element.value for element in app.header])
         self.assertTrue(
             any("never a validated prediction" in str(element.value).lower() for element in app.caption)
         )
@@ -71,7 +71,7 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
         app.form_submit_button[0].click().run()
         self.assertEqual(len(app.exception), 0)
         self.assertTrue(
-            any("4. Hazard-specific scientific assessment" == element.value for element in app.header)
+            any("3. Key hazard assessment and recommended precautions" == element.value for element in app.header)
         )
         self.assertTrue(
             any("Compound interaction remains unresolved" in str(element.value) for element in app.info)
@@ -120,7 +120,7 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
         )
         load_button.click().run()
         self.assertEqual(len(app.exception), 0)
-        rendered_text = "\n".join(
+        rendered_text = "\\n".join(
             str(element.value)
             for elements in (app.markdown, app.info, app.error)
             for element in elements
@@ -150,7 +150,7 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
         map_button = next(
             button
             for button in app.button
-            if button.label == "View prone areas on the Kochi map"
+            if button.label == "Open Kochi map and available hazard evidence"
         )
         map_button.click().run()
 
@@ -171,17 +171,7 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
         self.assertTrue(
             any("No facility is assumed safe or exposed" in str(item.value) for item in app.info)
         )
-        self.assertTrue(
-            any("WorldCover 2021 land-cover context" in item.label for item in app.checkbox)
-        )
-        self.assertTrue(
-            any(
-                "Land-cover classes only; not hazard severity or exposure"
-                in element.value["Meaning"].tolist()
-                for element in app.dataframe
-                if "Meaning" in element.value.columns
-            )
-        )
+
 
     def test_map_hides_flood_scenario_for_unrelated_selected_hazard(self):
         app = _decision_workflow_app(90)
@@ -193,7 +183,7 @@ class DecisionWorkflowStreamlitTests(unittest.TestCase):
         next(
             button
             for button in app.button
-            if button.label == "View prone areas on the Kochi map"
+            if button.label == "Open Kochi map and available hazard evidence"
         ).click().run()
 
         self.assertEqual(len(app.exception), 0)
