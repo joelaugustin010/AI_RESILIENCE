@@ -2377,3 +2377,200 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+
+# AI_RESILIENCE — Coastal Sage component harmonisation.
+# These final selectors cover page-specific HTML components as well as native
+# Streamlit widgets, so the visual identity remains consistent across every route.
+st.markdown(
+    """
+    <style>
+    /* Shared custom cards and information panels */
+    [data-testid="stMain"] .ar-explorer-card,
+    [data-testid="stMain"] .disaster-card,
+    [data-testid="stMain"] .disaster-result,
+    [data-testid="stMain"] .probability-panel,
+    [data-testid="stMain"] .concept-note,
+    [data-testid="stMain"] .smart-panel,
+    [data-testid="stMain"] .wf-step,
+    [data-testid="stMain"] .ar-signal > div,
+    [data-testid="stMain"] .ar-threat,
+    [data-testid="stMain"] .ar-tile {
+      border-color: rgba(48,82,69,.20) !important;
+      box-shadow: 0 8px 24px rgba(35,61,49,.06) !important;
+    }
+    [data-testid="stMain"] .ar-explorer-card,
+    [data-testid="stMain"] .disaster-card,
+    [data-testid="stMain"] .disaster-result,
+    [data-testid="stMain"] .probability-panel,
+    [data-testid="stMain"] .concept-note,
+    [data-testid="stMain"] .smart-panel,
+    [data-testid="stMain"] .wf-step {
+      background: #FFFFFF !important;
+      color: #263A35 !important;
+    }
+    [data-testid="stMain"] .ar-explorer-card h1,
+    [data-testid="stMain"] .ar-explorer-card h2,
+    [data-testid="stMain"] .ar-explorer-card h3,
+    [data-testid="stMain"] .disaster-card-title,
+    [data-testid="stMain"] .smart-panel h3,
+    [data-testid="stMain"] .wf-step strong {
+      color: #263A35 !important;
+    }
+    [data-testid="stMain"] .ar-explorer-card p,
+    [data-testid="stMain"] .ar-explorer-lede,
+    [data-testid="stMain"] .disaster-card-copy,
+    [data-testid="stMain"] .disaster-result-copy,
+    [data-testid="stMain"] .concept-note p,
+    [data-testid="stMain"] .smart-panel p,
+    [data-testid="stMain"] .mitigation-ml-copy,
+    [data-testid="stMain"] .mitigation-ml-copy p,
+    [data-testid="stMain"] .mitigation-ml-copy li {
+      color: #5D7068 !important;
+    }
+    [data-testid="stMain"] .ar-explorer-group,
+    [data-testid="stMain"] .ar-overline,
+    [data-testid="stMain"] .disaster-kicker,
+    [data-testid="stMain"] .probability-label,
+    [data-testid="stMain"] .mitigation-ml-kicker,
+    [data-testid="stMain"] .wf-kicker {
+      color: #3F7F72 !important;
+    }
+    [data-testid="stMain"] .disaster-result-label,
+    [data-testid="stMain"] .disaster-result-value,
+    [data-testid="stMain"] .probability-value {
+      color: #356F63 !important;
+    }
+    [data-testid="stMain"] .disaster-pill,
+    [data-testid="stMain"] .ar-explorer-meta,
+    [data-testid="stMain"] .ar-cine-chips span {
+      background: #E7EEE7 !important;
+      border-color: rgba(48,82,69,.18) !important;
+      color: #40564F !important;
+    }
+    [data-testid="stMain"] .disaster-empty,
+    [data-testid="stMain"] .probability-unavailable {
+      background: #F7F9F5 !important;
+      border-color: rgba(48,82,69,.18) !important;
+      color: #5D7068 !important;
+    }
+
+    /* Custom module mastheads: one consistent forest/sage treatment */
+    [data-testid="stMain"] .disaster-hero,
+    [data-testid="stMain"] .wf-hero,
+    [data-testid="stMain"] .air-hero {
+      background-color: #203D36 !important;
+      border-color: rgba(169,199,183,.30) !important;
+      box-shadow: 0 16px 36px rgba(35,61,49,.12) !important;
+    }
+    [data-testid="stMain"] .disaster-title,
+    [data-testid="stMain"] .wf-title,
+    [data-testid="stMain"] .air-hero h2 {
+      color: #FFFFFF !important;
+    }
+    [data-testid="stMain"] .disaster-subtitle,
+    [data-testid="stMain"] .wf-copy,
+    [data-testid="stMain"] .air-hero p {
+      color: #E6F0E9 !important;
+    }
+    [data-testid="stMain"] .disaster-step,
+    [data-testid="stMain"] .wf-steps {
+      border-color: rgba(169,199,183,.24) !important;
+    }
+    [data-testid="stMain"] .disaster-step,
+    [data-testid="stMain"] .wf-step:hover {
+      background: #E7EEE7 !important;
+      color: #263A35 !important;
+    }
+
+    /* Homepage: preserve cinematic photography, harmonise its supporting UI */
+    [data-testid="stMain"] .ar-cine-scrim {
+      background: linear-gradient(90deg, rgba(21,48,39,.82), rgba(24,58,48,.34) 62%, rgba(24,58,48,.18)) !important;
+    }
+    [data-testid="stMain"] .ar-cine-kicker,
+    [data-testid="stMain"] .ar-cine-coord,
+    [data-testid="stMain"] .ar-cine-foot,
+    [data-testid="stMain"] .ar-cine-sub,
+    [data-testid="stMain"] .ar-cine-desc {
+      color: #F1F6EF !important;
+    }
+    [data-testid="stMain"] .ar-live-dot { background: #A9C7B7 !important; }
+    [data-testid="stMain"] .ar-scroll-line { background: #A9C7B7 !important; }
+    [data-testid="stMain"] .ar-story h2 { color: #263A35 !important; }
+    [data-testid="stMain"] .ar-story p,
+    [data-testid="stMain"] .ar-fineprint { color: #5D7068 !important; }
+    [data-testid="stMain"] .ar-signal {
+      background: #FFFFFF !important;
+      border-color: rgba(48,82,69,.18) !important;
+    }
+    [data-testid="stMain"] .ar-signal strong { color: #356F63 !important; }
+    [data-testid="stMain"] .ar-signal span,
+    [data-testid="stMain"] .ar-signal p { color: #5D7068 !important; }
+    [data-testid="stMain"] .st-key-ar-hero-ctas [data-testid="stButton"] > button[kind="secondary"] {
+      background: #FFFFFF !important;
+      color: #356F63 !important;
+      border-color: #A9C7B7 !important;
+    }
+
+    /* Sidebar-specific widgets and assistant chat remain legible */
+    [data-testid="stSidebar"] .stButton > button {
+      background: rgba(169,199,183,.14) !important;
+      color: #F4F7F2 !important;
+      border: 1px solid rgba(169,199,183,.30) !important;
+    }
+    [data-testid="stSidebar"] .stButton > button:hover {
+      background: rgba(169,199,183,.24) !important;
+    }
+    [data-testid="stMain"] [data-testid="stChatMessage"] {
+      background: #FFFFFF !important;
+      border: 1px solid rgba(48,82,69,.16) !important;
+      border-radius: 14px !important;
+      color: #263A35 !important;
+    }
+    [data-testid="stMain"] [data-testid="stChatMessage"] [data-testid="stMarkdownContainer"],
+    [data-testid="stMain"] [data-testid="stChatMessage"] p,
+    [data-testid="stMain"] [data-testid="stChatMessage"] li {
+      color: #40564F !important;
+    }
+    [data-testid="stMain"] [data-testid="stChatInput"] {
+      background: #FFFFFF !important;
+      border-color: rgba(48,82,69,.24) !important;
+    }
+    [data-testid="stMain"] [data-testid="stChatInput"] textarea {
+      color: #263A35 !important;
+      background: #FFFFFF !important;
+    }
+
+    /* Tables, file uploaders, select menus and secondary buttons */
+    [data-testid="stMain"] [data-testid="stFileUploader"] section {
+      background: #F7F9F5 !important;
+      border-color: rgba(48,82,69,.24) !important;
+    }
+    [data-testid="stMain"] [data-testid="stFileUploader"] label,
+    [data-testid="stMain"] [data-testid="stFileUploader"] small {
+      color: #5D7068 !important;
+    }
+    [data-testid="stMain"] [data-baseweb="popover"] [role="listbox"],
+    [data-testid="stMain"] [data-baseweb="menu"] {
+      background: #FFFFFF !important;
+      border: 1px solid rgba(48,82,69,.18) !important;
+    }
+    [data-testid="stMain"] [role="option"] { color: #263A35 !important; }
+    [data-testid="stMain"] [role="option"]:hover,
+    [data-testid="stMain"] [aria-selected="true"][role="option"] {
+      background: #E7EEE7 !important;
+      color: #263A35 !important;
+    }
+    [data-testid="stMain"] button[kind="secondary"] {
+      background: #FFFFFF !important;
+      color: #356F63 !important;
+      border: 1px solid #A9C7B7 !important;
+    }
+    [data-testid="stMain"] button[kind="secondary"]:hover {
+      background: #E7EEE7 !important;
+      border-color: #4F8F83 !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
