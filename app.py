@@ -31,7 +31,6 @@ pages = {
             url_path="module_explorer",
             title="Module Explorer",
             icon=":material/explore:",
-            url_path="module_explorer",
         ),
         st.Page(
             "app_pages/kochi_map.py",
