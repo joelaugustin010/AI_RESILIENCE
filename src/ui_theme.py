@@ -16,6 +16,22 @@ import streamlit as st
 
 # One accent per module family. The values are also exposed as CSS variables so
 # page headers keep their own character while sharing typography and spacing.
+HEADER_IMAGES: dict[str, str] = {
+    "module-explorer": "app/static/images/kochi/water-metro.jpg",
+    "air-quality": "app/static/images/threats-monsoon.webp",
+    "data-readiness": "app/static/images/kochi/mangalavanam.jpg",
+    "hazard-model-lab": "app/static/images/kochi/backwaters.jpg",
+    "hospital-vulnerability": "app/static/images/kochi/water-metro.jpg",
+    "compound-scenario": "app/static/images/kochi/maradu.jpg",
+    "disaster-probability": "app/static/images/kochi/coast.jpg",
+    "mitigation-budget": "app/static/images/kochi/backwaters.jpg",
+    "smart-mitigation": "app/static/images/kochi/mangalavanam.jpg",
+    "mitigation-data-intelligence": "app/static/images/kochi/industrial-coast.jpg",
+    "submission-ml-demo": "app/static/images/kochi/waterfront.jpg",
+    "kochi-map": "app/static/images/kochi/waterfront.jpg",
+    "disaster-assistant": "app/static/images/kochi/fishing-nets.jpg",
+}
+
 ACCENTS: dict[str, str] = {
     # Shared eco palette; hazard-specific colours remain distinct from severity.
     "teal": "#247A65",
@@ -63,7 +79,12 @@ def page_header(
 
     accent_hex = ACCENTS.get(accent, ACCENTS["teal"])
     container_key = f"ar-head-{_slug(key or title)}"
-    image_css = f"--ar-hero-image:url('{_escape(image)}');" if image else "--ar-hero-image:none;"
+    selected_image = image or HEADER_IMAGES.get(_slug(key or title))
+    image_css = (
+        f"--ar-hero-image:url('{_escape(selected_image)}');"
+        if selected_image
+        else "--ar-hero-image:none;"
+    )
     st.markdown(
         f"<style>.st-key-{container_key}{{--ar-accent:{accent_hex};{image_css}}}</style>",
         unsafe_allow_html=True,
