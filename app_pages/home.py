@@ -2395,6 +2395,63 @@ st.markdown(
       position: relative !important;
       z-index: 3 !important;
     }
+
+    /* Final contrast correction: the threats section uses a light sage surface,
+       so its heading and description must use readable forest-green text. */
+    .main .ar-threat {
+      background: #F2F7F2 !important;
+      border: 1px solid #C8DCCF !important;
+      box-shadow: 0 18px 42px rgba(26,65,49,.08) !important;
+    }
+    .main .ar-threat .ar-threat-bg {
+      opacity: .10 !important;
+      filter: saturate(.55) blur(1px) !important;
+    }
+    .main .ar-threat .ar-threat-scrim {
+      background: linear-gradient(115deg,
+        rgba(243,248,244,.97),
+        rgba(239,247,241,.95) 58%,
+        rgba(232,244,237,.93)) !important;
+      opacity: 1 !important;
+    }
+    .main .ar-threat .ar-threat-inner .ar-story .ar-overline {
+      color: #287653 !important;
+      -webkit-text-fill-color: #287653 !important;
+      text-shadow: none !important;
+    }
+    .main .ar-threat .ar-threat-inner .ar-story h2 {
+      color: #173D31 !important;
+      -webkit-text-fill-color: #173D31 !important;
+      text-shadow: none !important;
+      font-size: clamp(2.15rem, 4vw, 3.15rem) !important;
+      line-height: 1.16 !important;
+    }
+    .main .ar-threat .ar-threat-inner .ar-threat-description {
+      color: #286247 !important;
+      -webkit-text-fill-color: #286247 !important;
+      text-shadow: none !important;
+      font-size: clamp(1.02rem, 1.25vw, 1.12rem) !important;
+      font-weight: 550 !important;
+      line-height: 1.85 !important;
+      max-width: 880px !important;
+    }
+    .main .ar-threat .ar-threat-inner .ar-hazard {
+      background: rgba(255,255,255,.94) !important;
+      border: 1px solid #C6DCCB !important;
+      box-shadow: 0 8px 22px rgba(26,65,49,.06) !important;
+    }
+    .main .ar-threat .ar-threat-inner .ar-hazard h3 {
+      color: #173D31 !important;
+      -webkit-text-fill-color: #173D31 !important;
+    }
+    .main .ar-threat .ar-threat-inner .ar-hazard p {
+      color: #40594C !important;
+      -webkit-text-fill-color: #40594C !important;
+    }
+    .main .ar-threat .ar-threat-inner .ar-hazard-icon {
+      color: #287653 !important;
+      -webkit-text-fill-color: #287653 !important;
+    }
     </style>
     """,
     unsafe_allow_html=True,
