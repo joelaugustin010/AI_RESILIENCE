@@ -1888,3 +1888,170 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+
+# Home page typography reset: readable type sizes and explicit contrast for every content region.
+st.markdown(
+    """
+    <style>
+    /* Consistent, legible typography throughout the Home page. */
+    .main .block-container {
+      font-family: Inter, "Segoe UI", Arial, sans-serif !important;
+      font-size: 16px !important;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+    .main .block-container p,
+    .main .block-container li {
+      font-size: 1rem !important;
+      line-height: 1.72 !important;
+      letter-spacing: .005em !important;
+    }
+    .main .block-container h1,
+    .main .block-container h2,
+    .main .block-container h3,
+    .main .block-container h4 {
+      line-height: 1.2 !important;
+      letter-spacing: -.02em !important;
+      font-weight: 780 !important;
+    }
+    /* Hero is a dark photographic region: enforce white type and readable line lengths. */
+    .ar-cine-hero .ar-cine-inner,
+    .ar-cine-hero .ar-cine-inner * {
+      opacity: 1 !important;
+    }
+    .ar-cine-hero .ar-cine-kicker,
+    .ar-cine-hero .ar-cine-coord,
+    .ar-cine-hero .ar-cine-sub,
+    .ar-cine-hero .ar-cine-desc,
+    .ar-cine-hero .ar-cine-foot {
+      color: #FFFFFF !important;
+      -webkit-text-fill-color: #FFFFFF !important;
+      text-shadow: 0 2px 5px rgba(0,0,0,.9) !important;
+      font-weight: 650 !important;
+    }
+    .ar-cine-hero .ar-cine-title {
+      color: #FFFFFF !important;
+      font-size: clamp(2.8rem, 6vw, 5rem) !important;
+      line-height: 1.04 !important;
+      font-weight: 900 !important;
+      text-shadow: 0 3px 14px rgba(0,0,0,.85) !important;
+    }
+    .ar-cine-hero .ar-cine-title span {
+      background: none !important;
+      -webkit-text-fill-color: #FFFFFF !important;
+      color: #FFFFFF !important;
+    }
+    .ar-cine-hero .ar-cine-sub {
+      font-size: clamp(1.12rem, 1.8vw, 1.38rem) !important;
+      line-height: 1.55 !important;
+    }
+    .ar-cine-hero .ar-cine-desc {
+      max-width: 720px !important;
+      font-size: 1rem !important;
+      line-height: 1.75 !important;
+    }
+    .ar-cine-hero .ar-cine-chips span {
+      color: #FFFFFF !important;
+      -webkit-text-fill-color: #FFFFFF !important;
+      background: #183A30 !important;
+      border: 1px solid #D7EBDD !important;
+      font-size: .82rem !important;
+      font-weight: 750 !important;
+    }
+    .ar-cine-hero .ar-cine-scrim {
+      background: linear-gradient(90deg,rgba(4,18,13,.99) 0%,rgba(4,18,13,.94) 62%,rgba(4,18,13,.78) 100%),
+                  linear-gradient(0deg,rgba(4,18,13,.8),rgba(4,18,13,.28)) !important;
+      opacity: 1 !important;
+    }
+    /* Dark threat / hazard panel. */
+    .ar-threat .ar-threat-inner,
+    .ar-threat .ar-threat-inner * {
+      color: #F7FAF7 !important;
+      -webkit-text-fill-color: #F7FAF7 !important;
+      opacity: 1 !important;
+      text-shadow: none !important;
+    }
+    .ar-threat .ar-hazard {
+      background: #173D34 !important;
+      border: 1px solid #6D9A83 !important;
+    }
+    .ar-threat .ar-hazard h3 { font-size: 1.08rem !important; font-weight: 800 !important; }
+    .ar-threat .ar-hazard p { font-size: .96rem !important; line-height: 1.7 !important; }
+    /* Story and supporting sections: dark ink on the existing light page surface. */
+    .ar-story h2 { color: #173D31 !important; -webkit-text-fill-color: #173D31 !important; font-size: clamp(1.9rem,3.5vw,2.7rem) !important; }
+    .ar-story p { color: #263F35 !important; -webkit-text-fill-color: #263F35 !important; font-size: 1.04rem !important; line-height: 1.8 !important; }
+    .ar-overline { color: #176B54 !important; -webkit-text-fill-color: #176B54 !important; font-size: .82rem !important; font-weight: 850 !important; }
+    .ar-fineprint { color: #40564F !important; -webkit-text-fill-color: #40564F !important; font-size: .88rem !important; }
+    /* Workspace links: strong dark-green text on a light surface. */
+    .ar-workspace-link {
+      background: #FFFFFF !important;
+      border: 1px solid #A9C7B7 !important;
+      box-shadow: 0 3px 12px rgba(32,61,54,.08) !important;
+    }
+    .ar-workspace-link-label { color: #173D31 !important; -webkit-text-fill-color: #173D31 !important; font-size: 1rem !important; font-weight: 800 !important; }
+    .ar-workspace-link-action { color: #176B54 !important; -webkit-text-fill-color: #176B54 !important; font-size: .86rem !important; font-weight: 800 !important; }
+    /* SDG: solid white cards and high-contrast text, including nested spans. */
+    .ar-sdg-section {
+      background: #F4F7F2 !important;
+      color: #203D36 !important;
+    }
+    .ar-sdg-section,
+    .ar-sdg-section * {
+      opacity: 1 !important;
+      text-shadow: none !important;
+    }
+    .ar-sdg-section .ar-sdg-kicker { color: #176B54 !important; -webkit-text-fill-color: #176B54 !important; font-size: .82rem !important; font-weight: 850 !important; }
+    .ar-sdg-section .ar-sdg-title { color: #173D31 !important; -webkit-text-fill-color: #173D31 !important; font-size: clamp(2rem,4vw,3.1rem) !important; line-height: 1.12 !important; }
+    .ar-sdg-section .ar-sdg-lede,
+    .ar-sdg-section .ar-sdg-callout,
+    .ar-sdg-section .ar-sdg-subhead p,
+    .ar-sdg-section .ar-sdg-footer,
+    .ar-sdg-section .ar-sdg-note {
+      color: #263F35 !important;
+      -webkit-text-fill-color: #263F35 !important;
+      font-size: .96rem !important;
+      line-height: 1.72 !important;
+    }
+    .ar-sdg-section .ar-sdg-card {
+      background: #FFFFFF !important;
+      border: 1px solid #AFC8B7 !important;
+      box-shadow: 0 5px 16px rgba(24,58,48,.10) !important;
+    }
+    .ar-sdg-section .ar-sdg-card h4,
+    .ar-sdg-section .ar-sdg-card h4 span {
+      color: #173D31 !important;
+      -webkit-text-fill-color: #173D31 !important;
+      font-size: 1rem !important;
+      line-height: 1.45 !important;
+      font-weight: 850 !important;
+    }
+    .ar-sdg-section .ar-sdg-card p {
+      color: #263F35 !important;
+      -webkit-text-fill-color: #263F35 !important;
+      font-size: .94rem !important;
+      line-height: 1.72 !important;
+    }
+    .ar-sdg-section .ar-sdg-note a { color: #075B43 !important; -webkit-text-fill-color: #075B43 !important; font-weight: 800 !important; text-decoration: underline !important; }
+    /* Gallery captions and footer. */
+    .ar-gallery figcaption,
+    .ar-gallery figcaption strong,
+    .ar-gallery figcaption span,
+    .ar-gallery .ar-tile-tag {
+      color: #FFFFFF !important;
+      -webkit-text-fill-color: #FFFFFF !important;
+      text-shadow: 0 2px 6px rgba(0,0,0,.95) !important;
+      font-size: .94rem !important;
+      line-height: 1.6 !important;
+    }
+    .ar-footer, .ar-footer .ar-foot-right { color: #40564F !important; -webkit-text-fill-color: #40564F !important; font-size: .86rem !important; }
+    .ar-footer strong { color: #173D31 !important; -webkit-text-fill-color: #173D31 !important; }
+    @media (max-width: 700px) {
+      .main .block-container p { font-size: .98rem !important; }
+      .ar-cine-hero .ar-cine-title { font-size: clamp(2.5rem,12vw,4rem) !important; }
+      .ar-workspace-link { flex-direction: column !important; align-items: flex-start !important; }
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
