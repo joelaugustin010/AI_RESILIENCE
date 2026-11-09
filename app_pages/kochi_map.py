@@ -1,6 +1,5 @@
 """Kochi map showing licensed reference geometry and user-reviewed points."""
 
-import html
 import json
 import re
 from pathlib import Path
