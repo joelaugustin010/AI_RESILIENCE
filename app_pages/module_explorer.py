@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import streamlit as st
 
-from src.ui_theme import render_page_intro
+from src.ui_theme import page_header
 
 
 st.markdown(
@@ -23,12 +23,12 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-render_page_intro(
-    "kochi-map",
+page_header(
+    "AI_RESILIENCE · MODULE EXPLORER",
     "Explore AI_RESILIENCE",
     "Choose an existing workspace by the question you want to answer — from environmental signals and spatial context to disaster resilience and practical mitigation planning.",
-    eyebrow="AI_RESILIENCE · MODULE EXPLORER",
-    tags=("Existing modules", "Evidence first", "Kochi and Kerala"),
+    key="module-explorer",
+    meta=("Existing modules", "Evidence first", "Kochi and Kerala"),
 )
 st.markdown(
     '<p class="ar-explorer-lede">Every card below opens a registered application module. Outputs retain their existing provenance, uncertainty notes, calculations and data-quality safeguards.</p>',
