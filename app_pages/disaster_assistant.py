@@ -10,6 +10,8 @@ from __future__ import annotations
 
 import streamlit as st
 
+from src.ui_theme import page_header
+
 from src.disaster_assistant import (
     KnowledgeBaseError,
     LLMConfigurationError,
@@ -29,7 +31,7 @@ st.markdown(
       --air-muted: #62736b; --air-line: #d9e2da; --air-soft: #eaf1eb;
     }
     html, body, [class*="css"] { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
-    .stApp { background: radial-gradient(circle at 100% 0%, #e3eee7 0, transparent 32rem), linear-gradient(180deg, #fbfaf5 0%, var(--air-ivory) 100%); color: var(--air-charcoal); }
+    .stApp { background: transparent !important; color: var(--ar-ink) !important; }
     .block-container { max-width: 1120px; padding: 2.3rem 2rem 3rem; }
     [data-testid="stHeader"] { background: transparent; }
     [data-testid="stSidebar"] { background: var(--air-forest); border-right: 0; }
@@ -39,7 +41,7 @@ st.markdown(
     [data-testid="stSidebar"] hr { border-color: rgba(255,255,255,.16); }
     [data-testid="stSidebar"] .stButton > button { background: transparent; border-color: rgba(255,255,255,.18); color: #f3f8f3; text-align: left; }
     [data-testid="stSidebar"] .stButton > button:hover { background: rgba(255,255,255,.10); border-color: #a9d1bb; }
-    h1, h2, h3, h4, p, li, label { color: var(--air-charcoal); }
+    .air-chat-context, [data-testid="stChatMessage"] p, [data-testid="stChatMessage"] li { color: var(--ar-ink-soft); }
     h1 { letter-spacing: -.035em; font-weight: 800; }
     [data-testid="stChatMessage"] { border: 1px solid var(--air-line); border-radius: 18px; margin: .8rem 0; padding: 1rem 1.1rem; animation: air-rise .32s ease-out both; }
     [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) { background: #e6f0e8; border-color: #c9ddd0; margin-left: 12%; }
@@ -76,9 +78,13 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.markdown('<div class="air-eyebrow">AI_RESILIENCE · DISASTER INTELLIGENCE</div>', unsafe_allow_html=True)
-st.title("Environmental Intelligence Assistant")
-st.caption("Explore environmental risks, understand disaster vulnerability and discover evidence-based resilience strategies for Kerala.")
+page_header(
+    "AI_RESILIENCE · DISASTER INTELLIGENCE",
+    "Environmental Intelligence Assistant",
+    "Explore environmental risks, understand disaster vulnerability and discover evidence-based resilience strategies for Kerala.",
+    key="disaster-assistant",
+    meta=("Grounded project evidence", "Natural-language exploration", "Limitations visible"),
+)
 
 try:
     load_knowledge()
