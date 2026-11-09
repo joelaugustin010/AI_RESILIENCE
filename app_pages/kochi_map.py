@@ -915,7 +915,7 @@ if active_hazard is None or "Flood" in active_components:
             with jrc_control_slot:
                 show_jrc = st.checkbox(
                     "JRC GloFAS RP100 modelled flood context",
-                    value=False,
+                    value=True,
                     key=f"kochimap_jrc_{active_hazard}",
                     help="Modelled 100-year river-flood scenario context; not observed flooding or an official warning.",
                 )
