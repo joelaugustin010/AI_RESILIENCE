@@ -10,14 +10,128 @@ from src.ui_theme import render_page_intro
 st.markdown(
     """
     <style>
-    .ar-explorer-lede { max-width:850px; color:#5d756c; line-height:1.7; margin:-.4rem 0 1.4rem; }
-    .ar-explorer-group { margin:1.7rem 0 .7rem; color:#247a65; font-size:.72rem; font-weight:850; letter-spacing:.14em; text-transform:uppercase; }
-    .ar-explorer-card { min-height:185px; display:flex; flex-direction:column; justify-content:flex-end; padding:1.15rem; border-radius:20px; overflow:hidden; color:#fff; background:linear-gradient(180deg,rgba(7,24,22,.03),rgba(7,25,23,.9)),var(--explorer-image) center/cover; box-shadow:0 12px 30px rgba(24,73,55,.13); transition:transform .2s ease,box-shadow .2s ease; }
-    .ar-explorer-card:hover { transform:translateY(-4px); box-shadow:0 20px 42px rgba(24,73,55,.21); }
-    .ar-explorer-icon { margin-bottom:auto; font-size:1.5rem; }
-    .ar-explorer-card h3 { color:#fff!important; font-size:1.05rem; margin:0 0 .25rem; }
-    .ar-explorer-card p { color:#e4f4ea!important; font-size:.8rem; line-height:1.45; margin:0; }
-    .ar-explorer-meta { margin-top:.55rem; color:#c8f2dc; font-size:.68rem; font-weight:750; letter-spacing:.05em; text-transform:uppercase; }
+    /* Explorer uses a light coastal surface so text remains readable under
+       both the global app theme and Streamlit's light/dark browser settings. */
+    [data-testid="stMain"] .ar-explorer-lede {
+      max-width: 900px !important;
+      color: #36545a !important;
+      -webkit-text-fill-color: #36545a !important;
+      font-size: 1rem !important;
+      line-height: 1.75 !important;
+      font-weight: 450 !important;
+      margin: 0 0 1.35rem !important;
+    }
+    [data-testid="stMain"] .ar-explorer-group {
+      margin: 1.8rem 0 .85rem !important;
+      color: #176b63 !important;
+      -webkit-text-fill-color: #176b63 !important;
+      font-size: .82rem !important;
+      line-height: 1.4 !important;
+      font-weight: 800 !important;
+      letter-spacing: .11em !important;
+      text-transform: uppercase !important;
+    }
+    [data-testid="stMain"] .ar-explorer-card {
+      min-height: 190px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: flex-end !important;
+      padding: 1.25rem !important;
+      border: 1px solid #cfe2dc !important;
+      border-radius: 18px !important;
+      overflow: hidden !important;
+      color: #183e43 !important;
+      background: linear-gradient(145deg, #ffffff 0%, #edf6f2 100%) !important;
+      box-shadow: 0 8px 24px rgba(23, 78, 85, .08) !important;
+      transition: transform .18s ease, box-shadow .18s ease !important;
+    }
+    [data-testid="stMain"] .ar-explorer-card:hover {
+      transform: translateY(-3px) !important;
+      box-shadow: 0 14px 30px rgba(23, 78, 85, .13) !important;
+      border-color: #91c8bb !important;
+    }
+    [data-testid="stMain"] .ar-explorer-icon {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 2.7rem !important;
+      height: 2.7rem !important;
+      margin: 0 0 auto !important;
+      border-radius: 13px !important;
+      background: #dcefe9 !important;
+      color: #176b63 !important;
+      font-size: 1.45rem !important;
+    }
+    [data-testid="stMain"] .ar-explorer-card h3 {
+      color: #173f43 !important;
+      -webkit-text-fill-color: #173f43 !important;
+      font-size: 1.12rem !important;
+      font-weight: 780 !important;
+      line-height: 1.35 !important;
+      letter-spacing: -.015em !important;
+      margin: 1.15rem 0 .45rem !important;
+    }
+    [data-testid="stMain"] .ar-explorer-card p {
+      color: #456267 !important;
+      -webkit-text-fill-color: #456267 !important;
+      font-size: .91rem !important;
+      font-weight: 450 !important;
+      line-height: 1.6 !important;
+      margin: 0 !important;
+    }
+    [data-testid="stMain"] .ar-explorer-meta {
+      margin-top: .8rem !important;
+      color: #176b63 !important;
+      -webkit-text-fill-color: #176b63 !important;
+      font-size: .72rem !important;
+      line-height: 1.35 !important;
+      font-weight: 800 !important;
+      letter-spacing: .055em !important;
+      text-transform: uppercase !important;
+    }
+    [data-testid="stMain"] [data-testid="stWidgetLabel"] p {
+      color: #294f53 !important;
+      -webkit-text-fill-color: #294f53 !important;
+      font-size: .9rem !important;
+      font-weight: 700 !important;
+    }
+    [data-testid="stMain"] [data-testid="stTextInput"] input {
+      color: #173f43 !important;
+      -webkit-text-fill-color: #173f43 !important;
+      background: #ffffff !important;
+      border: 1px solid #bfd8d0 !important;
+      border-radius: 11px !important;
+      min-height: 2.8rem !important;
+    }
+    [data-testid="stMain"] [data-testid="stTextInput"] input::placeholder {
+      color: #718985 !important;
+      -webkit-text-fill-color: #718985 !important;
+      opacity: 1 !important;
+    }
+    [data-testid="stMain"] [data-testid="stSelectbox"] div,
+    [data-testid="stMain"] [data-testid="stSelectbox"] span {
+      color: #173f43 !important;
+      -webkit-text-fill-color: #173f43 !important;
+    }
+    [data-testid="stMain"] [data-testid="stMetricLabel"],
+    [data-testid="stMain"] [data-testid="stMetricLabel"] p {
+      color: #456267 !important;
+      -webkit-text-fill-color: #456267 !important;
+      font-weight: 700 !important;
+    }
+    [data-testid="stMain"] [data-testid="stMetricValue"] {
+      color: #176b63 !important;
+      -webkit-text-fill-color: #176b63 !important;
+      font-weight: 800 !important;
+    }
+    [data-testid="stMain"] [data-testid="stAlert"] p {
+      color: #294f53 !important;
+      -webkit-text-fill-color: #294f53 !important;
+    }
+    @media (max-width: 760px) {
+      [data-testid="stMain"] .ar-explorer-card { min-height: 170px !important; }
+      [data-testid="stMain"] .ar-explorer-card h3 { font-size: 1.04rem !important; }
+    }
     </style>
     """,
     unsafe_allow_html=True,
