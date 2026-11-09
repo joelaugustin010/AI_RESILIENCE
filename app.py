@@ -69,11 +69,6 @@ pages = {
             icon=":material/fact_check:",
         ),
         st.Page(
-            "app_pages/mitigation_data_intelligence.py",
-            title="Mitigation Data Intelligence",
-            icon=":material/verified:",
-        ),
-        st.Page(
             "app_pages/submission_ml_demo.py",
             title="ML Evidence & Demonstration",
             icon=":material/science:",
