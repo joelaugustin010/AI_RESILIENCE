@@ -1286,22 +1286,25 @@ if legend_rows:
     with main_legend_slot.container():
         st.markdown("**Map colour key · hazard & infrastructure**")
         st.caption("Each swatch identifies the displayed layer; colour does not imply severity unless the source explicitly defines it.")
-        legend_html = ['<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;">']
         for label, symbol, meaning in legend_rows:
             match = re.search(r"#[0-9A-Fa-f]{6}", str(symbol))
             swatch = match.group(0) if match else "#237FB7"
-            style = "width:18px;height:18px;display:inline-block;border-radius:4px;border:1px solid #64748b;vertical-align:middle;flex:0 0 18px;"
-            if "outline" in str(symbol).casefold():
-                style += f"background:transparent;border:3px solid {swatch};"
-            else:
-                style += f"background:{swatch};"
-            legend_html.append(
-                '<div style="display:flex;align-items:flex-start;gap:9px;padding:9px;border:1px solid rgba(128,128,128,.35);border-radius:8px;">'
-                f'<span style="{style}"></span><div><strong>{html.escape(str(label))}</strong>'
-                f'<div style="font-size:.88em;opacity:.85;">{html.escape(str(meaning))}</div></div></div>'
-            )
-        legend_html.append("</div>")
-        main_legend_slot.markdown("".join(legend_html), unsafe_allow_html=True)
+            with st.container(border=True):
+                swatch_column, text_column = st.columns([0.06, 0.94], vertical_alignment="center")
+                with swatch_column:
+                    if "outline" in str(symbol).casefold():
+                        st.markdown(
+                            f'<div style="width:20px;height:20px;border:3px solid {swatch};border-radius:4px;"></div>',
+                            unsafe_allow_html=True,
+                        )
+                    else:
+                        st.markdown(
+                            f'<div style="width:20px;height:20px;background:{swatch};border:1px solid #64748b;border-radius:4px;"></div>',
+                            unsafe_allow_html=True,
+                        )
+                with text_column:
+                    st.markdown(f"**{label}**")
+                    st.caption(meaning)
 
 if context_deck_layers:
     context_deck = pdk.Deck(
@@ -1321,17 +1324,20 @@ if context_deck_layers:
         with context_legend_slot.container():
             st.markdown("**Land-cover colour key · ESA WorldCover 2021**")
             st.caption("These are categorical land-cover classes, not flood depth, hazard severity, risk, or exposure.")
-            class_html = ['<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;">']
-            for item in worldcover_class_rows:
+            class_columns = st.columns(2)
+            for index, item in enumerate(worldcover_class_rows):
                 color = item["Map color"]
-                class_html.append(
-                    '<div style="display:flex;align-items:center;gap:9px;padding:8px;border:1px solid rgba(128,128,128,.35);border-radius:8px;">'
-                    f'<span style="width:18px;height:18px;display:inline-block;flex:0 0 18px;border-radius:4px;background:{html.escape(color)};border:1px solid #64748b;"></span>'
-                    f'<span><strong>{html.escape(str(item["Land-cover class"]))}</strong><br>'
-                    f'<small>Class {html.escape(str(item["Class code"]))} · {html.escape(color)}</small></span></div>'
-                )
-            class_html.append("</div>")
-            context_legend_slot.markdown("".join(class_html), unsafe_allow_html=True)
+                with class_columns[index % 2]:
+                    with st.container(border=True):
+                        swatch_column, text_column = st.columns([0.12, 0.88], vertical_alignment="center")
+                        with swatch_column:
+                            st.markdown(
+                                f'<div style="width:20px;height:20px;background:{color};border:1px solid #64748b;border-radius:4px;"></div>',
+                                unsafe_allow_html=True,
+                            )
+                        with text_column:
+                            st.markdown(f"**{item['Land-cover class']}**")
+                            st.caption(f"Class {item['Class code']} · {color}")
 else:
     context_map_slot.info("The ESA WorldCover context map is unavailable or switched off. The main hazard/infrastructure map remains independent.")
 
