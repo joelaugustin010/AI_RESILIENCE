@@ -224,7 +224,7 @@ st.markdown(
       inset: 0;
       z-index: 3;
       pointer-events: none;
-      box-shadow: inset 0 0 150px 34px rgba(0, 0, 0, .48);
+      box-shadow: inset 0 0 90px 18px rgba(0, 0, 0, .10);
     }
     .ar-cine-grain {
       position: absolute;
@@ -1997,8 +1997,9 @@ st.markdown(
       font-weight: 750 !important;
     }
     .ar-cine-hero .ar-cine-scrim {
-      background: linear-gradient(90deg,rgba(4,18,13,.99) 0%,rgba(4,18,13,.94) 62%,rgba(4,18,13,.78) 100%),
-                  linear-gradient(0deg,rgba(4,18,13,.8),rgba(4,18,13,.28)) !important;
+      /* Keep the hero photograph naturally visible; retain only a light text-side wash. */
+      background: linear-gradient(90deg,rgba(4,18,13,.30) 0%,rgba(4,18,13,.18) 48%,rgba(4,18,13,.07) 76%,rgba(4,18,13,.10) 100%),
+                  linear-gradient(0deg,rgba(4,18,13,.16),rgba(4,18,13,.03)) !important;
       opacity: 1 !important;
     }
     /* Dark threat / hazard panel. */
